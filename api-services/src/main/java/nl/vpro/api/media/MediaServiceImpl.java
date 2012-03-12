@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 @Service("mediaService")
 public class MediaServiceImpl implements MediaService {
 
-    @Value("mediaservice.api.url")
+    @Value("${mediaservice.api.url}")
     String apiUrl;
 
     public String get(String urn) {
