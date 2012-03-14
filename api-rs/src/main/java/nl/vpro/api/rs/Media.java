@@ -4,19 +4,18 @@
  */
 package nl.vpro.api.rs;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-
+import nl.vpro.api.rs.util.TestBean;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.SearchService;
 import nl.vpro.api.service.search.SearchResult;
-import nl.vpro.api.rs.util.TestBean;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 
 
 /**

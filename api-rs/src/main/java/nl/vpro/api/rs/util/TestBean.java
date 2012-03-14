@@ -4,7 +4,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
