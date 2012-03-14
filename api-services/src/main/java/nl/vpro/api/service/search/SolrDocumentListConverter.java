@@ -1,4 +1,4 @@
-package nl.vpro.api.media.search;
+package nl.vpro.api.service.search;
 
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.core.convert.converter.Converter;

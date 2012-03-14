@@ -1,10 +1,9 @@
-package nl.vpro.api.media.search;
+package nl.vpro.api.service.search;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
 import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

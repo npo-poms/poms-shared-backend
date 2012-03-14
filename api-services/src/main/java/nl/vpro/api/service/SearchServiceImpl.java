@@ -1,21 +1,18 @@
-package nl.vpro.api.media;
+package nl.vpro.api.service;
 
 import com.sun.net.ssl.internal.ssl.SSLSocketImpl;
-import nl.vpro.api.media.search.SearchResult;
+import nl.vpro.api.service.search.SearchResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
 
 /**
  * Date: 12-3-12

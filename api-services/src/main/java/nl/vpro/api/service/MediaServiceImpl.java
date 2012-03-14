@@ -2,7 +2,7 @@
  * Copyright (C) 2012 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.api.media;
+package nl.vpro.api.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
