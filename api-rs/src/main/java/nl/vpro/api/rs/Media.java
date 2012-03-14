@@ -8,9 +8,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
-import nl.vpro.api.media.MediaService;
-import nl.vpro.api.media.SearchService;
-import nl.vpro.api.media.search.SearchResult;
+import nl.vpro.api.service.MediaService;
+import nl.vpro.api.service.SearchService;
+import nl.vpro.api.service.search.SearchResult;
 import nl.vpro.api.rs.util.TestBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
