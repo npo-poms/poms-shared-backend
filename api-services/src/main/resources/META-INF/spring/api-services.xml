@@ -5,9 +5,27 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <context:annotation-config/>
+  <context:annotation-config/>
 
-    <context:component-scan base-package="nl.vpro.api">
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
-    </context:component-scan>
+  <context:component-scan base-package="nl.vpro.api">
+    <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+  </context:component-scan>
+
+  <bean id="solrServer" class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer">
+    <constructor-arg>
+      <bean class="java.net.URL">
+        <constructor-arg value="${solr.media.api.url}"/>
+      </bean>
+    </constructor-arg>
+  </bean>
+
+  <bean id="conversionService"
+      class="org.springframework.context.support.ConversionServiceFactoryBean">
+    <property name="converters">
+        <set>
+            <bean class="nl.vpro.api.media.search.SolrDocumentListConverter"/>
+        </set>
+    </property>
+</bean>
+
 </beans>
