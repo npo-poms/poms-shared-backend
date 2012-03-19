@@ -4,6 +4,8 @@
  */
 package nl.vpro.api.service;
 
+import nl.vpro.api.transfer.SearchResult;
+
 /**
  * User: rico
  * Date: 08/03/2012
@@ -12,5 +14,6 @@ public interface MediaService {
 
     public String get(String urn);
 
+    public SearchResult search(String query, String profile, Integer offset, Integer max);
 
 }

@@ -17,9 +17,20 @@
   <packaging>jar</packaging>
 
   <dependencies>
+
+    <dependency>
+      <groupId>nl.vpro.media</groupId>
+      <artifactId>media-domain</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-transfer</artifactId>
+      <version>${parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -41,10 +52,12 @@
     </dependency>
 
     <!-- jackson annotations org.codehaus.jackson:jackson-xc-->
+    <!--
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
       <artifactId>jackson-mapper-asl</artifactId>
     </dependency>
+    -->
 
   </dependencies>
 </project>
