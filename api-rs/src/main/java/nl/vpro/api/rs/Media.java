@@ -6,8 +6,7 @@ package nl.vpro.api.rs;
 
 import nl.vpro.api.rs.util.TestBean;
 import nl.vpro.api.service.MediaService;
-import nl.vpro.api.service.SearchService;
-import nl.vpro.api.service.search.SearchResult;
+import nl.vpro.api.transfer.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 
 /**
@@ -28,12 +28,10 @@ import javax.ws.rs.PathParam;
 public class Media {
     Logger logger = LoggerFactory.getLogger(Media.class);
     MediaService mediaService;
-    SearchService searchService;
 
     @Autowired
-    public Media(MediaService mediaService, SearchService searchService) {
+    public Media(MediaService mediaService) {
         this.mediaService = mediaService;
-        this.searchService = searchService;
     }
 
     @GET
@@ -44,12 +42,15 @@ public class Media {
     }
 
     @GET
-    @Path("find/bygroup/{group}")
-    public SearchResult findItemsInGroup(@PathParam("group") String group){
-        if(group.matches("^\\d+$")){
-            group = "urn:vpro:media:group:" + group;
-        }
-        return searchService.searchMediaWithAncestor(group, null, -1, -1);
+    @Path("search/{profile}")
+    public SearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam( "q") String queryString, @QueryParam( "max") Integer maxResult, @QueryParam( "offset") Integer offset ) {
+        return mediaService.search(queryString, profileName, offset, maxResult);
+    }
+
+    @GET
+    @Path("search")
+    public SearchResult search(@QueryParam( "q") String queryString, @QueryParam( "max") Integer maxResult, @QueryParam( "offset") Integer offset ) {
+        return mediaService.search(queryString, "", offset, maxResult);
     }
 
     @GET
