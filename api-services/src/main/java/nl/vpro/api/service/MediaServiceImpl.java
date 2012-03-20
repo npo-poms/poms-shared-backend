@@ -5,7 +5,7 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.service.search.MediaSearchQuery;
-import nl.vpro.api.transfer.SearchResult;
+import nl.vpro.api.transfer.MediaSearchResult;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -49,12 +49,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public SearchResult search(String query, String profileName, Integer offset, Integer max) {
+    public MediaSearchResult search(String query, String profileName, Integer offset, Integer max) {
         Profile profile = profileService.getProfile(profileName);
         MediaSearchQuery mediaSearchQuery = profile.createSearchQuery();
+
         mediaSearchQuery.setQueryString(query);
 
         SolrQuery solrQuery = new SolrQuery(mediaSearchQuery.createQueryString());
+        solrQuery.add("fl", "*,score");
 
         Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
         solrQuery.setRows(queryMaxRows);
@@ -65,11 +67,11 @@ public class MediaServiceImpl implements MediaService {
 
         try {
             QueryResponse response = solrServer.query(solrQuery);
-            return conversionService.convert(response.getResults(), SearchResult.class);
+            return conversionService.convert(response.getResults(), MediaSearchResult.class);
         } catch (SolrServerException e) {
             log.error("Something went wrong submitting the query to solr:", e);
         }
-        return new SearchResult();
+        return new MediaSearchResult();
     }
 
 

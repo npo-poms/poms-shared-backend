@@ -1,13 +1,17 @@
 package nl.vpro.spring.converter;
 
-import nl.vpro.api.transfer.SearchResult;
+import nl.vpro.api.transfer.Broadcasting;
+import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.MediaSearchResultItem;
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Date: 13-3-12
@@ -15,20 +19,83 @@ import java.util.Map;
  *
  * @author Ernst Bunders
  */
-public class SolrDocumentListConverter implements Converter<SolrDocumentList, SearchResult> {
+public class SolrDocumentListConverter implements Converter<SolrDocumentList, MediaSearchResult> {
+    private static final List<String> IMAGE_TYPES_ORDERED = Arrays.asList("LOGO", "STILL", "ICON", "BACKGROUND", "PORTRAIT", "PICTURE");
+    private static final String IMG_URL_TEMPLATE = "http://poms-test.omroep.nl/images/ext-api/images/s100/{id}.jpg";
+
     @Override
-    public SearchResult convert(SolrDocumentList sdl) {
-        SearchResult searchResult = new SearchResult(sdl.getNumFound(), sdl.getStart(), sdl.getMaxScore());
-        Map<String, Object> document;
+    public MediaSearchResult convert(SolrDocumentList sdl) {
+        MediaSearchResult searchResult = new MediaSearchResult(sdl.getNumFound(), sdl.getStart(), sdl.getMaxScore());
+        MediaSearchResultItem item;
 
         for (Iterator<SolrDocument> it = sdl.iterator(); it.hasNext(); ) {
             SolrDocument solrDocument = it.next();
-            document = new HashMap<String, Object>();
-            for (String fieldName : solrDocument.getFieldNames()) {
-                document.put(fieldName, solrDocument.getFieldValue(fieldName));
-            }
-            searchResult.addDocument(document);
+            item = new MediaSearchResultItem();
+            item.setUrn(trimIfNotNull((String) solrDocument.getFieldValue("urn")));
+            item.setTitle(trimIfNotNull((String) solrDocument.getFieldValue("titleMain")));
+            item.setDescription(trimIfNotNull((String) solrDocument.getFieldValue("descriptionMain")));
+            item.setScore((Float) solrDocument.getFieldValue("score"));
+            item.setBroadcaster(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("broadcaster"), ","));
+            item.setAvType((String) solrDocument.getFieldValue("avType"));
+            item.setGenre(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("genre"), ","));
+
+            item.setCreationDate((Date) solrDocument.getFieldValue("creationDate"));
+
+            setFirstBroadcastDate(solrDocument, item);
+            setImageLink(solrDocument, item);
+
+            searchResult.addDocument(item);
         }
         return searchResult;
+    }
+
+    private String trimIfNotNull(String s) {
+        if (s != null) {
+            return s.trim();
+        }
+        return s;
+    }
+
+    private void setImageLink(SolrDocument solrDocument, MediaSearchResultItem item) {
+        for (String imgType : IMAGE_TYPES_ORDERED) {
+            String imageFieldName = "image_urn_" + imgType;
+            if (solrDocument.getFieldNames().contains(imageFieldName)) {
+                String imageUrn = (String) solrDocument.getFieldValues(imageFieldName).iterator().next();
+                item.setImageUrl(createUrlFromUrn(imageUrn));
+            }
+        }
+    }
+
+    private void setFirstBroadcastDate(SolrDocument solrDocument, MediaSearchResultItem item) {
+        String startField = "scheduleEvent_start";
+        String channelField = "scheduleEvent_channel";
+
+        Date firstBroadcastDate = null;
+        if (solrDocument.getFieldNames().contains(startField)) {
+            firstBroadcastDate = (Date) solrDocument.getFieldValues(startField).iterator().next();
+        }
+
+        String firstBroadcastChannel = null;
+        if (solrDocument.getFieldNames().contains(channelField)) {
+            firstBroadcastChannel = (String) solrDocument.getFieldValues(channelField).iterator().next();
+        }
+
+        if (firstBroadcastChannel != null && firstBroadcastDate != null) {
+            item.setFirstBroadcasting(new Broadcasting(firstBroadcastChannel, firstBroadcastDate));
+        }
+    }
+
+    private String createUrlFromUrn(String urn) {
+        String id = StringUtils.substringAfterLast(urn, ":");
+        return IMG_URL_TEMPLATE.replace("{id}", id);
+    }
+
+    private String concatenateListOfStrings(List<String> list, String separator) {
+        if (list == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (String s : list) {
+            sb.append(s).append(separator);
+        }
+        return StringUtils.substringBeforeLast(sb.toString(), separator);
     }
 }

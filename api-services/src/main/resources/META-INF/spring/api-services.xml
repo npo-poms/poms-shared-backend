@@ -20,12 +20,12 @@
   </bean>
 
   <bean id="conversionService"
-      class="org.springframework.context.support.ConversionServiceFactoryBean">
+        class="org.springframework.context.support.ConversionServiceFactoryBean">
     <property name="converters">
-        <set>
-            <bean class="nl.vpro.spring.converter.SolrDocumentListConverter"/>
-        </set>
+      <set>
+        <bean class="nl.vpro.spring.converter.SolrDocumentListConverter"/>
+      </set>
     </property>
-</bean>
+  </bean>
 
 </beans>

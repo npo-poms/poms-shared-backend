@@ -4,7 +4,7 @@
  */
 package nl.vpro.api.service;
 
-import nl.vpro.api.transfer.SearchResult;
+import nl.vpro.api.transfer.MediaSearchResult;
 
 /**
  * User: rico
@@ -14,6 +14,6 @@ public interface MediaService {
 
     public String get(String urn);
 
-    public SearchResult search(String query, String profile, Integer offset, Integer max);
+    public MediaSearchResult search(String query, String profile, Integer offset, Integer max);
 
 }
