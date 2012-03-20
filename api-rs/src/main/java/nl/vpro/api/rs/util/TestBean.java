@@ -17,11 +17,11 @@ import java.util.List;
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class TestBean {
 
-//    @XmlAttribute
+    //    @XmlAttribute
     private int anInt = 10;
-//    @XmlAttribute
+    //    @XmlAttribute
     private long aLong = 20L;
-//    @XmlAttribute
+    //    @XmlAttribute
     private boolean aBoolean = false;
     private float aFloat = 1.2F;
     private List<Friend> friends;
@@ -67,7 +67,7 @@ public class TestBean {
 
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
-    public static final class Friend{
+    public static final class Friend {
         private String firstName;
         private String lastName;
 

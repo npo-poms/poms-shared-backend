@@ -6,7 +6,7 @@ package nl.vpro.api.rs;
 
 import nl.vpro.api.rs.util.TestBean;
 import nl.vpro.api.service.MediaService;
-import nl.vpro.api.transfer.SearchResult;
+import nl.vpro.api.transfer.MediaSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,19 +43,19 @@ public class Media {
 
     @GET
     @Path("search/{profile}")
-    public SearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam( "q") String queryString, @QueryParam( "max") Integer maxResult, @QueryParam( "offset") Integer offset ) {
+    public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
         return mediaService.search(queryString, profileName, offset, maxResult);
     }
 
     @GET
     @Path("search")
-    public SearchResult search(@QueryParam( "q") String queryString, @QueryParam( "max") Integer maxResult, @QueryParam( "offset") Integer offset ) {
+    public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
         return mediaService.search(queryString, "", offset, maxResult);
     }
 
     @GET
     @Path("/test")
-    public TestBean test(){
+    public TestBean test() {
         return new TestBean();
     }
 }
