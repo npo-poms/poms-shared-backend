@@ -7,6 +7,7 @@
 
 
   <context:annotation-config/>
-  <context:component-scan base-package="nl.vpro.api.rs"/>
+  <context:component-scan base-package="nl.vpro.api"/>
+  <bean class="nl.vpro.api.filter.JsonpCallbackFilter" id="jsonpCallbackFilter" />
 
 </beans>
