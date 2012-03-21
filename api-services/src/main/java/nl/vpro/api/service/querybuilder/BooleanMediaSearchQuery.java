@@ -1,4 +1,4 @@
-package nl.vpro.api.service.search;
+package nl.vpro.api.service.querybuilder;
 
 import nl.vpro.domain.media.AVFileFormat;
 import nl.vpro.domain.media.AVType;

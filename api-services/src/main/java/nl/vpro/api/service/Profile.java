@@ -1,9 +1,9 @@
 package nl.vpro.api.service;
 
-import nl.vpro.api.service.search.BooleanOp;
-import nl.vpro.api.service.search.MediaSearchQuery;
-import nl.vpro.api.service.search.BooleanMediaSearchQuery;
-import nl.vpro.api.service.search.MediaSearchQueryList;
+import nl.vpro.api.service.querybuilder.BooleanOp;
+import nl.vpro.api.service.querybuilder.MediaSearchQuery;
+import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
+import nl.vpro.api.service.querybuilder.MediaSearchQueryList;
 import nl.vpro.domain.media.AVFileFormat;
 import nl.vpro.domain.media.AVType;
 import nl.vpro.domain.media.search.MediaType;

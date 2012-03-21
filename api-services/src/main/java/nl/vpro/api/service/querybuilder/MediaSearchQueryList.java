@@ -1,4 +1,4 @@
-package nl.vpro.api.service.search;
+package nl.vpro.api.service.querybuilder;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

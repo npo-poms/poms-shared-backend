@@ -1,4 +1,4 @@
-package nl.vpro.api.service.search;
+package nl.vpro.api.service.querybuilder;
 
 /**
  * Date: 21-3-12

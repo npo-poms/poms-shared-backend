@@ -4,7 +4,7 @@
  */
 package nl.vpro.api.service;
 
-import nl.vpro.api.service.search.MediaSearchQuery;
+import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import org.apache.commons.lang.StringUtils;

@@ -1,4 +1,4 @@
-package nl.vpro.api.service.search;
+package nl.vpro.api.service.querybuilder;
 
 /**
  * Date: 19-3-12
@@ -59,8 +59,9 @@ public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
 
         public void close() {
             if (grouping && hasOpened) {
-                stringBuilder.append(") ");
+                stringBuilder.append(")");
             }
+            stringBuilder.append(" ");
             first = true;
         }
 
