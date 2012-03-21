@@ -16,8 +16,8 @@ import java.util.List;
  *
  * @author Ernst Bunders
  */
-public final class MediaSearchQueryAND extends MediaSearchQuery<MediaSearchQueryAND> {
-    private static final Logger log = LoggerFactory.getLogger(MediaSearchQueryAND.class);
+public final class BooleanMediaSearchQuery extends MediaSearchQuery<BooleanMediaSearchQuery> {
+    private static final Logger log = LoggerFactory.getLogger(BooleanMediaSearchQuery.class);
     private List<MediaType> mediaTypes = new ArrayList<MediaType>();
 
     private List<AVFileFormat> locationFormats = new ArrayList<AVFileFormat>();
@@ -33,40 +33,44 @@ public final class MediaSearchQueryAND extends MediaSearchQuery<MediaSearchQuery
     public static final String DOCUMENT_TYPE_PROGRAM = "program";
     public static final String DOCUMENT_TYPE_GROUP = "group";
 
+    public BooleanMediaSearchQuery(BooleanOp booleanOp) {
+        super(booleanOp);
+    }
 
-    public MediaSearchQueryAND addMediaType(MediaType mediaType) {
+
+    public BooleanMediaSearchQuery addMediaType(MediaType mediaType) {
         mediaTypes.add(mediaType);
         return this;
     }
 
-    public MediaSearchQueryAND addLocationFormat(AVFileFormat avFileFormat) {
+    public BooleanMediaSearchQuery addLocationFormat(AVFileFormat avFileFormat) {
         locationFormats.add(avFileFormat);
         return this;
     }
 
-    public MediaSearchQueryAND addAvType(AVType avType) {
+    public BooleanMediaSearchQuery addAvType(AVType avType) {
         avTypes.add(avType);
         return this;
     }
 
-    public MediaSearchQueryAND addDescendant(String descendant) {
+    public BooleanMediaSearchQuery addDescendant(String descendant) {
         descendants.add(descendant);
         return this;
     }
 
-    public MediaSearchQueryAND setMainTitle(String mainTitle) {
+    public BooleanMediaSearchQuery setMainTitle(String mainTitle) {
         this.mainTitle = mainTitle;
         return this;
     }
 
-    public MediaSearchQueryAND setDocumentType(String documentType) {
+    public BooleanMediaSearchQuery setDocumentType(String documentType) {
         this.documentType = documentType;
         return this;
     }
 
 
     public String createQueryString() {
-        BooleanGroupingStringBuilder sb = BooleanGroupingStringBuilder.ANDBuilder();
+        BooleanGroupingStringBuilder sb = new BooleanGroupingStringBuilder();
 
         for (MediaType mediaType : mediaTypes) {
             sb.append("mediaType:" + mediaType.name());
@@ -103,7 +107,7 @@ public final class MediaSearchQueryAND extends MediaSearchQuery<MediaSearchQuery
 
 
     @Override
-    protected MediaSearchQueryAND getInstance() {
+    protected BooleanMediaSearchQuery getInstance() {
         return this;
     }
 

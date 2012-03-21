@@ -1,8 +1,9 @@
 package nl.vpro.api.service;
 
+import nl.vpro.api.service.search.BooleanOp;
 import nl.vpro.api.service.search.MediaSearchQuery;
-import nl.vpro.api.service.search.MediaSearchQueryAND;
-import nl.vpro.api.service.search.MediaSearchQueryOR;
+import nl.vpro.api.service.search.BooleanMediaSearchQuery;
+import nl.vpro.api.service.search.MediaSearchQueryList;
 import nl.vpro.domain.media.AVFileFormat;
 import nl.vpro.domain.media.AVType;
 import nl.vpro.domain.media.search.MediaType;
@@ -17,22 +18,22 @@ public enum Profile {
     WOORD("woord", "Woord.nl") {
         public MediaSearchQuery createSearchQuery() {
 
-            return new MediaSearchQueryOR()
-                .addAnd(new MediaSearchQueryAND() /*program*/
+            return new MediaSearchQueryList(BooleanOp.OR)
+                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
                     .addAvType(AVType.AUDIO)
                     .addDescendant(getArchiveUrn())
                     .addMediaType(MediaType.BROADCAST)
                     .addLocationFormat(AVFileFormat.MP3))
-                .addAnd(new MediaSearchQueryAND() /*any type of group*/
+                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*any type of group*/
                     .addDescendant(getArchiveUrn())
-                    .setDocumentType(MediaSearchQueryAND.DOCUMENT_TYPE_GROUP)
+                    .setDocumentType(BooleanMediaSearchQuery.DOCUMENT_TYPE_GROUP)
                 );
         }
     },
 
     DEFAULT("", "") {
         public MediaSearchQuery createSearchQuery() {
-            return new MediaSearchQueryAND();
+            return new BooleanMediaSearchQuery(BooleanOp.AND);
         }
     };
 

@@ -1,6 +1,7 @@
 package nl.vpro.api.service;
 
-import nl.vpro.api.service.search.MediaSearchQueryAND;
+import nl.vpro.api.service.search.BooleanMediaSearchQuery;
+import nl.vpro.api.service.search.BooleanOp;
 import nl.vpro.domain.media.search.MediaType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -62,7 +63,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private void fetchArchiveUrn(String name) {
         log.debug("Profile not found in cache. look up in solr");
-        String queryString = new MediaSearchQueryAND()
+        String queryString = new BooleanMediaSearchQuery(BooleanOp.AND)
             .addMediaType(MediaType.ARCHIVE)
             .setMainTitle(name)
             .createQueryString();
@@ -71,7 +72,7 @@ public class ProfileServiceImpl implements ProfileService {
         try {
             QueryResponse response = solrServer.query(query);
             if (response.getResults().getNumFound() == 1) {
-                String archiveUrn = (String) ((SolrDocument) response.getResults().get(0)).getFieldValue("urn");
+                String archiveUrn = (String) response.getResults().get(0).getFieldValue("urn");
                 archiveCache.put(name, archiveUrn);
             } else {
                 throw new RuntimeException("Can not find archive with name " + name + "in Sorl, no or too many results");

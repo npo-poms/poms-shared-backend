@@ -8,7 +8,13 @@ package nl.vpro.api.service.search;
  */
 public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
 
+    private BooleanOp booleanOp;
+
     protected String queryString;
+
+    protected MediaSearchQuery(BooleanOp booleanOp) {
+        this.booleanOp = booleanOp;
+    }
 
     public T setQueryString(String queryString) {
         this.queryString = queryString;
@@ -24,26 +30,17 @@ public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
     protected abstract T getInstance();
 
 
-    protected static class BooleanGroupingStringBuilder {
+
+
+    
+
+    protected class BooleanGroupingStringBuilder {
         private boolean first = true;
         private boolean hasOpened = false;
-        private boolean grouping = true;
+        protected boolean grouping = true; /*should this group be wrapped in parenthesis?*/
         StringBuilder stringBuilder = new StringBuilder();
-        private String operator;
 
-        static BooleanGroupingStringBuilder ANDBuilder() {
-            BooleanGroupingStringBuilder builder = new BooleanGroupingStringBuilder();
-            builder.operator = "AND";
-            return builder;
-        }
-
-        static BooleanGroupingStringBuilder ORBuilder() {
-            BooleanGroupingStringBuilder builder = new BooleanGroupingStringBuilder();
-            builder.operator = "OR";
-            return builder;
-        }
-
-        private BooleanGroupingStringBuilder() {
+        protected BooleanGroupingStringBuilder() {
         }
 
         public BooleanGroupingStringBuilder append(Object o) {
@@ -54,7 +51,7 @@ public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
                 }
                 first = false;
             } else {
-                stringBuilder.append(" " + operator + " ");
+                stringBuilder.append(" ").append(booleanOp.name()).append(" ");
             }
             stringBuilder.append(o);
             return this;
