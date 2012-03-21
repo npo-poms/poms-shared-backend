@@ -6,6 +6,8 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.service.search.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.MediaSearchSuggestions;
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -31,6 +33,12 @@ public class MediaServiceImpl implements MediaService {
     @Value("${solr.max.result}")
     private int maxResult;
 
+    @Value("${solr.suggest.min.occurrence}")
+    private Integer suggestionsMinOccurrence;
+
+    @Value("${solr.suggest.limit}")
+    private Integer suggestionsLimit;
+
     private SolrServer solrServer;
 
     private ConversionService conversionService;
@@ -51,12 +59,16 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public MediaSearchResult search(String query, String profileName, Integer offset, Integer max) {
         Profile profile = profileService.getProfile(profileName);
-        MediaSearchQuery mediaSearchQuery = profile.createSearchQuery();
+        MediaSearchQuery filterQuery = profile.createSearchQuery();
+        String filterQueryString = filterQuery.createQueryString();
 
-        mediaSearchQuery.setQueryString(query);
-
-        SolrQuery solrQuery = new SolrQuery(mediaSearchQuery.createQueryString());
-        solrQuery.add("fl", "*,score");
+        SolrQuery solrQuery = new SolrQuery(filterQueryString);
+        solrQuery.setFields("*", "score");
+        if (StringUtils.isNotBlank(filterQueryString)) {
+            solrQuery.setFilterQueries(filterQueryString);
+        }
+        solrQuery.add("qf", "titleMain^4.0 descriptionMain^2.0");
+        solrQuery.setQuery(query);
 
         Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
         solrQuery.setRows(queryMaxRows);
@@ -67,15 +79,51 @@ public class MediaServiceImpl implements MediaService {
 
         try {
             QueryResponse response = solrServer.query(solrQuery);
-            return conversionService.convert(response.getResults(), MediaSearchResult.class);
+            return conversionService.convert(response, MediaSearchResult.class);
         } catch (SolrServerException e) {
             log.error("Something went wrong submitting the query to solr:", e);
         }
         return new MediaSearchResult();
     }
 
+    @Override
+    public MediaSearchSuggestions searchSuggestions(String query, String profileName) {
+        Profile profile = profileService.getProfile(profileName);
+        MediaSearchQuery filterQuery = profile.createSearchQuery();
+        String filterQueryString = filterQuery.createQueryString();
+
+        SolrQuery solrQuery = new SolrQuery();
+        solrQuery.setQuery("*:*");
+        if (StringUtils.isNotBlank(filterQueryString)) {
+            solrQuery.setFilterQueries(filterQueryString);
+        }
+        solrQuery.setFacet(true);
+        solrQuery.setFacetLimit(suggestionsLimit);
+        solrQuery.addFacetField("titleMain", "descriptionMain");
+        solrQuery.setFacetPrefix(query);
+        solrQuery.setFacetMinCount(suggestionsMinOccurrence);
+        solrQuery.setFields("titleMain", "descriptionMain");
+        solrQuery.setRows(0);
+
+        try {
+            QueryResponse response = solrServer.query(solrQuery);
+            return conversionService.convert(response, MediaSearchSuggestions.class);
+        } catch (SolrServerException e) {
+            log.error("Something went wrong submitting the query to solr:", e);
+        }
+        return new MediaSearchSuggestions();
+    }
+
 
     public void setMaxResult(int maxResult) {
         this.maxResult = maxResult;
+    }
+
+    public void setSuggestionsMinOccurrence(Integer suggestionsMinOccurrence) {
+        this.suggestionsMinOccurrence = suggestionsMinOccurrence;
+    }
+
+    public void setSuggestionsLimit(Integer suggestionsLimit) {
+        this.suggestionsLimit = suggestionsLimit;
     }
 }

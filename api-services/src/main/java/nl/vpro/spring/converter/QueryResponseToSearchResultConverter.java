@@ -4,6 +4,7 @@ import nl.vpro.api.transfer.Broadcasting;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItem;
 import org.apache.commons.lang.StringUtils;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.core.convert.converter.Converter;
@@ -19,12 +20,13 @@ import java.util.List;
  *
  * @author Ernst Bunders
  */
-public class SolrDocumentListConverter implements Converter<SolrDocumentList, MediaSearchResult> {
+public class QueryResponseToSearchResultConverter implements Converter<QueryResponse, MediaSearchResult> {
     private static final List<String> IMAGE_TYPES_ORDERED = Arrays.asList("LOGO", "STILL", "ICON", "BACKGROUND", "PORTRAIT", "PICTURE");
     private static final String IMG_URL_TEMPLATE = "http://poms-test.omroep.nl/images/ext-api/images/s100/{id}.jpg";
 
     @Override
-    public MediaSearchResult convert(SolrDocumentList sdl) {
+    public MediaSearchResult convert(QueryResponse queryResponse) {
+        SolrDocumentList sdl = queryResponse.getResults();
         MediaSearchResult searchResult = new MediaSearchResult(sdl.getNumFound(), sdl.getStart(), sdl.getMaxScore());
         MediaSearchResultItem item;
 
@@ -38,7 +40,7 @@ public class SolrDocumentListConverter implements Converter<SolrDocumentList, Me
             item.setBroadcaster(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("broadcaster"), ","));
             item.setAvType((String) solrDocument.getFieldValue("avType"));
             item.setGenre(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("genre"), ","));
-
+            item.setMediaType((String) solrDocument.getFieldValue("mediaType"));
             item.setCreationDate((Date) solrDocument.getFieldValue("creationDate"));
 
             setFirstBroadcastDate(solrDocument, item);

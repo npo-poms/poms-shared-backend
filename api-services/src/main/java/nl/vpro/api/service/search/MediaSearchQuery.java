@@ -1,90 +1,75 @@
 package nl.vpro.api.service.search;
 
-import nl.vpro.domain.media.AVFileFormat;
-import nl.vpro.domain.media.AVType;
-import nl.vpro.domain.media.search.MediaType;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Date: 19-3-12
  * Time: 13:51
  *
  * @author Ernst Bunders
  */
-public class MediaSearchQuery {
+public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
 
-    private List<MediaType> mediaTypes = new ArrayList<MediaType>();
+    protected String queryString;
 
-    private List<AVFileFormat> locationFormats = new ArrayList<AVFileFormat>();
-
-    private List<AVType> avTypes = new ArrayList<AVType>();
-
-    private List<String> descendants = new ArrayList<String>();
-
-    private String mainTitle;
-    private String queryString;
-
-
-    public MediaSearchQuery addMediaType(MediaType mediaType) {
-        mediaTypes.add(mediaType);
-        return this;
-    }
-
-    public MediaSearchQuery addLocationFormat(AVFileFormat avFileFormat) {
-        locationFormats.add(avFileFormat);
-        return this;
-    }
-
-    public MediaSearchQuery addAvType(AVType avType) {
-        avTypes.add(avType);
-        return this;
-    }
-
-    public MediaSearchQuery addDescendant(String descendant) {
-        descendants.add(descendant);
-        return this;
-    }
-
-    public MediaSearchQuery setMainTitle(String mainTitle) {
-        this.mainTitle = mainTitle;
-        return this;
-    }
-
-    public MediaSearchQuery setQueryString(String queryString) {
+    public T setQueryString(String queryString) {
         this.queryString = queryString;
-        return this;
+        return getInstance();
     }
 
-    public String createQueryString() {
-        StringBuilder sb = new StringBuilder();
+    protected String wrapInQuotes(String s) {
+        return "\"" + s + "\"";
+    }
 
-        for (MediaType mediaType : mediaTypes) {
-            sb.append("mediaType:").append(mediaType.name()).append(" ");
+    public abstract String createQueryString();
+
+    protected abstract T getInstance();
+
+
+    protected static class BooleanGroupingStringBuilder {
+        private boolean first = true;
+        private boolean hasOpened = false;
+        private boolean grouping = true;
+        StringBuilder stringBuilder = new StringBuilder();
+        private String operator;
+
+        static BooleanGroupingStringBuilder ANDBuilder() {
+            BooleanGroupingStringBuilder builder = new BooleanGroupingStringBuilder();
+            builder.operator = "AND";
+            return builder;
         }
 
-        for (AVFileFormat fileFormat : locationFormats) {
-            sb.append("location_formats:").append(fileFormat.name()).append(" ");
+        static BooleanGroupingStringBuilder ORBuilder() {
+            BooleanGroupingStringBuilder builder = new BooleanGroupingStringBuilder();
+            builder.operator = "OR";
+            return builder;
         }
 
-        for (AVType avType : avTypes) {
-            sb.append("avType:").append(avType.name()).append(" ");
+        private BooleanGroupingStringBuilder() {
         }
 
-        for (String descendant : descendants) {
-            sb.append("descendantOf:").append(descendant).append(" ");
+        public BooleanGroupingStringBuilder append(Object o) {
+            if (first) {
+                if (grouping) {
+                    stringBuilder.append("(");
+                    hasOpened = true;
+                }
+                first = false;
+            } else {
+                stringBuilder.append(" " + operator + " ");
+            }
+            stringBuilder.append(o);
+            return this;
         }
 
-        if (StringUtils.isNotBlank(mainTitle)) {
-            sb.append("titleMain:").append(mainTitle).append(" ");
+        public void close() {
+            if (grouping && hasOpened) {
+                stringBuilder.append(") ");
+            }
+            first = true;
         }
 
-        if (StringUtils.isNotBlank(queryString)) {
-            sb.append(queryString);
+        public String toString() {
+            return stringBuilder.toString().trim();
         }
 
-        return sb.toString().trim();
     }
 }

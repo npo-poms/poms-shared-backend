@@ -23,7 +23,8 @@
         class="org.springframework.context.support.ConversionServiceFactoryBean">
     <property name="converters">
       <set>
-        <bean class="nl.vpro.spring.converter.SolrDocumentListConverter"/>
+        <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter"/>
+        <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
       </set>
     </property>
   </bean>

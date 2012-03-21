@@ -1,6 +1,6 @@
 package nl.vpro.api.service;
 
-import nl.vpro.api.service.search.MediaSearchQuery;
+import nl.vpro.api.service.search.MediaSearchQueryAND;
 import nl.vpro.domain.media.search.MediaType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -62,10 +62,11 @@ public class ProfileServiceImpl implements ProfileService {
 
     private void fetchArchiveUrn(String name) {
         log.debug("Profile not found in cache. look up in solr");
-        SolrQuery query = new SolrQuery(new MediaSearchQuery()
+        String queryString = new MediaSearchQueryAND()
             .addMediaType(MediaType.ARCHIVE)
             .setMainTitle(name)
-            .createQueryString());
+            .createQueryString();
+        SolrQuery query = new SolrQuery(queryString);
 
         try {
             QueryResponse response = solrServer.query(query);

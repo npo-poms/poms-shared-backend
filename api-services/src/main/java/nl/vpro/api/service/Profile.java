@@ -1,6 +1,8 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.service.search.MediaSearchQuery;
+import nl.vpro.api.service.search.MediaSearchQueryAND;
+import nl.vpro.api.service.search.MediaSearchQueryOR;
 import nl.vpro.domain.media.AVFileFormat;
 import nl.vpro.domain.media.AVType;
 import nl.vpro.domain.media.search.MediaType;
@@ -14,16 +16,22 @@ import nl.vpro.domain.media.search.MediaType;
 public enum Profile {
     WOORD("woord", "Woord.nl") {
         public MediaSearchQuery createSearchQuery() {
-            return new MediaSearchQuery()
-                .addAvType(AVType.AUDIO)
-                .addDescendant(getArchiveUrn())
-                .addMediaType(MediaType.BROADCAST)
-                .addLocationFormat(AVFileFormat.MP3);
+
+            return new MediaSearchQueryOR()
+                .addAnd(new MediaSearchQueryAND() /*program*/
+                    .addAvType(AVType.AUDIO)
+                    .addDescendant(getArchiveUrn())
+                    .addMediaType(MediaType.BROADCAST)
+                    .addLocationFormat(AVFileFormat.MP3))
+                .addAnd(new MediaSearchQueryAND()
+                    .addDescendant(getArchiveUrn())
+                    .setDocumentType(MediaSearchQueryAND.DOCUMENT_TYPE_GROUP)
+                );
         }
     },
     DEFAULT("", "") {
         public MediaSearchQuery createSearchQuery() {
-            return new MediaSearchQuery();
+            return new MediaSearchQueryAND();
         }
     };
 
