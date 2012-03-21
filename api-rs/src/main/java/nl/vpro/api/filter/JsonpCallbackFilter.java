@@ -17,7 +17,7 @@ import java.util.Map;
  * @author Ernst Bunders
  * @author http://jpgmr.wordpress.com/2010/07/28/tutorial-implementing-a-servlet-filter-for-jsonp-callback-with-springs-delegatingfilterproxy
  */
-public class JsonpCallbackFilter implements Filter{
+public class JsonpCallbackFilter implements Filter {
     private static Logger log = LoggerFactory.getLogger(JsonpCallbackFilter.class);
 
     public void init(FilterConfig fConfig) throws ServletException {
@@ -33,7 +33,7 @@ public class JsonpCallbackFilter implements Filter{
         if (parms.containsKey("callback")) {
             if (log.isDebugEnabled())
                 log.debug("Wrapping response with JSONP callback '" + parms.get("callback")[0] + "'");
-            
+
             OutputStream out = httpResponse.getOutputStream();
             GenericResponseWrapper wrapper = new GenericResponseWrapper(httpResponse);
             chain.doFilter(request, wrapper);
