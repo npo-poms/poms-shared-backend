@@ -23,12 +23,13 @@ public enum Profile {
                     .addDescendant(getArchiveUrn())
                     .addMediaType(MediaType.BROADCAST)
                     .addLocationFormat(AVFileFormat.MP3))
-                .addAnd(new MediaSearchQueryAND()
+                .addAnd(new MediaSearchQueryAND() /*any type of group*/
                     .addDescendant(getArchiveUrn())
                     .setDocumentType(MediaSearchQueryAND.DOCUMENT_TYPE_GROUP)
                 );
         }
     },
+
     DEFAULT("", "") {
         public MediaSearchQuery createSearchQuery() {
             return new MediaSearchQueryAND();
