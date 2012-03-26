@@ -18,16 +18,20 @@ public enum Profile {
     WOORD("woord", "Woord.nl") {
         public MediaSearchQuery createSearchQuery() {
 
-            return new MediaSearchQueryList(BooleanOp.OR)
-                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
+//            return new MediaSearchQueryList(BooleanOp.OR)
+//                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
+//                    .addAvType(AVType.AUDIO)
+//                    .addDescendant(getArchiveUrn())
+//                    .addLocationFormat(AVFileFormat.MP3))
+//                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*any type of group*/
+//                    .addDescendant(getArchiveUrn())
+//                    .setDocumentType(BooleanMediaSearchQuery.DOCUMENT_TYPE_GROUP)
+//                );
+
+            return new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
                     .addAvType(AVType.AUDIO)
                     .addDescendant(getArchiveUrn())
-                    .addMediaType(MediaType.BROADCAST)
-                    .addLocationFormat(AVFileFormat.MP3))
-                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*any type of group*/
-                    .addDescendant(getArchiveUrn())
-                    .setDocumentType(BooleanMediaSearchQuery.DOCUMENT_TYPE_GROUP)
-                );
+                    .addLocationFormat(AVFileFormat.MP3);
         }
     },
 
