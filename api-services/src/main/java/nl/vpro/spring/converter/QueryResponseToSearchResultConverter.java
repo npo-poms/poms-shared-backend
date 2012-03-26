@@ -42,6 +42,7 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             item.setGenre(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("genre"), ","));
             item.setMediaType((String) solrDocument.getFieldValue("mediaType"));
             item.setCreationDate((Date) solrDocument.getFieldValue("creationDate"));
+            item.setDuration((Integer) solrDocument.getFieldValue("duration"));
 
             setFirstBroadcastDate(solrDocument, item);
             setImageLink(solrDocument, item);
