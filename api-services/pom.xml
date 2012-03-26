@@ -36,7 +36,7 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
 
-    <!-- SolrJ client. see: 5-->
+    <!-- SolrJ client -->
     <dependency>
       <artifactId>solr-solrj</artifactId>
       <groupId>org.apache.solr</groupId>
@@ -46,13 +46,11 @@
       <groupId>org.apache.solr</groupId>
     </dependency>
 
-    <!-- jackson annotations org.codehaus.jackson:jackson-xc-->
-    <!--
+    <!-- CouchDB client -->
     <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
+      <groupId>com.google.code.jcouchdb</groupId>
+      <artifactId>jcouchdb</artifactId>
     </dependency>
-    -->
 
   </dependencies>
 </project>
