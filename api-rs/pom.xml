@@ -11,14 +11,14 @@
 
   <groupId>nl.vpro.api</groupId>
   <artifactId>api-rs</artifactId>
-  <version>${parent.version}</version>
+  <version>${project.parent.version}</version>
   <packaging>jar</packaging>
 
   <dependencies>
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-services</artifactId>
-      <version>${parent.version}</version>
+      <version>${project.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
