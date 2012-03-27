@@ -6,6 +6,7 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.domain.media.MediaObject;
 
 /**
  * User: rico
@@ -18,5 +19,7 @@ public interface MediaService {
     public MediaSearchResult search(String query, String profile, Integer offset, Integer max);
 
     public MediaSearchSuggestions searchSuggestions(String query, String profile);
+
+    public MediaObject getById(String id);
 
 }

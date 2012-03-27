@@ -7,11 +7,13 @@ package nl.vpro.api.service;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.domain.media.MediaObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.jcouchdb.db.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +47,14 @@ public class MediaServiceImpl implements MediaService {
 
     private ProfileService profileService;
 
+    private Database couchDbMedaiServer;
+
     @Autowired
-    public MediaServiceImpl(SolrServer solrServer, ConversionService conversionService, ProfileService profileService) {
+    public MediaServiceImpl(SolrServer solrServer, ConversionService conversionService, ProfileService profileService, Database couchDbMedaiServer) {
         this.solrServer = solrServer;
         this.conversionService = conversionService;
         this.profileService = profileService;
+        this.couchDbMedaiServer = couchDbMedaiServer;
     }
 
     public String get(String urn) {
@@ -112,6 +117,12 @@ public class MediaServiceImpl implements MediaService {
             log.error("Something went wrong submitting the query to solr:", e);
         }
         return new MediaSearchSuggestions();
+    }
+
+    @Override
+    public MediaObject getById(String id) {
+        
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 

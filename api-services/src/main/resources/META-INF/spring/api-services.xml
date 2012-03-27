@@ -19,6 +19,16 @@
     </constructor-arg>
   </bean>
 
+  <bean id="couchDbMedaiServer" class="org.jcouchdb.db.Database">
+    <constructor-arg name="server">
+      <bean class="org.jcouchdb.db.ServerImpl">
+        <constructor-arg value="${couchdb.media.server.host}" name="host"/>
+        <constructor-arg value="${couchdb.media.server.port}" name="port"/>
+      </bean>
+    </constructor-arg>
+    <constructor-arg value="${couchdb.media.db}" name="name"/>
+  </bean>
+
   <bean id="conversionService"
         class="org.springframework.context.support.ConversionServiceFactoryBean">
     <property name="converters">
