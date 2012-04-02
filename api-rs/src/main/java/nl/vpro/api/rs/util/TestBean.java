@@ -24,11 +24,12 @@ public class TestBean {
     //    @XmlAttribute
     private boolean aBoolean = false;
     private float aFloat = 1.2F;
-    private List<Friend> friends;
+
     @XmlElementWrapper(name = "friends")
     @XmlElement(name = "friend")
+    private List<Friend> friends;
 
-    private String aString = null;
+//    private String aString = null;
 
     public TestBean() {
         friends = new ArrayList<Friend>();
@@ -61,9 +62,9 @@ public class TestBean {
         return friends;
     }
 
-    public String getaString() {
-        return aString;
-    }
+//    public String getaString() {
+//        return aString;
+//    }
 
     @XmlRootElement
     @XmlAccessorType(XmlAccessType.FIELD)
