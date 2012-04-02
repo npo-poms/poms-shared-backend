@@ -47,14 +47,14 @@ public class MediaServiceImpl implements MediaService {
 
     private ProfileService profileService;
 
-    private Database couchDbMedaiServer;
+    private Database couchDbMediaServer;
 
     @Autowired
-    public MediaServiceImpl(SolrServer solrServer, ConversionService conversionService, ProfileService profileService, Database couchDbMedaiServer) {
+    public MediaServiceImpl(SolrServer solrServer, ConversionService conversionService, ProfileService profileService, Database couchDbMediaServer) {
         this.solrServer = solrServer;
         this.conversionService = conversionService;
         this.profileService = profileService;
-        this.couchDbMedaiServer = couchDbMedaiServer;
+        this.couchDbMediaServer = couchDbMediaServer;
     }
 
     public String get(String urn) {
