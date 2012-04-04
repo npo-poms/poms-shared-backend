@@ -39,7 +39,7 @@ public class Media {
     @Path("item/{urn}")
     public String getMedia(@PathParam("urn") String urn) {
         logger.debug("Called with param " + urn);
-        return mediaService.get(urn);
+        return mediaService.getById(urn).getUrn();
     }
 
     @GET
