@@ -14,8 +14,6 @@ import nl.vpro.domain.media.MediaObject;
  */
 public interface MediaService {
 
-    public String get(String urn);
-
     public MediaSearchResult search(String query, String profile, Integer offset, Integer max);
 
     public MediaSearchSuggestions searchSuggestions(String query, String profile);

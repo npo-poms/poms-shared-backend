@@ -27,13 +27,12 @@ public class ProfileServiceImpl implements ProfileService {
 
     private static final Logger log = LoggerFactory.getLogger(ProfileServiceImpl.class);
 
+    @Autowired
     private SolrServer solrServer;
 
     private Map<String, String> archiveCache = new HashMap<String, String>();
 
-    @Autowired
-    public ProfileServiceImpl(SolrServer solrServer) {
-        this.solrServer = solrServer;
+    public ProfileServiceImpl() {
     }
 
     @Override

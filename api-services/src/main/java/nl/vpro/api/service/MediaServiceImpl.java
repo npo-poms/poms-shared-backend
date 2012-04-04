@@ -7,6 +7,7 @@ package nl.vpro.api.service;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.domain.media.Group;
 import nl.vpro.domain.media.MediaObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -19,7 +20,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * User: rico
@@ -41,24 +44,22 @@ public class MediaServiceImpl implements MediaService {
     @Value("${solr.suggest.limit}")
     private Integer suggestionsLimit;
 
+    @Autowired
     private SolrServer solrServer;
 
+    @Autowired
     private ConversionService conversionService;
 
+    @Autowired
     private ProfileService profileService;
 
+    @Autowired
     private Database couchDbMediaServer;
 
     @Autowired
-    public MediaServiceImpl(SolrServer solrServer, ConversionService conversionService, ProfileService profileService, Database couchDbMediaServer) {
-        this.solrServer = solrServer;
-        this.conversionService = conversionService;
-        this.profileService = profileService;
-        this.couchDbMediaServer = couchDbMediaServer;
-    }
+    private RestTemplate restTemplate;
 
-    public String get(String urn) {
-        return urn;
+    public MediaServiceImpl() {
     }
 
     @Override
@@ -121,8 +122,11 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaObject getById(String id) {
-        
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        ResponseEntity<Group> responseEntity=restTemplate.getForEntity("http://docs-test.poms.omroep.nl/poms/{urn}", Group.class, id);
+        Group mediaObject=responseEntity.getBody();
+//        String json=couchDbMediaServer.getDocument(String.class,id);
+        // parse json into mediaobject using jackson
+        return mediaObject;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 

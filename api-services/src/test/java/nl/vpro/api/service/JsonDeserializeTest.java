@@ -1,5 +1,7 @@
 package nl.vpro.api.service;
 
+import nl.vpro.jackson.DurationDeserializer;
+import nl.vpro.jackson.MediaMapper;
 import nl.vpro.jackson.ProgramProblemHandler;
 import nl.vpro.domain.image.ImageType;
 import nl.vpro.domain.media.*;
@@ -9,12 +11,18 @@ import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.Module;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.deser.DateDeserializer;
+import org.codehaus.jackson.map.ext.CoreXMLDeserializers;
 import org.codehaus.jackson.map.module.SimpleModule;
 import org.junit.Test;
+
+import javax.xml.datatype.Duration;
+
 import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 /**
  * Date: 26-3-12
@@ -27,16 +35,18 @@ public class JsonDeserializeTest {
     @Test
     public void testDeserializerProgram() {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("program.json");
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new MediaMapper();
+//        ObjectMapper mapper = new ObjectMapper();
 
         Module module = new SimpleModule("PomsModule", new Version(1,0,0, null))
-            .addDeserializer(Repeat.class, new RepeatDeserializer());
-        
-        mapper.registerModule(module);
+          .addDeserializer(Repeat.class, new RepeatDeserializer())
+          .addDeserializer(Duration.class, new DurationDeserializer());
 
-        DeserializationConfig deserializationConfig =  mapper.getDeserializationConfig();
-        deserializationConfig.set(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        deserializationConfig.addHandler(new ProgramProblemHandler());
+        mapper.registerModule(module);
+//
+//        DeserializationConfig deserializationConfig =  mapper.getDeserializationConfig();
+//        deserializationConfig.set(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        deserializationConfig.addHandler(new ProgramProblemHandler());
         try {
             Program program = mapper.readValue(is,Program.class);
 
