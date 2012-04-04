@@ -4,9 +4,9 @@
  */
 package nl.vpro.api.service;
 
+import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
-import nl.vpro.domain.media.MediaObject;
 
 /**
  * User: rico

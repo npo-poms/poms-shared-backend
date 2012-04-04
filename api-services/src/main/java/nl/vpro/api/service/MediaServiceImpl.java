@@ -4,11 +4,11 @@
  */
 package nl.vpro.api.service;
 
+import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
-import nl.vpro.domain.media.Group;
-import nl.vpro.domain.media.MediaObject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -122,8 +122,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaObject getById(String id) {
-        ResponseEntity<Group> responseEntity=restTemplate.getForEntity("http://docs-test.poms.omroep.nl/poms/{urn}", Group.class, id);
-        Group mediaObject=responseEntity.getBody();
+        ResponseEntity<Group> responseEntity = restTemplate.getForEntity("http://docs-test.poms.omroep.nl/poms/{urn}", Group.class, id);
+        Group mediaObject = responseEntity.getBody();
 //        String json=couchDbMediaServer.getDocument(String.class,id);
         // parse json into mediaobject using jackson
         return mediaObject;  //To change body of implemented methods use File | Settings | File Templates.

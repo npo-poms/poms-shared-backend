@@ -20,13 +20,10 @@ public class MediaMapper extends ObjectMapper {
 
 
     public MediaMapper() {
-        JacksonAnnotationIntrospector jacksonAnnotationIntrospector = new JacksonAnnotationIntrospector();
-        JaxbAnnotationIntrospector jaxbAnnotationIntrospector = new JaxbAnnotationIntrospector();
-        AnnotationIntrospector introspector = AnnotationIntrospector.pair(jacksonAnnotationIntrospector, jaxbAnnotationIntrospector);
 
         // Deserialization settings.
         DeserializationConfig deserializationConfig = copyDeserializationConfig();
-        deserializationConfig.setAnnotationIntrospector(introspector);
+        deserializationConfig.addHandler(new MediaProblemHandler());
         deserializationConfig.set(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         setDeserializationConfig(deserializationConfig);
 
@@ -35,7 +32,6 @@ public class MediaMapper extends ObjectMapper {
         serializationConfig.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
         serializationConfig.set(SerializationConfig.Feature.INDENT_OUTPUT, true);
         serializationConfig.set(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, true);
-        serializationConfig.setAnnotationIntrospector(introspector);
         setSerializationConfig(serializationConfig);
     }
 }
