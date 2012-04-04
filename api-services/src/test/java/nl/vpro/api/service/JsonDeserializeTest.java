@@ -35,18 +35,16 @@ public class JsonDeserializeTest {
     @Test
     public void testDeserializerProgram() {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("program.json");
-        ObjectMapper mapper = new MediaMapper();
-//        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper();
 
         Module module = new SimpleModule("PomsModule", new Version(1,0,0, null))
-          .addDeserializer(Repeat.class, new RepeatDeserializer())
-          .addDeserializer(Duration.class, new DurationDeserializer());
+          .addDeserializer(Repeat.class, new RepeatDeserializer());
 
         mapper.registerModule(module);
-//
-//        DeserializationConfig deserializationConfig =  mapper.getDeserializationConfig();
-//        deserializationConfig.set(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-//        deserializationConfig.addHandler(new ProgramProblemHandler());
+
+        DeserializationConfig deserializationConfig =  mapper.getDeserializationConfig();
+        deserializationConfig.set(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        deserializationConfig.addHandler(new ProgramProblemHandler());
         try {
             Program program = mapper.readValue(is,Program.class);
 
