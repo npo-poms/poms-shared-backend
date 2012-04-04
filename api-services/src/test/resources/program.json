@@ -47,7 +47,7 @@
     "type": "BROADCAST",
     "workflow": "PUBLISHED",
     "crids": [
-        "crid://bds.tv/16935045"
+        "crids://bds.tv/16935045"
     ],
     "descriptions": [
         {

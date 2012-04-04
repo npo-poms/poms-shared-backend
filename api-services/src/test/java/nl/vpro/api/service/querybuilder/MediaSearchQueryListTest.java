@@ -15,12 +15,12 @@ public class MediaSearchQueryListTest {
     private static BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
 
     static {
-        q.setMainTitle("title");
+        q.setMainTitle("titles");
         q.addAvType(AVType.AUDIO);
 
     }
 
-    private static final String qs = "(avType:AUDIO AND titleMain:title)";
+    private static final String qs = "(avType:AUDIO AND titleMain:titles)";
 
     @Test
     public void testEmpytList() {
