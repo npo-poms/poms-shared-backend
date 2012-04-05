@@ -6,9 +6,14 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.MediaObject;
+import nl.vpro.api.domain.media.Program;
+import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.support.MediaObjectType;
+import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.util.UrlProvider;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -24,6 +29,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import static nl.vpro.api.domain.media.support.MediaObjectType.*;
+
 /**
  * User: rico
  * Date: 08/03/2012
@@ -34,6 +41,8 @@ public class MediaServiceImpl implements MediaService {
     public static String MEDIA_CORE_NAME = "poms";
     private static final Logger log = LoggerFactory.getLogger(MediaService.class);
 
+    @Autowired
+    private UrlProvider urlProvider;
 
     @Value("${solr.max.result}")
     private int maxResult;
@@ -122,11 +131,27 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaObject getById(String id) {
-        ResponseEntity<Group> responseEntity = restTemplate.getForEntity("http://docs-test.poms.omroep.nl/poms/{urn}", Group.class, id);
-        Group mediaObject = responseEntity.getBody();
-//        String json=couchDbMediaServer.getDocument(String.class,id);
-        // parse json into mediaobject using jackson
-        return mediaObject;  //To change body of implemented methods use File | Settings | File Templates.
+        MediaObject mediaObject=null;
+        if (MediaUtil.isUrn(id)) {
+            switch (MediaUtil.getMediaType(id)) {
+                case group:
+                    ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), id);
+                    mediaObject = groupResponseEntity.getBody();
+                    break;
+                case program:
+                    ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, urlProvider.getUrl(), id);
+                    mediaObject = programResponseEntity.getBody();
+                    break;
+                case segment:
+                    ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, urlProvider.getUrl(), id);
+                    mediaObject = segmentResponseEntity.getBody();
+                    break;
+                default:
+                    log.warn("Unknown mediaType for urn "+id);
+                    break;
+            }
+        }
+        return mediaObject;
     }
 
 

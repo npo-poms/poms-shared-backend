@@ -62,4 +62,10 @@
         </property>
     </bean>
 
+    <bean id="urlProvider" class="nl.vpro.api.util.UrlProvider" >
+      <property name="host" value="${couchdb.media.server.host}" />
+      <property name="port" value="${couchdb.media.server.port}" />
+      <property name="uri" value="${couchdb.media.db}" />
+    </bean>
+
 </beans>
