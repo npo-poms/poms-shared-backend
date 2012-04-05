@@ -8,7 +8,6 @@ import nl.vpro.jackson.MediaMapper;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,16 +25,16 @@ import java.io.IOException;
 @Produces(MediaType.APPLICATION_JSON)
 public class JacksonContextResolver implements ContextResolver<ObjectMapper> {
 
-	private transient Logger log = LoggerFactory.getLogger(JacksonContextResolver.class);
-	private ObjectMapper objectMapper;
+    private transient Logger log = LoggerFactory.getLogger(JacksonContextResolver.class);
+    private ObjectMapper objectMapper;
 
-	public JacksonContextResolver() throws JsonGenerationException, JsonMappingException, IOException {
-		log.info("Using my own Jackson ObjectMapper");
-        objectMapper=new MediaMapper();
-	}
+    public JacksonContextResolver() throws JsonGenerationException, JsonMappingException, IOException {
+        log.info("Using my own Jackson ObjectMapper");
+        objectMapper = new MediaMapper();
+    }
 
-	@Override
-	public ObjectMapper getContext(Class<?> type) {
-		return objectMapper;
-	}
+    @Override
+    public ObjectMapper getContext(Class<?> type) {
+        return objectMapper;
+    }
 }
