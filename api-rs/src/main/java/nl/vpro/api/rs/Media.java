@@ -4,6 +4,7 @@
  */
 package nl.vpro.api.rs;
 
+import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.rs.util.TestBean;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.transfer.MediaSearchResult;
@@ -37,9 +38,9 @@ public class Media {
 
     @GET
     @Path("item/{urn}")
-    public String getMedia(@PathParam("urn") String urn) {
+    public MediaObject getMedia(@PathParam("urn") String urn) {
         logger.debug("Called with param " + urn);
-        return mediaService.getById(urn).getUrn();
+        return mediaService.getById(urn);
     }
 
     @GET
