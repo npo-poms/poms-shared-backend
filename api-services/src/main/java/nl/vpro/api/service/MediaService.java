@@ -20,4 +20,7 @@ public interface MediaService {
 
     public MediaObject getById(String id);
 
+    public MediaObject getById(String id, boolean addMembers);
+
+
 }

@@ -48,7 +48,7 @@ public class MediaMapper extends ObjectMapper {
         setDeserializationConfig(deserializationConfig);
 
         // Serialization settings.
-        SerializationConfig serializationConfig = getSerializationConfig();
+        SerializationConfig serializationConfig = copySerializationConfig();
         serializationConfig.setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
         serializationConfig.set(SerializationConfig.Feature.INDENT_OUTPUT, true);
         serializationConfig.set(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, true);

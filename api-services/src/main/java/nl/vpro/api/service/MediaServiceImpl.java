@@ -20,14 +20,20 @@ import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.jcouchdb.db.Database;
+import org.jcouchdb.db.Options;
+import org.jcouchdb.document.ValueRow;
+import org.jcouchdb.document.ViewResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.*;
 
 import static nl.vpro.api.domain.media.support.MediaObjectType.*;
 
@@ -131,20 +137,26 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaObject getById(String id) {
+        return getById(id, false);
+    }
+
+    @Override
+    public MediaObject getById(String id, boolean addMembers) {
         MediaObject mediaObject=null;
         if (MediaUtil.isUrn(id)) {
             switch (MediaUtil.getMediaType(id)) {
                 case group:
-                    ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), id);
-                    mediaObject = groupResponseEntity.getBody();
+                    Group group=getGroup(id);
+                    if (addMembers) {
+                        group.getMembers().addAll(getProgramsForGroup(id));
+                    }
+                    mediaObject=group;
                     break;
                 case program:
-                    ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, urlProvider.getUrl(), id);
-                    mediaObject = programResponseEntity.getBody();
+                    mediaObject=getProgram(id);
                     break;
                 case segment:
-                    ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, urlProvider.getUrl(), id);
-                    mediaObject = segmentResponseEntity.getBody();
+                    mediaObject=getSegment(id);
                     break;
                 default:
                     log.warn("Unknown mediaType for urn "+id);
@@ -152,6 +164,30 @@ public class MediaServiceImpl implements MediaService {
             }
         }
         return mediaObject;
+    }
+
+    private Group getGroup(String id) {
+        if (MediaUtil.getMediaType(id)==group) {
+            ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), id);
+            return groupResponseEntity.getBody();
+        }
+        return null;
+    }
+
+    private Program getProgram(String id) {
+        if (MediaUtil.getMediaType(id)==program) {
+            ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, urlProvider.getUrl(), id);
+            return programResponseEntity.getBody();
+        }
+        return null;
+    }
+
+    private Segment getSegment(String id) {
+        if (MediaUtil.getMediaType(id)==segment) {
+            ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, urlProvider.getUrl(), id);
+            return segmentResponseEntity.getBody();
+        }
+        return null;
     }
 
 
@@ -166,4 +202,46 @@ public class MediaServiceImpl implements MediaService {
     public void setSuggestionsLimit(Integer suggestionsLimit) {
         this.suggestionsLimit = suggestionsLimit;
     }
+
+    private List<Program> getProgramsForGroup(String groupUrn) {
+        List<Program> programs=new ArrayList<Program>();
+        ViewResult<Map> viewResult = null;
+        final Group group = getGroup(groupUrn);
+        if (group != null) {
+            viewResult = getViewResult(groupUrn, "media/by-group");
+            for (ValueRow<Map> row : viewResult.getRows()) {
+                String urn = row.getId();
+                Program program=getProgram(urn);
+                if (program!=null) {
+                    programs.add(program);
+                }
+            }
+            if (group.isIsOrdered()) {
+                Collections.sort(programs,new Comparator<Program>() {
+                    @Override
+                    public int compare(Program program, Program program1) {
+                        return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
+                    }
+                });
+            } else {
+                Collections.sort(programs,new Comparator<Program>() {
+                    @Override
+                    public int compare(Program program, Program program1) {
+                        return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
+                    }
+                });
+            }
+        }
+        return programs;
+    }
+
+    private ViewResult<Map> getViewResult(final String groupUrn, final String view) {
+        return couchDbMediaServer.queryView(view,
+                Map.class,
+                new Options().startKey(groupUrn)
+                        .endKey(groupUrn)
+                        .reduce(false),
+                null);
+    }
+
 }

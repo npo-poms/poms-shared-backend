@@ -22,7 +22,7 @@ import java.util.Map;
  *
  * @author Ernst Bunders
  */
-@Service
+@Service("profileService")
 public class ProfileServiceImpl implements ProfileService {
 
     private static final Logger log = LoggerFactory.getLogger(ProfileServiceImpl.class);
