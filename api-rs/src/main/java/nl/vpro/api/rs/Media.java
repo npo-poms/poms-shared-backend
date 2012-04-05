@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 
 
 /**
@@ -38,9 +35,9 @@ public class Media {
 
     @GET
     @Path("item/{urn}")
-    public MediaObject getMedia(@PathParam("urn") String urn) {
-        logger.debug("Called with param " + urn);
-        return mediaService.getById(urn);
+    public MediaObject getMedia(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers ) {
+        logger.debug("Called with urn " + urn +" and members "+addMembers);
+        return mediaService.getById(urn,addMembers);
     }
 
     @GET
