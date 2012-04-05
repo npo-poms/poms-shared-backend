@@ -1,8 +1,8 @@
 package nl.vpro.api.service;
 
+import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
 import nl.vpro.api.service.querybuilder.BooleanOp;
-import nl.vpro.domain.media.search.MediaType;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;

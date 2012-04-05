@@ -1,6 +1,6 @@
 package nl.vpro.api.service.querybuilder;
 
-import nl.vpro.domain.media.AVType;
+import nl.vpro.api.domain.media.AvType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -16,7 +16,7 @@ public class MediaSearchQueryListTest {
 
     static {
         q.setMainTitle("titles");
-        q.addAvType(AVType.AUDIO);
+        q.addAvType(AvType.AUDIO);
 
     }
 
@@ -67,24 +67,24 @@ public class MediaSearchQueryListTest {
         MediaSearchQueryList ql = new MediaSearchQueryList(BooleanOp.OR);
         ql.addQuery(q);
         ql.addQuery(q);
-        assertEquals("((avType:AUDIO AND titleMain:title) OR (avType:AUDIO AND titleMain:title))", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) OR (avType:AUDIO AND titleMain:titles))", ql.createQueryString());
 
         ql = new MediaSearchQueryList(BooleanOp.AND);
         ql.addQuery(q);
         ql.addQuery(q);
-        assertEquals("((avType:AUDIO AND titleMain:title) AND (avType:AUDIO AND titleMain:title))", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) AND (avType:AUDIO AND titleMain:titles))", ql.createQueryString());
 
         //with search term
         ql = new MediaSearchQueryList(BooleanOp.OR);
         ql.addQuery(q);
         ql.addQuery(q);
         ql.setQueryString("test");
-        assertEquals("((avType:AUDIO AND titleMain:title) OR (avType:AUDIO AND titleMain:title)) test", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) OR (avType:AUDIO AND titleMain:titles)) test", ql.createQueryString());
 
         ql = new MediaSearchQueryList(BooleanOp.AND);
         ql.addQuery(q);
         ql.addQuery(q);
         ql.setQueryString("test");
-        assertEquals("((avType:AUDIO AND titleMain:title) AND (avType:AUDIO AND titleMain:title)) test", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) AND (avType:AUDIO AND titleMain:titles)) test", ql.createQueryString());
     }
 }

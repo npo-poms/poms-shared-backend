@@ -1,8 +1,8 @@
 package nl.vpro.api.service.querybuilder;
 
-import nl.vpro.domain.media.AVFileFormat;
-import nl.vpro.domain.media.AVType;
-import nl.vpro.domain.media.search.MediaType;
+import nl.vpro.api.domain.media.AvFileFormat;
+import nl.vpro.api.domain.media.AvType;
+import nl.vpro.api.domain.media.search.MediaType;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -37,21 +37,21 @@ public class BooleanMediaSearchQueryTest {
     @Test
     public void testSingleConstraint(){
         BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
-        q.addAvType(AVType.AUDIO);
+        q.addAvType(AvType.AUDIO);
         assertEquals("(avType:AUDIO)", q.createQueryString());
 
         q = new BooleanMediaSearchQuery(BooleanOp.OR);
-        q.addAvType(AVType.AUDIO);
+        q.addAvType(AvType.AUDIO);
         assertEquals("(avType:AUDIO)", q.createQueryString());
 
         //with term
         q = new BooleanMediaSearchQuery(BooleanOp.AND);
-        q.addAvType(AVType.AUDIO);
+        q.addAvType(AvType.AUDIO);
         q.setQueryString("hallo");
         assertEquals("(avType:AUDIO) hallo", q.createQueryString());
 
         q = new BooleanMediaSearchQuery(BooleanOp.OR);
-        q.addAvType(AVType.AUDIO);
+        q.addAvType(AvType.AUDIO);
         q.setQueryString("hallo");
         assertEquals("(avType:AUDIO) hallo", q.createQueryString());
     }
@@ -61,10 +61,10 @@ public class BooleanMediaSearchQueryTest {
         BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
         q.addMediaType(MediaType.ALBUM);
         q.addMediaType(MediaType.CLIP);
-        q.addLocationFormat(AVFileFormat.MP3);
-        q.addLocationFormat(AVFileFormat.FLV);
-        q.addAvType(AVType.AUDIO);
-        q.addAvType(AVType.VIDEO);
+        q.addLocationFormat(AvFileFormat.MP3);
+        q.addLocationFormat(AvFileFormat.FLV);
+        q.addAvType(AvType.AUDIO);
+        q.addAvType(AvType.VIDEO);
         q.addDescendant("urn:123");
         q.addDescendant("urn:456");
         q.setMainTitle("main");
@@ -75,10 +75,10 @@ public class BooleanMediaSearchQueryTest {
         q = new BooleanMediaSearchQuery(BooleanOp.OR);
         q.addMediaType(MediaType.ALBUM);
         q.addMediaType(MediaType.CLIP);
-        q.addLocationFormat(AVFileFormat.MP3);
-        q.addLocationFormat(AVFileFormat.FLV);
-        q.addAvType(AVType.AUDIO);
-        q.addAvType(AVType.VIDEO);
+        q.addLocationFormat(AvFileFormat.MP3);
+        q.addLocationFormat(AvFileFormat.FLV);
+        q.addAvType(AvType.AUDIO);
+        q.addAvType(AvType.VIDEO);
         q.addDescendant("urn:123");
         q.addDescendant("urn:456");
         q.setMainTitle("main");

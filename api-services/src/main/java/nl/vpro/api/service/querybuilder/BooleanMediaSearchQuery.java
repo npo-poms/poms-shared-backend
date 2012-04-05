@@ -1,8 +1,8 @@
 package nl.vpro.api.service.querybuilder;
 
-import nl.vpro.domain.media.AVFileFormat;
-import nl.vpro.domain.media.AVType;
-import nl.vpro.domain.media.search.MediaType;
+import nl.vpro.api.domain.media.AvFileFormat;
+import nl.vpro.api.domain.media.AvType;
+import nl.vpro.api.domain.media.search.MediaType;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +20,9 @@ public final class BooleanMediaSearchQuery extends MediaSearchQuery<BooleanMedia
     private static final Logger log = LoggerFactory.getLogger(BooleanMediaSearchQuery.class);
     private List<MediaType> mediaTypes = new ArrayList<MediaType>();
 
-    private List<AVFileFormat> locationFormats = new ArrayList<AVFileFormat>();
+    private List<AvFileFormat> locationFormats = new ArrayList<AvFileFormat>();
 
-    private List<AVType> avTypes = new ArrayList<AVType>();
+    private List<AvType> avTypes = new ArrayList<AvType>();
 
     private List<String> descendants = new ArrayList<String>();
 
@@ -43,12 +43,12 @@ public final class BooleanMediaSearchQuery extends MediaSearchQuery<BooleanMedia
         return this;
     }
 
-    public BooleanMediaSearchQuery addLocationFormat(AVFileFormat avFileFormat) {
+    public BooleanMediaSearchQuery addLocationFormat(AvFileFormat avFileFormat) {
         locationFormats.add(avFileFormat);
         return this;
     }
 
-    public BooleanMediaSearchQuery addAvType(AVType avType) {
+    public BooleanMediaSearchQuery addAvType(AvType avType) {
         avTypes.add(avType);
         return this;
     }
@@ -76,11 +76,11 @@ public final class BooleanMediaSearchQuery extends MediaSearchQuery<BooleanMedia
             sb.append("mediaType:" + mediaType.name());
         }
 
-        for (AVFileFormat fileFormat : locationFormats) {
+        for (AvFileFormat fileFormat : locationFormats) {
             sb.append("location_formats:" + fileFormat.name());
         }
 
-        for (AVType avType : avTypes) {
+        for (AvType avType : avTypes) {
             sb.append("avType:" + avType.name());
         }
 

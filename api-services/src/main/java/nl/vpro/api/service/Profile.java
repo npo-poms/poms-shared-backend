@@ -1,12 +1,11 @@
 package nl.vpro.api.service;
 
+import nl.vpro.api.domain.media.AvFileFormat;
+import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.service.querybuilder.BooleanOp;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
-import nl.vpro.api.service.querybuilder.MediaSearchQueryList;
-import nl.vpro.domain.media.AVFileFormat;
-import nl.vpro.domain.media.AVType;
-import nl.vpro.domain.media.search.MediaType;
+
 
 /**
  * Date: 19-3-12
@@ -29,9 +28,9 @@ public enum Profile {
 //                );
 
             return new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
-                    .addAvType(AVType.AUDIO)
+                    .addAvType(AvType.AUDIO)
                     .addDescendant(getArchiveUrn())
-                    .addLocationFormat(AVFileFormat.MP3);
+                    .addLocationFormat(AvFileFormat.MP3);
         }
     },
 
