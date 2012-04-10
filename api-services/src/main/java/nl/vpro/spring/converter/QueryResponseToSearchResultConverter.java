@@ -1,6 +1,7 @@
 package nl.vpro.spring.converter;
 
 import nl.vpro.api.transfer.Broadcasting;
+import nl.vpro.api.transfer.LocationFormat;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItem;
 import org.apache.commons.lang.StringUtils;
@@ -9,10 +10,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Date: 13-3-12
@@ -47,9 +45,31 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             setFirstBroadcastDate(solrDocument, item);
             setImageLink(solrDocument, item);
 
+            setLocations(solrDocument, item);
+
             searchResult.addDocument(item);
         }
         return searchResult;
+    }
+
+    private void setLocations(SolrDocument solrDocument, MediaSearchResultItem item) {
+        if (solrDocument.containsKey("location_formats")) {
+            for (Object o : solrDocument.getFieldValues("location_formats")) {
+                String locationFormatName = (String) o;
+                if (solrDocument.containsKey("location_programUrl_" + locationFormatName)) {
+                    LocationFormat locationFormat = new LocationFormat();
+                    locationFormat.setFormat(locationFormatName);
+
+                    for (Object location : solrDocument.getFieldValues("location_programUrl_" + locationFormatName)) {
+                        locationFormat.addLocation((String) location);
+                    }
+
+                    if (locationFormat.getLinks().size() > 0) {
+                        item.addLocation(locationFormat);
+                    }
+                }
+            }
+        }
     }
 
     private String trimIfNotNull(String s) {
