@@ -1,7 +1,7 @@
 package nl.vpro.spring.converter;
 
 import nl.vpro.api.transfer.Broadcasting;
-import nl.vpro.api.transfer.LocationFormat;
+import nl.vpro.api.transfer.Location;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItem;
 import org.apache.commons.lang.StringUtils;
@@ -57,15 +57,8 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             for (Object o : solrDocument.getFieldValues("location_formats")) {
                 String locationFormatName = (String) o;
                 if (solrDocument.containsKey("location_programUrl_" + locationFormatName)) {
-                    LocationFormat locationFormat = new LocationFormat();
-                    locationFormat.setFormat(locationFormatName);
-
                     for (Object location : solrDocument.getFieldValues("location_programUrl_" + locationFormatName)) {
-                        locationFormat.addLocation((String) location);
-                    }
-
-                    if (locationFormat.getLinks().size() > 0) {
-                        item.addLocation(locationFormat);
+                        item.addLocation(new Location(locationFormatName, (String) location));
                     }
                 }
             }
