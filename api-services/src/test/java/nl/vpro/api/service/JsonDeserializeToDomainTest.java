@@ -13,7 +13,9 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * User: rico
@@ -107,7 +109,7 @@ public class JsonDeserializeToDomainTest {
 
             assertEquals(1330615422470L, group.getLastModified().getTime());
             assertTrue(group.isEmbeddable());
-            assertEquals("urn:vpro:media:group:12879828",group.getUrn());
+            assertEquals("urn:vpro:media:group:12879828", group.getUrn());
             assertEquals(GroupType.ALBUM, group.getType());
             assertTrue(group.isIsOrdered());
 
@@ -119,7 +121,7 @@ public class JsonDeserializeToDomainTest {
             assertEquals(1, group.getBroadcasters().size());
 
             String broadcaster = group.getBroadcasters().get(0);
-            assertEquals("VPRO",broadcaster);
+            assertEquals("VPRO", broadcaster);
 
             Description d = group.getDescriptions().iterator().next();
             assertEquals(OwnerType.BROADCASTER, d.getOwner());
@@ -140,18 +142,17 @@ public class JsonDeserializeToDomainTest {
             assertEquals(ImageType.PICTURE, i.getType());
             assertEquals(Workflow.PUBLISHED, i.getWorkflow());
 
-            Relation relation1=group.getRelations().get(0);
-            assertEquals("Lambchop",relation1.getValue());
-            assertEquals("ARTIST",relation1.getType());
-            assertEquals("VPRO",relation1.getBroadcaster());
-            assertEquals("urn:vpro:media:relation:12879831",relation1.getUrn());
+            Relation relation1 = group.getRelations().get(0);
+            assertEquals("Lambchop", relation1.getValue());
+            assertEquals("ARTIST", relation1.getType());
+            assertEquals("VPRO", relation1.getBroadcaster());
+            assertEquals("urn:vpro:media:relation:12879831", relation1.getUrn());
 
-            Relation relation2=group.getRelations().get(1);
-            assertEquals("City Slang/Konkurrent",relation2.getValue());
-            assertEquals("LABEL",relation2.getType());
-            assertEquals("VPRO",relation2.getBroadcaster());
-            assertEquals("urn:vpro:media:relation:12879832",relation2.getUrn());
-
+            Relation relation2 = group.getRelations().get(1);
+            assertEquals("City Slang/Konkurrent", relation2.getValue());
+            assertEquals("LABEL", relation2.getType());
+            assertEquals("VPRO", relation2.getBroadcaster());
+            assertEquals("urn:vpro:media:relation:12879832", relation2.getUrn());
 
 
         } catch (IOException e) {

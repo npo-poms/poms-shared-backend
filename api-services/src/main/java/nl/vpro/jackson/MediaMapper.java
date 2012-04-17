@@ -4,7 +4,7 @@
  */
 package nl.vpro.jackson;
 
-import nl.vpro.api.domain.media.*;
+import nl.vpro.api.domain.media.MediaObject;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -24,19 +24,19 @@ import java.util.Collection;
 public class MediaMapper extends ObjectMapper {
 
     private static BeanPropertyFilter CollectionFilter =
-            new BeanPropertyFilter() {
-                @Override
-                public void serializeAsField(Object bean, JsonGenerator jgen, SerializerProvider prov, BeanPropertyWriter writer) throws Exception {
-                    Object value = writer.get(bean);
-                    if (value instanceof Collection) {
-                        Collection col = (Collection) value;
-                        if (col.isEmpty()) {
-                            return;
-                        }
+        new BeanPropertyFilter() {
+            @Override
+            public void serializeAsField(Object bean, JsonGenerator jgen, SerializerProvider prov, BeanPropertyWriter writer) throws Exception {
+                Object value = writer.get(bean);
+                if (value instanceof Collection) {
+                    Collection col = (Collection) value;
+                    if (col.isEmpty()) {
+                        return;
                     }
-                    writer.serializeAsField(bean, jgen, prov);
                 }
-            };
+                writer.serializeAsField(bean, jgen, prov);
+            }
+        };
 
 
     public MediaMapper() {

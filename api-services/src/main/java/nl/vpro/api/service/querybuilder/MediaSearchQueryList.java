@@ -32,7 +32,7 @@ public final class MediaSearchQueryList extends MediaSearchQuery<MediaSearchQuer
     public String createQueryString() {
         BooleanGroupingStringBuilder sb = new BooleanGroupingStringBuilder();
         sb.grouping = mediaSearchQueries.size() > 1;
-        
+
         for (MediaSearchQuery query : mediaSearchQueries) {
             sb.append(query.createQueryString());
         }

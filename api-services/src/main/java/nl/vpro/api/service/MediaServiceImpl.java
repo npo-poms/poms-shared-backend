@@ -5,7 +5,6 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.Group;
-import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
@@ -14,6 +13,7 @@ import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.util.UrlProvider;
+import nl.vpro.domain.ugc.annotation.Annotation;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -26,7 +26,6 @@ import org.jcouchdb.document.ViewResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +33,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-
-import static nl.vpro.api.domain.media.support.MediaObjectType.*;
 
 /**
  * User: rico
@@ -135,59 +132,36 @@ public class MediaServiceImpl implements MediaService {
         return new MediaSearchSuggestions();
     }
 
-    @Override
-    public MediaObject getById(String id) {
-        return getById(id, false);
-    }
 
     @Override
-    public MediaObject getById(String id, boolean addMembers) {
-        MediaObject mediaObject=null;
-        if (MediaUtil.isUrn(id)) {
-            switch (MediaUtil.getMediaType(id)) {
-                case group:
-                    Group group=getGroup(id);
-                    if (addMembers) {
-                        group.getMembers().addAll(getProgramsForGroup(id));
-                    }
-                    mediaObject=group;
-                    break;
-                case program:
-                    mediaObject=getProgram(id);
-                    break;
-                case segment:
-                    mediaObject=getSegment(id);
-                    break;
-                default:
-                    log.warn("Unknown mediaType for urn "+id);
-                    break;
-            }
-        }
-        return mediaObject;
+    public Program getProgram(Long id) {
+        String urn = MediaUtil.createUrnFromId(MediaObjectType.program, id);
+        ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, urlProvider.getUrl(), urn);
+        return programResponseEntity.getBody();
     }
 
-    private Group getGroup(String id) {
-        if (MediaUtil.getMediaType(id)==group) {
-            ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), id);
-            return groupResponseEntity.getBody();
-        }
-        return null;
+    @Override
+    public Annotation getProgramAnnotation(Long id) {
+        Program program = getProgram(id);
+        return conversionService.convert(program, Annotation.class);
     }
 
-    private Program getProgram(String id) {
-        if (MediaUtil.getMediaType(id)==program) {
-            ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, urlProvider.getUrl(), id);
-            return programResponseEntity.getBody();
+    @Override
+    public Group getGroup(Long id, boolean addMembers) {
+        String urn = MediaUtil.createUrnFromId(MediaObjectType.group, id);
+        ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), urn);
+        Group group = groupResponseEntity.getBody();
+        if (addMembers) {
+            group.getMembers().addAll(getProgramsForGroup(group));
         }
-        return null;
+        return group;
     }
 
-    private Segment getSegment(String id) {
-        if (MediaUtil.getMediaType(id)==segment) {
-            ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, urlProvider.getUrl(), id);
-            return segmentResponseEntity.getBody();
-        }
-        return null;
+    @Override
+    public Segment getSegment(Long id) {
+        String urn = MediaUtil.createUrnFromId(MediaObjectType.segment, id);
+        ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, urlProvider.getUrl(), urn);
+        return segmentResponseEntity.getBody();
     }
 
 
@@ -203,28 +177,32 @@ public class MediaServiceImpl implements MediaService {
         this.suggestionsLimit = suggestionsLimit;
     }
 
-    private List<Program> getProgramsForGroup(String groupUrn) {
-        List<Program> programs=new ArrayList<Program>();
+    private List<Program> getProgramsForGroup(final Group group) {
+        List<Program> programs = new ArrayList<Program>();
         ViewResult<Map> viewResult = null;
-        final Group group = getGroup(groupUrn);
+
         if (group != null) {
-            viewResult = getViewResult(groupUrn, "media/by-group");
+            viewResult = getViewResult(group.getUrn(), "media/by-group");
             for (ValueRow<Map> row : viewResult.getRows()) {
                 String urn = row.getId();
-                Program program=getProgram(urn);
-                if (program!=null) {
-                    programs.add(program);
+                if (MediaUtil.getMediaType(urn) == MediaObjectType.program) {
+                    Long programId = MediaUtil.getMediaId(MediaObjectType.program, row.getId());
+                    Program program = getProgram(programId);
+                    if (program != null) {
+                        programs.add(program);
+                    }
                 }
+
             }
             if (group.isIsOrdered()) {
-                Collections.sort(programs,new Comparator<Program>() {
+                Collections.sort(programs, new Comparator<Program>() {
                     @Override
                     public int compare(Program program, Program program1) {
                         return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
                     }
                 });
             } else {
-                Collections.sort(programs,new Comparator<Program>() {
+                Collections.sort(programs, new Comparator<Program>() {
                     @Override
                     public int compare(Program program, Program program1) {
                         return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
@@ -237,11 +215,11 @@ public class MediaServiceImpl implements MediaService {
 
     private ViewResult<Map> getViewResult(final String groupUrn, final String view) {
         return couchDbMediaServer.queryView(view,
-                Map.class,
-                new Options().startKey(groupUrn)
-                        .endKey(groupUrn)
-                        .reduce(false),
-                null);
+            Map.class,
+            new Options().startKey(groupUrn)
+                .endKey(groupUrn)
+                .reduce(false),
+            null);
     }
 
 }

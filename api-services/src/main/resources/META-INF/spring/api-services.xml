@@ -36,36 +36,38 @@
       <set>
         <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter"/>
         <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
+        <bean class="nl.vpro.spring.converter.ProgramToAnnotationCoverter"/>
       </set>
     </property>
   </bean>
 
   <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
-        <property name="messageConverters">
-            <list>
-                <ref bean="jacksonHttpMessageConverter"/>
-            </list>
-        </property>
-    </bean>
+    <property name="messageConverters">
+      <list>
+        <ref bean="jacksonHttpMessageConverter"/>
+      </list>
+    </property>
+  </bean>
 
-    <bean id="jacksonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
-        <property name="supportedMediaTypes">
-            <list>
-               <bean class="org.springframework.http.MediaType">
-                <constructor-arg index="0" value="text"/>
-                <constructor-arg index="1" value="plain"/>
-               </bean>
-            </list>
-        </property>
-        <property name="objectMapper">
-            <bean class="nl.vpro.jackson.MediaMapper" />
-        </property>
-    </bean>
+  <bean id="jacksonHttpMessageConverter"
+        class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+    <property name="supportedMediaTypes">
+      <list>
+        <bean class="org.springframework.http.MediaType">
+          <constructor-arg index="0" value="text"/>
+          <constructor-arg index="1" value="plain"/>
+        </bean>
+      </list>
+    </property>
+    <property name="objectMapper">
+      <bean class="nl.vpro.jackson.MediaMapper"/>
+    </property>
+  </bean>
 
-    <bean id="urlProvider" class="nl.vpro.api.util.UrlProvider" >
-      <property name="host" value="${couchdb.media.server.host}" />
-      <property name="port" value="${couchdb.media.server.port}" />
-      <property name="uri" value="${couchdb.media.db}" />
-    </bean>
+  <bean id="urlProvider" class="nl.vpro.api.util.UrlProvider">
+    <property name="host" value="${couchdb.media.server.host}"/>
+    <property name="port" value="${couchdb.media.server.port}"/>
+    <property name="uri" value="${couchdb.media.db}"/>
+  </bean>
 
 </beans>

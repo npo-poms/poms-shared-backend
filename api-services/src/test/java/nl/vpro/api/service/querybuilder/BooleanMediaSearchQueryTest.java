@@ -5,7 +5,7 @@ import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.search.MediaType;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Date: 21-3-12
@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
  */
 
 public class BooleanMediaSearchQueryTest {
-    
+
     @Test
     public void testEmptyQuery() {
         BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
@@ -35,7 +35,7 @@ public class BooleanMediaSearchQueryTest {
     }
 
     @Test
-    public void testSingleConstraint(){
+    public void testSingleConstraint() {
         BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
         q.addAvType(AvType.AUDIO);
         assertEquals("(avType:AUDIO)", q.createQueryString());
@@ -57,7 +57,7 @@ public class BooleanMediaSearchQueryTest {
     }
 
     @Test
-    public void testAllConstraints(){
+    public void testAllConstraints() {
         BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
         q.addMediaType(MediaType.ALBUM);
         q.addMediaType(MediaType.CLIP);
@@ -83,7 +83,7 @@ public class BooleanMediaSearchQueryTest {
         q.addDescendant("urn:456");
         q.setMainTitle("main");
         q.setDocumentType(BooleanMediaSearchQuery.DOCUMENT_TYPE_GROUP);
-        
+
         assertEquals("(mediaType:ALBUM OR mediaType:CLIP OR location_formats:MP3 OR location_formats:FLV OR avType:AUDIO OR avType:VIDEO OR descendantOf:\"urn:123\" OR descendantOf:\"urn:456\" OR titleMain:main OR documentType:group)", q.createQueryString());
     }
 

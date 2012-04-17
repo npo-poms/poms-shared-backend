@@ -10,7 +10,10 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Date: 13-3-12
@@ -40,7 +43,11 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             item.setGenre(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("genre"), ","));
             item.setMediaType((String) solrDocument.getFieldValue("mediaType"));
             item.setCreationDate((Date) solrDocument.getFieldValue("creationDate"));
-            item.setDuration((Integer) solrDocument.getFieldValue("duration"));
+            //duration in solr is seconds, we want milliseconds
+            Integer duration = (Integer) solrDocument.getFieldValue("duration");
+            if (duration != null) {
+                item.setDuration(duration * 1000L);
+            }
 
             setFirstBroadcastDate(solrDocument, item);
             setImageLink(solrDocument, item);

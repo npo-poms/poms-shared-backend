@@ -4,9 +4,12 @@
  */
 package nl.vpro.api.service;
 
-import nl.vpro.api.domain.media.MediaObject;
+import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.Program;
+import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.domain.ugc.annotation.Annotation;
 
 /**
  * User: rico
@@ -18,9 +21,11 @@ public interface MediaService {
 
     public MediaSearchSuggestions searchSuggestions(String query, String profile);
 
-    public MediaObject getById(String id);
+    public Program getProgram(Long id);
 
-    public MediaObject getById(String id, boolean addMembers);
+    public Annotation getProgramAnnotation(Long id);
 
+    public Group getGroup(Long id, boolean addMembers);
 
+    public Segment getSegment(Long id);
 }

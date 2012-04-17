@@ -30,10 +30,6 @@ public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
     protected abstract T getInstance();
 
 
-
-
-    
-
     protected class BooleanGroupingStringBuilder {
         private boolean first = true;
         private boolean hasOpened = false;

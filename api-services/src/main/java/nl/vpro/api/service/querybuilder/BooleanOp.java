@@ -6,5 +6,6 @@ package nl.vpro.api.service.querybuilder;
  *
  * @author Ernst Bunders
  */
-public enum BooleanOp {OR, AND
+public enum BooleanOp {
+    OR, AND
 }

@@ -2,9 +2,9 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
+import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
 import nl.vpro.api.service.querybuilder.BooleanOp;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
-import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
 
 
 /**
@@ -28,9 +28,9 @@ public enum Profile {
 //                );
 
             return new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
-                    .addAvType(AvType.AUDIO)
-                    .addDescendant(getArchiveUrn())
-                    .addLocationFormat(AvFileFormat.MP3);
+                .addAvType(AvType.AUDIO)
+                .addDescendant(getArchiveUrn())
+                .addLocationFormat(AvFileFormat.MP3);
         }
     },
 

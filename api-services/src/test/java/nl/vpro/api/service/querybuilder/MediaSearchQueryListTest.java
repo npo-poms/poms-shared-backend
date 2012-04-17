@@ -63,7 +63,7 @@ public class MediaSearchQueryListTest {
     }
 
     @Test
-    public void testWithMultipleQueries(){
+    public void testWithMultipleQueries() {
         MediaSearchQueryList ql = new MediaSearchQueryList(BooleanOp.OR);
         ql.addQuery(q);
         ql.addQuery(q);

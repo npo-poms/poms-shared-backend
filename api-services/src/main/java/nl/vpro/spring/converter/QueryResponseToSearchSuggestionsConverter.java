@@ -23,9 +23,9 @@ public class QueryResponseToSearchSuggestionsConverter implements Converter<Quer
             FacetField facetField = queryResponse.getFacetField(fieldName);
             if (facetField != null && facetField.getValues() != null) {
                 for (FacetField.Count count : facetField.getValues()) {
-                    if(suggestionPresent(suggestions, count.getName())) {
+                    if (suggestionPresent(suggestions, count.getName())) {
                         mergeSuggestion(suggestions, count);
-                    }else{
+                    } else {
                         suggestions.addSuggestion(new MediaSearchSuggestion(count.getName(), count.getCount()));
                     }
                 }
@@ -35,7 +35,7 @@ public class QueryResponseToSearchSuggestionsConverter implements Converter<Quer
     }
 
     private void mergeSuggestion(MediaSearchSuggestions suggestions, FacetField.Count count) {
-        MediaSearchSuggestion suggestion =  findSuggestion(suggestions, count.getName());
+        MediaSearchSuggestion suggestion = findSuggestion(suggestions, count.getName());
         suggestion.setOccurrence(suggestion.getOccurrence() + count.getCount());
     }
 
@@ -43,7 +43,7 @@ public class QueryResponseToSearchSuggestionsConverter implements Converter<Quer
         return findSuggestion(suggestions, name) != null;
     }
 
-    private MediaSearchSuggestion findSuggestion(MediaSearchSuggestions suggestions,  String name) {
+    private MediaSearchSuggestion findSuggestion(MediaSearchSuggestions suggestions, String name) {
         for (MediaSearchSuggestion suggestion : suggestions.getSuggestions()) {
             if (suggestion.getValue().equals(name)) {
                 return suggestion;
