@@ -4,11 +4,18 @@
  */
 package nl.vpro.api.rs;
 
-import nl.vpro.api.domain.media.MediaObject;
+import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.Program;
+import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.support.MediaObjectType;
+import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.rs.util.TestBean;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.domain.ugc.annotation.Annotation;
+import nl.vpro.ugc.transfer.annotation.Annotations;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +41,42 @@ public class Media {
     }
 
     @GET
-    @Path("item/{urn}")
-    public MediaObject getMedia(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers ) {
-        logger.debug("Called with urn " + urn +" and members "+addMembers);
-        return mediaService.getById(urn,addMembers);
+    @Path("program/{urn}")
+    public Program getProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
+        logger.debug("Called with urn " + urn);
+        return mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, urn));
+    }
+
+    /**
+     * Currently this only fetches the default annotation from the poms segments.
+     * @param urn
+     * @return
+     * @throws IllegalArgumentException
+     */
+    @GET
+    @Path("program/{urn}/annotations")
+    public Annotations getAnnotationsForProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
+        Annotation annotation = mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, urn));
+        Annotations annotations = new Annotations();
+        if (annotation != null) {
+            annotations.addAnnotation(annotation);
+            annotations.setDefaultAnnotationIndex(0);
+        }
+        return annotations;
+    }
+
+    @GET
+    @Path("group/{urn}")
+    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers) throws IllegalArgumentException {
+        logger.debug("Called with urn " + urn);
+        return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers);
+    }
+
+    @GET
+    @Path("segment/{urn}")
+    public Segment getSegment(@PathParam("urn") String urn) throws IllegalArgumentException {
+        logger.debug("Called with urn " + urn);
+        return mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, urn));
     }
 
     @GET
@@ -69,5 +108,15 @@ public class Media {
     public TestBean test() {
 
         return new TestBean();
+    }
+
+    private long getMediaId(String type, String urn) throws IllegalArgumentException {
+        if (urn.matches("[0-9]+]")) {
+            return Long.parseLong(urn);
+        }
+        if (urn.matches("urn:vpro:media:" + type + ":[0-9]+")) {
+            return Long.parseLong(StringUtils.substringAfterLast(urn, ":"));
+        }
+        throw new IllegalArgumentException("urn " + urn + " could not be parsed to a valid id for an object of type " + type);
     }
 }
