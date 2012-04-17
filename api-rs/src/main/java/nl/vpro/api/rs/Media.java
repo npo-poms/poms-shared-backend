@@ -14,7 +14,8 @@ import nl.vpro.api.service.MediaService;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
-import nl.vpro.ugc.transfer.annotation.Annotations;
+
+import nl.vpro.transfer.ugc.annotation.Annotations;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
