@@ -14,14 +14,18 @@ import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
+import nl.vpro.jackson.MediaMapper;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jcouchdb.db.Database;
 import org.jcouchdb.db.Options;
+import org.jcouchdb.document.ValueAndDocumentRow;
 import org.jcouchdb.document.ValueRow;
+import org.jcouchdb.document.ViewAndDocumentsResult;
 import org.jcouchdb.document.ViewResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +35,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.svenson.JSONParser;
 
 import java.util.*;
 
@@ -152,7 +157,7 @@ public class MediaServiceImpl implements MediaService {
         ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), urn);
         Group group = groupResponseEntity.getBody();
         if (addMembers) {
-            group.getMembers().addAll(getProgramsForGroup(group));
+            group.getMembers().addAll(getProgramsForGroupBulk(group));
         }
         return group;
     }
@@ -193,6 +198,51 @@ public class MediaServiceImpl implements MediaService {
                     }
                 }
 
+            }
+            if (group.isIsOrdered()) {
+                Collections.sort(programs, new Comparator<Program>() {
+                    @Override
+                    public int compare(Program program, Program program1) {
+                        return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
+                    }
+                });
+            } else {
+                Collections.sort(programs, new Comparator<Program>() {
+                    @Override
+                    public int compare(Program program, Program program1) {
+                        return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
+                    }
+                });
+            }
+        }
+        return programs;
+    }
+
+    private List<Program> getProgramsForGroupBulk(final Group group) {
+        List<Program> programs = new ArrayList<Program>();
+        ViewResult<Map> viewResult = null;
+        List<String> programIds = new ArrayList<String>();
+
+        if (group != null) {
+            ObjectMapper mapper = new MediaMapper();
+            List<String> groups = new ArrayList<String>();
+            groups.add(group.getUrn());
+            Options options = new Options();
+            options.reduce(false);
+
+            viewResult = getViewResult(group.getUrn(), "media/by-group");
+            for (ValueRow<Map> row : viewResult.getRows()) {
+                String urn = row.getId();
+                if (MediaUtil.getMediaType(urn) == MediaObjectType.program) {
+                    programIds.add(urn);
+                }
+            }
+            // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
+            ViewAndDocumentsResult<Map,Map> progs=couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, programIds, new Options(), new JSONParser());
+            for (ValueAndDocumentRow<Map, Map> row : progs.getRows()) {
+                Map m = row.getDocument();
+                Program program=mapper.convertValue(m, Program.class);
+                programs.add(program);
             }
             if (group.isIsOrdered()) {
                 Collections.sort(programs, new Comparator<Program>() {
