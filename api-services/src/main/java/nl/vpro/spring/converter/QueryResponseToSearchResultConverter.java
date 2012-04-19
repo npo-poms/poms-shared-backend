@@ -38,9 +38,9 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             item.setTitle(trimIfNotNull((String) solrDocument.getFieldValue("titleMain")));
             item.setDescription(trimIfNotNull((String) solrDocument.getFieldValue("descriptionMain")));
             item.setScore((Float) solrDocument.getFieldValue("score"));
-            item.setBroadcaster(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("broadcasters"), ","));
+            item.setBroadcaster((List<String>) solrDocument.getFieldValue("broadcaster"));
             item.setAvType((String) solrDocument.getFieldValue("avType"));
-            item.setGenre(concatenateListOfStrings((List<String>) solrDocument.getFieldValue("genre"), ","));
+            item.setGenre((List<String>) solrDocument.getFieldValue("genre"));
             item.setMediaType((String) solrDocument.getFieldValue("mediaType"));
             item.setCreationDate((Date) solrDocument.getFieldValue("creationDate"));
             //duration in solr is seconds, we want milliseconds
