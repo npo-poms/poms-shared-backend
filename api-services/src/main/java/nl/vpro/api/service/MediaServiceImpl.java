@@ -209,6 +209,7 @@ public class MediaServiceImpl implements MediaService {
         this.suggestionsLimit = suggestionsLimit;
     }
 
+    //TODO: should we keep this? it is not used...
     private List<Program> getProgramsForGroup(final Group group) {
         List<Program> programs = new ArrayList<Program>();
         ViewResult<Map> viewResult;
@@ -226,21 +227,8 @@ public class MediaServiceImpl implements MediaService {
                 }
 
             }
-            if (group.isIsOrdered()) {
-                Collections.sort(programs, new Comparator<Program>() {
-                    @Override
-                    public int compare(Program program, Program program1) {
-                        return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
-                    }
-                });
-            } else {
-                Collections.sort(programs, new Comparator<Program>() {
-                    @Override
-                    public int compare(Program program, Program program1) {
-                        return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
-                    }
-                });
-            }
+            Collections.sort(programs, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByOrderComparator(group));
+
         }
         return programs;
     }
@@ -252,9 +240,6 @@ public class MediaServiceImpl implements MediaService {
 
         if (group != null) {
             ObjectMapper mapper = new MediaMapper();
-            //TODO: groups wordt nooit gebruikt.
-            List<String> groups = new ArrayList<String>();
-            groups.add(group.getUrn());
             Options options = new Options();
             options.reduce(false);
 
@@ -272,21 +257,8 @@ public class MediaServiceImpl implements MediaService {
                 Program program = mapper.convertValue(m, Program.class);
                 programs.add(program);
             }
-            if (group.isIsOrdered()) {
-                Collections.sort(programs, new Comparator<Program>() {
-                    @Override
-                    public int compare(Program program, Program program1) {
-                        return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
-                    }
-                });
-            } else {
-                Collections.sort(programs, new Comparator<Program>() {
-                    @Override
-                    public int compare(Program program, Program program1) {
-                        return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
-                    }
-                });
-            }
+            
+            Collections.sort(programs, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByOrderComparator(group));
         }
         return programs;
     }
@@ -299,5 +271,31 @@ public class MediaServiceImpl implements MediaService {
                 .reduce(false),
             null);
     }
+
+
+
+    private static final class SortInGroupByOrderComparator implements Comparator<Program>{
+        protected final Group group;
+        public SortInGroupByOrderComparator(Group group) {
+            this.group = group;
+        }
+        @Override
+        public int compare(Program program, Program program1) {
+            return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
+        }
+    }
+
+    private static final class SortInGroupByDateComparator implements Comparator<Program>{
+        protected final Group group;
+        public SortInGroupByDateComparator(Group group) {
+            this.group = group;
+        }
+        @Override
+        public int compare(Program program, Program program1) {
+            return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
+        }
+    }
+
+
 
 }
