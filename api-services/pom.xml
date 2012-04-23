@@ -43,6 +43,11 @@
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-utils</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>

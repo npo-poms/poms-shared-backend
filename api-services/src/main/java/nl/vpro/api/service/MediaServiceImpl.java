@@ -9,6 +9,8 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
+import nl.vpro.api.rs.error.NotFoundException;
+import nl.vpro.api.rs.error.ServerErrorException;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
@@ -173,7 +175,7 @@ public class MediaServiceImpl implements MediaService {
             ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), urn);
             Group group = groupResponseEntity.getBody();
             if (addMembers) {
-                group.getMembers().addAll(getProgramsForGroupBulk(group));
+                group.getMembers().addAll(getProgramsForGroup(group));
             }
             return group;
         } catch (HttpServerErrorException e) {
@@ -209,31 +211,7 @@ public class MediaServiceImpl implements MediaService {
         this.suggestionsLimit = suggestionsLimit;
     }
 
-    //TODO: should we keep this? it is not used...
     private List<Program> getProgramsForGroup(final Group group) {
-        List<Program> programs = new ArrayList<Program>();
-        ViewResult<Map> viewResult;
-
-        if (group != null) {
-            viewResult = getViewResult(group.getUrn(), "media/by-group");
-            for (ValueRow<Map> row : viewResult.getRows()) {
-                String urn = row.getId();
-                if (MediaUtil.getMediaType(urn) == MediaObjectType.program) {
-                    Long programId = MediaUtil.getMediaId(MediaObjectType.program, row.getId());
-                    Program program = getProgram(programId);
-                    if (program != null) {
-                        programs.add(program);
-                    }
-                }
-
-            }
-            Collections.sort(programs, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByOrderComparator(group));
-
-        }
-        return programs;
-    }
-
-    private List<Program> getProgramsForGroupBulk(final Group group) {
         List<Program> programs = new ArrayList<Program>();
         ViewResult<Map> viewResult;
         List<String> programIds = new ArrayList<String>();
@@ -257,7 +235,7 @@ public class MediaServiceImpl implements MediaService {
                 Program program = mapper.convertValue(m, Program.class);
                 programs.add(program);
             }
-            
+
             Collections.sort(programs, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByOrderComparator(group));
         }
         return programs;
@@ -273,29 +251,29 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-
-    private static final class SortInGroupByOrderComparator implements Comparator<Program>{
+    private static final class SortInGroupByOrderComparator implements Comparator<Program> {
         protected final Group group;
+
         public SortInGroupByOrderComparator(Group group) {
             this.group = group;
         }
+
         @Override
         public int compare(Program program, Program program1) {
             return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
         }
     }
 
-    private static final class SortInGroupByDateComparator implements Comparator<Program>{
+    private static final class SortInGroupByDateComparator implements Comparator<Program> {
         protected final Group group;
+
         public SortInGroupByDateComparator(Group group) {
             this.group = group;
         }
+
         @Override
         public int compare(Program program, Program program1) {
             return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
         }
     }
-
-
-
 }
