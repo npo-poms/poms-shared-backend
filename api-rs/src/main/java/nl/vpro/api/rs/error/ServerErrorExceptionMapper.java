@@ -1,6 +1,5 @@
 package nl.vpro.api.rs.error;
 
-import nl.vpro.api.service.NotFoundException;
 import nl.vpro.api.service.ServerErrorException;
 
 import javax.ws.rs.core.Response;

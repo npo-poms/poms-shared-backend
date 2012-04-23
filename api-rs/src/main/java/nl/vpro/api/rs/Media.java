@@ -16,7 +16,6 @@ import nl.vpro.api.service.ServerErrorException;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
-
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,13 +51,14 @@ public class Media {
 
     /**
      * Currently this only fetches the default annotation from the poms segments.
+     *
      * @param urn
      * @return
      * @throws IllegalArgumentException
      */
     @GET
     @Path("program/{urn}/annotations")
-    public Annotations getAnnotationsForProgram(@PathParam("urn") String urn) throws IllegalArgumentException{
+    public Annotations getAnnotationsForProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
         Annotation annotation = mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, urn));
         Annotations annotations = new Annotations();
         if (annotation != null) {
