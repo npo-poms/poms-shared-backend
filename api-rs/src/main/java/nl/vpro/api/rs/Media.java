@@ -11,6 +11,8 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.rs.util.TestBean;
 import nl.vpro.api.service.MediaService;
+import nl.vpro.api.service.NotFoundException;
+import nl.vpro.api.service.ServerErrorException;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -56,7 +58,7 @@ public class Media {
      */
     @GET
     @Path("program/{urn}/annotations")
-    public Annotations getAnnotationsForProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
+    public Annotations getAnnotationsForProgram(@PathParam("urn") String urn) throws IllegalArgumentException{
         Annotation annotation = mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, urn));
         Annotations annotations = new Annotations();
         if (annotation != null) {
@@ -68,14 +70,14 @@ public class Media {
 
     @GET
     @Path("group/{urn}")
-    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers) throws IllegalArgumentException {
+    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers) throws IllegalArgumentException, ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
         return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers);
     }
 
     @GET
     @Path("segment/{urn}")
-    public Segment getSegment(@PathParam("urn") String urn) throws IllegalArgumentException {
+    public Segment getSegment(@PathParam("urn") String urn) throws IllegalArgumentException, ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
         return mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, urn));
     }
@@ -107,8 +109,8 @@ public class Media {
     @GET
     @Path("/test")
     public TestBean test() {
-
-        return new TestBean();
+        throw new NotFoundException("not found, baby!");
+//        return new TestBean();
     }
 
     private long getMediaId(String type, String urn) throws IllegalArgumentException {
