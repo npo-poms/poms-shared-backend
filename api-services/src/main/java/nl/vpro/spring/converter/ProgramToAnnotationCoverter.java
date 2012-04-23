@@ -2,10 +2,10 @@ package nl.vpro.spring.converter;
 
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
-import nl.vpro.domain.ugc.annotation.AnnotationType;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.domain.ugc.annotation.AnnotationPart;
 import nl.vpro.domain.ugc.annotation.AnnotationPartTemplate;
+import nl.vpro.domain.ugc.annotation.AnnotationType;
 import org.pegdown.PegDownProcessor;
 import org.springframework.core.convert.converter.Converter;
 

@@ -6,7 +6,7 @@ package nl.vpro.api.service;
  *
  * @author Ernst Bunders
  */
-public class ServerErrorException extends RuntimeException   {
+public class ServerErrorException extends RuntimeException {
     public ServerErrorException() {
     }
 

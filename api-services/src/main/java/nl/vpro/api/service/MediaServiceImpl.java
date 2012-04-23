@@ -34,7 +34,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 import org.svenson.JSONParser;
 
 import java.util.*;
@@ -77,7 +80,6 @@ public class MediaServiceImpl implements MediaService {
     private RestTemplate restTemplate;
 
 
-
     public MediaServiceImpl() {
     }
 
@@ -111,7 +113,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String query, String profileName){
+    public MediaSearchSuggestions searchSuggestions(String query, String profileName) {
         Profile profile = profileService.getProfile(profileName);
         MediaSearchQuery filterQuery = profile.createSearchQuery();
         String filterQueryString = filterQuery.createQueryString();
@@ -133,13 +135,13 @@ public class MediaServiceImpl implements MediaService {
             QueryResponse response = solrServer.query(solrQuery);
             return conversionService.convert(response, MediaSearchSuggestions.class);
         } catch (SolrServerException e) {
-                   throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
+            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
         }
     }
 
 
     @Override
-    public Program getProgram(Long id){
+    public Program getProgram(Long id) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.program, id);
         try {
             ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, urlProvider.getUrl(), urn);
@@ -149,23 +151,23 @@ public class MediaServiceImpl implements MediaService {
         } catch (ResourceAccessException e1) {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
-            if(e3.getStatusCode().value() == 404){
+            if (e3.getStatusCode().value() == 404) {
                 throw new NotFoundException("Program with id " + id + " could not be found", e3);
-            }else {
+            } else {
                 throw new ServerErrorException("Something went wrong fetching program with id " + id + ". reason: " + e3.getMessage(), e3);
             }
         }
     }
 
     @Override
-    public Annotation getProgramAnnotation(Long id){
+    public Annotation getProgramAnnotation(Long id) {
         Program program = getProgram(id);
         return conversionService.convert(program, Annotation.class);
 
     }
 
     @Override
-    public Group getGroup(Long id, boolean addMembers){
+    public Group getGroup(Long id, boolean addMembers) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.group, id);
         try {
             ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), urn);
@@ -179,16 +181,16 @@ public class MediaServiceImpl implements MediaService {
         } catch (ResourceAccessException e1) {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
-            if(e3.getStatusCode().value() == 404){
+            if (e3.getStatusCode().value() == 404) {
                 throw new NotFoundException("Group with id " + id + " could not be found", e3);
-            }else {
+            } else {
                 throw new ServerErrorException("Something went wrong fetching group with id " + id + ". reason: " + e3.getMessage(), e3);
             }
         }
     }
 
     @Override
-    public Segment getSegment(Long id){
+    public Segment getSegment(Long id) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.segment, id);
         ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, urlProvider.getUrl(), urn);
         return segmentResponseEntity.getBody();
@@ -207,7 +209,7 @@ public class MediaServiceImpl implements MediaService {
         this.suggestionsLimit = suggestionsLimit;
     }
 
-    private List<Program> getProgramsForGroup(final Group group){
+    private List<Program> getProgramsForGroup(final Group group) {
         List<Program> programs = new ArrayList<Program>();
         ViewResult<Map> viewResult;
 
@@ -264,7 +266,7 @@ public class MediaServiceImpl implements MediaService {
                 }
             }
             // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
-            ViewAndDocumentsResult<Map,Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, programIds, new Options(), new JSONParser());
+            ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, programIds, new Options(), new JSONParser());
             for (ValueAndDocumentRow<Map, Map> row : progs.getRows()) {
                 Map m = row.getDocument();
                 Program program = mapper.convertValue(m, Program.class);

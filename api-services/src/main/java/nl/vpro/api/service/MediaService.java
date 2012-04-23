@@ -17,15 +17,15 @@ import nl.vpro.domain.ugc.annotation.Annotation;
  */
 public interface MediaService {
 
-    public MediaSearchResult search(String query, String profile, Integer offset, Integer max) ;
+    public MediaSearchResult search(String query, String profile, Integer offset, Integer max);
 
-    public MediaSearchSuggestions searchSuggestions(String query, String profile)  ;
+    public MediaSearchSuggestions searchSuggestions(String query, String profile);
 
     public Program getProgram(Long id);
 
-    public Annotation getProgramAnnotation(Long id) ;
+    public Annotation getProgramAnnotation(Long id);
 
-    public Group getGroup(Long id, boolean addMembers) ;
+    public Group getGroup(Long id, boolean addMembers);
 
     public Segment getSegment(Long id);
 }

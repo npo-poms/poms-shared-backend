@@ -6,7 +6,7 @@ package nl.vpro.api.service;
  *
  * @author Ernst Bunders
  */
-public class NotFoundException extends RuntimeException{
+public class NotFoundException extends RuntimeException {
     public NotFoundException() {
     }
 
