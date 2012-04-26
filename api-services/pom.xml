@@ -11,7 +11,6 @@
 
   <groupId>nl.vpro.api</groupId>
   <artifactId>api-services</artifactId>
-  <version>${project.parent.version}</version>
 
   <name>api-services</name>
   <packaging>jar</packaging>

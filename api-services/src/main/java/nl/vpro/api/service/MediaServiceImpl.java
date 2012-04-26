@@ -42,6 +42,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.svenson.JSONParser;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -251,7 +252,9 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-    private static final class SortInGroupByOrderComparator implements Comparator<Program> {
+    private static final class SortInGroupByOrderComparator implements Comparator<Program>, Serializable {
+        private static final long serialVersionUID=23450383305L;
+
         protected final Group group;
 
         public SortInGroupByOrderComparator(Group group) {
@@ -264,7 +267,8 @@ public class MediaServiceImpl implements MediaService {
         }
     }
 
-    private static final class SortInGroupByDateComparator implements Comparator<Program> {
+    private static final class SortInGroupByDateComparator implements Comparator<Program>, Serializable {
+        private static final long serialVersionUID=23450389305L;
         protected final Group group;
 
         public SortInGroupByDateComparator(Group group) {

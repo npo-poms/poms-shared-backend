@@ -23,7 +23,7 @@ import java.util.Collection;
  */
 public class MediaMapper extends ObjectMapper {
 
-    private static BeanPropertyFilter CollectionFilter =
+    private static BeanPropertyFilter collectionFilter =
         new BeanPropertyFilter() {
             @Override
             public void serializeAsField(Object bean, JsonGenerator jgen, SerializerProvider prov, BeanPropertyWriter writer) throws Exception {
@@ -53,8 +53,8 @@ public class MediaMapper extends ObjectMapper {
         serializationConfig.set(SerializationConfig.Feature.INDENT_OUTPUT, true);
         serializationConfig.set(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, true);
         SimpleFilterProvider filter = new SimpleFilterProvider();
-        filter.setDefaultFilter(CollectionFilter);
-        filter.addFilter(MediaObject.class.getSimpleName(), CollectionFilter);
+        filter.setDefaultFilter(collectionFilter);
+        filter.addFilter(MediaObject.class.getSimpleName(), collectionFilter);
 
         setSerializationConfig(serializationConfig.withFilters(filter));
     }
