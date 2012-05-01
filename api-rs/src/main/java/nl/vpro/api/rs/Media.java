@@ -13,6 +13,7 @@ import nl.vpro.api.rs.error.NotFoundException;
 import nl.vpro.api.rs.error.ServerErrorException;
 import nl.vpro.api.rs.util.TestBean;
 import nl.vpro.api.service.MediaService;
+import nl.vpro.api.service.UgcService;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -37,9 +38,16 @@ public class Media {
     Logger logger = LoggerFactory.getLogger(Media.class);
     MediaService mediaService;
 
+    UgcService ugcService;
+
     @Autowired
     public Media(MediaService mediaService) {
         this.mediaService = mediaService;
+    }
+
+    @Autowired
+    public void setUgcService(UgcService ugcService) {
+        this.ugcService = ugcService;
     }
 
     @GET
@@ -108,9 +116,10 @@ public class Media {
 
     @GET
     @Path("/test")
-    public TestBean test() {
-        throw new NotFoundException("not found, baby!");
-//        return new TestBean();
+    public Annotation test() {
+
+        Annotation a = ugcService.test("uri:vpro:ugc:annotation:123");
+        return a;
     }
 
     private long getMediaId(String type, String urn) throws IllegalArgumentException {
