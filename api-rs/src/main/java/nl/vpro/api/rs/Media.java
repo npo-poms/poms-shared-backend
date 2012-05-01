@@ -114,14 +114,6 @@ public class Media {
         return mediaService.searchSuggestions(queyString, profileName);
     }
 
-    @GET
-    @Path("/test")
-    public Annotation test() {
-
-        Annotation a = ugcService.test("uri:vpro:ugc:annotation:123");
-        return a;
-    }
-
     private long getMediaId(String type, String urn) throws IllegalArgumentException {
         if (urn.matches("[0-9]+]")) {
             return Long.parseLong(urn);
