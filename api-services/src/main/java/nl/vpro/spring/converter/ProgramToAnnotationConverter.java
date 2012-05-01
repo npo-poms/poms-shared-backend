@@ -15,7 +15,7 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Ernst Bunders
  */
-public class ProgramToAnnotationCoverter implements Converter<Program, Annotation> {
+public class ProgramToAnnotationConverter implements Converter<Program, Annotation> {
 
     @Override
     public Annotation convert(Program program) {
@@ -25,11 +25,14 @@ public class ProgramToAnnotationCoverter implements Converter<Program, Annotatio
         PegDownProcessor processor = new PegDownProcessor();
 
         Annotation annotation = new Annotation();
+//        annotation.set
         annotation.setId(program.getUrn());
+        annotation.setTitle("Standaard annotatie");
         annotation.setType(AnnotationType.TIMELINE);
         annotation.setMedia(program.getUrn());
         annotation.setCreationDate(program.getCreationDate());
         annotation.setLastModifiedDate(program.getLastModified());
+
 
 
         for (Segment segment : program.getSegments()) {

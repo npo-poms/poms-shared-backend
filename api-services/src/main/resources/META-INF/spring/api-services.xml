@@ -36,7 +36,7 @@
       <set>
         <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter"/>
         <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
-        <bean class="nl.vpro.spring.converter.ProgramToAnnotationCoverter"/>
+        <bean class="nl.vpro.spring.converter.ProgramToAnnotationConverter"/>
       </set>
     </property>
   </bean>
