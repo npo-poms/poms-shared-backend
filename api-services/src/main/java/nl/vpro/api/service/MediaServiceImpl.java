@@ -55,8 +55,8 @@ public class MediaServiceImpl implements MediaService {
     public static String MEDIA_CORE_NAME = "poms";
     private static final Logger log = LoggerFactory.getLogger(MediaService.class);
 
-    @Autowired
-    private UrlProvider urlProvider;
+    @Autowired()
+    private UrlProvider couchdbUrlprovider;
 
     @Value("${solr.max.result}")
     private int maxResult;
@@ -147,7 +147,7 @@ public class MediaServiceImpl implements MediaService {
     public Program getProgram(Long id) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.program, id);
         try {
-            ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, urlProvider.getUrl(), urn);
+            ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, couchdbUrlprovider.getUrl(), urn);
             return programResponseEntity.getBody();
         } catch (HttpServerErrorException e) {
             throw new ServerErrorException(e.getMessage(), e);
@@ -173,7 +173,7 @@ public class MediaServiceImpl implements MediaService {
     public Group getGroup(Long id, boolean addMembers) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.group, id);
         try {
-            ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, urlProvider.getUrl(), urn);
+            ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, couchdbUrlprovider.getUrl(), urn);
             Group group = groupResponseEntity.getBody();
             if (addMembers) {
                 group.getMembers().addAll(getProgramsForGroup(group));
@@ -195,7 +195,7 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public Segment getSegment(Long id) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.segment, id);
-        ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, urlProvider.getUrl(), urn);
+        ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, couchdbUrlprovider.getUrl(), urn);
         return segmentResponseEntity.getBody();
     }
 

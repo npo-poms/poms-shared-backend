@@ -64,10 +64,16 @@
     </property>
   </bean>
 
-  <bean id="urlProvider" class="nl.vpro.api.util.UrlProvider">
+  <bean id="couchdbUrlprovider" class="nl.vpro.api.util.UrlProvider">
     <property name="host" value="${couchdb.media.server.host}"/>
     <property name="port" value="${couchdb.media.server.port}"/>
     <property name="uri" value="${couchdb.media.db}"/>
   </bean>
+
+  <bean id="ugcUrlprovider" class="nl.vpro.api.util.UrlProvider">
+      <property name="host" value="${vpro.ugc.url}"/>
+      <property name="port" value="${vpro.ugc.port}"/>
+      <property name="uri" value="${vpro.ugc.context}"/>
+    </bean>
 
 </beans>
