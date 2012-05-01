@@ -4,6 +4,7 @@ import nl.vpro.api.rs.error.NotFoundException;
 import nl.vpro.api.rs.error.ServerErrorException;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
+import nl.vpro.domain.ugc.playerconfiguration.PlayerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Ernst Bunders
  */
 @Service("ugcService")
-public class UgcServiceRestImpl implements UgcService{
+public class UgcServiceRestImpl implements UgcService {
 
     @Autowired
     private UrlProvider ugcUrlprovider;
@@ -26,10 +27,23 @@ public class UgcServiceRestImpl implements UgcService{
     private RestTemplate restTemplate;
 
     @Override
-    public Annotation test(String id) {
+    public Annotation getAnnotation(String id) {
+        return getById("annotation", id, Annotation.class);
+    }
+
+    @Override
+    public PlayerConfiguration getPlayerConfiguration(String id) {
+        return getById("playerconfiguration", id, PlayerConfiguration.class);
+    }
+
+
+
+
+
+    private <T> T getById(String typeName, String id, Class<T> type) {
         Object[] args = {ugcUrlprovider.getUrl(), id};
         try {
-            ResponseEntity<Annotation> responseEntity = restTemplate.getForEntity("{url}annotation/get/{urn}", Annotation.class, args);
+            ResponseEntity<T> responseEntity = restTemplate.getForEntity("{url}" + typeName + "/{urn}.json", type, args);
             return responseEntity.getBody();
         } catch (HttpClientErrorException cee) {
             throw new NotFoundException("Could not fetch annotation with id " + id + ". It does not exist");

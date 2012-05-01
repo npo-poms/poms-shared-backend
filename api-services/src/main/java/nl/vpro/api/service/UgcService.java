@@ -1,6 +1,7 @@
 package nl.vpro.api.service;
 
 import nl.vpro.domain.ugc.annotation.Annotation;
+import nl.vpro.domain.ugc.playerconfiguration.PlayerConfiguration;
 
 /**
  * Date: 24-4-12
@@ -9,5 +10,7 @@ import nl.vpro.domain.ugc.annotation.Annotation;
  * @author Ernst Bunders
  */
 public interface UgcService {
-    public Annotation test(String id);
+    public Annotation getAnnotation(String id);
+
+    public PlayerConfiguration getPlayerConfiguration(String id);
 }
