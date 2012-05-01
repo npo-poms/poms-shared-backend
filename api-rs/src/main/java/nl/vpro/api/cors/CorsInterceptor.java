@@ -11,18 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
- * Created with IntelliJ IDEA.
  * User: ricojansen
  * Date: 27-04-2012
  * Time: 14:12
- * To change this template use File | Settings | File Templates.
  */
 @Provider
 @ServerInterceptor
@@ -36,11 +30,18 @@ public class CorsInterceptor implements MessageBodyWriterInterceptor {
 
     @Override
     public void write(MessageBodyWriterContext context) throws IOException, WebApplicationException {
+        String origin = httpServletRequest.getHeader(CorsHeaders.ORIGIN);
         if (corsPolicy.isEnabled()) {
-            String origin = httpServletRequest.getHeader(CorsHeaders.ORIGIN);
             String method = httpServletRequest.getMethod();
             if (StringUtils.isNotEmpty(origin)) {
-                context.getHeaders().add("Access-Control-Allow-Origin", origin);
+                boolean allowed=corsPolicy.allowedOriginAndMethod(origin, method);
+                if (allowed) {
+                    context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                }
+            }
+        } else {
+            if (StringUtils.isNotEmpty(origin)) {
+                context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
             }
         }
         context.proceed();

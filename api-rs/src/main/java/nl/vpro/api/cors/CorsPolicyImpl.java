@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 /**
  * Created with IntelliJ IDEA.
@@ -17,42 +20,75 @@ import java.util.Properties;
  */
 public class CorsPolicyImpl implements CorsPolicy {
 
-    String policyFile;
+    private String policyFile;
+    private boolean enabled;
 
-    boolean enabled;
+    private Map<String, Pattern> policyTable = null;
 
     @Override
     public boolean allowedOrigin(String origin) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        return allowedOriginAndMethod(origin, "GET");
     }
 
     @Override
     public boolean allowedOriginAndMethod(String origin, String method) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        if (StringUtils.isNotEmpty(method) && StringUtils.isNotEmpty(origin)) {
+            Pattern pattern = getPolicyTable().get(method);
+            if (pattern != null) {
+                return pattern.matcher(origin).matches();
+            }
+        }
+        return false;
     }
 
-    private Properties getPolicy() {
-        InputStream in=null;
-        Properties properties;
-        try {
-            if (policyFile.startsWith("classpath:")) {
-                in=getClass().getResourceAsStream(StringUtils.substringAfter(policyFile, "classpath:"));
-            } else {
-                File file=new File(policyFile);
-                in=new FileInputStream(file);
+    private Map<String, Pattern> getPolicyTable() {
+        if (policyTable == null) {
+            synchronized (this) {
+                if (policyTable == null) {
+                    policyTable = parseProperties();
+                }
             }
+        }
+        return policyTable;
+    }
+
+
+    private Map<String, Pattern> parseProperties() {
+        Map<String, Pattern> table = new HashMap<String, Pattern>();
+        Properties properties = getPolicyProperties();
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            String key = (String) entry.getKey();
+            String value = (String) entry.getValue();
+            Pattern pattern = Pattern.compile(value);
+            table.put(key, pattern);
+        }
+        return table;
+    }
+
+    private Properties getPolicyProperties() {
+        InputStream in = null;
+        Properties properties=new Properties();
+        String filename = getPolicyFile();
+        try {
+            if (filename.startsWith("classpath:")) {
+                in = getClass().getResourceAsStream(StringUtils.substringAfter(filename, "classpath:"));
+            } else {
+                File file = new File(policyFile);
+                in = new FileInputStream(file);
+            }
+            properties.load(in);
         } catch (IOException ioe) {
 
         } finally {
             try {
-                if (in!=null) {
+                if (in != null) {
                     in.close();
                 }
             } catch (IOException ieo) {
 
             }
         }
-        return null;
+        return properties;
     }
 
     public String getPolicyFile() {
