@@ -55,7 +55,7 @@ public class MediaServiceImpl implements MediaService {
     public static String MEDIA_CORE_NAME = "poms";
     private static final Logger log = LoggerFactory.getLogger(MediaService.class);
 
-    @Autowired()
+    @Autowired
     private UrlProvider couchdbUrlprovider;
 
     @Value("${solr.max.result}")

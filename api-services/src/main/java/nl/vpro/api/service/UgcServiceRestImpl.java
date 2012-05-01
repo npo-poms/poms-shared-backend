@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 @Service("ugcService")
 public class UgcServiceRestImpl implements UgcService{
 
-    @Autowired()
+    @Autowired
     private UrlProvider ugcUrlprovider;
 
     @Autowired
