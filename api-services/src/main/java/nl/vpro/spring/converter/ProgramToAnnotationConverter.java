@@ -37,6 +37,7 @@ public class ProgramToAnnotationConverter implements Converter<Program, Annotati
 
         for (Segment segment : program.getSegments()) {
             AnnotationPart part = new AnnotationPart();
+            part.setUrn(segment.getUrn());
             part.setStart(segment.getStart().getTime());
             part.setStop(segment.getStart().getTime() + segment.getDuration().getTime());
             if (segment.getImages().size() > 0) {
