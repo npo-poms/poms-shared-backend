@@ -1,6 +1,7 @@
 package nl.vpro.api.cors;
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,11 +20,16 @@ import java.util.regex.Pattern;
  * To change this template use File | Settings | File Templates.
  */
 public class CorsPolicyImpl implements CorsPolicy {
-
     private String policyFile;
     private boolean enabled;
 
     private Map<String, Pattern> policyTable = null;
+
+    public CorsPolicyImpl(boolean enabled, String policyFile) {
+        this.policyFile=policyFile;
+        this.enabled=enabled;
+        policyTable=parseProperties();
+    }
 
     @Override
     public boolean allowedOrigin(String origin) {
@@ -33,23 +39,12 @@ public class CorsPolicyImpl implements CorsPolicy {
     @Override
     public boolean allowedOriginAndMethod(String origin, String method) {
         if (StringUtils.isNotEmpty(method) && StringUtils.isNotEmpty(origin)) {
-            Pattern pattern = getPolicyTable().get(method);
+            Pattern pattern = policyTable.get(method);
             if (pattern != null) {
                 return pattern.matcher(origin).matches();
             }
         }
         return false;
-    }
-
-    private Map<String, Pattern> getPolicyTable() {
-        if (policyTable == null) {
-            synchronized (this) {
-                if (policyTable == null) {
-                    policyTable = parseProperties();
-                }
-            }
-        }
-        return policyTable;
     }
 
 
@@ -68,10 +63,10 @@ public class CorsPolicyImpl implements CorsPolicy {
     private Properties getPolicyProperties() {
         InputStream in = null;
         Properties properties=new Properties();
-        String filename = getPolicyFile();
+        String filename = policyFile;
         try {
             if (filename.startsWith("classpath:")) {
-                in = getClass().getResourceAsStream(StringUtils.substringAfter(filename, "classpath:"));
+                in = CorsPolicyImpl.class.getResourceAsStream(StringUtils.substringAfter(filename, "classpath:"));
             } else {
                 File file = new File(policyFile);
                 in = new FileInputStream(file);
@@ -91,19 +86,7 @@ public class CorsPolicyImpl implements CorsPolicy {
         return properties;
     }
 
-    public String getPolicyFile() {
-        return policyFile;
-    }
-
-    public void setPolicyFile(String policyFile) {
-        this.policyFile = policyFile;
-    }
-
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
 }

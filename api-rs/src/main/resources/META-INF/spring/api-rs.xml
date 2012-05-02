@@ -14,7 +14,7 @@
   <bean class="nl.vpro.api.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
 
   <bean class="nl.vpro.api.cors.CorsPolicyImpl" id="corsPolicy">
-    <property name="policyFile" value="${cors.policy}"/>
-    <property name="enabled" value="${cors.enabled}" />
+    <constructor-arg index="0" value="${cors.enabled}" />
+    <constructor-arg index="1" value="${cors.policy}" />
   </bean>
 </beans>

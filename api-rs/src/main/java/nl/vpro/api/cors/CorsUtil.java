@@ -12,14 +12,14 @@ import org.apache.commons.lang.StringUtils;
  */
 public class CorsUtil {
 
-    private enum simpleMethods {
+    private enum SimpleMethods {
         GET,
         HEAD,
         POST
     }
     public static boolean isSimpleMethod(String method) {
         if (StringUtils.isNotEmpty(method)) {
-            if (simpleMethods.valueOf(method)!=null) {
+            if (SimpleMethods.valueOf(method)!=null) {
                 return true;
             }
         }
