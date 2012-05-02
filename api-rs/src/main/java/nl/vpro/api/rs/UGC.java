@@ -1,7 +1,16 @@
 package nl.vpro.api.rs;
 
+import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.support.MediaObjectType;
+import nl.vpro.api.domain.media.support.MediaUtil;
+import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.UgcService;
+import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.domain.ugc.playerconfiguration.PlayerConfiguration;
+import nl.vpro.ugc.util.UrnUtil;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -18,7 +27,10 @@ import javax.ws.rs.PathParam;
 @Path("/ugc")
 @Controller
 public class UGC {
+    Logger logger = LoggerFactory.getLogger(UGC.class);
 
+    @Autowired
+    private MediaService mediaService;
     @Autowired
     private UgcService ugcService;
 
@@ -26,5 +38,35 @@ public class UGC {
     @Path("playerconfiguration/{urn}")
     public PlayerConfiguration getPlayerConfiguration(@PathParam("urn") String id) {
         return ugcService.getPlayerConfiguration(id);
+    }
+
+    @GET
+    @Path("annotation/{urn}")
+    public Annotation getAnnotation(@PathParam("urn") String id) {
+        if (StringUtils.isNotEmpty(id)) {
+            if (MediaUtil.isUrn(id)) {
+                return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, id));
+            } else {
+                return ugcService.getAnnotation(id);
+            }
+        }
+        return null;
+    }
+
+    @GET
+    @Path("annotation/bypart/{urn}")
+    public Annotation getAnnotationByPart(@PathParam("urn") String id) {
+        if (StringUtils.isNotEmpty(id)) {
+            if (MediaUtil.isUrn(id)) {
+                Segment segment=mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment,id));
+                if (segment!=null) {
+                    String urn=segment.getUrnRef();
+                    return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program,urn));
+                }
+            } else {
+                return ugcService.getAnnotiationByPart(id);
+            }
+        }
+        return null;
     }
 }
