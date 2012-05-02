@@ -12,5 +12,7 @@ import nl.vpro.domain.ugc.playerconfiguration.PlayerConfiguration;
 public interface UgcService {
     public Annotation getAnnotation(String id);
 
+    public Annotation getAnnotiationByPart(String id);
+
     public PlayerConfiguration getPlayerConfiguration(String id);
 }

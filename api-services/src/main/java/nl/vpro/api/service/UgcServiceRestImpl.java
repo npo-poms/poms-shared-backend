@@ -19,7 +19,6 @@ import org.springframework.web.client.RestTemplate;
  */
 @Service("ugcService")
 public class UgcServiceRestImpl implements UgcService {
-
     @Autowired
     private UrlProvider ugcUrlprovider;
 
@@ -36,8 +35,18 @@ public class UgcServiceRestImpl implements UgcService {
         return getById("playerconfiguration", id, PlayerConfiguration.class);
     }
 
-
-
+    @Override
+    public Annotation getAnnotiationByPart(String id) {
+        Object[] args = {ugcUrlprovider.getUrl(), id};
+        try {
+            ResponseEntity<Annotation> responseEntity = restTemplate.getForEntity("{url}annotation/bypart/{urn}.json", Annotation.class, args);
+            return responseEntity.getBody();
+        } catch (HttpClientErrorException cee) {
+            throw new NotFoundException("Could not fetch annotation with id " + id + ". It does not exist");
+        } catch (Exception e) {
+            throw new ServerErrorException("Something went wrong fetching an annotation from the ugc service: " + e.getMessage(), e);
+        }
+    }
 
 
     private <T> T getById(String typeName, String id, Class<T> type) {
@@ -51,4 +60,6 @@ public class UgcServiceRestImpl implements UgcService {
             throw new ServerErrorException("Something went wrong fetching an annotation from the ugc service: " + e.getMessage(), e);
         }
     }
+
+
 }
