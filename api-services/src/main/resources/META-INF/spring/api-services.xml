@@ -41,12 +41,12 @@
     </property>
   </bean>
 
-  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
-    <property name="messageConverters">
-      <list>
-        <ref bean="jacksonHttpMessageConverter"/>
-      </list>
-    </property>
+  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
+
+  <!-- This is a utility for converting upstream error responses into matching exceptions and rethrow them
+  for the client-->
+  <bean id="errorConverter" class="nl.vpro.api.rs.error.util.ErrorResponseToExceptionConverter">
+    <constructor-arg ref="restTemplate"/>
   </bean>
 
   <bean id="jacksonHttpMessageConverter"

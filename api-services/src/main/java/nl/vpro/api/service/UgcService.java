@@ -15,4 +15,9 @@ public interface UgcService {
     public Annotation getAnnotiationByPart(String id);
 
     public PlayerConfiguration getPlayerConfiguration(String id);
+
+    public PlayerConfiguration insertPlayerConfiguration(PlayerConfiguration playerConfiguration);
+
+    public PlayerConfiguration updatePlayerConfiguration(PlayerConfiguration playerConfiguration);
+
 }
