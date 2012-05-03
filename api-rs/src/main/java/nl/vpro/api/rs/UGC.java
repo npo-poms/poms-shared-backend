@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 
@@ -40,33 +41,9 @@ public class UGC {
         return ugcService.getPlayerConfiguration(id);
     }
 
-    @GET
-    @Path("annotation/{urn}")
-    public Annotation getAnnotation(@PathParam("urn") String id) {
-        if (StringUtils.isNotEmpty(id)) {
-            if (MediaUtil.isUrn(id)) {
-                return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, id));
-            } else {
-                return ugcService.getAnnotation(id);
-            }
-        }
-        return null;
-    }
-
-    @GET
-    @Path("annotation/bypart/{urn}")
-    public Annotation getAnnotationByPart(@PathParam("urn") String id) {
-        if (StringUtils.isNotEmpty(id)) {
-            if (MediaUtil.isUrn(id)) {
-                Segment segment=mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment,id));
-                if (segment!=null) {
-                    String urn=segment.getUrnRef();
-                    return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program,urn));
-                }
-            } else {
-                return ugcService.getAnnotiationByPart(id);
-            }
-        }
-        return null;
+    @POST
+    @Path("playerconfiguration")
+    public PlayerConfiguration insertPlayerConfiguration(PlayerConfiguration playerConfiguration) {
+        return ugcService.insertPlayerConfiguration(playerConfiguration);
     }
 }
