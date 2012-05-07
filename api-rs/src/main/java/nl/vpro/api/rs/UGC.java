@@ -46,4 +46,36 @@ public class UGC {
     public PlayerConfiguration insertPlayerConfiguration(PlayerConfiguration playerConfiguration) {
         return ugcService.insertPlayerConfiguration(playerConfiguration);
     }
+
+    @GET
+    @Path("annotation/{urn}")
+    public Annotation getAnnotation(@PathParam("urn") String id) {
+        if (StringUtils.isNotEmpty(id)) {
+            if (MediaUtil.isUrn(id)) {
+                return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, id));
+            } else {
+                return ugcService.getAnnotation(id);
+            }
+        }
+        return null;
+    }
+
+    @GET
+    @Path("annotation/bypart/{urn}")
+    public Annotation getAnnotationByPart(@PathParam("urn") String id) {
+        if (StringUtils.isNotEmpty(id)) {
+            if (MediaUtil.isUrn(id)) {
+                Segment segment=mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment,id));
+                if (segment!=null) {
+                    String urn=segment.getUrnRef();
+                    return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program,urn));
+                }
+            } else {
+                return ugcService.getAnnotiationByPart(id);
+            }
+        }
+        return null;
+    }
 }
+
+
