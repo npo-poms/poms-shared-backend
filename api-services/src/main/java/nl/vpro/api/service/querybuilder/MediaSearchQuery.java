@@ -33,7 +33,7 @@ public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
     protected class BooleanGroupingStringBuilder {
         private boolean first = true;
         private boolean hasOpened = false;
-        protected boolean grouping = false; /*should this group be wrapped in parenthesis?*/
+        protected boolean grouping = true; /*should this group be wrapped in parenthesis?*/
         StringBuilder stringBuilder = new StringBuilder();
 
         protected BooleanGroupingStringBuilder() {

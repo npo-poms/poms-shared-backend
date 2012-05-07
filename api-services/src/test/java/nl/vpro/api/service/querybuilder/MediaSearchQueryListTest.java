@@ -20,7 +20,7 @@ public class MediaSearchQueryListTest {
 
     }
 
-    private static final String qs = "avType:AUDIO AND titleMain:titles";
+    private static final String qs = "(avType:AUDIO AND titleMain:titles)";
 
     @Test
     public void testEmpytList() {
@@ -63,28 +63,28 @@ public class MediaSearchQueryListTest {
     }
 
     @Test
-    public void testWithMultipleQueries() {
+    public void testWithMultipleQueries(){
         MediaSearchQueryList ql = new MediaSearchQueryList(BooleanOp.OR);
         ql.addQuery(q);
         ql.addQuery(q);
-        assertEquals("(avType:AUDIO AND titleMain:titles OR avType:AUDIO AND titleMain:titles)", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) OR (avType:AUDIO AND titleMain:titles))", ql.createQueryString());
 
         ql = new MediaSearchQueryList(BooleanOp.AND);
         ql.addQuery(q);
         ql.addQuery(q);
-        assertEquals("(avType:AUDIO AND titleMain:titles AND avType:AUDIO AND titleMain:titles)", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) AND (avType:AUDIO AND titleMain:titles))", ql.createQueryString());
 
         //with search term
         ql = new MediaSearchQueryList(BooleanOp.OR);
         ql.addQuery(q);
         ql.addQuery(q);
         ql.setQueryString("test");
-        assertEquals("(avType:AUDIO AND titleMain:titles OR avType:AUDIO AND titleMain:titles) test", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) OR (avType:AUDIO AND titleMain:titles)) test", ql.createQueryString());
 
         ql = new MediaSearchQueryList(BooleanOp.AND);
         ql.addQuery(q);
         ql.addQuery(q);
         ql.setQueryString("test");
-        assertEquals("(avType:AUDIO AND titleMain:titles AND avType:AUDIO AND titleMain:titles) test", ql.createQueryString());
+        assertEquals("((avType:AUDIO AND titleMain:titles) AND (avType:AUDIO AND titleMain:titles)) test", ql.createQueryString());
     }
 }

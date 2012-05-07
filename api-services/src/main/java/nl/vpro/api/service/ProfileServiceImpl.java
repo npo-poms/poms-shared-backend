@@ -3,6 +3,7 @@ package nl.vpro.api.service;
 import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
 import nl.vpro.api.service.querybuilder.BooleanOp;
+import nl.vpro.api.util.SolrQueryBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -29,6 +30,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Autowired
     private SolrServer solrServer;
+
+    @Autowired
+    SolrQueryBuilder solrQueryBuilder;
 
     private Map<String, String> archiveCache = new HashMap<String, String>();
 
@@ -65,7 +69,7 @@ public class ProfileServiceImpl implements ProfileService {
             .addMediaType(MediaType.ARCHIVE)
             .setMainTitle(name)
             .createQueryString();
-        SolrQuery query = new SolrQuery(queryString);
+        SolrQuery query = solrQueryBuilder.build(queryString);
 
         try {
             QueryResponse response = solrServer.query(query);

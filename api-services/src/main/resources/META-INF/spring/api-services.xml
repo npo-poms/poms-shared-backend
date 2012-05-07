@@ -76,4 +76,7 @@
     <property name="uri" value="${vpro.ugc.context}"/>
   </bean>
 
+  <bean id="solrQueryBuilder" class="nl.vpro.api.util.SolrQueryBuilderImpl" />
+
+
 </beans>

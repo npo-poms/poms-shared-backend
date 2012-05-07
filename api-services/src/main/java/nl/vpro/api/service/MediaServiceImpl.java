@@ -12,6 +12,7 @@ import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.util.SolrQueryBuilder;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
@@ -82,6 +83,9 @@ public class MediaServiceImpl implements MediaService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private SolrQueryBuilder solrQueryBuilder;
+
 
     public MediaServiceImpl() {
     }
@@ -92,7 +96,7 @@ public class MediaServiceImpl implements MediaService {
         MediaSearchQuery filterQuery = profile.createSearchQuery();
         String filterQueryString = filterQuery.createQueryString();
 
-        SolrQuery solrQuery = new SolrQuery(filterQueryString);
+        SolrQuery solrQuery = solrQueryBuilder.build(filterQueryString);
         solrQuery.setFields("*", "score");
         if (StringUtils.isNotBlank(filterQueryString)) {
             solrQuery.setFilterQueries(filterQueryString);
@@ -121,7 +125,7 @@ public class MediaServiceImpl implements MediaService {
         MediaSearchQuery filterQuery = profile.createSearchQuery();
         String filterQueryString = filterQuery.createQueryString();
 
-        SolrQuery solrQuery = new SolrQuery();
+        SolrQuery solrQuery = solrQueryBuilder.build();
         solrQuery.setQuery("*:*");
         if (StringUtils.isNotBlank(filterQueryString)) {
             solrQuery.setFilterQueries(filterQueryString);
