@@ -2,6 +2,8 @@ package nl.vpro.spring.converter;
 
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.TextualType;
+import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.domain.ugc.annotation.AnnotationPart;
 import nl.vpro.domain.ugc.annotation.AnnotationPartTemplate;
@@ -45,8 +47,13 @@ public class ProgramToAnnotationConverter implements Converter<Program, Annotati
             part.setTemplate(AnnotationPartTemplate.TEXTIMAGELEFT);
 
             if (segment.getDescriptions().size() > 0) {
-                part.setText(segment.getDescriptions().get(0).getValue());
-                part.setHtml(processor.markdownToHtml(part.getText()));
+                String description = MediaUtil.getDescription(segment.getDescriptions(), true, TextualType.MAIN, TextualType.ORIGINAL, TextualType.SHORT);
+                part.setText(description);
+                part.setHtml(processor.markdownToHtml(description));
+            }
+
+            if (segment.getTitles().size() > 0) {
+                part.setTitle(MediaUtil.getTitle(segment.getTitles(), true, TextualType.MAIN, TextualType.ORIGINAL, TextualType.SHORT));
             }
             annotation.addPart(part);
         }
