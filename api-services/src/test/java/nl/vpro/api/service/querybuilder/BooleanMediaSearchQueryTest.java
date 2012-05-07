@@ -38,22 +38,22 @@ public class BooleanMediaSearchQueryTest {
     public void testSingleConstraint() {
         BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
         q.addAvType(AvType.AUDIO);
-        assertEquals("(avType:AUDIO)", q.createQueryString());
+        assertEquals("avType:AUDIO", q.createQueryString());
 
         q = new BooleanMediaSearchQuery(BooleanOp.OR);
         q.addAvType(AvType.AUDIO);
-        assertEquals("(avType:AUDIO)", q.createQueryString());
+        assertEquals("avType:AUDIO", q.createQueryString());
 
         //with term
         q = new BooleanMediaSearchQuery(BooleanOp.AND);
         q.addAvType(AvType.AUDIO);
         q.setQueryString("hallo");
-        assertEquals("(avType:AUDIO) hallo", q.createQueryString());
+        assertEquals("avType:AUDIO hallo", q.createQueryString());
 
         q = new BooleanMediaSearchQuery(BooleanOp.OR);
         q.addAvType(AvType.AUDIO);
         q.setQueryString("hallo");
-        assertEquals("(avType:AUDIO) hallo", q.createQueryString());
+        assertEquals("avType:AUDIO hallo", q.createQueryString());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class BooleanMediaSearchQueryTest {
         q.setMainTitle("main");
         q.setDocumentType(BooleanMediaSearchQuery.DOCUMENT_TYPE_GROUP);
 
-        assertEquals("(mediaType:ALBUM AND mediaType:CLIP AND location_formats:MP3 AND location_formats:FLV AND avType:AUDIO AND avType:VIDEO AND descendantOf:\"urn:123\" AND descendantOf:\"urn:456\" AND titleMain:main AND documentType:group)", q.createQueryString());
+        assertEquals("mediaType:ALBUM AND mediaType:CLIP AND location_formats:MP3 AND location_formats:FLV AND avType:AUDIO AND avType:VIDEO AND descendantOf:\"urn:123\" AND descendantOf:\"urn:456\" AND titleMain:main AND documentType:group", q.createQueryString());
 
         q = new BooleanMediaSearchQuery(BooleanOp.OR);
         q.addMediaType(MediaType.ALBUM);
@@ -84,7 +84,7 @@ public class BooleanMediaSearchQueryTest {
         q.setMainTitle("main");
         q.setDocumentType(BooleanMediaSearchQuery.DOCUMENT_TYPE_GROUP);
 
-        assertEquals("(mediaType:ALBUM OR mediaType:CLIP OR location_formats:MP3 OR location_formats:FLV OR avType:AUDIO OR avType:VIDEO OR descendantOf:\"urn:123\" OR descendantOf:\"urn:456\" OR titleMain:main OR documentType:group)", q.createQueryString());
+        assertEquals("mediaType:ALBUM OR mediaType:CLIP OR location_formats:MP3 OR location_formats:FLV OR avType:AUDIO OR avType:VIDEO OR descendantOf:\"urn:123\" OR descendantOf:\"urn:456\" OR titleMain:main OR documentType:group", q.createQueryString());
     }
 
 
