@@ -10,8 +10,8 @@ import org.springframework.stereotype.Controller;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 
-@Controller
-@Path("{path : .*}")
+//@Controller
+//@Path("{path : .*}")
 public class OptionsController {
     @OPTIONS
     public void options() {
