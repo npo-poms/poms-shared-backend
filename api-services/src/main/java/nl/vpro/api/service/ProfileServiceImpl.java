@@ -73,7 +73,7 @@ public class ProfileServiceImpl implements ProfileService {
                 String archiveUrn = (String) response.getResults().get(0).getFieldValue("urn");
                 archiveCache.put(name, archiveUrn);
             } else {
-                throw new RuntimeException("Can not find archive with name " + name + "in Sorl, no or too many results");
+                throw new RuntimeException("Can not find archive with name " + name + " in Solr, no or too many results");
             }
         } catch (SolrServerException e) {
             throw new RuntimeException("Something went wrong connecting to Solr service.", e);
