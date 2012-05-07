@@ -34,7 +34,6 @@ public class ProgramToAnnotationConverter implements Converter<Program, Annotati
         annotation.setLastModifiedDate(program.getLastModified());
 
 
-
         for (Segment segment : program.getSegments()) {
             AnnotationPart part = new AnnotationPart();
             part.setUrn(segment.getUrn());

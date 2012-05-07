@@ -9,14 +9,14 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
-import nl.vpro.api.rs.error.NotFoundException;
-import nl.vpro.api.rs.error.ServerErrorException;
 import nl.vpro.api.service.querybuilder.MediaSearchQuery;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
+import nl.vpro.util.rs.error.NotFoundException;
+import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -253,7 +253,7 @@ public class MediaServiceImpl implements MediaService {
 
 
     private static final class SortInGroupByOrderComparator implements Comparator<Program>, Serializable {
-        private static final long serialVersionUID=23450383305L;
+        private static final long serialVersionUID = 23450383305L;
 
         protected final Group group;
 
@@ -268,7 +268,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     private static final class SortInGroupByDateComparator implements Comparator<Program>, Serializable {
-        private static final long serialVersionUID=23450389305L;
+        private static final long serialVersionUID = 23450389305L;
         protected final Group group;
 
         public SortInGroupByDateComparator(Group group) {

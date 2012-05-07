@@ -1,27 +1,19 @@
 package nl.vpro.api.service;
 
-import nl.vpro.api.rs.error.DataErrorException;
-import nl.vpro.api.rs.error.NotFoundException;
-import nl.vpro.api.rs.error.ServerErrorException;
-import nl.vpro.api.rs.error.util.ErrorResponseToExceptionConverter;
-import nl.vpro.api.transfer.ErrorResponse;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.domain.ugc.playerconfiguration.PlayerConfiguration;
-import org.apache.commons.lang.StringUtils;
+import nl.vpro.util.rs.error.ErrorResponseToExceptionConverter;
+import nl.vpro.util.rs.error.NotFoundException;
+import nl.vpro.util.rs.error.ServerErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.*;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Date: 24-4-12
@@ -83,7 +75,6 @@ public class UgcServiceRestImpl implements UgcService {
             throw new ServerErrorException("Something went wrong fetching an annotation from the ugc service: " + e.getMessage(), e);
         }
     }
-
 
 
     private <T> T getById(String typeName, String id, Class<T> type) {
