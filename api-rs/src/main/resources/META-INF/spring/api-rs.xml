@@ -10,11 +10,14 @@
   <context:component-scan base-package="nl.vpro.api">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
   </context:component-scan>
+  <context:component-scan base-package="nl.vpro.util.rs">
+    <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
+  </context:component-scan>
 
   <bean class="nl.vpro.api.filter.JsonpCallbackFilter" id="jsonpCallbackFilter"/>
 
   <bean class="nl.vpro.api.cors.CorsPolicyImpl" id="corsPolicy">
-    <constructor-arg index="0" value="${cors.enabled}" />
-    <constructor-arg index="1" value="${cors.policy}" />
+    <constructor-arg index="0" value="${cors.enabled}"/>
+    <constructor-arg index="1" value="${cors.policy}"/>
   </bean>
 </beans>
