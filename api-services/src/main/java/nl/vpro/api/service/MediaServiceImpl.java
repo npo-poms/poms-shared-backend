@@ -5,6 +5,7 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
@@ -161,7 +162,7 @@ public class MediaServiceImpl implements MediaService {
             if (e3.getStatusCode().value() == 404) {
                 throw new NotFoundException("Program with id " + id + " could not be found", e3);
             } else {
-                throw new ServerErrorException("Something went wrong fetching program with id " + id + ". reason: " + e3.getMessage(), e3);
+                throw new ServerErrorException("Something went wrong fetching media with id " + id + ". reason: " + e3.getMessage(), e3);
             }
         }
     }
@@ -180,7 +181,7 @@ public class MediaServiceImpl implements MediaService {
             ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, couchdbUrlprovider.getUrl(), urn);
             Group group = groupResponseEntity.getBody();
             if (addMembers) {
-                group.getMembers().addAll(getProgramsForGroup(group));
+                group.getMembers().addAll(getMediaForGroup(group, MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment));
             }
             return group;
         } catch (HttpServerErrorException e) {
@@ -216,10 +217,10 @@ public class MediaServiceImpl implements MediaService {
         this.suggestionsLimit = suggestionsLimit;
     }
 
-    private List<Program> getProgramsForGroup(final Group group) {
-        List<Program> programs = new ArrayList<Program>();
+    private List<MediaObject> getMediaForGroup(final Group group, MediaObjectType... types) {
+        List<MediaObject> mediaObjects = new ArrayList<MediaObject>();
         ViewResult<Map> viewResult;
-        List<String> programIds = new ArrayList<String>();
+        List<String> mediaIds = new ArrayList<String>();
 
         if (group != null) {
             ObjectMapper mapper = new MediaMapper();
@@ -229,34 +230,55 @@ public class MediaServiceImpl implements MediaService {
             viewResult = getViewResult(group.getUrn(), "media/by-group");
             for (ValueRow<Map> row : viewResult.getRows()) {
                 String urn = row.getId();
-                if (MediaUtil.getMediaType(urn) == MediaObjectType.program) {
-                    programIds.add(urn);
+                MediaObjectType mediaType = MediaUtil.getMediaType(urn);
+                for (MediaObjectType type : types) {
+                    if (type == mediaType) {
+                        mediaIds.add(urn);
+                    }
                 }
             }
             // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
-            ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, programIds, new Options(), new JSONParser());
+            ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, mediaIds, new Options(), new JSONParser());
             for (ValueAndDocumentRow<Map, Map> row : progs.getRows()) {
                 Map m = row.getDocument();
-                Program program = mapper.convertValue(m, Program.class);
-                programs.add(program);
+                String urn = (String) m.get("_id");
+                MediaObjectType mediaType = MediaUtil.getMediaType(urn);
+                MediaObject mediaObject;
+                switch (mediaType) {
+                    case group:
+                        mediaObject = mapper.convertValue(m, Group.class);
+                        mediaObjects.add(mediaObject);
+                        break;
+                    case program:
+                        mediaObject = mapper.convertValue(m, Program.class);
+                        mediaObjects.add(mediaObject);
+                        break;
+                    case segment:
+                        mediaObject = mapper.convertValue(m, Segment.class);
+                        mediaObjects.add(mediaObject);
+                        break;
+                    default:
+                        log.error("Unknown mediatype for urn : "+urn+" : "+mediaType);
+                        break;
+                }
             }
 
-            Collections.sort(programs, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByOrderComparator(group));
+            Collections.sort(mediaObjects, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByOrderComparator(group));
         }
-        return programs;
+        return mediaObjects;
     }
 
     private ViewResult<Map> getViewResult(final String groupUrn, final String view) {
         return couchDbMediaServer.queryView(view,
-            Map.class,
-            new Options().startKey(groupUrn)
-                .endKey(groupUrn)
-                .reduce(false),
-            null);
+                Map.class,
+                new Options().startKey(groupUrn)
+                        .endKey(groupUrn)
+                        .reduce(false),
+                null);
     }
 
 
-    private static final class SortInGroupByOrderComparator implements Comparator<Program>, Serializable {
+    private static final class SortInGroupByOrderComparator implements Comparator<MediaObject>, Serializable {
         private static final long serialVersionUID = 23450383305L;
 
         protected final Group group;
@@ -266,12 +288,12 @@ public class MediaServiceImpl implements MediaService {
         }
 
         @Override
-        public int compare(Program program, Program program1) {
-            return program.getMemberRef(group).getIndex().compareTo(program1.getMemberRef(group).getIndex());
+        public int compare(MediaObject media, MediaObject media1) {
+            return media.getMemberRef(group).getIndex().compareTo(media1.getMemberRef(group).getIndex());
         }
     }
 
-    private static final class SortInGroupByDateComparator implements Comparator<Program>, Serializable {
+    private static final class SortInGroupByDateComparator implements Comparator<MediaObject>, Serializable {
         private static final long serialVersionUID = 23450389305L;
         protected final Group group;
 
@@ -280,8 +302,8 @@ public class MediaServiceImpl implements MediaService {
         }
 
         @Override
-        public int compare(Program program, Program program1) {
-            return -(program.getMemberRef(group).getAdded().compareTo(program1.getMemberRef(group).getAdded()));
+        public int compare(MediaObject media, MediaObject media1) {
+            return -(media.getMemberRef(group).getAdded().compareTo(media1.getMemberRef(group).getAdded()));
         }
     }
 }
