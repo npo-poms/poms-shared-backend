@@ -1,8 +1,13 @@
 package nl.vpro.api.rs;
 
+import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.support.MediaObjectType;
+import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.UgcService;
+import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.domain.ugc.playerconfiguration.PlayerConfiguration;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
