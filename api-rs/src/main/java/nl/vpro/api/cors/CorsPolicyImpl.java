@@ -1,7 +1,6 @@
 package nl.vpro.api.cors;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,9 +25,9 @@ public class CorsPolicyImpl implements CorsPolicy {
     private Map<String, Pattern> policyTable = null;
 
     public CorsPolicyImpl(boolean enabled, String policyFile) {
-        this.policyFile=policyFile;
-        this.enabled=enabled;
-        policyTable=parseProperties();
+        this.policyFile = policyFile;
+        this.enabled = enabled;
+        policyTable = parseProperties();
     }
 
     @Override
@@ -62,7 +61,7 @@ public class CorsPolicyImpl implements CorsPolicy {
 
     private Properties getPolicyProperties() {
         InputStream in = null;
-        Properties properties=new Properties();
+        Properties properties = new Properties();
         String filename = policyFile;
         try {
             if (filename.startsWith("classpath:")) {

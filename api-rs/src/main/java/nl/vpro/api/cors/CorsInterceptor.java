@@ -34,7 +34,7 @@ public class CorsInterceptor implements MessageBodyWriterInterceptor {
         if (corsPolicy.isEnabled()) {
             String method = httpServletRequest.getMethod();
             if (StringUtils.isNotEmpty(origin)) {
-                boolean allowed=corsPolicy.allowedOriginAndMethod(origin, method);
+                boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
                 if (allowed) {
                     context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                 }

@@ -9,6 +9,8 @@ package nl.vpro.api.cors;
  */
 public interface CorsPolicy {
     public boolean allowedOrigin(String origin);
+
     public boolean allowedOriginAndMethod(String origin, String method);
+
     public boolean isEnabled();
 }

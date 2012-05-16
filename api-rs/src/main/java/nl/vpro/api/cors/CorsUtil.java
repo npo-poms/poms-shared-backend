@@ -17,9 +17,10 @@ public class CorsUtil {
         HEAD,
         POST
     }
+
     public static boolean isSimpleMethod(String method) {
         if (StringUtils.isNotEmpty(method)) {
-            if (SimpleMethods.valueOf(method)!=null) {
+            if (SimpleMethods.valueOf(method) != null) {
                 return true;
             }
         }

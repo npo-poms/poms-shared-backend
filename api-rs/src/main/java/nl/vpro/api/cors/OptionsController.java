@@ -5,10 +5,7 @@ package nl.vpro.api.cors;
  * Date: 01-05-2012
  */
 
-import org.springframework.stereotype.Controller;
-
 import javax.ws.rs.OPTIONS;
-import javax.ws.rs.Path;
 
 //@Controller
 //@Path("{path : .*}")

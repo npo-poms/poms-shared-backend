@@ -96,9 +96,21 @@ public class Media {
     }
 
     @GET
+    @Path("searchES/{profile}")
+    public MediaSearchResult searchESWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
+        return mediaService.searchES(queryString, profileName, offset, maxResult);
+    }
+
+    @GET
     @Path("search")
     public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
         return mediaService.search(queryString, "", offset, maxResult);
+    }
+
+    @GET
+    @Path("searchES")
+    public MediaSearchResult searchES(@QueryParam("q") String queryString, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
+        return mediaService.searchES(queryString, "", offset, maxResult);
     }
 
     @GET
@@ -108,9 +120,21 @@ public class Media {
     }
 
     @GET
+    @Path("searchES/suggest")
+    public MediaSearchSuggestions searchESSuggestions(@QueryParam("q") String queyString) {
+        return mediaService.searchSuggestionsES(queyString, "");
+    }
+
+    @GET
     @Path("search/suggest/{profile}")
     public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queyString, @PathParam("profile") String profileName) {
         return mediaService.searchSuggestions(queyString, profileName);
+    }
+
+    @GET
+    @Path("searchES/suggest/{profile}")
+    public MediaSearchSuggestions searchESSuggestionsWithProfile(@QueryParam("q") String queyString, @PathParam("profile") String profileName) {
+        return mediaService.searchSuggestionsES(queyString, profileName);
     }
 
     private long getMediaId(String type, String urn) throws IllegalArgumentException {
