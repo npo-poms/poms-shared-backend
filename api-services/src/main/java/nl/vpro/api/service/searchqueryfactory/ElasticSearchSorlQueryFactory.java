@@ -22,6 +22,7 @@ import static org.elasticsearch.index.query.FilterBuilders.orFilter;
 import static org.elasticsearch.index.query.FilterBuilders.termFilter;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.textQuery;
 
 /**
@@ -55,9 +56,9 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
 
     @Override
     public SolrQuery createSuggestQuery(Profile profile, String term, Integer minOccurrence, Integer limit) {
-        QueryBuilder query = textQuery("*", "*");
+        QueryBuilder query = matchAllQuery();
         SolrQuery solrQuery = createBasicQuery(profile, query);
-//        setFacetFields(term, minOccurrence, limit, solrQuery);
+        setFacetFields(term, minOccurrence, limit, solrQuery);
         return solrQuery;
     }
 
