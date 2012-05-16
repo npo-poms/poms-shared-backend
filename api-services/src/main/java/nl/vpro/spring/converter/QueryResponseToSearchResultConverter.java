@@ -10,10 +10,7 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.springframework.core.convert.converter.Converter;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Date: 13-3-12
@@ -38,14 +35,14 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             item.setTitle(trimIfNotNull((String) solrDocument.getFieldValue("titleMain")));
             item.setDescription(trimIfNotNull((String) solrDocument.getFieldValue("descriptionMain")));
             item.setScore((Float) solrDocument.getFieldValue("score"));
-            item.setBroadcaster((List<String>) solrDocument.getFieldValue("broadcaster"));
+            item.setBroadcaster(asList(solrDocument.getFieldValue("broadcaster")));
             item.setAvType((String) solrDocument.getFieldValue("avType"));
-            item.setGenre((List<String>) solrDocument.getFieldValue("genre"));
+            item.setGenre(asList(solrDocument.getFieldValue("genre")));
             item.setMediaType((String) solrDocument.getFieldValue("mediaType"));
-            item.setCreationDate((Date) solrDocument.getFieldValue("creationDate"));
-            //duration in solr is seconds, we want milliseconds
-            Integer duration = (Integer) solrDocument.getFieldValue("duration");
+            item.setCreationDate(asDate(solrDocument.getFieldValue("creationDate")));
+            Integer duration = asInteger(solrDocument.getFieldValue("duration"));
             if (duration != null) {
+                //duration in solr is seconds, we want milliseconds
                 item.setDuration(duration * 1000L);
             }
 
@@ -72,13 +69,6 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
         }
     }
 
-    private String trimIfNotNull(String s) {
-        if (s != null) {
-            return s.trim();
-        }
-        return s;
-    }
-
     private void setImageLink(SolrDocument solrDocument, MediaSearchResultItem item) {
         for (String imgType : IMAGE_TYPES_ORDERED) {
             String imageFieldName = "image_urn_" + imgType;
@@ -95,7 +85,7 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
 
         Date firstBroadcastDate = null;
         if (solrDocument.getFieldNames().contains(startField)) {
-            firstBroadcastDate = (Date) solrDocument.getFieldValues(startField).iterator().next();
+            firstBroadcastDate = asDate(solrDocument.getFieldValues(startField).iterator().next());
         }
 
         String firstBroadcastChannel = null;
@@ -120,5 +110,58 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             sb.append(s).append(separator);
         }
         return StringUtils.substringBeforeLast(sb.toString(), separator);
+    }
+
+    private Date asDate(Object o) {
+        if (o != null) {
+            if (o instanceof Date) {
+                return (Date) o;
+            }
+            if (o instanceof String) {
+                try {
+                    long l = Long.parseLong((String) o);
+                    return new Date(l);
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("You can not convert a string with value [" + o + "] to a date", e);
+                }
+            }
+            throw new RuntimeException("You can not convert object of type [" + o.getClass() + "] to a date. It should be a string");
+        }
+        return null;
+    }
+
+    private List<String> asList(Object o) {
+        List<String> result = new ArrayList<String>();
+        if (o instanceof Collection) {
+            for (Object oo : (Collection) o) {
+                result.add(oo.toString());
+            }
+        } else if (o != null) {
+            result.add(o.toString());
+        }
+        return result;
+    }
+
+    private Integer asInteger(Object o) {
+        if (o != null) {
+            if (o instanceof Integer) {
+                return (Integer) o;
+            }
+            if (o instanceof String) {
+                try {
+                    return Integer.parseInt((String) o);
+                } catch (NumberFormatException e) {
+                    throw new RuntimeException("You can not convert String [" + (String) o + "] to an Iteger");
+                }
+            }
+        }
+        return null;
+    }
+
+    private String trimIfNotNull(String s) {
+        if (s != null) {
+            return s.trim();
+        }
+        return s;
     }
 }

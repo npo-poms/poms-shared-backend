@@ -10,19 +10,18 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
-import nl.vpro.api.service.querybuilder.MediaSearchQuery;
+import nl.vpro.api.service.searchqueryfactory.SolrQueryFactory;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
-import nl.vpro.api.util.SolrQueryBuilder;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
-import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jcouchdb.db.Database;
@@ -45,6 +44,7 @@ import org.springframework.web.client.RestTemplate;
 import org.svenson.JSONParser;
 
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.util.*;
 
 /**
@@ -70,9 +70,6 @@ public class MediaServiceImpl implements MediaService {
     private Integer suggestionsLimit;
 
     @Autowired
-    private SolrServer solrServer;
-
-    @Autowired
     private ConversionService conversionService;
 
     @Autowired
@@ -85,7 +82,10 @@ public class MediaServiceImpl implements MediaService {
     private RestTemplate restTemplate;
 
     @Autowired
-    private SolrQueryBuilder solrQueryBuilder;
+    private SolrQueryFactory solrQueryFactory;
+
+    @Autowired
+    private SolrQueryFactory solrESQueryFactory;
 
 
     public MediaServiceImpl() {
@@ -93,25 +93,10 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaSearchResult search(String query, String profileName, Integer offset, Integer max) {
-        Profile profile = profileService.getProfile(profileName);
-        MediaSearchQuery filterQuery = profile.createSearchQuery();
-        String filterQueryString = filterQuery.createQueryString();
-
-        SolrQuery solrQuery = solrQueryBuilder.build(filterQueryString);
-        solrQuery.setFields("*", "score");
-        if (StringUtils.isNotBlank(filterQueryString)) {
-            solrQuery.setFilterQueries(filterQueryString);
-        }
-        solrQuery.add("qf", "titleMain^4.0 descriptionMain^2.0");
-        solrQuery.setQuery(query);
-
+        SolrServer solrServer = solrQueryFactory.getSolrServer();
+        Profile profile = profileService.getProfile(profileName, solrServer);
         Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
-        solrQuery.setRows(queryMaxRows);
-
-        if (offset != null && offset > 0) {
-            solrQuery.setStart(offset);
-        }
-
+        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, offset, max);
         try {
             QueryResponse response = solrServer.query(solrQuery);
             return conversionService.convert(response, MediaSearchResult.class);
@@ -121,24 +106,39 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String query, String profileName) {
-        Profile profile = profileService.getProfile(profileName);
-        MediaSearchQuery filterQuery = profile.createSearchQuery();
-        String filterQueryString = filterQuery.createQueryString();
+    public MediaSearchResult searchES(String query, String profileName, Integer offset, Integer max) {
+        try {
+            SolrServer solrServer = solrESQueryFactory.getSolrServer();
+            Profile profile = profileService.getProfile(profileName, solrServer);
+            SolrQuery solrQuery = solrESQueryFactory.createSearchQuery(profile, query, offset, max);
 
-        SolrQuery solrQuery = solrQueryBuilder.build();
-        solrQuery.setQuery("*:*");
-        if (StringUtils.isNotBlank(filterQueryString)) {
-            solrQuery.setFilterQueries(filterQueryString);
+            QueryResponse results = solrServer.query(solrQuery);
+            MediaSearchResult mediaSearchResult = conversionService.convert(results, MediaSearchResult.class);
+            return mediaSearchResult;
+        } catch (SolrServerException e) {
+            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
         }
-        solrQuery.setFacet(true);
-        solrQuery.setFacetLimit(suggestionsLimit);
-        solrQuery.addFacetField("titleMain", "descriptionMain");
-        solrQuery.setFacetPrefix(query);
-        solrQuery.setFacetMinCount(suggestionsMinOccurrence);
-        solrQuery.setFields("titleMain", "descriptionMain");
-        solrQuery.setRows(0);
+    }
 
+
+    @Override
+    public MediaSearchSuggestions searchSuggestions(String query, String profileName) {
+        SolrServer solrServer = solrQueryFactory.getSolrServer();
+        Profile profile = profileService.getProfile(profileName, solrServer);
+        SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, suggestionsMinOccurrence, suggestionsLimit);
+        try {
+            QueryResponse response = solrServer.query(solrQuery);
+            return conversionService.convert(response, MediaSearchSuggestions.class);
+        } catch (SolrServerException e) {
+            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public MediaSearchSuggestions searchSuggestionsES(String query, String profileName) {
+        SolrServer solrServer = solrESQueryFactory.getSolrServer();
+        Profile profile = profileService.getProfile(profileName, solrServer);
+        SolrQuery solrQuery = solrESQueryFactory.createSuggestQuery(profile, query, suggestionsMinOccurrence, suggestionsLimit);
         try {
             QueryResponse response = solrServer.query(solrQuery);
             return conversionService.convert(response, MediaSearchSuggestions.class);
@@ -305,5 +305,19 @@ public class MediaServiceImpl implements MediaService {
         public int compare(MediaObject media, MediaObject media1) {
             return -(media.getMemberRef(group).getAdded().compareTo(media1.getMemberRef(group).getAdded()));
         }
+    }
+
+    public static void main(String[] args) {
+        SolrServer pomsSolrServer = null;
+        try {
+            pomsSolrServer = new CommonsHttpSolrServer("http://test.elasticsearch.search.publiekeomroep.nl/structured/poms/_solr/");
+            QueryResponse response = pomsSolrServer.query(new SolrQuery("*"));
+            System.out.println(response.getResults().get(0));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (SolrServerException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
     }
 }

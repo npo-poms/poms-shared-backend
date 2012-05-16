@@ -1,4 +1,4 @@
-package nl.vpro.api.service.querybuilder;
+package nl.vpro.api.service.searchfilterbuilder;
 
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
@@ -16,8 +16,8 @@ import java.util.List;
  *
  * @author Ernst Bunders
  */
-public final class BooleanMediaSearchQuery extends MediaSearchQuery<BooleanMediaSearchQuery> {
-    private static final Logger log = LoggerFactory.getLogger(BooleanMediaSearchQuery.class);
+public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilter> {
+    private static final Logger log = LoggerFactory.getLogger(DocumentSearchFilter.class);
     private List<MediaType> mediaTypes = new ArrayList<MediaType>();
 
     private List<AvFileFormat> locationFormats = new ArrayList<AvFileFormat>();
@@ -33,37 +33,37 @@ public final class BooleanMediaSearchQuery extends MediaSearchQuery<BooleanMedia
     public static final String DOCUMENT_TYPE_PROGRAM = "program";
     public static final String DOCUMENT_TYPE_GROUP = "group";
 
-    public BooleanMediaSearchQuery(BooleanOp booleanOp) {
-        super(booleanOp);
+    public DocumentSearchFilter() {
+        super(BooleanOp.AND);
     }
 
 
-    public BooleanMediaSearchQuery addMediaType(MediaType mediaType) {
+    public DocumentSearchFilter addMediaType(MediaType mediaType) {
         mediaTypes.add(mediaType);
         return this;
     }
 
-    public BooleanMediaSearchQuery addLocationFormat(AvFileFormat avFileFormat) {
+    public DocumentSearchFilter addLocationFormat(AvFileFormat avFileFormat) {
         locationFormats.add(avFileFormat);
         return this;
     }
 
-    public BooleanMediaSearchQuery addAvType(AvType avType) {
+    public DocumentSearchFilter addAvType(AvType avType) {
         avTypes.add(avType);
         return this;
     }
 
-    public BooleanMediaSearchQuery addDescendant(String descendant) {
+    public DocumentSearchFilter addDescendant(String descendant) {
         descendants.add(descendant);
         return this;
     }
 
-    public BooleanMediaSearchQuery setMainTitle(String mainTitle) {
+    public DocumentSearchFilter setMainTitle(String mainTitle) {
         this.mainTitle = mainTitle;
         return this;
     }
 
-    public BooleanMediaSearchQuery setDocumentType(String documentType) {
+    public DocumentSearchFilter setDocumentType(String documentType) {
         this.documentType = documentType;
         return this;
     }
@@ -105,9 +105,32 @@ public final class BooleanMediaSearchQuery extends MediaSearchQuery<BooleanMedia
         return q;
     }
 
+    public List<MediaType> getMediaTypes() {
+        return mediaTypes;
+    }
+
+    public List<AvFileFormat> getLocationFormats() {
+        return locationFormats;
+    }
+
+    public List<AvType> getAvTypes() {
+        return avTypes;
+    }
+
+    public List<String> getDescendants() {
+        return descendants;
+    }
+
+    public String getMainTitle() {
+        return mainTitle;
+    }
+
+    public String getDocumentType() {
+        return documentType;
+    }
 
     @Override
-    protected BooleanMediaSearchQuery getInstance() {
+    protected DocumentSearchFilter getInstance() {
         return this;
     }
 

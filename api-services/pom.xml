@@ -23,6 +23,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch</artifactId>
+      <version>0.19.3</version>
+    </dependency>
+
+    <dependency>
       <groupId>nl.vpro.ugc</groupId>
       <artifactId>ugc-transfer</artifactId>
     </dependency>

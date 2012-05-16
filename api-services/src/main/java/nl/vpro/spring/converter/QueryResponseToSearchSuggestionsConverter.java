@@ -1,12 +1,11 @@
 package nl.vpro.spring.converter;
 
+import nl.vpro.api.service.searchqueryfactory.SolrQueryFactory;
 import nl.vpro.api.transfer.MediaSearchSuggestion;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.core.convert.converter.Converter;
-
-import java.util.Arrays;
 
 /**
  * Date: 21-3-12
@@ -19,7 +18,7 @@ public class QueryResponseToSearchSuggestionsConverter implements Converter<Quer
     public MediaSearchSuggestions convert(QueryResponse queryResponse) {
         MediaSearchSuggestions suggestions = new MediaSearchSuggestions();
 
-        for (String fieldName : Arrays.asList("titleMain", "descriptionMain")) {
+        for (String fieldName : SolrQueryFactory.searchFields) {
             FacetField facetField = queryResponse.getFacetField(fieldName);
             if (facetField != null && facetField.getValues() != null) {
                 for (FacetField.Count count : facetField.getValues()) {

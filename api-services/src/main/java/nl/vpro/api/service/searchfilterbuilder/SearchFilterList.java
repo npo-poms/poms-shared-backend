@@ -1,4 +1,4 @@
-package nl.vpro.api.service.querybuilder;
+package nl.vpro.api.service.searchfilterbuilder;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -13,19 +13,23 @@ import java.util.List;
  *
  * @author Ernst Bunders
  */
-public final class MediaSearchQueryList extends MediaSearchQuery<MediaSearchQueryList> {
+public final class SearchFilterList extends SearchFilter<SearchFilterList> {
 
-    private static final Logger log = LoggerFactory.getLogger(MediaSearchQueryList.class);
+    private static final Logger log = LoggerFactory.getLogger(SearchFilterList.class);
 
-    private List<MediaSearchQuery> mediaSearchQueries = new ArrayList<MediaSearchQuery>();
+    private List<SearchFilter> mediaSearchQueries = new ArrayList<SearchFilter>();
 
-    public MediaSearchQueryList(BooleanOp booleanOp) {
+    public SearchFilterList(BooleanOp booleanOp) {
         super(booleanOp);
     }
 
-    public MediaSearchQueryList addQuery(MediaSearchQuery mediaSearchQuery) {
+    public SearchFilterList addQuery(SearchFilter mediaSearchQuery) {
         mediaSearchQueries.add(mediaSearchQuery);
         return this;
+    }
+
+    public List<SearchFilter> getMediaSearchQueries() {
+        return mediaSearchQueries;
     }
 
     @Override
@@ -33,7 +37,7 @@ public final class MediaSearchQueryList extends MediaSearchQuery<MediaSearchQuer
         BooleanGroupingStringBuilder sb = new BooleanGroupingStringBuilder();
         sb.grouping = mediaSearchQueries.size() > 1;
 
-        for (MediaSearchQuery query : mediaSearchQueries) {
+        for (SearchFilter query : mediaSearchQueries) {
             sb.append(query.createQueryString());
         }
         sb.close();
@@ -48,7 +52,7 @@ public final class MediaSearchQueryList extends MediaSearchQuery<MediaSearchQuer
     }
 
     @Override
-    protected MediaSearchQueryList getInstance() {
+    protected SearchFilterList getInstance() {
         return this;
     }
 

@@ -1,4 +1,4 @@
-package nl.vpro.api.service.querybuilder;
+package nl.vpro.api.service.searchfilterbuilder;
 
 /**
  * Date: 19-3-12
@@ -6,13 +6,13 @@ package nl.vpro.api.service.querybuilder;
  *
  * @author Ernst Bunders
  */
-public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
+public abstract class SearchFilter<T extends SearchFilter> {
 
     private BooleanOp booleanOp;
 
     protected String queryString;
 
-    protected MediaSearchQuery(BooleanOp booleanOp) {
+    protected SearchFilter(BooleanOp booleanOp) {
         this.booleanOp = booleanOp;
     }
 
@@ -65,5 +65,9 @@ public abstract class MediaSearchQuery<T extends MediaSearchQuery> {
             return stringBuilder.toString().trim();
         }
 
+    }
+
+    public BooleanOp getBooleanOp() {
+        return booleanOp;
     }
 }

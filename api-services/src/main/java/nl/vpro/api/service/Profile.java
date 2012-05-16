@@ -2,9 +2,10 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
-import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
-import nl.vpro.api.service.querybuilder.BooleanOp;
-import nl.vpro.api.service.querybuilder.MediaSearchQuery;
+import nl.vpro.api.service.searchfilterbuilder.BooleanOp;
+import nl.vpro.api.service.searchfilterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.searchfilterbuilder.SearchFilter;
+import nl.vpro.api.service.searchfilterbuilder.SearchFilterList;
 
 
 /**
@@ -15,28 +16,32 @@ import nl.vpro.api.service.querybuilder.MediaSearchQuery;
  */
 public enum Profile {
     WOORD("woord", "Woord.nl") {
-        public MediaSearchQuery createSearchQuery() {
+        public SearchFilter createFilterQuery() {
 
-//            return new MediaSearchQueryList(BooleanOp.OR)
-//                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
-//                    .addAvType(AVType.AUDIO)
-//                    .addDescendant(getArchiveUrn())
-//                    .addLocationFormat(AVFileFormat.MP3))
-//                .addQuery(new BooleanMediaSearchQuery(BooleanOp.AND) /*any type of group*/
-//                    .addDescendant(getArchiveUrn())
-//                    .setDocumentType(BooleanMediaSearchQuery.DOCUMENT_TYPE_GROUP)
-//                );
+            //The document should be a program or a segment
+            SearchFilterList documentTypes = new SearchFilterList(BooleanOp.OR)
+                .addQuery(new DocumentSearchFilter()
+                    .setDocumentType("program"))
+                .addQuery(new DocumentSearchFilter()
+                    .setDocumentType("segment")
+                );
 
-            return new BooleanMediaSearchQuery(BooleanOp.AND) /*program*/
+
+            //the document must have an mp3, be of type audio and must be part of the given archive.
+            SearchFilter contentRules = new DocumentSearchFilter() /*program*/
                 .addAvType(AvType.AUDIO)
                 .addDescendant(getArchiveUrn())
                 .addLocationFormat(AvFileFormat.MP3);
+
+            return new SearchFilterList(BooleanOp.AND)
+                .addQuery(documentTypes)
+                .addQuery(contentRules);
         }
     },
 
     DEFAULT("", "") {
-        public MediaSearchQuery createSearchQuery() {
-            return new BooleanMediaSearchQuery(BooleanOp.AND);
+        public SearchFilter createFilterQuery() {
+            return null;
         }
     };
 
@@ -67,6 +72,6 @@ public enum Profile {
         return archiveUrn;
     }
 
-    abstract public MediaSearchQuery createSearchQuery();
+    abstract public SearchFilter createFilterQuery();
 
 }

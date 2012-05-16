@@ -13,8 +13,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 public class SolrQueryBuilderImpl implements SolrQueryBuilder {
 
     public SolrQuery build() {
-        SolrQuery query=new SolrQuery();
-        query.set("defType","lucene");
+        SolrQuery query = new SolrQuery();
+        query.set("defType", "lucene");
         return query;
     }
 

@@ -1,8 +1,7 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.search.MediaType;
-import nl.vpro.api.service.querybuilder.BooleanMediaSearchQuery;
-import nl.vpro.api.service.querybuilder.BooleanOp;
+import nl.vpro.api.service.searchfilterbuilder.DocumentSearchFilter;
 import nl.vpro.api.util.SolrQueryBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -28,8 +27,6 @@ public class ProfileServiceImpl implements ProfileService {
 
     private static final Logger log = LoggerFactory.getLogger(ProfileServiceImpl.class);
 
-    @Autowired
-    private SolrServer solrServer;
 
     @Autowired
     SolrQueryBuilder solrQueryBuilder;
@@ -40,32 +37,34 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public Profile getProfile(String name) {
+    public Profile getProfile(String name, SolrServer solrServer) {
         for (Profile profile : Profile.values()) {
             if (profile.getName().equals(name)) {
-                setArchive(profile);
+                if (StringUtils.isNotBlank(profile.getArchiveName())) {
+                    setArchive(profile, solrServer);
+                }
                 return profile;
             }
         }
         return Profile.DEFAULT;
     }
 
-    private void setArchive(Profile profile) {
+    private void setArchive(Profile profile, SolrServer solrServer) {
         log.debug("setting archive for profile " + profile.getName());
         String archiveName = profile.getArchiveName();
         if (StringUtils.isNotBlank(archiveName)) {
             if (!archiveCache.containsKey(archiveName)) {
                 synchronized (this) {
-                    fetchArchiveUrn(archiveName);
+                    fetchArchiveUrn(archiveName, solrServer);
                 }
             }
             profile.setArchiveUrn(archiveCache.get(archiveName));
         }
     }
 
-    private void fetchArchiveUrn(String name) {
+    private void fetchArchiveUrn(String name, SolrServer solrServer) {
         log.debug("Profile not found in cache. look up in solr");
-        String queryString = new BooleanMediaSearchQuery(BooleanOp.AND)
+        String queryString = new DocumentSearchFilter()
             .addMediaType(MediaType.ARCHIVE)
             .setMainTitle(name)
             .createQueryString();

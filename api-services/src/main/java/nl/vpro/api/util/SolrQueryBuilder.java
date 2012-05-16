@@ -13,5 +13,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 public interface SolrQueryBuilder {
 
     public SolrQuery build();
+
     public SolrQuery build(String query);
 }

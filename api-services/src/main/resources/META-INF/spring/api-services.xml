@@ -11,13 +11,6 @@
     <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
   </context:component-scan>
 
-  <bean id="solrServer" class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer">
-    <constructor-arg>
-      <bean class="java.net.URL">
-        <constructor-arg value="${solr.media.api.url}"/>
-      </bean>
-    </constructor-arg>
-  </bean>
 
   <bean id="couchDbMediaServer" class="org.jcouchdb.db.Database">
     <constructor-arg name="server">
@@ -76,7 +69,31 @@
     <property name="uri" value="${vpro.ugc.context}"/>
   </bean>
 
-  <bean id="solrQueryBuilder" class="nl.vpro.api.util.SolrQueryBuilderImpl" />
+  <bean id="solrQueryBuilder" class="nl.vpro.api.util.SolrQueryBuilderImpl"/>
 
+  <bean id="solrQueryFactory" class="nl.vpro.api.service.searchqueryfactory.BasicSolrQueryFactory">
+    <property name="solrQueryBuilder" ref="solrQueryBuilder"/>
+    <property name="solrServer">
+      <bean class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer">
+        <constructor-arg>
+          <bean class="java.net.URL">
+            <constructor-arg value="${solr.media.api.url}"/>
+          </bean>
+        </constructor-arg>
+      </bean>
+    </property>
+  </bean>
 
+  <bean id="solrESQueryFactory" class="nl.vpro.api.service.searchqueryfactory.ElasticSearchSorlQueryFactory">
+    <property name="solrQueryBuilder" ref="solrQueryBuilder"/>
+    <property name="solrServer">
+      <bean class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer">
+        <constructor-arg>
+          <bean class="java.net.URL">
+            <constructor-arg value="${solr.elastic.media.api.url}"/>
+          </bean>
+        </constructor-arg>
+      </bean>
+    </property>
+  </bean>
 </beans>

@@ -1,4 +1,4 @@
-package nl.vpro.api.service.querybuilder;
+package nl.vpro.api.service.searchfilterbuilder;
 
 import nl.vpro.api.domain.media.AvType;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
  * @author Ernst Bunders
  */
 public class MediaSearchQueryListTest {
-    private static BooleanMediaSearchQuery q = new BooleanMediaSearchQuery(BooleanOp.AND);
+    private static DocumentSearchFilter q = new DocumentSearchFilter();
 
     static {
         q.setMainTitle("titles");
@@ -24,64 +24,64 @@ public class MediaSearchQueryListTest {
 
     @Test
     public void testEmpytList() {
-        MediaSearchQueryList ql = new MediaSearchQueryList(BooleanOp.AND);
+        SearchFilterList ql = new SearchFilterList(BooleanOp.AND);
         assertEquals("", ql.createQueryString());
 
-        ql = new MediaSearchQueryList(BooleanOp.OR);
+        ql = new SearchFilterList(BooleanOp.OR);
         assertEquals("", ql.createQueryString());
 
         //with term
-        ql = new MediaSearchQueryList(BooleanOp.AND);
+        ql = new SearchFilterList(BooleanOp.AND);
         ql.setQueryString("test");
         assertEquals("test", ql.createQueryString());
 
-        ql = new MediaSearchQueryList(BooleanOp.OR);
+        ql = new SearchFilterList(BooleanOp.OR);
         ql.setQueryString("test");
         assertEquals("test", ql.createQueryString());
     }
 
     @Test
     public void testListWithSingleQuery() {
-        MediaSearchQueryList ql = new MediaSearchQueryList(BooleanOp.OR);
+        SearchFilterList ql = new SearchFilterList(BooleanOp.OR);
         ql.addQuery(q);
         assertEquals(qs, ql.createQueryString());
 
-        ql = new MediaSearchQueryList(BooleanOp.AND);
+        ql = new SearchFilterList(BooleanOp.AND);
         ql.addQuery(q);
         assertEquals(qs, ql.createQueryString());
 
         //with search term
-        ql = new MediaSearchQueryList(BooleanOp.OR);
+        ql = new SearchFilterList(BooleanOp.OR);
         ql.addQuery(q);
         ql.setQueryString("test");
         assertEquals(qs + " test", ql.createQueryString());
 
-        ql = new MediaSearchQueryList(BooleanOp.AND);
+        ql = new SearchFilterList(BooleanOp.AND);
         ql.addQuery(q);
         ql.setQueryString("test");
         assertEquals(qs + " test", ql.createQueryString());
     }
 
     @Test
-    public void testWithMultipleQueries(){
-        MediaSearchQueryList ql = new MediaSearchQueryList(BooleanOp.OR);
+    public void testWithMultipleQueries() {
+        SearchFilterList ql = new SearchFilterList(BooleanOp.OR);
         ql.addQuery(q);
         ql.addQuery(q);
         assertEquals("((avType:AUDIO AND titleMain:titles) OR (avType:AUDIO AND titleMain:titles))", ql.createQueryString());
 
-        ql = new MediaSearchQueryList(BooleanOp.AND);
+        ql = new SearchFilterList(BooleanOp.AND);
         ql.addQuery(q);
         ql.addQuery(q);
         assertEquals("((avType:AUDIO AND titleMain:titles) AND (avType:AUDIO AND titleMain:titles))", ql.createQueryString());
 
         //with search term
-        ql = new MediaSearchQueryList(BooleanOp.OR);
+        ql = new SearchFilterList(BooleanOp.OR);
         ql.addQuery(q);
         ql.addQuery(q);
         ql.setQueryString("test");
         assertEquals("((avType:AUDIO AND titleMain:titles) OR (avType:AUDIO AND titleMain:titles)) test", ql.createQueryString());
 
-        ql = new MediaSearchQueryList(BooleanOp.AND);
+        ql = new SearchFilterList(BooleanOp.AND);
         ql.addQuery(q);
         ql.addQuery(q);
         ql.setQueryString("test");
