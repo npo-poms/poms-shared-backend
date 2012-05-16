@@ -1,6 +1,7 @@
 package nl.vpro.api.service.searchqueryfactory;
 
 import nl.vpro.api.util.SolrQueryBuilder;
+import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 
 /**
@@ -27,5 +28,15 @@ public abstract class AbstractSolrQueryFactory implements SolrQueryFactory {
 
     public void setSolrServer(SolrServer solrServer) {
         this.solrServer = solrServer;
+    }
+
+    protected void setFacetFields(String term, Integer minOccurrence, Integer limit, SolrQuery solrQuery) {
+        solrQuery.setFacet(true);
+        solrQuery.setFacetLimit(limit);
+        solrQuery.addFacetField(searchFields.toArray(new String[searchFields.size()]));
+        solrQuery.setFacetPrefix(term);
+        solrQuery.setFacetMinCount(minOccurrence);
+        solrQuery.setFields(searchFields.toArray(new String[searchFields.size()]));
+        solrQuery.setRows(0);
     }
 }

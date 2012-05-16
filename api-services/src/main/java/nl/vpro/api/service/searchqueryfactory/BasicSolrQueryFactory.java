@@ -58,15 +58,8 @@ public class BasicSolrQueryFactory extends AbstractSolrQueryFactory {
         if (StringUtils.isNotBlank(filterQueryString)) {
             solrQuery.setFilterQueries(filterQueryString);
         }
-        solrQuery.setFacet(true);
-        solrQuery.setFacetLimit(limit);
-        solrQuery.addFacetField(searchFields.toArray(new String[searchFields.size()]));
-        solrQuery.setFacetPrefix(term);
-        solrQuery.setFacetMinCount(minOccurrence);
-//        solrQuery.setFields("titleMain", "descriptionMain");
-        solrQuery.setFields(searchFields.toArray(new String[searchFields.size()]));
-        solrQuery.setRows(0);
+        setFacetFields(term, minOccurrence, limit, solrQuery);
+
         return solrQuery;
     }
-
 }

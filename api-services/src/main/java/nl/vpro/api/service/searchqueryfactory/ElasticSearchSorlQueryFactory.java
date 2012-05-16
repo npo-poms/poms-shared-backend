@@ -10,6 +10,7 @@ import nl.vpro.api.service.searchfilterbuilder.SearchFilter;
 import nl.vpro.api.service.searchfilterbuilder.SearchFilterList;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 
@@ -35,23 +36,14 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
 
     @Override
     public SolrQuery createSearchQuery(Profile profile, String term, Integer max, Integer offset) {
-        SearchFilter filterQuery = profile.createFilterQuery();
+        BoolQueryBuilder boolQueryBuilder = boolQuery()
+            .minimumNumberShouldMatch(1);
 
-        QueryBuilder query = boolQuery()
-            .minimumNumberShouldMatch(1)
-            .should(textQuery("titleMain", term))
-            .should(textQuery("titleAlternative", term))
-            .should(textQuery("descriptionMain", term))
-            .should(textQuery("descriptionShort", term))
-            .should(textQuery("descriptionAlternative", term));
-
-        if (filterQuery != null) {
-            FilterBuilder filter = createFilter(filterQuery);
-            query = filteredQuery(query, filter);
+        for (String searchfield : searchFields) {
+            boolQueryBuilder.should(textQuery(searchfield, term));
         }
 
-        SolrQuery solrQuery = solrQueryBuilder.build(query.toString());
-        solrQuery.set("q.dsl", "true");
+        SolrQuery solrQuery = createBasicQuery(profile, boolQueryBuilder);
         solrQuery.setRows(max);
 
         if (offset != null && offset > 0) {
@@ -63,8 +55,29 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
 
     @Override
     public SolrQuery createSuggestQuery(Profile profile, String term, Integer minOccurrence, Integer limit) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        QueryBuilder query = textQuery("*", "*");
+        SolrQuery solrQuery = createBasicQuery(profile, query);
+//        setFacetFields(term, minOccurrence, limit, solrQuery);
+        return solrQuery;
     }
+
+
+
+
+    private SolrQuery createBasicQuery(Profile profile, QueryBuilder query) {
+        SearchFilter filterQuery = profile.createFilterQuery();
+
+        if (filterQuery != null) {
+            FilterBuilder filter = createFilter(filterQuery);
+            query = filteredQuery(query, filter);
+        }
+
+        SolrQuery solrQuery = solrQueryBuilder.build(query.toString().replaceAll(" ", ""));
+        solrQuery.set("q.dsl", "true");
+
+        return solrQuery;
+    }
+
 
     public FilterBuilder createFilter(SearchFilter mediaSearchQuery) {
         FilterBuilder filterBuilder = null;
@@ -77,6 +90,7 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
         }
         return filterBuilder;
     }
+
 
     private FilterBuilder parseFilterList(SearchFilterList queryList) {
         FilterBuilder result = null;

@@ -85,7 +85,8 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
 
         Date firstBroadcastDate = null;
         if (solrDocument.getFieldNames().contains(startField)) {
-            firstBroadcastDate = asDate(solrDocument.getFieldValues(startField).iterator().next());
+            Object next = solrDocument.getFieldValues(startField).iterator().next();
+            firstBroadcastDate = asDate(next);
         }
 
         String firstBroadcastChannel = null;
@@ -127,7 +128,7 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             }
             throw new RuntimeException("You can not convert object of type [" + o.getClass() + "] to a date. It should be a string");
         }
-        return null;
+        return new Date(0l);
     }
 
     private List<String> asList(Object o) {
