@@ -51,7 +51,10 @@ public class BasicSolrQueryFactory extends AbstractSolrQueryFactory {
     @Override
     public SolrQuery createSuggestQuery(Profile profile, String term, Integer minOccurrence, Integer limit) {
         SearchFilter filterQuery = profile.createFilterQuery();
-        String filterQueryString = filterQuery.createQueryString();
+        String filterQueryString="";
+        if (filterQuery!=null) {
+            filterQueryString = filterQuery.createQueryString();
+        }
 
         SolrQuery solrQuery = solrQueryBuilder.build();
         solrQuery.setQuery("*:*");
