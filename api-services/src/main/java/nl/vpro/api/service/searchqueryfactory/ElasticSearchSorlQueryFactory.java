@@ -10,7 +10,6 @@ import nl.vpro.api.service.searchfilterbuilder.SearchFilter;
 import nl.vpro.api.service.searchfilterbuilder.SearchFilterList;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 
@@ -20,10 +19,8 @@ import java.util.List;
 import static org.elasticsearch.index.query.FilterBuilders.andFilter;
 import static org.elasticsearch.index.query.FilterBuilders.orFilter;
 import static org.elasticsearch.index.query.FilterBuilders.termFilter;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.filteredQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-import static org.elasticsearch.index.query.QueryBuilders.textQuery;
 
 /**
  * This class creates the search query for the ElasticSearch service with solr plugin.
@@ -37,21 +34,7 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
 
     @Override
     public SolrQuery createSearchQuery(Profile profile, String term, Integer max, Integer offset) {
-        BoolQueryBuilder boolQueryBuilder = boolQuery()
-            .minimumNumberShouldMatch(1);
-
-        for (String searchfield : searchFields) {
-            boolQueryBuilder.should(textQuery(searchfield, term));
-        }
-
-        SolrQuery solrQuery = createBasicQuery(profile, boolQueryBuilder);
-        solrQuery.setRows(max);
-
-        if (offset != null && offset > 0) {
-            solrQuery.setStart(offset);
-        }
-
-        return solrQuery;
+        return createDefaultLuceneQuery(profile, term, max, offset);
     }
 
     @Override
@@ -61,8 +44,6 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
         setFacetFields(term, minOccurrence, limit, solrQuery);
         return solrQuery;
     }
-
-
 
 
     private SolrQuery createBasicQuery(Profile profile, QueryBuilder query) {
