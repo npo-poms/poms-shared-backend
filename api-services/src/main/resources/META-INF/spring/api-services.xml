@@ -71,26 +71,28 @@
 
   <bean id="solrQueryBuilder" class="nl.vpro.api.util.SolrQueryBuilderImpl"/>
 
+  <!-- currenty set to work on elastic search, with common solr syntax-->
   <bean id="solrQueryFactory" class="nl.vpro.api.service.searchqueryfactory.BasicSolrQueryFactory">
     <property name="solrQueryBuilder" ref="solrQueryBuilder"/>
     <property name="solrServer">
-      <bean class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer">
+      <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
         <constructor-arg>
           <bean class="java.net.URL">
-            <constructor-arg value="${solr.media.api.url}"/>
+            <constructor-arg value="${solr.elastic.media.api.url}"/>
           </bean>
         </constructor-arg>
       </bean>
     </property>
   </bean>
 
-  <bean id="solrESQueryFactory" class="nl.vpro.api.service.searchqueryfactory.ElasticSearchSorlQueryFactory">
+  <!-- currently set to work on solr, for testing purposes-->
+  <bean id="solrESQueryFactory" class="nl.vpro.api.service.searchqueryfactory.BasicSolrQueryFactory">
     <property name="solrQueryBuilder" ref="solrQueryBuilder"/>
     <property name="solrServer">
-      <bean class="org.apache.solr.client.solrj.impl.CommonsHttpSolrServer">
+      <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
         <constructor-arg>
           <bean class="java.net.URL">
-            <constructor-arg value="${solr.elastic.media.api.url}"/>
+            <constructor-arg value="${solr.media.api.url}"/>
           </bean>
         </constructor-arg>
       </bean>

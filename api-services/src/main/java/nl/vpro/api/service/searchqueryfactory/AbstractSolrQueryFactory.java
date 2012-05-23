@@ -58,15 +58,7 @@ public abstract class AbstractSolrQueryFactory implements SolrQueryFactory {
 
     public SolrQuery createDefaultLuceneQuery(Profile profile, String term, Integer max, Integer offset) {
         SolrQuery solrQuery = solrQueryBuilder.build();
-
-        SearchFilter filterQuery = profile.createFilterQuery();
-        if (filterQuery != null) {
-            String filterQueryString = filterQuery.createQueryString();
-            if (StringUtils.isNotBlank(filterQueryString)) {
-                solrQuery.setFilterQueries(filterQueryString);
-            }
-        }
-
+        setFilterQuery(profile, solrQuery);
         solrQuery.setFields("*", "score");
         solrQuery.setQuery(createQuery(term));
         solrQuery.setRows(max);
@@ -78,16 +70,21 @@ public abstract class AbstractSolrQueryFactory implements SolrQueryFactory {
     }
 
     public SolrQuery createDefaultLuceneSuggestQuery(Profile profile, String term, Integer minOccurrence, Integer limit) {
-        SearchFilter filterQuery = profile.createFilterQuery();
-        String filterQueryString = filterQuery.createQueryString();
-
         SolrQuery solrQuery = solrQueryBuilder.build();
+        setFilterQuery(profile, solrQuery);
         solrQuery.setQuery("*:*");
-        if (StringUtils.isNotBlank(filterQueryString)) {
-            solrQuery.setFilterQueries(filterQueryString);
-        }
         setFacetFields(term, minOccurrence, limit, solrQuery);
 
         return solrQuery;
+    }
+
+    private void setFilterQuery(Profile profile, SolrQuery solrQuery) {
+        SearchFilter filterQuery = profile.createFilterQuery();
+        if (filterQuery != null) {
+            String filterQueryString = filterQuery.createQueryString();
+            if (StringUtils.isNotBlank(filterQueryString)) {
+                solrQuery.setFilterQueries(filterQueryString);
+            }
+        }
     }
 }

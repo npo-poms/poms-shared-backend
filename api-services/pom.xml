@@ -16,6 +16,11 @@
   <packaging>jar</packaging>
 
   <dependencies>
+    <dependency>
+    	<groupId>org.apache.httpcomponents</groupId>
+    	<artifactId>httpmime</artifactId>
+    </dependency>
+
 
     <dependency>
       <groupId>org.pegdown</groupId>
