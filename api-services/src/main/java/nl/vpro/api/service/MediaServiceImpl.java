@@ -118,6 +118,10 @@ public class MediaServiceImpl implements MediaService {
             SolrQuery solrQuery = solrESQueryFactory.createSearchQuery(profile, query, offset, max);
 
             QueryResponse results = solrServer.query(solrQuery);
+            if (log.isDebugEnabled()) {
+                log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
+                log.debug("Query: " + solrQuery.toString());
+            }
             MediaSearchResult mediaSearchResult = conversionService.convert(results, MediaSearchResult.class);
             return mediaSearchResult;
         } catch (SolrServerException e) {
@@ -131,6 +135,10 @@ public class MediaServiceImpl implements MediaService {
         SolrServer solrServer = solrQueryFactory.getSolrServer();
         Profile profile = profileService.getProfile(profileName, solrServer);
         SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, suggestionsMinOccurrence, suggestionsLimit);
+        if (log.isDebugEnabled()) {
+            log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
+            log.debug("Query: " + solrQuery.toString());
+        }
         try {
             QueryResponse response = solrServer.query(solrQuery);
             return conversionService.convert(response, MediaSearchSuggestions.class);
@@ -144,6 +152,10 @@ public class MediaServiceImpl implements MediaService {
         SolrServer solrServer = solrESQueryFactory.getSolrServer();
         Profile profile = profileService.getProfile(profileName, solrServer);
         SolrQuery solrQuery = solrESQueryFactory.createSuggestQuery(profile, query, suggestionsMinOccurrence, suggestionsLimit);
+        if (log.isDebugEnabled()) {
+            log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
+            log.debug("Query: " + solrQuery.toString());
+        }
         try {
             QueryResponse response = solrServer.query(solrQuery);
             return conversionService.convert(response, MediaSearchSuggestions.class);
