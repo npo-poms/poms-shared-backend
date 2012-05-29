@@ -78,7 +78,7 @@
       <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
         <constructor-arg>
           <bean class="java.net.URL">
-            <constructor-arg value="${solr.elastic.media.api.url}"/>
+            <constructor-arg value="${solr.media.api.url}"/>
           </bean>
         </constructor-arg>
       </bean>
@@ -92,7 +92,7 @@
       <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
         <constructor-arg>
           <bean class="java.net.URL">
-            <constructor-arg value="${solr.media.api.url}"/>
+            <constructor-arg value="${solr.extra.media.api.url}"/>
           </bean>
         </constructor-arg>
       </bean>

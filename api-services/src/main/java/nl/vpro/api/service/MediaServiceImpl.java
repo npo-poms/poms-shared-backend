@@ -22,6 +22,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jcouchdb.db.Database;
@@ -97,6 +98,10 @@ public class MediaServiceImpl implements MediaService {
         Profile profile = profileService.getProfile(profileName, solrServer);
         Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
         SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, offset, max);
+        if (log.isDebugEnabled()) {
+            log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
+            log.debug("Query: " + solrQuery.toString());
+        }
         try {
             QueryResponse response = solrServer.query(solrQuery);
             return conversionService.convert(response, MediaSearchResult.class);
