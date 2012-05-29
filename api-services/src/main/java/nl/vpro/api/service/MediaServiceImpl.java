@@ -97,7 +97,7 @@ public class MediaServiceImpl implements MediaService {
         SolrServer solrServer = solrQueryFactory.getSolrServer();
         Profile profile = profileService.getProfile(profileName, solrServer);
         Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
-        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, offset, max);
+        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, queryMaxRows, offset);
         if (log.isDebugEnabled()) {
             log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
             log.debug("Query: " + solrQuery.toString());
@@ -115,7 +115,8 @@ public class MediaServiceImpl implements MediaService {
         try {
             SolrServer solrServer = solrESQueryFactory.getSolrServer();
             Profile profile = profileService.getProfile(profileName, solrServer);
-            SolrQuery solrQuery = solrESQueryFactory.createSearchQuery(profile, query, offset, max);
+            Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
+            SolrQuery solrQuery = solrESQueryFactory.createSearchQuery(profile, query, queryMaxRows, offset);
 
             QueryResponse results = solrServer.query(solrQuery);
             if (log.isDebugEnabled()) {
