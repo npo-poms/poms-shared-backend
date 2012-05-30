@@ -19,11 +19,7 @@ public interface MediaService {
 
     public MediaSearchResult search(String query, String profile, Integer offset, Integer max);
 
-    public MediaSearchResult searchES(String query, String profile, Integer offset, Integer max);
-
     public MediaSearchSuggestions searchSuggestions(String query, String profile);
-
-    public MediaSearchSuggestions searchSuggestionsES(String query, String profile);
 
     public Program getProgram(Long id);
 

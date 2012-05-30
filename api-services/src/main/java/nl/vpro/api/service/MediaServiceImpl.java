@@ -85,10 +85,6 @@ public class MediaServiceImpl implements MediaService {
     @Autowired
     private SolrQueryFactory solrQueryFactory;
 
-    @Autowired
-    private SolrQueryFactory solrESQueryFactory;
-
-
     public MediaServiceImpl() {
     }
 
@@ -99,32 +95,12 @@ public class MediaServiceImpl implements MediaService {
         Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
         SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, queryMaxRows, offset);
         if (log.isDebugEnabled()) {
-            log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
+            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
             log.debug("Query: " + solrQuery.toString());
         }
         try {
             QueryResponse response = solrServer.query(solrQuery);
             return conversionService.convert(response, MediaSearchResult.class);
-        } catch (SolrServerException e) {
-            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public MediaSearchResult searchES(String query, String profileName, Integer offset, Integer max) {
-        try {
-            SolrServer solrServer = solrESQueryFactory.getSolrServer();
-            Profile profile = profileService.getProfile(profileName, solrServer);
-            Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
-            SolrQuery solrQuery = solrESQueryFactory.createSearchQuery(profile, query, queryMaxRows, offset);
-
-            QueryResponse results = solrServer.query(solrQuery);
-            if (log.isDebugEnabled()) {
-                log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
-                log.debug("Query: " + solrQuery.toString());
-            }
-            MediaSearchResult mediaSearchResult = conversionService.convert(results, MediaSearchResult.class);
-            return mediaSearchResult;
         } catch (SolrServerException e) {
             throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
         }
@@ -137,24 +113,7 @@ public class MediaServiceImpl implements MediaService {
         Profile profile = profileService.getProfile(profileName, solrServer);
         SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, suggestionsMinOccurrence, suggestionsLimit);
         if (log.isDebugEnabled()) {
-            log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
-            log.debug("Query: " + solrQuery.toString());
-        }
-        try {
-            QueryResponse response = solrServer.query(solrQuery);
-            return conversionService.convert(response, MediaSearchSuggestions.class);
-        } catch (SolrServerException e) {
-            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public MediaSearchSuggestions searchSuggestionsES(String query, String profileName) {
-        SolrServer solrServer = solrESQueryFactory.getSolrServer();
-        Profile profile = profileService.getProfile(profileName, solrServer);
-        SolrQuery solrQuery = solrESQueryFactory.createSuggestQuery(profile, query, suggestionsMinOccurrence, suggestionsLimit);
-        if (log.isDebugEnabled()) {
-            log.debug("Server: "+((HttpSolrServer) solrServer).getBaseURL().toString());
+            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
             log.debug("Query: " + solrQuery.toString());
         }
         try {
@@ -276,7 +235,7 @@ public class MediaServiceImpl implements MediaService {
                         mediaObjects.add(mediaObject);
                         break;
                     default:
-                        log.error("Unknown mediatype for urn : "+urn+" : "+mediaType);
+                        log.error("Unknown mediatype for urn : " + urn + " : " + mediaType);
                         break;
                 }
             }
@@ -288,11 +247,11 @@ public class MediaServiceImpl implements MediaService {
 
     private ViewResult<Map> getViewResult(final String groupUrn, final String view) {
         return couchDbMediaServer.queryView(view,
-                Map.class,
-                new Options().startKey(groupUrn)
-                        .endKey(groupUrn)
-                        .reduce(false),
-                null);
+            Map.class,
+            new Options().startKey(groupUrn)
+                .endKey(groupUrn)
+                .reduce(false),
+            null);
     }
 
 

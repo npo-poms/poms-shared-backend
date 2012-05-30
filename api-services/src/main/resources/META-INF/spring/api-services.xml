@@ -85,17 +85,4 @@
     </property>
   </bean>
 
-  <!-- currently set to work on solr, for testing purposes-->
-  <bean id="solrESQueryFactory" class="nl.vpro.api.service.searchqueryfactory.BasicSolrQueryFactory">
-    <property name="solrQueryBuilder" ref="solrQueryBuilder"/>
-    <property name="solrServer">
-      <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
-        <constructor-arg>
-          <bean class="java.net.URL">
-            <constructor-arg value="${solr.extra.media.api.url}"/>
-          </bean>
-        </constructor-arg>
-      </bean>
-    </property>
-  </bean>
 </beans>
