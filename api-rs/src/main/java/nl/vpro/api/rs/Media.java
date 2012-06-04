@@ -11,6 +11,8 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.UgcService;
+import nl.vpro.api.service.searchfilterbuilder.BooleanOp;
+import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -91,27 +93,42 @@ public class Media {
 
     @GET
     @Path("search/{profile}")
-    public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
-        return mediaService.search(queryString, profileName, offset, maxResult);
+    public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
+        TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
+        return mediaService.search(queryString, tagFilter, profileName, offset, maxResult);
     }
 
     @GET
     @Path("search")
-    public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
-        return mediaService.search(queryString, "", offset, maxResult);
+    public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
+        TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
+        return mediaService.search(queryString, tagFilter, "", offset, maxResult);
     }
 
     @GET
     @Path("search/suggest")
-    public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String queyString) {
-        return mediaService.searchSuggestions(queyString, "");
+    public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String queyString, @QueryParam("tags") String tags) {
+        TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
+        return mediaService.searchSuggestions(queyString, tagFilter, "");
     }
-
 
     @GET
     @Path("search/suggest/{profile}")
-    public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queyString, @PathParam("profile") String profileName) {
-        return mediaService.searchSuggestions(queyString, profileName);
+    public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queyString, @QueryParam("tags") String tags, @PathParam("profile") String profileName) {
+        TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
+        return mediaService.searchSuggestions(queyString, tagFilter, profileName);
+    }
+
+
+    private TagFilter createFilter(String tags, BooleanOp booleanOp) {
+        TagFilter tagFilter = null;
+        if (StringUtils.isNotBlank(tags)) {
+            tagFilter = new TagFilter((booleanOp));
+            for (String tag : tags.split(" ")) {
+                tagFilter.addTag(tag);
+            }
+        }
+        return tagFilter;
     }
 
 

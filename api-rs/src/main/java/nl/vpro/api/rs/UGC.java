@@ -64,10 +64,10 @@ public class UGC {
     public Annotation getAnnotationByPart(@PathParam("urn") String id) {
         if (StringUtils.isNotEmpty(id)) {
             if (MediaUtil.isUrn(id)) {
-                Segment segment=mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment,id));
-                if (segment!=null) {
-                    String urn=segment.getUrnRef();
-                    return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program,urn));
+                Segment segment = mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, id));
+                if (segment != null) {
+                    String urn = segment.getUrnRef();
+                    return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, urn));
                 }
             } else {
                 return ugcService.getAnnotiationByPart(id);
