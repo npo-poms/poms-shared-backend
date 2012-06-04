@@ -1,6 +1,7 @@
 package nl.vpro.api.service.searchqueryfactory;
 
 import nl.vpro.api.service.Profile;
+import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 
@@ -21,9 +22,9 @@ public interface SolrQueryFactory {
     static final List<Float> searchFieldBoosting = Arrays.asList(2.0f, 2.0f, 1.0f, 1.0f, 1.0f);
 
 
-    SolrQuery createSearchQuery(Profile profile, String term, Integer max, Integer offset);
+    SolrQuery createSearchQuery(Profile profile, String term, TagFilter tagFilter, Integer max, Integer offset);
 
-    SolrQuery createSuggestQuery(Profile profile, String term, Integer minOccurrence, Integer limit);
+    SolrQuery createSuggestQuery(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit);
 
     SolrServer getSolrServer();
 }

@@ -17,8 +17,8 @@
 
   <dependencies>
     <dependency>
-    	<groupId>org.apache.httpcomponents</groupId>
-    	<artifactId>httpmime</artifactId>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
     </dependency>
 
 

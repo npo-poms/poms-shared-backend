@@ -10,6 +10,7 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
+import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import nl.vpro.api.service.searchqueryfactory.SolrQueryFactory;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
@@ -21,7 +22,6 @@ import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -45,7 +45,6 @@ import org.springframework.web.client.RestTemplate;
 import org.svenson.JSONParser;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
 import java.util.*;
 
 /**
@@ -89,11 +88,11 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public MediaSearchResult search(String query, String profileName, Integer offset, Integer max) {
+    public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer max) {
         SolrServer solrServer = solrQueryFactory.getSolrServer();
         Profile profile = profileService.getProfile(profileName, solrServer);
         Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
-        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, queryMaxRows, offset);
+        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, tagFilter, queryMaxRows, offset);
         if (log.isDebugEnabled()) {
             log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
             log.debug("Query: " + solrQuery.toString());
@@ -108,10 +107,10 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String query, String profileName) {
+    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) {
         SolrServer solrServer = solrQueryFactory.getSolrServer();
         Profile profile = profileService.getProfile(profileName, solrServer);
-        SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, suggestionsMinOccurrence, suggestionsLimit);
+        SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
         if (log.isDebugEnabled()) {
             log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
             log.debug("Query: " + solrQuery.toString());
@@ -282,19 +281,5 @@ public class MediaServiceImpl implements MediaService {
         public int compare(MediaObject media, MediaObject media1) {
             return -(media.getMemberRef(group).getAdded().compareTo(media1.getMemberRef(group).getAdded()));
         }
-    }
-
-    public static void main(String[] args) {
-        SolrServer pomsSolrServer = null;
-        try {
-            pomsSolrServer = new CommonsHttpSolrServer("http://test.elasticsearch.search.publiekeomroep.nl/structured/poms/_solr/");
-            QueryResponse response = pomsSolrServer.query(new SolrQuery("*"));
-            System.out.println(response.getResults().get(0));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (SolrServerException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-
     }
 }

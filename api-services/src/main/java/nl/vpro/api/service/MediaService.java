@@ -7,6 +7,7 @@ package nl.vpro.api.service;
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -17,9 +18,9 @@ import nl.vpro.domain.ugc.annotation.Annotation;
  */
 public interface MediaService {
 
-    public MediaSearchResult search(String query, String profile, Integer offset, Integer max);
+    public MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer max);
 
-    public MediaSearchSuggestions searchSuggestions(String query, String profile);
+    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile);
 
     public Program getProgram(Long id);
 

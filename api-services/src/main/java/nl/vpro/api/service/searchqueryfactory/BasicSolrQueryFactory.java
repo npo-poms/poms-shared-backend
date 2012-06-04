@@ -1,6 +1,7 @@
 package nl.vpro.api.service.searchqueryfactory;
 
 import nl.vpro.api.service.Profile;
+import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import org.apache.solr.client.solrj.SolrQuery;
 
 /**
@@ -12,13 +13,13 @@ import org.apache.solr.client.solrj.SolrQuery;
  */
 public class BasicSolrQueryFactory extends AbstractSolrQueryFactory {
     @Override
-    public SolrQuery createSearchQuery(Profile profile, String term, Integer max, Integer offset) {
-        return createDefaultLuceneQuery(profile, term, max, offset);
+    public SolrQuery createSearchQuery(Profile profile, String term, TagFilter tagFilter, Integer max, Integer offset) {
+        return createDefaultLuceneQuery(profile, term, tagFilter, max, offset);
     }
 
 
     @Override
-    public SolrQuery createSuggestQuery(Profile profile, String term, Integer minOccurrence, Integer limit) {
-        return createDefaultLuceneSuggestQuery(profile, term, minOccurrence, limit);
+    public SolrQuery createSuggestQuery(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit) {
+        return createDefaultLuceneSuggestQuery(profile, term, tagFilter, minOccurrence, limit);
     }
 }

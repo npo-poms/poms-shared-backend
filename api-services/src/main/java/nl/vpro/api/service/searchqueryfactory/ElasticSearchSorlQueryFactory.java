@@ -4,10 +4,7 @@ import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.searchfilterbuilder.BooleanOp;
-import nl.vpro.api.service.searchfilterbuilder.DocumentSearchFilter;
-import nl.vpro.api.service.searchfilterbuilder.SearchFilter;
-import nl.vpro.api.service.searchfilterbuilder.SearchFilterList;
+import nl.vpro.api.service.searchfilterbuilder.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.elasticsearch.index.query.FilterBuilder;
@@ -24,6 +21,9 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * This class creates the search query for the ElasticSearch service with solr plugin.
+ * It is currently not used, I hope we can chuck it out.
+ * Should we use it again: first fix the to-do's.
+ * <p/>
  * Date: 15-5-12
  * Time: 11:38
  *
@@ -33,15 +33,16 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
 
 
     @Override
-    public SolrQuery createSearchQuery(Profile profile, String term, Integer max, Integer offset) {
-        return createDefaultLuceneQuery(profile, term, max, offset);
+    public SolrQuery createSearchQuery(Profile profile, String term, TagFilter tagFilter, Integer max, Integer offset) {
+        return createDefaultLuceneQuery(profile, term, tagFilter, max, offset);
     }
 
     @Override
-    public SolrQuery createSuggestQuery(Profile profile, String term, Integer minOccurrence, Integer limit) {
+    public SolrQuery createSuggestQuery(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit) {
         QueryBuilder query = matchAllQuery();
         SolrQuery solrQuery = createBasicQuery(profile, query);
         setFacetFields(term, minOccurrence, limit, solrQuery);
+        //TODO: IMPLEMENT TAGS
         return solrQuery;
     }
 

@@ -46,6 +46,12 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
                 item.setDuration(duration * 1000L);
             }
 
+            if (solrDocument.containsKey("tag")) {
+                for (Object tag : solrDocument.getFieldValues("tag")) {
+                    item.addTag(tag.toString());
+                }
+            }
+
             setFirstBroadcastDate(solrDocument, item);
             setImageLink(solrDocument, item);
 
