@@ -39,8 +39,18 @@ public enum Profile {
         }
     },
 
+    VPRO("vpro", "") {
+        @Override
+        public SearchFilter createFilterQuery() {
+            return new DocumentSearchFilter()
+                .addBroadcaster("VPRO");
+        }
+    },
+
     DEFAULT("", "") {
         public SearchFilter createFilterQuery() {
+            //The documents should have the VPRO as broadcasters.
+
             return null;
         }
     };

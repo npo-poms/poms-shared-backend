@@ -123,6 +123,10 @@ public class ElasticSearchSorlQueryFactory extends AbstractSolrQueryFactory {
             fbl.add(termFilter("location_formats", fileFormat.name()));
         }
 
+        for (String broadcaster : query.getBroadcasters()) {
+            fbl.add(termFilter("broadcaster", broadcaster));
+        }
+
         for (AvType avType : query.getAvTypes()) {
             fbl.add(termFilter("avType", avType.name()));
         }

@@ -26,6 +26,8 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
 
     private List<String> descendants = new ArrayList<String>();
 
+    private List<String> broadcasters = new ArrayList<String>();
+
     private String mainTitle;
 
     private String documentType;
@@ -58,6 +60,11 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
         return this;
     }
 
+    public DocumentSearchFilter addBroadcaster(String broadcaster) {
+        broadcasters.add(broadcaster);
+        return this;
+    }
+
     public DocumentSearchFilter setMainTitle(String mainTitle) {
         this.mainTitle = mainTitle;
         return this;
@@ -78,6 +85,10 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
 
         for (AvFileFormat fileFormat : locationFormats) {
             sb.append("location_formats:" + fileFormat.name());
+        }
+
+        for (String broadcaster : broadcasters) {
+            sb.append("broadcaster:" + broadcaster);
         }
 
         for (AvType avType : avTypes) {
@@ -119,6 +130,10 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
 
     public List<String> getDescendants() {
         return descendants;
+    }
+
+    public List<String> getBroadcasters() {
+        return broadcasters;
     }
 
     public String getMainTitle() {
