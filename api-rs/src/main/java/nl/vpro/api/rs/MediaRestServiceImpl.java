@@ -10,7 +10,6 @@ import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.MediaService;
-import nl.vpro.api.service.UgcService;
 import nl.vpro.api.service.searchfilterbuilder.BooleanOp;
 import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
@@ -29,28 +28,26 @@ import javax.ws.rs.*;
 
 
 /**
+ * Offers REST access to api.service.MediaService
  * User: rico
  * Date: 09/03/2012
  */
 
 @Path("/media")
 @Controller
-public class Media {
-    Logger logger = LoggerFactory.getLogger(Media.class);
+public class MediaRestServiceImpl implements MediaRestService {
+    Logger logger = LoggerFactory.getLogger(MediaRestServiceImpl.class);
     MediaService mediaService;
 
-    UgcService ugcService;
-
     @Autowired
-    public Media(MediaService mediaService) {
+    /**
+     * inject the media service impl that does the real job
+     */
+    public MediaRestServiceImpl(MediaService mediaService) {
         this.mediaService = mediaService;
     }
 
-    @Autowired
-    public void setUgcService(UgcService ugcService) {
-        this.ugcService = ugcService;
-    }
-
+    @Override
     @GET
     @Path("program/{urn}")
     public Program getProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
@@ -65,6 +62,7 @@ public class Media {
      * @return
      * @throws IllegalArgumentException
      */
+    @Override
     @GET
     @Path("program/{urn}/annotations")
     public Annotations getAnnotationsForProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
@@ -77,20 +75,23 @@ public class Media {
         return annotations;
     }
 
+    @Override
     @GET
     @Path("group/{urn}")
-    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers) throws IllegalArgumentException, ServerErrorException, NotFoundException {
+    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers) throws ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
         return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers);
     }
 
+    @Override
     @GET
     @Path("segment/{urn}")
-    public Segment getSegment(@PathParam("urn") String urn) throws IllegalArgumentException, ServerErrorException, NotFoundException {
+    public Segment getSegment(@PathParam("urn") String urn) throws ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
         return mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, urn));
     }
 
+    @Override
     @GET
     @Path("search/{profile}")
     public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
@@ -98,6 +99,7 @@ public class Media {
         return mediaService.search(queryString, tagFilter, profileName, offset, maxResult);
     }
 
+    @Override
     @GET
     @Path("search")
     public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
@@ -105,20 +107,21 @@ public class Media {
         return mediaService.search(queryString, tagFilter, "", offset, maxResult);
     }
 
+    @Override
     @GET
     @Path("search/suggest")
-    public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String queyString, @QueryParam("tags") String tags) {
+    public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String queryString, @QueryParam("tags") String tags) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
-        return mediaService.searchSuggestions(queyString, tagFilter, "");
+        return mediaService.searchSuggestions(queryString, tagFilter, "");
     }
 
+    @Override
     @GET
     @Path("search/suggest/{profile}")
-    public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queyString, @QueryParam("tags") String tags, @PathParam("profile") String profileName) {
+    public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @PathParam("profile") String profileName) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
-        return mediaService.searchSuggestions(queyString, tagFilter, profileName);
+        return mediaService.searchSuggestions(queryString, tagFilter, profileName);
     }
-
 
     private TagFilter createFilter(String tags, BooleanOp booleanOp) {
         TagFilter tagFilter = null;
@@ -130,7 +133,6 @@ public class Media {
         }
         return tagFilter;
     }
-
 
     private long getMediaId(String type, String urn) throws IllegalArgumentException {
         if (urn.matches("[0-9]+]")) {
