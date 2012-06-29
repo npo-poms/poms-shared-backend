@@ -6,6 +6,7 @@ package nl.vpro.jackson;
 
 import nl.vpro.api.domain.media.MediaObject;
 import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
@@ -46,6 +47,8 @@ public class MediaMapper extends ObjectMapper {
         deserializationConfig.addHandler(new MediaProblemHandler());
         deserializationConfig.set(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         setDeserializationConfig(deserializationConfig);
+        //http://wiki.fasterxml.com/JacksonPolymorphicDeserialization#A1.1._Global_default_typing :
+//        enableDefaultTyping(DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);
 
         // Serialization settings.
         SerializationConfig serializationConfig = copySerializationConfig();

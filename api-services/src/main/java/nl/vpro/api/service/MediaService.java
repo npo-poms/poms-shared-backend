@@ -24,6 +24,10 @@ public interface MediaService {
 
     public Program getProgram(Long id);
 
+    /**
+     * @param id
+     * @return the POMS segments as one annotation
+     */
     public Annotation getProgramAnnotation(Long id);
 
     public Group getGroup(Long id, boolean addMembers);

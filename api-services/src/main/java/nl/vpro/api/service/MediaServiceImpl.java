@@ -176,8 +176,20 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public Segment getSegment(Long id) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.segment, id);
+        try{
         ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, couchdbUrlprovider.getUrl(), urn);
         return segmentResponseEntity.getBody();
+        } catch (HttpServerErrorException e) {
+            throw new ServerErrorException(e.getMessage(), e);
+        } catch (ResourceAccessException e1) {
+            throw new ServerErrorException(e1.getMessage(), e1);
+        } catch (HttpClientErrorException e3) {
+            if (e3.getStatusCode().value() == 404) {
+                throw new NotFoundException("Segment with id " + id + " could not be found", e3);
+            } else {
+                throw new ServerErrorException("Something went wrong fetching segment with id " + id + ". reason: " + e3.getMessage(), e3);
+            }
+        }
     }
 
 
