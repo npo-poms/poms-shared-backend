@@ -176,9 +176,9 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public Segment getSegment(Long id) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.segment, id);
-        try{
-        ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, couchdbUrlprovider.getUrl(), urn);
-        return segmentResponseEntity.getBody();
+        try {
+            ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, couchdbUrlprovider.getUrl(), urn);
+            return segmentResponseEntity.getBody();
         } catch (HttpServerErrorException e) {
             throw new ServerErrorException(e.getMessage(), e);
         } catch (ResourceAccessException e1) {
@@ -258,11 +258,11 @@ public class MediaServiceImpl implements MediaService {
 
     private ViewResult<Map> getViewResult(final String groupUrn, final String view) {
         return couchDbMediaServer.queryView(view,
-            Map.class,
-            new Options().startKey(groupUrn)
-                .endKey(groupUrn)
-                .reduce(false),
-            null);
+                Map.class,
+                new Options().startKey(groupUrn)
+                        .endKey(groupUrn)
+                        .reduce(false),
+                null);
     }
 
 
