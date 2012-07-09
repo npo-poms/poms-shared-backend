@@ -19,6 +19,7 @@ import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
+import nl.vpro.api.rs.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +128,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         TagFilter tagFilter = null;
         if (StringUtils.isNotBlank(tags)) {
             tagFilter = new TagFilter((booleanOp));
-            for (String tag : tags.split(" ")) {
+            for (String tag :  StringUtil.split(tags)) { //tags.split(" ") is not enough, because tags can have spaces.
                 tagFilter.addTag(tag);
             }
         }

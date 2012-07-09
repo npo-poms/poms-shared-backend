@@ -26,7 +26,7 @@ public interface MediaRestService {
 
     /**
      * @param queryString zoekterm volgens Lucene
-     * @param tags spatie-gescheiden tags
+     * @param tags spatie-gescheiden tags. Tags met een spatie (zoals Europese Unie) tussen quotes zetten ("Europese Unie").
      * @param maxResult maximum aantal resultaten, meer dan 50 wordt nog niet ondersteund
      * @param offset te beginnen bij dit resultaat
      * @return de gevonden media in een MediaSearchResult
