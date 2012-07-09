@@ -96,7 +96,7 @@ public abstract class AbstractSolrQueryFactory implements SolrQueryFactory {
                 }
                 tagsBuilder
                     .append("tag:")
-                    .append(tag)
+                    .append(asLuceneQueryPhrase(tag))
                     .append(" ");
 
             }
@@ -104,6 +104,20 @@ public abstract class AbstractSolrQueryFactory implements SolrQueryFactory {
         String tagsQuery = tagsBuilder.toString().trim();
         log.debug("Tags Query: " + tagsQuery);
         return tagsQuery;
+    }
+
+    /**
+     * If the input string contains space(s), this method returns the input string between double quotes.
+     * If the input contains no space(s), it returns the original input string.
+     * Useful for Lucene Queries, see http://www.solrtutorial.com/solr-query-syntax.html for the lucent syntax.
+     * @param aString
+     */
+    private static String asLuceneQueryPhrase(final String aString){
+        String lqp = aString;
+        if (StringUtils.containsAny(aString, " ")){
+            lqp = "\""+aString+"\"";
+        }
+        return lqp;
     }
 
     public SolrQuery createDefaultLuceneQuery(Profile profile, String term, TagFilter tagFilter, Integer max, Integer offset) {
