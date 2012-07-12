@@ -6,7 +6,6 @@ package nl.vpro.jackson;
 
 import nl.vpro.api.domain.media.MediaObject;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.annotate.JsonTypeInfo;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;

@@ -12,13 +12,13 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import nl.vpro.api.service.searchqueryfactory.SolrQueryFactory;
-import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.*;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -45,6 +45,7 @@ import org.springframework.web.client.RestTemplate;
 import org.svenson.JSONParser;
 
 import java.io.Serializable;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -62,6 +63,9 @@ public class MediaServiceImpl implements MediaService {
 
     @Value("${solr.max.result}")
     private int maxResult;
+
+    @Value("${couchdb.view.replayable.programs.by.first.broadcating}")
+    private String couchdbViewReplayableRrogramsByFirstBroadcating;
 
     @Value("${solr.suggest.min.occurrence}")
     private Integer suggestionsMinOccurrence;
@@ -141,6 +145,69 @@ public class MediaServiceImpl implements MediaService {
                 throw new ServerErrorException("Something went wrong fetching media with id " + id + ". reason: " + e3.getMessage(), e3);
             }
         }
+    }
+
+    @Override
+    public MediaObjectList<Program> getReplayablePrograms(Integer max, Integer offset) {
+        Options options = new Options().reduce(false);
+        if (offset != null) {
+            options.skip(offset);
+        }
+        options.limit(max != null ? max : maxResult);
+        options.descending(true);
+        options.includeDocs(true);
+
+        // we use a 'now' value with hour precision, so we can have some caching of this query.
+        //maybe an hour is too long?
+        Calendar now = createNowWithHourPrecision();
+        options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
+        options.endKey((new Object[]{"VPRO"}));
+
+        String requestUrl = createCouchdbViewUrl(couchdbViewReplayableRrogramsByFirstBroadcating, options);
+
+        try {
+            ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
+
+            MediaObjectList<Program> list = new MediaObjectList<Program>();
+            list.setNumFound(programViewResult.getBody().getTotalRows());
+            list.setStart(programViewResult.getBody().getOffset());
+            for (ResultRowWithDocument<Program, String> row : programViewResult.getBody().getRows()) {
+                list.addDocument(row.getDoc());
+            }
+
+            return list;
+        } catch (HttpServerErrorException e) {
+            throw new ServerErrorException(e.getMessage(), e);
+        } catch (ResourceAccessException e1) {
+            throw new ServerErrorException(e1.getMessage(), e1);
+        } catch (HttpClientErrorException e3) {
+            if (e3.getStatusCode().value() == 404) {
+                throw new NotFoundException("View with name " + couchdbViewReplayableRrogramsByFirstBroadcating + " could not be queried", e3);
+            } else {
+                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + couchdbViewReplayableRrogramsByFirstBroadcating + ". reason: " + e3.getMessage(), e3);
+            }
+        }
+    }
+
+    /**
+     * Create an url for querying a couchdb view. We don't use the jcouchdb api because this uses the Svensson json library,
+     * which won't work with the jaxb and jackson mapping annotations we already use. Best to use the rest template, that uses
+     * Jackson and existing marshalling and unmarshalling 'just works!'
+     */
+    private String createCouchdbViewUrl(String view, Options options) {
+        if (!view.contains("/")) {
+            throw new RuntimeException("view must contain a slash to separate the document name from the view name");
+        }
+        String query = "/_design/" + StringUtils.substringBefore(view, "/") + "/_view/" + StringUtils.substringAfter(view, "/");
+        return couchdbUrlprovider.getUrl() + query + URLDecoder.decode(options.toQuery());
+    }
+
+
+    private Calendar createNowWithHourPrecision() {
+        Calendar c = new GregorianCalendar(new Locale("NL", "nl"));
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MINUTE, 0);
+        return c;
     }
 
     @Override
@@ -258,11 +325,11 @@ public class MediaServiceImpl implements MediaService {
 
     private ViewResult<Map> getViewResult(final String groupUrn, final String view) {
         return couchDbMediaServer.queryView(view,
-                Map.class,
-                new Options().startKey(groupUrn)
-                        .endKey(groupUrn)
-                        .reduce(false),
-                null);
+            Map.class,
+            new Options().startKey(groupUrn)
+                .endKey(groupUrn)
+                .reduce(false),
+            null);
     }
 
 

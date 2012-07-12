@@ -110,12 +110,13 @@ public abstract class AbstractSolrQueryFactory implements SolrQueryFactory {
      * If the input string contains space(s), this method returns the input string between double quotes.
      * If the input contains no space(s), it returns the original input string.
      * Useful for Lucene Queries, see http://www.solrtutorial.com/solr-query-syntax.html for the lucent syntax.
+     *
      * @param aString
      */
-    private static String asLuceneQueryPhrase(final String aString){
+    private static String asLuceneQueryPhrase(final String aString) {
         String lqp = aString;
-        if (StringUtils.containsAny(aString, " ")){
-            lqp = "\""+aString+"\"";
+        if (StringUtils.containsAny(aString, " ")) {
+            lqp = "\"" + aString + "\"";
         }
         return lqp;
     }

@@ -8,6 +8,7 @@ import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.service.searchfilterbuilder.TagFilter;
+import nl.vpro.api.transfer.MediaObjectList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -23,6 +24,13 @@ public interface MediaService {
     public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile);
 
     public Program getProgram(Long id);
+
+    /**
+     * This method returns a number of the most recent programs broadcasted by by the VPRO
+     * that has (a) location(s) attached to it, so it is playable.
+     * The programs are sorted by first broadcast date descending.
+     */
+    public MediaObjectList<Program> getReplayablePrograms(Integer max, Integer offset);
 
     /**
      * @param id
