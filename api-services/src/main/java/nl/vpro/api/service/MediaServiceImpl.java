@@ -218,13 +218,19 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Group getGroup(Long id, boolean addMembers) {
+    /**
+     * Returns a group, optionally with members.
+     * If addMembers=true, and memberTypes is null or empty, all members are returned.
+     * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
+     */
+    public Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.group, id);
         try {
             ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, couchdbUrlprovider.getUrl(), urn);
             Group group = groupResponseEntity.getBody();
             if (addMembers) {
-                group.getMembers().addAll(getMediaForGroup(group, MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment));
+
+                group.getMembers().addAll(getMediaForGroup(group, memberTypesFilter )); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
             }
             return group;
         } catch (HttpServerErrorException e) {
@@ -272,7 +278,15 @@ public class MediaServiceImpl implements MediaService {
         this.suggestionsLimit = suggestionsLimit;
     }
 
-    private List<MediaObject> getMediaForGroup(final Group group, MediaObjectType... types) {
+    /**
+     * get the members of a group.
+     * Optionally filter on specific types of members.
+     * If the filter is null or empty, any member is added to the returned result.
+     * @param group The group of which we want to get the members
+     * @param memberTypesFilter List of types to filter the members on, or empty if you want all members regardless its type.
+     * @return
+     */
+    private List<MediaObject> getMediaForGroup(final Group group, List<MediaObjectType> memberTypesFilter) {
         List<MediaObject> mediaObjects = new ArrayList<MediaObject>();
         ViewResult<Map> viewResult;
         List<String> mediaIds = new ArrayList<String>();
@@ -285,12 +299,17 @@ public class MediaServiceImpl implements MediaService {
             viewResult = getViewResult(group.getUrn(), "media/by-group");
             for (ValueRow<Map> row : viewResult.getRows()) {
                 String urn = row.getId();
-                MediaObjectType mediaType = MediaUtil.getMediaType(urn);
-                for (MediaObjectType type : types) {
-                    if (type == mediaType) {
-                        mediaIds.add(urn);
-                    }
+
+                if (memberTypesFilter==null || memberTypesFilter.isEmpty() || memberTypesFilter.contains(MediaUtil.getMediaType(urn))) {
+                    mediaIds.add(urn);
                 }
+
+//                MediaObjectType mediaType = MediaUtil.getMediaType(urn);
+//                for (MediaObjectType type : typesFilter) {
+//                    if (type == mediaType) {
+//                        mediaIds.add(urn);
+//                    }
+//                }
             }
             // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
             ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, mediaIds, new Options(), new JSONParser());

@@ -7,11 +7,14 @@ package nl.vpro.api.service;
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.searchfilterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaObjectList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
+
+import java.util.List;
 
 /**
  * User: rico
@@ -38,7 +41,12 @@ public interface MediaService {
      */
     public Annotation getProgramAnnotation(Long id);
 
-    public Group getGroup(Long id, boolean addMembers);
+    /**
+     * Returns a group, optionally with members.
+     * If addMembers=true, and memberTypes is null or empty, all members are returned.
+     * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
+     */
+    public Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter);
 
     public Segment getSegment(Long id);
 }
