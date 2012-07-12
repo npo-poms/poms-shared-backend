@@ -22,7 +22,15 @@ public interface MediaRestService {
 
     public Annotations getAnnotationsForProgram(String urn);
 
-    public Group getGroup(String urn, boolean addMembers) throws ServerErrorException, NotFoundException;
+    /**
+     * if addMembers=true, members are added.
+     * You can filter the types of members that may be returned, by added a mediaTypes request parameter, which contains comma-seperated list of allowed mediatypes.
+     * The values of the media types must be the toString values of class MediaObjectType,
+     * No filtering (thus getting all members, regardless its type) is obtained by either:
+     * - memberTypesFilter = null or ""
+     * - memberTypesFilter = "program,group,segment" (a comma seperated list of all possible mediaObjectTypes)
+     */
+    public Group getGroup(String urn, boolean addMembers, String memberTypesFilter ) throws ServerErrorException, NotFoundException;
 
     public Segment getSegment(String urn) throws ServerErrorException, NotFoundException;
 

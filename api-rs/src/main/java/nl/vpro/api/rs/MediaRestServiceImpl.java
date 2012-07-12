@@ -27,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -88,9 +91,34 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     @GET
     @Path("group/{urn}")
-    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers) throws ServerErrorException, NotFoundException {
+    /**
+     * if members=true, members are added.
+     * You can filter the types of members that may be returned, by added a membertypes request parameter, which contains comma-seperated list of allowed mediatypes.
+     * The values of the media types must be the toString values of class MediaObjectType,
+     * No filtering is obtained by either:
+     * - not passing req.param membertypes
+     * - leaving req.param membertypes an empty value: &membertypes=
+     * - adding all possibile mediaObjectTypes: &membertypes=program,group,segment
+     */
+    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
-        return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers);
+
+        List<MediaObjectType> mediaObjectTypesFilter = null;
+
+        if (addMembers && memberTypesFilter != null && !memberTypesFilter.isEmpty()) {
+            //the caller wants members of specific types
+            mediaObjectTypesFilter = new ArrayList<MediaObjectType>();
+            List<String> allowedMediaTypes = Arrays.asList(memberTypesFilter.split(","));
+            for (String memberType : allowedMediaTypes) {
+                try {
+                    mediaObjectTypesFilter.add(MediaObjectType.valueOf(memberType));
+                } catch (java.lang.IllegalArgumentException iae) {
+                    logger.error("Bij het opvragen van een Group aan de API Media Server werd een ongeldige filterwaarde op in membertypes meegegeven, namelijk: " + memberType + ". Dit wordt daarom genegeerd als filterwaarde.");
+                }
+            }
+        }
+
+        return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers, mediaObjectTypesFilter);
     }
 
     @Override
