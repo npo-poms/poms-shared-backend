@@ -35,7 +35,7 @@ public class StringUtilTest {
 
     @Test
     public void testSplit4() throws Exception {
-        ArrayList<String> expected = new ArrayList<String>(Arrays.asList("Europees beleid","Nederland","Duitsland", "minister van binnenlandse zaken","jojo","broodje aap"));
+        ArrayList<String> expected = new ArrayList<String>(Arrays.asList("Europees beleid", "Nederland", "Duitsland", "minister van binnenlandse zaken", "jojo", "broodje aap"));
         Assert.assertEquals(expected, StringUtil.split("\"Europees beleid\" Nederland Duitsland \"minister van binnenlandse zaken\"      jojo  \"broodje aap\""));
     }
 

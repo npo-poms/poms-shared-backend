@@ -3,20 +3,22 @@ package nl.vpro.api.rs;
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.transfer.MediaObjectList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 
-import javax.ws.rs.*;
-
 /**
  * Public REST API to api.service.MediaService
+ *
  * @author : maarten hogendoorn
  */
 public interface MediaRestService {
     public Program getProgram(String urn);
+
+    public MediaObjectList<Program> getRecentReplayablePrograms(Integer maxResult, Integer offset);
 
     public Annotations getAnnotationsForProgram(String urn);
 
@@ -26,15 +28,16 @@ public interface MediaRestService {
 
     /**
      * @param queryString zoekterm volgens Lucene
-     * @param tags spatie-gescheiden tags. Tags met een spatie (zoals Europese Unie) tussen quotes zetten ("Europese Unie").
-     * @param maxResult maximum aantal resultaten, meer dan 50 wordt nog niet ondersteund
-     * @param offset te beginnen bij dit resultaat
+     * @param tags        spatie-gescheiden tags. Tags met een spatie (zoals Europese Unie) tussen quotes zetten ("Europese Unie").
+     * @param maxResult   maximum aantal resultaten, meer dan 50 wordt nog niet ondersteund
+     * @param offset      te beginnen bij dit resultaat
      * @return de gevonden media in een MediaSearchResult
      */
     public MediaSearchResult search(String queryString, String tags, Integer maxResult, Integer offset);
 
     /**
      * Only the first parameter is obligatory.
+     *
      * @param profileName, must be filled. Currently supported profiles: "woord" and "vpro"
      * @param queryString
      * @param tags

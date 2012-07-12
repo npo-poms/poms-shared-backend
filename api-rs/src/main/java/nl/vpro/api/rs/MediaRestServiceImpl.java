@@ -9,9 +9,11 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
+import nl.vpro.api.rs.util.StringUtil;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.searchfilterbuilder.BooleanOp;
 import nl.vpro.api.service.searchfilterbuilder.TagFilter;
+import nl.vpro.api.transfer.MediaObjectList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -19,7 +21,6 @@ import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
-import nl.vpro.api.rs.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,14 @@ public class MediaRestServiceImpl implements MediaRestService {
     public Program getProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
         logger.debug("Called with urn " + urn);
         return mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, urn));
+    }
+
+    @Override
+    @GET
+    @Path("program/replay")
+    public MediaObjectList<Program> getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
+//    public MediaObjectList<Program> getRecentReplayablePrograms() {
+        return mediaService.getReplayablePrograms(10, 0);
     }
 
     /**
@@ -128,7 +137,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         TagFilter tagFilter = null;
         if (StringUtils.isNotBlank(tags)) {
             tagFilter = new TagFilter((booleanOp));
-            for (String tag :  StringUtil.split(tags)) { //tags.split(" ") is not enough, because tags can have spaces.
+            for (String tag : StringUtil.split(tags)) { //tags.split(" ") is not enough, because tags can have spaces.
                 tagFilter.addTag(tag);
             }
         }

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 /**
  * Wat Apache kan, kunnen WIJ ook!
- *
+ * <p/>
  * Additional String conversion utilities
  */
 
@@ -31,6 +31,7 @@ public class StringUtil {
 
     /**
      * split("apple    \"banana orange\" gorilla") = ["apple","banana orange","gorilla"]
+     *
      * @param spaceSeperatedString the string to split on spaces, unless surrounded with dbl quotes
      * @return
      */
@@ -65,12 +66,13 @@ public class StringUtil {
      * If the input string contains space(s), this method returns the input string between double quotes.
      * If the input contains no space(s), it returns the original input string.
      * Useful for Lucene Queries, see http://www.solrtutorial.com/solr-query-syntax.html for the lucent syntax.
+     *
      * @param aString
      */
-    public static String asLuceneQueryPhrase(final String aString){
+    public static String asLuceneQueryPhrase(final String aString) {
         String lqp = aString;
-        if (StringUtils.containsAny(aString, " ")){
-            lqp = "\""+aString+"\"";
+        if (StringUtils.containsAny(aString, " ")) {
+            lqp = "\"" + aString + "\"";
         }
         return lqp;
     }
