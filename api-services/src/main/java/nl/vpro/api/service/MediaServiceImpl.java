@@ -148,7 +148,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public MediaObjectList<Program> getReplayablePrograms(Integer max, Integer offset) {
+    public ProgramList getReplayablePrograms(Integer max, Integer offset) {
         Options options = new Options().reduce(false);
         if (offset != null) {
             options.skip(offset);
@@ -168,11 +168,11 @@ public class MediaServiceImpl implements MediaService {
         try {
             ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
 
-            MediaObjectList<Program> list = new MediaObjectList<Program>();
+            ProgramList list = new ProgramList();
             list.setNumFound(programViewResult.getBody().getTotalRows());
             list.setStart(programViewResult.getBody().getOffset());
             for (ResultRowWithDocument<Program, String> row : programViewResult.getBody().getRows()) {
-                list.addDocument(row.getDoc());
+                list.addProgram(row.getDoc());
             }
 
             return list;
@@ -230,7 +230,7 @@ public class MediaServiceImpl implements MediaService {
             Group group = groupResponseEntity.getBody();
             if (addMembers) {
 
-                group.getMembers().addAll(getMediaForGroup(group, memberTypesFilter )); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
+                group.getMembers().addAll(getMediaForGroup(group, memberTypesFilter)); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
             }
             return group;
         } catch (HttpServerErrorException e) {
@@ -282,7 +282,8 @@ public class MediaServiceImpl implements MediaService {
      * get the members of a group.
      * Optionally filter on specific types of members.
      * If the filter is null or empty, any member is added to the returned result.
-     * @param group The group of which we want to get the members
+     *
+     * @param group             The group of which we want to get the members
      * @param memberTypesFilter List of types to filter the members on, or empty if you want all members regardless its type.
      * @return
      */
@@ -300,7 +301,7 @@ public class MediaServiceImpl implements MediaService {
             for (ValueRow<Map> row : viewResult.getRows()) {
                 String urn = row.getId();
 
-                if (memberTypesFilter==null || memberTypesFilter.isEmpty() || memberTypesFilter.contains(MediaUtil.getMediaType(urn))) {
+                if (memberTypesFilter == null || memberTypesFilter.isEmpty() || memberTypesFilter.contains(MediaUtil.getMediaType(urn))) {
                     mediaIds.add(urn);
                 }
 

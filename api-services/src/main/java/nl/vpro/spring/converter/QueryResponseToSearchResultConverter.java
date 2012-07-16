@@ -57,7 +57,7 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
 
             setLocations(solrDocument, item);
 
-            searchResult.addDocument(item);
+            searchResult.addMediaSearchResultItem(item);
         }
         return searchResult;
     }

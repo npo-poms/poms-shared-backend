@@ -9,7 +9,7 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.searchfilterbuilder.TagFilter;
-import nl.vpro.api.transfer.MediaObjectList;
+import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -33,7 +33,7 @@ public interface MediaService {
      * that has (a) location(s) attached to it, so it is playable.
      * The programs are sorted by first broadcast date descending.
      */
-    public MediaObjectList<Program> getReplayablePrograms(Integer max, Integer offset);
+    public ProgramList getReplayablePrograms(Integer max, Integer offset);
 
     /**
      * @param id
