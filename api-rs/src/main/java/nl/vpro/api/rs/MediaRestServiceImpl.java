@@ -13,7 +13,7 @@ import nl.vpro.api.rs.util.StringUtil;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.searchfilterbuilder.BooleanOp;
 import nl.vpro.api.service.searchfilterbuilder.TagFilter;
-import nl.vpro.api.transfer.MediaObjectList;
+import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -63,7 +63,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     @GET
     @Path("program/replay")
-    public MediaObjectList<Program> getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
+    public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
 //    public MediaObjectList<Program> getRecentReplayablePrograms() {
         return mediaService.getReplayablePrograms(10, 0);
     }

@@ -3,7 +3,7 @@ package nl.vpro.api.rs;
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
-import nl.vpro.api.transfer.MediaObjectList;
+import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.transfer.ugc.annotation.Annotations;
@@ -18,7 +18,7 @@ import nl.vpro.util.rs.error.ServerErrorException;
 public interface MediaRestService {
     public Program getProgram(String urn);
 
-    public MediaObjectList<Program> getRecentReplayablePrograms(Integer maxResult, Integer offset);
+    public ProgramList getRecentReplayablePrograms(Integer maxResult, Integer offset);
 
     public Annotations getAnnotationsForProgram(String urn);
 
@@ -30,7 +30,7 @@ public interface MediaRestService {
      * - memberTypesFilter = null or ""
      * - memberTypesFilter = "program,group,segment" (a comma seperated list of all possible mediaObjectTypes)
      */
-    public Group getGroup(String urn, boolean addMembers, String memberTypesFilter ) throws ServerErrorException, NotFoundException;
+    public Group getGroup(String urn, boolean addMembers, String memberTypesFilter) throws ServerErrorException, NotFoundException;
 
     public Segment getSegment(String urn) throws ServerErrorException, NotFoundException;
 
