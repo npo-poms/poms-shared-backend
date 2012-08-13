@@ -35,10 +35,11 @@ public class ProgramToAnnotationConverter implements Converter<Program, Annotati
         annotation.setCreationDate(program.getCreationDate());
         annotation.setLastModifiedDate(program.getLastModified());
 
-
+        int sequenceNumber = 0;
         for (Segment segment : program.getSegments()) {
             AnnotationPart part = new AnnotationPart();
-            part.setUrn(segment.getUrn());
+//            part.setUrn(segment.getUrn());
+            part.setSequenceNumber(sequenceNumber++);
             part.setStart(segment.getStart().getTime());
             part.setStop(segment.getStart().getTime() + segment.getDuration().getTime());
             if (segment.getImages().size() > 0) {

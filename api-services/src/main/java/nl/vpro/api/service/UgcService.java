@@ -14,10 +14,19 @@ public interface UgcService {
 
     public Annotation getAnnotiationByPart(String id);
 
+    /**
+     * @param id The couchDB-id (32 char UUID) or URN of the playerConfiguration
+     * @return a found playerConfiguration
+     * @throws nl.vpro.util.rs.error.NotFoundException if not found
+     * @throws nl.vpro.util.rs.error.ServerErrorException if any other error occurred
+     */
     public PlayerConfiguration getPlayerConfiguration(String id);
 
+    /**
+     * Insert a playerConfig. Field "id" must be empty.
+     * @param playerConfiguration
+     * @return
+     */
     public PlayerConfiguration insertPlayerConfiguration(PlayerConfiguration playerConfiguration);
-
-    public PlayerConfiguration updatePlayerConfiguration(PlayerConfiguration playerConfiguration);
 
 }

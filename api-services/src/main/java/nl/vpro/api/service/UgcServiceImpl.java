@@ -22,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
  * @author Ernst Bunders
  */
 @Service("ugcService")
-public class UgcServiceRestImpl implements UgcService {
+public class UgcServiceImpl implements UgcService {
 
     @Autowired
     private UrlProvider ugcUrlprovider;
@@ -52,11 +52,6 @@ public class UgcServiceRestImpl implements UgcService {
         }
     }
 
-
-    @Override
-    public PlayerConfiguration updatePlayerConfiguration(PlayerConfiguration playerConfiguration) {
-        return null;
-    }
 
     @Override
     public Annotation getAnnotation(String id) {
