@@ -38,9 +38,10 @@ import java.util.List;
  * Date: 09/03/2012
  */
 
-@Path("/media")
+@Path(MediaRestServiceImpl.PATH)
 @Controller
 public class MediaRestServiceImpl implements MediaRestService {
+    public static final String PATH = "media";
     Logger logger = LoggerFactory.getLogger(MediaRestServiceImpl.class);
     MediaService mediaService;
 

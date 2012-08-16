@@ -24,9 +24,10 @@ import javax.ws.rs.PathParam;
  *
  * @author Ernst Bunders
  */
-@Path("/ugc")
+@Path(UGC.PATH)
 @Controller
 public class UGC {
+    public static final String PATH = "ugc";
     Logger logger = LoggerFactory.getLogger(UGC.class);
 
     @Autowired

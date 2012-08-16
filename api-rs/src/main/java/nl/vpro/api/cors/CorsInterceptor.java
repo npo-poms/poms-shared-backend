@@ -37,11 +37,13 @@ public class CorsInterceptor implements MessageBodyWriterInterceptor {
                 boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
                 if (allowed) {
                     context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                    context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
+                    context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
                 }
             }
         } else {
             if (StringUtils.isNotEmpty(origin)) {
-                context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+                context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             }
         }
         context.proceed();
