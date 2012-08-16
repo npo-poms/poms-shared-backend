@@ -5,13 +5,17 @@ package nl.vpro.api.cors;
  * Date: 01-05-2012
  */
 
-import javax.ws.rs.OPTIONS;
+import org.springframework.stereotype.Controller;
 
-//@Controller
-//@Path("{path : .*}")
+import javax.ws.rs.OPTIONS;
+import javax.ws.rs.Path;
+
+@Controller
+@Path("{path : .*}")
 public class OptionsController {
     @OPTIONS
-    public void options() {
+    public String options() {
+        return "ok";
         // For CORS support
     }
 }
