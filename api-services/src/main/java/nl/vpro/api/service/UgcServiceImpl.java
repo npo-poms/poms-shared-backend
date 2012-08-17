@@ -78,7 +78,7 @@ public class UgcServiceImpl implements UgcService {
             ResponseEntity<T> responseEntity = restTemplate.getForEntity("{url}" + typeName + "/{urn}.json", type, args);
             return responseEntity.getBody();
         } catch (HttpClientErrorException cee) {
-            throw new NotFoundException("Could not fetch annotation with id " + id + ". It does not exist");
+            throw new NotFoundException("Could not fetch " + type.getSimpleName() + " with id " + id + ". It does not exist");
         } catch (Exception e) {
             throw new ServerErrorException("Something went wrong fetching an annotation from the ugc service: " + e.getMessage(), e);
         }
