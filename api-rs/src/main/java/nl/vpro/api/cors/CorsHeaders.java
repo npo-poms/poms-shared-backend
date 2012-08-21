@@ -20,6 +20,6 @@ public class CorsHeaders {
 
     // Response Header Values
     public static final String ACCESS_CONTROL_ALLOW_METHODS_VALUE = "GET, HEAD, OPTIONS, POST";
-    public static final String ACCESS_CONTROL_ALLOW_HEADERS_VALUE = "x-http-method-override";
+    public static final String ACCESS_CONTROL_ALLOW_HEADERS_VALUE = "x-http-method-override, origin, content-type, accept";
 
 }
