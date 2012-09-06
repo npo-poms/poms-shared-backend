@@ -338,7 +338,7 @@ public class MediaServiceImpl implements MediaService {
                 }
             }
 
-            Collections.sort(mediaObjects, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByOrderComparator(group));
+            Collections.sort(mediaObjects, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByDateComparator(group));
         }
         return mediaObjects;
     }
