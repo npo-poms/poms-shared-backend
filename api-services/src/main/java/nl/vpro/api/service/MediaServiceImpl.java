@@ -64,8 +64,8 @@ public class MediaServiceImpl implements MediaService {
     @Value("${solr.max.result}")
     private int maxResult;
 
-    @Value("${couchdb.view.replayable.programs.by.first.broadcating}")
-    private String couchdbViewReplayableRrogramsByFirstBroadcating;
+    @Value("${couchdb.view.replayable.programs.by.first.broadcasting}")
+    private String couchdbViewReplayableRrogramsByFirstBroadcasting;
 
     @Value("${solr.suggest.min.occurrence}")
     private Integer suggestionsMinOccurrence;
@@ -163,7 +163,7 @@ public class MediaServiceImpl implements MediaService {
         options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
         options.endKey((new Object[]{"VPRO"}));
 
-        String requestUrl = createCouchdbViewUrl(couchdbViewReplayableRrogramsByFirstBroadcating, options);
+        String requestUrl = createCouchdbViewUrl(couchdbViewReplayableRrogramsByFirstBroadcasting, options);
 
         try {
             ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
@@ -182,9 +182,9 @@ public class MediaServiceImpl implements MediaService {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
             if (e3.getStatusCode().value() == 404) {
-                throw new NotFoundException("View with name " + couchdbViewReplayableRrogramsByFirstBroadcating + " could not be queried", e3);
+                throw new NotFoundException("View with name " + couchdbViewReplayableRrogramsByFirstBroadcasting + " could not be queried", e3);
             } else {
-                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + couchdbViewReplayableRrogramsByFirstBroadcating + ". reason: " + e3.getMessage(), e3);
+                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + couchdbViewReplayableRrogramsByFirstBroadcasting + ". reason: " + e3.getMessage(), e3);
             }
         }
     }
