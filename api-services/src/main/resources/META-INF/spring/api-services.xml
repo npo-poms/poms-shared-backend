@@ -26,7 +26,9 @@
         class="org.springframework.context.support.ConversionServiceFactoryBean">
     <property name="converters">
       <set>
-        <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter"/>
+        <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter">
+          <property name="img_url_template" value="${solr.imageurl.template}" />
+        </bean>
         <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
         <bean class="nl.vpro.spring.converter.ProgramToAnnotationConverter"/>
       </set>

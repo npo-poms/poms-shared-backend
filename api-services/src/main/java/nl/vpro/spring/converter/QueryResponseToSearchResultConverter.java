@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class QueryResponseToSearchResultConverter implements Converter<QueryResponse, MediaSearchResult> {
     private static final List<String> IMAGE_TYPES_ORDERED = Arrays.asList("LOGO", "STILL", "ICON", "BACKGROUND", "PORTRAIT", "PICTURE");
-    private static final String IMG_URL_TEMPLATE = "http://poms-test.omroep.nl/images/ext-api/images/s100/{id}.jpg";
+    private String img_url_template;
 
     @Override
     public MediaSearchResult convert(QueryResponse queryResponse) {
@@ -81,6 +81,7 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             if (solrDocument.getFieldNames().contains(imageFieldName)) {
                 String imageUrn = (String) solrDocument.getFieldValues(imageFieldName).iterator().next();
                 item.setImageUrl(createUrlFromUrn(imageUrn));
+                item.setImageUrn(imageUrn);
             }
         }
     }
@@ -107,7 +108,7 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
 
     private String createUrlFromUrn(String urn) {
         String id = StringUtils.substringAfterLast(urn, ":");
-        return IMG_URL_TEMPLATE.replace("{id}", id);
+        return img_url_template.replace("{id}", id);
     }
 
     private String concatenateListOfStrings(List<String> list, String separator) {
@@ -170,5 +171,9 @@ public class QueryResponseToSearchResultConverter implements Converter<QueryResp
             return s.trim();
         }
         return s;
+    }
+
+    public void setImg_url_template(String img_url_template) {
+        this.img_url_template = img_url_template;
     }
 }
