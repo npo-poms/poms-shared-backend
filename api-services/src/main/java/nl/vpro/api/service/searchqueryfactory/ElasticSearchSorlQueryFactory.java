@@ -4,7 +4,7 @@ import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.searchfilterbuilder.*;
+import nl.vpro.api.service.search.fiterbuilder.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.elasticsearch.index.query.FilterBuilder;

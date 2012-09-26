@@ -1,4 +1,4 @@
-package nl.vpro.api.service.searchfilterbuilder;
+package nl.vpro.api.service.search.fiterbuilder;
 
 import java.util.ArrayList;
 import java.util.List;

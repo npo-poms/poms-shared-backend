@@ -1,7 +1,7 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.search.MediaType;
-import nl.vpro.api.service.searchfilterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.util.SolrQueryBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;

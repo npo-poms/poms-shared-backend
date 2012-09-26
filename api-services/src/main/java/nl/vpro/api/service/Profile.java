@@ -2,10 +2,10 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
-import nl.vpro.api.service.searchfilterbuilder.BooleanOp;
-import nl.vpro.api.service.searchfilterbuilder.DocumentSearchFilter;
-import nl.vpro.api.service.searchfilterbuilder.SearchFilter;
-import nl.vpro.api.service.searchfilterbuilder.SearchFilterList;
+import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
+import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
 
 
 /**

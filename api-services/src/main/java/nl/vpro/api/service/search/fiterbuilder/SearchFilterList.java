@@ -1,4 +1,4 @@
-package nl.vpro.api.service.searchfilterbuilder;
+package nl.vpro.api.service.search.fiterbuilder;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

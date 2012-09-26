@@ -1,7 +1,7 @@
 package nl.vpro.api.service.searchqueryfactory;
 
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.searchfilterbuilder.TagFilter;
+import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import org.apache.solr.client.solrj.SolrQuery;
 
 /**

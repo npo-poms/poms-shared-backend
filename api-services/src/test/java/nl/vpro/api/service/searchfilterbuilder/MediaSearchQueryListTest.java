@@ -1,6 +1,9 @@
 package nl.vpro.api.service.searchfilterbuilder;
 
 import nl.vpro.api.domain.media.AvType;
+import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
+import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
