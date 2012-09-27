@@ -172,7 +172,7 @@ public class MediaServiceImpl implements MediaService {
             view=couchdbViewReplayableRrogramsByFirstBroadcasting;
         } else {
             options.startKey(new Object[]{"VPRO", avType.toUpperCase(), now.getTimeInMillis()});
-            options.endKey((new Object[]{"VPRO"}));
+            options.endKey((new Object[]{"VPRO", avType.toUpperCase()}));
             view=couchdbViewReplayableRrogramsByAvtype;
         }
         requestUrl = createCouchdbViewUrl(view, options);
