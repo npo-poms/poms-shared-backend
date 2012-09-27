@@ -16,6 +16,7 @@ import nl.vpro.api.transfer.*;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
+import nl.vpro.util.Helper;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
@@ -66,6 +67,9 @@ public class MediaServiceImpl implements MediaService {
 
     @Value("${couchdb.view.replayable.programs.by.first.broadcasting}")
     private String couchdbViewReplayableRrogramsByFirstBroadcasting;
+
+    @Value("${couchdb.view.replayable.programs.by.avtype}")
+    private String couchdbViewReplayableRrogramsByAvtype;
 
     @Value("${solr.suggest.min.occurrence}")
     private Integer suggestionsMinOccurrence;
@@ -148,7 +152,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public ProgramList getReplayablePrograms(Integer max, Integer offset) {
+    public ProgramList getReplayablePrograms(Integer max, Integer offset, String avType) {
         Options options = new Options().reduce(false);
         if (offset != null) {
             options.skip(offset);
@@ -160,11 +164,18 @@ public class MediaServiceImpl implements MediaService {
         // we use a 'now' value with hour precision, so we can have some caching of this query.
         //maybe an hour is too long?
         Calendar now = createNowWithHourPrecision();
-        options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
-        options.endKey((new Object[]{"VPRO"}));
-
-        String requestUrl = createCouchdbViewUrl(couchdbViewReplayableRrogramsByFirstBroadcasting, options);
-
+        String requestUrl;
+        String view;
+        if (Helper.isEmpty(avType)) {
+            options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
+            options.endKey((new Object[]{"VPRO"}));
+            view=couchdbViewReplayableRrogramsByFirstBroadcasting;
+        } else {
+            options.startKey(new Object[]{"VPRO", avType.toUpperCase(), now.getTimeInMillis()});
+            options.endKey((new Object[]{"VPRO"}));
+            view=couchdbViewReplayableRrogramsByAvtype;
+        }
+        requestUrl = createCouchdbViewUrl(view, options);
         try {
             ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
 
@@ -182,12 +193,13 @@ public class MediaServiceImpl implements MediaService {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
             if (e3.getStatusCode().value() == 404) {
-                throw new NotFoundException("View with name " + couchdbViewReplayableRrogramsByFirstBroadcasting + " could not be queried", e3);
+                throw new NotFoundException("View with name " + view + " could not be queried", e3);
             } else {
-                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + couchdbViewReplayableRrogramsByFirstBroadcasting + ". reason: " + e3.getMessage(), e3);
+                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + view + ". reason: " + e3.getMessage(), e3);
             }
         }
     }
+
 
     /**
      * Create an url for querying a couchdb view. We don't use the jcouchdb api because this uses the Svensson json library,
@@ -345,11 +357,11 @@ public class MediaServiceImpl implements MediaService {
 
     private ViewResult<Map> getViewResult(final String groupUrn, final String view) {
         return couchDbMediaServer.queryView(view,
-            Map.class,
-            new Options().startKey(groupUrn)
-                .endKey(groupUrn)
-                .reduce(false),
-            null);
+                Map.class,
+                new Options().startKey(groupUrn)
+                        .endKey(groupUrn)
+                        .reduce(false),
+                null);
     }
 
 

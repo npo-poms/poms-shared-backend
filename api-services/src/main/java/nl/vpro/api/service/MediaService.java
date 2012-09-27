@@ -33,7 +33,7 @@ public interface MediaService {
      * that has (a) location(s) attached to it, so it is playable.
      * The programs are sorted by first broadcast date descending.
      */
-    public ProgramList getReplayablePrograms(Integer max, Integer offset);
+    public ProgramList getReplayablePrograms(Integer max, Integer offset, String avType);
 
     /**
      * @param id
