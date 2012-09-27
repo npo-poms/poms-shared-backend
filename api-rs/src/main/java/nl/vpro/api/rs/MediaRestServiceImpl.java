@@ -64,9 +64,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     @GET
     @Path("program/replay")
-    public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
-//    public MediaObjectList<Program> getRecentReplayablePrograms() {
-        return mediaService.getReplayablePrograms(maxResult, offset);
+    public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType ) {
+        return mediaService.getReplayablePrograms(maxResult, offset, avType);
     }
 
     /**

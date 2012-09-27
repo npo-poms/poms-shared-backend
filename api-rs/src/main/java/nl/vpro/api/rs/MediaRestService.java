@@ -18,7 +18,7 @@ import nl.vpro.util.rs.error.ServerErrorException;
 public interface MediaRestService {
     public Program getProgram(String urn);
 
-    public ProgramList getRecentReplayablePrograms(Integer maxResult, Integer offset);
+    public ProgramList getRecentReplayablePrograms(Integer maxResult, Integer offset, String avType);
 
     public Annotations getAnnotationsForProgram(String urn);
 
