@@ -1,9 +1,12 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.search.MediaType;
+import nl.vpro.api.service.search.Search;
 import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.util.SolrQueryBuilder;
+import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
+
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -25,23 +28,31 @@ import java.util.Map;
 @Service("profileService")
 public class ProfileServiceImpl implements ProfileService {
 
+    @Autowired
+    private Search search;
+
+//    @Autowired
+//    private SolrServer solrServer;
+
     private static final Logger log = LoggerFactory.getLogger(ProfileServiceImpl.class);
 
 
-    @Autowired
-    SolrQueryBuilder solrQueryBuilder;
-
     private Map<String, String> archiveCache = new HashMap<String, String>();
+
+//    @Autowired
+//    SolrQueryBuilder solrQueryBuilder;
+
+
 
     public ProfileServiceImpl() {
     }
 
     @Override
-    public Profile getProfile(String name, SolrServer solrServer) {
+    public Profile getProfile(String name) throws ServerErrorException{
         for (Profile profile : Profile.values()) {
             if (profile.getName().equals(name)) {
                 if (StringUtils.isNotBlank(profile.getArchiveName())) {
-                    setArchive(profile, solrServer);
+                    setArchive(profile);
                 }
                 return profile;
             }
@@ -49,38 +60,22 @@ public class ProfileServiceImpl implements ProfileService {
         return Profile.DEFAULT;
     }
 
-    private void setArchive(Profile profile, SolrServer solrServer) {
+    /**
+     * Tries to set the id of a named (poms) archive.The serach service is used to retrieve the poms archive from
+     * a specific backend.
+     * @param profile
+     * @throws ServerErrorException
+     */
+    private void setArchive(Profile profile) throws ServerErrorException {
         log.debug("setting archive for profile " + profile.getName());
         String archiveName = profile.getArchiveName();
         if (StringUtils.isNotBlank(archiveName)) {
             if (!archiveCache.containsKey(archiveName)) {
                 synchronized (this) {
-                    fetchArchiveUrn(archiveName, solrServer);
+                    archiveCache.put(archiveName, search.findArchiveId(archiveName));
                 }
             }
             profile.setArchiveUrn(archiveCache.get(archiveName));
         }
     }
-
-    private void fetchArchiveUrn(String name, SolrServer solrServer) {
-        log.debug("Profile not found in cache. look up in solr");
-        String queryString = new DocumentSearchFilter()
-            .addMediaType(MediaType.ARCHIVE)
-            .setMainTitle(name)
-            .createQueryString();
-        SolrQuery query = solrQueryBuilder.build(queryString);
-
-        try {
-            QueryResponse response = solrServer.query(query);
-            if (response.getResults().getNumFound() == 1) {
-                String archiveUrn = (String) response.getResults().get(0).getFieldValue("urn");
-                archiveCache.put(name, archiveUrn);
-            } else {
-                throw new RuntimeException("Can not find archive with name " + name + " in Solr, no or too many results");
-            }
-        } catch (SolrServerException e) {
-            throw new RuntimeException("Something went wrong connecting to Solr service.", e);
-        }
-    }
-
 }

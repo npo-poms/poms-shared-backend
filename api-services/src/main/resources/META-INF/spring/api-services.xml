@@ -5,86 +5,83 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-  <context:annotation-config/>
+    <context:annotation-config/>
 
-  <context:component-scan base-package="nl.vpro.api">
-    <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
-  </context:component-scan>
+    <context:component-scan base-package="nl.vpro.api">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+    </context:component-scan>
 
 
-  <bean id="couchDbMediaServer" class="org.jcouchdb.db.Database">
-    <constructor-arg name="server">
-      <bean class="org.jcouchdb.db.ServerImpl">
-        <constructor-arg value="${couchdb.media.server.host}" name="host"/>
-        <constructor-arg value="${couchdb.media.server.port}" name="port"/>
-      </bean>
-    </constructor-arg>
-    <constructor-arg value="${couchdb.media.db}" name="name"/>
-  </bean>
-
-  <bean id="conversionService"
-        class="org.springframework.context.support.ConversionServiceFactoryBean">
-    <property name="converters">
-      <set>
-        <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter">
-          <property name="img_url_template" value="${solr.imageurl.template}" />
-        </bean>
-        <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
-        <bean class="nl.vpro.spring.converter.ProgramToAnnotationConverter"/>
-      </set>
-    </property>
-  </bean>
-
-  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
-
-  <!-- This is a utility for converting upstream error responses into matching exceptions and rethrow them
-  for the client-->
-  <bean id="errorConverter" class="nl.vpro.util.rs.error.ErrorResponseToExceptionConverter">
-    <constructor-arg ref="restTemplate"/>
-  </bean>
-
-  <bean id="jacksonHttpMessageConverter"
-        class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
-    <property name="supportedMediaTypes">
-      <list>
-        <bean class="org.springframework.http.MediaType">
-          <constructor-arg index="0" value="application"/>
-          <constructor-arg index="1" value="json"/>
-        </bean>
-      </list>
-    </property>
-
-    <property name="objectMapper">
-      <bean class="nl.vpro.jackson.MediaMapper"/>
-    </property>
-  </bean>
-
-  <bean id="couchdbUrlprovider" class="nl.vpro.api.util.UrlProvider">
-    <property name="host" value="${couchdb.media.server.host}"/>
-    <property name="port" value="${couchdb.media.server.port}"/>
-    <property name="uri" value="${couchdb.media.db}"/>
-  </bean>
-
-  <bean id="ugcUrlprovider" class="nl.vpro.api.util.UrlProvider">
-    <property name="host" value="${vpro.ugc.url}"/>
-    <property name="port" value="${vpro.ugc.port}"/>
-    <property name="uri" value="${vpro.ugc.context}"/>
-  </bean>
-
-  <bean id="solrQueryBuilder" class="nl.vpro.api.util.SolrQueryBuilderImpl"/>
-
-  <!-- currenty set to work on elastic search, with common solr syntax-->
-  <bean id="solrQueryFactory" class="nl.vpro.api.service.searchqueryfactory.BasicSolrQueryFactory">
-    <property name="solrQueryBuilder" ref="solrQueryBuilder"/>
-    <property name="solrServer">
-      <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer">
-        <constructor-arg>
-          <bean class="java.net.URL">
-            <constructor-arg value="${solr.media.api.url}"/>
-          </bean>
+    <bean id="couchDbMediaServer" class="org.jcouchdb.db.Database">
+        <constructor-arg name="server">
+            <bean class="org.jcouchdb.db.ServerImpl">
+                <constructor-arg value="${couchdb.media.server.host}" name="host"/>
+                <constructor-arg value="${couchdb.media.server.port}" name="port"/>
+            </bean>
         </constructor-arg>
-      </bean>
-    </property>
-  </bean>
+        <constructor-arg value="${couchdb.media.db}" name="name"/>
+    </bean>
+
+    <bean id="conversionService"
+          class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter">
+                    <property name="img_url_template" value="${solr.imageurl.template}"/>
+                </bean>
+                <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
+                <bean class="nl.vpro.spring.converter.ProgramToAnnotationConverter"/>
+            </set>
+        </property>
+    </bean>
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
+
+    <!-- This is a utility for converting upstream error responses into matching exceptions and rethrow them
+  for the client-->
+    <bean id="errorConverter" class="nl.vpro.util.rs.error.ErrorResponseToExceptionConverter">
+        <constructor-arg ref="restTemplate"/>
+    </bean>
+
+    <bean id="jacksonHttpMessageConverter"
+          class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+        <property name="supportedMediaTypes">
+            <list>
+                <bean class="org.springframework.http.MediaType">
+                    <constructor-arg index="0" value="application"/>
+                    <constructor-arg index="1" value="json"/>
+                </bean>
+            </list>
+        </property>
+
+        <property name="objectMapper">
+            <bean class="nl.vpro.jackson.MediaMapper"/>
+        </property>
+    </bean>
+
+    <bean id="couchdbUrlprovider" class="nl.vpro.api.util.UrlProvider">
+        <property name="host" value="${couchdb.media.server.host}"/>
+        <property name="port" value="${couchdb.media.server.port}"/>
+        <property name="uri" value="${couchdb.media.db}"/>
+    </bean>
+
+    <bean id="ugcUrlprovider" class="nl.vpro.api.util.UrlProvider">
+        <property name="host" value="${vpro.ugc.url}"/>
+        <property name="port" value="${vpro.ugc.port}"/>
+        <property name="uri" value="${vpro.ugc.context}"/>
+    </bean>
+
+
+    <!-- This is the search bean that abstracts the backend for searching and suggesting (Solr or ES)-->
+    <bean id="search" class="nl.vpro.api.service.search.SolrSearch">
+        <property name="searchFields"
+                  value="titleMain,titleAlternative,descriptionMain,descriptionShort,descriptionAlternative"/>
+        <property name="searchFieldBoosting" value="2.0f,2.0f,1.0f,1.0f,1.0f"/>
+    </bean>
+
+    <!-- The solr search implementation needs this-->
+    <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer" id="solrServer">
+        <constructor-arg value="${solr.media.api.url}"/>
+    </bean>
 
 </beans>

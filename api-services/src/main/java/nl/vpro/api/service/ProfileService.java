@@ -7,7 +7,9 @@ import org.apache.solr.client.solrj.SolrServer;
  * Time: 11:50
  *
  * @author Ernst Bunders
+ *
+ * Tries to find a named profile. If that fales, return the default profile
  */
 public interface ProfileService {
-    public Profile getProfile(String name, SolrServer solrServer);
+    public Profile getProfile(String name);
 }

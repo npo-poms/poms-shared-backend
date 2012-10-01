@@ -1,6 +1,5 @@
 package nl.vpro.spring.converter;
 
-import nl.vpro.api.service.searchqueryfactory.SolrQueryFactory;
 import nl.vpro.api.transfer.MediaSearchSuggestion;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -18,8 +17,7 @@ public class QueryResponseToSearchSuggestionsConverter implements Converter<Quer
     public MediaSearchSuggestions convert(QueryResponse queryResponse) {
         MediaSearchSuggestions suggestions = new MediaSearchSuggestions();
 
-        for (String fieldName : SolrQueryFactory.searchFields) {
-            FacetField facetField = queryResponse.getFacetField(fieldName);
+        for (FacetField facetField: queryResponse.getFacetFields()) {
             if (facetField != null && facetField.getValues() != null) {
                 for (FacetField.Count count : facetField.getValues()) {
                     if (suggestionPresent(suggestions, count.getName())) {

@@ -22,7 +22,7 @@ import java.util.List;
  */
 public interface MediaService {
 
-    public MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer max);
+    public MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer maxResult);
 
     public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile);
 

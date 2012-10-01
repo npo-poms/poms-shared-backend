@@ -5,11 +5,13 @@
 package nl.vpro.api.util;
 
 import org.apache.solr.client.solrj.SolrQuery;
+import org.springframework.stereotype.Component;
 
 /**
  * User: rico
  * Date: 07/05/2012
  */
+@Component("solrQueryBuilder")
 public class SolrQueryBuilderImpl implements SolrQueryBuilder {
 
     public SolrQuery build() {

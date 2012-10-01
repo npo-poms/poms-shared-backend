@@ -10,6 +10,7 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
+import nl.vpro.api.service.search.Search;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.service.searchqueryfactory.SolrQueryFactory;
 import nl.vpro.api.transfer.*;
@@ -90,45 +91,56 @@ public class MediaServiceImpl implements MediaService {
     private RestTemplate restTemplate;
 
     @Autowired
-    private SolrQueryFactory solrQueryFactory;
+    private Search search;
 
     public MediaServiceImpl() {
     }
 
     @Override
-    public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer max) {
-        SolrServer solrServer = solrQueryFactory.getSolrServer();
-        Profile profile = profileService.getProfile(profileName, solrServer);
-        Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
-        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, tagFilter, queryMaxRows, offset);
-        if (log.isDebugEnabled()) {
-            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
-            log.debug("Query: " + solrQuery.toString());
-        }
-        try {
-            QueryResponse response = solrServer.query(solrQuery);
-            return conversionService.convert(response, MediaSearchResult.class);
-        } catch (SolrServerException e) {
-            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
-        }
+//    public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer max) {
+//        SolrServer solrServer = solrQueryFactory.getSolrServer();
+//        Profile profile = profileService.getProfile(profileName, solrServer);
+//        Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
+//        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, tagFilter, queryMaxRows, offset);
+//        if (log.isDebugEnabled()) {
+//            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
+//            log.debug("Query: " + solrQuery.toString());
+//        }
+//        try {
+//            QueryResponse response = solrServer.query(solrQuery);
+//            return conversionService.convert(response, MediaSearchResult.class);
+//        } catch (SolrServerException e) {
+//            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
+//        }
+//    }
+    public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer maxResult) throws ServerErrorException{
+        Profile profile = profileService.getProfile(profileName);
+        Integer queryMaxRows = maxResult != null && maxResult < maxResult ? maxResult: maxResult;
+        return search.search(profile, query, tagFilter, offset, queryMaxRows);
     }
 
 
+//    @Override
+//    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) {
+//        SolrServer solrServer = solrQueryFactory.getSolrServer();
+//        Profile profile = profileService.getProfile(profileName, solrServer);
+//        SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
+//        if (log.isDebugEnabled()) {
+//            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
+//            log.debug("Query: " + solrQuery.toString());
+//        }
+//        try {
+//            QueryResponse response = solrServer.query(solrQuery);
+//            return conversionService.convert(response, MediaSearchSuggestions.class);
+//        } catch (SolrServerException e) {
+//            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
+//        }
+//    }
+
     @Override
-    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) {
-        SolrServer solrServer = solrQueryFactory.getSolrServer();
-        Profile profile = profileService.getProfile(profileName, solrServer);
-        SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
-        if (log.isDebugEnabled()) {
-            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
-            log.debug("Query: " + solrQuery.toString());
-        }
-        try {
-            QueryResponse response = solrServer.query(solrQuery);
-            return conversionService.convert(response, MediaSearchSuggestions.class);
-        } catch (SolrServerException e) {
-            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
-        }
+    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) throws ServerErrorException{
+        Profile profile = profileService.getProfile(profileName);
+        return search.suggest(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
     }
 
 
