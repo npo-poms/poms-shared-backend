@@ -132,7 +132,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     @GET
     @Path("search/{profile}")
-    public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
+    public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
         return mediaService.search(queryString, tagFilter, profileName, offset, maxResult);
     }
@@ -142,7 +142,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("search")
     public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
-        return mediaService.search(queryString, tagFilter, "", offset, maxResult);
+        return mediaService.search(queryString, tagFilter, "", maxResult, offset);
     }
 
     @Override
