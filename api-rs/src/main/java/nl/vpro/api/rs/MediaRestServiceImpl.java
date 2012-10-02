@@ -21,15 +21,16 @@ import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.action.search.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import javax.ws.rs.core.Context;
+import java.util.*;
 
 
 /**
@@ -148,9 +149,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     @GET
     @Path("search/suggest")
-    public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String queryString, @QueryParam("tags") String tags) {
+    public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String termPrefix, @QueryParam("tags") String tags) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
-        return mediaService.searchSuggestions(queryString, tagFilter, "");
+        return mediaService.searchSuggestions(termPrefix, tagFilter, "");
     }
 
     @Override
@@ -159,6 +160,14 @@ public class MediaRestServiceImpl implements MediaRestService {
     public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @PathParam("profile") String profileName) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
         return mediaService.searchSuggestions(queryString, tagFilter, profileName);
+    }
+
+    @Override
+    @POST
+    @Path("search/es/{index}")
+    public SearchResponse searchES(@PathParam("index")String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString) {
+        String[] types = typesAsString.trim().split(" ");
+        return mediaService.searchES(index, types, query);
     }
 
     private TagFilter createFilter(String tags, BooleanOp booleanOp) {

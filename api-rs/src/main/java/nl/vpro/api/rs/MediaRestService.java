@@ -9,6 +9,9 @@ import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
+import org.elasticsearch.action.search.SearchResponse;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Public REST API to api.service.MediaService
@@ -32,31 +35,52 @@ public interface MediaRestService {
      */
     public Group getGroup(String urn, boolean addMembers, String memberTypesFilter) throws ServerErrorException, NotFoundException;
 
+
     public Segment getSegment(String urn) throws ServerErrorException, NotFoundException;
 
     /**
-     * @param queryString zoekterm volgens Lucene
-     * @param tags        spatie-gescheiden tags. Tags met een spatie (zoals Europese Unie) tussen quotes zetten ("Europese Unie").
-     * @param maxResult   maximum aantal resultaten, meer dan 50 wordt nog niet ondersteund
-     * @param offset      te beginnen bij dit resultaat
-     * @return de gevonden media in een MediaSearchResult
+     * Search for a certain term.
+     * You can use tags to limit your search.
+     *
+     * @param queryString term to search on.
+     * @param tags        space-separaterd list of tag names. Tag names that contain spaces themselfs, should be wrapped with quotes (").
+     * @param maxResult   maximum amount of search result hits. This value can not exceed the system wide limit.
+     * @param offset      for pagination. Which result 'page' you want.
      */
     public MediaSearchResult search(String queryString, String tags, Integer maxResult, Integer offset);
 
     /**
-     * Only the first parameter is obligatory.
+     * Search within a certain profile. for argument descriptions @see nl.vpro.api.transfer.MediaSearchResult.
+     * You can use tags to limit your search.
      *
-     * @param profileName, must be filled. Currently supported profiles: "woord" and "vpro"
-     * @param queryString
-     * @param tags
-     * @param maxResult
-     * @param offset
-     * @return
-     * @throw new IllegalArgumentException if (StringUtils.isEmpty(profileName))
+     * @param profileName when empty defaults to 'no profile'. @see nl.vpro.api.service.Profile for valid values.
      */
     public MediaSearchResult searchWithProfile(String profileName, String queryString, String tags, Integer maxResult, Integer offset);
 
-    public MediaSearchSuggestions searchSuggestions(String queryString, String tags);
+    /**
+     * Find popular search terms for a given prefix. This feature is used for the presentation of suggestions while
+     * typing search terms.
+     * You can use tags to limit your search.
+     *
+     * @param termPrefix the prefix terms will be searched for.
+     * @param tags space-separated list of tag names. Tag names that contain spaces themselves, should be wrapped with quotes (").
+     */
+    public MediaSearchSuggestions searchSuggestions(String termPrefix, String tags);
 
+    /**
+     * @see nl.vpro.api.transfer.MediaSearchSuggestions
+     * This version of the call lets you search for popular terms within a certain profile.
+     * @param profileName when empty defaults to 'no profile'. @see nl.vpro.api.service.Profile for valid values.
+     */
     public MediaSearchSuggestions searchSuggestionsWithProfile(String queryString, String tags, String profileName);
+
+    /**
+     * Temporary call added to ease the introduction of Elastic Search support. It allows you to use the full flexibility of the
+     * ES query dsl, at the cost of having to use the full flexibility of the ES dsl :-)
+     * This method will be replaced by a set of higher level search calls as soon as we know what they should be.
+     * @param index What ES index to use?
+     * @param query the query, in json format.
+     * @param types space-separaterd list of types, as they occur in the given index. This is actually a query filter.
+     */
+    public SearchResponse searchES(String index, String query, String types);
 }
