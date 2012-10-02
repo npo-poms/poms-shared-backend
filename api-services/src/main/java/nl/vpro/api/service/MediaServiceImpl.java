@@ -12,7 +12,6 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.search.Search;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
-import nl.vpro.api.service.searchqueryfactory.SolrQueryFactory;
 import nl.vpro.api.transfer.*;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -27,6 +26,12 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
 import org.jcouchdb.db.Database;
 import org.jcouchdb.db.Options;
 import org.jcouchdb.document.ValueAndDocumentRow;
@@ -49,6 +54,7 @@ import org.svenson.JSONParser;
 import java.io.Serializable;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * User: rico
@@ -93,26 +99,17 @@ public class MediaServiceImpl implements MediaService {
     @Autowired
     private Search search;
 
+    @Autowired
+    private Client esClient;
+
     public MediaServiceImpl() {
     }
 
+    /**
+     * Search calls
+     */
+
     @Override
-//    public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer max) {
-//        SolrServer solrServer = solrQueryFactory.getSolrServer();
-//        Profile profile = profileService.getProfile(profileName, solrServer);
-//        Integer queryMaxRows = max != null && max < maxResult ? max : maxResult;
-//        SolrQuery solrQuery = solrQueryFactory.createSearchQuery(profile, query, tagFilter, queryMaxRows, offset);
-//        if (log.isDebugEnabled()) {
-//            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
-//            log.debug("Query: " + solrQuery.toString());
-//        }
-//        try {
-//            QueryResponse response = solrServer.query(solrQuery);
-//            return conversionService.convert(response, MediaSearchResult.class);
-//        } catch (SolrServerException e) {
-//            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
-//        }
-//    }
     public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer maxResult) throws ServerErrorException{
         Profile profile = profileService.getProfile(profileName);
         Integer queryMaxRows = maxResult != null && maxResult < maxResult ? maxResult: maxResult;
@@ -120,29 +117,33 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-//    @Override
-//    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) {
-//        SolrServer solrServer = solrQueryFactory.getSolrServer();
-//        Profile profile = profileService.getProfile(profileName, solrServer);
-//        SolrQuery solrQuery = solrQueryFactory.createSuggestQuery(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
-//        if (log.isDebugEnabled()) {
-//            log.debug("Server: " + ((HttpSolrServer) solrServer).getBaseURL().toString());
-//            log.debug("Query: " + solrQuery.toString());
-//        }
-//        try {
-//            QueryResponse response = solrServer.query(solrQuery);
-//            return conversionService.convert(response, MediaSearchSuggestions.class);
-//        } catch (SolrServerException e) {
-//            throw new ServerErrorException("Something went wrong submitting search query to solr:" + e.getMessage(), e);
-//        }
-//    }
-
     @Override
     public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) throws ServerErrorException{
         Profile profile = profileService.getProfile(profileName);
         return search.suggest(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
     }
 
+    @Override
+    public SearchResponse searchES(String index, String[] types, String query) throws ServerErrorException{
+        SearchRequest searchRequest = new SearchRequest(index);
+        searchRequest
+                .types(types)
+                .searchType(SearchType.DEFAULT)
+                .source(query);
+        ActionFuture<SearchResponse> responseFuture = esClient.search(searchRequest);
+        try {
+            return responseFuture.get();
+        } catch (InterruptedException e) {
+            throw new ServerErrorException("something went wrong executing ES query [" + query + "] on index " + index + ": " + e.getMessage());
+        } catch (ExecutionException e) {
+            throw new ServerErrorException("something went wrong executing ES query [" + query + "] on index " + index + ": " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * Program calls
+     */
 
     @Override
     public Program getProgram(Long id) {
@@ -241,6 +242,11 @@ public class MediaServiceImpl implements MediaService {
 
     }
 
+
+    /**
+     * Group calls
+     */
+
     @Override
     /**
      * Returns a group, optionally with members.
@@ -269,6 +275,10 @@ public class MediaServiceImpl implements MediaService {
             }
         }
     }
+
+    /**
+     * Segment calls
+     */
 
     @Override
     public Segment getSegment(Long id) {

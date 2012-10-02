@@ -43,6 +43,7 @@ public class UrlProvider {
         if (port > 0 && port != 80) {
             buffer.append(":").append(port);
         }
+
         buffer.append("/").append(uri);
         return buffer.toString();
     }

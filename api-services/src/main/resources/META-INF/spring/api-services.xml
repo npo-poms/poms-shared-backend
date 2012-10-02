@@ -59,11 +59,14 @@
         </property>
     </bean>
 
+    <!-- connection to the POMS couchdb instance-->
     <bean id="couchdbUrlprovider" class="nl.vpro.api.util.UrlProvider">
         <property name="host" value="${couchdb.media.server.host}"/>
         <property name="port" value="${couchdb.media.server.port}"/>
         <property name="uri" value="${couchdb.media.db}"/>
     </bean>
+
+    <!-- connection to the User Generated Content service (rest api)-->
 
     <bean id="ugcUrlprovider" class="nl.vpro.api.util.UrlProvider">
         <property name="host" value="${vpro.ugc.url}"/>
@@ -71,15 +74,31 @@
         <property name="uri" value="${vpro.ugc.context}"/>
     </bean>
 
+    <!-- Create an ElasticSearch client with a nice factory bean -->
+    <bean id="myESClientFactory" class="nl.vpro.api.util.ESClientFactory">
+        <property name="transportAddresses">
+            <list>
+                <bean class="nl.vpro.api.util.UrlProvider">
+                    <property name="host" value="${elasticSearch.host}"/>
+                    <property name="port" value="${elasticSearch.port}"/>
+                </bean>
+            </list>
+        </property>
+        <property name="sniffCluster" value="false"/>
+        <property name="clusterName" value="${elasticSearch.cluster}"/>
+    </bean>
+    <bean id="esClient" class="org.elasticsearch.client.Client" factory-bean="myESClientFactory" factory-method="buildClient"/>
 
-    <!-- This is the search bean that abstracts the backend for searching and suggesting (Solr or ES)-->
+
+
+    <!-- Solr search implementation-->
     <bean id="search" class="nl.vpro.api.service.search.SolrSearch">
         <property name="searchFields"
                   value="titleMain,titleAlternative,descriptionMain,descriptionShort,descriptionAlternative"/>
         <property name="searchFieldBoosting" value="2.0f,2.0f,1.0f,1.0f,1.0f"/>
     </bean>
 
-    <!-- The solr search implementation needs this-->
+    <!-- The solr search java client-->
     <bean class="org.apache.solr.client.solrj.impl.HttpSolrServer" id="solrServer">
         <constructor-arg value="${solr.media.api.url}"/>
     </bean>

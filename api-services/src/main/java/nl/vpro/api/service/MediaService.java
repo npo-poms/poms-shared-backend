@@ -13,6 +13,8 @@ import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
+import nl.vpro.util.rs.error.ServerErrorException;
+import org.elasticsearch.action.search.SearchResponse;
 
 import java.util.List;
 
@@ -22,9 +24,11 @@ import java.util.List;
  */
 public interface MediaService {
 
-    public MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer maxResult);
+    public MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer maxResult) throws ServerErrorException;
 
-    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile);
+    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile) throws ServerErrorException;
+
+    public SearchResponse searchES(String index, String[] types, String query) throws ServerErrorException;
 
     public Program getProgram(Long id);
 
