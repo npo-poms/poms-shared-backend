@@ -20,15 +20,9 @@ import nl.vpro.util.Helper;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
@@ -70,7 +64,7 @@ public class MediaServiceImpl implements MediaService {
     private UrlProvider couchdbUrlprovider;
 
     @Value("${solr.max.result}")
-    private int maxResult;
+    private int globalMaxResult;
 
     @Value("${couchdb.view.replayable.programs.by.first.broadcasting}")
     private String couchdbViewReplayableRrogramsByFirstBroadcasting;
@@ -112,7 +106,7 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer maxResult) throws ServerErrorException{
         Profile profile = profileService.getProfile(profileName);
-        Integer queryMaxRows = maxResult != null && maxResult < maxResult ? maxResult: maxResult;
+        Integer queryMaxRows = maxResult != null && maxResult < globalMaxResult ? maxResult: globalMaxResult;
         return search.search(profile, query, tagFilter, offset, queryMaxRows);
     }
 
@@ -124,15 +118,18 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public SearchResponse searchES(String index, String[] types, String query) throws ServerErrorException{
+    public String searchES(String index, String[] types, String query) throws ServerErrorException{
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest
-                .types(types)
                 .searchType(SearchType.DEFAULT)
                 .source(query);
+        if (types.length > 0) {
+            searchRequest.types(types);
+        }
+
         ActionFuture<SearchResponse> responseFuture = esClient.search(searchRequest);
         try {
-            return responseFuture.get();
+            return responseFuture.get().toString();
         } catch (InterruptedException e) {
             throw new ServerErrorException("something went wrong executing ES query [" + query + "] on index " + index + ": " + e.getMessage());
         } catch (ExecutionException e) {
@@ -170,7 +167,7 @@ public class MediaServiceImpl implements MediaService {
         if (offset != null) {
             options.skip(offset);
         }
-        options.limit(max != null ? max : maxResult);
+        options.limit(max != null ? max : globalMaxResult);
         options.descending(true);
         options.includeDocs(true);
 
@@ -300,8 +297,8 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-    public void setMaxResult(int maxResult) {
-        this.maxResult = maxResult;
+    public void setGlobalMaxResult(int globalMaxResult) {
+        this.globalMaxResult = globalMaxResult;
     }
 
     public void setSuggestionsMinOccurrence(Integer suggestionsMinOccurrence) {

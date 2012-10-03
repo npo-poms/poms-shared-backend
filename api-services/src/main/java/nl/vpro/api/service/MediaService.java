@@ -9,9 +9,9 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
-import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.elasticsearch.action.search.SearchResponse;
@@ -28,7 +28,7 @@ public interface MediaService {
 
     public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile) throws ServerErrorException;
 
-    public SearchResponse searchES(String index, String[] types, String query) throws ServerErrorException;
+    public String searchES(String index, String[] types, String query) throws ServerErrorException;
 
     public Program getProgram(Long id);
 
