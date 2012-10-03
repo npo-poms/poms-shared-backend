@@ -165,7 +165,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     @POST
     @Path("search/es/{index}")
-    public SearchResponse searchES(@PathParam("index")String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString) {
+    public String searchES(@PathParam("index")String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString) {
         String[] types = typesAsString.trim().split(" ");
         return mediaService.searchES(index, types, query);
     }

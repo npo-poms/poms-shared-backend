@@ -82,5 +82,5 @@ public interface MediaRestService {
      * @param query the query, in json format.
      * @param types space-separaterd list of types, as they occur in the given index. This is actually a query filter.
      */
-    public SearchResponse searchES(String index, String query, String types);
+    public String searchES(String index, String query, String types);
 }
