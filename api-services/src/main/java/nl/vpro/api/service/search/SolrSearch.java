@@ -20,15 +20,22 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
  * User: ernst
  * Date: 9/26/12
  * Time: 4:49 PM
  * This is the solr implementation of the search interface.
- * For some reason I can't quite remember
+ *
+ *The tag filter behaviour that we want (tags boost the search result but do not cause search hits)
+ * can not be done with the SolrSearch impl.
+ * Because the dismax parser does not support AND and OR syntax in the query, we can not use it as it does not allow
+ * us to build the filter queryies.
+ * But dismax supports the 'bq' (boost query) param, and the lucene query parser does not. Catch 22!
+ *
+ * We support the use case where tags boost the search result, but will also create hits. Not nice, let's move to ES
  */
 public class SolrSearch extends AbstractSearch {
 
@@ -42,9 +49,6 @@ public class SolrSearch extends AbstractSearch {
 
     @Autowired
     ConversionService conversionService;
-
-
-
 
     @Override
     public MediaSearchResult search(Profile profile, String term, TagFilter tagFilter, Integer offset, Integer maxResult) {
@@ -186,16 +190,21 @@ public class SolrSearch extends AbstractSearch {
         return tagsQuery;
     }
 
+    /**
+     * We can not implement this the way we want. Look at the class documentation above.
+     * @param termQuery
+     * @param tagsQuery
+     * @return
+     */
     private String createSearchQuery(String termQuery, String tagsQuery) {
         StringBuilder queryBuilder = new StringBuilder();
         if (StringUtils.isBlank(tagsQuery)) {
             queryBuilder.append(termQuery);
         } else {
-            queryBuilder.append("(")
+            queryBuilder
                     .append(termQuery)
-                    .append(") AND (")
-                    .append(tagsQuery)
-                    .append(")");
+                    .append(" ")
+                    .append(tagsQuery);
         }
         String searchQuery = queryBuilder.toString().trim();
         log.debug("Search Query: " + searchQuery);
