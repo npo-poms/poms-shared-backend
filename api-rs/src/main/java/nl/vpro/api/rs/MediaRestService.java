@@ -47,7 +47,7 @@ public interface MediaRestService {
      * @param maxResult   maximum amount of search result hits. This value can not exceed the system wide limit.
      * @param offset      for pagination. Which result 'page' you want.
      */
-    public MediaSearchResult search(String queryString, String tags, Integer maxResult, Integer offset);
+    public MediaSearchResult search(String queryString, String tags, Integer offset, Integer maxResult);
 
     /**
      * Search within a certain profile. for argument descriptions @see nl.vpro.api.transfer.MediaSearchResult.
