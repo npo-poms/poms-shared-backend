@@ -44,7 +44,6 @@ public class MediaMapper extends ObjectMapper {
         // Deserialization settings.
         DeserializationConfig deserializationConfig = copyDeserializationConfig();
         deserializationConfig.addHandler(new MediaProblemHandler());
-        deserializationConfig.set(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         setDeserializationConfig(deserializationConfig);
         //http://wiki.fasterxml.com/JacksonPolymorphicDeserialization#A1.1._Global_default_typing :
 //        enableDefaultTyping(DefaultTyping.OBJECT_AND_NON_CONCRETE, JsonTypeInfo.As.PROPERTY);

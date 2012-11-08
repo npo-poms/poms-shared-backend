@@ -35,28 +35,40 @@
         </property>
     </bean>
 
-    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate"/>
+  <bean id="jacksonHttpMessageConverter"
+        class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+      <property name="supportedMediaTypes">
+          <list>
+              <bean class="org.springframework.http.MediaType">
+                  <constructor-arg index="0" value="application"/>
+                  <constructor-arg index="1" value="json"/>
+              </bean>
+          </list>
+      </property>
+
+      <property name="objectMapper">
+          <bean class="nl.vpro.jackson.MediaMapper"/>
+      </property>
+  </bean>
+
+    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+      <property name="messageConverters">
+        <list>
+          <ref bean="jacksonHttpMessageConverter"/>
+          <bean class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter" />
+          <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+          <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+          <bean class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+          <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+          <bean class="org.springframework.http.converter.xml.XmlAwareFormHttpMessageConverter" />
+        </list>
+      </property>
+    </bean>
 
     <!-- This is a utility for converting upstream error responses into matching exceptions and rethrow them
   for the client-->
     <bean id="errorConverter" class="nl.vpro.util.rs.error.ErrorResponseToExceptionConverter">
         <constructor-arg ref="restTemplate"/>
-    </bean>
-
-    <bean id="jacksonHttpMessageConverter"
-          class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
-        <property name="supportedMediaTypes">
-            <list>
-                <bean class="org.springframework.http.MediaType">
-                    <constructor-arg index="0" value="application"/>
-                    <constructor-arg index="1" value="json"/>
-                </bean>
-            </list>
-        </property>
-
-        <property name="objectMapper">
-            <bean class="nl.vpro.jackson.MediaMapper"/>
-        </property>
     </bean>
 
     <!-- connection to the POMS couchdb instance-->
