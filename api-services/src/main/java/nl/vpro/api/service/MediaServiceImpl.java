@@ -163,7 +163,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public ProgramList getReplayablePrograms(Integer max, Integer offset, String avType) {
-        Options options = new Options().reduce(false);
+        Options options = new Options();
+        options.reduce(false);
         options.descending(true);
         options.includeDocs(true);
 
