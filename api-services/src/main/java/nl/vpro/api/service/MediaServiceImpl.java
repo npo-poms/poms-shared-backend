@@ -104,21 +104,21 @@ public class MediaServiceImpl implements MediaService {
      */
 
     @Override
-    public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer maxResult) throws ServerErrorException{
+    public MediaSearchResult search(String query, TagFilter tagFilter, String profileName, Integer offset, Integer maxResult) throws ServerErrorException {
         Profile profile = profileService.getProfile(profileName);
-        Integer queryMaxRows = maxResult != null && maxResult < globalMaxResult ? maxResult: globalMaxResult;
+        Integer queryMaxRows = maxResult != null && maxResult < globalMaxResult ? maxResult : globalMaxResult;
         return search.search(profile, query, tagFilter, offset, queryMaxRows);
     }
 
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) throws ServerErrorException{
+    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) throws ServerErrorException {
         Profile profile = profileService.getProfile(profileName);
         return search.suggest(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
     }
 
     @Override
-    public String searchES(String index, String[] types, String query) throws ServerErrorException{
+    public String searchES(String index, String[] types, String query) throws ServerErrorException {
         SearchRequest searchRequest = new SearchRequest(index);
         searchRequest
                 .searchType(SearchType.DEFAULT)
@@ -164,33 +164,45 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public ProgramList getReplayablePrograms(Integer max, Integer offset, String avType) {
         Options options = new Options().reduce(false);
-        if (offset != null) {
-            options.skip(offset);
-        }
-        options.limit(max != null ? max : globalMaxResult);
         options.descending(true);
         options.includeDocs(true);
 
         // we use a 'now' value with hour precision, so we can have some caching of this query.
         //maybe an hour is too long?
         Calendar now = createNowWithHourPrecision();
-        String requestUrl;
         String view;
         if (Helper.isEmpty(avType)) {
             options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
             options.endKey((new Object[]{"VPRO"}));
-            view=couchdbViewReplayableRrogramsByFirstBroadcasting;
+            view = couchdbViewReplayableRrogramsByFirstBroadcasting;
         } else {
             options.startKey(new Object[]{"VPRO", avType.toUpperCase(), now.getTimeInMillis()});
             options.endKey((new Object[]{"VPRO", avType.toUpperCase()}));
-            view=couchdbViewReplayableRrogramsByAvtype;
+            view = couchdbViewReplayableRrogramsByAvtype;
         }
-        requestUrl = createCouchdbViewUrl(view, options);
+
+        Options countoptions = new Options(options);
+        countoptions.includeDocs(false);
+        countoptions.reduce(true);
+        String countUrl = createCouchdbViewUrl(view, countoptions);
+
+        if (offset != null) {
+            options.skip(offset);
+        }
+        options.limit(max != null ? max : globalMaxResult);
+        String requestUrl = createCouchdbViewUrl(view, options);
+
         try {
+            Long count=0L;
+            ViewResult<String> viewResult = couchDbMediaServer.queryView(view,String.class,countoptions, null);
+            for (ValueRow<String> row : viewResult.getRows()) {
+                count = Long.valueOf(row.getValue());
+            }
+
             ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
 
             ProgramList list = new ProgramList();
-            list.setNumFound(programViewResult.getBody().getTotalRows());
+            list.setNumFound(count);
             list.setStart(programViewResult.getBody().getOffset());
             for (ResultRowWithDocument<Program, String> row : programViewResult.getBody().getRows()) {
                 list.addProgram(row.getDoc());
