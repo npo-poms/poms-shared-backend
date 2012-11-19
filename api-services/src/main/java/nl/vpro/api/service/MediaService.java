@@ -50,7 +50,7 @@ public interface MediaService {
      * If addMembers=true, and memberTypes is null or empty, all members are returned.
      * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
      */
-    public Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter);
+    public Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter);
 
     public Segment getSegment(Long id);
 }

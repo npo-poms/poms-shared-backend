@@ -194,8 +194,8 @@ public class MediaServiceImpl implements MediaService {
         String requestUrl = createCouchdbViewUrl(view, options);
 
         try {
-            Long count=0L;
-            ViewResult<String> viewResult = couchDbMediaServer.queryView(view,String.class,countoptions, null);
+            Long count = 0L;
+            ViewResult<String> viewResult = couchDbMediaServer.queryView(view, String.class, countoptions, null);
             for (ValueRow<String> row : viewResult.getRows()) {
                 count = Long.valueOf(row.getValue());
             }
@@ -263,7 +263,7 @@ public class MediaServiceImpl implements MediaService {
      * If addMembers=true, and memberTypes is null or empty, all members are returned.
      * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
      */
-    public Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter) {
+    public Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.group, id);
         try {
             ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, couchdbUrlprovider.getUrl(), urn);
@@ -271,6 +271,9 @@ public class MediaServiceImpl implements MediaService {
             if (addMembers) {
 
                 group.getMembers().addAll(getMediaForGroup(group, memberTypesFilter)); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
+            }
+            if (addEpisodes) {
+                group.getMembers().addAll(getEpisodesForGroup(group, memberTypesFilter)); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
             }
             return group;
         } catch (HttpServerErrorException e) {
@@ -337,45 +340,80 @@ public class MediaServiceImpl implements MediaService {
         List<String> mediaIds = new ArrayList<String>();
 
         if (group != null) {
-            ObjectMapper mapper = new MediaMapper();
-            Options options = new Options();
-            options.reduce(false);
-
             viewResult = getViewResult(group.getUrn(), "media/by-group");
             for (ValueRow<Map> row : viewResult.getRows()) {
                 String urn = row.getId();
-
                 if (memberTypesFilter == null || memberTypesFilter.isEmpty() || memberTypesFilter.contains(MediaUtil.getMediaType(urn))) {
                     mediaIds.add(urn);
                 }
             }
-            // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
-            ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, mediaIds, new Options(), new JSONParser());
-            for (ValueAndDocumentRow<Map, Map> row : progs.getRows()) {
-                Map m = row.getDocument();
-                String urn = (String) m.get("_id");
-                MediaObjectType mediaType = MediaUtil.getMediaType(urn);
-                MediaObject mediaObject;
-                switch (mediaType) {
-                    case group:
-                        mediaObject = mapper.convertValue(m, Group.class);
-                        mediaObjects.add(mediaObject);
-                        break;
-                    case program:
-                        mediaObject = mapper.convertValue(m, Program.class);
-                        mediaObjects.add(mediaObject);
-                        break;
-                    case segment:
-                        mediaObject = mapper.convertValue(m, Segment.class);
-                        mediaObjects.add(mediaObject);
-                        break;
-                    default:
-                        log.error("Unknown mediatype for urn : " + urn + " : " + mediaType);
-                        break;
-                }
-            }
+            mediaObjects = getMediaObjects(mediaIds);
 
             Collections.sort(mediaObjects, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByDateComparator(group));
+        }
+        return mediaObjects;
+    }
+
+    /**
+     * get the episodes of a group.
+     * Optionally filter on specific types of members.
+     * If the filter is null or empty, any member is added to the returned result.
+     *
+     * @param group The group of which we want to get the members
+     * @return
+     */
+    private List<MediaObject> getEpisodesForGroup(final Group group, List<MediaObjectType> memberTypesFilter) {
+        List<MediaObject> mediaObjects = new ArrayList<MediaObject>();
+        ViewResult<Map> viewResult;
+        List<String> mediaIds = new ArrayList<String>();
+
+        if (group != null) {
+            viewResult = getViewResult(group.getUrn(), "media/episodes-by-group");
+            for (ValueRow<Map> row : viewResult.getRows()) {
+                String urn = row.getId();
+                if (memberTypesFilter == null || memberTypesFilter.isEmpty() || memberTypesFilter.contains(MediaUtil.getMediaType(urn))) {
+                    mediaIds.add(urn);
+                }
+            }
+            mediaObjects = getMediaObjects(mediaIds);
+            Collections.sort(mediaObjects, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByDateComparator(group));
+        }
+        return mediaObjects;
+    }
+
+    /**
+     * Get a list of mediaobjects from a list of ids
+     *
+     * @param ids
+     * @return
+     */
+    private List<MediaObject> getMediaObjects(List<String> ids) {
+        ObjectMapper mapper = new MediaMapper();
+        List<MediaObject> mediaObjects = new ArrayList<MediaObject>(ids.size());
+        // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
+        ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, ids, new Options(), new JSONParser());
+        for (ValueAndDocumentRow<Map, Map> row : progs.getRows()) {
+            Map m = row.getDocument();
+            String urn = (String) m.get("_id");
+            MediaObjectType mediaType = MediaUtil.getMediaType(urn);
+            MediaObject mediaObject;
+            switch (mediaType) {
+                case group:
+                    mediaObject = mapper.convertValue(m, Group.class);
+                    mediaObjects.add(mediaObject);
+                    break;
+                case program:
+                    mediaObject = mapper.convertValue(m, Program.class);
+                    mediaObjects.add(mediaObject);
+                    break;
+                case segment:
+                    mediaObject = mapper.convertValue(m, Segment.class);
+                    mediaObjects.add(mediaObject);
+                    break;
+                default:
+                    log.error("Unknown mediatype for urn : " + urn + " : " + mediaType);
+                    break;
+            }
         }
         return mediaObjects;
     }
