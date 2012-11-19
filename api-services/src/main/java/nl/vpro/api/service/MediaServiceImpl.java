@@ -387,7 +387,8 @@ public class MediaServiceImpl implements MediaService {
                     programs.add((Program) mediaObject);
                 }
             }
-            Collections.sort(programs, group.isIsOrdered() ? new SortEpisodesInGroupByOrderComparator(group) : new SortEpisodesInGroupByDateComparator(group));
+            // Collections.sort(programs, group.isIsOrdered() ? new SortEpisodesInGroupByOrderComparator(group) : new SortEpisodesInGroupByDateComparator(group));
+            Collections.sort(programs, new SortEpisodesByDateComparator(group));
         }
         return programs;
     }
@@ -494,6 +495,20 @@ public class MediaServiceImpl implements MediaService {
         @Override
         public int compare(Program media, Program media1) {
             return -(getMemberRef(media.getEpisodeOf(), group).getAdded().compareTo(getMemberRef(media1.getEpisodeOf(), group).getAdded()));
+        }
+    }
+
+    private static final class SortEpisodesByDateComparator implements Comparator<Program>, Serializable {
+        private static final long serialVersionUID = 23450389305L;
+        protected final Group group;
+
+        public SortEpisodesByDateComparator(Group group) {
+            this.group = group;
+        }
+
+        @Override
+        public int compare(Program media, Program media1) {
+            return -(media.getSortDate().compareTo(media1.getSortDate()));
         }
     }
 
