@@ -34,6 +34,8 @@ public interface MediaRestService {
      * - memberTypesFilter = "program,group,segment" (a comma seperated list of all possible mediaObjectTypes)
      */
     public Group getGroup(String urn, boolean addMembers, String memberTypesFilter) throws ServerErrorException, NotFoundException;
+    public Group getGroup(String urn, boolean addMembers, boolean addEpisodes, String memberTypesFilter) throws ServerErrorException, NotFoundException;
+
 
 
     public Segment getSegment(String urn) throws ServerErrorException, NotFoundException;

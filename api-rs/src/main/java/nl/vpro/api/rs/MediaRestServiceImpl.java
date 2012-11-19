@@ -90,6 +90,11 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
+    public Group getGroup(String urn, boolean addMembers, String membersTypeFilter) {
+        return getGroup(urn,addMembers,false,membersTypeFilter);
+    }
+
+    @Override
     @GET
     @Path("group/{urn}")
     /**
