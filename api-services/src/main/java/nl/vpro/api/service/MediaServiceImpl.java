@@ -348,13 +348,6 @@ public class MediaServiceImpl implements MediaService {
                 if (memberTypesFilter == null || memberTypesFilter.isEmpty() || memberTypesFilter.contains(MediaUtil.getMediaType(urn))) {
                     mediaIds.add(urn);
                 }
-
-//                MediaObjectType mediaType = MediaUtil.getMediaType(urn);
-//                for (MediaObjectType type : typesFilter) {
-//                    if (type == mediaType) {
-//                        mediaIds.add(urn);
-//                    }
-//                }
             }
             // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
             ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, mediaIds, new Options(), new JSONParser());
