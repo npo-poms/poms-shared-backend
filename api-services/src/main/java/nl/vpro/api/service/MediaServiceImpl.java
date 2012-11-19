@@ -263,6 +263,16 @@ public class MediaServiceImpl implements MediaService {
      * If addMembers=true, and memberTypes is null or empty, all members are returned.
      * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
      */
+    public Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter) {
+        return getGroup(id, addMembers, false, memberTypesFilter);
+    }
+
+    @Override
+    /**
+     * Returns a group, optionally with members.
+     * If addMembers=true, and memberTypes is null or empty, all members are returned.
+     * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
+     */
     public Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.group, id);
         try {
