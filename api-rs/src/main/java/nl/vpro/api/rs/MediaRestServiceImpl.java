@@ -101,7 +101,7 @@ public class MediaRestServiceImpl implements MediaRestService {
      * - leaving req.param membertypes an empty value: &membertypes=
      * - adding all possibile mediaObjectTypes: &membertypes=program,group,segment
      */
-    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException {
+    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes,@QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
 
         List<MediaObjectType> mediaObjectTypesFilter = null;
@@ -119,7 +119,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             }
         }
 
-        return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers, mediaObjectTypesFilter);
+        return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers, addEpisodes, mediaObjectTypesFilter);
     }
 
     @Override
