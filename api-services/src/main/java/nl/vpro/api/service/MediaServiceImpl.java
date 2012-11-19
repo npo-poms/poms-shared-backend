@@ -4,10 +4,7 @@
  */
 package nl.vpro.api.service;
 
-import nl.vpro.api.domain.media.Group;
-import nl.vpro.api.domain.media.MediaObject;
-import nl.vpro.api.domain.media.Program;
-import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.search.Search;
@@ -283,7 +280,7 @@ public class MediaServiceImpl implements MediaService {
                 group.getMembers().addAll(getMediaForGroup(group, memberTypesFilter)); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
             }
             if (addEpisodes) {
-                group.getMembers().addAll(getEpisodesForGroup(group, memberTypesFilter)); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
+                group.getMembers().addAll(getEpisodesForGroup(group)); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
             }
             return group;
         } catch (HttpServerErrorException e) {
@@ -372,8 +369,8 @@ public class MediaServiceImpl implements MediaService {
      * @param group The group of which we want to get the members
      * @return
      */
-    private List<MediaObject> getEpisodesForGroup(final Group group, List<MediaObjectType> memberTypesFilter) {
-        List<MediaObject> mediaObjects = new ArrayList<MediaObject>();
+    private List<Program> getEpisodesForGroup(final Group group) {
+        List<Program> programs = new ArrayList<Program>();
         ViewResult<Map> viewResult;
         List<String> mediaIds = new ArrayList<String>();
 
@@ -381,14 +378,18 @@ public class MediaServiceImpl implements MediaService {
             viewResult = getViewResult(group.getUrn(), "media/episodes-by-group");
             for (ValueRow<Map> row : viewResult.getRows()) {
                 String urn = row.getId();
-                if (memberTypesFilter == null || memberTypesFilter.isEmpty() || memberTypesFilter.contains(MediaUtil.getMediaType(urn))) {
+                if (MediaObjectType.program.name().equals(MediaUtil.getMediaType(urn).name())) {
                     mediaIds.add(urn);
                 }
             }
-            mediaObjects = getMediaObjects(mediaIds);
-            Collections.sort(mediaObjects, group.isIsOrdered() ? new SortInGroupByOrderComparator(group) : new SortInGroupByDateComparator(group));
+            for (MediaObject mediaObject : getMediaObjects(mediaIds)) {
+                if (mediaObject instanceof Program) {
+                    programs.add((Program) mediaObject);
+                }
+            }
+            Collections.sort(programs, group.isIsOrdered() ? new SortEpisodesInGroupByOrderComparator(group) : new SortEpisodesInGroupByDateComparator(group));
         }
-        return mediaObjects;
+        return programs;
     }
 
     /**
@@ -465,5 +466,45 @@ public class MediaServiceImpl implements MediaService {
         public int compare(MediaObject media, MediaObject media1) {
             return -(media.getMemberRef(group).getAdded().compareTo(media1.getMemberRef(group).getAdded()));
         }
+    }
+
+    private static final class SortEpisodesInGroupByOrderComparator implements Comparator<Program>, Serializable {
+        private static final long serialVersionUID = 23450383305L;
+
+        protected final Group group;
+
+        public SortEpisodesInGroupByOrderComparator(Group group) {
+            this.group = group;
+        }
+
+        @Override
+        public int compare(Program media, Program media1) {
+            return getMemberRef(media.getEpisodeOf(), group).getIndex().compareTo(getMemberRef(media1.getEpisodeOf(), group).getIndex());
+        }
+    }
+
+    private static final class SortEpisodesInGroupByDateComparator implements Comparator<Program>, Serializable {
+        private static final long serialVersionUID = 23450389305L;
+        protected final Group group;
+
+        public SortEpisodesInGroupByDateComparator(Group group) {
+            this.group = group;
+        }
+
+        @Override
+        public int compare(Program media, Program media1) {
+            return -(getMemberRef(media.getEpisodeOf(), group).getAdded().compareTo(getMemberRef(media1.getEpisodeOf(), group).getAdded()));
+        }
+    }
+
+    private static MemberRef getMemberRef(List<MemberRef> refs, MediaObject parent) {
+        MemberRef foundRef = null;
+        for (MemberRef ref : refs) {
+            if (ref.getUrnRef().equals(parent.getUrn())) {
+                foundRef = ref;
+                break;
+            }
+        }
+        return foundRef;
     }
 }
