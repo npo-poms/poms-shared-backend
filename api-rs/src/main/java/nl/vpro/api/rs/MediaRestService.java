@@ -27,6 +27,7 @@ public interface MediaRestService {
 
     /**
      * if addMembers=true, members are added.
+     * if addEpisodes=true, episodes are added.
      * You can filter the types of members that may be returned, by added a mediaTypes request parameter, which contains comma-seperated list of allowed mediatypes.
      * The values of the media types must be the toString values of class MediaObjectType,
      * No filtering (thus getting all members, regardless its type) is obtained by either:

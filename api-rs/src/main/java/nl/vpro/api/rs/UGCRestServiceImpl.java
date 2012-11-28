@@ -24,11 +24,11 @@ import javax.ws.rs.PathParam;
  *
  * @author Ernst Bunders
  */
-@Path(UGC.PATH)
+@Path(UGCRestServiceImpl.PATH)
 @Controller
-public class UGC {
+public class UGCRestServiceImpl implements UGCRestService {
     public static final String PATH = "ugc";
-    Logger logger = LoggerFactory.getLogger(UGC.class);
+    Logger logger = LoggerFactory.getLogger(UGCRestServiceImpl.class);
 
     @Autowired
     private MediaService mediaService;

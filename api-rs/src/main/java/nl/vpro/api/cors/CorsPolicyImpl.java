@@ -12,11 +12,8 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
- * Created with IntelliJ IDEA.
  * User: ricojansen
  * Date: 27-04-2012
- * Time: 15:16
- * To change this template use File | Settings | File Templates.
  */
 public class CorsPolicyImpl implements CorsPolicy {
     private String policyFile;
