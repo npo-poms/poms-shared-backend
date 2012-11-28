@@ -7,7 +7,6 @@ import org.elasticsearch.action.search.SearchResponse;
  * User: ernst
  * Date: 10/2/12
  * Time: 3:19 PM
- * To change this template use File | Settings | File Templates.
  */
 public class SearchResponseExtender{
     private SearchResponse searchResponse;

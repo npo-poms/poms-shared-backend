@@ -15,7 +15,7 @@ import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
  * @author Ernst Bunders
  */
 public enum Profile {
-    WOORD("woord", "Woord.nl") {
+    WOORD("woord", "Woord.nl","") {
         public SearchFilter createFilterQuery() {
 
             //The document should be a program or a segment
@@ -39,7 +39,7 @@ public enum Profile {
         }
     },
 
-    VPRO("vpro", "") {
+    VPRO("vpro", "", "") {
         @Override
         public SearchFilter createFilterQuery() {
             return new DocumentSearchFilter()
@@ -47,10 +47,16 @@ public enum Profile {
         }
     },
 
-    DEFAULT("", "") {
+    WETENSCHAP24("wetenschap24", "", "w24") {
+        @Override
+        public SearchFilter createFilterQuery() {
+            return null;
+        }
+    },
+
+    DEFAULT("", "", "") {
         public SearchFilter createFilterQuery() {
             //The documents should have the VPRO as broadcasters.
-
             return null;
         }
     };
@@ -59,11 +65,14 @@ public enum Profile {
 
     private final String archiveName;
 
+    private final String indexName;
+
     private String archiveUrn;
 
-    Profile(String name, String archiveName) {
+    Profile(String name, String archiveName, String indexName) {
         this.name = name;
         this.archiveName = archiveName;
+        this.indexName = indexName;
     }
 
     public String getName() {
@@ -72,6 +81,10 @@ public enum Profile {
 
     public String getArchiveName() {
         return archiveName;
+    }
+
+    public String getIndexName() {
+        return indexName;
     }
 
     public void setArchiveUrn(String archiveUrn) {

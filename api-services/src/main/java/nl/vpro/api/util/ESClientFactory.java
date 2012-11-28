@@ -12,11 +12,9 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created with IntelliJ IDEA.
  * User: ernst
  * Date: 10/1/12
  * Time: 11:34 AM
- * To change this template use File | Settings | File Templates.
  */
 public class ESClientFactory {
     private List<UrlProvider> transportAddresses = Collections.emptyList();

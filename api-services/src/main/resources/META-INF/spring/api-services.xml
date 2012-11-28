@@ -32,6 +32,7 @@
                 <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
                 <bean class="nl.vpro.spring.converter.ProgramToAnnotationConverter"/>
                 <bean class="nl.vpro.spring.converter.ESSearchResponseToSearchResultConverter"/>
+                <bean class="nl.vpro.spring.converter.ESSearchResponseToGenericSearchResultConverter"/>
             </set>
         </property>
     </bean>

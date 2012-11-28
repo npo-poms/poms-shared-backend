@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
  * User: ernst
  * Date: 10/2/12
  * Time: 10:56 AM
- * To change this template use File | Settings | File Templates.
  */
 public class ESSearch extends AbstractSearch {
 
@@ -46,7 +45,6 @@ public class ESSearch extends AbstractSearch {
         ActionFuture<SearchResponse> searchResponseFuture = esClient.search(request);
         try {
             SearchResponse response = searchResponseFuture.actionGet(5, TimeUnit.SECONDS);
-
             return conversionService.convert(new SearchResponseExtender(response, offset), MediaSearchResult.class);
         } catch (Throwable e) {
             throw new ServerErrorException("Something went wrong performing an elastic search operation:" + e.getMessage(), e);
@@ -56,7 +54,7 @@ public class ESSearch extends AbstractSearch {
     //TODO implement
     @Override
     public MediaSearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit) throws ServerErrorException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     private SearchSourceBuilder createBasicQuery(String term, TagFilter tagFilter, Profile profile, Integer offset, Integer maxResult) {
@@ -67,6 +65,7 @@ public class ESSearch extends AbstractSearch {
             searchBuilder.filter(new ProfileFilterBuilder(profile));
         }
         //handle the tags
+
         //handle paging
         if (offset != null) {
             searchBuilder.from(offset);
@@ -81,7 +80,7 @@ public class ESSearch extends AbstractSearch {
     //TODO implement
     @Override
     public String findArchiveId(String archiveName) throws ServerErrorException {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     public String getPomsIndexName() {
