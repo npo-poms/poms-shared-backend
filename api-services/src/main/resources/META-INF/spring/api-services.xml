@@ -31,6 +31,7 @@
                 </bean>
                 <bean class="nl.vpro.spring.converter.QueryResponseToSearchSuggestionsConverter"/>
                 <bean class="nl.vpro.spring.converter.ProgramToAnnotationConverter"/>
+                <bean class="nl.vpro.spring.converter.ESSearchResponseToSearchResultConverter"/>
             </set>
         </property>
     </bean>
@@ -102,6 +103,13 @@
     <bean id="esClient" class="org.elasticsearch.client.Client" factory-bean="myESClientFactory" factory-method="buildClient"/>
 
 
+    <!-- ElasticSearch Search implementation-->
+    <bean id="essearch" class="nl.vpro.api.service.search.ESSearch">
+        <property name="searchFields"
+                  value="titleMain,titleAlternative,descriptionMain,descriptionShort,descriptionAlternative"/>
+        <property name="searchFieldBoosting" value="2.0f,2.0f,1.0f,1.0f,1.0f"/>
+        <property name="pomsIndexName" value="${elasticSearch.poms.index}"/>
+    </bean>
 
     <!-- Solr search implementation-->
     <bean id="search" class="nl.vpro.api.service.search.SolrSearch">
