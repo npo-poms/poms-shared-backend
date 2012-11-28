@@ -37,7 +37,7 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
         if (profile == null || profile.createFilterQuery() == null) {
             throw new IllegalStateException("profile and filter query may not be null");
         }
-        result = createFilter(profile.createFilterQuery());
+        createFilter(profile.createFilterQuery());
     }
 
     @Override
@@ -45,22 +45,18 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
         result.toXContent(builder, params);
     }
 
-    public FilterBuilder createFilter(SearchFilter mediaSearchQuery) {
-        FilterBuilder filterBuilder = null;
+    public void createFilter(SearchFilter mediaSearchQuery) {
         if (mediaSearchQuery instanceof SearchFilterList) {
-            filterBuilder = parseFilterList((SearchFilterList) mediaSearchQuery);
+            result = parseFilterList((SearchFilterList) mediaSearchQuery);
         }
 
         if (mediaSearchQuery instanceof DocumentSearchFilter) {
-            filterBuilder = parseBooleanFilter((DocumentSearchFilter) mediaSearchQuery);
+            result = parseBooleanFilter((DocumentSearchFilter) mediaSearchQuery);
         }
-        return filterBuilder;
     }
 
     private FilterBuilder parseFilterList(SearchFilterList queryList) {
-        FilterBuilder result = null;
-
-        List<FilterBuilder> filterBuilderList = new ArrayList<FilterBuilder>();
+        final List<FilterBuilder> filterBuilderList = new ArrayList<FilterBuilder>();
         for (SearchFilter childQuery : queryList.getMediaSearchQueries()) {
             if (childQuery instanceof SearchFilterList) {
                 filterBuilderList.add(parseFilterList((SearchFilterList) childQuery));
@@ -77,17 +73,15 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
             }
         }
         if (queryList.getBooleanOp() == BooleanOp.AND) {
-            result = andFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
+            return andFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
+        }else /*OR*/{
+            return orFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
         }
-        if (queryList.getBooleanOp() == BooleanOp.OR) {
-            result = orFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
-        }
-        return result;
     }
 
 
     private FilterBuilder parseBooleanFilter(DocumentSearchFilter documentSearchFilter) {
-        List<FilterBuilder> fbl = gatherTermFilters(documentSearchFilter);
+        final List<FilterBuilder> fbl = gatherTermFilters(documentSearchFilter);
         if (fbl == null) return null;
 
         return fbl.size() > 1 ?
@@ -96,7 +90,7 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
     }
 
     private List<FilterBuilder> gatherTermFilters(DocumentSearchFilter documentSearchFilter) {
-        List<FilterBuilder> fbl = new ArrayList<FilterBuilder>();
+        final List<FilterBuilder> fbl = new ArrayList<FilterBuilder>();
         for (MediaType mediaType : documentSearchFilter.getMediaTypes()) {
             fbl.add(termFilter("mediaType", mediaType.name()));
         }
