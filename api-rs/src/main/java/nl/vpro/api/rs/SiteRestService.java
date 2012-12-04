@@ -23,7 +23,7 @@ public interface SiteRestService {
 
     @GET
     @Path("{profile}/search")
-    public GenericSearchResult search(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult, @QueryParam("constraints") List<String> constraints, @QueryParam("facets") List<String> facets,  @QueryParam("response") String response);
+    public GenericSearchResult search(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult, @QueryParam("constraints") List<String> constraints, @QueryParam("facets") List<String> facets,@QueryParam("order") List<String> sortFields,  @QueryParam("response") String response);
 
 
     @GET

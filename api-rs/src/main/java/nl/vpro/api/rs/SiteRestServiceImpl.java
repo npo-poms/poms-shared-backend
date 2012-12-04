@@ -4,6 +4,7 @@
  */
 package nl.vpro.api.rs;
 
+import nl.vpro.api.service.SiteService;
 import nl.vpro.api.service.search.Search;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.transfer.GenericSearchResult;
@@ -20,16 +21,15 @@ import java.util.List;
 @Controller
 public class SiteRestServiceImpl implements SiteRestService {
     @Autowired
-    @Qualifier("essearch")
-    private Search search;
+    SiteService siteService;
 
     @Override
-    public GenericSearchResult search(String profileName, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, String response) {
-        return null;
+    public GenericSearchResult search(String profileName, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields, String response) {
+        return siteService.search(profileName,queryString,offset,maxResult,constraints,facets,sortFields,response);
     }
 
     @Override
     public MediaSearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints) {
-        return null;
+        return siteService.searchSuggestions(profileName,queryString,constraints);
     }
 }

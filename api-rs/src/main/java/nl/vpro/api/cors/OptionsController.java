@@ -6,6 +6,8 @@ package nl.vpro.api.cors;
  */
 
 import nl.vpro.api.rs.MediaRestServiceImpl;
+import nl.vpro.api.rs.SiteRestService;
+import nl.vpro.api.rs.SiteRestServiceImpl;
 import nl.vpro.api.rs.UGCRestServiceImpl;
 import org.springframework.stereotype.Controller;
 
@@ -20,7 +22,7 @@ public class OptionsController {
      * Mention all RESTable URLs here. In this way, only RESTable Urls are intercepted,
      * such that /index.html remains accessible.
      */
-    public static final String PATH = "{path : (" + MediaRestServiceImpl.PATH + "|" + UGCRestServiceImpl.PATH + ")/.*}";
+    public static final String PATH = "{path : (" + MediaRestServiceImpl.PATH + "|" + UGCRestServiceImpl.PATH + "|" + "/site"+ ")/.*}";
 
     @OPTIONS
     public String options() {

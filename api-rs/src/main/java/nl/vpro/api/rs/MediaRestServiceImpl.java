@@ -44,15 +44,9 @@ import java.util.*;
 public class MediaRestServiceImpl implements MediaRestService {
     public static final String PATH = "media";
     Logger logger = LoggerFactory.getLogger(MediaRestServiceImpl.class);
-    MediaService mediaService;
 
     @Autowired
-    /**
-     * inject the media service impl that does the real job
-     */
-    public MediaRestServiceImpl(MediaService mediaService) {
-        this.mediaService = mediaService;
-    }
+    MediaService mediaService;
 
     @Override
     @GET
