@@ -5,6 +5,7 @@ import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.util.SolrQueryBuilder;
@@ -226,4 +227,13 @@ public class SolrSearch extends AbstractSearch {
         return lqp;
     }
 
+    @Override
+    public MediaSearchSuggestions suggest(Profile profile, String queryString, List<String> constraints, Integer minOccurrence, Integer Limit) throws ServerErrorException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public GenericSearchResult search(Profile profile, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 }

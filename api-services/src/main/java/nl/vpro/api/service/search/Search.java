@@ -2,9 +2,12 @@ package nl.vpro.api.service.search;
 
 import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.util.rs.error.ServerErrorException;
+
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -63,4 +66,7 @@ public interface Search {
 
     String findArchiveId(String archiveName) throws ServerErrorException;
 
+    MediaSearchSuggestions suggest(Profile profile, String queryString, List<String> constraints, Integer minOccurrence, Integer Limit) throws ServerErrorException;
+
+    GenericSearchResult search(Profile profile, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException;
 }

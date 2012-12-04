@@ -30,18 +30,10 @@ public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private Search search;
 
-//    @Autowired
-//    private SolrServer solrServer;
-
     private static final Logger log = LoggerFactory.getLogger(ProfileServiceImpl.class);
 
 
     private Map<String, String> archiveCache = new HashMap<String, String>();
-
-//    @Autowired
-//    SolrQueryBuilder solrQueryBuilder;
-
-
 
     public ProfileServiceImpl() {
     }
