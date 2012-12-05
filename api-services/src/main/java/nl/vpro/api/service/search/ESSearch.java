@@ -116,7 +116,7 @@ public class ESSearch extends AbstractSearch {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
 
         // handle the profile
-        if (profile != null && profile.createFilterQuery() != null) {
+        if (profile.createFilterQuery() != null) {
             searchBuilder.filter(new ProfileFilterBuilder(profile));
         }
 
@@ -160,7 +160,7 @@ public class ESSearch extends AbstractSearch {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
 
         // handle the profile
-        if (profile != null && profile.createFilterQuery() != null) {
+        if (profile.createFilterQuery() != null) {
             searchBuilder.filter(new ProfileFilterBuilder(profile));
         }
 //        request.types("poms");
