@@ -13,6 +13,7 @@ import nl.vpro.api.rs.util.StringUtil;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.transfer.MediaSearchResultItem;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
@@ -20,30 +21,28 @@ import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
+
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.action.search.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import java.util.*;
 
+import java.util.*;
 
 /**
  * Offers REST access to api.service.MediaService
  * User: rico
  * Date: 09/03/2012
  */
-
 @Path(MediaRestServiceImpl.PATH)
 @Controller
 public class MediaRestServiceImpl implements MediaRestService {
+
     public static final String PATH = "media";
-    Logger logger = LoggerFactory.getLogger(MediaRestServiceImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(MediaRestServiceImpl.class);
 
     @Autowired
     MediaService mediaService;
@@ -52,14 +51,14 @@ public class MediaRestServiceImpl implements MediaRestService {
     @GET
     @Path("program/{urn}")
     public Program getProgram(@PathParam("urn") String urn) throws IllegalArgumentException {
-        logger.debug("Called with urn " + urn);
+        logger.debug("Method getProgram called with urn " + urn);
         return mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, urn));
     }
 
     @Override
     @GET
     @Path("program/replay")
-    public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType ) {
+    public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType) {
         return mediaService.getReplayablePrograms(maxResult, offset, avType);
     }
 
@@ -85,7 +84,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Group getGroup(String urn, boolean addMembers, String membersTypeFilter) {
-        return getGroup(urn,addMembers,false,membersTypeFilter);
+        return getGroup(urn, addMembers, false, membersTypeFilter);
     }
 
     @Override
@@ -100,7 +99,7 @@ public class MediaRestServiceImpl implements MediaRestService {
      * - leaving req.param membertypes an empty value: &membertypes=
      * - adding all possibile mediaObjectTypes: &membertypes=program,group,segment
      */
-    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes,@QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException {
+    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes, @QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
 
         List<MediaObjectType> mediaObjectTypesFilter = null;
@@ -140,7 +139,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     @GET
     @Path("search")
-    public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("tags") String tags ,@QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult) {
+    public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
         return mediaService.search(queryString, tagFilter, "", offset, maxResult);
     }
@@ -162,9 +161,52 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
+    @GET
+    @Path("related/{urn}")
+    public ProgramList related(@PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult) throws IllegalArgumentException {
+        return relatedWithProfile(StringUtils.EMPTY, urn, offset, maxResult);
+    }
+
+    @Override
+    @GET
+    @Path("related/{profile}/{urn}")
+    public ProgramList relatedWithProfile(@PathParam("profile") String profile, @PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult) throws IllegalArgumentException {
+        Long id = MediaUtil.getMediaId(MediaObjectType.program, urn); // TODO: Segments? Groups?
+        Program program = mediaService.getProgram(id);
+
+        List<String> tags = program.getTags();
+        TagFilter tagFilter = new TagFilter(BooleanOp.OR);
+        for (String tag : tags) {
+            tagFilter.addTag(tag);
+        }
+
+        MediaSearchResult mediaSearchResult = mediaService.search(StringUtils.EMPTY, tagFilter, profile, offset, maxResult);
+
+        long numFound = mediaSearchResult.getNumFound();
+        long start = mediaSearchResult.getStart();
+        ProgramList programList = new ProgramList(numFound, start); // TODO: num found is momenteel niet correct omdat er nog MediaSearchResultItems genegeerd worden
+
+        List<MediaSearchResultItem> mediaSearchResultItems = mediaSearchResult.getMediaSearchResultItems();
+        for (MediaSearchResultItem mediaSearchResultItem : mediaSearchResultItems) {
+            String relatedUrn = mediaSearchResultItem.getUrn();
+            try {
+                Long relatedId = MediaUtil.getMediaId(MediaObjectType.program, relatedUrn); // TODO: Segments? Groups?
+                Program relatedProgram = mediaService.getProgram(relatedId);
+                programList.addProgram(relatedProgram);
+            }
+            catch (IllegalArgumentException e) {
+                // TODO: Ignore, we only consider programs at the moment
+            }
+        }
+
+        return programList;
+    }
+
+    @Override
     @POST
     @Path("search/es/{index}")
-    public String searchES(@PathParam("index")String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString) {
+    @Deprecated
+    public String searchES(@PathParam("index") String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString) {
         String[] types = typesAsString.trim().split(" ");
         return mediaService.searchES(index, types, query);
     }

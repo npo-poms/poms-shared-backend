@@ -12,6 +12,7 @@ import nl.vpro.util.rs.error.ServerErrorException;
 import org.elasticsearch.action.search.SearchResponse;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.PathParam;
 
 /**
  * Public REST API to api.service.MediaService
@@ -78,12 +79,35 @@ public interface MediaRestService {
     public MediaSearchSuggestions searchSuggestionsWithProfile(String queryString, String tags, String profileName);
 
     /**
+     * Find related media.
+     *
+     * @param urn The urn of the program to find related media for.
+     * @param offset Paging offset.
+     * @param maxResult Maximum number of results to return.
+     * @return
+     */
+    public ProgramList related(String urn, Integer offset, Integer maxResult);
+
+    /**
+     * Find related media based on a search profile.
+     *
+     * @param profile The name of the search profile to limit the related items to.
+     * @param urn The urn of the program to find related media for.
+     * @param offset Paging offset.
+     * @param maxResult Maximum number of results to return.
+     * @return
+     */
+    public ProgramList relatedWithProfile(String profile, String urn, Integer offset, Integer maxResult);
+
+    /**
      * Temporary call added to ease the introduction of Elastic Search support. It allows you to use the full flexibility of the
      * ES query dsl, at the cost of having to use the full flexibility of the ES dsl :-)
      * This method will be replaced by a set of higher level search calls as soon as we know what they should be.
      * @param index What ES index to use?
      * @param query the query, in json format.
      * @param types space-separaterd list of types, as they occur in the given index. This is actually a query filter.
+     * @deprecated This is only a temporary call and will be removed in a future version.
      */
+    @Deprecated
     public String searchES(String index, String query, String types);
 }
