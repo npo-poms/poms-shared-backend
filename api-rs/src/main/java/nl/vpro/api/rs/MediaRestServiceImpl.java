@@ -158,19 +158,19 @@ public class MediaRestServiceImpl implements MediaRestService {
             tagFilter.addTag(tag);
         }
 
-        MediaSearchResult mediaSearchResult = mediaService.search(StringUtils.EMPTY, tagFilter, profile, offset, maxResult + 1); // We could find ourself in the results, so search for one more to be sure
+        MediaSearchResult mediaSearchResult = mediaService.search(StringUtils.EMPTY, tagFilter, profile, offset, maxResult != null ? maxResult + 1 : null); // We could find ourself in the results, so search for one more to be sure
         List<MediaSearchResultItem> mediaSearchResultItems = mediaSearchResult.getMediaSearchResultItems();
 
         List<MediaObject> relatedMediaObjects = new ArrayList<MediaObject>();
         for (MediaSearchResultItem mediaSearchResultItem : mediaSearchResultItems) {
-            if (relatedMediaObjects.size() >= maxResult) break; // Since we searched for one more than maxResult, we could already be done
+            if (maxResult != null && relatedMediaObjects.size() >= maxResult) break; // Since we searched for one more than maxResult, we could already be done
             String relatedUrn = mediaSearchResultItem.getUrn();
             if (! urn.equals(relatedUrn)) {
                 try {
                     MediaObject relatedMediaObject = getMedia(relatedUrn);
                     relatedMediaObjects.add(relatedMediaObject);
                 } catch (Exception e) {
-                    logger.warn("Could not retrieve related media object " + relatedUrn, e);
+                    logger.warn("Could not retrieve related media object {}: {}", relatedUrn, e.getMessage());
                 }
             }
         }
