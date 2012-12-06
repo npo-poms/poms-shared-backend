@@ -21,10 +21,10 @@ public class OrderedSearchSourceBuilder extends SearchSourceBuilder {
         if (sortFields != null && sortFields.size() > 0) {
             for (String sortField : sortFields) {
                 SortBuilder sort = ESUtil.parseOrder(sortField);
-                if (sort!=null) {
+                if (sort != null) {
                     sort(sort);
                 }
-              }
+            }
         } else {
             sort(SortBuilders.scoreSort());
         }
