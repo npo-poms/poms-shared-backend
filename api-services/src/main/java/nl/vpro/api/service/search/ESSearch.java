@@ -56,6 +56,10 @@ public class ESSearch extends AbstractSearch {
 
         request.source(searchBuilder);
 
+        if (offset==null) {
+            offset=0;
+        }
+
         return executeQuery(request, offset, MediaSearchResult.class);
     }
 
@@ -180,6 +184,8 @@ public class ESSearch extends AbstractSearch {
         //handle paging
         if (offset != null) {
             searchBuilder.from(offset);
+        } else {
+            offset = 0;
         }
         searchBuilder.size(maxResult);
 
