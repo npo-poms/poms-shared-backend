@@ -28,6 +28,7 @@ public class ESSearchResponseToGenericSearchResultConverter implements Converter
 
         GenericSearchResult genericSearchResult = new GenericSearchResult(response.hits().totalHits(), start, response.hits().maxScore());
         GenericSearchResultItem item;
+
         for (SearchHit hit : response.getHits()) {
             item = new GenericSearchResultItem();
             item.setScore(hit.score());

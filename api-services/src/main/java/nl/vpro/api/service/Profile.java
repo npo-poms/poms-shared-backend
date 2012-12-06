@@ -7,6 +7,10 @@ import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 
 /**
  * Date: 19-3-12
@@ -21,9 +25,9 @@ public enum Profile {
             //The document should be a program or a segment
             SearchFilterList documentTypes = new SearchFilterList(BooleanOp.OR)
                 .addQuery(new DocumentSearchFilter()
-                    .setDocumentType("program"))
+                        .setDocumentType("program"))
                 .addQuery(new DocumentSearchFilter()
-                    .setDocumentType("segment")
+                        .setDocumentType("segment")
                 );
 
 
@@ -37,6 +41,15 @@ public enum Profile {
                 .addQuery(documentTypes)
                 .addQuery(contentRules);
         }
+        @Override
+        public List<String> getSearchFields() {
+            return new ArrayList<String>();
+        }
+
+        @Override
+        public List<Float> getSearchBoosting() {
+            return new ArrayList<Float>();
+        }
     },
 
     VPRO("vpro", "", "") {
@@ -45,6 +58,16 @@ public enum Profile {
             return new DocumentSearchFilter()
                 .addBroadcaster("VPRO");
         }
+
+        @Override
+        public List<String> getSearchFields() {
+            return new ArrayList<String>();
+        }
+
+        @Override
+        public List<Float> getSearchBoosting() {
+            return new ArrayList<Float>();
+        }
     },
 
     WETENSCHAP24("wetenschap24", "", "w24") {
@@ -52,12 +75,29 @@ public enum Profile {
         public SearchFilter createFilterQuery() {
             return null;
         }
+        public List<String> getSearchFields() {
+            return (Arrays.asList("title", "subtitle", "summary", "body", "extra_field_nl_vpro_page_type","extra_field_nl_vpro_subsite", "persons", "genre", "keywords"));
+        }
+
+        @Override
+        public List<Float> getSearchBoosting() {
+            return Arrays.asList(3.0f, 2.0f, 1.0f, 1.5f, 2.0f, 2.0f, 1.0f, 1.0f, 1.0f);
+        }
     },
 
     DEFAULT("", "", "") {
         public SearchFilter createFilterQuery() {
             //The documents should have the VPRO as broadcasters.
             return null;
+        }
+        @Override
+        public List<String> getSearchFields() {
+            return new ArrayList<String>();
+        }
+
+        @Override
+        public List<Float> getSearchBoosting() {
+            return new ArrayList<Float>();
         }
     };
 
@@ -94,6 +134,10 @@ public enum Profile {
     public String getArchiveUrn() {
         return archiveUrn;
     }
+
+    abstract public List<String> getSearchFields();
+
+    abstract public List<Float> getSearchBoosting();
 
     abstract public SearchFilter createFilterQuery();
 
