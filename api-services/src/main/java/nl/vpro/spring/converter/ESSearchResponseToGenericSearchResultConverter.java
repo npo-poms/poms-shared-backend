@@ -8,12 +8,15 @@ import nl.vpro.api.service.search.es.SearchResponseExtender;
 import nl.vpro.api.transfer.GenericSearchFacet;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.GenericSearchResultItem;
+import nl.vpro.jackson.MediaMapper;
+import org.codehaus.jackson.JsonNode;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.Facet;
 import org.elasticsearch.search.facet.terms.strings.InternalStringTermsFacet;
 import org.springframework.core.convert.converter.Converter;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -34,9 +37,11 @@ public class ESSearchResponseToGenericSearchResultConverter implements Converter
             item.setScore(hit.score());
             item.setType(hit.type());
 
-            // document type aka mapping : hit.getFields().get("_type").value();
-            for (Map.Entry<String, Object> entry : hit.sourceAsMap().entrySet()) {
-                item.addValue(entry.getKey(), entry.getValue());
+            try {
+                JsonNode node=new MediaMapper().readTree(hit.sourceAsString());
+                item.setResult(node);
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
             genericSearchResult.addSearchResultItem(item);
         }
