@@ -24,10 +24,8 @@ import javax.ws.rs.PathParam;
  *
  * @author Ernst Bunders
  */
-@Path(UGCRestServiceImpl.PATH)
 @Controller
 public class UGCRestServiceImpl implements UGCRestService {
-    public static final String PATH = "ugc";
     Logger logger = LoggerFactory.getLogger(UGCRestServiceImpl.class);
 
     @Autowired
@@ -35,21 +33,17 @@ public class UGCRestServiceImpl implements UGCRestService {
     @Autowired
     private UgcService ugcService;
 
-    @GET
-    @Path("playerconfiguration/{urn}")
-    public PlayerConfiguration getPlayerConfiguration(@PathParam("urn") String id) {
+
+    public PlayerConfiguration getPlayerConfiguration(String id) {
         return ugcService.getPlayerConfiguration(id);
     }
 
-    @POST
-    @Path("playerconfiguration")
     public PlayerConfiguration insertPlayerConfiguration(PlayerConfiguration playerConfiguration) {
         return ugcService.insertPlayerConfiguration(playerConfiguration);
     }
 
-    @GET
-    @Path("annotation/{urn}")
-    public Annotation getAnnotation(@PathParam("urn") String id) {
+
+    public Annotation getAnnotation(String id) {
         if (StringUtils.isNotEmpty(id)) {
             if (MediaUtil.isUrn(id)) {
                 return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, id));
@@ -60,9 +54,7 @@ public class UGCRestServiceImpl implements UGCRestService {
         return null;
     }
 
-    @GET
-    @Path("annotation/bypart/{urn}")
-    public Annotation getAnnotationByPart(@PathParam("urn") String id) {
+    public Annotation getAnnotationByPart(String id) {
         if (StringUtils.isNotEmpty(id)) {
             if (MediaUtil.isUrn(id)) {
                 Segment segment = mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, id));
