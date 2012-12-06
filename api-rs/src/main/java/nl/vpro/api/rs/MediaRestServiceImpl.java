@@ -5,6 +5,7 @@
 package nl.vpro.api.rs;
 
 import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
@@ -31,6 +32,8 @@ import javax.ws.rs.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static nl.vpro.api.domain.media.support.MediaObjectType.*;
 
 /**
  * Offers REST access to api.service.MediaService
@@ -141,42 +144,38 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public ProgramList related(String urn, Integer offset, Integer maxResult) throws IllegalArgumentException {
+    public List<MediaObject> related(String urn, Integer offset, Integer maxResult) throws IllegalArgumentException {
         return relatedWithProfile(StringUtils.EMPTY, urn, offset, maxResult);
     }
 
     @Override
-    public ProgramList relatedWithProfile(String profile, String urn, Integer offset, Integer maxResult) throws IllegalArgumentException {
-        Long id = MediaUtil.getMediaId(MediaObjectType.program, urn); // TODO: Segments? Groups?
-        Program program = mediaService.getProgram(id);
+    public List<MediaObject> relatedWithProfile(String profile, String urn, Integer offset, Integer maxResult) throws IllegalArgumentException {
+        MediaObject mediaObject = getMedia(urn);
 
-        List<String> tags = program.getTags();
+        List<String> tags = mediaObject.getTags();
         TagFilter tagFilter = new TagFilter(BooleanOp.OR);
         for (String tag : tags) {
             tagFilter.addTag(tag);
         }
 
-        MediaSearchResult mediaSearchResult = mediaService.search(StringUtils.EMPTY, tagFilter, profile, offset, maxResult);
-
-        long numFound = mediaSearchResult.getNumFound();
-        long start = mediaSearchResult.getStart();
-        ProgramList programList = new ProgramList(numFound, start); // TODO: num found is momenteel niet correct omdat er nog MediaSearchResultItems genegeerd worden
-
+        MediaSearchResult mediaSearchResult = mediaService.search(StringUtils.EMPTY, tagFilter, profile, offset, maxResult + 1); // We could find ourself in the results, so search for one more to be sure
         List<MediaSearchResultItem> mediaSearchResultItems = mediaSearchResult.getMediaSearchResultItems();
+
+        List<MediaObject> relatedMediaObjects = new ArrayList<MediaObject>();
         for (MediaSearchResultItem mediaSearchResultItem : mediaSearchResultItems) {
+            if (relatedMediaObjects.size() >= maxResult) break; // Since we searched for one more than maxResult, we could already be done
             String relatedUrn = mediaSearchResultItem.getUrn();
-            try {
-                Long relatedId = MediaUtil.getMediaId(MediaObjectType.program, relatedUrn); // TODO: Segments? Groups?
-                if (!relatedId.equals(id)) {
-                    Program relatedProgram = mediaService.getProgram(relatedId);
-                    programList.addProgram(relatedProgram);
+            if (! urn.equals(relatedUrn)) {
+                try {
+                    MediaObject relatedMediaObject = getMedia(relatedUrn);
+                    relatedMediaObjects.add(relatedMediaObject);
+                } catch (Exception e) {
+                    logger.warn("Could not retrieve related media object " + relatedUrn, e);
                 }
-            } catch (IllegalArgumentException e) {
-                // TODO: Ignore, we only consider programs at the moment
             }
         }
 
-        return programList;
+        return relatedMediaObjects;
     }
 
     @Override
@@ -204,5 +203,24 @@ public class MediaRestServiceImpl implements MediaRestService {
             return Long.parseLong(StringUtils.substringAfterLast(urn, ":"));
         }
         throw new IllegalArgumentException("urn " + urn + " could not be parsed to a valid id for an object of type " + type);
+    }
+
+    private MediaObject getMedia(String urn) {
+        MediaObject mediaObject;
+        MediaObjectType mediaObjectType = MediaUtil.getMediaType(urn);
+        switch (mediaObjectType) {
+            case program:
+                mediaObject = mediaService.getProgram(MediaUtil.getMediaId(program, urn));
+                break;
+            case segment:
+                mediaObject = mediaService.getSegment(MediaUtil.getMediaId(segment, urn));
+                break;
+            case group:
+                mediaObject = mediaService.getGroup(MediaUtil.getMediaId(group, urn), false, null);
+                break;
+            default:
+                throw new RuntimeException("Unknown media object type: " + mediaObjectType);
+        }
+        return mediaObject;
     }
 }

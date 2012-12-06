@@ -1,6 +1,9 @@
 package nl.vpro.api.rs;
 
+import java.util.List;
+
 import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.transfer.MediaSearchResult;
@@ -53,7 +56,6 @@ public interface MediaRestService {
     @Path("group/{urn}")
     @Produces("application/json")
     public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes, @QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException;
-
 
     @GET
     @Path("segment/{urn}")
@@ -120,7 +122,7 @@ public interface MediaRestService {
     @GET
     @Path("related/{urn}")
     @Produces("application/json")
-    public ProgramList related(@PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
+    public List<MediaObject> related(@PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     /**
      * Find related media based on a search profile.
@@ -134,7 +136,7 @@ public interface MediaRestService {
     @GET
     @Path("related/{profile}/{urn}")
     @Produces("application/json")
-    public ProgramList relatedWithProfile(@PathParam("profile") String profile, @PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
+    public List<MediaObject> relatedWithProfile(@PathParam("profile") String profile, @PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     /**
      * Temporary call added to ease the introduction of Elastic Search support. It allows you to use the full flexibility of the
