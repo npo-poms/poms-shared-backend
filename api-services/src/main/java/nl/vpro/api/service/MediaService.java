@@ -14,7 +14,6 @@ import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.util.rs.error.ServerErrorException;
-import org.elasticsearch.action.search.SearchResponse;
 
 import java.util.List;
 
