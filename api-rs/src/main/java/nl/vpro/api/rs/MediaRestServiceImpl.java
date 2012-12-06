@@ -191,8 +191,10 @@ public class MediaRestServiceImpl implements MediaRestService {
             String relatedUrn = mediaSearchResultItem.getUrn();
             try {
                 Long relatedId = MediaUtil.getMediaId(MediaObjectType.program, relatedUrn); // TODO: Segments? Groups?
-                Program relatedProgram = mediaService.getProgram(relatedId);
-                programList.addProgram(relatedProgram);
+                if (! relatedId.equals(id)) {
+                    Program relatedProgram = mediaService.getProgram(relatedId);
+                    programList.addProgram(relatedProgram);
+                }
             }
             catch (IllegalArgumentException e) {
                 // TODO: Ignore, we only consider programs at the moment
