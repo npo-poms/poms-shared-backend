@@ -5,6 +5,7 @@
 package nl.vpro.api.service.search.es;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
 
 import java.util.List;
 
@@ -12,11 +13,11 @@ import java.util.List;
  * User: rico
  * Date: 05/12/2012
  */
-public class ParsingStringConstraintBuilder extends BoolQueryBuilder {
+public class MultiQueryStringConstraintBuilder extends BoolQueryBuilder {
 
-    public ParsingStringConstraintBuilder(List<String> constraints) {
+    public MultiQueryStringConstraintBuilder(List<String> constraints) {
         for (String constraint : constraints) {
-            must(ESUtil.parseConstraint(constraint));
+            must(new QueryStringQueryBuilder(constraint));
         }
     }
 }

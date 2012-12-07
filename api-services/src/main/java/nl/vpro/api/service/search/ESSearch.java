@@ -23,8 +23,6 @@ import org.springframework.core.convert.ConversionService;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.elasticsearch.index.query.QueryBuilders.customBoostFactorQuery;
-import static org.elasticsearch.index.query.QueryBuilders.customScoreQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 
@@ -151,7 +149,7 @@ public class ESSearch extends AbstractSearch {
 
         SearchFieldsQueryBuilder queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), queryString);
         if (constraints.size() > 0) {
-            queryBuilder.must(new ParsingStringConstraintBuilder(constraints));
+            queryBuilder.must(new MultiQueryStringConstraintBuilder(constraints));
         }
 
         searchBuilder.query(queryBuilder);
@@ -180,7 +178,7 @@ public class ESSearch extends AbstractSearch {
 
         SearchFieldsQueryBuilder queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), queryString);
         if (constraints.size() > 0) {
-            queryBuilder.must(new ParsingStringConstraintBuilder(constraints));
+            queryBuilder.must(new MultiQueryStringConstraintBuilder(constraints));
         }
 
         searchBuilder.query(queryBuilder);

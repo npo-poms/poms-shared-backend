@@ -4,7 +4,11 @@
  */
 package nl.vpro.api.service.search.es;
 
+import org.apache.lucene.search.BooleanQuery;
 import org.elasticsearch.index.query.BaseQueryBuilder;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.index.query.QueryStringQueryParser;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -34,14 +38,4 @@ public class ESUtil {
         }
     }
 
-    public static BaseQueryBuilder parseConstraint(String constraint) {
-        String field, value;
-        int idx = constraint.indexOf(':');
-        if (idx > 0) {
-            field = constraint.substring(0, idx);
-            value = constraint.substring(idx + 1);
-            return termQuery(field, value);
-        }
-        return null;
-    }
 }
