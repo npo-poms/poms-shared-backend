@@ -28,13 +28,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.ws.rs.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static nl.vpro.api.domain.media.support.MediaObjectType.*;
-import static nl.vpro.api.domain.media.support.MediaObjectType.group;
 
 /**
  * Offers REST access to api.service.MediaService
@@ -57,7 +53,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public List<MediaObject> relatedForProgram(String programUrn, String profile, Integer offset, Integer maxResult) {
-        MediaObject mediaObject = mediaService.getProgram(MediaUtil.getMediaId(program, programUrn));
+        MediaObject mediaObject = mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, programUrn));
         return relatedForMediaObject(mediaObject, profile, offset, maxResult);
     }
 
@@ -122,7 +118,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public List<MediaObject> relatedForSegment(String segmentUrn, String profile, Integer offset, Integer maxResult) {
-        MediaObject mediaObject = mediaService.getSegment(MediaUtil.getMediaId(segment, segmentUrn));
+        MediaObject mediaObject = mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, segmentUrn));
         return relatedForMediaObject(mediaObject, profile, offset, maxResult);
     }
 
@@ -134,7 +130,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public List<MediaObject> relatedForGroup(String groupUrn, String profile, Integer offset, Integer maxResult) {
-        MediaObject mediaObject = mediaService.getGroup(MediaUtil.getMediaId(group, groupUrn), false, null);
+        MediaObject mediaObject = mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, groupUrn), false, null);
         return relatedForMediaObject(mediaObject, profile, offset, maxResult);
     }
 
@@ -142,8 +138,12 @@ public class MediaRestServiceImpl implements MediaRestService {
     public List<MediaObject> getMediaObjects(List<String> urns) {
         List<MediaObject> mediaObjects = new ArrayList<MediaObject>();
         for (String urn : urns) {
-            MediaObject mediaObject = getMedia(urn);
-            mediaObjects.add(mediaObject);
+            try {
+                MediaObject mediaObject = getMedia(urn);
+                mediaObjects.add(mediaObject);
+            } catch (Exception e) {
+                logger.warn("Could not add media object with urn '{}' to result of bulk retrieve call: {}", urn, e.getMessage());
+            }
         }
         return mediaObjects;
     }
@@ -219,18 +219,14 @@ public class MediaRestServiceImpl implements MediaRestService {
     private MediaObject getMedia(String urn) {
         MediaObject mediaObject;
         MediaObjectType mediaObjectType = MediaUtil.getMediaType(urn);
-        switch (mediaObjectType) {
-            case program:
-                mediaObject = mediaService.getProgram(MediaUtil.getMediaId(program, urn));
-                break;
-            case segment:
-                mediaObject = mediaService.getSegment(MediaUtil.getMediaId(segment, urn));
-                break;
-            case group:
-                mediaObject = mediaService.getGroup(MediaUtil.getMediaId(group, urn), false, null);
-                break;
-            default:
-                throw new RuntimeException("Unknown media object type: " + mediaObjectType);
+        if (MediaObjectType.program.equals(mediaObjectType)) {
+            mediaObject = mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, urn));
+        } else if (MediaObjectType.segment.equals(mediaObjectType)) {
+            mediaObject = mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, urn));
+        } else if (MediaObjectType.group.equals(mediaObjectType)) {
+            mediaObject = mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), false, null);
+        } else {
+            throw new RuntimeException("Unknown media object type: " + mediaObjectType);
         }
         return mediaObject;
     }
