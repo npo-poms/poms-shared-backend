@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static nl.vpro.api.domain.media.support.MediaObjectType.*;
+import static nl.vpro.api.domain.media.support.MediaObjectType.group;
 
 /**
  * Offers REST access to api.service.MediaService
@@ -52,6 +53,12 @@ public class MediaRestServiceImpl implements MediaRestService {
     public Program getProgram(String urn) throws IllegalArgumentException {
         logger.debug("Method getProgram called with urn " + urn);
         return mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, urn));
+    }
+
+    @Override
+    public List<MediaObject> relatedForProgram(String programUrn, String profile, Integer offset, Integer maxResult) {
+        MediaObject mediaObject = mediaService.getProgram(MediaUtil.getMediaId(program, programUrn));
+        return relatedForMediaObject(mediaObject, profile, offset, maxResult);
     }
 
     @Override
@@ -114,9 +121,31 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
+    public List<MediaObject> relatedForSegment(String segmentUrn, String profile, Integer offset, Integer maxResult) {
+        MediaObject mediaObject = mediaService.getSegment(MediaUtil.getMediaId(segment, segmentUrn));
+        return relatedForMediaObject(mediaObject, profile, offset, maxResult);
+    }
+
+    @Override
     public Segment getSegment(String urn) throws ServerErrorException, NotFoundException {
         logger.debug("Called with urn " + urn);
         return mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, urn));
+    }
+
+    @Override
+    public List<MediaObject> relatedForGroup(String groupUrn, String profile, Integer offset, Integer maxResult) {
+        MediaObject mediaObject = mediaService.getGroup(MediaUtil.getMediaId(group, groupUrn), false, null);
+        return relatedForMediaObject(mediaObject, profile, offset, maxResult);
+    }
+
+    @Override
+    public List<MediaObject> getMediaObjects(List<String> urns) {
+        List<MediaObject> mediaObjects = new ArrayList<MediaObject>();
+        for (String urn : urns) {
+            MediaObject mediaObject = getMedia(urn);
+            mediaObjects.add(mediaObject);
+        }
+        return mediaObjects;
     }
 
     @Override
@@ -144,41 +173,6 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public List<MediaObject> related(String urn, Integer offset, Integer maxResult) throws IllegalArgumentException {
-        return relatedWithProfile(StringUtils.EMPTY, urn, offset, maxResult);
-    }
-
-    @Override
-    public List<MediaObject> relatedWithProfile(String profile, String urn, Integer offset, Integer maxResult) throws IllegalArgumentException {
-        MediaObject mediaObject = getMedia(urn);
-
-        List<String> tags = mediaObject.getTags();
-        TagFilter tagFilter = new TagFilter(BooleanOp.OR);
-        for (String tag : tags) {
-            tagFilter.addTag(tag);
-        }
-
-        MediaSearchResult mediaSearchResult = mediaService.search(StringUtils.EMPTY, tagFilter, profile, offset, maxResult != null ? maxResult + 1 : null); // We could find ourself in the results, so search for one more to be sure
-        List<MediaSearchResultItem> mediaSearchResultItems = mediaSearchResult.getMediaSearchResultItems();
-
-        List<MediaObject> relatedMediaObjects = new ArrayList<MediaObject>();
-        for (MediaSearchResultItem mediaSearchResultItem : mediaSearchResultItems) {
-            if (maxResult != null && relatedMediaObjects.size() >= maxResult) break; // Since we searched for one more than maxResult, we could already be done
-            String relatedUrn = mediaSearchResultItem.getUrn();
-            if (! urn.equals(relatedUrn)) {
-                try {
-                    MediaObject relatedMediaObject = getMedia(relatedUrn);
-                    relatedMediaObjects.add(relatedMediaObject);
-                } catch (Exception e) {
-                    logger.warn("Could not retrieve related media object {}: {}", relatedUrn, e.getMessage());
-                }
-            }
-        }
-
-        return relatedMediaObjects;
-    }
-
-    @Override
     public String searchES(String index,String query, String typesAsString) {
         String[] types = typesAsString.trim().split(" ");
         return mediaService.searchES(index, types, query);
@@ -195,14 +189,31 @@ public class MediaRestServiceImpl implements MediaRestService {
         return tagFilter;
     }
 
-    private long getMediaId(String type, String urn) throws IllegalArgumentException {
-        if (urn.matches("[0-9]+]")) {
-            return Long.parseLong(urn);
+    private List<MediaObject> relatedForMediaObject(MediaObject mediaObject, String profile, Integer offset, Integer maxResult) {
+        List<String> tags = mediaObject.getTags();
+        TagFilter tagFilter = new TagFilter(BooleanOp.OR);
+        for (String tag : tags) {
+            tagFilter.addTag(tag);
         }
-        if (urn.matches("urn:vpro:media:" + type + ":[0-9]+")) {
-            return Long.parseLong(StringUtils.substringAfterLast(urn, ":"));
+
+        MediaSearchResult mediaSearchResult = mediaService.search(StringUtils.EMPTY, tagFilter, profile, offset, maxResult != null ? maxResult + 1 : null); // We could find ourself in the results, so search for one more to be sure
+        List<MediaSearchResultItem> mediaSearchResultItems = mediaSearchResult.getMediaSearchResultItems();
+
+        String urn = mediaObject.getUrn();
+        List<MediaObject> relatedMediaObjects = new ArrayList<MediaObject>();
+        for (MediaSearchResultItem mediaSearchResultItem : mediaSearchResultItems) {
+            if (maxResult != null && relatedMediaObjects.size() >= maxResult) break; // Since we searched for one more than maxResult, we could already be done
+            String relatedUrn = mediaSearchResultItem.getUrn();
+            if (! urn.equals(relatedUrn)) {
+                try {
+                    MediaObject relatedMediaObject = getMedia(relatedUrn);
+                    relatedMediaObjects.add(relatedMediaObject);
+                } catch (Exception e) {
+                    logger.warn("Could not retrieve related media object {}: {}", relatedUrn, e.getMessage());
+                }
+            }
         }
-        throw new IllegalArgumentException("urn " + urn + " could not be parsed to a valid id for an object of type " + type);
+        return relatedMediaObjects;
     }
 
     private MediaObject getMedia(String urn) {

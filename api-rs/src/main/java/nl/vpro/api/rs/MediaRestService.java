@@ -14,6 +14,7 @@ import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Public REST API to api.service.MediaService
@@ -27,17 +28,31 @@ public interface MediaRestService {
 
     @GET
     @Path("program/{urn}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Program getProgram(@PathParam("urn") String urn);
+
+    /**
+     * Find related media for a program.
+     *
+     * @param urn       The urn of the program to find related media for.
+     * @param profile   The search profile used to restrict the results.
+     * @param offset    Paging offset.
+     * @param maxResult Maximum number of results to return.
+     * @return
+     */
+    @GET
+    @Path("program/{urn}/related")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<MediaObject> relatedForProgram(@PathParam("urn") String programUrn, @QueryParam("profile") String profile, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     @GET
     @Path("program/replay")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType);
 
     @GET
     @Path("program/{urn}/annotations")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Annotations getAnnotationsForProgram(@PathParam("urn") String urn);
 
     /**
@@ -54,13 +69,52 @@ public interface MediaRestService {
 
     @GET
     @Path("group/{urn}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes, @QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException;
+
+    /**
+     * Find related media for a segment.
+     *
+     * @param urn       The urn of the segment to find related media for.
+     * @param profile   The search profile used to restrict the results.
+     * @param offset    Paging offset.
+     * @param maxResult Maximum number of results to return.
+     * @return
+     */
+    @GET
+    @Path("segment/{urn}/related")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<MediaObject> relatedForSegment(@PathParam("urn") String groupUrn, @QueryParam("profile") String profile, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     @GET
     @Path("segment/{urn}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Segment getSegment(@PathParam("urn") String urn) throws ServerErrorException, NotFoundException;
+
+    /**
+     * Find related media for a group.
+     *
+     * @param urn       The urn of the program to find related media for.
+     * @param profile   The search profile used to restrict the results.
+     * @param offset    Paging offset.
+     * @param maxResult Maximum number of results to return.
+     * @return
+     */
+    @GET
+    @Path("group/{urn}/related")
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<MediaObject> relatedForGroup(@PathParam("urn") String groupUrn, @QueryParam("profile") String profile, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
+
+    /**
+     * Retrieve multiple media objects at once.
+     *
+     * @param urns id's of media objects to retrieve.
+     * @return list of media objects
+     */
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<MediaObject> getMediaObjects(@FormParam("urn") List<String> urns);
 
     /**
      * Search for a certain term.
@@ -73,7 +127,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("search")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     /**
@@ -85,7 +139,7 @@ public interface MediaRestService {
 
     @GET
     @Path("search/{profile}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     /**
@@ -98,7 +152,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("search/suggest")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String termPrefix, @QueryParam("tags") String tags);
 
     /**
@@ -108,35 +162,8 @@ public interface MediaRestService {
      */
     @GET
     @Path("search/suggest/{profile}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @PathParam("profile") String profileName);
-
-    /**
-     * Find related media.
-     *
-     * @param urn       The urn of the program to find related media for.
-     * @param offset    Paging offset.
-     * @param maxResult Maximum number of results to return.
-     * @return
-     */
-    @GET
-    @Path("related/{urn}")
-    @Produces("application/json")
-    public List<MediaObject> related(@PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
-
-    /**
-     * Find related media based on a search profile.
-     *
-     * @param profile   The name of the search profile to limit the related items to.
-     * @param urn       The urn of the program to find related media for.
-     * @param offset    Paging offset.
-     * @param maxResult Maximum number of results to return.
-     * @return
-     */
-    @GET
-    @Path("related/{profile}/{urn}")
-    @Produces("application/json")
-    public List<MediaObject> relatedWithProfile(@PathParam("profile") String profile, @PathParam("urn") String urn, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     /**
      * Temporary call added to ease the introduction of Elastic Search support. It allows you to use the full flexibility of the
@@ -151,6 +178,6 @@ public interface MediaRestService {
     @POST
     @Path("search/es/{index}")
     @Deprecated
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public String searchES(@PathParam("index") String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString);
 }
