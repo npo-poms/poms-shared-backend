@@ -34,10 +34,10 @@ public interface MediaRestService {
     /**
      * Find related media for a program.
      *
-     * @param urn       The urn of the program to find related media for.
-     * @param profile   The search profile used to restrict the results.
-     * @param offset    Paging offset.
-     * @param maxResult Maximum number of results to return.
+     * @param programUrn The urn of the program to find related media for.
+     * @param profile    The search profile used to restrict the results.
+     * @param offset     Paging offset.
+     * @param maxResult  Maximum number of results to return.
      * @return
      */
     @GET
@@ -72,7 +72,7 @@ public interface MediaRestService {
     /**
      * Find related media for a segment.
      *
-     * @param urn       The urn of the segment to find related media for.
+     * @param groupUrn  The urn of the segment to find related media for.
      * @param profile   The search profile used to restrict the results.
      * @param offset    Paging offset.
      * @param maxResult Maximum number of results to return.
@@ -91,7 +91,7 @@ public interface MediaRestService {
     /**
      * Find related media for a group.
      *
-     * @param urn       The urn of the program to find related media for.
+     * @param groupUrn  The urn of the program to find related media for.
      * @param profile   The search profile used to restrict the results.
      * @param offset    Paging offset.
      * @param maxResult Maximum number of results to return.
