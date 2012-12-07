@@ -23,6 +23,8 @@ import org.springframework.core.convert.ConversionService;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.elasticsearch.index.query.QueryBuilders.customBoostFactorQuery;
+import static org.elasticsearch.index.query.QueryBuilders.customScoreQuery;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 
@@ -165,6 +167,7 @@ public class ESSearch extends AbstractSearch {
         }
         SearchRequest request = new SearchRequest(profile.getIndexName());
         SearchSourceBuilder searchBuilder = new OrderedSearchSourceBuilder(sortFields);
+
 
         // handle the profile
         if (profile.createFilterQuery() != null) {
