@@ -64,9 +64,6 @@ public interface MediaRestService {
      * - memberTypesFilter = null or ""
      * - memberTypesFilter = "program,group,segment" (a comma seperated list of all possible mediaObjectTypes)
      */
-
-    public Group getGroup(String urn, boolean addMembers, String memberTypesFilter) throws ServerErrorException, NotFoundException;
-
     @GET
     @Path("group/{urn}")
     @Produces(MediaType.APPLICATION_JSON)

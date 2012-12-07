@@ -81,11 +81,6 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public Group getGroup(String urn, boolean addMembers, String membersTypeFilter) {
-        return getGroup(urn, addMembers, false, membersTypeFilter);
-    }
-
-    @Override
     /**
      * if members=true, members are added.
      * You can filter the types of members that may be returned, by added a membertypes request parameter, which contains comma-seperated list of allowed mediatypes.
