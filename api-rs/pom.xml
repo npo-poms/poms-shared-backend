@@ -20,6 +20,12 @@
       <version>${project.parent.version}</version>
     </dependency>
     <dependency>
+      <groupId>nl.vpro.shared</groupId>
+      <artifactId>shared-util</artifactId>
+      <version>0.9</version>
+    </dependency>
+
+    <dependency>
       <groupId>nl.vpro.ugc</groupId>
       <artifactId>ugc-transfer</artifactId>
     </dependency>
