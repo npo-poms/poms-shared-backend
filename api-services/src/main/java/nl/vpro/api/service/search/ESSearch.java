@@ -13,7 +13,6 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.parboiled.common.StringUtils;
@@ -57,8 +56,8 @@ public class ESSearch extends AbstractSearch {
 
         request.source(searchBuilder);
 
-        if (offset==null) {
-            offset=0;
+        if (offset == null) {
+            offset = 0;
         }
 
         return executeQuery(request, offset, MediaSearchResult.class);
@@ -179,9 +178,9 @@ public class ESSearch extends AbstractSearch {
 
         BoolQueryBuilder queryBuilder;
         if (StringUtils.isNotEmpty(queryString)) {
-             queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), queryString);
+            queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), queryString);
         } else {
-             queryBuilder = new BoolQueryBuilder();
+            queryBuilder = new BoolQueryBuilder();
         }
         if (constraints.size() > 0) {
             queryBuilder.must(new MultiQueryStringConstraintBuilder(constraints));
