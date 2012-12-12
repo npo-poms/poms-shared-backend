@@ -13,6 +13,7 @@ import java.util.List;
  * @author Ernst Bunders
  */
 @XmlRootElement
+@org.jboss.resteasy.annotations.providers.jaxb.IgnoreMediaTypes("application/*+json")
 @XmlAccessorType(XmlAccessType.FIELD)
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class TestBean {
@@ -67,6 +68,7 @@ public class TestBean {
 //    }
 
     @XmlRootElement
+@org.jboss.resteasy.annotations.providers.jaxb.IgnoreMediaTypes("application/*+json")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static final class Friend {
         private String firstName;
