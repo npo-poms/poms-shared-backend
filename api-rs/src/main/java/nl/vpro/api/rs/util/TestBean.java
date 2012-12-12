@@ -68,7 +68,7 @@ public class TestBean {
 //    }
 
     @XmlRootElement
-@org.jboss.resteasy.annotations.providers.jaxb.IgnoreMediaTypes("application/*+json")
+    @org.jboss.resteasy.annotations.providers.jaxb.IgnoreMediaTypes("application/*+json")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static final class Friend {
         private String firstName;
