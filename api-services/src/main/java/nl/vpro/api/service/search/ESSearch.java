@@ -23,6 +23,7 @@ import org.springframework.core.convert.ConversionService;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.elasticsearch.index.query.FilterBuilders.termFilter;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 
@@ -75,7 +76,7 @@ public class ESSearch extends AbstractSearch {
         searchBuilder.facet(new SuggestionFacetBuilder(profile, "suggestions", term, limit));
 
         SearchFieldsQueryBuilder queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), term);
-        if (tagFilter.hasTags()) {
+        if (tagFilter!=null && tagFilter.hasTags()) {
             for (String tag : tagFilter.getTags()) {
                 queryBuilder.should(termQuery("tags", tag));
             }
@@ -92,13 +93,15 @@ public class ESSearch extends AbstractSearch {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
 
         // handle the profile
-        if (profile != null && profile != Profile.DEFAULT && profile.createFilterQuery() != null) {
+        if (profile != null && profile.createFilterQuery() != null) {
+
+//            searchBuilder.filter(termFilter("broadcasters", "vpro"));
             searchBuilder.filter(new ProfileFilterBuilder(profile));
         }
 
         SearchFieldsQueryBuilder searchFieldsQueryBuilder = new SearchFieldsQueryBuilder(getSearchFields(), getSearchFieldBoosting(), term);
         // handle the tags
-        if (tagFilter.hasTags()) {
+        if (tagFilter!=null && tagFilter.hasTags()) {
             for (String tag : tagFilter.getTags()) {
                 searchFieldsQueryBuilder.should(termQuery("tags", tag));
             }

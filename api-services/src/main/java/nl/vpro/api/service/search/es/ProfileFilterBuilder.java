@@ -9,6 +9,7 @@ import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
 import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.common.xcontent.ToXContent;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BaseFilterBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
@@ -41,8 +42,13 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
     }
 
     @Override
+    public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
+        return result.toXContent(builder, params);
+    }
+
+    @Override
     protected void doXContent(XContentBuilder builder, Params params) throws IOException {
-        result.toXContent(builder, params);
+        // nothing
     }
 
     public void createFilter(SearchFilter mediaSearchQuery) {
@@ -92,15 +98,15 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
     private List<FilterBuilder> gatherTermFilters(DocumentSearchFilter documentSearchFilter) {
         final List<FilterBuilder> fbl = new ArrayList<FilterBuilder>();
         for (MediaType mediaType : documentSearchFilter.getMediaTypes()) {
-            fbl.add(termFilter("mediaType", mediaType.name()));
+            fbl.add(termFilter("type", mediaType.name()));
         }
 
         for (AvFileFormat fileFormat : documentSearchFilter.getLocationFormats()) {
-            fbl.add(termFilter("location_formats", fileFormat.name()));
+            fbl.add(termFilter("locations.avAttributes.avFileFormat", fileFormat.name()));
         }
 
         for (String broadcaster : documentSearchFilter.getBroadcasters()) {
-            fbl.add(termFilter("broadcaster", broadcaster));
+            fbl.add(termFilter("broadcasters", broadcaster.toLowerCase()));
         }
 
         for (AvType avType : documentSearchFilter.getAvTypes()) {
@@ -112,11 +118,11 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
         }
 
         if (StringUtils.isNotBlank(documentSearchFilter.getMainTitle())) {
-            fbl.add(termFilter("titleMain", documentSearchFilter.getMainTitle()));
+            fbl.add(termFilter("titles", documentSearchFilter.getMainTitle()));
         }
 
         if (StringUtils.isNotBlank(documentSearchFilter.getDocumentType())) {
-            fbl.add(termFilter("documentType", documentSearchFilter.getDocumentType()));
+            fbl.add(termFilter("_type", documentSearchFilter.getDocumentType()));
         }
         if (fbl.size() == 0) {
             return null;

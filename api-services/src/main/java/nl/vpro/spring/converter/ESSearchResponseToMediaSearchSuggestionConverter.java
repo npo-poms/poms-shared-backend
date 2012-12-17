@@ -28,9 +28,7 @@ public class ESSearchResponseToMediaSearchSuggestionConverter implements Convert
                 Facet facet = facets.getValue();
                 if (facet instanceof InternalStringTermsFacet) {
                     for (InternalStringTermsFacet.StringEntry stringEntry : ((InternalStringTermsFacet) facet).entries()) {
-                        MediaSearchSuggestion mediaSearchSuggestion = new MediaSearchSuggestion();
-                        mediaSearchSuggestion.setValue(stringEntry.getTerm());
-                        mediaSearchSuggestion.setOccurrence(Long.valueOf(stringEntry.getCount()));
+                        MediaSearchSuggestion mediaSearchSuggestion = new MediaSearchSuggestion(stringEntry.getTerm(),Long.valueOf(stringEntry.getCount()));
                         mediaSearchSuggestions.addSuggestion(mediaSearchSuggestion);
                     }
                 }

@@ -40,10 +40,10 @@ public class ESSearchResponseToGenericSearchResultConverter implements Converter
             try {
                 JsonNode node=new MediaMapper().readTree(hit.sourceAsString());
                 item.setResult(node);
+                genericSearchResult.addSearchResultItem(item);
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
-            genericSearchResult.addSearchResultItem(item);
         }
         if (response.getFacets() != null) {
             for (Map.Entry<String, Facet> facets : response.getFacets().getFacets().entrySet()) {

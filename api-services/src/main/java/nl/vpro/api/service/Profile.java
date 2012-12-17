@@ -19,7 +19,7 @@ import java.util.List;
  * @author Ernst Bunders
  */
 public enum Profile {
-    WOORD("woord", "Woord.nl","") {
+    WOORD("woord", "Woord.nl","woord") {
         public SearchFilter createFilterQuery() {
 
             //The document should be a program or a segment
@@ -87,8 +87,8 @@ public enum Profile {
 
     DEFAULT("", "", "") {
         public SearchFilter createFilterQuery() {
-            //The documents should have the VPRO as broadcasters.
-            return null;
+            return new DocumentSearchFilter()
+                .addBroadcaster("VPRO");
         }
         @Override
         public List<String> getSearchFields() {
