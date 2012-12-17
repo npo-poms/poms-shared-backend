@@ -23,7 +23,6 @@ import org.springframework.core.convert.ConversionService;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static org.elasticsearch.index.query.FilterBuilders.termFilter;
 import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 
@@ -52,8 +51,7 @@ public class ESSearch extends AbstractSearch {
     @Override
     public MediaSearchResult search(Profile profile, String term, TagFilter tagFilter, Integer offset, Integer maxResult) throws ServerErrorException {
         SearchSourceBuilder searchBuilder = createBasicQuery(term, tagFilter, profile, offset, maxResult);
-        SearchRequest request = new SearchRequest(pomsIndexName);
-        request.types("poms");
+        SearchRequest request = createRequest(profile);
 
         request.source(searchBuilder);
 
@@ -64,9 +62,10 @@ public class ESSearch extends AbstractSearch {
         return executeQuery(request, offset, MediaSearchResult.class);
     }
 
+
     @Override
     public MediaSearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit) throws ServerErrorException {
-        SearchRequest request = new SearchRequest(pomsIndexName);
+        SearchRequest request = createRequest(profile);
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         // handle the profile
         if (profile.createFilterQuery() != null) {
@@ -76,7 +75,7 @@ public class ESSearch extends AbstractSearch {
         searchBuilder.facet(new SuggestionFacetBuilder(profile, "suggestions", term, limit));
 
         SearchFieldsQueryBuilder queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), term);
-        if (tagFilter!=null && tagFilter.hasTags()) {
+        if (tagFilter != null && tagFilter.hasTags()) {
             for (String tag : tagFilter.getTags()) {
                 queryBuilder.should(termQuery("tags", tag));
             }
@@ -101,7 +100,7 @@ public class ESSearch extends AbstractSearch {
 
         SearchFieldsQueryBuilder searchFieldsQueryBuilder = new SearchFieldsQueryBuilder(getSearchFields(), getSearchFieldBoosting(), term);
         // handle the tags
-        if (tagFilter!=null && tagFilter.hasTags()) {
+        if (tagFilter != null && tagFilter.hasTags()) {
             for (String tag : tagFilter.getTags()) {
                 searchFieldsQueryBuilder.should(termQuery("tags", tag));
             }
@@ -140,7 +139,7 @@ public class ESSearch extends AbstractSearch {
         if (StringUtils.isEmpty(profile.getIndexName())) {
             throw new ServerErrorException("No index available for the profile " + profile.getName());
         }
-        SearchRequest request = new SearchRequest(profile.getIndexName());
+        SearchRequest request = createRequest(profile);
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
 
         // handle the profile
@@ -166,7 +165,7 @@ public class ESSearch extends AbstractSearch {
         if (StringUtils.isEmpty(profile.getIndexName())) {
             throw new ServerErrorException("No index available for the profile " + profile.getName());
         }
-        SearchRequest request = new SearchRequest(profile.getIndexName());
+        SearchRequest request = createRequest(profile);
         SearchSourceBuilder searchBuilder = new OrderedSearchSourceBuilder(sortFields);
 
 
@@ -201,6 +200,14 @@ public class ESSearch extends AbstractSearch {
         request.source(searchBuilder);
 
         return executeQuery(request, offset, GenericSearchResult.class);
+    }
+
+    private SearchRequest createRequest(Profile profile) {
+        if (profile != null && StringUtils.isNotEmpty(profile.getIndexName())) {
+            return new SearchRequest(profile.getIndexName());
+        } else {
+            return new SearchRequest(pomsIndexName);
+        }
     }
 
     private <T> T executeQuery(SearchRequest request, int offset, Class<T> targetType) throws ServerErrorException {
