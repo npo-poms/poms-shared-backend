@@ -333,8 +333,8 @@ public class MediaServiceImpl implements MediaService {
         try {
             Profile profile = profileService.getProfile(profileName);
             String urn = profile.getArchiveUrn();
-            SearchFilter filter = profile.createFilterQuery();
-            URL couchdb = new URL(couchdbUrlprovider.getUrl() + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
+            URL couchdb = new URL(couchdbUrlprovider.getUrl()
+                + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
             InputStream inputStream = couchdb.openStream();
             return new FilteringIterator<MediaObject>(new MediaObjectIterator(new CouchdbViewIterator(inputStream)), profile.createFilterQuery());
         } catch (Exception e) {
