@@ -1,5 +1,9 @@
 package nl.vpro.api.service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
@@ -7,19 +11,15 @@ import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 
 /**
  * Date: 19-3-12
- * Time: 11:50
  *
  * @author Ernst Bunders
  */
 public enum Profile {
     WOORD("woord", "Woord.nl","woord") {
+        @Override
         public SearchFilter createFilterQuery() {
 
             //The document should be a program or a segment
@@ -75,6 +75,8 @@ public enum Profile {
         public SearchFilter createFilterQuery() {
             return null;
         }
+
+        @Override
         public List<String> getSearchFields() {
             return (Arrays.asList("title", "subtitle", "summary", "body", "extra_field_nl_vpro_page_type","extra_field_nl_vpro_subsite", "persons", "genre", "keywords"));
         }
@@ -86,6 +88,7 @@ public enum Profile {
     },
 
     DEFAULT("", "", "") {
+        @Override
         public SearchFilter createFilterQuery() {
             return new DocumentSearchFilter()
                 .addBroadcaster("VPRO");
@@ -126,7 +129,7 @@ public enum Profile {
     public String getIndexName() {
         return indexName;
     }
-
+    // a modifiable enum? odd...
     public void setArchiveUrn(String archiveUrn) {
         this.archiveUrn = archiveUrn;
     }
