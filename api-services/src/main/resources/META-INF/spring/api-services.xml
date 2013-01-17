@@ -34,6 +34,7 @@
                 <bean class="nl.vpro.spring.converter.ESSearchResponseToSearchResultConverter"/>
                 <bean class="nl.vpro.spring.converter.ESSearchResponseToGenericSearchResultConverter"/>
                 <bean class="nl.vpro.spring.converter.ESSearchResponseToMediaSearchSuggestionConverter"/>
+              <bean class="nl.vpro.spring.converter.MediaObjectToMediaSearchResultItem" />
             </set>
         </property>
     </bean>

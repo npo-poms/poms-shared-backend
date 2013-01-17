@@ -4,7 +4,8 @@
  */
 package nl.vpro.jackson;
 
-import nl.vpro.api.domain.media.MediaObject;
+import java.util.Collection;
+
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -15,13 +16,35 @@ import org.codehaus.jackson.map.ser.BeanPropertyFilter;
 import org.codehaus.jackson.map.ser.BeanPropertyWriter;
 import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
 
-import java.util.Collection;
+import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.MediaObject;
+import nl.vpro.api.domain.media.Program;
+import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.support.MediaObjectType;
+import nl.vpro.api.domain.media.support.MediaUtil;
 
 /**
  * User: rico
  * Date: 03/04/2012
  */
 public class MediaMapper extends ObjectMapper {
+
+    public static MediaMapper INSTANCE = new MediaMapper();
+
+
+    public static MediaObject convert(String urn,  Object o) {
+        MediaObjectType mediaType = MediaUtil.getMediaType(urn);
+        switch (mediaType) {
+            case group:
+                return INSTANCE.convertValue(o, Group.class);
+            case program:
+                return INSTANCE.convertValue(o, Program.class);
+            case segment:
+                return INSTANCE.convertValue(o, Segment.class);
+            default:
+                return null;
+        }
+    }
 
     private static BeanPropertyFilter collectionFilter =
         new BeanPropertyFilter() {

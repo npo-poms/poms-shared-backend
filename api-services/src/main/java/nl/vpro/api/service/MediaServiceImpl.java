@@ -4,18 +4,13 @@
  */
 package nl.vpro.api.service;
 
-import nl.vpro.api.domain.media.*;
-import nl.vpro.api.domain.media.support.MediaObjectType;
-import nl.vpro.api.domain.media.support.MediaUtil;
-import nl.vpro.api.service.search.Search;
-import nl.vpro.api.service.search.fiterbuilder.TagFilter;
-import nl.vpro.api.transfer.*;
-import nl.vpro.api.util.UrlProvider;
-import nl.vpro.domain.ugc.annotation.Annotation;
-import nl.vpro.jackson.MediaMapper;
-import nl.vpro.util.Helper;
-import nl.vpro.util.rs.error.NotFoundException;
-import nl.vpro.util.rs.error.ServerErrorException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.elasticsearch.action.ActionFuture;
@@ -42,10 +37,22 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.svenson.JSONParser;
 
-import java.io.Serializable;
-import java.net.URLDecoder;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
+import nl.vpro.api.domain.media.*;
+import nl.vpro.api.domain.media.support.MediaObjectType;
+import nl.vpro.api.domain.media.support.MediaUtil;
+import nl.vpro.api.service.search.Search;
+import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.transfer.*;
+import nl.vpro.api.util.CouchdbViewIterator;
+import nl.vpro.api.util.FilteringIterator;
+import nl.vpro.api.util.MediaObjectIterator;
+import nl.vpro.api.util.UrlProvider;
+import nl.vpro.domain.ugc.annotation.Annotation;
+import nl.vpro.jackson.MediaMapper;
+import nl.vpro.util.Helper;
+import nl.vpro.util.rs.error.NotFoundException;
+import nl.vpro.util.rs.error.ServerErrorException;
 
 /**
  * User: rico
@@ -55,7 +62,7 @@ import java.util.concurrent.ExecutionException;
 public class MediaServiceImpl implements MediaService {
 
     public static String MEDIA_CORE_NAME = "poms";
-    private static final Logger log = LoggerFactory.getLogger(MediaService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MediaService.class);
 
     @Autowired
     private UrlProvider couchdbUrlprovider;
@@ -221,6 +228,8 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
+
+
     /**
      * Create an url for querying a couchdb view. We don't use the jcouchdb api because this uses the Svensson json library,
      * which won't work with the jaxb and jackson mapping annotations we already use. Best to use the rest template, that uses
@@ -319,6 +328,20 @@ public class MediaServiceImpl implements MediaService {
         }
     }
 
+    @Override
+    public Iterator<MediaObject> getProfile(String profileName) {
+        try {
+            Profile profile = profileService.getProfile(profileName);
+            String urn = profile.getArchiveUrn();
+            SearchFilter filter = profile.createFilterQuery();
+            URL couchdb = new URL(couchdbUrlprovider.getUrl() + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
+            InputStream inputStream = couchdb.openStream();
+            return new FilteringIterator<MediaObject>(new MediaObjectIterator(new CouchdbViewIterator(inputStream)), profile.createFilterQuery());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     public void setGlobalMaxResult(int globalMaxResult) {
         this.globalMaxResult = globalMaxResult;
@@ -400,31 +423,17 @@ public class MediaServiceImpl implements MediaService {
      * @return
      */
     private List<MediaObject> getMediaObjects(List<String> ids) {
-        ObjectMapper mapper = new MediaMapper();
         List<MediaObject> mediaObjects = new ArrayList<MediaObject>(ids.size());
         // Note: the direct view variant does not work with couchdb 1.0.2 time to phase out this library
         ViewAndDocumentsResult<Map, Map> progs = couchDbMediaServer.queryDocumentsByKeys(Map.class, Map.class, ids, new Options(), new JSONParser());
         for (ValueAndDocumentRow<Map, Map> row : progs.getRows()) {
             Map m = row.getDocument();
             String urn = (String) m.get("_id");
-            MediaObjectType mediaType = MediaUtil.getMediaType(urn);
-            MediaObject mediaObject;
-            switch (mediaType) {
-                case group:
-                    mediaObject = mapper.convertValue(m, Group.class);
-                    mediaObjects.add(mediaObject);
-                    break;
-                case program:
-                    mediaObject = mapper.convertValue(m, Program.class);
-                    mediaObjects.add(mediaObject);
-                    break;
-                case segment:
-                    mediaObject = mapper.convertValue(m, Segment.class);
-                    mediaObjects.add(mediaObject);
-                    break;
-                default:
-                    log.error("Unknown mediatype for urn : " + urn + " : " + mediaType);
-                    break;
+            MediaObject mediaObject = MediaMapper.convert(urn, m);
+            if (mediaObject != null) {
+                mediaObjects.add(mediaObject);
+            } else {
+                LOG.error("Unknown mediatype for urn : " + urn);
             }
         }
         return mediaObjects;

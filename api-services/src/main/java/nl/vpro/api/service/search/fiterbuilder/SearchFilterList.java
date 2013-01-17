@@ -1,11 +1,11 @@
 package nl.vpro.api.service.search.fiterbuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Date: 20-3-12
@@ -13,31 +13,35 @@ import java.util.List;
  *
  * @author Ernst Bunders
  */
-public final class SearchFilterList extends SearchFilter<SearchFilterList> {
+public final class SearchFilterList extends SearchFilter<Object, SearchFilterList> {
 
-    private static final Logger log = LoggerFactory.getLogger(SearchFilterList.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SearchFilterList.class);
 
-    private List<SearchFilter> mediaSearchQueries = new ArrayList<SearchFilter>();
+    private final List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 
     public SearchFilterList(BooleanOp booleanOp) {
         super(booleanOp);
     }
 
     public SearchFilterList addQuery(SearchFilter mediaSearchQuery) {
-        mediaSearchQueries.add(mediaSearchQuery);
+        searchFilters.add(mediaSearchQuery);
         return this;
     }
 
+    /**
+     * 'Media' search queries?
+     * @return
+     */
     public List<SearchFilter> getMediaSearchQueries() {
-        return mediaSearchQueries;
+        return searchFilters;
     }
 
     @Override
     public String createQueryString() {
         BooleanGroupingStringBuilder sb = new BooleanGroupingStringBuilder();
-        sb.grouping = mediaSearchQueries.size() > 1;
+        sb.grouping = searchFilters.size() > 1;
 
-        for (SearchFilter query : mediaSearchQueries) {
+        for (SearchFilter query : searchFilters) {
             sb.append(query.createQueryString());
         }
         sb.close();
@@ -47,13 +51,31 @@ public final class SearchFilterList extends SearchFilter<SearchFilterList> {
         }
 
         String s = sb.toString();
-        log.debug("query:" + s);
+        LOG.debug("query:" + s);
         return s;
     }
 
     @Override
     protected SearchFilterList getInstance() {
         return this;
+    }
+
+    @Override
+    public boolean evaluate(Object object) {
+        switch(getBooleanOp()) {
+            case AND:
+                for (SearchFilter filter : getMediaSearchQueries()) {
+                    if (! filter.evaluate(object)) return false;
+                }
+                return true;
+            case OR:
+                for (SearchFilter filter : getMediaSearchQueries()) {
+                    if (filter.evaluate(object)) return true;
+                }
+                return false;
+            default:
+                return true;
+        }
     }
 
 }

@@ -1,14 +1,17 @@
 package nl.vpro.api.service.search.fiterbuilder;
 
-import nl.vpro.api.domain.media.AvFileFormat;
-import nl.vpro.api.domain.media.AvType;
-import nl.vpro.api.domain.media.search.MediaType;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.common.collect.Sets;
+
+import nl.vpro.api.domain.media.*;
+import nl.vpro.api.domain.media.search.MediaType;
 
 /**
  * Date: 20-3-12
@@ -16,17 +19,18 @@ import java.util.List;
  *
  * @author Ernst Bunders
  */
-public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilter> {
-    private static final Logger log = LoggerFactory.getLogger(DocumentSearchFilter.class);
-    private List<MediaType> mediaTypes = new ArrayList<MediaType>();
+public final class DocumentSearchFilter extends SearchFilter<MediaObject, DocumentSearchFilter> {
+    private static final Logger LOG = LoggerFactory.getLogger(DocumentSearchFilter.class);
 
-    private List<AvFileFormat> locationFormats = new ArrayList<AvFileFormat>();
+    private final Set<MediaType> mediaTypes         = new HashSet<MediaType>();
 
-    private List<AvType> avTypes = new ArrayList<AvType>();
+    private final Set<AvFileFormat> locationFormats = new HashSet<AvFileFormat>();
 
-    private List<String> descendants = new ArrayList<String>();
+    private final Set<AvType> avTypes               = new HashSet<AvType>();
 
-    private List<String> broadcasters = new ArrayList<String>();
+    private final Set<String> descendants           = new HashSet<String>();
+
+    private final Set<String> broadcasters          = new HashSet<String>();
 
     private String mainTitle;
 
@@ -75,7 +79,52 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
         return this;
     }
 
+    @Override
+    public boolean evaluate(MediaObject object) {
+        if ("program".equals(this.documentType) && (!(object instanceof Program))) return false;
+        if ("segment".equals(this.documentType) && (!(object instanceof Segment))) return false;
+        if (! avTypes.isEmpty()) {
+            if (! avTypes.contains(object.getAvType())) return false;
+        }
 
+        if (!locationFormats.isEmpty()) {
+            if (object instanceof Program) {
+                boolean found = false;
+                for (Location location : object.getLocations()) {
+                    if (locationFormats.contains(location.getAvAttributes().getAvFileFormat())) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (! found) return false;
+            } else {
+                // TODO
+            }
+        }
+        if (! descendants.isEmpty()) {
+            Set<String> descendantsOf = new HashSet<String>();
+            for (DescendantRef ref : object.getDescendantOf()) {
+                descendantsOf.add(ref.getUrnRef());
+            }
+            if ( Sets.intersection(descendants, descendantsOf).isEmpty()) return false;
+
+        }
+        if (!mediaTypes.isEmpty()) {
+            throw new UnsupportedOperationException();
+        }
+        if (! broadcasters.isEmpty()) {
+            throw new UnsupportedOperationException();
+        }
+        if (StringUtils.isNotEmpty(mainTitle)) {
+            throw new UnsupportedOperationException();
+        }
+
+        return true;
+
+    }
+
+
+    @Override
     public String createQueryString() {
         BooleanGroupingStringBuilder sb = new BooleanGroupingStringBuilder();
 
@@ -112,27 +161,27 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
         if (StringUtils.isNotBlank(queryString)) sb.stringBuilder.append(queryString);
 
         String q = sb.toString();
-        log.debug("query: " + q);
+        LOG.debug("query: " + q);
         return q;
     }
 
-    public List<MediaType> getMediaTypes() {
+    public Collection<MediaType> getMediaTypes() {
         return mediaTypes;
     }
 
-    public List<AvFileFormat> getLocationFormats() {
+    public Collection<AvFileFormat> getLocationFormats() {
         return locationFormats;
     }
 
-    public List<AvType> getAvTypes() {
+    public Collection<AvType> getAvTypes() {
         return avTypes;
     }
 
-    public List<String> getDescendants() {
+    public Collection<String> getDescendants() {
         return descendants;
     }
 
-    public List<String> getBroadcasters() {
+    public Collection<String> getBroadcasters() {
         return broadcasters;
     }
 

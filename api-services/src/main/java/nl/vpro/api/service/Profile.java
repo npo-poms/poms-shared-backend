@@ -18,7 +18,7 @@ import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
  * @author Ernst Bunders
  */
 public enum Profile {
-    WOORD("woord", "Woord.nl","woord") {
+    WOORD("woord", "Woord.nl", "woord") {
         @Override
         public SearchFilter createFilterQuery() {
 

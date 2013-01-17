@@ -38,7 +38,7 @@ public class UrlProvider {
     }
 
     public String getUrl() {
-        StringBuffer buffer = new StringBuffer("http://");
+        StringBuilder buffer = new StringBuilder("http://");
         buffer.append(host);
         if (port > 0 && port != 80) {
             buffer.append(":").append(port);

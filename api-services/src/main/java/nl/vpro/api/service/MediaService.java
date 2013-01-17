@@ -4,7 +4,11 @@
  */
 package nl.vpro.api.service;
 
+import java.util.Iterator;
+import java.util.List;
+
 import nl.vpro.api.domain.media.Group;
+import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
@@ -14,8 +18,6 @@ import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.util.rs.error.ServerErrorException;
-
-import java.util.List;
 
 /**
  * User: rico
@@ -60,4 +62,7 @@ public interface MediaService {
     public Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter);
 
     public Segment getSegment(Long id);
+
+    public Iterator<MediaObject> getProfile(String profileName);
+
 }

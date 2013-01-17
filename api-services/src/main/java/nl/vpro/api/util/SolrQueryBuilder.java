@@ -12,7 +12,7 @@ import org.apache.solr.client.solrj.SolrQuery;
  */
 public interface SolrQueryBuilder {
 
-    public SolrQuery build();
+    SolrQuery build();
 
-    public SolrQuery build(String query);
+    SolrQuery build(String query);
 }

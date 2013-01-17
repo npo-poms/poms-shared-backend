@@ -6,7 +6,7 @@ package nl.vpro.api.service.search.fiterbuilder;
  *
  * @author Ernst Bunders
  */
-public abstract class SearchFilter<T extends SearchFilter> {
+public abstract class SearchFilter<O, T extends SearchFilter> {
 
     private BooleanOp booleanOp;
 
@@ -29,6 +29,13 @@ public abstract class SearchFilter<T extends SearchFilter> {
 
     protected abstract T getInstance();
 
+    public abstract boolean evaluate(O object);
+
+
+    @Override
+    public String toString() {
+        return createQueryString();
+    }
 
     protected class BooleanGroupingStringBuilder {
         private boolean first = true;
@@ -61,6 +68,7 @@ public abstract class SearchFilter<T extends SearchFilter> {
             first = true;
         }
 
+        @Override
         public String toString() {
             return stringBuilder.toString().trim();
         }
