@@ -1,6 +1,5 @@
 package nl.vpro.api.rs;
 
-import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.*;
@@ -11,7 +10,7 @@ import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchResultItem;
+import nl.vpro.api.transfer.MediaSearchResultItemIterator;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.transfer.ugc.annotation.Annotations;
@@ -144,7 +143,7 @@ public interface MediaRestService {
     @GET
     @Path("get/{profile}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Iterator<MediaSearchResultItem> getProfile(@PathParam("profile") String profileName);
+    public MediaSearchResultItemIterator getProfile(@PathParam("profile") String profileName);
 
     /**
      * Find popular search terms for a given prefix. This feature is used for the presentation of suggestions while

@@ -28,10 +28,7 @@ import nl.vpro.api.rs.util.StringUtil;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
-import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchResultItem;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
-import nl.vpro.api.transfer.ProgramList;
+import nl.vpro.api.transfer.*;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
@@ -165,9 +162,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public Iterator<MediaSearchResultItem> getProfile(String profileName) {
+    public MediaSearchResultItemIterator getProfile(String profileName) {
         final Iterator<MediaObject> iterator = mediaService.getProfile(profileName);
-        return new UnmodifiableIterator<MediaSearchResultItem>() {
+        return new MediaSearchResultItemIterator(new UnmodifiableIterator<MediaSearchResultItem>() {
             @Override
             public boolean hasNext() {
                 return iterator.hasNext();
@@ -175,9 +172,11 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             @Override
             public MediaSearchResultItem next() {
-                return conversionService.convert(iterator.next(), MediaSearchResultItem.class);
+                return conversionService.convert(
+                    iterator.next(),
+                    MediaSearchResultItem.class);
             }
-        };
+        });
     }
 
     @Override
