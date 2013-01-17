@@ -4,6 +4,20 @@
  */
 package nl.vpro.api.rs;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.stereotype.Controller;
+
+import com.google.common.collect.UnmodifiableIterator;
+
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
@@ -22,15 +36,6 @@ import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Offers REST access to api.service.MediaService
@@ -40,14 +45,18 @@ import java.util.List;
 @Controller
 public class MediaRestServiceImpl implements MediaRestService {
 
-    private final static Logger logger = LoggerFactory.getLogger(MediaRestServiceImpl.class);
+    private final static Logger LOG = LoggerFactory.getLogger(MediaRestServiceImpl.class);
 
     @Autowired
     MediaService mediaService;
 
+
+    @Autowired
+    ConversionService conversionService;
+
     @Override
     public Program getProgram(String urn) throws IllegalArgumentException {
-        logger.debug("Method getProgram called with urn " + urn);
+        LOG.debug("Method getProgram called with urn " + urn);
         return mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, urn));
     }
 
@@ -91,7 +100,7 @@ public class MediaRestServiceImpl implements MediaRestService {
      * - adding all possibile mediaObjectTypes: &membertypes=program,group,segment
      */
     public Group getGroup(String urn, boolean addMembers, boolean addEpisodes, String memberTypesFilter) throws ServerErrorException, NotFoundException {
-        logger.debug("Called with urn " + urn);
+        LOG.debug("Called with urn " + urn);
 
         List<MediaObjectType> mediaObjectTypesFilter = null;
 
@@ -103,7 +112,7 @@ public class MediaRestServiceImpl implements MediaRestService {
                 try {
                     mediaObjectTypesFilter.add(MediaObjectType.valueOf(memberType));
                 } catch (java.lang.IllegalArgumentException iae) {
-                    logger.error("Bij het opvragen van een Group aan de API Media Server werd een ongeldige filterwaarde op in membertypes meegegeven, namelijk: " + memberType + ". Dit wordt daarom genegeerd als filterwaarde.");
+                    LOG.error("Bij het opvragen van een Group aan de API Media Server werd een ongeldige filterwaarde op in membertypes meegegeven, namelijk: " + memberType + ". Dit wordt daarom genegeerd als filterwaarde.");
                 }
             }
         }
@@ -119,7 +128,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Segment getSegment(String urn) throws ServerErrorException, NotFoundException {
-        logger.debug("Called with urn " + urn);
+        LOG.debug("Called with urn " + urn);
         return mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, urn));
     }
 
@@ -137,7 +146,7 @@ public class MediaRestServiceImpl implements MediaRestService {
                 MediaObject mediaObject = getMedia(urn);
                 mediaObjects.add(mediaObject);
             } catch (Exception e) {
-                logger.warn("Could not add media object with urn '{}' to result of bulk retrieve call: {}", urn, e.getMessage());
+                LOG.warn("Could not add media object with urn '{}' to result of bulk retrieve call: {}", urn, e.getMessage());
             }
         }
         return mediaObjects;
@@ -153,6 +162,22 @@ public class MediaRestServiceImpl implements MediaRestService {
     public MediaSearchResult searchWithProfile(String profileName, String queryString, String tags, Integer offset, Integer maxResult) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
         return mediaService.search(queryString, tagFilter, profileName, offset, maxResult);
+    }
+
+    @Override
+    public Iterator<MediaSearchResultItem> getProfile(String profileName) {
+        final Iterator<MediaObject> iterator = mediaService.getProfile(profileName);
+        return new UnmodifiableIterator<MediaSearchResultItem>() {
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public MediaSearchResultItem next() {
+                return conversionService.convert(iterator.next(), MediaSearchResultItem.class);
+            }
+        };
     }
 
     @Override
@@ -204,7 +229,7 @@ public class MediaRestServiceImpl implements MediaRestService {
                     MediaObject relatedMediaObject = getMedia(relatedUrn);
                     relatedMediaObjects.add(relatedMediaObject);
                 } catch (Exception e) {
-                    logger.warn("Could not retrieve related media object {}: {}", relatedUrn, e.getMessage());
+                    LOG.warn("Could not retrieve related media object {}: {}", relatedUrn, e.getMessage());
                 }
             }
         }

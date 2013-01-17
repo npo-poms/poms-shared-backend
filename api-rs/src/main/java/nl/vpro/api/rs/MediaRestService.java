@@ -1,20 +1,22 @@
 package nl.vpro.api.rs;
 
+import java.util.Iterator;
 import java.util.List;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.MediaSearchResultItem;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 /**
  * Public REST API to api.service.MediaService
@@ -138,6 +140,11 @@ public interface MediaRestService {
     @Path("search/{profile}")
     @Produces(MediaType.APPLICATION_JSON)
     public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
+
+    @GET
+    @Path("get/{profile}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Iterator<MediaSearchResultItem> getProfile(@PathParam("profile") String profileName);
 
     /**
      * Find popular search terms for a given prefix. This feature is used for the presentation of suggestions while
