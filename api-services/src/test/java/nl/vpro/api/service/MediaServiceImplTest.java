@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import nl.vpro.api.domain.media.MediaObject;
+import nl.vpro.api.transfer.MediaSearchResultItem;
 
 import static org.junit.Assert.assertTrue;
 
@@ -29,7 +29,7 @@ public class MediaServiceImplTest {
     @Ignore
     public void getProfile() throws Exception {
 
-        Iterator<MediaObject> result = impl.getProfile("woord");
+        Iterator<MediaSearchResultItem> result = impl.getProfile("woord");
         assertTrue(result.hasNext());
 
 
