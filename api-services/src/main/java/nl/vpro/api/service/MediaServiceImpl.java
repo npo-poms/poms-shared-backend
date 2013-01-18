@@ -103,7 +103,11 @@ public class MediaServiceImpl implements MediaService {
     @Autowired
     private Client esClient;
 
+    public static MediaService INSTANCE;
+
     public MediaServiceImpl() {
+        if (INSTANCE != null) throw new IllegalStateException();
+        INSTANCE = this;
     }
 
     /**

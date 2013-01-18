@@ -3,7 +3,6 @@ package nl.vpro.spring.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 
 import nl.vpro.api.domain.media.MediaObject;
@@ -11,7 +10,7 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
-import nl.vpro.api.service.MediaService;
+import nl.vpro.api.service.MediaServiceImpl;
 import nl.vpro.api.transfer.Location;
 import nl.vpro.api.transfer.MediaSearchResultItem;
 
@@ -21,8 +20,6 @@ import nl.vpro.api.transfer.MediaSearchResultItem;
  */
 public class MediaObjectToMediaSearchResultItem implements Converter<MediaObject, MediaSearchResultItem> {
 
-    @Autowired
-    MediaService mediaService;
 
     @Override
     public MediaSearchResultItem convert(MediaObject source) {
@@ -46,7 +43,7 @@ public class MediaObjectToMediaSearchResultItem implements Converter<MediaObject
         addLocations(source, locations);
         if (source instanceof Segment) {
             // Hmm. this is a bit sad. We just need the format to make FilteringIterator work.
-            Program program = mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, ((Segment) source).getUrnRef()));
+            Program program = MediaServiceImpl.INSTANCE.getProgram(MediaUtil.getMediaId(MediaObjectType.program, ((Segment) source).getUrnRef()));
             addLocations(program, locations);
         }
         value.setLocations(locations);
