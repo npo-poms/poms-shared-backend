@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Controller;
 
-import com.google.common.collect.UnmodifiableIterator;
-
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
@@ -31,6 +29,7 @@ import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.*;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.transfer.ugc.annotation.Annotations;
+import nl.vpro.util.WrappedIterator;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 
@@ -163,20 +162,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public MediaSearchResultItemIterator getProfile(String profileName) {
-        final Iterator<MediaObject> iterator = mediaService.getProfile(profileName);
-        return new MediaSearchResultItemIterator(new UnmodifiableIterator<MediaSearchResultItem>() {
-            @Override
-            public boolean hasNext() {
-                return iterator.hasNext();
-            }
-
-            @Override
-            public MediaSearchResultItem next() {
-                return conversionService.convert(
-                    iterator.next(),
-                    MediaSearchResultItem.class);
-            }
-        });
+        return new MediaSearchResultItemIterator(mediaService.getProfile(profileName));
     }
 
     @Override

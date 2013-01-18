@@ -140,6 +140,12 @@ public interface MediaRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
+
+    /**
+     * @since 1.3
+     * @param profileName
+     * @return
+     */
     @GET
     @Path("get/{profile}")
     @Produces(MediaType.APPLICATION_JSON)
