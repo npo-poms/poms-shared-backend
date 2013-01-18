@@ -26,7 +26,7 @@ public enum Profile {
             //The document should be a program or a segment
             SearchFilterList documentTypes = new SearchFilterList(BooleanOp.OR)
                 .addQuery(new DocumentSearchFilter()
-                        .setDocumentType(MediaObjectType.group))
+                    .setDocumentType(MediaObjectType.program))
                 .addQuery(new DocumentSearchFilter()
                     .setDocumentType(MediaObjectType.segment)
                 );
