@@ -12,7 +12,7 @@ import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 
 /**
  * @author Michiel Meeuwissen
- * @since 1.8
+ * @since 1.3
  */
 public class FilteringIterator<T> extends UnmodifiableIterator<T> {
 

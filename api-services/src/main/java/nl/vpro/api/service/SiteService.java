@@ -4,10 +4,10 @@
  */
 package nl.vpro.api.service;
 
+import java.util.List;
+
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
-
-import java.util.List;
 
 /**
  * User: rico
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface SiteService {
 
-    public GenericSearchResult search(String profileName, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields, String response);
+    GenericSearchResult search(String profileName, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields, String response);
 
-    public MediaSearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints);
+    MediaSearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints);
 }

@@ -1,5 +1,14 @@
 package nl.vpro.api.service.search.es;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.index.query.BaseFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilder;
+
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.search.MediaType;
@@ -8,17 +17,10 @@ import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
 import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
-import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.common.xcontent.ToXContent;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.index.query.BaseFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.elasticsearch.index.query.FilterBuilders.*;
+import static org.elasticsearch.index.query.FilterBuilders.andFilter;
+import static org.elasticsearch.index.query.FilterBuilders.orFilter;
+import static org.elasticsearch.index.query.FilterBuilders.termFilter;
 
 /**
  * This class can create an ElasticSearch query filter from an SearchFilter
@@ -121,7 +123,7 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
             fbl.add(termFilter("titles", documentSearchFilter.getMainTitle()));
         }
 
-        if (StringUtils.isNotBlank(documentSearchFilter.getDocumentType())) {
+        if (documentSearchFilter.getDocumentType() != null) {
             fbl.add(termFilter("_type", documentSearchFilter.getDocumentType()));
         }
         if (fbl.size() == 0) {

@@ -1,5 +1,7 @@
 package nl.vpro.api.service.search;
 
+import java.util.List;
+
 import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
@@ -7,14 +9,7 @@ import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.util.rs.error.ServerErrorException;
 
-import java.util.List;
-
 /**
- * Created with IntelliJ IDEA.
- * User: ernst
- * Date: 9/26/12
- * Time: 4:35 PM
- *
  * this class abstracts the building of search queries, so we can have different implementations (i.e. Solr and ElasticSearch)
  *
  * Tag filter: for now we ignore the boolean op in the tag filter. What we want is just score boosting based on
@@ -29,7 +24,7 @@ import java.util.List;
  * - no prefix=boost
  * - + prefix = and
  * - ~ prefix = or
- *
+ * @author Ernst Bunders
  */
 public interface Search {
 

@@ -6,6 +6,7 @@ import java.util.List;
 
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
+import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
 import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
@@ -25,9 +26,9 @@ public enum Profile {
             //The document should be a program or a segment
             SearchFilterList documentTypes = new SearchFilterList(BooleanOp.OR)
                 .addQuery(new DocumentSearchFilter()
-                        .setDocumentType("program"))
+                        .setDocumentType(MediaObjectType.group))
                 .addQuery(new DocumentSearchFilter()
-                        .setDocumentType("segment")
+                    .setDocumentType(MediaObjectType.segment)
                 );
 
 

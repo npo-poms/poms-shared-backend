@@ -1,10 +1,11 @@
 package nl.vpro.api.service.searchfilterbuilder;
 
+import org.junit.Test;
+
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
 import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertEquals;
  *
  * @author Ernst Bunders
  */
-public class MediaSearchQueryListTest {
+public class SearchFilterListTest {
     private static DocumentSearchFilter q = new DocumentSearchFilter();
 
     static {

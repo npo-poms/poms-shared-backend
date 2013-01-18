@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Ernst Bunders
  */
-public final class SearchFilterList extends SearchFilter<Object, SearchFilterList> {
+public final class SearchFilterList extends SearchFilter<SearchFilterList> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchFilterList.class);
 

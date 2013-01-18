@@ -1,15 +1,7 @@
 package nl.vpro.api.service.search;
 
-import nl.vpro.api.domain.media.search.MediaType;
-import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.TagFilter;
-import nl.vpro.api.transfer.GenericSearchResult;
-import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
-import nl.vpro.api.util.SolrQueryBuilder;
-import nl.vpro.util.rs.error.ServerErrorException;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -21,13 +13,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 
-import java.util.ArrayList;
-import java.util.List;
+import nl.vpro.api.domain.media.search.MediaType;
+import nl.vpro.api.service.Profile;
+import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.transfer.GenericSearchResult;
+import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.util.SolrQueryBuilder;
+import nl.vpro.util.rs.error.ServerErrorException;
 
 /**
- * User: ernst
- * Date: 9/26/12
- * Time: 4:49 PM
  * This is the solr implementation of the search interface.
  *
  *The tag filter behaviour that we want (tags boost the search result but do not cause search hits)
@@ -37,6 +34,7 @@ import java.util.List;
  * But dismax supports the 'bq' (boost query) param, and the lucene query parser does not. Catch 22!
  *
  * We support the use case where tags boost the search result, but will also create hits. Not nice, let's move to ES
+ * @author Ernst Bunders
  */
 public class SolrSearch extends AbstractSearch {
 

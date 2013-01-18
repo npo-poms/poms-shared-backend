@@ -8,12 +8,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import nl.vpro.api.domain.media.Group;
-import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.MediaSearchResultItem;
 import nl.vpro.api.transfer.MediaSearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.domain.ugc.annotation.Annotation;
@@ -25,33 +25,33 @@ import nl.vpro.util.rs.error.ServerErrorException;
  */
 public interface MediaService {
 
-    public MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer maxResult) throws ServerErrorException;
+    MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer maxResult) throws ServerErrorException;
 
-    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile) throws ServerErrorException;
+    MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile) throws ServerErrorException;
 
-    public String searchES(String index, String[] types, String query) throws ServerErrorException;
+    String searchES(String index, String[] types, String query) throws ServerErrorException;
 
-    public Program getProgram(Long id);
+    Program getProgram(Long id);
 
     /**
      * This method returns a number of the most recent programs broadcasted by by the VPRO
      * that has (a) location(s) attached to it, so it is playable.
      * The programs are sorted by first broadcast date descending.
      */
-    public ProgramList getReplayablePrograms(Integer max, Integer offset, String avType);
+    ProgramList getReplayablePrograms(Integer max, Integer offset, String avType);
 
     /**
      * @param id
      * @return the POMS segments as one annotation
      */
-    public Annotation getProgramAnnotation(Long id);
+    Annotation getProgramAnnotation(Long id);
 
     /**
      * Returns a group, optionally with members.
      * If addMembers=true, and memberTypes is null or empty, all members are returned.
      * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
      */
-    public Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter);
+    Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter);
 
     /**
      * Returns a group, optionally with members.
@@ -59,10 +59,10 @@ public interface MediaService {
      * If addEpisodes=true, and memberTypes is null or empty, all members are returned.
      * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
      */
-    public Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter);
+    Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter);
 
-    public Segment getSegment(Long id);
+    Segment getSegment(Long id);
 
-    public Iterator<MediaObject> getProfile(String profileName);
+    Iterator<MediaSearchResultItem> getProfile(String profileName);
 
 }

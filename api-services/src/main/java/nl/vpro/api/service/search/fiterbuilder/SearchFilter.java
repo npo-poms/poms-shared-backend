@@ -1,12 +1,13 @@
 package nl.vpro.api.service.search.fiterbuilder;
 
 /**
+ * MM: See comments in {@link DocumentSearchFilter}
  * Date: 19-3-12
  * Time: 13:51
  *
  * @author Ernst Bunders
  */
-public abstract class SearchFilter<O, T extends SearchFilter> {
+public abstract class SearchFilter<T extends SearchFilter> {
 
     private BooleanOp booleanOp;
 
@@ -29,7 +30,7 @@ public abstract class SearchFilter<O, T extends SearchFilter> {
 
     protected abstract T getInstance();
 
-    public abstract boolean evaluate(O object);
+    public abstract boolean evaluate(Object object);
 
 
     @Override
@@ -38,10 +39,13 @@ public abstract class SearchFilter<O, T extends SearchFilter> {
     }
 
     protected class BooleanGroupingStringBuilder {
+
+        final StringBuilder stringBuilder = new StringBuilder();
+
         private boolean first = true;
         private boolean hasOpened = false;
         protected boolean grouping = true; /*should this group be wrapped in parenthesis?*/
-        StringBuilder stringBuilder = new StringBuilder();
+
 
         protected BooleanGroupingStringBuilder() {
         }

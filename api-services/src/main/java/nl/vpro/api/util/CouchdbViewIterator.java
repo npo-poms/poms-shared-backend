@@ -16,7 +16,7 @@ import com.google.common.collect.UnmodifiableIterator;
 
 /**
  * @author Michiel Meeuwissen
- * @since 1.8
+ * @since 1.3
  */
 public class CouchdbViewIterator extends UnmodifiableIterator<JsonNode> {
 

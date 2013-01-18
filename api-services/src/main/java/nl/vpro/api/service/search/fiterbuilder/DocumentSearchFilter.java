@@ -2,6 +2,7 @@ package nl.vpro.api.service.search.fiterbuilder;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
@@ -12,32 +13,37 @@ import com.google.common.collect.Sets;
 
 import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.search.MediaType;
+import nl.vpro.api.domain.media.support.MediaObjectType;
 
 /**
+ * MM: Would it not be nicer to split up this class in several ones?
+ *     E.g. a MediaTypeSearchFilter, LocationFormatSearchFilter, AVTypeSearchFilter.
+ *     they can simply be joined with a SearchFilterList(AND).
+ *     This would result in less clutter and a better seperation of concerns.
+ *     Also I'd then propose to remove the BooleanOp from SearchFilter itself then, since that would
+ *     be the task of SearchFilterList only.
+ *
  * Date: 20-3-12
  * Time: 16:00
  *
  * @author Ernst Bunders
  */
-public final class DocumentSearchFilter extends SearchFilter<MediaObject, DocumentSearchFilter> {
+public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilter> {
     private static final Logger LOG = LoggerFactory.getLogger(DocumentSearchFilter.class);
 
-    private final Set<MediaType> mediaTypes         = new HashSet<MediaType>();
+    private final Set<MediaType> mediaTypes         = new LinkedHashSet<MediaType>();
 
-    private final Set<AvFileFormat> locationFormats = new HashSet<AvFileFormat>();
+    private final Set<AvFileFormat> locationFormats = new LinkedHashSet<AvFileFormat>();
 
-    private final Set<AvType> avTypes               = new HashSet<AvType>();
+    private final Set<AvType> avTypes               = new LinkedHashSet<AvType>();
 
-    private final Set<String> descendants           = new HashSet<String>();
+    private final Set<String> descendants           = new LinkedHashSet<String>();
 
-    private final Set<String> broadcasters          = new HashSet<String>();
+    private final Set<String> broadcasters          = new LinkedHashSet<String>();
 
     private String mainTitle;
 
-    private String documentType;
-
-    public static final String DOCUMENT_TYPE_PROGRAM = "program";
-    public static final String DOCUMENT_TYPE_GROUP = "group";
+    private MediaObjectType documentType;
 
     public DocumentSearchFilter() {
         super(BooleanOp.AND);
@@ -74,15 +80,19 @@ public final class DocumentSearchFilter extends SearchFilter<MediaObject, Docume
         return this;
     }
 
-    public DocumentSearchFilter setDocumentType(String documentType) {
+    public DocumentSearchFilter setDocumentType(MediaObjectType documentType) {
         this.documentType = documentType;
         return this;
     }
 
     @Override
-    public boolean evaluate(MediaObject object) {
-        if ("program".equals(this.documentType) && (!(object instanceof Program))) return false;
-        if ("segment".equals(this.documentType) && (!(object instanceof Segment))) return false;
+    public boolean evaluate(Object o) {
+        if (! (o instanceof MediaObject)) return false;
+        MediaObject object = (MediaObject) o;
+
+        if (this.documentType != null) {
+            if (! this.documentType.isInstance(object)) return false;
+        }
         if (! avTypes.isEmpty()) {
             if (! avTypes.contains(object.getAvType())) return false;
         }
@@ -90,14 +100,17 @@ public final class DocumentSearchFilter extends SearchFilter<MediaObject, Docume
         if (!locationFormats.isEmpty()) {
             if (object instanceof Program) {
                 boolean found = false;
-                for (Location location : object.getLocations()) {
-                    if (locationFormats.contains(location.getAvAttributes().getAvFileFormat())) {
-                        found = true;
-                        break;
+                if (object.getLocations() != null) {
+                    for (Location location : object.getLocations()) {
+                        if (locationFormats.contains(location.getAvAttributes().getAvFileFormat())) {
+                            found = true;
+                            break;
+                        }
                     }
                 }
                 if (! found) return false;
             } else {
+                // Hmm, this is actually hardly implementable because the 'location_formats' are only available in solr.
                 // TODO
             }
         }
@@ -106,7 +119,7 @@ public final class DocumentSearchFilter extends SearchFilter<MediaObject, Docume
             for (DescendantRef ref : object.getDescendantOf()) {
                 descendantsOf.add(ref.getUrnRef());
             }
-            if ( Sets.intersection(descendants, descendantsOf).isEmpty()) return false;
+            if (Sets.intersection(descendants, descendantsOf).isEmpty()) return false;
 
         }
         if (!mediaTypes.isEmpty()) {
@@ -152,7 +165,7 @@ public final class DocumentSearchFilter extends SearchFilter<MediaObject, Docume
             sb.append("titleMain:" + mainTitle);
         }
 
-        if (StringUtils.isNotBlank(documentType)) {
+        if (documentType != null) {
             sb.append("documentType:" + documentType);
         }
 
@@ -189,7 +202,7 @@ public final class DocumentSearchFilter extends SearchFilter<MediaObject, Docume
         return mainTitle;
     }
 
-    public String getDocumentType() {
+    public MediaObjectType getDocumentType() {
         return documentType;
     }
 

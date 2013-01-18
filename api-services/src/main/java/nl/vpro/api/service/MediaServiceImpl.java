@@ -4,8 +4,10 @@
  */
 package nl.vpro.api.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
@@ -51,6 +53,7 @@ import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
 import nl.vpro.util.Helper;
+import nl.vpro.util.WrappedIterator;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 
@@ -329,18 +332,35 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Iterator<MediaObject> getProfile(String profileName) {
+    public Iterator<MediaSearchResultItem> getProfile(String profileName) {
         try {
             Profile profile = profileService.getProfile(profileName);
-            String urn = profile.getArchiveUrn();
-            URL couchdb = new URL(couchdbUrlprovider.getUrl()
-                + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
-            InputStream inputStream = couchdb.openStream();
-            return new FilteringIterator<MediaObject>(new MediaObjectIterator(new CouchdbViewIterator(inputStream)), profile.createFilterQuery());
+
+            // Implemented with couchdb now
+            // This works, but the location formats for segments are not in couchdb
+            // So it will have to request the program for every segment to fill the result appropriately.
+            // This may be a bit expensive. It probably can also be implemented with solr.
+            return getProfileWithCouchdb(profile);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private Iterator<MediaSearchResultItem> getProfileWithCouchdb(Profile profile) throws IOException {
+        String urn = profile.getArchiveUrn();
+        URL couchdb = new URL(couchdbUrlprovider.getUrl()
+            + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
+        InputStream inputStream = couchdb.openStream();
+        Iterator<MediaObject> iterator = new FilteringIterator<MediaObject>(new MediaObjectIterator(new CouchdbViewIterator(inputStream)), profile.createFilterQuery());
+        return new WrappedIterator<MediaObject, MediaSearchResultItem>(iterator) {
+            @Override
+            public MediaSearchResultItem next() {
+                return conversionService.convert(
+                    wrapped.next(),
+                    MediaSearchResultItem.class);
+            }
+        };
     }
 
     public void setGlobalMaxResult(int globalMaxResult) {
