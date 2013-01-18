@@ -1,5 +1,7 @@
 package nl.vpro.api.service.search.fiterbuilder;
 
+import com.google.common.base.Predicate;
+
 /**
  * MM: See comments in {@link DocumentSearchFilter}
  * Date: 19-3-12
@@ -7,7 +9,7 @@ package nl.vpro.api.service.search.fiterbuilder;
  *
  * @author Ernst Bunders
  */
-public abstract class SearchFilter<T extends SearchFilter> {
+public abstract class SearchFilter<T extends SearchFilter>  implements Predicate<Object> {
 
     private BooleanOp booleanOp;
 
@@ -29,8 +31,6 @@ public abstract class SearchFilter<T extends SearchFilter> {
     public abstract String createQueryString();
 
     protected abstract T getInstance();
-
-    public abstract boolean evaluate(Object object);
 
 
     @Override

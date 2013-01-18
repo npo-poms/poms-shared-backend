@@ -1,4 +1,4 @@
-package nl.vpro.api.util;
+package nl.vpro.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -6,9 +6,8 @@ import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.UnmodifiableIterator;
-
-import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 
 /**
  * @author Michiel Meeuwissen
@@ -20,11 +19,11 @@ public class FilteringIterator<T> extends UnmodifiableIterator<T> {
 
 
     private final Iterator<T> wrapped;
-    private final SearchFilter filter;
+    private final Predicate<T> filter;
 
     private T next;
 
-    public FilteringIterator(Iterator<T> wrapped, SearchFilter filter) {
+    public FilteringIterator(Iterator<T> wrapped, Predicate<T> filter) {
         this.wrapped = wrapped;
         this.filter = filter;
     }
@@ -58,6 +57,6 @@ public class FilteringIterator<T> extends UnmodifiableIterator<T> {
     }
 
     private boolean inFilter(T object) {
-        return filter == null || filter.evaluate(object);
+        return filter == null || filter.apply(object);
     }
 }

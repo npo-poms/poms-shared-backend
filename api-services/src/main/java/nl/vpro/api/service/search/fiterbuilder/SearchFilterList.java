@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Ernst Bunders
  */
-public final class SearchFilterList extends SearchFilter<SearchFilterList> {
+public final class SearchFilterList extends SearchFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchFilterList.class);
 
@@ -23,7 +23,7 @@ public final class SearchFilterList extends SearchFilter<SearchFilterList> {
         super(booleanOp);
     }
 
-    public SearchFilterList addQuery(SearchFilter mediaSearchQuery) {
+    public SearchFilterList addQuery(SearchFilter<?> mediaSearchQuery) {
         searchFilters.add(mediaSearchQuery);
         return this;
     }
@@ -61,16 +61,16 @@ public final class SearchFilterList extends SearchFilter<SearchFilterList> {
     }
 
     @Override
-    public boolean evaluate(Object object) {
+    public boolean apply(Object object) {
         switch(getBooleanOp()) {
             case AND:
-                for (SearchFilter filter : getMediaSearchQueries()) {
-                    if (! filter.evaluate(object)) return false;
+                for (SearchFilter<?> filter : getMediaSearchQueries()) {
+                    if (! filter.apply(object)) return false;
                 }
                 return true;
             case OR:
-                for (SearchFilter filter : getMediaSearchQueries()) {
-                    if (filter.evaluate(object)) return true;
+                for (SearchFilter<?> filter : getMediaSearchQueries()) {
+                    if (filter.apply(object)) return true;
                 }
                 return false;
             default:

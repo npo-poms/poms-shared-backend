@@ -9,6 +9,7 @@ import org.junit.Test;
 import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
+import nl.vpro.util.FilteringIterator;
 
 import static org.junit.Assert.assertNotNull;
 

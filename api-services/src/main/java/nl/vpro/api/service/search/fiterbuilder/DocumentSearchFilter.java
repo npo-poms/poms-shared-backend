@@ -86,7 +86,7 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
     }
 
     @Override
-    public boolean evaluate(Object o) {
+    public boolean apply(Object o) {
         if (! (o instanceof MediaObject)) return false;
         MediaObject object = (MediaObject) o;
 

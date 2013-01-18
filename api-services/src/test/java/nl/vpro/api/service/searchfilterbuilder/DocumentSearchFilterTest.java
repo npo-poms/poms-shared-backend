@@ -69,23 +69,23 @@ public class DocumentSearchFilterTest {
     }
 
     @Test
-    public void evaluate() {
+    public void apply() {
         DocumentSearchFilter q = new DocumentSearchFilter();
         Program program = new Program();
         q.setDocumentType(MediaObjectType.group);
-        assertFalse(q.evaluate(program));
+        assertFalse(q.apply(program));
         q.setDocumentType(MediaObjectType.program);
-        assertTrue(q.evaluate(program));
+        assertTrue(q.apply(program));
 
         q.addAvType(AvType.AUDIO);
-        assertFalse(q.evaluate(program));
+        assertFalse(q.apply(program));
         program.setAvType(AvType.VIDEO);
-        assertFalse(q.evaluate(program));
+        assertFalse(q.apply(program));
         program.setAvType(AvType.AUDIO);
-        assertTrue(q.evaluate(program));
+        assertTrue(q.apply(program));
 
         q.addLocationFormat(AvFileFormat.MP3);
-        assertFalse(q.evaluate(program));
+        assertFalse(q.apply(program));
         program.setLocations(Arrays.asList(new Location()));
     }
 
