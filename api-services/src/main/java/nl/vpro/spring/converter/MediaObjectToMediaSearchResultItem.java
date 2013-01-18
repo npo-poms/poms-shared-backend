@@ -27,6 +27,8 @@ public class MediaObjectToMediaSearchResultItem implements Converter<MediaObject
         value.setAvType(source.getAvType().toString());
         value.setBroadcaster(source.getBroadcasters());
         value.setCreationDate(source.getCreationDate());
+        value.setLastModified(source.getLastModified());
+
         if (source.getDescriptions().size() > 0) {
             value.setDescription(source.getDescriptions().get(0).getValue());
         }
