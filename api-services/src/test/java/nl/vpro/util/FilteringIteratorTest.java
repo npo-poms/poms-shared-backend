@@ -1,15 +1,15 @@
-package nl.vpro.api.util;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Iterator;
-
-import org.junit.Test;
+package nl.vpro.util;
 
 import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
-import nl.vpro.util.FilteringIterator;
+import nl.vpro.api.util.CouchdbViewIterator;
+import nl.vpro.api.util.MediaObjectIterator;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Iterator;
 
 import static org.junit.Assert.assertNotNull;
 
