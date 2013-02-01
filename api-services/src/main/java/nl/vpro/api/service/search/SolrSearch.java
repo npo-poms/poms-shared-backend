@@ -1,7 +1,15 @@
 package nl.vpro.api.service.search;
 
-import java.util.List;
-
+import nl.vpro.api.domain.media.search.MediaType;
+import nl.vpro.api.service.Profile;
+import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
+import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.transfer.GenericSearchResult;
+import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.util.SolrQueryBuilder;
+import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -13,16 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 
-import nl.vpro.api.domain.media.search.MediaType;
-import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.TagFilter;
-import nl.vpro.api.transfer.GenericSearchResult;
-import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
-import nl.vpro.api.util.SolrQueryBuilder;
-import nl.vpro.util.rs.error.ServerErrorException;
+import java.util.List;
 
 /**
  * This is the solr implementation of the search interface.
@@ -108,7 +107,7 @@ public class SolrSearch extends AbstractSearch {
             if (response.getResults().getNumFound() == 1) {
                 return (String) response.getResults().get(0).getFieldValue("urn");
             } else {
-                throw new ServerErrorException("Can not find archive with name " + archiveName + " in Solr, no or too many results");
+                throw new ServerErrorException("Can not find archive with name " + archiveName + " in Solr. Because number of results for " + archiveName + " is not 1, but  " + response.getResults().getNumFound());
             }
         } catch (SolrServerException e) {
             throw new ServerErrorException("Something went wrong connecting to Solr service.", e);
