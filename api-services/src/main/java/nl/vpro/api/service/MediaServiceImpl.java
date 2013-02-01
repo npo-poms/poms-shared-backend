@@ -139,9 +139,9 @@ public class MediaServiceImpl implements MediaService {
         try {
             return responseFuture.get().toString();
         } catch (InterruptedException e) {
-            throw new ServerErrorException("something went wrong executing ES query [" + query + "] on index " + index + ": " + e.getMessage());
+            throw new ServerErrorException("Interrupted while executing ES query [" + query + "] on index " + index + ": " + e.getMessage());
         } catch (ExecutionException e) {
-            throw new ServerErrorException("something went wrong executing ES query [" + query + "] on index " + index + ": " + e.getMessage());
+            throw new ServerErrorException("something went wrong executing ES query [" + query + "] on index " + index + ": " + e.getMessage(), e);
         }
     }
 
@@ -157,7 +157,7 @@ public class MediaServiceImpl implements MediaService {
             ResponseEntity<Program> programResponseEntity = restTemplate.getForEntity("{base}/{urn}", Program.class, couchdbUrlprovider.getUrl(), urn);
             return programResponseEntity.getBody();
         } catch (HttpServerErrorException e) {
-            throw new ServerErrorException(e.getMessage(), e);
+            throw new ServerErrorException(couchdbUrlprovider.getUrl() + ": " + e.getMessage(), e);
         } catch (ResourceAccessException e1) {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
@@ -297,7 +297,7 @@ public class MediaServiceImpl implements MediaService {
             }
             return group;
         } catch (HttpServerErrorException e) {
-            throw new ServerErrorException(e.getMessage(), e);
+            throw new ServerErrorException(couchdbUrlprovider.getUrl() + ": " + e.getMessage(), e);
         } catch (ResourceAccessException e1) {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
@@ -320,7 +320,7 @@ public class MediaServiceImpl implements MediaService {
             ResponseEntity<Segment> segmentResponseEntity = restTemplate.getForEntity("{base}/{urn}", Segment.class, couchdbUrlprovider.getUrl(), urn);
             return segmentResponseEntity.getBody();
         } catch (HttpServerErrorException e) {
-            throw new ServerErrorException(e.getMessage(), e);
+            throw new ServerErrorException(couchdbUrlprovider.getUrl() + ": " + e.getMessage(), e);
         } catch (ResourceAccessException e1) {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
@@ -348,6 +348,34 @@ public class MediaServiceImpl implements MediaService {
 
     }
 
+    /* hackaton
+    @Override
+    public List<Subtitle> searchSubtitles(String urn, String term) {
+        SearchRequest searchRequest = new SearchRequest("subtitles");
+
+        String query = "{\"query\":{\"bool\":{\"must\":[{\"wildcard\":{\"urn\":\"urn:vpro:media:*\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":50,\"sort\":[],\"facets\":{}}\"";
+
+        searchRequest
+                .searchType(SearchType.DEFAULT)
+                .source(query.getBytes())
+        ;
+
+        ActionFuture<SearchResponse> responseFuture = esClient.search(searchRequest);
+
+        try {
+            SearchResponse response = responseFuture.get();
+            System.out.println("response" + response);
+            //return response.getHits();
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage(), e);
+        } catch (ExecutionException e) {
+            LOG.error(e.getMessage(), e);
+        }
+
+        return Collections.<Subtitle>emptyList();
+
+    }
+    */
     private Iterator<MediaSearchResultItem> getProfileWithCouchdb(Profile profile) throws IOException {
         String urn = profile.getArchiveUrn();
         URL couchdb = new URL(couchdbUrlprovider.getUrl()
