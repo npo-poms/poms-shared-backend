@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.ConversionService;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -90,15 +91,18 @@ public class ESSearch extends AbstractSearch {
 
     private SearchSourceBuilder createBasicQuery(String term, TagFilter tagFilter, Profile profile, Integer offset, Integer maxResult) {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+        SearchFieldsQueryBuilder searchFieldsQueryBuilder;
 
         // handle the profile
-        if (profile != null && profile.createFilterQuery() != null) {
-
-//            searchBuilder.filter(termFilter("broadcasters", "vpro"));
-            searchBuilder.filter(new ProfileFilterBuilder(profile));
+        if (profile != null) {
+            if (profile.createFilterQuery() != null) {
+                searchBuilder.filter(new ProfileFilterBuilder(profile));
+            }
+            searchFieldsQueryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), term);
+        } else {
+            searchFieldsQueryBuilder = new SearchFieldsQueryBuilder(Collections.<String>emptyList(), Collections.<Float>emptyList(), term);
         }
 
-        SearchFieldsQueryBuilder searchFieldsQueryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), term);
         // handle the tags
         if (tagFilter != null && tagFilter.hasTags()) {
             for (String tag : tagFilter.getTags()) {
