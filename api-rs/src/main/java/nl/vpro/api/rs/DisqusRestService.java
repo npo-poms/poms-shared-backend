@@ -14,13 +14,11 @@ import javax.ws.rs.core.MediaType;
  */
 @Path(DisqusRestService.PATH)
 public interface DisqusRestService {
-	public static final String PATH = "disqus";
+    public static final String PATH = "disqus";
 
-
-	@GET
-	@Path("details/{ids}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public JSONArray getDetails(@PathParam("ids") String ... ids);
-
+    @GET
+    @Path("details/{ids}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public JSONArray getDetails(@PathParam("ids") String... ids);
 
 }

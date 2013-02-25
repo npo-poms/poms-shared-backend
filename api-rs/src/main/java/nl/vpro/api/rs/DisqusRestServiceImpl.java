@@ -10,23 +10,23 @@ import org.springframework.stereotype.Controller;
  * @since 1.4
  */
 @Controller
-public class DisqusRestServiceImpl implements DisqusRestService{
+public class DisqusRestServiceImpl implements DisqusRestService {
 
-	//@Resource(name = "threadDetailsCache")
-	Cache cache;
+    //@Resource(name = "threadDetailsCache")
+    Cache cache;
 
-	@Override
-	public JSONArray getDetails(String... ids) {
-		JSONArray array = new JSONArray();
-		for (String id : ids) {
-			array.put(getDetailsForOneThread(id));
-		}
-		return array;
-	}
+    @Override
+    public JSONArray getDetails(String... ids) {
+        JSONArray array = new JSONArray();
+        for (String id : ids) {
+            array.put(getDetailsForOneThread(id));
+        }
+        return array;
+    }
 
 
-	private JSONObject getDetailsForOneThread(String id) {
-		return new JSONObject();
-	}
+    private JSONObject getDetailsForOneThread(String id) {
+        return new JSONObject();
+    }
 
 }
