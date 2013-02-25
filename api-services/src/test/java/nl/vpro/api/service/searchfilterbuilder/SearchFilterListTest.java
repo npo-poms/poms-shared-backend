@@ -1,5 +1,6 @@
 package nl.vpro.api.service.searchfilterbuilder;
 
+import nl.vpro.api.service.search.fiterbuilder.FieldFilter;
 import org.junit.Test;
 
 import nl.vpro.api.domain.media.AvType;
@@ -90,5 +91,10 @@ public class SearchFilterListTest {
         ql.addQuery(q);
         ql.setQueryString("test");
         assertEquals("((avType:AUDIO AND titleMain:titles) AND (avType:AUDIO AND titleMain:titles)) test", ql.createQueryString());
+
+        ql = new SearchFilterList(BooleanOp.AND);
+        ql.addQuery(q);
+        ql.addQuery(new FieldFilter().setField("title","testje"));
+        assertEquals("((avType:AUDIO AND titleMain:titles) AND title:testje)",ql.createQueryString());
     }
 }

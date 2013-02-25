@@ -98,7 +98,7 @@ public class ESSearch extends AbstractSearch {
             searchBuilder.filter(new ProfileFilterBuilder(profile));
         }
 
-        SearchFieldsQueryBuilder searchFieldsQueryBuilder = new SearchFieldsQueryBuilder(getSearchFields(), getSearchFieldBoosting(), term);
+        SearchFieldsQueryBuilder searchFieldsQueryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), term);
         // handle the tags
         if (tagFilter != null && tagFilter.hasTags()) {
             for (String tag : tagFilter.getTags()) {

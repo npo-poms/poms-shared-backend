@@ -1,16 +1,13 @@
 package nl.vpro.api.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.support.MediaObjectType;
-import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
-import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
+import nl.vpro.api.service.search.fiterbuilder.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -42,14 +39,13 @@ public enum Profile {
                 .addQuery(documentTypes)
                 .addQuery(contentRules);
         }
-        @Override
         public List<String> getSearchFields() {
-            return new ArrayList<String>();
+            return Arrays.asList("title", "subTitle", "description", "programTitles", "genres", "tags");
         }
 
         @Override
         public List<Float> getSearchBoosting() {
-            return new ArrayList<Float>();
+            return Arrays.asList(3.0f, 2.0f, 1.5f, 2.0f, 1.0f, 1.0f);
         }
     },
 
@@ -74,12 +70,12 @@ public enum Profile {
     WETENSCHAP24("wetenschap24", "", "w24") {
         @Override
         public SearchFilter createFilterQuery() {
-            return null;
+            return new FieldFilter().setField("brand_title","wetenschap");
         }
 
         @Override
         public List<String> getSearchFields() {
-            return (Arrays.asList("title", "subtitle", "summary", "body", "extra_field_nl_vpro_page_type","extra_field_nl_vpro_subsite", "persons", "genre", "keywords"));
+            return Arrays.asList("title", "subtitle", "summary", "body", "extra_field_nl_vpro_page_type","extra_field_nl_vpro_subsite", "persons", "genre", "keywords");
         }
 
         @Override
