@@ -13,6 +13,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.FilteredQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.parboiled.common.StringUtils;
@@ -172,14 +173,10 @@ public class ESSearch extends AbstractSearch {
         SearchRequest request = createRequest(profile);
         SearchSourceBuilder searchBuilder = new OrderedSearchSourceBuilder(sortFields);
 
-
         // handle the profile
+        ProfileFilterBuilder profileFilter=null;
         if (profile.createFilterQuery() != null) {
-            searchBuilder.filter(new ProfileFilterBuilder(profile));
-        }
-
-        for (String stringFacet : facets) {
-            searchBuilder.facet(FacetBuilders.termsFacet(stringFacet).field(stringFacet).size(facetLimit));
+            profileFilter = new ProfileFilterBuilder(profile);
         }
 
         BoolQueryBuilder queryBuilder;
@@ -192,7 +189,12 @@ public class ESSearch extends AbstractSearch {
             queryBuilder.must(new MultiQueryStringConstraintBuilder(constraints));
         }
 
-        searchBuilder.query(queryBuilder);
+        searchBuilder.query(new FilteredQueryBuilder(queryBuilder,profileFilter));
+
+        for (String stringFacet : facets) {
+            searchBuilder.facet(FacetBuilders.termsFacet(stringFacet).field(stringFacet).size(facetLimit));
+        }
+
         //handle paging
         if (offset != null) {
             searchBuilder.from(offset);
