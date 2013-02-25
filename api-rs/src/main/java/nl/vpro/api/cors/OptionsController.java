@@ -22,12 +22,12 @@ public class OptionsController {
      * Mention all RESTable URLs here. In this way, only RESTable Urls are intercepted,
      * such that /index.html remains accessible.
      */
-    public static final String PATH
-            = "{path : (" + MediaRestService.PATH +
-            "|" + UGCRestService.PATH +
-            "|" + SiteRestService.PATH +
-            "|" + DisqusRestService.PATH +
-            ")/.*}";
+    public static final String PATH =
+        "{path : (" + MediaRestService.PATH +
+        "|" + UGCRestService.PATH +
+        "|" + SiteRestService.PATH +
+        "|" + DisqusRestService.PATH +
+        ")/.*}";
 
     @OPTIONS
     public String options() {
