@@ -1,13 +1,13 @@
 package nl.vpro.api.service.search;
 
-import java.util.List;
-
 import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.util.rs.error.ServerErrorException;
+
+import java.util.List;
 
 /**
  * this class abstracts the building of search queries, so we can have different implementations (i.e. Solr and ElasticSearch)
@@ -50,7 +50,7 @@ public interface Search {
      * @return
      * @throws ServerErrorException
      */
-    MediaSearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit) throws ServerErrorException;
+    SearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, List<String> constraints, Integer minOccurrence, Integer limit) throws ServerErrorException;
 
     /**
      * Some profiles use a (poms) archive as constraint (i.e. all content belonging to..)
@@ -60,8 +60,6 @@ public interface Search {
      */
 
     String findArchiveId(String archiveName) throws ServerErrorException;
-
-    MediaSearchSuggestions suggest(Profile profile, String queryString, List<String> constraints, Integer minOccurrence, Integer Limit) throws ServerErrorException;
 
     GenericSearchResult search(Profile profile, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException;
 }

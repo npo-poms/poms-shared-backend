@@ -1,7 +1,7 @@
 package nl.vpro.spring.converter;
 
-import nl.vpro.api.transfer.MediaSearchSuggestion;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestion;
+import nl.vpro.api.transfer.SearchSuggestions;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.core.convert.converter.Converter;
@@ -12,10 +12,10 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Ernst Bunders
  */
-public class QueryResponseToSearchSuggestionsConverter implements Converter<QueryResponse, MediaSearchSuggestions> {
+public class QueryResponseToSearchSuggestionsConverter implements Converter<QueryResponse, SearchSuggestions> {
     @Override
-    public MediaSearchSuggestions convert(QueryResponse queryResponse) {
-        MediaSearchSuggestions suggestions = new MediaSearchSuggestions();
+    public SearchSuggestions convert(QueryResponse queryResponse) {
+        SearchSuggestions suggestions = new SearchSuggestions();
 
         for (FacetField facetField: queryResponse.getFacetFields()) {
             if (facetField != null && facetField.getValues() != null) {
@@ -23,7 +23,7 @@ public class QueryResponseToSearchSuggestionsConverter implements Converter<Quer
                     if (suggestionPresent(suggestions, count.getName())) {
                         mergeSuggestion(suggestions, count);
                     } else {
-                        suggestions.addSuggestion(new MediaSearchSuggestion(count.getName(), count.getCount()));
+                        suggestions.addSuggestion(new SearchSuggestion(count.getName(), count.getCount()));
                     }
                 }
             }
@@ -31,17 +31,17 @@ public class QueryResponseToSearchSuggestionsConverter implements Converter<Quer
         return suggestions;
     }
 
-    private void mergeSuggestion(MediaSearchSuggestions suggestions, FacetField.Count count) {
-        MediaSearchSuggestion suggestion = findSuggestion(suggestions, count.getName());
+    private void mergeSuggestion(SearchSuggestions suggestions, FacetField.Count count) {
+        SearchSuggestion suggestion = findSuggestion(suggestions, count.getName());
         suggestion.setOccurrence(suggestion.getOccurrence() + count.getCount());
     }
 
-    private boolean suggestionPresent(MediaSearchSuggestions suggestions, String name) {
+    private boolean suggestionPresent(SearchSuggestions suggestions, String name) {
         return findSuggestion(suggestions, name) != null;
     }
 
-    private MediaSearchSuggestion findSuggestion(MediaSearchSuggestions suggestions, String name) {
-        for (MediaSearchSuggestion suggestion : suggestions.getSuggestions()) {
+    private SearchSuggestion findSuggestion(SearchSuggestions suggestions, String name) {
+        for (SearchSuggestion suggestion : suggestions.getSuggestions()) {
             if (suggestion.getValue().equals(name)) {
                 return suggestion;
             }

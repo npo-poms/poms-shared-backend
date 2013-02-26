@@ -6,7 +6,7 @@ import nl.vpro.api.service.search.es.*;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
@@ -64,30 +64,38 @@ public class ESSearch extends AbstractSearch {
         return executeQuery(request, offset, MediaSearchResult.class);
     }
 
-
     @Override
-    public MediaSearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit) throws ServerErrorException {
+    public SearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, List<String> constraints, Integer minOccurrence, Integer limit) throws ServerErrorException {
+        if (StringUtils.isEmpty(profile.getIndexName())) {
+            throw new ServerErrorException("No index available for the profile " + profile.getName());
+        }
         SearchRequest request = createRequest(profile);
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+
         // handle the profile
+        ProfileFilterBuilder profileFilterBuilder = null;
         if (profile.createFilterQuery() != null) {
-            searchBuilder.filter(new ProfileFilterBuilder(profile));
+            profileFilterBuilder = new ProfileFilterBuilder(profile);
         }
 
         searchBuilder.facet(new SuggestionFacetBuilder(profile, "suggestions", term, limit));
 
         SearchFieldsQueryBuilder queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), term);
+
         if (tagFilter != null && tagFilter.hasTags()) {
             for (String tag : tagFilter.getTags()) {
                 queryBuilder.should(termQuery("tags", tag));
             }
         }
-        searchBuilder.query(queryBuilder);
 
-        request.types("poms");
+        if (constraints.size() > 0) {
+            queryBuilder.must(new MultiQueryStringConstraintBuilder(constraints));
+        }
+
+        searchBuilder.query(new FilteredQueryBuilder(queryBuilder, profileFilterBuilder));
         request.source(searchBuilder);
 
-        return executeQuery(request, 0, MediaSearchSuggestions.class);
+        return executeQuery(request, 0, SearchSuggestions.class);
     }
 
     private SearchSourceBuilder createBasicQuery(String term, TagFilter tagFilter, Profile profile, Integer offset, Integer maxResult) {
@@ -140,32 +148,6 @@ public class ESSearch extends AbstractSearch {
     }
 
     @Override
-    public MediaSearchSuggestions suggest(Profile profile, String queryString, List<String> constraints, Integer minOccurrence, Integer Limit) throws ServerErrorException {
-        if (StringUtils.isEmpty(profile.getIndexName())) {
-            throw new ServerErrorException("No index available for the profile " + profile.getName());
-        }
-        SearchRequest request = createRequest(profile);
-        SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
-
-        // handle the profile
-        if (profile.createFilterQuery() != null) {
-            searchBuilder.filter(new ProfileFilterBuilder(profile));
-        }
-
-        searchBuilder.facet(new SuggestionFacetBuilder(profile, "suggestions", queryString, Limit));
-
-        SearchFieldsQueryBuilder queryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), queryString);
-        if (constraints.size() > 0) {
-            queryBuilder.must(new MultiQueryStringConstraintBuilder(constraints));
-        }
-
-        searchBuilder.query(queryBuilder);
-        request.source(searchBuilder);
-
-        return executeQuery(request, 0, MediaSearchSuggestions.class);
-    }
-
-    @Override
     public GenericSearchResult search(Profile profile, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException {
         if (StringUtils.isEmpty(profile.getIndexName())) {
             throw new ServerErrorException("No index available for the profile " + profile.getName());
@@ -174,7 +156,7 @@ public class ESSearch extends AbstractSearch {
         SearchSourceBuilder searchBuilder = new OrderedSearchSourceBuilder(sortFields);
 
         // handle the profile
-        ProfileFilterBuilder profileFilter=null;
+        ProfileFilterBuilder profileFilter = null;
         if (profile.createFilterQuery() != null) {
             profileFilter = new ProfileFilterBuilder(profile);
         }
@@ -189,7 +171,7 @@ public class ESSearch extends AbstractSearch {
             queryBuilder.must(new MultiQueryStringConstraintBuilder(constraints));
         }
 
-        searchBuilder.query(new FilteredQueryBuilder(queryBuilder,profileFilter));
+        searchBuilder.query(new FilteredQueryBuilder(queryBuilder, profileFilter));
 
         for (String stringFacet : facets) {
             searchBuilder.facet(FacetBuilders.termsFacet(stringFacet).field(stringFacet).size(facetLimit));

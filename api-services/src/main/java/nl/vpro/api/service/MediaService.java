@@ -14,7 +14,7 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItem;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.util.rs.error.ServerErrorException;
@@ -27,7 +27,7 @@ public interface MediaService {
 
     MediaSearchResult search(String query, TagFilter tagFilter, String profile, Integer offset, Integer maxResult) throws ServerErrorException;
 
-    MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile) throws ServerErrorException;
+    SearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profile) throws ServerErrorException;
 
     String searchES(String index, String[] types, String query) throws ServerErrorException;
 

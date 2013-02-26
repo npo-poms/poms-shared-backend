@@ -5,8 +5,8 @@
 package nl.vpro.spring.converter;
 
 import nl.vpro.api.service.search.es.SearchResponseExtender;
-import nl.vpro.api.transfer.MediaSearchSuggestion;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestion;
+import nl.vpro.api.transfer.SearchSuggestions;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.facet.Facet;
 import org.elasticsearch.search.facet.terms.strings.InternalStringTermsFacet;
@@ -18,22 +18,22 @@ import java.util.Map;
  * User: rico
  * Date: 03/12/2012
  */
-public class ESSearchResponseToMediaSearchSuggestionConverter implements Converter<SearchResponseExtender, MediaSearchSuggestions> {
+public class ESSearchResponseToSearchSuggestionConverter implements Converter<SearchResponseExtender, SearchSuggestions> {
     @Override
-    public MediaSearchSuggestions convert(SearchResponseExtender responseExtender) {
+    public SearchSuggestions convert(SearchResponseExtender responseExtender) {
         final SearchResponse response = responseExtender.searchResponse();
-        MediaSearchSuggestions mediaSearchSuggestions = new MediaSearchSuggestions();
+        SearchSuggestions searchSuggestions = new SearchSuggestions();
         if (response.getFacets() != null) {
             for (Map.Entry<String, Facet> facets : response.getFacets().getFacets().entrySet()) {
                 Facet facet = facets.getValue();
                 if (facet instanceof InternalStringTermsFacet) {
                     for (InternalStringTermsFacet.StringEntry stringEntry : ((InternalStringTermsFacet) facet).entries()) {
-                        MediaSearchSuggestion mediaSearchSuggestion = new MediaSearchSuggestion(stringEntry.getTerm(),Long.valueOf(stringEntry.getCount()));
-                        mediaSearchSuggestions.addSuggestion(mediaSearchSuggestion);
+                        SearchSuggestion searchSuggestion = new SearchSuggestion(stringEntry.getTerm(),Long.valueOf(stringEntry.getCount()));
+                        searchSuggestions.addSuggestion(searchSuggestion);
                     }
                 }
             }
         }
-        return mediaSearchSuggestions;
+        return searchSuggestions;
     }
 }

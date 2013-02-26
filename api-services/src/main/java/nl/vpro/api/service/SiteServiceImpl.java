@@ -6,8 +6,7 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.service.search.Search;
 import nl.vpro.api.transfer.GenericSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
-import org.elasticsearch.search.facet.FacetBuilders;
+import nl.vpro.api.transfer.SearchSuggestions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,9 +47,9 @@ public class SiteServiceImpl implements SiteService {
     }
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints) {
+    public SearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints) {
         Profile profile=profileService.getProfile(profileName);
-        MediaSearchSuggestions suggestions=search.suggest(profile, queryString,constraints, suggestionsMinOccurrence, suggestionsLimit);
-        return suggestions;  //To change body of implemented methods use File | Settings | File Templates.
+        SearchSuggestions suggestions=search.suggest(profile, queryString, null, constraints, suggestionsMinOccurrence, suggestionsLimit);
+        return suggestions;
     }
 }

@@ -7,7 +7,7 @@ import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.util.SolrQueryBuilder;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
@@ -64,15 +64,19 @@ public class SolrSearch extends AbstractSearch {
     }
 
     @Override
-    public MediaSearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, Integer minOccurrence, Integer limit) {
+    public SearchSuggestions suggest(Profile profile, String term, TagFilter tagFilter, List<String> constraints, Integer minOccurrence, Integer limit) {
         SolrQuery solrQuery = solrQueryBuilder.build();
         setFilterQuery(profile, solrQuery);
         solrQuery.setQuery(createSearchQuery(createTermQuery(""), createTagsQuery(tagFilter)));
         setFacetFields(term, minOccurrence, limit, solrQuery);
         QueryResponse response = null;
+
+        if (constraints!=null && constraints.size()>0) {
+            log.warn("Contraints are set, but will not be handled by this implementation");
+        }
         try {
             response = solrServer.query(solrQuery);
-            return conversionService.convert(response, MediaSearchSuggestions.class);
+            return conversionService.convert(response, SearchSuggestions.class);
         } catch (SolrServerException e) {
             throw new ServerErrorException("Something went wrong submitting search suggestions query to solr: " + e.getMessage(), e);
         }
@@ -222,11 +226,6 @@ public class SolrSearch extends AbstractSearch {
             lqp = "\"" + aString + "\"";
         }
         return lqp;
-    }
-
-    @Override
-    public MediaSearchSuggestions suggest(Profile profile, String queryString, List<String> constraints, Integer minOccurrence, Integer Limit) throws ServerErrorException {
-        throw new UnsupportedOperationException("Not implemented");
     }
 
     @Override

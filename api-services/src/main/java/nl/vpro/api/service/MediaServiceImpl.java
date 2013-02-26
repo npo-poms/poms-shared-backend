@@ -120,9 +120,9 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) throws ServerErrorException {
+    public SearchSuggestions searchSuggestions(String query, TagFilter tagFilter, String profileName) throws ServerErrorException {
         Profile profile = profileService.getProfile(profileName);
-        return search.suggest(profile, query, tagFilter, suggestionsMinOccurrence, suggestionsLimit);
+        return search.suggest(profile, query, tagFilter, Collections.<String>emptyList(), suggestionsMinOccurrence, suggestionsLimit);
     }
 
     @Override
