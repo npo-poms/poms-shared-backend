@@ -6,7 +6,6 @@ package nl.vpro.api.rs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -29,7 +28,6 @@ import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.*;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.transfer.ugc.annotation.Annotations;
-import nl.vpro.util.WrappedIterator;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 
@@ -166,13 +164,13 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String termPrefix, String tags) {
+    public SearchSuggestions searchSuggestions(String termPrefix, String tags) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
         return mediaService.searchSuggestions(termPrefix, tagFilter, "");
     }
 
     @Override
-    public MediaSearchSuggestions searchSuggestionsWithProfile(String queryString, String tags, String profileName) {
+    public SearchSuggestions searchSuggestionsWithProfile(String queryString, String tags, String profileName) {
         TagFilter tagFilter = createFilter(tags, BooleanOp.OR);
         return mediaService.searchSuggestions(queryString, tagFilter, profileName);
     }

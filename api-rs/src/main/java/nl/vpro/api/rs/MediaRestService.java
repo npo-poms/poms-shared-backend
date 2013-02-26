@@ -11,7 +11,7 @@ import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItemIterator;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
@@ -162,17 +162,17 @@ public interface MediaRestService {
     @GET
     @Path("search/suggest")
     @Produces(MediaType.APPLICATION_JSON)
-    public MediaSearchSuggestions searchSuggestions(@QueryParam("q") String termPrefix, @QueryParam("tags") String tags);
+    public SearchSuggestions searchSuggestions(@QueryParam("q") String termPrefix, @QueryParam("tags") String tags);
 
     /**
      * @param profileName when empty defaults to 'no profile'. @see nl.vpro.api.service.Profile for valid values.
-     * @see nl.vpro.api.transfer.MediaSearchSuggestions
+     * @see nl.vpro.api.transfer.SearchSuggestions
      *      This version of the call lets you search for popular terms within a certain profile.
      */
     @GET
     @Path("search/suggest/{profile}")
     @Produces(MediaType.APPLICATION_JSON)
-    public MediaSearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @PathParam("profile") String profileName);
+    public SearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @PathParam("profile") String profileName);
 
     /**
      * Temporary call added to ease the introduction of Elastic Search support. It allows you to use the full flexibility of the

@@ -5,11 +5,9 @@
 package nl.vpro.api.rs;
 
 import nl.vpro.api.service.SiteService;
-import nl.vpro.api.service.search.Search;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.transfer.GenericSearchResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -29,7 +27,7 @@ public class SiteRestServiceImpl implements SiteRestService {
     }
 
     @Override
-    public MediaSearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints) {
+    public SearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints) {
         return siteService.searchSuggestions(profileName,queryString,constraints);
     }
 }

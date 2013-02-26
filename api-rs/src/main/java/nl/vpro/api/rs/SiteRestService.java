@@ -5,8 +5,7 @@
 package nl.vpro.api.rs;
 
 import nl.vpro.api.transfer.GenericSearchResult;
-import nl.vpro.api.transfer.MediaSearchSuggestions;
-import org.springframework.stereotype.Controller;
+import nl.vpro.api.transfer.SearchSuggestions;
 
 import javax.ws.rs.*;
 import java.util.List;
@@ -28,6 +27,6 @@ public interface SiteRestService {
     @GET
     @Path("{profile}/search/suggest")
     @Produces("application/json")
-    public MediaSearchSuggestions searchSuggestions(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("constraints") List<String> constraints);
+    public SearchSuggestions searchSuggestions(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("constraints") List<String> constraints);
 
 }
