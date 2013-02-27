@@ -1,12 +1,10 @@
 package nl.vpro.api.rs;
 
-import org.json.JSONArray;
+import nl.vpro.api.transfer.DisqusThreadInfo;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
 /**
  * @author Michiel Meeuwissen
@@ -16,9 +14,11 @@ import javax.ws.rs.core.MediaType;
 public interface DisqusRestService {
     public static final String PATH = "disqus";
 
+
     @GET
-    @Path("details/{ids}")
+    @Path("details/{sitename}")
     @Produces(MediaType.APPLICATION_JSON)
-    public JSONArray getDetails(@PathParam("ids") String... ids);
+    public Map<String, DisqusThreadInfo> getDetails(@PathParam("sitename") String siteName, @QueryParam("id") String... ids);
+
 
 }

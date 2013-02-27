@@ -4,17 +4,6 @@
  */
 package nl.vpro.api.rs;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.stereotype.Controller;
-
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.domain.media.Program;
@@ -30,6 +19,16 @@ import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.stereotype.Controller;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Offers REST access to api.service.MediaService
@@ -68,8 +67,6 @@ public class MediaRestServiceImpl implements MediaRestService {
     /**
      * Currently this only fetches the default annotation from the poms segments.
      *
-     * @param urn
-     * @return
      * @throws IllegalArgumentException
      */
     @Override
@@ -176,7 +173,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public String searchES(String index,String query, String typesAsString) {
+    public String searchES(String index, String query, String typesAsString) {
         String[] types = typesAsString.trim().split(" ");
         return mediaService.searchES(index, types, query);
     }
@@ -205,9 +202,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         String urn = mediaObject.getUrn();
         List<MediaObject> relatedMediaObjects = new ArrayList<MediaObject>();
         for (MediaSearchResultItem mediaSearchResultItem : mediaSearchResultItems) {
-            if (maxResult != null && relatedMediaObjects.size() >= maxResult) break; // Since we searched for one more than maxResult, we could already be done
+            if (maxResult != null && relatedMediaObjects.size() >= maxResult)
+                break; // Since we searched for one more than maxResult, we could already be done
             String relatedUrn = mediaSearchResultItem.getUrn();
-            if (! urn.equals(relatedUrn)) {
+            if (!urn.equals(relatedUrn)) {
                 try {
                     MediaObject relatedMediaObject = getMedia(relatedUrn);
                     relatedMediaObjects.add(relatedMediaObject);
