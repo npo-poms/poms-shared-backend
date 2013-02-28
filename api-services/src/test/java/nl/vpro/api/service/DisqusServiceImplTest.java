@@ -150,7 +150,7 @@ public class DisqusServiceImplTest {
 
         DisqusThreadInfo cachedItem = (DisqusThreadInfo) cache.get(site + id).get();
         assertFalse("available cached expired item overwritten with unavailable item",
-                DisqusThreadInfo.infoUnavailable.equals(cachedItem));
+                DisqusThreadInfo.INFO_UNAVAILABLE.equals(cachedItem));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class DisqusServiceImplTest {
 
         DisqusServiceImpl service = runTest(cache, noListener, restOps, noService);
         DisqusThreadInfo cachedInfo = (DisqusThreadInfo) cache.get(site + id).get();
-        assertTrue("We should have the 'unavailable' in the cache", DisqusThreadInfo.infoUnavailable.equals(cachedInfo));
+        assertTrue("We should have the 'unavailable' in the cache", DisqusThreadInfo.INFO_UNAVAILABLE.equals(cachedInfo));
 
         //then run a second request, make sure no RestOperation is called.
         cache = cacheMiss();

@@ -19,14 +19,14 @@ import java.util.concurrent.atomic.AtomicLong;
  * This class fetches data from the Disqus api service.
  * Because we have a limit of 1000 requests per second it relies heavily on caching.
  * For a request there are two possible outcomes: 'available' and 'unavailable. Both outcomes will translate to
- * a {@link DisqusThreadInfo} object. unavailable is reference to {@link DisqusThreadInfo#infoUnavailable}
+ * a {@link DisqusThreadInfo} object. unavailable is reference to {@link DisqusThreadInfo#INFO_UNAVAILABLE}
  * <p/>
  * The caching mechanism treats the outcomes different:
  * - if the outcome is 'available' the cached item will be cached for the number of seconds set with {@link #timeToLiveSeconds}
  * - if the outcome is 'unavailable' the cached item will be cached for the number of seconds set with {@link #unavailableTimeToLiveSeconds}
  * <p/>
  * If the request limit has been reached, the service will lay of sending requests for a time set in seconds
- * with {@link #rateLimitExceededPauzeInSeconds}. During that time all requests will result in {@link DisqusThreadInfo#infoUnavailable}
+ * with {@link #rateLimitExceededPauzeInSeconds}. During that time all requests will result in {@link DisqusThreadInfo#INFO_UNAVAILABLE}
  * <p/>
  * The caching mechanism will not replace 'unavailable' results with 'available' results. in this situation the cached
  * version is reinserted into the cache, to reset the creation time.
@@ -86,10 +86,10 @@ public final class DisqusServiceImpl implements DisqusService {
             } catch (RateLimitExceededException e) {
                 LOG.warn("Rate limit exceeded!");
                 setPause();
-                return DisqusThreadInfo.infoUnavailable;
+                return DisqusThreadInfo.INFO_UNAVAILABLE;
             }
         }
-        return DisqusThreadInfo.infoUnavailable;
+        return DisqusThreadInfo.INFO_UNAVAILABLE;
     }
 
     private boolean shouldUpdateCache(String key, DisqusThreadInfo info) {
@@ -136,7 +136,7 @@ public final class DisqusServiceImpl implements DisqusService {
     }
 
     private boolean isAvailable(DisqusThreadInfo cachedInfo) {
-        return !DisqusThreadInfo.infoUnavailable.equals(cachedInfo);
+        return !DisqusThreadInfo.INFO_UNAVAILABLE.equals(cachedInfo);
     }
 
     private boolean pauseExpired() {
@@ -158,7 +158,7 @@ public final class DisqusServiceImpl implements DisqusService {
 
     /**
      * This method tries to fetch the info from disqus.
-     * It will always return a DisqusThreadInfo instance, it can be {@link DisqusThreadInfo#infoUnavailable}
+     * It will always return a DisqusThreadInfo instance, it can be {@link DisqusThreadInfo#INFO_UNAVAILABLE}
      *
      * @throws RateLimitExceededException when the rate limit is exceeded. We should lay of the requests for a while
      */
@@ -180,7 +180,7 @@ public final class DisqusServiceImpl implements DisqusService {
         } catch (RestClientException e) {
             LOG.error(String.format("Something went wrong fetching info for thread %s in site %s: %s", identifier, siteName, e.getMessage()));
         }
-        return DisqusThreadInfo.infoUnavailable;
+        return DisqusThreadInfo.INFO_UNAVAILABLE;
     }
 
     private boolean rateLimitExceeded(int statusCode) {

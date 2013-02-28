@@ -7,7 +7,7 @@ import nl.vpro.api.transfer.DisqusThreadInfo;
  * - The api limit can be reached. In that case we are going to stop querying the api
  * for a predefined amount of time.
  * - There is no thread for a given id.
- * When this happens {@link DisqusThreadInfo#infoUnavailable} is returned for that id.
+ * When this happens {@link DisqusThreadInfo#INFO_UNAVAILABLE} is returned for that id.
  *
  * @author Ernst Bunders
  */
