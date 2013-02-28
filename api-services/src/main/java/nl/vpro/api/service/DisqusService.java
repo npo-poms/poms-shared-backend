@@ -12,5 +12,5 @@ import nl.vpro.api.transfer.DisqusThreadInfo;
  * @author Ernst Bunders
  */
 public interface DisqusService {
-    public DisqusThreadInfo getThreadInfo(String siteName, String identifier);
+    DisqusThreadInfo getThreadInfo(String siteName, String identifier);
 }
