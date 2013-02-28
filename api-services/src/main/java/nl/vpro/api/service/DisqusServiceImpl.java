@@ -127,7 +127,7 @@ public final class DisqusServiceImpl implements DisqusService {
         final long cacheCreationTime = cacheWrapper.getCreationTime(key).get();
 
         //Expired?
-        if (cacheCreationTime + (1000 * secondsToCacheThis) < System.currentTimeMillis()) {
+        if (System.currentTimeMillis() > cacheCreationTime + (1000 * secondsToCacheThis)) {
             LOG.debug("Cache item {} has expired.", key);
             return true;
         }
