@@ -174,7 +174,10 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public String searchES(String index, String query, String typesAsString) {
-        String[] types = typesAsString.trim().split(" ");
+        String[] types = null;
+        if (typesAsString != null) {
+            types = typesAsString.trim().split(" ");
+        }
         return mediaService.searchES(index, types, query);
     }
 
