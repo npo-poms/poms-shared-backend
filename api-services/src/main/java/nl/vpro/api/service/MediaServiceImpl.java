@@ -131,7 +131,7 @@ public class MediaServiceImpl implements MediaService {
         searchRequest
                 .searchType(SearchType.DEFAULT)
                 .source(query);
-        if (types.length > 0) {
+        if (types != null && types.length > 0) {
             searchRequest.types(types);
         }
 
