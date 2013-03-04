@@ -16,6 +16,40 @@ import java.util.List;
  * @author Ernst Bunders
  */
 public enum Profile {
+    GESCHIEDENIS24("geschiedenis24", "", "g24") {
+        @Override
+        public SearchFilter createFilterQuery() {
+            return new FieldFilter().setField("brand_title","geschiedenis");
+        }
+
+        @Override
+        public List<String> getSearchFields() {
+            return Arrays.asList("title", "subtitle", "summary", "body", "extra_field_nl_vpro_page_type","extra_field_nl_vpro_subsite", "persons", "genre", "keywords");
+        }
+
+        @Override
+        public List<Float> getSearchBoosting() {
+            return Arrays.asList(3.0f, 2.0f, 1.0f, 1.5f, 2.0f, 2.0f, 1.0f, 1.0f, 1.0f);
+        }
+    },
+
+    WETENSCHAP24("wetenschap24", "", "w24") {
+        @Override
+        public SearchFilter createFilterQuery() {
+            return new FieldFilter().setField("brand_title","wetenschap");
+        }
+
+        @Override
+        public List<String> getSearchFields() {
+            return Arrays.asList("title", "subtitle", "summary", "body", "extra_field_nl_vpro_page_type","extra_field_nl_vpro_subsite", "persons", "genre", "keywords");
+        }
+
+        @Override
+        public List<Float> getSearchBoosting() {
+            return Arrays.asList(3.0f, 2.0f, 1.0f, 1.5f, 2.0f, 2.0f, 1.0f, 1.0f, 1.0f);
+        }
+    },
+
     WOORD("woord", "Woord.nl", "woord") {
         @Override
         public SearchFilter createFilterQuery() {
@@ -64,23 +98,6 @@ public enum Profile {
         @Override
         public List<Float> getSearchBoosting() {
             return new ArrayList<Float>();
-        }
-    },
-
-    WETENSCHAP24("wetenschap24", "", "w24") {
-        @Override
-        public SearchFilter createFilterQuery() {
-            return new FieldFilter().setField("brand_title","wetenschap");
-        }
-
-        @Override
-        public List<String> getSearchFields() {
-            return Arrays.asList("title", "subtitle", "summary", "body", "extra_field_nl_vpro_page_type","extra_field_nl_vpro_subsite", "persons", "genre", "keywords");
-        }
-
-        @Override
-        public List<Float> getSearchBoosting() {
-            return Arrays.asList(3.0f, 2.0f, 1.0f, 1.5f, 2.0f, 2.0f, 1.0f, 1.0f, 1.0f);
         }
     },
 
