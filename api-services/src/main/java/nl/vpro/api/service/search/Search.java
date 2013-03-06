@@ -61,5 +61,7 @@ public interface Search {
 
     String findArchiveId(String archiveName) throws ServerErrorException;
 
+    GenericSearchResult search(Profile profile, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException;
+
     GenericSearchResult search(Profile profile, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException;
 }

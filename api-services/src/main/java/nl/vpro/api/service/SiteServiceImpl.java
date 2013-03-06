@@ -37,19 +37,28 @@ public class SiteServiceImpl implements SiteService {
     private Integer suggestionsLimit;
 
     @Override
-    public GenericSearchResult search(String profileName, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields, String response) {
-        Profile profile=profileService.getProfile(profileName);
+    public GenericSearchResult view(String profileName, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) {
+        Profile profile = profileService.getProfile(profileName);
         Integer queryMaxRows = maxResult != null && maxResult < globalMaxResult ? maxResult : globalMaxResult;
 
-        GenericSearchResult result=search.search(profile,queryString,offset,queryMaxRows,constraints,facets,sortFields);
-        // reduce SearchResult according to repsonse specification
+        GenericSearchResult result = search.search(profile, offset, queryMaxRows, constraints, facets, sortFields);
+        return result;
+    }
+
+    @Override
+    public GenericSearchResult search(String profileName, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields, String response) {
+        Profile profile = profileService.getProfile(profileName);
+        Integer queryMaxRows = maxResult != null && maxResult < globalMaxResult ? maxResult : globalMaxResult;
+
+        GenericSearchResult result = search.search(profile, queryString, offset, queryMaxRows, constraints, facets, sortFields);
+        // reduce SearchResult according to response specification
         return result;
     }
 
     @Override
     public SearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints) {
-        Profile profile=profileService.getProfile(profileName);
-        SearchSuggestions suggestions=search.suggest(profile, queryString, null, constraints, suggestionsMinOccurrence, suggestionsLimit);
+        Profile profile = profileService.getProfile(profileName);
+        SearchSuggestions suggestions = search.suggest(profile, queryString, null, constraints, suggestionsMinOccurrence, suggestionsLimit);
         return suggestions;
     }
 }

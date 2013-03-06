@@ -232,4 +232,9 @@ public class SolrSearch extends AbstractSearch {
     public GenericSearchResult search(Profile profile, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException {
         throw new UnsupportedOperationException("Not implemented");
     }
+
+    @Override
+    public GenericSearchResult search(Profile profile, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException {
+        throw new UnsupportedOperationException("Not implemented");
+    }
 }

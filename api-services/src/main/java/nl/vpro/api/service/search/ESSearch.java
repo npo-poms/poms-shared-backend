@@ -14,6 +14,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilteredQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.facet.FacetBuilders;
 import org.parboiled.common.StringUtils;
@@ -145,6 +147,46 @@ public class ESSearch extends AbstractSearch {
             return result.getMediaSearchResultItems().get(0).getUrn();
         }
         return null;
+    }
+
+    @Override
+    public GenericSearchResult search(Profile profile, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException {
+        if (StringUtils.isEmpty(profile.getIndexName())) {
+            throw new ServerErrorException("No index available for the profile " + profile.getName());
+        }
+        SearchRequest request = createRequest(profile);
+        SearchSourceBuilder searchBuilder = new OrderedSearchSourceBuilder(sortFields);
+
+        // handle the profile
+        ProfileFilterBuilder profileFilter = null;
+        if (profile.createFilterQuery() != null) {
+            profileFilter = new ProfileFilterBuilder(profile);
+        }
+
+        QueryBuilder queryBuilder;
+        if (constraints.size() > 0) {
+            queryBuilder = new MultiQueryStringConstraintBuilder(constraints);
+        } else {
+            queryBuilder = new MatchAllQueryBuilder();
+        }
+
+        searchBuilder.query(new FilteredQueryBuilder(queryBuilder, profileFilter));
+
+        for (String stringFacet : facets) {
+            searchBuilder.facet(FacetBuilders.termsFacet(stringFacet).field(stringFacet).size(facetLimit));
+        }
+
+        //handle paging
+        if (offset != null) {
+            searchBuilder.from(offset);
+        } else {
+            offset = 0;
+        }
+        searchBuilder.size(maxResult);
+
+        request.source(searchBuilder);
+
+        return executeQuery(request, offset, GenericSearchResult.class);
     }
 
     @Override
