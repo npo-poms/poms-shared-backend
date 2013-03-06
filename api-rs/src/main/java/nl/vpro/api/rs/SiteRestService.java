@@ -19,6 +19,11 @@ public interface SiteRestService {
     public static final String PATH = "site";
 
     @GET
+    @Path("{profile}/view")
+    @Produces("application/json")
+    public GenericSearchResult view(@PathParam("profile") String profileName,  @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("max") Integer maxResult, @QueryParam("constraints") List<String> constraints, @QueryParam("facets") List<String> facets, @QueryParam("order") List<String> sortFields);
+
+    @GET
     @Path("{profile}/search")
     @Produces("application/json")
     public GenericSearchResult search(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("max") Integer maxResult, @QueryParam("constraints") List<String> constraints, @QueryParam("facets") List<String> facets,@QueryParam("order") List<String> sortFields,  @QueryParam("response") String response);
