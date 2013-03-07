@@ -6,6 +6,7 @@ package nl.vpro.api.service;
 
 import nl.vpro.api.service.search.Search;
 import nl.vpro.api.transfer.GenericSearchResult;
+import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -60,5 +61,13 @@ public class SiteServiceImpl implements SiteService {
         Profile profile = profileService.getProfile(profileName);
         SearchSuggestions suggestions = search.suggest(profile, queryString, null, constraints, suggestionsMinOccurrence, suggestionsLimit);
         return suggestions;
+    }
+
+    @Override
+    public GenericSearchResult search(String profileName, SearchQuery searchQuery) {
+        Integer queryMaxRows = searchQuery.getMax() != null && searchQuery.getMax() < globalMaxResult ? searchQuery.getMax() : globalMaxResult;
+        searchQuery.setMax(queryMaxRows);
+        Profile profile = profileService.getProfile(profileName);
+        return search.search(profile,searchQuery);
     }
 }

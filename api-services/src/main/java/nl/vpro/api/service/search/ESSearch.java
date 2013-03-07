@@ -6,18 +6,18 @@ import nl.vpro.api.service.search.es.*;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.FilteredQueryBuilder;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.facet.FacetBuilders;
+import org.elasticsearch.search.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.parboiled.common.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,10 +58,6 @@ public class ESSearch extends AbstractSearch {
         SearchRequest request = createRequest(profile);
 
         request.source(searchBuilder);
-
-        if (offset == null) {
-            offset = 0;
-        }
 
         return executeQuery(request, offset, MediaSearchResult.class);
     }
@@ -232,6 +228,75 @@ public class ESSearch extends AbstractSearch {
         return executeQuery(request, offset, GenericSearchResult.class);
     }
 
+    @Override
+    public GenericSearchResult search(Profile profile, SearchQuery searchQuery) {
+        if (StringUtils.isEmpty(profile.getIndexName())) {
+            throw new ServerErrorException("No index available for the profile " + profile.getName());
+        }
+        SearchRequest request = createRequest(profile);
+        SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+
+        // query
+        BoolQueryBuilder boolQueryBuilder;
+        if (StringUtils.isNotEmpty(searchQuery.getQuery())) {
+            boolQueryBuilder = new SearchFieldsQueryBuilder(profile.getSearchFields(), profile.getSearchBoosting(), searchQuery.getQuery());
+        } else {
+            boolQueryBuilder = new BoolQueryBuilder();
+        }
+
+        // facets
+        for (SearchQuery.Facet facet : searchQuery.getFacets()) {
+            searchBuilder.facet(FacetBuilders.termsFacet(facet.getField()).field(facet.getField()).size(facet.getNumber()));
+        }
+
+        // constraints
+        for (SearchQuery.Constraint constraint : searchQuery.getConstraints()) {
+            boolQueryBuilder.must(termQuery(constraint.getField(), constraint.getValue()));
+        }
+
+        // highlights
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.tagsSchema("styled");
+        for (SearchQuery.Highlight highlight : searchQuery.getHighlights()) {
+            highlightBuilder.field(highlight.getField(),highlight.getSize(),highlight.getNumber());
+        }
+        searchBuilder.highlight(highlightBuilder);
+
+        // handle the profile
+        ProfileFilterBuilder profileFilterBuilder = null;
+        if (profile.createFilterQuery() != null) {
+            profileFilterBuilder = new ProfileFilterBuilder(profile);
+        }
+
+
+        // join query and filter
+        QueryBuilder queryBuilder=new FilteredQueryBuilder(boolQueryBuilder, profileFilterBuilder);
+
+        // sort order
+        if (searchQuery.getSortOrder().size()>0) {
+            for (SearchQuery.SortField sortField : searchQuery.getSortOrder()) {
+                searchBuilder.sort(sortField.getField(), SortOrder.valueOf(sortField.getDirection()));
+            }
+        } else {
+            CustomScoreQueryBuilder customScoreQueryBuilder = new CustomScoreQueryBuilder(queryBuilder);
+            // TODO custom script implementeren.
+            customScoreQueryBuilder.script("");
+            queryBuilder = customScoreQueryBuilder;
+        }
+
+        searchBuilder.query(queryBuilder);
+
+        //handle paging
+        if (searchQuery.getOffset() != null) {
+            searchBuilder.from(searchQuery.getOffset());
+        }
+        searchBuilder.size(searchQuery.getMax());
+
+        request.source(searchBuilder);
+
+        return executeQuery(request, searchQuery.getOffset(), GenericSearchResult.class);
+    }
+
     private SearchRequest createRequest(Profile profile) {
         if (profile != null && StringUtils.isNotEmpty(profile.getIndexName())) {
             return new SearchRequest(profile.getIndexName());
@@ -240,8 +305,12 @@ public class ESSearch extends AbstractSearch {
         }
     }
 
-    private <T> T executeQuery(SearchRequest request, int offset, Class<T> targetType) throws ServerErrorException {
+    private <T> T executeQuery(SearchRequest request, Integer offset, Class<T> targetType) throws ServerErrorException {
         ActionFuture<SearchResponse> searchResponseFuture = esClient.search(request);
+        if (offset==null) {
+            offset = 0;
+        }
+
         try {
             SearchResponse response = searchResponseFuture.actionGet(timeoutInSeconds, TimeUnit.SECONDS);
             return (T) conversionService.convert(new SearchResponseExtender(response, offset), targetType);

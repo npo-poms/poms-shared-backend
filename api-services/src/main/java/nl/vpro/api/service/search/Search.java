@@ -4,6 +4,7 @@ import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.fiterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.util.rs.error.ServerErrorException;
 
@@ -64,4 +65,6 @@ public interface Search {
     GenericSearchResult search(Profile profile, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException;
 
     GenericSearchResult search(Profile profile, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) throws ServerErrorException;
+
+    GenericSearchResult search(Profile profile, SearchQuery searchQuery);
 }

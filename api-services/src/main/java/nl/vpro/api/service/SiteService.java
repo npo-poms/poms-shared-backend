@@ -5,6 +5,7 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.transfer.GenericSearchResult;
+import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
 
 import java.util.List;
@@ -18,6 +19,8 @@ public interface SiteService {
     GenericSearchResult view(String profileName, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields);
 
     GenericSearchResult search(String profileName, String queryString, Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields, String response);
+
+    GenericSearchResult search(String profileName, SearchQuery searchQuery);
 
     SearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints);
 }
