@@ -5,6 +5,7 @@
 package nl.vpro.api.rs;
 
 import nl.vpro.api.transfer.GenericSearchResult;
+import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
 
 import javax.ws.rs.*;
@@ -34,4 +35,9 @@ public interface SiteRestService {
     @Produces("application/json")
     public SearchSuggestions searchSuggestions(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("constraints") List<String> constraints);
 
+    @POST
+    @Path("{profile}/search")
+    @Consumes("application/json")
+    @Produces("application/json")
+    public GenericSearchResult search(@PathParam("profile") String profileName, SearchQuery searchQuery);
 }

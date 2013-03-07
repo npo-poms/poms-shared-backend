@@ -5,8 +5,9 @@
 package nl.vpro.api.rs;
 
 import nl.vpro.api.service.SiteService;
-import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.transfer.GenericSearchResult;
+import nl.vpro.api.transfer.SearchQuery;
+import nl.vpro.api.transfer.SearchSuggestions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
@@ -20,12 +21,13 @@ import java.util.List;
  */
 @Controller
 public class SiteRestServiceImpl implements SiteRestService {
+
     @Autowired
     SiteService siteService;
 
     @Override
     public GenericSearchResult view(@PathParam("profile") String profileName, @DefaultValue("0") Integer offset, Integer maxResult, List<String> constraints, List<String> facets, List<String> sortFields) {
-        return siteService.view(profileName,offset,maxResult,constraints,facets,sortFields);
+        return siteService.view(profileName, offset, maxResult, constraints, facets, sortFields);
 
     }
 
@@ -37,5 +39,10 @@ public class SiteRestServiceImpl implements SiteRestService {
     @Override
     public SearchSuggestions searchSuggestions(String profileName, String queryString, List<String> constraints) {
         return siteService.searchSuggestions(profileName,queryString,constraints);
+    }
+
+    @Override
+    public GenericSearchResult search(String profileName, SearchQuery searchQuery) {
+        return siteService.search(profileName, searchQuery);
     }
 }
