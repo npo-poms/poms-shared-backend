@@ -1,7 +1,7 @@
 package nl.vpro.api.service.search.es;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ public class SearchFieldsQueryBuilder extends BoolQueryBuilder {
         }
 
         for (int i = 0; i < fields.size(); i++) {
-            should(new TermQueryBuilder(fields.get(i), term)
-                    .boost(boosting.get(i)));
+            should(new MatchQueryBuilder(fields.get(i), term).operator(MatchQueryBuilder.Operator.AND).boost(boosting.get(i)));
+            //should(new TermQueryBuilder(fields.get(i), term).boost(boosting.get(i)));
         }
     }
 }
