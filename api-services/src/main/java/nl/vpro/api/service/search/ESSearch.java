@@ -268,7 +268,6 @@ public class ESSearch extends AbstractSearch {
             profileFilterBuilder = new ProfileFilterBuilder(profile);
         }
 
-
         // join query and filter
         QueryBuilder queryBuilder=new FilteredQueryBuilder(boolQueryBuilder, profileFilterBuilder);
 
@@ -277,10 +276,9 @@ public class ESSearch extends AbstractSearch {
             for (SearchQuery.SortField sortField : searchQuery.getSortOrder()) {
                 searchBuilder.sort(sortField.getField(), SortOrder.valueOf(sortField.getDirection()));
             }
-        } else {
+        } else if (profile.getScoreField()!=null){
             CustomScoreQueryBuilder customScoreQueryBuilder = new CustomScoreQueryBuilder(queryBuilder);
-            // TODO custom script implementeren.
-            customScoreQueryBuilder.script("");
+            customScoreQueryBuilder.script(ScoreScriptGenerator.generate(profile.getScoreField(),profile.getScoreTable()));
             queryBuilder = customScoreQueryBuilder;
         }
 
