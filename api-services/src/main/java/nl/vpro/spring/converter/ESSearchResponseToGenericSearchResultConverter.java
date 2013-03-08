@@ -11,12 +11,16 @@ import nl.vpro.api.transfer.GenericSearchResultItem;
 import nl.vpro.jackson.MediaMapper;
 import org.codehaus.jackson.JsonNode;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.facet.Facet;
 import org.elasticsearch.search.facet.terms.strings.InternalStringTermsFacet;
+import org.elasticsearch.search.highlight.HighlightField;
 import org.springframework.core.convert.converter.Converter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +28,8 @@ import java.util.Map;
  * Date: 28/11/2012
  */
 public class ESSearchResponseToGenericSearchResultConverter implements Converter<SearchResponseExtender, GenericSearchResult> {
+    private static MediaMapper mapper = new MediaMapper();
+
     @Override
     public GenericSearchResult convert(SearchResponseExtender responseExtender) {
         final SearchResponse response = responseExtender.searchResponse();
@@ -38,7 +44,15 @@ public class ESSearchResponseToGenericSearchResultConverter implements Converter
             item.setType(hit.type());
 
             try {
-                JsonNode node=new MediaMapper().readTree(hit.sourceAsString());
+                JsonNode node = mapper.readTree(hit.sourceAsString());
+                for (Map.Entry<String, HighlightField> entry : hit.getHighlightFields().entrySet()) {
+                    Text[] texts = entry.getValue().getFragments();
+                    List<String> fragments = new ArrayList<String>(texts.length);
+                    for (Text text : texts) {
+                        fragments.add(text.string());
+                    }
+                    item.addHighLight(entry.getValue().getName(), fragments);
+                }
                 item.setResult(node);
                 genericSearchResult.addSearchResultItem(item);
             } catch (IOException e) {
