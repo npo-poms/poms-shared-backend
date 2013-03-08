@@ -236,6 +236,7 @@ public class ESSearch extends AbstractSearch {
         SearchRequest request = createRequest(profile);
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
 
+        QueryBuilder queryBuilder = null;
         // query
         BoolQueryBuilder boolQueryBuilder;
         if (StringUtils.isNotEmpty(searchQuery.getQuery())) {
@@ -243,24 +244,15 @@ public class ESSearch extends AbstractSearch {
         } else {
             boolQueryBuilder = new BoolQueryBuilder();
         }
-
-        // facets
-        for (SearchQuery.Facet facet : searchQuery.getFacets()) {
-            searchBuilder.facet(FacetBuilders.termsFacet(facet.getField()).field(facet.getField()).size(facet.getNumber()));
-        }
-
         // constraints
         for (SearchQuery.Constraint constraint : searchQuery.getConstraints()) {
             boolQueryBuilder.must(termQuery(constraint.getField(), constraint.getValue()));
         }
-
-        // highlights
-        HighlightBuilder highlightBuilder = new HighlightBuilder();
-        highlightBuilder.tagsSchema("styled");
-        for (SearchQuery.Highlight highlight : searchQuery.getHighlights()) {
-            highlightBuilder.field(highlight.getField(),highlight.getSize(),highlight.getNumber());
+        if (!boolQueryBuilder.hasClauses()) {
+            queryBuilder = new MatchAllQueryBuilder();
+        } else {
+            queryBuilder = boolQueryBuilder;
         }
-        searchBuilder.highlight(highlightBuilder);
 
         // handle the profile
         ProfileFilterBuilder profileFilterBuilder = null;
@@ -269,20 +261,34 @@ public class ESSearch extends AbstractSearch {
         }
 
         // join query and filter
-        QueryBuilder queryBuilder=new FilteredQueryBuilder(boolQueryBuilder, profileFilterBuilder);
+        searchBuilder.query(new FilteredQueryBuilder(queryBuilder, profileFilterBuilder));
+
 
         // sort order
-        if (searchQuery.getSortOrder().size()>0) {
+        if (searchQuery.getSortOrder().size() > 0) {
             for (SearchQuery.SortField sortField : searchQuery.getSortOrder()) {
                 searchBuilder.sort(sortField.getField(), SortOrder.valueOf(sortField.getDirection()));
             }
-        } else if (profile.getScoreField()!=null){
+        } else if (profile.getScoreField() != null) {
             CustomScoreQueryBuilder customScoreQueryBuilder = new CustomScoreQueryBuilder(queryBuilder);
-            customScoreQueryBuilder.script(ScoreScriptGenerator.generate(profile.getScoreField(),profile.getScoreTable()));
+            customScoreQueryBuilder.script(ScoreScriptGenerator.generate(profile.getScoreField(), profile.getScoreTable()));
             queryBuilder = customScoreQueryBuilder;
         }
 
-        searchBuilder.query(queryBuilder);
+        // facets
+        for (SearchQuery.Facet facet : searchQuery.getFacets()) {
+            searchBuilder.facet(FacetBuilders.termsFacet(facet.getField()).field(facet.getField()).size(facet.getNumber()));
+        }
+
+        // highlights
+        if (searchQuery.getHighlights().size() > 0) {
+            HighlightBuilder highlightBuilder = new HighlightBuilder();
+            highlightBuilder.tagsSchema("styled");
+            for (SearchQuery.Highlight highlight : searchQuery.getHighlights()) {
+                highlightBuilder.field(highlight.getField(), highlight.getSize(), highlight.getNumber());
+            }
+            searchBuilder.highlight(highlightBuilder);
+        }
 
         //handle paging
         if (searchQuery.getOffset() != null) {
@@ -305,7 +311,7 @@ public class ESSearch extends AbstractSearch {
 
     private <T> T executeQuery(SearchRequest request, Integer offset, Class<T> targetType) throws ServerErrorException {
         ActionFuture<SearchResponse> searchResponseFuture = esClient.search(request);
-        if (offset==null) {
+        if (offset == null) {
             offset = 0;
         }
 
