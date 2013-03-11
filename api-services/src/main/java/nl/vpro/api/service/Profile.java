@@ -43,7 +43,6 @@ public enum Profile {
     },
 
     WETENSCHAP24("wetenschap24", "", "w24") {
-
         @Override
         public SearchFilter createFilterQuery() {
             return new FieldFilter().setField("brand_title", "wetenschap");
@@ -69,9 +68,9 @@ public enum Profile {
             Map<String, Float> scoreTable = new HashMap<String, Float>();
             scoreTable.put("Specials", 5.0f);
             scoreTable.put("Home", 3.0f);
-            scoreTable.put("Video",1.5f);
-            scoreTable.put("Audio",1.3f);
-            scoreTable.put("Artikel",1.0f);
+            scoreTable.put("Video", 1.5f);
+            scoreTable.put("Audio", 1.3f);
+            scoreTable.put("Artikel", 1.0f);
 
             return scoreTable;
         }
@@ -87,7 +86,7 @@ public enum Profile {
                             .setDocumentType(MediaObjectType.program))
                     .addQuery(new DocumentSearchFilter()
                             .setDocumentType(MediaObjectType.segment)
-                    );
+                );
 
 
             //the document must have an mp3, be of type audio and must be part of the given archive.
