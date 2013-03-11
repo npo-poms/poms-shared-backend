@@ -8,6 +8,7 @@ import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
+import nl.vpro.util.Helper;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
@@ -295,6 +296,10 @@ public class ESSearch extends AbstractSearch {
             searchBuilder.from(searchQuery.getOffset());
         }
         searchBuilder.size(searchQuery.getMax());
+
+        if (Helper.isNotEmpty(searchQuery.getType())) {
+            request.types(searchQuery.getType());
+        }
 
         request.source(searchBuilder);
 

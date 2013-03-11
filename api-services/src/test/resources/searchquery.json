@@ -1,5 +1,6 @@
 {
   "query" : "TestQuery",
+  "type" : "page",
   "offset" : 10,
   "max" : 10,
   "constraints" : [ {
@@ -17,6 +18,6 @@
   } ],
   "sortOrder" : [ {
     "field" : "veld2",
-    "direction" : "asc"
+    "direction" : "ASC"
   } ]
 }

@@ -28,6 +28,7 @@ public class SearchQuerySerializeTest {
             ObjectMapper mapper = new MediaMapper();
             StringWriter buffer = new StringWriter();
             SearchQuery searchQuery = new SearchQuery("TestQuery");
+            searchQuery.setType("page");
             searchQuery.addConstraint(new SearchQuery.Constraint("veldje", "waarde"));
             searchQuery.addFacet(new SearchQuery.Facet("veld1", 5));
             searchQuery.addHighlight(new SearchQuery.Highlight("langveld", 50, 3));
@@ -54,6 +55,7 @@ public class SearchQuerySerializeTest {
             SearchQuery searchQuery = mapper.readValue(is, SearchQuery.class);
 
             assertEquals("TestQuery", searchQuery.getQuery());
+            assertEquals("page", searchQuery.getType());
             assertEquals(1, searchQuery.getConstraints().size());
             assertEquals(1, searchQuery.getFacets().size());
             assertEquals(1, searchQuery.getHighlights().size());
@@ -67,10 +69,10 @@ public class SearchQuerySerializeTest {
             SearchQuery.Highlight highlight = searchQuery.getHighlights().get(0);
             assertEquals("langveld", highlight.getField());
             assertEquals(50, highlight.getSize().intValue());
-            assertEquals(3, facet.getNumber().intValue());
+            assertEquals(3, highlight.getNumber().intValue());
             SearchQuery.SortField sortField = searchQuery.getSortOrder().get(0);
             assertEquals("veld2", sortField.getField());
-            assertEquals("asc", sortField.getDirection());
+            assertEquals("ASC", sortField.getDirection());
             assertEquals(10, searchQuery.getOffset().intValue());
             assertEquals(10, searchQuery.getMax().intValue());
         } catch (Exception e) {
