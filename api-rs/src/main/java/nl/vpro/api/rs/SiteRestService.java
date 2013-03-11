@@ -46,5 +46,5 @@ public interface SiteRestService {
     @Path("{profile}/search")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces("application/json")
-    public GenericSearchResult search(@PathParam("profile") String profileName, @FormParam("query") String searchQuery);
+    public GenericSearchResult search(@PathParam("profile") String profileName, @FormParam("query") String searchQueryAsJson);
 }

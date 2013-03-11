@@ -24,6 +24,7 @@ import java.util.List;
  */
 @Controller
 public class SiteRestServiceImpl implements SiteRestService {
+    private static ObjectMapper mapper = new MediaMapper();
 
     @Autowired
     SiteService siteService;
@@ -50,11 +51,10 @@ public class SiteRestServiceImpl implements SiteRestService {
     }
 
     @Override
-    public GenericSearchResult search(String profileName, String searchQuery) {
-        ObjectMapper mapper = new MediaMapper();
+    public GenericSearchResult search(String profileName, String searchQueryAsJson) {
         try {
-            SearchQuery query = mapper.readValue(searchQuery, SearchQuery.class);
-            return siteService.search(profileName, query);
+            SearchQuery searchQuery = mapper.readValue(searchQueryAsJson, SearchQuery.class);
+            return siteService.search(profileName, searchQuery);
         } catch (IOException e) {
             throw new RuntimeException("Can not parse value ",e);
         }
