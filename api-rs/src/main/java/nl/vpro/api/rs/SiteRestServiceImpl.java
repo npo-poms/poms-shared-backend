@@ -8,11 +8,14 @@ import nl.vpro.api.service.SiteService;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
+import nl.vpro.jackson.MediaMapper;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -44,5 +47,16 @@ public class SiteRestServiceImpl implements SiteRestService {
     @Override
     public GenericSearchResult search(String profileName, SearchQuery searchQuery) {
         return siteService.search(profileName, searchQuery);
+    }
+
+    @Override
+    public GenericSearchResult search(String profileName, String searchQuery) {
+        ObjectMapper mapper = new MediaMapper();
+        try {
+            SearchQuery query = mapper.readValue(searchQuery, SearchQuery.class);
+            return siteService.search(profileName, query);
+        } catch (IOException e) {
+            throw new RuntimeException("Can not parse value ",e);
+        }
     }
 }

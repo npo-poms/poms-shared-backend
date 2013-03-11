@@ -9,6 +9,7 @@ import nl.vpro.api.transfer.SearchQuery;
 import nl.vpro.api.transfer.SearchSuggestions;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import java.util.List;
 
 /**
@@ -40,4 +41,10 @@ public interface SiteRestService {
     @Consumes("application/json")
     @Produces("application/json")
     public GenericSearchResult search(@PathParam("profile") String profileName, SearchQuery searchQuery);
+
+    @POST
+    @Path("{profile}/search")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/json")
+    public GenericSearchResult search(@PathParam("profile") String profileName, @FormParam("query") String searchQuery);
 }
