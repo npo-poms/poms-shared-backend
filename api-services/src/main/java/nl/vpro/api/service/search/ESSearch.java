@@ -245,6 +245,7 @@ public class ESSearch extends AbstractSearch {
         } else {
             boolQueryBuilder = new BoolQueryBuilder();
         }
+
         // constraints
         for (SearchQuery.Constraint constraint : searchQuery.getConstraints()) {
             boolQueryBuilder.must(termQuery(constraint.getField(), constraint.getValue()));
@@ -261,10 +262,6 @@ public class ESSearch extends AbstractSearch {
             profileFilterBuilder = new ProfileFilterBuilder(profile);
         }
 
-        // join query and filter
-        searchBuilder.query(new FilteredQueryBuilder(queryBuilder, profileFilterBuilder));
-
-
         // sort order
         if (searchQuery.getSortOrder().size() > 0) {
             for (SearchQuery.SortField sortField : searchQuery.getSortOrder()) {
@@ -275,6 +272,9 @@ public class ESSearch extends AbstractSearch {
             customScoreQueryBuilder.script(ScoreScriptGenerator.generate(profile.getScoreField(), profile.getScoreTable()));
             queryBuilder = customScoreQueryBuilder;
         }
+
+        // join query and filter
+        searchBuilder.query(new FilteredQueryBuilder(queryBuilder, profileFilterBuilder));
 
         // facets
         for (SearchQuery.Facet facet : searchQuery.getFacets()) {
