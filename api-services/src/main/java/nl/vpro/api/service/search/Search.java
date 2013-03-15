@@ -1,7 +1,7 @@
 package nl.vpro.api.service.search;
 
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.SearchQuery;

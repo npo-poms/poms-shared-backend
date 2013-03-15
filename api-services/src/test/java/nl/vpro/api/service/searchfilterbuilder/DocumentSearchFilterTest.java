@@ -7,7 +7,7 @@ import org.junit.Test;
 import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.domain.media.support.MediaObjectType;
-import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.filterbuilder.DocumentSearchFilter;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

@@ -4,7 +4,7 @@ import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.search.fiterbuilder.*;
+import nl.vpro.api.service.search.filterbuilder.*;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.index.query.BaseFilterBuilder;

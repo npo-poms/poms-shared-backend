@@ -1,12 +1,12 @@
 package nl.vpro.api.service.searchfilterbuilder;
 
-import nl.vpro.api.service.search.fiterbuilder.FieldFilter;
+import nl.vpro.api.service.search.filterbuilder.FieldFilter;
 import org.junit.Test;
 
 import nl.vpro.api.domain.media.AvType;
-import nl.vpro.api.service.search.fiterbuilder.BooleanOp;
-import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.SearchFilterList;
+import nl.vpro.api.service.search.filterbuilder.BooleanOp;
+import nl.vpro.api.service.search.filterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.filterbuilder.SearchFilterList;
 
 import static org.junit.Assert.assertEquals;
 

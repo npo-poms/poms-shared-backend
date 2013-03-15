@@ -2,7 +2,7 @@
  * Copyright (C) 2013 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.api.service.search.fiterbuilder;
+package nl.vpro.api.service.search.filterbuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

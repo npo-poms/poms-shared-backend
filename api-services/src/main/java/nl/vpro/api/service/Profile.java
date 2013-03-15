@@ -3,7 +3,7 @@ package nl.vpro.api.service;
 import nl.vpro.api.domain.media.AvFileFormat;
 import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.support.MediaObjectType;
-import nl.vpro.api.service.search.fiterbuilder.*;
+import nl.vpro.api.service.search.filterbuilder.*;
 
 import java.util.*;
 

@@ -2,9 +2,9 @@ package nl.vpro.api.service.search;
 
 import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.search.fiterbuilder.DocumentSearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
-import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.service.search.filterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.filterbuilder.SearchFilter;
+import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.SearchQuery;

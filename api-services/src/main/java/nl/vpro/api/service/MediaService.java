@@ -11,7 +11,7 @@ import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
 import nl.vpro.api.domain.media.support.MediaObjectType;
-import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItem;
 import nl.vpro.api.transfer.SearchSuggestions;

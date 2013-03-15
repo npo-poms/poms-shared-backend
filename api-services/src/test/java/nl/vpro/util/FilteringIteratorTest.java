@@ -2,7 +2,7 @@ package nl.vpro.util;
 
 import nl.vpro.api.domain.media.MediaObject;
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.search.fiterbuilder.SearchFilter;
+import nl.vpro.api.service.search.filterbuilder.SearchFilter;
 import nl.vpro.api.util.CouchdbViewIterator;
 import nl.vpro.api.util.MediaObjectIterator;
 import org.junit.Test;

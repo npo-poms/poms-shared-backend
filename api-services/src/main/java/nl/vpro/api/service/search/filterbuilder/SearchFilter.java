@@ -1,4 +1,4 @@
-package nl.vpro.api.service.search.fiterbuilder;
+package nl.vpro.api.service.search.filterbuilder;
 
 import com.google.common.base.Predicate;
 

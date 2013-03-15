@@ -41,7 +41,7 @@ import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.search.Search;
-import nl.vpro.api.service.search.fiterbuilder.TagFilter;
+import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.*;
 import nl.vpro.api.util.CouchdbViewIterator;
 import nl.vpro.util.FilteringIterator;
