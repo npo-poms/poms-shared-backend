@@ -3,7 +3,6 @@
     "rows": [
         {
             "doc": {
-                "javaType":"Program",
                 "_id": "urn:vpro:media:program:14367824", 
                 "_rev": "44-9dbc48ba59b7074830cb6c22521048b6", 
                 "avAttributes": {
@@ -288,7 +287,6 @@
         }, 
         {
             "doc": {
-                "javaType":"Program",
                 "_id": "urn:vpro:media:program:14389752", 
                 "_rev": "46-d2575230712ae628bf0acf594b63ec2b", 
                 "avAttributes": {
