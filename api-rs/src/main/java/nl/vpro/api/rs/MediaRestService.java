@@ -1,21 +1,17 @@
 package nl.vpro.api.rs;
 
-import java.util.List;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-
-import nl.vpro.api.domain.media.Group;
-import nl.vpro.api.domain.media.MediaObject;
-import nl.vpro.api.domain.media.Program;
-import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.*;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItemIterator;
-import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  * Public REST API to api.service.MediaService
@@ -50,6 +46,11 @@ public interface MediaRestService {
     @Path("program/replay")
     @Produces(MediaType.APPLICATION_JSON)
     public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType);
+
+    @GET
+    @Path("program/replay/all")
+    @Produces(MediaType.APPLICATION_JSON)
+    public MediaSearchResultItemIterator getAllReplayableProgram(@QueryParam("type") String avType);
 
     @GET
     @Path("program/{urn}/annotations")
@@ -189,4 +190,15 @@ public interface MediaRestService {
     @Deprecated
     @Produces(MediaType.APPLICATION_JSON)
     public String searchES(@PathParam("index") String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString);
+
+/*
+
+	@GET
+	@Path("program/{urn}/subtitles")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Subtitle searchSubtitles(@PathParam("urn") String urn,
+										  @QueryParam("q") String term);
+*/
+
+
 }

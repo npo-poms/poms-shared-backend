@@ -4,10 +4,7 @@
  */
 package nl.vpro.api.rs;
 
-import nl.vpro.api.domain.media.Group;
-import nl.vpro.api.domain.media.MediaObject;
-import nl.vpro.api.domain.media.Program;
-import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.rs.util.StringUtil;
@@ -49,7 +46,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Program getProgram(String urn) throws IllegalArgumentException {
-        LOG.debug("Method getProgram called with urn " + urn);
+        LOG.debug("Method getProgram called with urn {}", urn);
         return mediaService.getProgram(MediaUtil.getMediaId(MediaObjectType.program, urn));
     }
 
@@ -61,7 +58,31 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public ProgramList getRecentReplayablePrograms(Integer maxResult, Integer offset, String avType) {
-        return mediaService.getReplayablePrograms(maxResult, offset, avType);
+        return mediaService.getReplayablePrograms(maxResult, offset, StringUtils.isEmpty(avType) ? null : AvType.valueOf(avType.toUpperCase()));
+    }
+
+    @Override
+    public MediaSearchResultItemIterator getAllReplayableProgram(final String avType) {
+
+        return new MediaSearchResultItemIterator(mediaService.getAllReplayablePrograms(getAvType(avType)));
+
+        /*
+        return new StreamingOutput() {
+            @Override
+            public void write(OutputStream output) throws IOException, WebApplicationException {
+                JsonGenerator jsonGen = new JsonFactory().createJsonGenerator(output);
+                Iterator<String> i = mediaService.getAllReplayablePrograms(getAvType(avType));
+                jsonGen.writeStartArray();
+                while (i.hasNext()) {
+                    jsonGen.writeString(i.next());
+                }
+                jsonGen.writeEndArray();
+            }
+        };*/
+    }
+
+    private AvType getAvType(String avType) {
+        return StringUtils.isEmpty(avType) ? null : AvType.valueOf(avType.toUpperCase());
     }
 
     /**
@@ -173,15 +194,25 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public String searchES(String index, String query, String typesAsString) {
+	@Deprecated
+	public String searchES(String index,String query, String typesAsString) {
         String[] types = null;
         if (typesAsString != null) {
             types = typesAsString.trim().split(" ");
         }
         return mediaService.searchES(index, types, query);
     }
+/*
 
-    private TagFilter createFilter(String tags, BooleanOp booleanOp) {
+	@Override
+	public Subtitle searchSubtitles(@PathParam("urn") String urn, String term) {
+        //mediaService.searchSubtitles(urn, term);
+		return new Subtitle(0, "urn:bla", "floe");
+
+	}
+*/
+
+	private TagFilter createFilter(String tags, BooleanOp booleanOp) {
         TagFilter tagFilter = null;
         if (StringUtils.isNotBlank(tags)) {
             tagFilter = new TagFilter((booleanOp));
