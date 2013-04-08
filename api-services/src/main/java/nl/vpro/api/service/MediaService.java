@@ -4,9 +4,7 @@
  */
 package nl.vpro.api.service;
 
-import java.util.Iterator;
-import java.util.List;
-
+import nl.vpro.api.domain.media.AvType;
 import nl.vpro.api.domain.media.Group;
 import nl.vpro.api.domain.media.Program;
 import nl.vpro.api.domain.media.Segment;
@@ -14,10 +12,13 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItem;
-import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.transfer.ProgramList;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.util.rs.error.ServerErrorException;
+
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * User: rico
@@ -38,7 +39,9 @@ public interface MediaService {
      * that has (a) location(s) attached to it, so it is playable.
      * The programs are sorted by first broadcast date descending.
      */
-    ProgramList getReplayablePrograms(Integer max, Integer offset, String avType);
+    ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType);
+
+    Iterator<MediaSearchResultItem> getAllReplayablePrograms(AvType avType);
 
     /**
      * @param id
@@ -65,4 +68,5 @@ public interface MediaService {
 
     Iterator<MediaSearchResultItem> getProfile(String profileName);
 
+	//List<Subtitle> searchSubtitles(String urn, String term);
 }

@@ -34,6 +34,7 @@
         <bean class="nl.vpro.spring.converter.ESSearchResponseToSearchSuggestionConverter"/>
 
         <bean class="nl.vpro.spring.converter.MediaObjectToMediaSearchResultItem"/>
+        <bean class="nl.vpro.spring.converter.JsonNodeToMediaSearchResultItem" />
         <bean class="nl.vpro.spring.converter.ProgramToAnnotationConverter"/>
 
         <bean class="nl.vpro.spring.converter.QueryResponseToSearchResultConverter">

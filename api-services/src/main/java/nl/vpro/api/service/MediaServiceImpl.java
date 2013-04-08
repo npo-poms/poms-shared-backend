@@ -4,15 +4,23 @@
  */
 package nl.vpro.api.service;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-
+import nl.vpro.api.domain.media.*;
+import nl.vpro.api.domain.media.support.MediaObjectType;
+import nl.vpro.api.domain.media.support.MediaUtil;
+import nl.vpro.api.service.search.Search;
+import nl.vpro.api.service.search.filterbuilder.TagFilter;
+import nl.vpro.api.transfer.*;
+import nl.vpro.api.util.CouchdbViewIterator;
+import nl.vpro.api.util.MediaObjectIterator;
+import nl.vpro.api.util.UrlProvider;
+import nl.vpro.domain.ugc.annotation.Annotation;
+import nl.vpro.jackson.MediaMapper;
+import nl.vpro.util.FilteringIterator;
+import nl.vpro.util.WrappedIterator;
+import nl.vpro.util.rs.error.NotFoundException;
+import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.JsonNode;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -37,22 +45,13 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.svenson.JSONParser;
 
-import nl.vpro.api.domain.media.*;
-import nl.vpro.api.domain.media.support.MediaObjectType;
-import nl.vpro.api.domain.media.support.MediaUtil;
-import nl.vpro.api.service.search.Search;
-import nl.vpro.api.service.search.filterbuilder.TagFilter;
-import nl.vpro.api.transfer.*;
-import nl.vpro.api.util.CouchdbViewIterator;
-import nl.vpro.util.FilteringIterator;
-import nl.vpro.api.util.MediaObjectIterator;
-import nl.vpro.api.util.UrlProvider;
-import nl.vpro.domain.ugc.annotation.Annotation;
-import nl.vpro.jackson.MediaMapper;
-import nl.vpro.util.Helper;
-import nl.vpro.util.WrappedIterator;
-import nl.vpro.util.rs.error.NotFoundException;
-import nl.vpro.util.rs.error.ServerErrorException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 /**
  * User: rico
@@ -170,48 +169,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public ProgramList getReplayablePrograms(Integer max, Integer offset, String avType) {
-        Options options = new Options();
-        options.reduce(false);
-        options.descending(true);
-        options.includeDocs(true);
-
-        // we use a 'now' value with hour precision, so we can have some caching of this query.
-        //maybe an hour is too long?
-        Calendar now = createNowWithHourPrecision();
-        String view;
-        if (Helper.isEmpty(avType)) {
-            options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
-            options.endKey((new Object[]{"VPRO"}));
-            view = couchdbViewReplayableRrogramsByFirstBroadcasting;
-        } else {
-            options.startKey(new Object[]{"VPRO", avType.toUpperCase(), now.getTimeInMillis()});
-            options.endKey((new Object[]{"VPRO", avType.toUpperCase()}));
-            view = couchdbViewReplayableRrogramsByAvtype;
-        }
-
-        Options countoptions = new Options(options);
-        countoptions.includeDocs(false);
-        countoptions.reduce(true);
-        String countUrl = createCouchdbViewUrl(view, countoptions);
-
-        if (offset != null) {
-            options.skip(offset);
-        }
-        options.limit(max != null ? max : globalMaxResult);
-        String requestUrl = createCouchdbViewUrl(view, options);
+    public ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType) {
+        String requestUrl = getReplayableProgramsCouchdbUrl(max != null ? max : globalMaxResult, offset, avType, true);
 
         try {
-            Long count = 0L;
-            ViewResult<String> viewResult = couchDbMediaServer.queryView(view, String.class, countoptions, null);
-            for (ValueRow<String> row : viewResult.getRows()) {
-                count = Long.valueOf(row.getValue());
-            }
-
             ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
 
             ProgramList list = new ProgramList();
-            list.setNumFound(count);
+            list.setNumFound(programViewResult.getBody().getTotalRows());
             list.setStart(programViewResult.getBody().getOffset());
             for (ResultRowWithDocument<Program, String> row : programViewResult.getBody().getRows()) {
                 list.addProgram(row.getDoc());
@@ -224,15 +189,67 @@ public class MediaServiceImpl implements MediaService {
             throw new ServerErrorException(e1.getMessage(), e1);
         } catch (HttpClientErrorException e3) {
             if (e3.getStatusCode().value() == 404) {
-                throw new NotFoundException("View with name " + view + " could not be queried", e3);
+                throw new NotFoundException("View  " + requestUrl + " could not be queried", e3);
             } else {
-                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + view + ". reason: " + e3.getMessage(), e3);
+                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + requestUrl + ". reason: " + e3.getMessage(), e3);
             }
         }
     }
 
 
+    @Override
+    public Iterator<MediaSearchResultItem> getAllReplayablePrograms(AvType avType) {
+        try {
+            URL requestUrl = new URL(getReplayableProgramsCouchdbUrl(null, null, avType, true));
 
+            InputStream inputStream = requestUrl.openStream();
+
+            Iterator<JsonNode> iterator = new CouchdbViewIterator(inputStream);
+            return new WrappedIterator<JsonNode, MediaSearchResultItem>(iterator) {
+                @Override
+                public MediaSearchResultItem next() {
+                    return conversionService.convert(
+                            wrapped.next(),
+                            MediaSearchResultItem.class);
+                }
+            };
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
+    private String getReplayableProgramsCouchdbUrl(Integer offset, Integer max, AvType avType, boolean includeDocs) {
+        Options options = new Options();
+        options.reduce(false);
+        options.descending(true);
+        options.includeDocs(includeDocs);
+
+
+        if (offset != null) {
+            options.skip(offset);
+        }
+        if (max != null) {
+            options.limit(max);
+        }
+
+        // we use a 'now' value with hour precision, so we can have some caching of this query.
+        //maybe an hour is too long?
+        Calendar now = createNowWithHourPrecision();
+        final String view;
+        if (avType == null) {
+            options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
+            options.endKey((new Object[]{"VPRO"}));
+            view = couchdbViewReplayableRrogramsByFirstBroadcasting;
+        } else {
+            options.startKey(new Object[]{"VPRO", avType.toString(), now.getTimeInMillis()});
+            options.endKey((new Object[]{"VPRO", avType.toString()}));
+            view = couchdbViewReplayableRrogramsByAvtype;
+        }
+        return createCouchdbViewUrl(view, options);
+
+    }
 
     /**
      * Create an url for querying a couchdb view. We don't use the jcouchdb api because this uses the Svensson json library,
@@ -375,9 +392,14 @@ public class MediaServiceImpl implements MediaService {
         return Collections.<Subtitle>emptyList();
 
     }
-    */
+        */
     private Iterator<MediaSearchResultItem> getProfileWithCouchdb(Profile profile) throws IOException {
         String urn = profile.getArchiveUrn();
+        Options options = new Options();
+        options.reduce(false);
+        options.descending(false);
+        options.includeDocs(true);
+
         URL couchdb = new URL(couchdbUrlprovider.getUrl()
             + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
         InputStream inputStream = couchdb.openStream();
