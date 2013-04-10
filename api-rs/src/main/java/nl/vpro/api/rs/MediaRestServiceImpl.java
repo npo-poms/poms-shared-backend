@@ -194,8 +194,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-	@Deprecated
-	public String searchES(String index,String query, String typesAsString) {
+    @Deprecated
+    public String searchES(String index,String query, String typesAsString) {
         String[] types = null;
         if (typesAsString != null) {
             types = typesAsString.trim().split(" ");
@@ -212,7 +212,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 	}
 */
 
-	private TagFilter createFilter(String tags, BooleanOp booleanOp) {
+    private TagFilter createFilter(String tags, BooleanOp booleanOp) {
         TagFilter tagFilter = null;
         if (StringUtils.isNotBlank(tags)) {
             tagFilter = new TagFilter((booleanOp));
