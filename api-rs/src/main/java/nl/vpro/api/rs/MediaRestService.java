@@ -191,13 +191,12 @@ public interface MediaRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public String searchES(@PathParam("index") String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString);
 
-/*
-
-	@GET
-	@Path("program/{urn}/subtitles")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Subtitle searchSubtitles(@PathParam("urn") String urn,
-										  @QueryParam("q") String term);
+    /*
+    @GET
+    @Path("program/{urn}/subtitles")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Subtitle searchSubtitles(@PathParam("urn") String urn,
+                                    @QueryParam("q") String term);
 */
 
 
