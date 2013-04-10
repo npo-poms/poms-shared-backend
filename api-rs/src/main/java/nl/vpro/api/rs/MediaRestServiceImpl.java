@@ -202,15 +202,15 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
         return mediaService.searchES(index, types, query);
     }
-/*
 
-	@Override
-	public Subtitle searchSubtitles(@PathParam("urn") String urn, String term) {
+    /*
+    @Override
+    public Subtitle searchSubtitles(@PathParam("urn") String urn, String term) {
         //mediaService.searchSubtitles(urn, term);
-		return new Subtitle(0, "urn:bla", "floe");
+        return new Subtitle(0, "urn:bla", "floe");
 
-	}
-*/
+    }
+    */
 
     private TagFilter createFilter(String tags, BooleanOp booleanOp) {
         TagFilter tagFilter = null;
