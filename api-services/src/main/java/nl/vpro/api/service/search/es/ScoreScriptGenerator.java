@@ -4,6 +4,8 @@
  */
 package nl.vpro.api.service.search.es;
 
+import java.util.Formatter;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -18,7 +20,7 @@ public class ScoreScriptGenerator {
         script.append("scoreTable = [");
         boolean first = true;
         for (Map.Entry<String, Float> entry : scoreTable.entrySet()) {
-            script.append(String.format("%s'%s' : %.2f", first ? "" : ", ", entry.getKey(), entry.getValue()));
+            script.append(new Formatter(Locale.US).format("%s'%s' : %.2f", first ? "" : ", ", entry.getKey(), entry.getValue()));
             first=false;
         }
         script.append("]; ");
