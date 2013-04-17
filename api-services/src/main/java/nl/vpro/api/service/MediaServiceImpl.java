@@ -170,7 +170,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType) {
-        String requestUrl = getReplayableProgramsCouchdbUrl(max != null ? max : globalMaxResult, offset, avType, true);
+        String requestUrl = getReplayableProgramsCouchdbUrl(offset, max != null ? max : globalMaxResult, avType, true);
 
         try {
             ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
