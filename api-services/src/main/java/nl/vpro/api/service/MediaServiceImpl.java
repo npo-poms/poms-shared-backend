@@ -60,7 +60,6 @@ import java.util.concurrent.ExecutionException;
 @Service("mediaService")
 public class MediaServiceImpl implements MediaService {
 
-    public static String MEDIA_CORE_NAME = "poms";
     private static final Logger LOG = LoggerFactory.getLogger(MediaService.class);
 
     @Autowired
@@ -585,15 +584,13 @@ public class MediaServiceImpl implements MediaService {
         public int compare(Program media, Program media1) {
             if (media.getSortDate()!=null) {
                 if (media1.getSortDate()!=null) {
-                    media.getSortDate().compareTo(media1.getSortDate());
+                    return media.getSortDate().compareTo(media1.getSortDate());
                 } else {
                     return 1;
                 }
             } else {
                 return -1;
             }
-
-            return media.getSortDate().compareTo(media1.getSortDate());
         }
     }
 
