@@ -21,6 +21,7 @@ import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -197,19 +198,22 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
-    public Iterator<MediaSearchResultItem> getAllReplayablePrograms(AvType avType) {
+    public Iterator<Program> getAllReplayablePrograms(AvType avType) {
         try {
             URL requestUrl = new URL(getReplayableProgramsCouchdbUrl(null, null, avType, true));
 
             InputStream inputStream = requestUrl.openStream();
+            final ObjectMapper m = new ObjectMapper();
 
             Iterator<JsonNode> iterator = new CouchdbViewIterator(inputStream);
-            return new WrappedIterator<JsonNode, MediaSearchResultItem>(iterator) {
+            return new WrappedIterator<JsonNode, Program>(iterator) {
                 @Override
-                public MediaSearchResultItem next() {
-                    return conversionService.convert(
-                            wrapped.next(),
-                            MediaSearchResultItem.class);
+                public Program next() {
+                    try {
+                        return m.readValue(wrapped.next(), Program.class);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             };
         } catch (Exception e) {
