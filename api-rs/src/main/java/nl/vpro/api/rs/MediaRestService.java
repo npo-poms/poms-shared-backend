@@ -69,7 +69,12 @@ public interface MediaRestService {
     @GET
     @Path("group/{urn}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Group getGroup(@PathParam("urn") String urn, @QueryParam("members") @DefaultValue("false") boolean addMembers, @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes, @QueryParam("membertypes") String memberTypesFilter) throws ServerErrorException, NotFoundException;
+    public Group getGroup(
+            @PathParam("urn") String urn,
+            @QueryParam("members") @DefaultValue("false") boolean addMembers,
+            @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes,
+            @QueryParam("membertypes") String memberTypesFilter
+    ) throws ServerErrorException, NotFoundException;
 
     /**
      * Find related media for a segment.
