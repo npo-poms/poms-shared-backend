@@ -64,8 +64,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public MediaSearchResultItemIterator getAllReplayableProgram(final String avType) {
-
-        return new MediaSearchResultItemIterator(new WrappedIterator<MediaObject, MediaSearchResultItem>(mediaService.getAllReplayablePrograms(getAvType(avType))) {
+        return new MediaSearchResultItemIterator(new WrappedIterator<Program, MediaSearchResultItem>(mediaService.getAllReplayablePrograms(getAvType(avType))) {
             @Override
             public MediaSearchResultItem next() {
                 return new MediaSearchResultItem(wrapped.next());
