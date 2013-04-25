@@ -14,6 +14,7 @@ import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.*;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.transfer.ugc.annotation.Annotations;
+import nl.vpro.util.WrappedIterator;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 import org.apache.commons.lang.StringUtils;
@@ -64,21 +65,12 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResultItemIterator getAllReplayableProgram(final String avType) {
 
-        return new MediaSearchResultItemIterator(mediaService.getAllReplayablePrograms(getAvType(avType)));
-
-        /*
-        return new StreamingOutput() {
+        return new MediaSearchResultItemIterator(new WrappedIterator<MediaObject, MediaSearchResultItem>(mediaService.getAllReplayablePrograms(getAvType(avType))) {
             @Override
-            public void write(OutputStream output) throws IOException, WebApplicationException {
-                JsonGenerator jsonGen = new JsonFactory().createJsonGenerator(output);
-                Iterator<String> i = mediaService.getAllReplayablePrograms(getAvType(avType));
-                jsonGen.writeStartArray();
-                while (i.hasNext()) {
-                    jsonGen.writeString(i.next());
-                }
-                jsonGen.writeEndArray();
+            public MediaSearchResultItem next() {
+                return new MediaSearchResultItem(wrapped.next());
             }
-        };*/
+        });
     }
 
     private AvType getAvType(String avType) {
@@ -111,7 +103,11 @@ public class MediaRestServiceImpl implements MediaRestService {
      * - leaving req.param membertypes an empty value: &membertypes=
      * - adding all possibile mediaObjectTypes: &membertypes=program,group,segment
      */
-    public Group getGroup(String urn, boolean addMembers, boolean addEpisodes, String memberTypesFilter) throws ServerErrorException, NotFoundException {
+    public Group getGroup(
+            String urn,
+            boolean addMembers,
+            boolean addEpisodes,
+            String memberTypesFilter) throws ServerErrorException, NotFoundException {
         LOG.debug("Called with urn " + urn);
 
         List<MediaObjectType> mediaObjectTypesFilter = null;
