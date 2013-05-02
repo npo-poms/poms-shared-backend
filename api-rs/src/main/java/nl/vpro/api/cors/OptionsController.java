@@ -8,7 +8,6 @@ package nl.vpro.api.cors;
 import nl.vpro.api.rs.DisqusRestService;
 import nl.vpro.api.rs.MediaRestService;
 import nl.vpro.api.rs.SiteRestService;
-import nl.vpro.api.rs.UGCRestService;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.OPTIONS;
@@ -24,7 +23,6 @@ public class OptionsController {
      */
     public static final String PATH =
         "{path : (" + MediaRestService.PATH +
-        "|" + UGCRestService.PATH +
         "|" + SiteRestService.PATH +
         "|" + DisqusRestService.PATH +
         ")/.*}";

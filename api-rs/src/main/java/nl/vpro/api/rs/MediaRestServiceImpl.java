@@ -12,8 +12,6 @@ import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.search.filterbuilder.BooleanOp;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.*;
-import nl.vpro.domain.ugc.annotation.Annotation;
-import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.WrappedIterator;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
@@ -76,21 +74,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         return StringUtils.isEmpty(avType) ? null : AvType.valueOf(avType.toUpperCase());
     }
 
-    /**
-     * Currently this only fetches the default annotation from the poms segments.
-     *
-     * @throws IllegalArgumentException
-     */
-    @Override
-    public Annotations getAnnotationsForProgram(String urn) throws IllegalArgumentException {
-        Annotation annotation = mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, urn));
-        Annotations annotations = new Annotations();
-        if (annotation != null) {
-            annotations.addAnnotation(annotation);
-            annotations.setDefaultAnnotationIndex(0);
-        }
-        return annotations;
-    }
+
 
     @Override
     /**
