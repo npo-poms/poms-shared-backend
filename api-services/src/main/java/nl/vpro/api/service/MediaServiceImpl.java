@@ -209,7 +209,13 @@ public class MediaServiceImpl implements MediaService {
                 @Override
                 public Program next() {
                     try {
-                        return m.readValue(wrapped.next(), Program.class);
+                        while (true) {
+                            final Program program = m.readValue(wrapped.next(), Program.class);
+                            final List<Image> images = program.getImages();
+                            if (images != null && !images.isEmpty()) {
+                                return program;
+                            }
+                        }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
