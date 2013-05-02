@@ -76,10 +76,6 @@
             <artifactId>solr-solrj</artifactId>
             <groupId>org.apache.solr</groupId>
         </dependency>
-        <dependency>
-            <artifactId>solr-core</artifactId>
-            <groupId>org.apache.solr</groupId>
-        </dependency>
 
         <!-- CouchDB client -->
         <dependency>
