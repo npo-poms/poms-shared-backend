@@ -86,7 +86,7 @@ public enum Profile {
                             .setDocumentType(MediaObjectType.program))
                     .add(new MediaSearchFilter()
                             .setDocumentType(MediaObjectType.segment)
-                    );
+                );
 
 
             //the document must have an mp3, be of type audio and must be part of the given archive.
