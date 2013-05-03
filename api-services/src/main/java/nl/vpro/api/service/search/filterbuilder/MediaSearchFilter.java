@@ -5,10 +5,13 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 
 import nl.vpro.api.domain.media.*;
@@ -28,8 +31,8 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
  *
  * @author Ernst Bunders
  */
-public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilter> {
-    private static final Logger LOG = LoggerFactory.getLogger(DocumentSearchFilter.class);
+public final class MediaSearchFilter extends SearchFilter {
+    private static final Logger LOG = LoggerFactory.getLogger(MediaSearchFilter.class);
 
     private final Set<MediaType> mediaTypes         = new LinkedHashSet<MediaType>();
 
@@ -45,100 +48,98 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
 
     private MediaObjectType documentType;
 
-    public DocumentSearchFilter() {
+    public MediaSearchFilter() {
         super(BooleanOp.AND);
     }
 
-
-    public DocumentSearchFilter addMediaType(MediaType mediaType) {
+    public MediaSearchFilter addMediaType(MediaType mediaType) {
         mediaTypes.add(mediaType);
         return this;
     }
 
-    public DocumentSearchFilter addLocationFormat(AvFileFormat avFileFormat) {
+    public MediaSearchFilter addLocationFormat(AvFileFormat avFileFormat) {
         locationFormats.add(avFileFormat);
         return this;
     }
 
-    public DocumentSearchFilter addAvType(AvType avType) {
+    public MediaSearchFilter addAvType(AvType avType) {
         avTypes.add(avType);
         return this;
     }
 
-    public DocumentSearchFilter addDescendant(String descendant) {
+    public MediaSearchFilter addDescendant(String descendant) {
         descendants.add(descendant);
         return this;
     }
 
-    public DocumentSearchFilter addBroadcaster(String broadcaster) {
+    public MediaSearchFilter addBroadcaster(String broadcaster) {
         broadcasters.add(broadcaster);
         return this;
     }
 
-    public DocumentSearchFilter setMainTitle(String mainTitle) {
+    public MediaSearchFilter setMainTitle(String mainTitle) {
         this.mainTitle = mainTitle;
         return this;
     }
 
-    public DocumentSearchFilter setDocumentType(MediaObjectType documentType) {
+    public MediaSearchFilter setDocumentType(MediaObjectType documentType) {
         this.documentType = documentType;
         return this;
     }
 
-    @Override
-    public boolean apply(Object o) {
-        if (! (o instanceof MediaObject)) return false;
-        MediaObject object = (MediaObject) o;
+    public Predicate<MediaObject> getPredicate() {
+        return new Predicate<MediaObject>() {
+            @Override
+            public boolean apply(@Nullable MediaObject object) {
+                if (documentType != null) {
+                    if (! documentType.isInstance(object)) return false;
+                }
+                if (! avTypes.isEmpty()) {
+                    if (! avTypes.contains(object.getAvType())) return false;
+                }
 
-        if (this.documentType != null) {
-            if (! this.documentType.isInstance(object)) return false;
-        }
-        if (! avTypes.isEmpty()) {
-            if (! avTypes.contains(object.getAvType())) return false;
-        }
-
-        if (!locationFormats.isEmpty()) {
-            if (object instanceof Program) {
-                boolean found = false;
-                if (object.getLocations() != null) {
-                    for (Location location : object.getLocations()) {
-                        if (locationFormats.contains(location.getAvAttributes().getAvFileFormat())) {
-                            found = true;
-                            break;
+                if (!locationFormats.isEmpty()) {
+                    if (object instanceof Program) {
+                        boolean found = false;
+                        if (object.getLocations() != null) {
+                            for (Location location : object.getLocations()) {
+                                if (locationFormats.contains(location.getAvAttributes().getAvFileFormat())) {
+                                    found = true;
+                                    break;
+                                }
+                            }
                         }
+                        if (! found) return false;
+                    } else {
+                        // Hmm, this is actually hardly implementable because the 'location_formats' are only available in solr.
+                        // TODO
                     }
                 }
-                if (! found) return false;
-            } else {
-                // Hmm, this is actually hardly implementable because the 'location_formats' are only available in solr.
-                // TODO
+                if (! descendants.isEmpty()) {
+                    Set<String> descendantsOf = new HashSet<String>();
+                    for (DescendantRef ref : object.getDescendantOf()) {
+                        descendantsOf.add(ref.getUrnRef());
+                    }
+                    if (Sets.intersection(descendants, descendantsOf).isEmpty()) return false;
+
+                }
+                if (!mediaTypes.isEmpty()) {
+                    throw new UnsupportedOperationException();
+                }
+                if (! broadcasters.isEmpty()) {
+                    throw new UnsupportedOperationException();
+                }
+                if (StringUtils.isNotEmpty(mainTitle)) {
+                    throw new UnsupportedOperationException();
+                }
+
+                return true;
             }
-        }
-        if (! descendants.isEmpty()) {
-            Set<String> descendantsOf = new HashSet<String>();
-            for (DescendantRef ref : object.getDescendantOf()) {
-                descendantsOf.add(ref.getUrnRef());
-            }
-            if (Sets.intersection(descendants, descendantsOf).isEmpty()) return false;
-
-        }
-        if (!mediaTypes.isEmpty()) {
-            throw new UnsupportedOperationException();
-        }
-        if (! broadcasters.isEmpty()) {
-            throw new UnsupportedOperationException();
-        }
-        if (StringUtils.isNotEmpty(mainTitle)) {
-            throw new UnsupportedOperationException();
-        }
-
-        return true;
-
+        };
     }
 
-
     @Override
-    public String createQueryString() {
+    public String createSolrQueryString() {
         BooleanGroupingStringBuilder sb = new BooleanGroupingStringBuilder();
 
         for (MediaType mediaType : mediaTypes) {
@@ -205,11 +206,4 @@ public final class DocumentSearchFilter extends SearchFilter<DocumentSearchFilte
     public MediaObjectType getDocumentType() {
         return documentType;
     }
-
-    @Override
-    protected DocumentSearchFilter getInstance() {
-        return this;
-    }
-
-
 }

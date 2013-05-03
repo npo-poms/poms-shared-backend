@@ -23,26 +23,22 @@ public final class SearchFilterList extends SearchFilter {
         super(booleanOp);
     }
 
-    public SearchFilterList addQuery(SearchFilter<?> mediaSearchQuery) {
-        searchFilters.add(mediaSearchQuery);
+    public SearchFilterList add(SearchFilter searchFilter) {
+        searchFilters.add(searchFilter);
         return this;
     }
 
-    /**
-     * 'Media' search queries?
-     * @return
-     */
-    public List<SearchFilter> getMediaSearchQueries() {
+    public List<SearchFilter> getSearchFilters() {
         return searchFilters;
     }
 
     @Override
-    public String createQueryString() {
+    public String createSolrQueryString() {
         BooleanGroupingStringBuilder sb = new BooleanGroupingStringBuilder();
         sb.grouping = searchFilters.size() > 1;
 
         for (SearchFilter query : searchFilters) {
-            sb.append(query.createQueryString());
+            sb.append(query.createSolrQueryString());
         }
         sb.close();
 
@@ -54,28 +50,4 @@ public final class SearchFilterList extends SearchFilter {
         LOG.debug("query:" + s);
         return s;
     }
-
-    @Override
-    protected SearchFilterList getInstance() {
-        return this;
-    }
-
-    @Override
-    public boolean apply(Object object) {
-        switch(getBooleanOp()) {
-            case AND:
-                for (SearchFilter<?> filter : getMediaSearchQueries()) {
-                    if (! filter.apply(object)) return false;
-                }
-                return true;
-            case OR:
-                for (SearchFilter<?> filter : getMediaSearchQueries()) {
-                    if (filter.apply(object)) return true;
-                }
-                return false;
-            default:
-                return true;
-        }
-    }
-
 }

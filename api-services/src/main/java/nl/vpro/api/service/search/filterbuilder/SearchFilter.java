@@ -1,15 +1,13 @@
 package nl.vpro.api.service.search.filterbuilder;
 
-import com.google.common.base.Predicate;
-
 /**
- * MM: See comments in {@link DocumentSearchFilter}
+ * MM: See comments in {@link MediaSearchFilter}
  * Date: 19-3-12
  * Time: 13:51
  *
  * @author Ernst Bunders
  */
-public abstract class SearchFilter<T extends SearchFilter>  implements Predicate<Object> {
+public abstract class SearchFilter {
 
     private BooleanOp booleanOp;
 
@@ -19,23 +17,20 @@ public abstract class SearchFilter<T extends SearchFilter>  implements Predicate
         this.booleanOp = booleanOp;
     }
 
-    public T setQueryString(String queryString) {
+    public SearchFilter setQueryString(String queryString) {
         this.queryString = queryString;
-        return getInstance();
+        return this;
     }
 
     protected String wrapInQuotes(String s) {
         return "\"" + s + "\"";
     }
 
-    public abstract String createQueryString();
-
-    protected abstract T getInstance();
-
+    public abstract String createSolrQueryString();
 
     @Override
     public String toString() {
-        return createQueryString();
+        return createSolrQueryString();
     }
 
     protected class BooleanGroupingStringBuilder {

@@ -52,12 +52,16 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
             result = parseFilterList((SearchFilterList) mediaSearchQuery);
         }
 
-        if (mediaSearchQuery instanceof DocumentSearchFilter) {
-            result = parseBooleanFilter((DocumentSearchFilter) mediaSearchQuery);
+        if (mediaSearchQuery instanceof MediaSearchFilter) {
+            result = parseBooleanFilter((MediaSearchFilter) mediaSearchQuery);
         }
 
         if (mediaSearchQuery instanceof FieldFilter) {
             result = parseFieldFilter((FieldFilter) mediaSearchQuery);
+        }
+
+        if (mediaSearchQuery instanceof PrefixFieldFilter) {
+            result = parsePrefixFilter((PrefixFieldFilter) mediaSearchQuery);
         }
     }
 
@@ -65,24 +69,28 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
         return termFilter(fieldFilter.getField(),fieldFilter.getValue());
     }
 
-    private FilterBuilder parseFilterList(SearchFilterList queryList) {
+    private FilterBuilder parsePrefixFilter(PrefixFieldFilter prefixFieldFilter) {
+        return prefixFilter(prefixFieldFilter.getField(), prefixFieldFilter.getValue());
+    }
+
+    private FilterBuilder parseFilterList(SearchFilterList searchFilterList) {
         final List<FilterBuilder> filterBuilderList = new ArrayList<FilterBuilder>();
-        for (SearchFilter childQuery : queryList.getMediaSearchQueries()) {
-            if (childQuery instanceof SearchFilterList) {
-                filterBuilderList.add(parseFilterList((SearchFilterList) childQuery));
-            } else if (childQuery instanceof DocumentSearchFilter) {
-                // If this queryList is of type and, we can just add all the term filters
-                // of the boolean query, and not wrap it in it's own and filter
-                if (queryList.getBooleanOp() == BooleanOp.AND) {
-                    //add filters to current and filter
-                    filterBuilderList.addAll(gatherTermFilters((DocumentSearchFilter) childQuery));
+        for (SearchFilter searchFilter : searchFilterList.getSearchFilters()) {
+            if (searchFilter instanceof SearchFilterList) {
+                filterBuilderList.add(parseFilterList((SearchFilterList) searchFilter));
+            } else if (searchFilter instanceof MediaSearchFilter) {
+                // If this searchFilterList is of type AND, we can just add all the term filters
+                // of the boolean query, and not wrap it in its own AND-filter
+                if (searchFilterList.getBooleanOp() == BooleanOp.AND) {
+                    //add filters to current AND-filter
+                    filterBuilderList.addAll(gatherTermFilters((MediaSearchFilter) searchFilter));
                 } else {
-                    //or: create new nested and filter
-                    filterBuilderList.add(parseBooleanFilter((DocumentSearchFilter) childQuery));
+                    //or: create new nested AND-filter
+                    filterBuilderList.add(parseBooleanFilter((MediaSearchFilter) searchFilter));
                 }
             }
         }
-        if (queryList.getBooleanOp() == BooleanOp.AND) {
+        if (searchFilterList.getBooleanOp() == BooleanOp.AND) {
             return andFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
         }else /*OR*/{
             return orFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
@@ -90,8 +98,8 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
     }
 
 
-    private FilterBuilder parseBooleanFilter(DocumentSearchFilter documentSearchFilter) {
-        final List<FilterBuilder> fbl = gatherTermFilters(documentSearchFilter);
+    private FilterBuilder parseBooleanFilter(MediaSearchFilter mediaSearchFilter) {
+        final List<FilterBuilder> fbl = gatherTermFilters(mediaSearchFilter);
         if (fbl == null) return null;
 
         return fbl.size() > 1 ?
@@ -99,34 +107,34 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
                 : fbl.get(0);
     }
 
-    private List<FilterBuilder> gatherTermFilters(DocumentSearchFilter documentSearchFilter) {
+    private List<FilterBuilder> gatherTermFilters(MediaSearchFilter mediaSearchFilter) {
         final List<FilterBuilder> fbl = new ArrayList<FilterBuilder>();
-        for (MediaType mediaType : documentSearchFilter.getMediaTypes()) {
+        for (MediaType mediaType : mediaSearchFilter.getMediaTypes()) {
             fbl.add(termFilter("type", mediaType.name()));
         }
 
-        for (AvFileFormat fileFormat : documentSearchFilter.getLocationFormats()) {
+        for (AvFileFormat fileFormat : mediaSearchFilter.getLocationFormats()) {
             fbl.add(termFilter("locations.avAttributes.avFileFormat", fileFormat.name()));
         }
 
-        for (String broadcaster : documentSearchFilter.getBroadcasters()) {
+        for (String broadcaster : mediaSearchFilter.getBroadcasters()) {
             fbl.add(termFilter("broadcasters", broadcaster.toLowerCase()));
         }
 
-        for (AvType avType : documentSearchFilter.getAvTypes()) {
+        for (AvType avType : mediaSearchFilter.getAvTypes()) {
             fbl.add(termFilter("avType", avType.name()));
         }
 
-        for (String descendant : documentSearchFilter.getDescendants()) {
+        for (String descendant : mediaSearchFilter.getDescendants()) {
             fbl.add(termFilter("descendantOf", descendant));
         }
 
-        if (StringUtils.isNotBlank(documentSearchFilter.getMainTitle())) {
-            fbl.add(termFilter("titles", documentSearchFilter.getMainTitle()));
+        if (StringUtils.isNotBlank(mediaSearchFilter.getMainTitle())) {
+            fbl.add(termFilter("titles", mediaSearchFilter.getMainTitle()));
         }
 
-        if (documentSearchFilter.getDocumentType() != null) {
-            fbl.add(termFilter("_type", documentSearchFilter.getDocumentType()));
+        if (mediaSearchFilter.getDocumentType() != null) {
+            fbl.add(termFilter("_type", mediaSearchFilter.getDocumentType()));
         }
         if (fbl.size() == 0) {
             return null;

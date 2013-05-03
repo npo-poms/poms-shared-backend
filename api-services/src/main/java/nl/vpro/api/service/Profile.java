@@ -18,7 +18,7 @@ public enum Profile {
     GESCHIEDENIS24("geschiedenis24", "", "g24") {
         @Override
         public SearchFilter createFilterQuery() {
-            return new FieldFilter().setField("brand_title", "geschiedenis");
+            return new FieldFilter("brand_title", "geschiedenis");
         }
 
         @Override
@@ -45,7 +45,7 @@ public enum Profile {
     WETENSCHAP24("wetenschap24", "", "w24") {
         @Override
         public SearchFilter createFilterQuery() {
-            return new FieldFilter().setField("brand_title", "wetenschap");
+            return new FieldFilter("brand_title", "wetenschap");
         }
 
         @Override
@@ -82,22 +82,22 @@ public enum Profile {
 
             //The document should be a program or a segment
             SearchFilterList documentTypes = new SearchFilterList(BooleanOp.OR)
-                    .addQuery(new DocumentSearchFilter()
+                    .add(new MediaSearchFilter()
                             .setDocumentType(MediaObjectType.program))
-                    .addQuery(new DocumentSearchFilter()
+                    .add(new MediaSearchFilter()
                             .setDocumentType(MediaObjectType.segment)
-                );
+                    );
 
 
             //the document must have an mp3, be of type audio and must be part of the given archive.
-            SearchFilter contentRules = new DocumentSearchFilter() /*program*/
+            SearchFilter contentRules = new MediaSearchFilter() /*program*/
                     .addAvType(AvType.AUDIO)
                     .addDescendant(getArchiveUrn())
                     .addLocationFormat(AvFileFormat.MP3);
 
             return new SearchFilterList(BooleanOp.AND)
-                    .addQuery(documentTypes)
-                    .addQuery(contentRules);
+                    .add(documentTypes)
+                    .add(contentRules);
         }
 
         public List<String> getSearchFields() {
@@ -123,8 +123,9 @@ public enum Profile {
     VPRO("vpro", "", "") {
         @Override
         public SearchFilter createFilterQuery() {
-            return new DocumentSearchFilter()
-                    .addBroadcaster("VPRO");
+            return new SearchFilterList(BooleanOp.AND)
+                .add(new MediaSearchFilter().addBroadcaster("VPRO"))
+                .add(new PrefixFieldFilter("images", "urn"));
         }
 
         @Override
@@ -151,7 +152,7 @@ public enum Profile {
     DEFAULT("", "", "") {
         @Override
         public SearchFilter createFilterQuery() {
-            return new DocumentSearchFilter()
+            return new MediaSearchFilter()
                     .addBroadcaster("VPRO");
         }
 

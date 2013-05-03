@@ -8,6 +8,8 @@ import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.search.Search;
+import nl.vpro.api.service.search.filterbuilder.MediaSearchFilter;
+import nl.vpro.api.service.search.filterbuilder.SearchFilter;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.*;
 import nl.vpro.api.util.CouchdbViewIterator;
@@ -403,15 +405,24 @@ public class MediaServiceImpl implements MediaService {
         URL couchdb = new URL(couchdbUrlprovider.getUrl()
             + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
         InputStream inputStream = couchdb.openStream();
-        Iterator<MediaObject> iterator = new FilteringIterator<MediaObject>(new MediaObjectIterator(new CouchdbViewIterator(inputStream)), profile.createFilterQuery());
-        return new WrappedIterator<MediaObject, MediaSearchResultItem>(iterator) {
-            @Override
-            public MediaSearchResultItem next() {
-                return conversionService.convert(
-                    wrapped.next(),
-                    MediaSearchResultItem.class);
-            }
-        };
+
+        SearchFilter searchFilter = profile.createFilterQuery();
+
+        if (searchFilter instanceof MediaSearchFilter) {
+            MediaSearchFilter mediaSearchFilter = (MediaSearchFilter) searchFilter;
+            Iterator<MediaObject> iterator = new FilteringIterator<MediaObject>(new MediaObjectIterator(new CouchdbViewIterator(inputStream)), mediaSearchFilter.getPredicate());
+            return new WrappedIterator<MediaObject, MediaSearchResultItem>(iterator) {
+                @Override
+                public MediaSearchResultItem next() {
+                    return conversionService.convert(
+                            wrapped.next(),
+                            MediaSearchResultItem.class);
+                }
+            };
+        }
+        else {
+            throw new IllegalArgumentException("Profile is not a media profile.");
+        }
     }
 
     public void setGlobalMaxResult(int globalMaxResult) {

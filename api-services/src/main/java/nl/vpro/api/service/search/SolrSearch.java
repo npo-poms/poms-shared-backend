@@ -2,7 +2,7 @@ package nl.vpro.api.service.search;
 
 import nl.vpro.api.domain.media.search.MediaType;
 import nl.vpro.api.service.Profile;
-import nl.vpro.api.service.search.filterbuilder.DocumentSearchFilter;
+import nl.vpro.api.service.search.filterbuilder.MediaSearchFilter;
 import nl.vpro.api.service.search.filterbuilder.SearchFilter;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.GenericSearchResult;
@@ -101,10 +101,10 @@ public class SolrSearch extends AbstractSearch {
     @Override
     public String findArchiveId(String archiveName) throws ServerErrorException{
         log.debug("Profile not found in cache. look up in solr");
-        String queryString = new DocumentSearchFilter()
+        String queryString = new MediaSearchFilter()
                 .addMediaType(MediaType.ARCHIVE)
                 .setMainTitle(archiveName)
-                .createQueryString();
+                .createSolrQueryString();
         SolrQuery query = solrQueryBuilder.build(queryString);
 
         try {
@@ -140,7 +140,7 @@ public class SolrSearch extends AbstractSearch {
     private void setFilterQuery(Profile profile, SolrQuery solrQuery) {
         SearchFilter filterQuery = profile.createFilterQuery();
         if (filterQuery != null) {
-            String filterQueryString = filterQuery.createQueryString();
+            String filterQueryString = filterQuery.createSolrQueryString();
             if (StringUtils.isNotBlank(filterQueryString)) {
                 log.debug("Filter Query: " + filterQueryString);
                 solrQuery.setFilterQueries(filterQueryString);
