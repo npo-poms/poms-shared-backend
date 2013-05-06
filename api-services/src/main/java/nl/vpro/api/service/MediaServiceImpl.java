@@ -8,6 +8,7 @@ import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.search.Search;
+import nl.vpro.api.service.search.es.ProfileFilterBuilder;
 import nl.vpro.api.service.search.filterbuilder.MediaSearchFilter;
 import nl.vpro.api.service.search.filterbuilder.SearchFilter;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
@@ -28,6 +29,13 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.jcouchdb.db.Database;
 import org.jcouchdb.db.Options;
 import org.jcouchdb.document.ValueAndDocumentRow;
@@ -171,32 +179,35 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType) {
-        String requestUrl = getReplayableProgramsCouchdbUrl(offset, max != null ? max : globalMaxResult, avType, true);
+        final SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        final Profile vpro = profileService.getProfile("vpro");
+        final FilterBuilder filterBuilder = new ProfileFilterBuilder(vpro);
+        sourceBuilder.filter(filterBuilder);
+
+        if (max    != null) sourceBuilder.size(max);
+        if (offset != null) sourceBuilder.from(offset);
+
+        final BoolQueryBuilder queryBuilder = new BoolQueryBuilder()
+            .must(QueryBuilders.prefixQuery("urn", "urn:vpro:media:program")); // Only return programs
+
+        if (avType != null) queryBuilder.must(QueryBuilders.termQuery("avType", avType.name().toLowerCase()));
+
+        sourceBuilder.query(queryBuilder);
+
+        sourceBuilder.sort("sortDate", SortOrder.DESC);
+
+        final SearchRequest request = new SearchRequest("poms").source(sourceBuilder);
+        final ActionFuture<SearchResponse> responseFuture = esClient.search(request);
 
         try {
-            ResponseEntity<ViewResultWithPrograms> programViewResult = restTemplate.getForEntity(requestUrl, ViewResultWithPrograms.class);
-
-            ProgramList list = new ProgramList();
-            list.setNumFound(programViewResult.getBody().getTotalRows());
-            list.setStart(programViewResult.getBody().getOffset());
-            for (ResultRowWithDocument<Program, String> row : programViewResult.getBody().getRows()) {
-                list.addProgram(row.getDoc());
-            }
-
-            return list;
-        } catch (HttpServerErrorException e) {
-            throw new ServerErrorException(e.getMessage(), e);
-        } catch (ResourceAccessException e1) {
-            throw new ServerErrorException(e1.getMessage(), e1);
-        } catch (HttpClientErrorException e3) {
-            if (e3.getStatusCode().value() == 404) {
-                throw new NotFoundException("View  " + requestUrl + " could not be queried", e3);
-            } else {
-                throw new ServerErrorException("Something went wrong fetching data from couchdb view " + requestUrl + ". reason: " + e3.getMessage(), e3);
-            }
+            final SearchResponse response = responseFuture.actionGet();
+            final SearchHits hits = response.hits();
+            return toProgramList(hits, offset);
+        } catch (Throwable e) {
+            throw new ServerErrorException("Something went wrong performing an elastic search operation: " + e.getMessage(), e);
         }
     }
-
 
     @Override
     public Iterator<Program> getAllReplayablePrograms(AvType avType) {
@@ -226,16 +237,26 @@ public class MediaServiceImpl implements MediaService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    private ProgramList toProgramList(SearchHits hits, Integer offset) {
+        final long numFound = hits.totalHits();
+        if (offset == null) { offset = 0; }
+        final ProgramList programList = new ProgramList(numFound, offset);
+        for (SearchHit hit : hits.getHits()) {
+            final String urn = hit.id();
+            final Long mediaId = MediaUtil.getMediaId(MediaObjectType.program, urn);
+            final Program program = getProgram(mediaId);
+            programList.addProgram(program);
+        }
+        return programList;
+    }
 
     private String getReplayableProgramsCouchdbUrl(Integer offset, Integer max, AvType avType, boolean includeDocs) {
         Options options = new Options();
         options.reduce(false);
         options.descending(true);
         options.includeDocs(includeDocs);
-
 
         if (offset != null) {
             options.skip(offset);
@@ -258,7 +279,6 @@ public class MediaServiceImpl implements MediaService {
             view = couchdbViewReplayableRrogramsByAvtype;
         }
         return createCouchdbViewUrl(view, options);
-
     }
 
     /**
@@ -273,7 +293,6 @@ public class MediaServiceImpl implements MediaService {
         String query = "/_design/" + StringUtils.substringBefore(view, "/") + "/_view/" + StringUtils.substringAfter(view, "/");
         return couchdbUrlprovider.getUrl() + query + URLDecoder.decode(options.toQuery());
     }
-
 
     private Calendar createNowWithHourPrecision() {
         Calendar c = new GregorianCalendar(new Locale("NL", "nl"));
@@ -364,37 +383,8 @@ public class MediaServiceImpl implements MediaService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
-    /* hackaton
-    @Override
-    public List<Subtitle> searchSubtitles(String urn, String term) {
-        SearchRequest searchRequest = new SearchRequest("subtitles");
-
-        String query = "{\"query\":{\"bool\":{\"must\":[{\"wildcard\":{\"urn\":\"urn:vpro:media:*\"}}],\"must_not\":[],\"should\":[]}},\"from\":0,\"size\":50,\"sort\":[],\"facets\":{}}\"";
-
-        searchRequest
-                .searchType(SearchType.DEFAULT)
-                .source(query.getBytes())
-        ;
-
-        ActionFuture<SearchResponse> responseFuture = esClient.search(searchRequest);
-
-        try {
-            SearchResponse response = responseFuture.get();
-            System.out.println("response" + response);
-            //return response.getHits();
-        } catch (InterruptedException e) {
-            LOG.error(e.getMessage(), e);
-        } catch (ExecutionException e) {
-            LOG.error(e.getMessage(), e);
-        }
-
-        return Collections.<Subtitle>emptyList();
-
-    }
-        */
     private Iterator<MediaSearchResultItem> getProfileWithCouchdb(Profile profile) throws IOException {
         String urn = profile.getArchiveUrn();
         Options options = new Options();
@@ -529,7 +519,6 @@ public class MediaServiceImpl implements MediaService {
                         .reduce(false),
                 null);
     }
-
 
     private static final class SortInGroupByOrderComparator implements Comparator<MediaObject>, Serializable {
         private static final long serialVersionUID = 23450383305L;

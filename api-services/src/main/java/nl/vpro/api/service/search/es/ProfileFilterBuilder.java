@@ -52,15 +52,15 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
             result = parseFilterList((SearchFilterList) mediaSearchQuery);
         }
 
-        if (mediaSearchQuery instanceof MediaSearchFilter) {
+        else if (mediaSearchQuery instanceof MediaSearchFilter) {
             result = parseBooleanFilter((MediaSearchFilter) mediaSearchQuery);
         }
 
-        if (mediaSearchQuery instanceof FieldFilter) {
+        else if (mediaSearchQuery instanceof FieldFilter) {
             result = parseFieldFilter((FieldFilter) mediaSearchQuery);
         }
 
-        if (mediaSearchQuery instanceof PrefixFieldFilter) {
+        else if (mediaSearchQuery instanceof PrefixFieldFilter) {
             result = parsePrefixFilter((PrefixFieldFilter) mediaSearchQuery);
         }
     }
@@ -88,12 +88,18 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
                     //or: create new nested AND-filter
                     filterBuilderList.add(parseBooleanFilter((MediaSearchFilter) searchFilter));
                 }
+            } else if (searchFilter instanceof FieldFilter) {
+                filterBuilderList.add(parseFieldFilter((FieldFilter) searchFilter));
+            } else if (searchFilter instanceof PrefixFieldFilter) {
+                filterBuilderList.add(parsePrefixFilter((PrefixFieldFilter) searchFilter));
             }
         }
+
+        final FilterBuilder[] filterBuilders = filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]);
         if (searchFilterList.getBooleanOp() == BooleanOp.AND) {
-            return andFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
+            return andFilter(filterBuilders);
         }else /*OR*/{
-            return orFilter(filterBuilderList.toArray(new FilterBuilder[filterBuilderList.size()]));
+            return orFilter(filterBuilders);
         }
     }
 

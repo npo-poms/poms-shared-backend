@@ -125,7 +125,7 @@ public enum Profile {
         public SearchFilter createFilterQuery() {
             return new SearchFilterList(BooleanOp.AND)
                 .add(new MediaSearchFilter().addBroadcaster("VPRO"))
-                .add(new PrefixFieldFilter("images", "urn"));
+                .add(new PrefixFieldFilter("images.urn", "urn"));
         }
 
         @Override
