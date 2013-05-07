@@ -90,6 +90,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             String urn,
             boolean addMembers,
             boolean addEpisodes,
+            boolean addSubgroups,
             String memberTypesFilter) throws ServerErrorException, NotFoundException {
         LOG.debug("Called with urn " + urn);
 
@@ -108,7 +109,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             }
         }
 
-        return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers, addEpisodes, mediaObjectTypesFilter);
+        return mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), addMembers, addEpisodes, addSubgroups, mediaObjectTypesFilter);
     }
 
     @Override
@@ -125,7 +126,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public List<MediaObject> relatedForGroup(String groupUrn, String profile, Integer offset, Integer maxResult) {
-        MediaObject mediaObject = mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, groupUrn), false, null);
+        MediaObject mediaObject = mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, groupUrn), false, false, false, null);
         return relatedForMediaObject(mediaObject, profile, offset, maxResult);
     }
 
@@ -238,7 +239,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         } else if (MediaObjectType.segment.equals(mediaObjectType)) {
             mediaObject = mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, urn));
         } else if (MediaObjectType.group.equals(mediaObjectType)) {
-            mediaObject = mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), false, null);
+            mediaObject = mediaService.getGroup(MediaUtil.getMediaId(MediaObjectType.group, urn), false, false, false, null);
         } else {
             throw new RuntimeException("Unknown media object type: " + mediaObjectType);
         }

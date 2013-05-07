@@ -71,6 +71,7 @@ public interface MediaRestService {
             @PathParam("urn") String urn,
             @QueryParam("members") @DefaultValue("false") boolean addMembers,
             @QueryParam("episodes") @DefaultValue("false") boolean addEpisodes,
+            @QueryParam("subgroups") @DefaultValue("false") boolean addSubgroups,
             @QueryParam("membertypes") String memberTypesFilter
     ) throws ServerErrorException, NotFoundException;
 
