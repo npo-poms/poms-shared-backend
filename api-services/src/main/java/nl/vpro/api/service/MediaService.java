@@ -45,17 +45,10 @@ public interface MediaService {
     /**
      * Returns a group, optionally with members.
      * If addMembers=true, and memberTypes is null or empty, all members are returned.
-     * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
-     */
-    Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter);
-
-    /**
-     * Returns a group, optionally with members.
-     * If addMembers=true, and memberTypes is null or empty, all members are returned.
      * If addEpisodes=true, and memberTypes is null or empty, all members are returned.
      * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
      */
-    Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter);
+    Group getGroup(Long id, boolean addMembers, boolean addEpisodes, boolean addSubgroups, List<MediaObjectType> memberTypesFilter);
 
     Segment getSegment(Long id);
 

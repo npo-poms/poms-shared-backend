@@ -310,18 +310,9 @@ public class MediaServiceImpl implements MediaService {
      * Returns a group, optionally with members.
      * If addMembers=true, and memberTypes is null or empty, all members are returned.
      * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
+     * If addSubgroups=true subgroups are also returned.
      */
-    public Group getGroup(Long id, boolean addMembers, List<MediaObjectType> memberTypesFilter) {
-        return getGroup(id, addMembers, false, memberTypesFilter);
-    }
-
-    @Override
-    /**
-     * Returns a group, optionally with members.
-     * If addMembers=true, and memberTypes is null or empty, all members are returned.
-     * If addMembers=true, and specific memberTypes are indicated, only members of those indicated MediaObjectTypes are returned.
-     */
-    public Group getGroup(Long id, boolean addMembers, boolean addEpisodes, List<MediaObjectType> memberTypesFilter) {
+    public Group getGroup(Long id, boolean addMembers, boolean addEpisodes, boolean addSubgroups, List<MediaObjectType> memberTypesFilter) {
         String urn = MediaUtil.createUrnFromId(MediaObjectType.group, id);
         try {
             ResponseEntity<Group> groupResponseEntity = restTemplate.getForEntity("{base}/{urn}", Group.class, couchdbUrlprovider.getUrl(), urn);
@@ -332,6 +323,11 @@ public class MediaServiceImpl implements MediaService {
             }
             if (addEpisodes) {
                 group.getMembers().addAll(getEpisodesForGroup(group)); //MediaObjectType.group, MediaObjectType.program, MediaObjectType.segment
+            }
+            if (addSubgroups) {
+                for (Long subgroupId : getSubgroupIds(group)) {
+                    group.getMembers().add(getGroup(subgroupId, addMembers, addEpisodes, addSubgroups, memberTypesFilter));
+                }
             }
             return group;
         } catch (HttpServerErrorException e) {
@@ -486,6 +482,21 @@ public class MediaServiceImpl implements MediaService {
             Collections.sort(programs, new SortEpisodesByDateComparator());
         }
         return programs;
+    }
+
+    private List<Long> getSubgroupIds(final Group group) {
+        List<Long> subgroupIds = new ArrayList<Long>();
+        if (group != null) {
+            ViewResult<Map> viewResult = getViewResult(group.getUrn(), "media/by-group");
+            for (ValueRow<Map> row : viewResult.getRows()) {
+                String urn = row.getId();
+                if (MediaObjectType.group.name().equals(MediaUtil.getMediaType(urn).name())) {
+                    Long subgroupId = MediaUtil.getMediaId(MediaObjectType.group, urn);
+                    subgroupIds.add(subgroupId);
+                }
+            }
+        }
+        return subgroupIds;
     }
 
     /**
