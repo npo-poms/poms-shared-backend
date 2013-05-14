@@ -16,6 +16,7 @@ import nl.vpro.api.transfer.*;
 import nl.vpro.api.util.CouchdbViewIterator;
 import nl.vpro.api.util.MediaObjectIterator;
 import nl.vpro.api.util.UrlProvider;
+import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
 import nl.vpro.util.FilteringIterator;
 import nl.vpro.util.WrappedIterator;
@@ -300,6 +301,14 @@ public class MediaServiceImpl implements MediaService {
         c.set(Calendar.MINUTE, 0);
         return c;
     }
+
+    @Override
+    public Annotation getProgramAnnotation(Long id) {
+        Program program = getProgram(id);
+        return conversionService.convert(program, Annotation.class);
+
+    }
+
 
     /**
      * Group calls

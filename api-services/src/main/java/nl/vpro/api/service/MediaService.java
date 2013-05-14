@@ -4,16 +4,14 @@
  */
 package nl.vpro.api.service;
 
-import nl.vpro.api.domain.media.AvType;
-import nl.vpro.api.domain.media.Group;
-import nl.vpro.api.domain.media.Program;
-import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.*;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItem;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.SearchSuggestions;
+import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.util.rs.error.ServerErrorException;
 
 import java.util.Iterator;
@@ -41,6 +39,12 @@ public interface MediaService {
     ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType);
 
     Iterator<Program> getAllReplayablePrograms(AvType avType);
+
+    /**
+     * @param id
+     * @return the POMS segments as one annotation
+     */
+    Annotation getProgramAnnotation(Long id);
 
     /**
      * Returns a group, optionally with members.
