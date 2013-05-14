@@ -111,6 +111,8 @@ public class MediaServiceImpl implements MediaService {
 
     public static MediaService INSTANCE;
 
+    private final ObjectMapper mapper = new MediaMapper();
+
     public MediaServiceImpl() {
         if (INSTANCE != null) throw new IllegalStateException();
         INSTANCE = this;
@@ -220,35 +222,60 @@ public class MediaServiceImpl implements MediaService {
 
             Iterator<JsonNode> iterator = new CouchdbViewIterator(inputStream);
             return new WrappedIterator<JsonNode, Program>(iterator) {
+                private final Logger log = LoggerFactory.getLogger(MediaService.class);
+
+                Program next;
                 @Override
                 public Program next() {
-                    try {
-                        while (true) {
-                            final Program program = m.readValue(wrapped.next(), Program.class);
-                            final List<Image> images = program.getImages();
-                            if (images != null && !images.isEmpty()) {
-                                return program;
+                    findNext();
+                    if (next == null) throw new NoSuchElementException();
+                    Program result = next;
+                    next = null;
+                    return result;
+                }
+                @Override
+                public boolean hasNext() {
+                    findNext();
+                    return next != null;
+                }
+
+                protected void findNext() {
+                    if (next == null) {
+                        while (wrapped.hasNext()) {
+                            JsonNode jsonNode = wrapped.next();
+                            try {
+                                final Program program = m.readValue(jsonNode, Program.class);
+                                final List<Image> images = program.getImages();
+                                if (images != null && !images.isEmpty()) {
+                                    next = program;
+                                    break;
+                                }
+                            } catch (IOException e) {
+                                log.error(jsonNode.get("_id") + ": " + e.getMessage());
                             }
                         }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
                     }
                 }
             };
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private ProgramList toProgramList(SearchHits hits, Integer offset) {
+
         final long numFound = hits.totalHits();
-        if (offset == null) { offset = 0; }
+        if (offset == null) {
+            offset = 0;
+        }
         final ProgramList programList = new ProgramList(numFound, offset);
         for (SearchHit hit : hits.getHits()) {
-            final String urn = hit.id();
-            final Long mediaId = MediaUtil.getMediaId(MediaObjectType.program, urn);
-            final Program program = getProgram(mediaId);
-            programList.addProgram(program);
+            try {
+                final Program program = mapper.readValue(hit.getSourceAsString(), Program.class);
+                programList.addProgram(program);
+            } catch (Throwable t) {
+                LOG.error(t.getClass().getName() + " " + t.getMessage());
+            }
         }
         return programList;
     }
