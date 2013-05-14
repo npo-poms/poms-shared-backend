@@ -1,13 +1,11 @@
 package nl.vpro.api.rs;
 
-import nl.vpro.api.domain.media.Group;
-import nl.vpro.api.domain.media.MediaObject;
-import nl.vpro.api.domain.media.Program;
-import nl.vpro.api.domain.media.Segment;
+import nl.vpro.api.domain.media.*;
 import nl.vpro.api.transfer.MediaSearchResult;
 import nl.vpro.api.transfer.MediaSearchResultItemIterator;
 import nl.vpro.api.transfer.ProgramList;
 import nl.vpro.api.transfer.SearchSuggestions;
+import nl.vpro.transfer.ugc.annotation.Annotations;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
 
@@ -54,6 +52,10 @@ public interface MediaRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public MediaSearchResultItemIterator getAllReplayableProgram(@QueryParam("type") String avType);
 
+    @GET
+    @Path("program/{urn}/annotations")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Annotations getAnnotationsForProgram(@PathParam("urn") String urn);
 
     /**
      * if addMembers=true, members are added.
