@@ -6,6 +6,7 @@ import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.MediaService;
 import nl.vpro.api.service.UgcService;
 import nl.vpro.domain.ugc.annotation.Annotation;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class UGCRestServiceImpl implements UGCRestService {
 
 
     @Override
-	public Annotation getAnnotation(String id) {
+    public Annotation getAnnotation(String id) {
         if (StringUtils.isNotEmpty(id)) {
             if (MediaUtil.isUrn(id)) {
                 return mediaService.getProgramAnnotation(MediaUtil.getMediaId(MediaObjectType.program, id));
@@ -41,7 +42,7 @@ public class UGCRestServiceImpl implements UGCRestService {
     }
 
     @Override
-	public Annotation getAnnotationByPart(String id) {
+    public Annotation getAnnotationByPart(String id) {
         if (StringUtils.isNotEmpty(id)) {
             if (MediaUtil.isUrn(id)) {
                 Segment segment = mediaService.getSegment(MediaUtil.getMediaId(MediaObjectType.segment, id));
