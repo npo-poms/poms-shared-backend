@@ -4,16 +4,16 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
-import org.springframework.stereotype.Service;
-
 import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.media.MediaBuilder;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.search.MediaForm;
+import org.springframework.stereotype.Service;
+
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -36,6 +36,11 @@ public class MediaRestServiceImpl<T extends MediaObject> implements MediaRestSer
 
     @Override
     public MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock) {
-        return MediaBuilder.program().build();
+        if (mock) {
+            return MediaBuilder.program().build();
+        } else {
+            // klinkt logisch, maar dat geeft een 404 dus...
+            throw new NotFoundException();
+        }
     }
 }
