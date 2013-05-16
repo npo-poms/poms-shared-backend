@@ -14,6 +14,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import java.util.Arrays;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -22,16 +23,37 @@ import javax.ws.rs.QueryParam;
  * @since 2.0
  */
 @Service
-public class MediaRestServiceImpl<T extends MediaObject> implements MediaRestService<T> {
+public class MediaRestServiceImpl  implements MediaRestService  {
 
     @Override
     public PagedResult<MediaObject> list(@DefaultValue("false") boolean mock) {
-        return null;
+        if (mock) {
+            return new PagedResult<MediaObject>(
+                    Arrays.asList(
+                            MediaBuilder.program().build(),
+                            MediaBuilder.program().build(),
+                            MediaBuilder.program().build()
+                    ), 10);
+
+        } else {
+            return new PagedResult<MediaObject>();
+        }
     }
 
     @Override
     public PagedResult<MediaObject> search(MediaForm form, @DefaultValue("false") boolean mock) {
-        return null;
+        if (mock) {
+            return new PagedResult<MediaObject>(
+                    Arrays.asList(
+                            MediaBuilder.program().build(),
+                            MediaBuilder.program().build(),
+                            MediaBuilder.program().build()
+                    ), 10);
+
+        } else {
+            return new PagedResult<MediaObject>();
+        }
+
     }
 
     @Override

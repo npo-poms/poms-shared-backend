@@ -1,7 +1,10 @@
 package nl.vpro.api.rs.v2.media;
 
+import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.media.MediaBuilder;
+import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.search.MediaForm;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
@@ -12,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,12 +50,31 @@ public class MediaRestServiceImplTest {
 
     @Test
     public void testList() throws Exception {
-        // TODO
+        MockHttpRequest request = MockHttpRequest.get("/media?mock=true");
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), PagedResult.class);
+        assertEquals(Integer.valueOf(3), result.getSize());
     }
 
     @Test
     public void testSearch() throws Exception {
-        // TODO
+        MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
+        request.contentType(MediaType.APPLICATION_JSON_TYPE);
+        MediaForm form = new MediaForm();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        mapper.writeValue(out, form);
+        request.content(out.toByteArray());
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), PagedResult.class);
+        assertEquals(Integer.valueOf(3), result.getSize());
     }
 
     @Test

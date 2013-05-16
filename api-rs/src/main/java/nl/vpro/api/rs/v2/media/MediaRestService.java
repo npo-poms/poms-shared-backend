@@ -34,7 +34,7 @@ import javax.ws.rs.core.MediaType;
     @ResponseCode(code = 400, condition = "bad request"),
     @ResponseCode(code = 500, condition = "server error")})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public interface MediaRestService<T extends MediaObject> {
+public interface MediaRestService {
 
     @GET
     @Path("/")
