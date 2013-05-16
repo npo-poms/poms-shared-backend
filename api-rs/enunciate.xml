@@ -9,6 +9,7 @@
   <api-import pattern="nl.vpro.api.rs.v2.**" seekSource="true"/>
   <deployment host="api.vpro.nl" context="v2"/>
   <namespaces>
+    <namespace id="api" uri="urn:vpro:api:2013"/>
     <namespace id="pages" uri="urn:vpro:pages:2013"/>
     <namespace id="media" uri="urn:vpro:media:2009"/>
     <namespace id="search" uri="urn:vpro:media:search:2012"/>

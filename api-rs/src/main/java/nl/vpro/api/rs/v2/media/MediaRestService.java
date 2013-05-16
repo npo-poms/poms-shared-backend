@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
+import nl.vpro.api.rs.v2.PagedResult;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.search.MediaForm;
 import nl.vpro.domain.media.search.MediaSearchResult;
@@ -24,10 +25,10 @@ import nl.vpro.domain.media.search.MediaSearchResult;
  * calls for sub-resources.
  * <p/>
  * The API returns three media instance types: Programs, Groups and Segments. A Program result always includes it's
- * contained Segments, but it is possible the retrieve Segments on there own. This is useful when a Segment occurs
+ * contained Segments, but it is possible to retrieve Segments on there own. This is useful when a Segment occurs
  * on a playlist for example.
  * <p/>
- * Media id's may be either a full urn of a mid. Retrieval by crid is not implemented at this moment.
+ * Media id's may be either a full urn or a mid. Retrieval by crid is not implemented at this moment.
  *
  * @author Roelof Jan Koekoek
  * @since 2.0
@@ -42,11 +43,11 @@ public interface MediaRestService<T extends MediaObject> {
 
     @GET
     @Path("/")
-    MediaSearchResult list(@QueryParam("mock") @DefaultValue("false") boolean mock);
+    PagedResult<MediaObject> list(@QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     @Path("/")
-    MediaSearchResult search(MediaForm form, @QueryParam("mock") @DefaultValue("false") boolean mock);
+    PagedResult<MediaObject> search(MediaForm form, @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * Retrieve a media resource, either a Program, Group or Segment, by it's id.
@@ -59,7 +60,5 @@ public interface MediaRestService<T extends MediaObject> {
     @Path("/{id}")
     MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
 
-    @GET
-    @Path("/repsonse")
-    Response response();
+
 }
