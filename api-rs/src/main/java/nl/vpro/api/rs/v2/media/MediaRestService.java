@@ -17,20 +17,24 @@ import nl.vpro.domain.media.MediaObject;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
- * queries on media used when building a site or apps containing POMS media. This not a real REST API. It has nu update
+ * queries on media used when building a site or apps containing POMS media. This not a real REST API. It has no update
  * statements and it is mainly document oriented. Most calls will return a full media document and there are no separate
  * calls for sub-resources.
- *
- * The API returns three media instance types: Programs, Groups and Segments. A Program result shall always include it's
- * contained Segments, but it is possible the retrieve segments on there own. This is useful when a Segment occurs
+ * <p/>
+ * The API returns three media instance types: Programs, Groups and Segments. A Program result always includes it's
+ * contained Segments, but it is possible the retrieve Segments on there own. This is useful when a Segment occurs
  * on a playlist for example.
- *
+ * <p/>
  * Media id's may be either a full urn of a mid. Retrieval by crid is not implemented at this moment.
  *
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
 @Path("/media")
+@StatusCodes({
+    @ResponseCode(code = 200, condition = "success"),
+    @ResponseCode(code = 400, condition = "not found"),
+    @ResponseCode(code = 500, condition = "error")})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface MediaRestService<T extends MediaObject> {
 
@@ -38,12 +42,9 @@ public interface MediaRestService<T extends MediaObject> {
      * Retrieve a media resource, either a Program, Group or Segment, by it's id.
      *
      * @param id An existing urn or mid
-     * @return A full Program, Group or Segment document
+     * @return A full Program, Group or Segment
      */
     @GET
     @Path("/{id}")
-    @StatusCodes({
-        @ResponseCode(code = 200, condition = "success"),
-        @ResponseCode(code = 400, condition = "not found")})
     T get(@PathParam("id") String id);
 }

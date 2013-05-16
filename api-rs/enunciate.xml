@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<enunciate label="VproAPI.v2"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
+  <disable-rule id="jersey.warnings"/>
+  <api-import pattern="nl.vpro.domain.media.Program" seekSource="true"/>
+  <api-import pattern="nl.vpro.domain.media.search.MediaForm" seekSource="true"/>
+  <!--<api-import pattern="nl.vpro.domain.image.Image" seekSource="true"/>-->
+  <api-import pattern="nl.vpro.api.rs.v2.**" seekSource="true"/>
+  <deployment host="api.vpro.nl" context="v2"/>
+  <namespaces>
+    <namespace id="pages" uri="urn:vpro:pages:2013"/>
+    <namespace id="media" uri="urn:vpro:media:2009"/>
+    <namespace id="search" uri="urn:vpro:media:search:2012"/>
+    <namespace id="update" uri="urn:vpro:media:update:2009"/>
+    <namespace id="shared" uri="urn:vpro:shared:2009"/>
+    <namespace id="image" uri="urn:vpro:image:2009"/>
+  </namespaces>
+  <modules>
+    <docs splashPackage="nl.vpro.api.rs.v2" title="API VPRO.nl V2" copyright="vpro.nl">
+      <download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
+    </docs>
+    <jaxws-ri disabled="true"/>
+    <c disabled="true"/>
+    <csharp disabled="true"/> <!-- Validation error on classes containing fields with an identical name -->
+    <cxf disabled="true"/>
+    <obj-c disabled="true"/>
+  </modules>
+</enunciate>

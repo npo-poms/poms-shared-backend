@@ -68,7 +68,6 @@
     </dependency>
   </dependencies>
 
-<!--
   <build>
     <plugins>
       <plugin>
@@ -77,21 +76,15 @@
         <version>1.26.2</version>
         <executions>
           <execution>
-            <phase>package</phase>
+            <configuration>
+            </configuration>
+            <phase>prepare-package</phase>
             <goals>
               <goal>docs</goal>
             </goals>
           </execution>
         </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.enunciate</groupId>
-            <artifactId>enunciate-amf</artifactId>
-            <version>1.26.2</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>
--->
 </project>
