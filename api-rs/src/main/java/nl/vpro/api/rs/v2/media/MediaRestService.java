@@ -4,19 +4,15 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import java.util.List;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
-import nl.vpro.api.rs.v2.PagedResult;
+import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.search.MediaForm;
-import nl.vpro.domain.media.search.MediaSearchResult;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent

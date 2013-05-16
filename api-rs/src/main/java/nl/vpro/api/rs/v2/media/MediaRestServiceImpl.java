@@ -5,18 +5,15 @@
 package nl.vpro.api.rs.v2.media;
 
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
 import org.springframework.stereotype.Service;
 
-import nl.vpro.api.rs.v2.PagedResult;
+import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.media.MediaBuilder;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.search.MediaForm;
-import nl.vpro.domain.media.search.MediaSearchResult;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
