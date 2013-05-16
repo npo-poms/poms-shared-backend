@@ -4,16 +4,18 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import java.util.List;
+
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.search.MediaForm;
+import nl.vpro.domain.media.search.MediaSearchResult;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
@@ -33,18 +35,31 @@ import nl.vpro.domain.media.MediaObject;
 @Path("/media")
 @StatusCodes({
     @ResponseCode(code = 200, condition = "success"),
-    @ResponseCode(code = 400, condition = "not found"),
-    @ResponseCode(code = 500, condition = "error")})
+    @ResponseCode(code = 400, condition = "bad request"),
+    @ResponseCode(code = 500, condition = "server error")})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface MediaRestService<T extends MediaObject> {
+
+    @GET
+    @Path("/")
+    MediaSearchResult list(@QueryParam("mock") @DefaultValue("false") boolean mock);
+
+    @POST
+    @Path("/")
+    MediaSearchResult search(MediaForm form, @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * Retrieve a media resource, either a Program, Group or Segment, by it's id.
      *
-     * @param id An existing urn or mid
-     * @return A full Program, Group or Segment
+     * @param id existing urn or mid
+     * @param mock whether to return a mock object
+     * @return full Program, Group or Segment
      */
     @GET
     @Path("/{id}")
-    T get(@PathParam("id") String id);
+    MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+
+    @GET
+    @Path("/repsonse")
+    Response response();
 }

@@ -4,14 +4,18 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.springframework.stereotype.Service;
 
 import nl.vpro.domain.media.MediaBuilder;
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.search.MediaForm;
+import nl.vpro.domain.media.search.MediaSearchResult;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -23,7 +27,22 @@ import nl.vpro.domain.media.MediaObject;
 public class MediaRestServiceImpl<T extends MediaObject> implements MediaRestService<T> {
 
     @Override
-    public T get(@PathParam("id") String id) {
-        return (T)MediaBuilder.program().build();
+    public MediaSearchResult list(@DefaultValue("false") boolean mock) {
+        return null;
+    }
+
+    @Override
+    public MediaSearchResult search(MediaForm form, @DefaultValue("false") boolean mock) {
+        return null;
+    }
+
+    @Override
+    public MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock) {
+        return MediaBuilder.program().build();
+    }
+
+    @Override
+    public Response response() {
+        return Response.ok(MediaBuilder.program().build()).build();
     }
 }
