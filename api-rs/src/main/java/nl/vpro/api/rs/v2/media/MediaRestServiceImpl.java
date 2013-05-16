@@ -27,16 +27,16 @@ import java.util.Arrays;
 @Service
 public class MediaRestServiceImpl  implements MediaRestService  {
 
-	MockMediaRestService mocks = new MockMediaRestService();
+    MockMediaRestService mocks = new MockMediaRestService();
 
     @Override
     public PagedResult<MediaObject> list(
-			String profile,
-			Integer offset,
-			Integer limit,
-			boolean mock) {
+            String profile,
+            Integer offset,
+            Integer limit,
+            boolean mock) {
         if (mock) {
-			return mocks.list(profile, offset, limit, true);
+            return mocks.list(profile, offset, limit, true);
         } else {
             return new PagedResult<>();
         }
@@ -44,19 +44,20 @@ public class MediaRestServiceImpl  implements MediaRestService  {
 
     @Override
     public PagedResult<MediaObject> search(
-			MediaForm form,
-			String profile,
-			Integer offset,
-			Integer limit,
-			boolean mock) {
+            MediaForm form,
+            String profile,
+            Integer offset,
+            Integer limit,
+            boolean mock) {
         if (mock) {
 
             return new PagedResult<MediaObject>(
                     Arrays.asList(
                             MediaBuilder.program().build(),
                             MediaBuilder.program().build(),
-                            MediaBuilder.program().build()
-                    ), offset, 100);
+                            MediaBuilder.program().build()),
+                    offset,
+                    100);
 
         } else {
             return new PagedResult<>();
@@ -70,22 +71,22 @@ public class MediaRestServiceImpl  implements MediaRestService  {
             return MediaBuilder.program().build();
         } else {
             // klinkt logisch, maar dat geeft een 404 dus...
-			throw new NotFoundException("bla");
-		}
+            throw new NotFoundException("bla");
+        }
     }
 
-	@Override
-	public PagedResult<MediaObject> getMembers(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
+    @Override
+    public PagedResult<MediaObject> getMembers(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-	@Override
-	public PagedResult<Program> getEpisodes(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
+    @Override
+    public PagedResult<Program> getEpisodes(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 
-	@Override
-	public PagedResult<Segment> getSegments(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
-		return null;  //To change body of implemented methods use File | Settings | File Templates.
-	}
+    @Override
+    public PagedResult<Segment> getSegments(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }
