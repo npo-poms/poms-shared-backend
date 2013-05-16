@@ -58,21 +58,10 @@ public class PageRestServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
         Page page = mapper.readValue(response.getContentAsString(), Page.class);
-        assertEquals("{\"id\":\"4b748d32-8006-4f0a-8aac-6d8d5c89a847\",\"title\":\"Groot brein in klein dier\",\"body\":null,\"summary\":\"Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.\",\"deepLink\":null,\"pageType\":null,\"brand\":null,\"author\":\"superuser\",\"mainImage\":null}", response.getContentAsString());
+        assertEquals("{\"id\":\"4b748d32-8006-4f0a-8aac-6d8d5c89a847\",\"title\":\"Groot brein in klein dier\",\"body\":null,\"summary\":\"Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.\",\"deepLink\":\"http://www.wetenschap24.nl/groot-brein-in-klein-dier.html\",\"pageType\":\"Artikel\",\"brand\":{\"site\":\"http://www.wetenschap24.nl\",\"title\":\"Wetenschap 24\"},\"author\":\"superuser\",\"mainImage\":{\"url\":\"http://www.wetenschap24.nl/eenkleinharigbeest.jpg\"}}", response.getContentAsString());
+
         assertEquals("4b748d32-8006-4f0a-8aac-6d8d5c89a847", page.getId());
 
     }
 
-    @Test
-    public void testGetXml() throws Exception {
-        MockHttpRequest request = MockHttpRequest.get("/pages/123.xml?mock=true");
-        MockHttpResponse response = new MockHttpResponse();
-        dispatcher.invoke(request, response);
-        assertEquals(response.getErrorMessage(), 200, response.getStatus());
-        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
-        Page page = mapper.readValue(response.getContentAsString(), Page.class);
-        assertEquals("{\"id\":\"4b748d32-8006-4f0a-8aac-6d8d5c89a847\",\"title\":\"Groot brein in klein dier\",\"body\":null,\"summary\":\"Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.\",\"deepLink\":null,\"pageType\":null,\"brand\":null,\"author\":\"superuser\",\"mainImage\":null}", response.getContentAsString());
-        assertEquals("4b748d32-8006-4f0a-8aac-6d8d5c89a847", page.getId());
-
-    }
 }

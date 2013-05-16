@@ -4,9 +4,11 @@ import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.api.pages.Page;
 import nl.vpro.domain.api.pages.PageBuilder;
 import nl.vpro.domain.api.pages.PageForm;
+import nl.vpro.domain.api.pages.PageType;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,11 +59,19 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
 
-    protected Page mockPage() {
-        return PageBuilder.id("4b748d32-8006-4f0a-8aac-6d8d5c89a847")
-                .title("Groot brein in klein dier")
-                .author("superuser")
-                .summary("Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.")
-                .build();
+    protected Page mockPage()  {
+        try {
+            return PageBuilder.id("4b748d32-8006-4f0a-8aac-6d8d5c89a847")
+                    .title("Groot brein in klein dier")
+                    .author("superuser")
+                    .summary("Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.")
+                    .deepLink("http://www.wetenschap24.nl/groot-brein-in-klein-dier.html")
+                    .pageType(PageType.Artikel)
+                    .brand("http://www.wetenschap24.nl", "Wetenschap 24")
+                    .mainImage("http://www.wetenschap24.nl/eenkleinharigbeest.jpg")
+                    .build();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
