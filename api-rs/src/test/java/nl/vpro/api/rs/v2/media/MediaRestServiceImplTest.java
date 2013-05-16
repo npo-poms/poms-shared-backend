@@ -80,7 +80,6 @@ public class MediaRestServiceImplTest {
     @Test
     public void testGet() throws Exception {
         MockHttpRequest request = MockHttpRequest.get("/media/123?mock=true");
-
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
@@ -106,4 +105,20 @@ public class MediaRestServiceImplTest {
 
 
     }
+
+
+	@Test
+	public void testGetMembers() {
+		// TODO
+	}
+
+	@Test
+	public void testGetEpisodies() {
+		// TODO
+	}
+
+	@Test
+	public void testgetSegments() {
+		// TODO
+	}
 }

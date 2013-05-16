@@ -6,6 +6,8 @@ package nl.vpro.api.rs.v2.media;
 
 import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.Segment;
 import nl.vpro.domain.media.search.MediaForm;
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
@@ -38,11 +40,20 @@ public interface MediaRestService {
 
     @GET
     @Path("/")
-    PagedResult<MediaObject> list(@QueryParam("mock") @DefaultValue("false") boolean mock);
+    PagedResult<MediaObject> list(
+			@QueryParam("profile") String profile,
+			@QueryParam("offset") @DefaultValue("0") Integer offset,
+			@QueryParam("limit") @DefaultValue("50") Integer limit,
+			@QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     @Path("/")
-    PagedResult<MediaObject> search(MediaForm form, @QueryParam("mock") @DefaultValue("false") boolean mock);
+    PagedResult<MediaObject> search(
+			MediaForm form,
+			@QueryParam("profile") String profile,
+			@QueryParam("offset") @DefaultValue("0") Integer offset,
+			@QueryParam("limit") @DefaultValue("50") Integer limit,
+			@QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * Retrieve a media resource, either a Program, Group or Segment, by it's id.
@@ -54,6 +65,20 @@ public interface MediaRestService {
     @GET
     @Path("/{id}")
     MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+
+
+	@GET
+	@Path("/{id}/members")
+	PagedResult<MediaObject> getMembers(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+
+
+	@GET
+	@Path("/{id}/episodes")
+	PagedResult<Program> getEpisodes(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+
+	@GET
+	@Path("/{id}/segments")
+	PagedResult<Segment> getSegments(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
 
 
 }

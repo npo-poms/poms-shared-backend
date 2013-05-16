@@ -28,14 +28,14 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.media</groupId>
+      <artifactId>media-test</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.media</groupId>
       <artifactId>media-domain</artifactId>
       <version>${media.version}</version>
       <classifier>sources</classifier>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.shared</groupId>
-      <artifactId>shared-util</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.shared</groupId>
