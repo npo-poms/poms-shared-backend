@@ -24,8 +24,8 @@ This is a direct clone from the White House API standards found here:
 These guidelines aim to support a truly RESTful API. Here are a few exceptions:
 * Put the version number of the API in the URL (see examples below). Don’t accept any requests that do not specify a version number.
 * Allow users to request formats like JSON or XML like this:
-    * http://api.vpro.nl/api/v1/magazines.json (???)
-    * http://api.vpro.nl/api/v1/magazines.xml (???)
+    * http://api.vpro.nl/v1/magazines.json (???)
+    * http://api.vpro.nl/v1/magazines.xml (???)
 
 ## RESTful URLs
 
