@@ -30,7 +30,7 @@ public class MediaRestServiceImplTest {
     public static final MediaType JSON;
 
     static {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         JSON = new MediaType("application", "json", params);
     }
 
@@ -97,7 +97,7 @@ public class MediaRestServiceImplTest {
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
-        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(response.getErrorMessage(), 200, response.getStatus()); // FAILS
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
         System.out.println(response.getContentAsString());
 

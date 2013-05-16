@@ -36,7 +36,7 @@ public class MediaRestServiceImpl  implements MediaRestService  {
                     ), 10);
 
         } else {
-            return new PagedResult<MediaObject>();
+            return new PagedResult<>();
         }
     }
 
@@ -51,7 +51,7 @@ public class MediaRestServiceImpl  implements MediaRestService  {
                     ), 10);
 
         } else {
-            return new PagedResult<MediaObject>();
+            return new PagedResult<>();
         }
 
     }
