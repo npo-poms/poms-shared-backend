@@ -17,7 +17,9 @@
     <namespace id="shared" uri="urn:vpro:shared:2009"/>
     <namespace id="image" uri="urn:vpro:image:2009"/>
   </namespaces>
-  <modules>
+  <services>
+    <rest defaultRestSubcontext="/v2/api" />
+  </services>  <modules>
     <docs splashPackage="nl.vpro.api.rs.v2" title="API VPRO.nl V2" copyright="vpro.nl">
       <download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
     </docs>
