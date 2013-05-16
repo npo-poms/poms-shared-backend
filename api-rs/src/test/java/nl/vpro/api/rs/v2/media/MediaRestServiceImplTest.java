@@ -107,18 +107,18 @@ public class MediaRestServiceImplTest {
     }
 
 
-	@Test
-	public void testGetMembers() {
-		// TODO
-	}
+    @Test
+    public void testGetMembers() {
+        // TODO
+    }
 
-	@Test
-	public void testGetEpisodies() {
-		// TODO
-	}
+    @Test
+    public void testGetEpisodies() {
+        // TODO
+    }
 
-	@Test
-	public void testgetSegments() {
-		// TODO
-	}
+    @Test
+    public void testgetSegments() {
+        // TODO
+    }
 }
