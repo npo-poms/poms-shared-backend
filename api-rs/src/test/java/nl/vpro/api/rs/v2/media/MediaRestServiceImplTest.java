@@ -73,6 +73,25 @@ public class MediaRestServiceImplTest {
         MediaObject object = result.getList().get(0);
     }
 
+
+    @Test
+    public void testListXml() throws Exception {
+        MockHttpRequest request = MockHttpRequest.get("/media?mock=true");
+        request.accept(MediaType.APPLICATION_XML);
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
+
+        PagedResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
+
+        assertEquals(Integer.valueOf(50), result.getSize());
+
+        MediaObject object = result.getList().get(0);
+    }
+
+
     @Test
     public void testSearch() throws Exception {
         MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
