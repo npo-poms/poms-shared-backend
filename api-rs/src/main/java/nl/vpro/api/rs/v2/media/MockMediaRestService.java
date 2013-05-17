@@ -51,7 +51,17 @@ class MockMediaRestService implements MediaRestService {
         int numberOfResults = Math.min(total - offset, limit);
         List<MediaObject> result = new ArrayList<>();
         for (int i = 0; i < numberOfResults; i++) {
-            result.add(MediaTestDataBuilder.program().constrained().build());
+            switch(i % 3) {
+                case 0:
+                    result.add(MediaTestDataBuilder.program().constrained().build());
+                    break;
+                case 1:
+                    result.add(MediaTestDataBuilder.group().constrained().build());
+                    break;
+                case 2:
+                    result.add(MediaTestDataBuilder.segment().constrained().build());
+                    break;
+            }
         }
         return result;
     }
