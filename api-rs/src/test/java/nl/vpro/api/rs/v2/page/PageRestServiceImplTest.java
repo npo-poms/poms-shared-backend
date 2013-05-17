@@ -26,12 +26,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class PageRestServiceImplTest {
     public static final MediaType JSON;
-	public static final MediaType XML;
+    public static final MediaType XML;
 
     static {
         Map<String, String> params = new HashMap<>();
-		JSON = new MediaType("application", "json", params);
-		XML = new MediaType("application", "xml", params);
+        JSON = new MediaType("application", "json", params);
+        XML = new MediaType("application", "xml", params);
     }
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -72,39 +72,39 @@ public class PageRestServiceImplTest {
     }
 
 
-	@Test
-	public void testGetXml() throws Exception {
-		MockHttpRequest request = MockHttpRequest.get("/pages/123?mock=true");
-		request.accept(MediaType.APPLICATION_XML);
-		MockHttpResponse response = new MockHttpResponse();
-		dispatcher.invoke(request, response);
-		assertEquals(response.getErrorMessage(), 200, response.getStatus());
-		assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
+    @Test
+    public void testGetXml() throws Exception {
+        MockHttpRequest request = MockHttpRequest.get("/pages/123?mock=true");
+        request.accept(MediaType.APPLICATION_XML);
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
-		Page page = JAXB.unmarshal(new StringReader(response.getContentAsString()), Page.class);
-		assertEquals("4b748d32-8006-4f0a-8aac-6d8d5c89a847", page.getId());
+        Page page = JAXB.unmarshal(new StringReader(response.getContentAsString()), Page.class);
+        assertEquals("4b748d32-8006-4f0a-8aac-6d8d5c89a847", page.getId());
 
-		String expected ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-				"<page xmlns=\"urn:vpro:pages:2013\" id=\"4b748d32-8006-4f0a-8aac-6d8d5c89a847\">\n" +
-				"  <title>Groot brein in klein dier</title>\n" +
-				"  <body>bla bla bla bla</body>\n" +
-				"  <summary>Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.</summary>\n" +
-				"  <deepLink>http://www.wetenschap24.nl/nieuws/artikelen/2001/mei/Groot-brein-in-klein-dier.html</deepLink>\n" +
-				"  <pageType>Artikel</pageType>\n" +
-				"  <brand>\n" +
-				"    <site>http://www.wetenschap24.nl</site>\n" +
-				"    <title>Wetenschap 24</title>\n" +
-				"  </brand>\n" +
-				"  <author>superuser</author>\n" +
-				"  <mainImage>\n" +
-				"    <url>http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg</url>\n" +
-				"  </mainImage>\n" +
-				"</page>";
+        String expected ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
+                "<page xmlns=\"urn:vpro:pages:2013\" id=\"4b748d32-8006-4f0a-8aac-6d8d5c89a847\">\n" +
+                "  <title>Groot brein in klein dier</title>\n" +
+                "  <body>bla bla bla bla</body>\n" +
+                "  <summary>Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.</summary>\n" +
+                "  <deepLink>http://www.wetenschap24.nl/nieuws/artikelen/2001/mei/Groot-brein-in-klein-dier.html</deepLink>\n" +
+                "  <pageType>Artikel</pageType>\n" +
+                "  <brand>\n" +
+                "    <site>http://www.wetenschap24.nl</site>\n" +
+                "    <title>Wetenschap 24</title>\n" +
+                "  </brand>\n" +
+                "  <author>superuser</author>\n" +
+                "  <mainImage>\n" +
+                "    <url>http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg</url>\n" +
+                "  </mainImage>\n" +
+                "</page>";
 
-		Diff diff = XMLUnit.compareXML(expected, response.getContentAsString());
-		assertTrue(diff.toString() + " " + response.getContentAsString(), diff.similar());
+        Diff diff = XMLUnit.compareXML(expected, response.getContentAsString());
+        assertTrue(diff.toString() + " " + response.getContentAsString(), diff.similar());
 
 
 
-	}
+    }
 }
