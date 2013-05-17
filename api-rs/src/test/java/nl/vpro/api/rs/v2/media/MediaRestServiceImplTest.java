@@ -1,16 +1,13 @@
 package nl.vpro.api.rs.v2.media;
 
+import nl.vpro.api.rs.v2.AbstractServiceImplTest;
 import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.MediaForm;
-import org.codehaus.jackson.map.ObjectMapper;
+import nl.vpro.domain.media.search.Pager;
 import org.codehaus.jackson.type.TypeReference;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
@@ -19,8 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,32 +23,14 @@ import static org.junit.Assert.assertEquals;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public class MediaRestServiceImplTest {
+public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
-    public static final MediaType JSON;
-    public static final MediaType XML;
 
-    static {
-        Map<String, String> params = new HashMap<>();
-        JSON = new MediaType("application", "json", params);
-        XML = new MediaType("application", "xml", params);
+    @Override
+    protected Object getTestObject() {
+        return new MediaRestServiceImpl();
     }
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-
-
-    Dispatcher dispatcher = MockDispatcherFactory.createDispatcher();
-
-    @Before
-    public void setup() {
-        MediaRestService testObject = new MediaRestServiceImpl();
-        dispatcher.getRegistry().addSingletonResource(testObject);
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-
-        //mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-    }
 
 
     @Test
@@ -71,6 +48,7 @@ public class MediaRestServiceImplTest {
         assertEquals(Integer.valueOf(50), result.getSize());
 
         MediaObject object = result.getList().get(0);
+        assertEquals("Main title", object.getMainTitle());
     }
 
 
@@ -89,6 +67,8 @@ public class MediaRestServiceImplTest {
         assertEquals(Integer.valueOf(50), result.getSize());
 
         MediaObject object = result.getList().get(0);
+        assertEquals("Main title", object.getMainTitle());
+
     }
 
 
@@ -97,16 +77,19 @@ public class MediaRestServiceImplTest {
         MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
         request.contentType(MediaType.APPLICATION_JSON);
 
-        MediaForm form = new MediaForm();
+        MediaForm form = new MediaForm(new Pager(50));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, form);
         request.content(out.toByteArray());
         System.out.println(new String(out.toByteArray()));
 
+        System.out.println(mapper.readValue(new String(out.toByteArray()), MediaForm.class));
+
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
-        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
+
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
 
@@ -114,6 +97,28 @@ public class MediaRestServiceImplTest {
         };
 
         PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertEquals(Integer.valueOf(50), result.getSize());
+    }
+
+
+    @Test
+    public void testSearchXML() throws Exception {
+        MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
+        request.contentType(MediaType.APPLICATION_XML);
+        request.accept(MediaType.APPLICATION_XML);
+
+        MediaForm form = new MediaForm(new Pager(50));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JAXB.marshal(form, out);
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
+        assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
+
+
+        PagedResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
         assertEquals(Integer.valueOf(50), result.getSize());
     }
 

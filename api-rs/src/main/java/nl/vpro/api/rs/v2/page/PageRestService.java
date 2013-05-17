@@ -46,7 +46,9 @@ public interface PageRestService {
      */
     @GET
     @Path("/{id}")
-    Page get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+    Page get(
+            @PathParam("id") String id,
+            @QueryParam("mock") @DefaultValue("false") boolean mock);
 
 
 

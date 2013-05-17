@@ -1,25 +1,20 @@
 package nl.vpro.api.rs.v2.page;
 
+import nl.vpro.api.rs.v2.AbstractServiceImplTest;
 import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.api.pages.Page;
 import nl.vpro.domain.api.pages.PageForm;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.jboss.resteasy.core.Dispatcher;
-import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
-import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,26 +23,11 @@ import static org.junit.Assert.assertTrue;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public class PageRestServiceImplTest {
-    public static final MediaType JSON;
-    public static final MediaType XML;
+public class PageRestServiceImplTest extends AbstractServiceImplTest {
 
-    static {
-        Map<String, String> params = new HashMap<>();
-        JSON = new MediaType("application", "json", params);
-        XML = new MediaType("application", "xml", params);
-    }
-
-    private static final ObjectMapper mapper = new ObjectMapper();
-    Dispatcher dispatcher = MockDispatcherFactory.createDispatcher();
-
-    @Before
-    public void setUp() throws Exception {
-        PageRestService testObject = new PageRestServiceImpl();
-        dispatcher.getRegistry().addSingletonResource(testObject);
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-
+    @Override
+    protected Object getTestObject() {
+        return new PageRestServiceImpl();
     }
 
     @Test

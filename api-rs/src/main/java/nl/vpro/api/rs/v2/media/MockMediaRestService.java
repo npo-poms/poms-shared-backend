@@ -28,7 +28,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public MediaObject get(String id, boolean mock) {
-        return MediaTestDataBuilder.program().constrained().build();
+        return build(id.hashCode());
 
     }
 
@@ -51,19 +51,21 @@ class MockMediaRestService implements MediaRestService {
         int numberOfResults = Math.min(total - offset, limit);
         List<MediaObject> result = new ArrayList<>();
         for (int i = 0; i < numberOfResults; i++) {
-            switch(i % 3) {
-                case 0:
-                    result.add(MediaTestDataBuilder.program().constrained().build());
-                    break;
-                case 1:
-                    result.add(MediaTestDataBuilder.group().constrained().build());
-                    break;
-                case 2:
-                    result.add(MediaTestDataBuilder.segment().constrained().build());
-                    break;
-            }
+            result.add(build(i));
         }
         return result;
+    }
+
+    protected MediaObject build(int hash) {
+        switch (hash % 3) {
+            case 1:
+                return MediaTestDataBuilder.group().constrained().build();
+            case 2:
+                return MediaTestDataBuilder.segment().constrained().build();
+            default:
+                return MediaTestDataBuilder.program().constrained().build();
+
+        }
     }
 
     protected List<Program> mockEpisodes(int total, int offset, int limit) {
