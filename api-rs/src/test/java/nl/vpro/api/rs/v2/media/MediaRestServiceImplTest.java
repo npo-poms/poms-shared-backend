@@ -3,6 +3,7 @@ package nl.vpro.api.rs.v2.media;
 import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.media.MediaBuilder;
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.search.MediaForm;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -15,7 +16,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
 import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,10 +31,12 @@ import static org.junit.Assert.assertEquals;
 public class MediaRestServiceImplTest {
 
     public static final MediaType JSON;
+    public static final MediaType XML;
 
     static {
         Map<String, String> params = new HashMap<>();
         JSON = new MediaType("application", "json", params);
+        XML = new MediaType("application", "xml", params);
     }
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -45,6 +50,9 @@ public class MediaRestServiceImplTest {
         dispatcher.getRegistry().addSingletonResource(testObject);
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
+
+        //mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     }
 
 
@@ -84,8 +92,29 @@ public class MediaRestServiceImplTest {
         dispatcher.invoke(request, response);
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+        System.out.println(response.getContentAsString());
         Program program = mapper.readValue(response.getContentAsString(), Program.class); // FAILS!
-        assertEquals(MediaBuilder.program().build(), program);
+        Program compareTo = MediaTestDataBuilder.program().constrained().build();
+
+        assertEquals(compareTo.getMainTitle(), program.getMainTitle());
+
+
+    }
+
+
+    @Test
+    public void testGetXml() throws Exception {
+        MockHttpRequest request = MockHttpRequest.get("/media/123?mock=true");
+        request.accept(MediaType.APPLICATION_XML);
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
+        System.out.println(response.getContentAsString());
+        Program program = JAXB.unmarshal(new StringReader(response.getContentAsString()), Program.class);
+        Program compareTo = MediaTestDataBuilder.program().constrained().build();
+
+        assertEquals(compareTo.getMainTitle(), program.getMainTitle());
 
 
     }

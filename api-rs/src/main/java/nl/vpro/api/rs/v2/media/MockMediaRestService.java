@@ -38,7 +38,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public MediaObject get(String id, boolean mock) {
-        return MediaTestDataBuilder.program().build();
+        return MediaTestDataBuilder.program().constrained().build();
 
     }
 

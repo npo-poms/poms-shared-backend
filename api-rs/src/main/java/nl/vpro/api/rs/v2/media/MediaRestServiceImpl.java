@@ -5,7 +5,6 @@
 package nl.vpro.api.rs.v2.media;
 
 import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.media.MediaBuilder;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
@@ -55,7 +54,7 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     @Override
     public MediaObject get(String id, boolean mock) {
         if (mock) {
-            return MediaBuilder.program().build();
+            return mocks.get(id, true);
         } else {
             // klinkt logisch, maar dat geeft een 404 dus...
             throw new NotFoundException("bla");
