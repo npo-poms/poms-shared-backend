@@ -65,6 +65,7 @@ public class PageRestServiceImplTest {
         System.out.println(response.getContentAsString());
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals(Integer.valueOf(100), pages.getTotal());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
 
 
@@ -82,6 +83,7 @@ public class PageRestServiceImplTest {
         System.out.println(response.getContentAsString());
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals(Integer.valueOf(100), pages.getTotal());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
 
 
@@ -109,6 +111,7 @@ public class PageRestServiceImplTest {
 
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals(Integer.valueOf(100), pages.getTotal());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
 
     }
@@ -134,6 +137,7 @@ public class PageRestServiceImplTest {
         System.out.println(response.getContentAsString());
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals(Integer.valueOf(100), pages.getTotal());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
 
 
