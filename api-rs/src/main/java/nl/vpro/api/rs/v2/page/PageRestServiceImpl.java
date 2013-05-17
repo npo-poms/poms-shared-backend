@@ -67,10 +67,10 @@ public class PageRestServiceImpl implements PageRestService {
                     .author("superuser")
                     .summary("Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.")
                     .body("bla bla bla bla")
-                    .deepLink("http://www.wetenschap24.nl/groot-brein-in-klein-dier.html")
+                    .deepLink("http://www.wetenschap24.nl/nieuws/artikelen/2001/mei/Groot-brein-in-klein-dier.html")
                     .pageType(PageType.Artikel)
                     .brand("http://www.wetenschap24.nl", "Wetenschap 24")
-                    .mainImage("http://www.wetenschap24.nl/eenkleinharigbeest.jpg")
+                    .mainImage("http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg")
                     .build();
         } catch (URISyntaxException | MalformedURLException e) {
             throw new RuntimeException(e);

@@ -11,8 +11,8 @@
   <api-import pattern="nl.vpro.api.rs.v2.**" seekSource="true"/>
   <deployment host="api.vpro.nl" context="v2"/>
   <namespaces>
-    <namespace id="api"    uri="urn:vpro:api:2013"/>
-    <namespace id="pages"  uri="urn:vpro:pages:2013"/>
+    <namespace id="api"    uri="urn:vpro:api:2013" />
+    <namespace id="pages"  uri="urn:vpro:pages:2013" />
     <namespace id="media"  uri="urn:vpro:media:2009"/>
     <namespace id="search" uri="urn:vpro:media:search:2012"/>
     <namespace id="update" uri="urn:vpro:media:update:2009"/>
@@ -21,7 +21,8 @@
   </namespaces>
   <services>
     <rest defaultRestSubcontext="/v2" />
-  </services>  <modules>
+  </services>
+  <modules>
     <docs splashPackage="nl.vpro.api.rs.v2" title="API VPRO.nl V2" copyright="vpro.nl">
       <download name="License" file="LICENSE.txt" description="The license file governing the use of this API."/>
     </docs>
@@ -30,5 +31,11 @@
     <csharp disabled="true"/> <!-- Validation error on classes containing fields with an identical name -->
     <cxf disabled="true"/>
     <obj-c disabled="true"/>
+    <xml>
+      <!-- namespaces with default empty prefix -->
+      <schema namespace="urn:vpro:pages:2013"        file="pages.xsd" />
+      <schema namespace="urn:vpro:media:search:2012" file="search.xsd"/>
+      <schema namespace="urn:vpro:media:2009"        file="media.xsd"/>
+    </xml>
   </modules>
 </enunciate>
