@@ -55,14 +55,14 @@ public class PageRestServiceImplTest {
         MockHttpRequest request = MockHttpRequest.get("/pages?mock=true");
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
+
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
         TypeReference<PagedResult<Page>> typeRef = new TypeReference<PagedResult<Page>>() {
         };
-
         PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
-        System.out.println(response.getContentAsString());
+
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
         assertEquals(Integer.valueOf(100), pages.getTotal());
@@ -77,10 +77,12 @@ public class PageRestServiceImplTest {
         request.accept(MediaType.APPLICATION_XML);
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
+
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
+
         PagedResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
-        System.out.println(response.getContentAsString());
+
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
         assertEquals(Integer.valueOf(100), pages.getTotal());
@@ -97,16 +99,14 @@ public class PageRestServiceImplTest {
         PageForm form = new PageForm();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, form);
-
         request.content(out.toByteArray());
-
         dispatcher.invoke(request, response);
+
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
         TypeReference<PagedResult<Page>> typeRef = new TypeReference<PagedResult<Page>>() {
         };
-
         PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
@@ -126,15 +126,14 @@ public class PageRestServiceImplTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         JAXB.marshal(form, out);
 
-
         request.content(out.toByteArray());
-
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
+
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
         PagedResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
-        System.out.println(response.getContentAsString());
+
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
         assertEquals(Integer.valueOf(100), pages.getTotal());
@@ -148,8 +147,10 @@ public class PageRestServiceImplTest {
         MockHttpRequest request = MockHttpRequest.get("/pages/123?mock=true");
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
+
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
         Page page = mapper.readValue(response.getContentAsString(), Page.class);
 
         assertEquals("{\"title\":\"Groot brein in klein dier\",\"body\":\"bla bla bla bla\",\"summary\":\"Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.\",\"deepLink\":\"http://www.wetenschap24.nl/nieuws/artikelen/2001/mei/Groot-brein-in-klein-dier.html\",\"pageType\":\"Artikel\",\"brand\":{\"site\":\"http://www.wetenschap24.nl\",\"title\":\"Wetenschap 24\"},\"author\":\"superuser\",\"mainImage\":{\"url\":\"http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg\"},\"id\":\"4b748d32-8006-4f0a-8aac-6d8d5c89a847\"}", response.getContentAsString());
@@ -167,6 +168,7 @@ public class PageRestServiceImplTest {
         request.accept(MediaType.APPLICATION_XML);
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
+
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
@@ -192,8 +194,6 @@ public class PageRestServiceImplTest {
 
         Diff diff = XMLUnit.compareXML(expected, response.getContentAsString());
         assertTrue(diff.toString() + " " + response.getContentAsString(), diff.similar());
-
-
 
     }
 }
