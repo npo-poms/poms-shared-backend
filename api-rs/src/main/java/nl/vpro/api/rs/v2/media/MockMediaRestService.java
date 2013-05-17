@@ -1,10 +1,7 @@
 package nl.vpro.api.rs.v2.media;
 
 import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.Segment;
+import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.MediaForm;
 
 import java.util.ArrayList;
@@ -27,14 +24,7 @@ class MockMediaRestService implements MediaRestService {
 
     }
 
-    protected List<MediaObject> mockList(int total, int offset, int limit) {
-        int numberOfResults = Math.min(total - offset, limit);
-        List<MediaObject> result = new ArrayList<>();
-        for (int i = 0; i < numberOfResults; i++) {
-            result.add(MediaTestDataBuilder.program().build());
-        }
-        return result;
-    }
+
 
     @Override
     public MediaObject get(String id, boolean mock) {
@@ -43,17 +33,44 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public PagedResult<MediaObject> getMembers(String id, boolean mock) {
-        return new PagedResult<>();
+    public PagedResult<MediaObject> getMembers(String id, Integer offset, Integer limit, boolean mock) {
+        return new PagedResult<>(mockList(listSizes, offset, limit), offset, listSizes);
     }
 
     @Override
-    public PagedResult<Program> getEpisodes(String id, boolean mock) {
-        return new PagedResult<>();
+    public PagedResult<Program> getEpisodes(String id, Integer offset, Integer limit, boolean mock) {
+        return new PagedResult<>(mockEpisodes(listSizes, offset, limit), offset, listSizes);
     }
 
     @Override
-    public PagedResult<Segment> getSegments(String id, boolean mock) {
-        return new PagedResult<>();
+    public PagedResult<Segment> getSegments(String id, Integer offset, Integer limit, boolean mock) {
+        return new PagedResult<>(mockSegments(listSizes, offset, limit), offset, listSizes);
+    }
+
+    protected List<MediaObject> mockList(int total, int offset, int limit) {
+        int numberOfResults = Math.min(total - offset, limit);
+        List<MediaObject> result = new ArrayList<>();
+        for (int i = 0; i < numberOfResults; i++) {
+            result.add(MediaTestDataBuilder.program().constrained().build());
+        }
+        return result;
+    }
+
+    protected List<Program> mockEpisodes(int total, int offset, int limit) {
+        int numberOfResults = Math.min(total - offset, limit);
+        List<Program> result = new ArrayList<>();
+        for (int i = 0; i < numberOfResults; i++) {
+            result.add(MediaTestDataBuilder.program().constrained().type(ProgramType.BROADCAST).build());
+        }
+        return result;
+    }
+
+    protected List<Segment> mockSegments(int total, int offset, int limit) {
+        int numberOfResults = Math.min(total - offset, limit);
+        List<Segment> result = new ArrayList<>();
+        for (int i = 0; i < numberOfResults; i++) {
+            result.add(MediaTestDataBuilder.segment().constrained().build());
+        }
+        return result;
     }
 }

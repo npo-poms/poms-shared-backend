@@ -62,9 +62,9 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public PagedResult<MediaObject> getMembers(String id, boolean mock) {
+    public PagedResult<MediaObject> getMembers(String id, Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return mocks.getMembers(id, true);
+            return mocks.getMembers(id, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -72,9 +72,9 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public PagedResult<Program> getEpisodes(String id, boolean mock) {
+    public PagedResult<Program> getEpisodes(String id, Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return mocks.getEpisodes(id, true);
+            return mocks.getEpisodes(id, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -82,9 +82,9 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public PagedResult<Segment> getSegments(String id, boolean mock) {
+    public PagedResult<Segment> getSegments(String id, Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return mocks.getSegments(id, true);
+            return mocks.getSegments(id, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }

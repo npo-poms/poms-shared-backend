@@ -7,6 +7,7 @@ import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.search.MediaForm;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
@@ -18,7 +19,9 @@ import org.junit.Test;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,14 +66,21 @@ public class MediaRestServiceImplTest {
         dispatcher.invoke(request, response);
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
-        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), PagedResult.class);
-        assertEquals(Integer.valueOf(3), result.getSize());
+
+        TypeReference<PagedResult<MediaObject>> typeRef = new TypeReference<PagedResult<MediaObject>>() {};
+
+        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+
+        assertEquals(Integer.valueOf(50), result.getSize());
+
+        MediaObject object = result.getList().get(0);
     }
 
     @Test
     public void testSearch() throws Exception {
         MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
-        request.contentType(MediaType.APPLICATION_JSON_TYPE);
+        request.contentType(MediaType.APPLICATION_JSON);
+
         MediaForm form = new MediaForm();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, form);
@@ -81,8 +91,13 @@ public class MediaRestServiceImplTest {
 
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
-        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), PagedResult.class);
-        assertEquals(Integer.valueOf(3), result.getSize());
+
+
+        TypeReference<PagedResult<MediaObject>> typeRef = new TypeReference<PagedResult<MediaObject>>() {
+        };
+
+        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertEquals(Integer.valueOf(50), result.getSize());
     }
 
     @Test
@@ -137,8 +152,21 @@ public class MediaRestServiceImplTest {
 
 
     @Test
-    public void testGetMembers() {
-        // TODO
+    public void testGetMembers() throws URISyntaxException, IOException {
+        MockHttpRequest request = MockHttpRequest.post("/media/123/members?mock=true");
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        TypeReference<PagedResult<MediaObject>> typeRef = new TypeReference<PagedResult<MediaObject>>() {
+        };
+
+        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertEquals(Integer.valueOf(50), result.getSize());
+
     }
 
     @Test

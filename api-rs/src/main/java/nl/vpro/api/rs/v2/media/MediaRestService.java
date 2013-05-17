@@ -69,16 +69,28 @@ public interface MediaRestService {
 
     @GET
     @Path("/{id}/members")
-    PagedResult<MediaObject> getMembers(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+    PagedResult<MediaObject> getMembers(
+            @PathParam("id") String id,
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("limit") @DefaultValue("50") Integer limit,
+            @QueryParam("mock") @DefaultValue("false") boolean mock);
 
 
     @GET
     @Path("/{id}/episodes")
-    PagedResult<Program> getEpisodes(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+    PagedResult<Program> getEpisodes(
+            @PathParam("id") String id,
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("limit") @DefaultValue("50") Integer limit,
+            @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @GET
     @Path("/{id}/segments")
-    PagedResult<Segment> getSegments(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+    PagedResult<Segment> getSegments(
+            @PathParam("id") String id,
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("limit") @DefaultValue("50") Integer limit,
+            @QueryParam("mock") @DefaultValue("false") boolean mock);
 
 
 }
