@@ -13,11 +13,6 @@ import nl.vpro.domain.media.search.MediaForm;
 import org.jboss.resteasy.spi.NotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import java.util.Arrays;
-
 /**
  * See https://jira.vpro.nl/browse/API-92
  *
@@ -27,7 +22,7 @@ import java.util.Arrays;
 @Service
 public class MediaRestServiceImpl  implements MediaRestService  {
 
-    MockMediaRestService mocks = new MockMediaRestService();
+    private final MockMediaRestService mocks = new MockMediaRestService();
 
     @Override
     public PagedResult<MediaObject> list(
@@ -50,15 +45,7 @@ public class MediaRestServiceImpl  implements MediaRestService  {
             Integer limit,
             boolean mock) {
         if (mock) {
-
-            return new PagedResult<MediaObject>(
-                    Arrays.asList(
-                            MediaBuilder.program().build(),
-                            MediaBuilder.program().build(),
-                            MediaBuilder.program().build()),
-                    offset,
-                    100);
-
+            return mocks.search(form, profile, offset, limit, true);
         } else {
             return new PagedResult<>();
         }
@@ -66,7 +53,7 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock) {
+    public MediaObject get(String id, boolean mock) {
         if (mock) {
             return MediaBuilder.program().build();
         } else {
@@ -76,17 +63,31 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public PagedResult<MediaObject> getMembers(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public PagedResult<MediaObject> getMembers(String id, boolean mock) {
+        if (mock) {
+            return mocks.getMembers(id, true);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
     }
 
     @Override
-    public PagedResult<Program> getEpisodes(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public PagedResult<Program> getEpisodes(String id, boolean mock) {
+        if (mock) {
+            return mocks.getEpisodes(id, true);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
     }
 
     @Override
-    public PagedResult<Segment> getSegments(@PathParam("id") String id, @DefaultValue("false") boolean mock) {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public PagedResult<Segment> getSegments(String id, boolean mock) {
+        if (mock) {
+            return mocks.getSegments(id, true);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 }

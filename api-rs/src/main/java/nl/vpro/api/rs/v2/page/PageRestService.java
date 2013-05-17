@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * See https://jira.vpro.nl/browse/API-92
  *
- * @author Roelof Jan Koekoek
+ * @author Michiel Meeuwissen
  * @since 2.0
  */
 @Path("/pages")
@@ -39,11 +39,10 @@ public interface PageRestService {
             @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
-     * Retrieve a media resource, either a Program, Group or Segment, by it's id.
+     * Retrieves a page by it's id.
      *
-     * @param id   existing urn or mid
+     * @param id   existing id for a page
      * @param mock whether to return a mock object
-     * @return full Program, Group or Segment
      */
     @GET
     @Path("/{id}")

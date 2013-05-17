@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,12 +66,13 @@ public class PageRestServiceImpl implements PageRestService {
                     .title("Groot brein in klein dier")
                     .author("superuser")
                     .summary("Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.")
+                    .body("bla bla bla bla")
                     .deepLink("http://www.wetenschap24.nl/groot-brein-in-klein-dier.html")
                     .pageType(PageType.Artikel)
                     .brand("http://www.wetenschap24.nl", "Wetenschap 24")
                     .mainImage("http://www.wetenschap24.nl/eenkleinharigbeest.jpg")
                     .build();
-        } catch (MalformedURLException e) {
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
