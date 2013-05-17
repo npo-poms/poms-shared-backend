@@ -57,7 +57,24 @@ public class PageRestServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
         PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), PagedResult.class);
+        System.out.println(response.getContentAsString());
+        assertEquals(Integer.valueOf(50), pages.getSize());
+        assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
 
+
+    }
+
+    @Test
+    public void testListXml() throws Exception {
+        MockHttpRequest request = MockHttpRequest.get("/pages?mock=true");
+        request.accept(MediaType.APPLICATION_XML);
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
+        PagedResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
+        System.out.println(response.getContentAsString());
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
@@ -82,6 +99,28 @@ public class PageRestServiceImplTest {
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
+
+    }
+
+    @Test
+    public void testSearchXml() throws Exception {
+        MockHttpRequest request = MockHttpRequest.post("/pages?mock=true");
+        request.accept(MediaType.APPLICATION_XML);
+        PageForm form = new PageForm();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        mapper.writeValue(out, form);
+        request.content(out.toByteArray());
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
+        PagedResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
+        System.out.println(response.getContentAsString());
+        assertEquals(Integer.valueOf(50), pages.getSize());
+        assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
+
 
     }
 
