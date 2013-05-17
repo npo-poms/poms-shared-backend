@@ -1,10 +1,7 @@
 package nl.vpro.api.rs.v2.media;
 
 import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.media.MediaBuilder;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.MediaForm;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -85,6 +82,7 @@ public class MediaRestServiceImplTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, form);
         request.content(out.toByteArray());
+        System.out.println(new String(out.toByteArray()));
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
@@ -153,7 +151,7 @@ public class MediaRestServiceImplTest {
 
     @Test
     public void testGetMembers() throws URISyntaxException, IOException {
-        MockHttpRequest request = MockHttpRequest.post("/media/123/members?mock=true");
+        MockHttpRequest request = MockHttpRequest.get("/media/123/members?mock=true");
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
@@ -170,12 +168,36 @@ public class MediaRestServiceImplTest {
     }
 
     @Test
-    public void testGetEpisodies() {
-        // TODO
+    public void testGetEpisodes() throws URISyntaxException, IOException {
+        MockHttpRequest request = MockHttpRequest.get("/media/123/episodes?mock=true");
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        TypeReference<PagedResult<Program>> typeRef = new TypeReference<PagedResult<Program>>() {
+        };
+
+        PagedResult<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertEquals(Integer.valueOf(50), result.getSize());
     }
 
     @Test
-    public void testgetSegments() {
-        // TODO
+    public void testgetSegments() throws URISyntaxException, IOException {
+        MockHttpRequest request = MockHttpRequest.get("/media/123/segments?mock=true");
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        TypeReference<PagedResult<Segment>> typeRef = new TypeReference<PagedResult<Segment>>() {
+        };
+
+        PagedResult<Segment> result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertEquals(Integer.valueOf(50), result.getSize());
     }
 }
