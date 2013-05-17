@@ -3,12 +3,11 @@ package nl.vpro.api.rs.v2.page;
 import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.api.pages.Page;
 import nl.vpro.domain.api.pages.PageBuilder;
-import nl.vpro.domain.api.pages.PageType;
 import nl.vpro.domain.api.pages.PageForm;
+import nl.vpro.domain.api.pages.PageType;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +71,7 @@ public class PageRestServiceImpl implements PageRestService {
                     .brand("http://www.wetenschap24.nl", "Wetenschap 24")
                     .mainImage("http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg")
                     .build();
-        } catch (URISyntaxException | MalformedURLException e) {
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

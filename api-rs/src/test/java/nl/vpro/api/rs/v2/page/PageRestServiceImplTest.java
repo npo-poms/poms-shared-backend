@@ -1,6 +1,8 @@
 package nl.vpro.api.rs.v2.page;
 
+import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.api.pages.Page;
+import nl.vpro.domain.api.pages.PageForm;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -13,6 +15,7 @@ import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
+import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,11 +51,37 @@ public class PageRestServiceImplTest {
 
     @Test
     public void testList() throws Exception {
+        MockHttpRequest request = MockHttpRequest.get("/pages?mock=true");
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), PagedResult.class);
+
+        assertEquals(Integer.valueOf(50), pages.getSize());
+        assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
+
 
     }
 
     @Test
     public void testSearch() throws Exception {
+        MockHttpRequest request = MockHttpRequest.post("/pages?mock=true");
+        MockHttpResponse response = new MockHttpResponse();
+        PageForm form = new PageForm();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        mapper.writeValue(out, form);
+        request.content(out.toByteArray());
+
+        dispatcher.invoke(request, response);
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), PagedResult.class);
+
+        assertEquals(Integer.valueOf(50), pages.getSize());
+        assertEquals(Integer.valueOf(0), pages.getOffset());
+        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
 
     }
 
