@@ -4,6 +4,7 @@ import nl.vpro.domain.api.PagedResult;
 import nl.vpro.domain.api.pages.Page;
 import nl.vpro.domain.api.pages.PageForm;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
@@ -56,7 +57,11 @@ public class PageRestServiceImplTest {
         dispatcher.invoke(request, response);
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
-        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), PagedResult.class);
+
+        TypeReference<PagedResult<Page>> typeRef = new TypeReference<PagedResult<Page>>() {
+        };
+
+        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
         System.out.println(response.getContentAsString());
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
@@ -85,16 +90,22 @@ public class PageRestServiceImplTest {
     @Test
     public void testSearch() throws Exception {
         MockHttpRequest request = MockHttpRequest.post("/pages?mock=true");
+        request.contentType(MediaType.APPLICATION_JSON);
         MockHttpResponse response = new MockHttpResponse();
         PageForm form = new PageForm();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, form);
+
         request.content(out.toByteArray());
 
         dispatcher.invoke(request, response);
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
-        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), PagedResult.class);
+
+        TypeReference<PagedResult<Page>> typeRef = new TypeReference<PagedResult<Page>>() {
+        };
+
+        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
@@ -105,10 +116,14 @@ public class PageRestServiceImplTest {
     @Test
     public void testSearchXml() throws Exception {
         MockHttpRequest request = MockHttpRequest.post("/pages?mock=true");
+        request.contentType(MediaType.APPLICATION_XML);
         request.accept(MediaType.APPLICATION_XML);
+
         PageForm form = new PageForm();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        mapper.writeValue(out, form);
+        JAXB.marshal(form, out);
+
+
         request.content(out.toByteArray());
 
         MockHttpResponse response = new MockHttpResponse();
