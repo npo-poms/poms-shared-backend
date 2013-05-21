@@ -1,7 +1,7 @@
 package nl.vpro.api.rs.v2.media;
 
 import nl.vpro.api.rs.v2.AbstractServiceImplTest;
-import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.*;
 import org.codehaus.jackson.type.TypeReference;
@@ -161,12 +161,12 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
-        assertEquals(response.getErrorMessage(), 400, response.getStatus()); // FAILS
+        assertEquals(response.getErrorMessage(), 400, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
         System.out.println(response.getContentAsString());
 
-        Program program = mapper.readValue(response.getContentAsString(), Program.class);
-        assertEquals(MediaBuilder.program().build(), program);
+        nl.vpro.domain.api.Error error = mapper.readValue(response.getContentAsString(), nl.vpro.domain.api.Error.class);
+        assertEquals(Integer.valueOf(400), error.getStatus());
 
 
     }
