@@ -1,18 +1,16 @@
 package nl.vpro.api.rs.v2.page;
 
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.NotFoundException;
-
-import org.springframework.stereotype.Service;
-
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.page.Page;
 import nl.vpro.domain.page.PageBuilder;
 import nl.vpro.domain.page.PageType;
+import org.springframework.stereotype.Service;
+
+import javax.ws.rs.NotFoundException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Michiel Meeuwissen
@@ -72,6 +70,7 @@ public class PageRestServiceImpl implements PageRestService {
                     .pageType(PageType.Artikel)
                     .brand("http://www.wetenschap24.nl", "Wetenschap 24")
                     .mainImage("http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg")
+                    .mediaIds("urn:vpro:media:program:1234", "urn:vpro:media:group:4321")
                     .build();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
