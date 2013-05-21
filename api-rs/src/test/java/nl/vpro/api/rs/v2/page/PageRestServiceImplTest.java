@@ -2,8 +2,8 @@ package nl.vpro.api.rs.v2.page;
 
 import nl.vpro.api.rs.v2.AbstractServiceImplTest;
 import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.api.pages.Page;
-import nl.vpro.domain.api.pages.PageForm;
+import nl.vpro.domain.pages.Page;
+import nl.vpro.domain.pages.PageForm;
 import org.codehaus.jackson.type.TypeReference;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;

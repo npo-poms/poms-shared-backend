@@ -1,10 +1,10 @@
 package nl.vpro.api.rs.v2.page;
 
 import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.api.pages.Page;
-import nl.vpro.domain.api.pages.PageBuilder;
-import nl.vpro.domain.api.pages.PageForm;
-import nl.vpro.domain.api.pages.PageType;
+import nl.vpro.domain.pages.PageBuilder;
+import nl.vpro.domain.pages.PageForm;
+import nl.vpro.domain.pages.PageType;
+import nl.vpro.domain.pages.Page;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
