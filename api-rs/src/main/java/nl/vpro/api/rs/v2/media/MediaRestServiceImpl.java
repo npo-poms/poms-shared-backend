@@ -4,17 +4,12 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-
-import org.springframework.stereotype.Service;
-
 import nl.vpro.api.rs.v2.exception.BadRequest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.Segment;
+import org.springframework.stereotype.Service;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -83,7 +78,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public Result<Segment> listDescendants(String id, String profile, Integer offset, Integer limit, boolean mock) {
+    public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer limit, boolean mock) {
         if(mock) {
             return mocks.listDescendants(id, profile, offset, limit, true);
         } else {
@@ -92,7 +87,11 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> listRelated(@PathParam("id") String id, String profile, @DefaultValue("0") Integer offset, @DefaultValue("50") Integer max, @DefaultValue("false") boolean mock) {
-        return null;
+    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer limit, boolean mock) {
+        if (mock) {
+            return mocks.listRelated(id, profile, offset, limit, true);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 }

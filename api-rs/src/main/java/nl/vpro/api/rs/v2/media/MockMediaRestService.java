@@ -1,14 +1,13 @@
 package nl.vpro.api.rs.v2.media;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.*;
+
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.PathParam;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Michiel Meeuwissen
@@ -48,8 +47,8 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public Result<Segment> listDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<Segment>(mockSegments(listSizes, offset, max), offset, listSizes);
+    public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
+        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     protected List<MediaObject> mockList(int total, int offset, int max) {
@@ -82,12 +81,5 @@ class MockMediaRestService implements MediaRestService {
         return result;
     }
 
-    protected List<Segment> mockSegments(int total, int offset, int max) {
-        int numberOfResults = Math.min(total - offset, max);
-        List<Segment> result = new ArrayList<>();
-        for(int i = 0; i < numberOfResults; i++) {
-            result.add(MediaTestDataBuilder.segment().constrained().build());
-        }
-        return result;
-    }
+
 }

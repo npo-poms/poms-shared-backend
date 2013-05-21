@@ -4,17 +4,15 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-
-import org.codehaus.enunciate.jaxrs.ResponseCode;
-import org.codehaus.enunciate.jaxrs.StatusCodes;
-
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.Segment;
+import org.codehaus.enunciate.jaxrs.ResponseCode;
+import org.codehaus.enunciate.jaxrs.StatusCodes;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
@@ -111,7 +109,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/descendants")
-    Result<Segment> listDescendants(
+    Result<MediaObject> listDescendants(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
