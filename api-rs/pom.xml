@@ -111,6 +111,7 @@
         <executions>
           <execution>
             <configuration>
+              <docsDir>${project.build.directory}</docsDir>
             </configuration>
             <phase>prepare-package</phase>
             <goals>
