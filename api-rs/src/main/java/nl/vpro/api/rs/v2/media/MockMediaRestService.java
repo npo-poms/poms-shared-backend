@@ -1,14 +1,14 @@
 package nl.vpro.api.rs.v2.media;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.ProgramType;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Michiel Meeuwissen
@@ -24,7 +24,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public Result<MediaObject> search(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<MediaObject>(mockList(listSizes, offset, max), offset, listSizes);
+        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
@@ -33,8 +33,8 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+    public Result<MediaObject> listMembers(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return listMembers(id, profile, offset, max, mock);
     }
 
     @Override
@@ -48,8 +48,28 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
+    public Result<Program> listEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return listEpisodes(id, profile, offset, max, mock);
+    }
+
+    @Override
     public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+    }
+
+    @Override
+    public Result<MediaObject> listDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return listDescendants(id, profile, offset, max, mock);
+    }
+
+    @Override
+    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
+        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+    }
+
+    @Override
+    public Result<MediaObject> listRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return listRelated(id, profile, offset, max, mock);
     }
 
     protected List<MediaObject> mockList(int total, int offset, int max) {
@@ -81,6 +101,4 @@ class MockMediaRestService implements MediaRestService {
         }
         return result;
     }
-
-
 }

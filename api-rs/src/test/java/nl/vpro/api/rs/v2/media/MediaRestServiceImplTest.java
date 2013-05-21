@@ -1,20 +1,24 @@
 package nl.vpro.api.rs.v2.media;
 
-import nl.vpro.api.rs.v2.AbstractServiceImplTest;
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.media.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
+import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.domain.media.Program;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,13 +28,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
-
     @Override
     protected Object getTestObject() {
         return new MediaRestServiceImpl();
     }
-
-
 
     @Test
     public void testList() throws Exception {
@@ -40,7 +41,8 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {};
+        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
+        };
 
         Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
 

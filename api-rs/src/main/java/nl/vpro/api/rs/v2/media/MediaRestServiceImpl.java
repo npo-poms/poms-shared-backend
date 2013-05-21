@@ -4,12 +4,13 @@
  */
 package nl.vpro.api.rs.v2.media;
 
+import org.springframework.stereotype.Service;
+
 import nl.vpro.api.rs.v2.exception.BadRequest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
-import org.springframework.stereotype.Service;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -68,13 +69,22 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
+    public Result<MediaObject> listMembers(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return null;
+    }
+
+    @Override
     public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer limit, boolean mock) {
         if(mock) {
             return mocks.listEpisodes(id, profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }
+    }
 
+    @Override
+    public Result<Program> listEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return null;
     }
 
     @Override
@@ -87,11 +97,17 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer limit, boolean mock) {
-        if (mock) {
-            return mocks.listRelated(id, profile, offset, limit, true);
-        } else {
-            throw new UnsupportedOperationException();
-        }
+    public Result<MediaObject> listDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return null;
+    }
+
+    @Override
+    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
+        return null;
+    }
+
+    @Override
+    public Result<MediaObject> listRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return null;
     }
 }

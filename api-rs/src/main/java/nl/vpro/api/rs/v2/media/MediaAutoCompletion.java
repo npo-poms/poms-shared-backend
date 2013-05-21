@@ -4,17 +4,20 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.*;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
 import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.Suggestion;
 import nl.vpro.domain.api.media.MediaForm;
 
 /**
- * See https://jira.vpro.nl/browse/API-
  *
  * @author Roelof Jan Koekoek
  * @since 2.0
@@ -28,11 +31,9 @@ import nl.vpro.domain.api.media.MediaForm;
 public interface MediaAutoCompletion {
 
     @POST
-    @Path("/")
-    Result<String> search(
+    @Path("/titles")
+    Result<Suggestion> search(
         MediaForm form,
-        @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue("10") Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("profile") String profile
+    );
 }
