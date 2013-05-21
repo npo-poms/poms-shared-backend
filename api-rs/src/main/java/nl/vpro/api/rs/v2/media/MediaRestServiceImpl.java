@@ -4,13 +4,14 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import nl.vpro.domain.api.PagedResult;
+import org.jboss.resteasy.spi.NotFoundException;
+import org.springframework.stereotype.Service;
+
+import nl.vpro.domain.api.Result;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
 import nl.vpro.domain.media.search.MediaForm;
-import org.jboss.resteasy.spi.NotFoundException;
-import org.springframework.stereotype.Service;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -24,7 +25,7 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     private final MockMediaRestService mocks = new MockMediaRestService();
 
     @Override
-    public PagedResult<MediaObject> list(
+    public Result<MediaObject> list(
             String profile,
             Integer offset,
             Integer limit,
@@ -32,12 +33,12 @@ public class MediaRestServiceImpl  implements MediaRestService  {
         if (mock) {
             return mocks.list(profile, offset, limit, true);
         } else {
-            return new PagedResult<>();
+            throw new UnsupportedOperationException("TODO");
         }
     }
 
     @Override
-    public PagedResult<MediaObject> search(
+    public Result<MediaObject> search(
             MediaForm form,
             String profile,
             Integer offset,
@@ -46,7 +47,7 @@ public class MediaRestServiceImpl  implements MediaRestService  {
         if (mock) {
             return mocks.search(form, profile, offset, limit, true);
         } else {
-            return new PagedResult<>();
+            throw new UnsupportedOperationException("TODO");
         }
 
     }
@@ -62,9 +63,9 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public PagedResult<MediaObject> getMembers(String id, Integer offset, Integer limit, boolean mock) {
+    public Result<MediaObject> listMembers(String id, String profile, Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return mocks.getMembers(id, offset, limit, true);
+            return mocks.listMembers(id, profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -72,9 +73,9 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public PagedResult<Program> getEpisodes(String id, Integer offset, Integer limit, boolean mock) {
+    public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return mocks.getEpisodes(id, offset, limit, true);
+            return mocks.listEpisodes(id, profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -82,9 +83,9 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public PagedResult<Segment> getSegments(String id, Integer offset, Integer limit, boolean mock) {
+    public Result<Segment> listDescendants(String id, String profile,Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return mocks.getSegments(id, offset, limit, true);
+            return mocks.listDescendants(id, profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }

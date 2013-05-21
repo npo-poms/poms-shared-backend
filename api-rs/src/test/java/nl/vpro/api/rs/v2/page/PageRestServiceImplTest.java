@@ -1,9 +1,11 @@
 package nl.vpro.api.rs.v2.page;
 
-import nl.vpro.api.rs.v2.AbstractServiceImplTest;
-import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.pages.Page;
-import nl.vpro.domain.pages.PageForm;
+import java.io.ByteArrayOutputStream;
+import java.io.StringReader;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -11,10 +13,10 @@ import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import java.io.ByteArrayOutputStream;
-import java.io.StringReader;
+import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.page.PageForm;
+import nl.vpro.domain.page.Page;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -39,9 +41,9 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<PagedResult<Page>> typeRef = new TypeReference<PagedResult<Page>>() {
+        TypeReference<Result<Page>> typeRef = new TypeReference<Result<Page>>() {
         };
-        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
@@ -61,7 +63,7 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
-        PagedResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
+        Result<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
@@ -85,9 +87,9 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<PagedResult<Page>> typeRef = new TypeReference<PagedResult<Page>>() {
+        TypeReference<Result<Page>> typeRef = new TypeReference<Result<Page>>() {
         };
-        PagedResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());
@@ -112,7 +114,7 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
 
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
-        PagedResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
+        Result<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Integer.valueOf(0), pages.getOffset());

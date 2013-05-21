@@ -4,15 +4,14 @@
  */
 package nl.vpro.api.rs.v2.page;
 
-import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.pages.PageForm;
-import nl.vpro.domain.pages.Page;
-
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.page.PageForm;
+import nl.vpro.domain.page.Page;
+
 /**
- * See https://jira.vpro.nl/browse/API-92
  *
  * @author Michiel Meeuwissen
  * @since 2.0
@@ -23,20 +22,20 @@ public interface PageRestService {
 
     @GET
     @Path("/")
-    PagedResult<Page> list(
-            @QueryParam("profile") String profile,
-            @QueryParam("offset") @DefaultValue("0") Integer offset,
-            @QueryParam("limit") @DefaultValue("50") Integer limit,
-            @QueryParam("mock") @DefaultValue("false") boolean mock);
+    Result<Page> list(
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("limit") @DefaultValue("50") Integer limit,
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     @Path("/")
-    PagedResult<Page> search(
-            PageForm form,
-            @QueryParam("profile") String profile,
-            @QueryParam("offset") @DefaultValue("0") Integer offset,
-            @QueryParam("limit") @DefaultValue("50") Integer limit,
-            @QueryParam("mock") @DefaultValue("false") boolean mock);
+    Result<Page> search(
+        PageForm form,
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("limit") @DefaultValue("50") Integer limit,
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * Retrieves a page by it's id.
@@ -47,9 +46,8 @@ public interface PageRestService {
     @GET
     @Path("/{id}")
     Page get(
-            @PathParam("id") String id,
-            @QueryParam("mock") @DefaultValue("false") boolean mock);
-
+        @PathParam("id") String id,
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
 
 }

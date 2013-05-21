@@ -25,9 +25,12 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
+      <artifactId>api-media</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
       <artifactId>api-pages</artifactId>
     </dependency>
-
     <dependency>
       <groupId>nl.vpro.media</groupId>
       <artifactId>media-domain</artifactId>

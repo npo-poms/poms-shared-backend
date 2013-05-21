@@ -1,21 +1,23 @@
 package nl.vpro.api.rs.v2.media;
 
-import nl.vpro.api.rs.v2.AbstractServiceImplTest;
-import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.media.*;
-import nl.vpro.domain.media.search.MediaForm;
-import nl.vpro.domain.media.search.Pager;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
+import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.media.*;
+import nl.vpro.domain.media.search.MediaForm;
+import nl.vpro.domain.media.search.Pager;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,9 +43,9 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<PagedResult<MediaObject>> typeRef = new TypeReference<PagedResult<MediaObject>>() {};
+        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {};
 
-        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(50), result.getSize());
 
@@ -62,7 +64,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
-        PagedResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
+        Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
 
         assertEquals(Integer.valueOf(50), result.getSize());
 
@@ -93,10 +95,10 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
 
-        TypeReference<PagedResult<MediaObject>> typeRef = new TypeReference<PagedResult<MediaObject>>() {
+        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
         };
 
-        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(50), result.getSize());
     }
 
@@ -118,7 +120,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
 
-        PagedResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), PagedResult.class);
+        Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
         assertEquals(Integer.valueOf(50), result.getSize());
     }
 
@@ -183,10 +185,10 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<PagedResult<MediaObject>> typeRef = new TypeReference<PagedResult<MediaObject>>() {
+        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
         };
 
-        PagedResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(50), result.getSize());
 
     }
@@ -201,10 +203,10 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<PagedResult<Program>> typeRef = new TypeReference<PagedResult<Program>>() {
+        TypeReference<Result<Program>> typeRef = new TypeReference<Result<Program>>() {
         };
 
-        PagedResult<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(50), result.getSize());
     }
 
@@ -218,10 +220,10 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<PagedResult<Segment>> typeRef = new TypeReference<PagedResult<Segment>>() {
+        TypeReference<Result<Segment>> typeRef = new TypeReference<Result<Segment>>() {
         };
 
-        PagedResult<Segment> result = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<Segment> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(50), result.getSize());
     }
 }

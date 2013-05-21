@@ -141,11 +141,11 @@ Use three simple, common response codes indicating (1) success, (2) failure due 
 
 ## Record limits
 
-* If no limit is specified, return results with a default limit.
+* If no max is specified, return results with a default max.
 * To get records 50 through 75 do this:
-    * http://api.vpro.nl/magazines?limit=25&offset=50
-    * offset=50 means, ‘begin with record number fifty’
-    * limit=25 means, ‘return 25 records’
+    * http://api.vpro.nl/magazines?max=25&offset=50
+    * offset=50 means, ‘skip fifty records’
+    * max=25 means, ‘return at most 25 records’
 
 Information about record limits should also be included in the Example resonse. Example:
 
@@ -154,7 +154,7 @@ Information about record limits should also be included in the Example resonse. 
             "resultset": {
                 "count": 50,
                 "offset": 25,
-                "limit": 25
+                "max": 25
             }
         },
         "results": [
@@ -179,7 +179,7 @@ Example: http://api.vpro.nl/api/v1/magazines.json
             "resultset": {
                 "count": 123,
                 "offset": 0,
-                "limit": 10
+                "max": 10
             }
         },
         "results": [

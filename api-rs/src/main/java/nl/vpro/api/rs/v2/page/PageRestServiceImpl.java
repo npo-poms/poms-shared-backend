@@ -1,16 +1,18 @@
 package nl.vpro.api.rs.v2.page;
 
-import nl.vpro.domain.api.PagedResult;
-import nl.vpro.domain.pages.PageBuilder;
-import nl.vpro.domain.pages.PageForm;
-import nl.vpro.domain.pages.PageType;
-import nl.vpro.domain.pages.Page;
-import org.springframework.stereotype.Service;
-
-import javax.ws.rs.NotFoundException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.ws.rs.NotFoundException;
+
+import org.springframework.stereotype.Service;
+
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.page.PageForm;
+import nl.vpro.domain.page.Page;
+import nl.vpro.domain.page.PageBuilder;
+import nl.vpro.domain.page.PageType;
 
 /**
  * @author Michiel Meeuwissen
@@ -22,20 +24,20 @@ public class PageRestServiceImpl implements PageRestService {
 
 
     @Override
-    public PagedResult<Page> list(String profile,  Integer offset, Integer limit, boolean mock) {
+    public Result<Page> list(String profile,  Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return new PagedResult<>(mockList(listSizes, offset, limit), offset, listSizes);
+            return new Result<>(mockList(listSizes, offset, limit), offset, listSizes);
         } else {
-            return new PagedResult<>();
+            throw new UnsupportedOperationException("TODO");
         }
     }
 
     @Override
-    public PagedResult<Page> search(PageForm form, String profile, Integer offset, Integer limit, boolean mock) {
+    public Result<Page> search(PageForm form, String profile, Integer offset, Integer limit, boolean mock) {
         if (mock) {
-            return new PagedResult<>(mockList(listSizes, offset, limit), offset, listSizes);
+            return new Result<>(mockList(listSizes, offset, limit), offset, listSizes);
         } else {
-            return new PagedResult<>();
+            throw new UnsupportedOperationException("TODO");
         }
     }
 
