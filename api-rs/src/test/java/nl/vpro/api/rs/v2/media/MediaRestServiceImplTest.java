@@ -210,5 +210,22 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(Integer.valueOf(10), result.getSize());
     }
 
+    @Test
+    public void testGetDescendants() throws URISyntaxException, IOException {
+        MockHttpRequest request = MockHttpRequest.get("/media/123/descendants?mock=true");
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
+        };
+
+        Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertEquals(Integer.valueOf(10), result.getSize());
+    }
+
 
 }
