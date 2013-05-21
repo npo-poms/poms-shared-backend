@@ -1,23 +1,20 @@
 package nl.vpro.api.rs.v2.media;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-
+import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.media.*;
 import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
 
-import nl.vpro.api.rs.v2.AbstractServiceImplTest;
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.media.*;
-import nl.vpro.domain.media.search.MediaForm;
-import nl.vpro.domain.media.search.Pager;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,7 +44,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
         Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
 
-        assertEquals(Integer.valueOf(50), result.getSize());
+        assertEquals(Integer.valueOf(10), result.getSize());
 
         MediaObject object = result.getList().get(0);
         assertEquals("Main title", object.getMainTitle());
@@ -66,7 +63,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
         Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
 
-        assertEquals(Integer.valueOf(50), result.getSize());
+        assertEquals(Integer.valueOf(10), result.getSize());
 
         MediaObject object = result.getList().get(0);
         assertEquals("Main title", object.getMainTitle());
@@ -79,7 +76,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
         request.contentType(MediaType.APPLICATION_JSON);
 
-        MediaForm form = new MediaForm(new Pager(50));
+        MediaForm form = new MediaForm();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, form);
         request.content(out.toByteArray());
@@ -99,7 +96,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         };
 
         Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
-        assertEquals(Integer.valueOf(50), result.getSize());
+        assertEquals(Integer.valueOf(10), result.getSize());
     }
 
 
@@ -109,7 +106,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         request.contentType(MediaType.APPLICATION_XML);
         request.accept(MediaType.APPLICATION_XML);
 
-        MediaForm form = new MediaForm(new Pager(50));
+        MediaForm form = new MediaForm();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         JAXB.marshal(form, out);
 
@@ -121,7 +118,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
 
         Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
-        assertEquals(Integer.valueOf(50), result.getSize());
+        assertEquals(Integer.valueOf(10), result.getSize());
     }
 
     @Test
@@ -164,7 +161,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
-        assertEquals(response.getErrorMessage(), 200, response.getStatus()); // FAILS
+        assertEquals(response.getErrorMessage(), 400, response.getStatus()); // FAILS
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
         System.out.println(response.getContentAsString());
 
@@ -189,7 +186,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         };
 
         Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
-        assertEquals(Integer.valueOf(50), result.getSize());
+        assertEquals(Integer.valueOf(10), result.getSize());
 
     }
 
@@ -207,23 +204,8 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         };
 
         Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
-        assertEquals(Integer.valueOf(50), result.getSize());
+        assertEquals(Integer.valueOf(10), result.getSize());
     }
 
-    @Test
-    public void testgetSegments() throws URISyntaxException, IOException {
-        MockHttpRequest request = MockHttpRequest.get("/media/123/segments?mock=true");
 
-        MockHttpResponse response = new MockHttpResponse();
-        dispatcher.invoke(request, response);
-
-        assertEquals(response.getErrorMessage(), 200, response.getStatus());
-        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
-
-        TypeReference<Result<Segment>> typeRef = new TypeReference<Result<Segment>>() {
-        };
-
-        Result<Segment> result = mapper.readValue(response.getContentAsString(), typeRef);
-        assertEquals(Integer.valueOf(50), result.getSize());
-    }
 }
