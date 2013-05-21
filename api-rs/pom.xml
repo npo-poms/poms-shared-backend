@@ -10,7 +10,7 @@
 
   <groupId>nl.vpro.api</groupId>
   <artifactId>api-rs</artifactId>
-  <packaging>jar</packaging>
+  <packaging>war</packaging>
 
   <dependencies>
     <dependency>
@@ -107,6 +107,7 @@
 
   <build>
     <plugins>
+
       <plugin>
         <groupId>org.codehaus.enunciate</groupId>
         <artifactId>maven-enunciate-plugin</artifactId>
@@ -114,7 +115,7 @@
         <executions>
           <execution>
             <configuration>
-              <docsDir>${project.build.directory}</docsDir>
+              <docsDir>${project.build.directory}/${project.name}-${project.version}/docs/</docsDir>
             </configuration>
             <phase>prepare-package</phase>
             <goals>
@@ -122,6 +123,34 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+<!--
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <configuration>
+              <descriptor>src/assemble/docs.xml</descriptor>
+              <classifier>docs</classifier>
+            </configuration>
+            <phase>package</phase>
+            <goals>
+              <goal>assembly</goal>
+            </goals>
+          </execution>
+        </executions>
+
+      </plugin>
+-->
+
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <archiveClasses>true</archiveClasses>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
       </plugin>
 
    <!--
