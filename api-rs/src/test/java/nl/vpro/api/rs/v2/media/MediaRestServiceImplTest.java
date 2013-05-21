@@ -107,8 +107,11 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         request.accept(MediaType.APPLICATION_XML);
 
         MediaForm form = new MediaForm();
+        form.setMax(10);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+
         JAXB.marshal(form, out);
+        System.out.println(new String(out.toByteArray()));
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
