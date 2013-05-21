@@ -32,7 +32,7 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
 
     @Test
     public void testList() throws Exception {
-        MockHttpRequest request = MockHttpRequest.get("/pages?mock=true");
+        MockHttpRequest request = MockHttpRequest.get("/pages?mock=true&max=50");
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
@@ -54,7 +54,7 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
 
     @Test
     public void testListXml() throws Exception {
-        MockHttpRequest request = MockHttpRequest.get("/pages?mock=true");
+        MockHttpRequest request = MockHttpRequest.get("/pages?mock=true&max=50");
         request.accept(MediaType.APPLICATION_XML);
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
@@ -74,7 +74,7 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
 
     @Test
     public void testSearch() throws Exception {
-        MockHttpRequest request = MockHttpRequest.post("/pages?mock=true");
+        MockHttpRequest request = MockHttpRequest.post("/pages?mock=true&max=50");
         request.contentType(MediaType.APPLICATION_JSON);
         MockHttpResponse response = new MockHttpResponse();
         PageForm form = new PageForm();
@@ -99,7 +99,7 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
 
     @Test
     public void testSearchXml() throws Exception {
-        MockHttpRequest request = MockHttpRequest.post("/pages?mock=true");
+        MockHttpRequest request = MockHttpRequest.post("/pages?mock=true&max=50");
         request.contentType(MediaType.APPLICATION_XML);
         request.accept(MediaType.APPLICATION_XML);
 

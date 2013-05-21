@@ -2,10 +2,11 @@ package nl.vpro.api.rs.v2.media;
 
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.media.*;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.ProgramType;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +33,7 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> listRelated(@PathParam("id") String id, String profile, @DefaultValue("0") Integer offset, @DefaultValue("50") Integer max, @DefaultValue("false") boolean mock) {
+    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
