@@ -3,9 +3,12 @@ package nl.vpro.api.rs.v2.media;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.PathParam;
+
 import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.*;
-import nl.vpro.domain.media.search.MediaForm;
 
 /**
  * @author Michiel Meeuwissen
@@ -15,14 +18,13 @@ class MockMediaRestService implements MediaRestService {
     private static int listSizes = 100;
 
     @Override
-    public Result<MediaObject> list(String profile, Integer offset, Integer limit, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, limit), offset, listSizes);
+    public Result<MediaObject> list(String profile, Integer offset, Integer max, boolean mock) {
+        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<MediaObject> search(MediaForm form, String profile, Integer offset, Integer limit, boolean mock) {
-        return new Result<MediaObject>(mockList(listSizes, offset, limit), offset, listSizes);
-
+    public Result<MediaObject> search(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
+        return new Result<MediaObject>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
@@ -31,22 +33,27 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> listMembers(String id, String profile, Integer offset, Integer limit, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, limit), offset, listSizes);
+    public Result<MediaObject> listRelated(@PathParam("id") String id, String profile, @DefaultValue("0") Integer offset, @DefaultValue("50") Integer max, @DefaultValue("false") boolean mock) {
+        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer limit, boolean mock) {
-        return new Result<>(mockEpisodes(listSizes, offset, limit), offset, listSizes);
+    public Result<MediaObject> listMembers(String id, String profile, Integer offset, Integer max, boolean mock) {
+        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<Segment> listDescendants(String id, String profile, Integer offset, Integer limit, boolean mock) {
-        return new Result<Segment>(mockSegments(listSizes, offset, limit), offset, listSizes);
+    public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer max, boolean mock) {
+        return new Result<>(mockEpisodes(listSizes, offset, max), offset, listSizes);
     }
 
-    protected List<MediaObject> mockList(int total, int offset, int limit) {
-        int numberOfResults = Math.min(total - offset, limit);
+    @Override
+    public Result<Segment> listDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
+        return new Result<Segment>(mockSegments(listSizes, offset, max), offset, listSizes);
+    }
+
+    protected List<MediaObject> mockList(int total, int offset, int max) {
+        int numberOfResults = Math.min(total - offset, max);
         List<MediaObject> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
             result.add(build(i));
@@ -66,8 +73,8 @@ class MockMediaRestService implements MediaRestService {
         }
     }
 
-    protected List<Program> mockEpisodes(int total, int offset, int limit) {
-        int numberOfResults = Math.min(total - offset, limit);
+    protected List<Program> mockEpisodes(int total, int offset, int max) {
+        int numberOfResults = Math.min(total - offset, max);
         List<Program> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
             result.add(MediaTestDataBuilder.program().constrained().type(ProgramType.BROADCAST).build());
@@ -75,8 +82,8 @@ class MockMediaRestService implements MediaRestService {
         return result;
     }
 
-    protected List<Segment> mockSegments(int total, int offset, int limit) {
-        int numberOfResults = Math.min(total - offset, limit);
+    protected List<Segment> mockSegments(int total, int offset, int max) {
+        int numberOfResults = Math.min(total - offset, max);
         List<Segment> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
             result.add(MediaTestDataBuilder.segment().constrained().build());

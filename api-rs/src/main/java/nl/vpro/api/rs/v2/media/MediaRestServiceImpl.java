@@ -4,14 +4,17 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import org.jboss.resteasy.spi.NotFoundException;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.PathParam;
+
 import org.springframework.stereotype.Service;
 
+import nl.vpro.api.rs.v2.exception.BadRequest;
 import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
-import nl.vpro.domain.media.search.MediaForm;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -20,17 +23,17 @@ import nl.vpro.domain.media.search.MediaForm;
  * @since 2.0
  */
 @Service
-public class MediaRestServiceImpl  implements MediaRestService  {
+public class MediaRestServiceImpl implements MediaRestService {
 
     private final MockMediaRestService mocks = new MockMediaRestService();
 
     @Override
     public Result<MediaObject> list(
-            String profile,
-            Integer offset,
-            Integer limit,
-            boolean mock) {
-        if (mock) {
+        String profile,
+        Integer offset,
+        Integer limit,
+        boolean mock) {
+        if(mock) {
             return mocks.list(profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException("TODO");
@@ -39,42 +42,39 @@ public class MediaRestServiceImpl  implements MediaRestService  {
 
     @Override
     public Result<MediaObject> search(
-            MediaForm form,
-            String profile,
-            Integer offset,
-            Integer limit,
-            boolean mock) {
-        if (mock) {
+        MediaForm form,
+        String profile,
+        Integer offset,
+        Integer limit,
+        boolean mock) {
+        if(mock) {
             return mocks.search(form, profile, offset, limit, true);
-        } else {
-            throw new UnsupportedOperationException("TODO");
         }
 
+        throw new UnsupportedOperationException("TODO");
     }
 
     @Override
     public MediaObject get(String id, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.get(id, true);
-        } else {
-            // klinkt logisch, maar dat geeft een 404 dus...
-            throw new NotFoundException("bla");
         }
+
+        throw new BadRequest("No media for id " + id);
     }
 
     @Override
     public Result<MediaObject> listMembers(String id, String profile, Integer offset, Integer limit, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.listMembers(id, profile, offset, limit, true);
-        } else {
-            throw new UnsupportedOperationException();
         }
 
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer limit, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.listEpisodes(id, profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
@@ -83,11 +83,16 @@ public class MediaRestServiceImpl  implements MediaRestService  {
     }
 
     @Override
-    public Result<Segment> listDescendants(String id, String profile,Integer offset, Integer limit, boolean mock) {
-        if (mock) {
+    public Result<Segment> listDescendants(String id, String profile, Integer offset, Integer limit, boolean mock) {
+        if(mock) {
             return mocks.listDescendants(id, profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }
+    }
+
+    @Override
+    public Result<MediaObject> listRelated(@PathParam("id") String id, String profile, @DefaultValue("0") Integer offset, @DefaultValue("50") Integer max, @DefaultValue("false") boolean mock) {
+        return null;
     }
 }

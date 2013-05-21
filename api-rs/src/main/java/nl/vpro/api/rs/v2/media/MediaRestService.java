@@ -11,10 +11,10 @@ import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
 import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
-import nl.vpro.domain.media.search.MediaForm;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
@@ -44,7 +44,7 @@ public interface MediaRestService {
     Result<MediaObject> list(
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue("50") Integer max,
+        @QueryParam("max") @DefaultValue("10") Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
@@ -53,7 +53,7 @@ public interface MediaRestService {
         MediaForm form,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue("50") Integer max,
+        @QueryParam("max") @DefaultValue("10") Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -68,8 +68,7 @@ public interface MediaRestService {
     MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
-     *
-     * @param id existing urn or mid
+     * @param id      existing urn or mid
      * @param profile
      * @param offset
      * @param max
@@ -82,12 +81,11 @@ public interface MediaRestService {
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue("50") Integer max,
+        @QueryParam("max") @DefaultValue("10") Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
-     * 
-     * @param id existing urn or mid
+     * @param id      existing urn or mid
      * @param profile
      * @param offset
      * @param max
@@ -100,12 +98,11 @@ public interface MediaRestService {
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue("50") Integer max,
+        @QueryParam("max") @DefaultValue("10") Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
-     * 
-     * @param id existing urn or mid
+     * @param id      existing urn or mid
      * @param profile
      * @param offset
      * @param max
@@ -118,7 +115,24 @@ public interface MediaRestService {
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue("50") Integer max,
+        @QueryParam("max") @DefaultValue("10") Integer max,
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
+
+    /**
+     * @param id      existing urn or mid
+     * @param profile
+     * @param offset
+     * @param max
+     * @param mock
+     * @return
+     */
+    @GET
+    @Path("/{id}/related")
+    Result<MediaObject> listRelated(
+        @PathParam("id") String id,
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("max") @DefaultValue("10") Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
 }
