@@ -10,7 +10,15 @@
 
   <bean class="nl.vpro.resteasy.JacksonContextResolver" />
 
-  <bean class="nl.vpro.api.profile.ProfileServiceImpl"/>
+  <bean class="nl.vpro.api.profile.ProfileServiceImpl">
+    <constructor-arg>
+      <array>
+        <value>woord</value>
+        <value>wetenschap</value>
+        <value>vpro</value>
+      </array>
+    </constructor-arg>
+  </bean>
 
 
 </beans>
