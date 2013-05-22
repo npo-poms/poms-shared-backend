@@ -61,18 +61,15 @@
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-profiles</artifactId>
     </dependency>
-<!--
-    <dependency>
+
+  <!--  <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-profiles</artifactId>
       <classifier>sources</classifier>
       <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
 -->
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-profiles</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>nl.vpro.media</groupId>
