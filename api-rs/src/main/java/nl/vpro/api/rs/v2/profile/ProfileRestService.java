@@ -29,14 +29,15 @@ import nl.vpro.domain.api.profile.Profile;
 public interface ProfileRestService {
 
     /**
-     * Returns a list of all available profiles
+     * Returns a list of all available profiles.
      *
      * @return all available profiles
      */
     @GET
     Result<Profile> list(
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("mock") @DefaultValue("false") boolean mock
     );
 
     /**
@@ -47,6 +48,9 @@ public interface ProfileRestService {
      */
     @GET
     @Path("/{name}")
-    Profile load(@PathParam("name") String name);
+    Profile load(
+        @PathParam("name") String name,
+        @QueryParam("mock") @DefaultValue("false") boolean mock
+    );
 
 }

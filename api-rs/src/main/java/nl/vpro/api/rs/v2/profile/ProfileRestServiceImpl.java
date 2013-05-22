@@ -4,14 +4,15 @@
  */
 package nl.vpro.api.rs.v2.profile;
 
-import nl.vpro.api.profile.ProfileService;
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.profile.Profile;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import nl.vpro.api.profile.ProfileService;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.profile.Profile;
 
 /**
  * @author Roelof Jan Koekoek
@@ -28,13 +29,17 @@ public class ProfileRestServiceImpl implements ProfileRestService {
     }
 
     @Override
-    public Result<Profile> list(Integer offset, Integer max) {
+    public Result<Profile> list(Integer offset, Integer max, boolean mock) {
         List<Profile> profiles = new ArrayList<>(profileService.getProfiles());
         return new Result<>(profiles.subList(offset, Math.min(profiles.size(), offset + max)), offset, profiles.size());
     }
 
     @Override
-    public Profile load(String name) {
+    public Profile load(String name, boolean mock) {
+        if(mock == true) {
+            return profileService.getProfiles().first();
+        }
+
         return profileService.getProfile(name);
     }
 
