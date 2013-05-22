@@ -10,5 +10,7 @@
 
   <bean class="nl.vpro.resteasy.JacksonContextResolver" />
 
+  <bean class="nl.vpro.api.profile.ProfileServiceImpl"/>
+
 
 </beans>
