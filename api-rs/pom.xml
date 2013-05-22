@@ -57,7 +57,18 @@
       <scope>provided</scope>
     </dependency>
 -->
-
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-profiles</artifactId>
+    </dependency>
+<!--
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-profiles</artifactId>
+      <classifier>sources</classifier>
+      <scope>provided</scope>
+    </dependency>
+-->
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-profiles</artifactId>
