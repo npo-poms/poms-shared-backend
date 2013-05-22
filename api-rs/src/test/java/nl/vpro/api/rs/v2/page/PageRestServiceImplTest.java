@@ -156,7 +156,6 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         Page page = JAXB.unmarshal(new StringReader(response.getContentAsString()), Page.class);
         assertEquals("4b748d32-8006-4f0a-8aac-6d8d5c89a847", page.getId());
 
-        System.out.println(response.getContentAsString());
         String expected ="<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
                 "<pages:page xmlns:pages=\"urn:vpro:pages:2013\" id=\"4b748d32-8006-4f0a-8aac-6d8d5c89a847\">\n" +
                 "  <pages:title>Groot brein in klein dier</pages:title>\n" +
