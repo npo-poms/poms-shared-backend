@@ -10,8 +10,6 @@ import javax.ws.rs.core.MediaType;
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
-import nl.vpro.domain.api.Constants;
-import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.profile.Profile;
 
 /**
@@ -29,18 +27,6 @@ import nl.vpro.domain.api.profile.Profile;
 public interface ProfileRestService {
 
     /**
-     * Returns a list of all available profiles.
-     *
-     * @return all available profiles
-     */
-    @GET
-    Result<Profile> list(
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock
-    );
-
-    /**
      * Returns a site profile by it's key
      *
      * @param name an profile identifier
@@ -52,5 +38,4 @@ public interface ProfileRestService {
         @PathParam("name") String name,
         @QueryParam("mock") @DefaultValue("false") boolean mock
     );
-
 }
