@@ -4,7 +4,7 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.POST;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -15,25 +15,23 @@ import org.codehaus.enunciate.jaxrs.StatusCodes;
 
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.Suggestion;
-import nl.vpro.domain.api.media.MediaSearch;
 
 /**
- *
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-@Path("/mediaCompletion")
+@Path("/suggest")
 @StatusCodes({
     @ResponseCode(code = 200, condition = "success"),
     @ResponseCode(code = 400, condition = "bad request"),
     @ResponseCode(code = 500, condition = "server error")})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-public interface MediaAutoCompletion {
+public interface SuggestRestService {
 
-    @POST
-    @Path("/titles")
-    Result<Suggestion> search(
-        MediaSearch form,
+    @GET
+    @Path("/")
+    Result<Suggestion> all(
+        @QueryParam("text") String text,
         @QueryParam("profile") String profile
     );
 }
