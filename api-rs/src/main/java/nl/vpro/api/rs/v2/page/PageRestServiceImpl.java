@@ -1,16 +1,18 @@
 package nl.vpro.api.rs.v2.page;
 
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.NotFoundException;
+
+import org.springframework.stereotype.Service;
+
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.page.Page;
 import nl.vpro.domain.page.PageBuilder;
 import nl.vpro.domain.page.PageType;
-import org.springframework.stereotype.Service;
-
-import javax.ws.rs.NotFoundException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Michiel Meeuwissen
@@ -22,7 +24,7 @@ public class PageRestServiceImpl implements PageRestService {
 
 
     @Override
-    public Result<Page> list(String profile,  Integer offset, Integer limit, boolean mock) {
+    public Result<Page> find(String profile,  Integer offset, Integer limit, boolean mock) {
         if (mock) {
             return new Result<>(mockList(listSizes, offset, limit), offset, listSizes);
         } else {
@@ -31,7 +33,7 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
     @Override
-    public Result<Page> search(PageForm form, String profile, Integer offset, Integer limit, boolean mock) {
+    public Result<Page> find(PageForm form, String profile, Integer offset, Integer limit, boolean mock) {
         if (mock) {
             return new Result<>(mockList(listSizes, offset, limit), offset, listSizes);
         } else {
@@ -40,7 +42,7 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
     @Override
-    public Page get(String id, boolean mock) {
+    public Page load(String id, boolean mock) {
         if (mock) {
             return mockPage();
         } else {

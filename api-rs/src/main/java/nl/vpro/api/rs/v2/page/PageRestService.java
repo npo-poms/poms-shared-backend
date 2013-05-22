@@ -4,12 +4,12 @@
  */
 package nl.vpro.api.rs.v2.page;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.page.Page;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -23,7 +23,7 @@ public interface PageRestService {
 
     @GET
     @Path("/")
-    Result<Page> list(
+    Result<Page> find(
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
         @QueryParam("max") @DefaultValue(DEFAULT_MAX) Integer max,
@@ -31,7 +31,7 @@ public interface PageRestService {
 
     @POST
     @Path("/")
-    Result<Page> search(
+    Result<Page> find(
         PageForm form,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -46,7 +46,7 @@ public interface PageRestService {
      */
     @GET
     @Path("/{id}")
-    Page get(
+    Page load(
         @PathParam("id") String id,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 

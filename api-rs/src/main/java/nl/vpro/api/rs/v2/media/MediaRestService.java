@@ -40,7 +40,7 @@ public interface MediaRestService {
 
     @GET
     @Path("/")
-    Result<MediaObject> list(
+    Result<MediaObject> find(
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
         @QueryParam("max") @DefaultValue("10") Integer max,
@@ -48,7 +48,7 @@ public interface MediaRestService {
 
     @POST
     @Path("/")
-    Result<MediaObject> search(
+    Result<MediaObject> find(
         MediaForm form,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -64,7 +64,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}")
-    MediaObject get(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
+    MediaObject load(@PathParam("id") String id, @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * @param id      existing urn or mid
@@ -76,7 +76,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/members")
-    Result<MediaObject> listMembers(
+    Result<MediaObject> findMembers(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -93,7 +93,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/members")
-    Result<MediaObject> listMembers(
+    Result<MediaObject> findMembers(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -111,7 +111,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/episodes")
-    Result<Program> listEpisodes(
+    Result<Program> findEpisodes(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -128,7 +128,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/episodes")
-    Result<Program> listEpisodes(
+    Result<Program> findEpisodes(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -146,7 +146,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/descendants")
-    Result<MediaObject> listDescendants(
+    Result<MediaObject> findDescendants(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -163,7 +163,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/descendants")
-    Result<MediaObject> listDescendants(
+    Result<MediaObject> findDescendants(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -181,7 +181,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/related")
-    Result<MediaObject> listRelated(
+    Result<MediaObject> findRelated(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -198,7 +198,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/related")
-    Result<MediaObject> listRelated(
+    Result<MediaObject> findRelated(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,

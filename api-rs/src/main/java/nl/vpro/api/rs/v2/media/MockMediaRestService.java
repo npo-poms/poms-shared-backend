@@ -18,58 +18,58 @@ class MockMediaRestService implements MediaRestService {
     private static int listSizes = 100;
 
     @Override
-    public Result<MediaObject> list(String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> find(String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<MediaObject> search(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public MediaObject get(String id, boolean mock) {
+    public MediaObject load(String id, boolean mock) {
         return build(id.hashCode());
     }
 
     @Override
-    public Result<MediaObject> listMembers(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return listMembers(id, profile, offset, max, mock);
+    public Result<MediaObject> findMembers(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return findMembers(id, profile, offset, max, mock);
     }
 
     @Override
-    public Result<MediaObject> listMembers(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> findMembers(String id, String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<Program> findEpisodes(String id, String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockEpisodes(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<Program> listEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return listEpisodes(id, profile, offset, max, mock);
+    public Result<Program> findEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return findEpisodes(id, profile, offset, max, mock);
     }
 
     @Override
-    public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> findDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<MediaObject> listDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return listDescendants(id, profile, offset, max, mock);
+    public Result<MediaObject> findDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return findDescendants(id, profile, offset, max, mock);
     }
 
     @Override
-    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> findRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
     }
 
     @Override
-    public Result<MediaObject> listRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return listRelated(id, profile, offset, max, mock);
+    public Result<MediaObject> findRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        return findRelated(id, profile, offset, max, mock);
     }
 
     protected List<MediaObject> mockList(int total, int offset, int max) {
