@@ -79,6 +79,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
     @Test
     public void testSearch() throws Exception {
         MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
+        request.contentType(MediaType.APPLICATION_JSON);
         request.accept(MediaType.APPLICATION_JSON);
 
         MediaForm form = new MediaForm();
@@ -89,7 +90,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
-        System.out.println(response.getContentAsString());
+        System.out.println(new String(out.toByteArray()));
 
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
 
