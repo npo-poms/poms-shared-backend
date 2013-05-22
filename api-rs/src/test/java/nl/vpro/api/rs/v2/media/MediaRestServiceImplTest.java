@@ -99,6 +99,8 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
         SearchResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(10), result.getSize());
+        assertEquals("foo", result.getList().get(0).getHighlights().get(0).getTerm());
+
     }
 
 
@@ -124,6 +126,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
         SearchResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), SearchResult.class);
         assertEquals(Integer.valueOf(10), result.getSize());
+        assertEquals("foo", result.getList().get(0).getHighlights().get(0).getTerm());
     }
 
     @Test

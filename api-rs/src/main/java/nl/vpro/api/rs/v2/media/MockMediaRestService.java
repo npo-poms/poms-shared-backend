@@ -1,5 +1,6 @@
 package nl.vpro.api.rs.v2.media;
 
+import nl.vpro.domain.api.HighLight;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.SearchResultItem;
@@ -9,9 +10,7 @@ import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.ProgramType;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -28,7 +27,8 @@ class MockMediaRestService implements MediaRestService {
     @Override
     public SearchResult<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
-        return new SearchResult<>(list, offset, listSizes);
+        SearchResult<MediaObject> result = new SearchResult<>(list, offset, listSizes);
+        return result;
     }
 
     @Override
@@ -83,7 +83,7 @@ class MockMediaRestService implements MediaRestService {
             public SearchResultItem<T> get(int index) {
                 SearchResultItem<T> result = new SearchResultItem<>(list.get(index));
                 result.setScore(0.5f);
-                //
+                result.setHighlights(Arrays.asList(new HighLight("foo", "bla <em>foo</em> bloe", "blie <em>foo</em> blo")));
                 return result;
             }
 
