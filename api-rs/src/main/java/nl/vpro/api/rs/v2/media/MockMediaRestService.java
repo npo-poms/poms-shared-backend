@@ -1,9 +1,6 @@
 package nl.vpro.api.rs.v2.media;
 
-import nl.vpro.domain.api.HighLight;
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.SearchResult;
-import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
@@ -21,13 +18,17 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public SearchResult<MediaObject> find(String profile, Integer offset, Integer max, boolean mock) {
-        return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, listSizes);
+        List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
+        SearchResult<MediaObject> result = new SearchResult<>(list, offset, listSizes);
+        result.setSearchFacets(Arrays.asList(new FacetResult("foo", Arrays.asList(new FacetResultItem("a", 100)))));
+        return result;
     }
 
     @Override
     public SearchResult<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         SearchResult<MediaObject> result = new SearchResult<>(list, offset, listSizes);
+        result.setSearchFacets(Arrays.asList(new FacetResult("foo", Arrays.asList(new FacetResultItem("a", 100)))));
         return result;
     }
 
