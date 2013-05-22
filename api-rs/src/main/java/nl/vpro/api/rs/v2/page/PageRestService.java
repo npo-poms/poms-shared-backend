@@ -4,6 +4,7 @@
  */
 package nl.vpro.api.rs.v2.page;
 
+import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.page.Page;
@@ -19,14 +20,13 @@ import javax.ws.rs.core.MediaType;
 @Path("/pages")
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface PageRestService {
-    static final String DEFAULT_MAX = "10";
 
     @GET
     @Path("/")
     SearchResult<Page> find(
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue(DEFAULT_MAX) Integer max,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
@@ -35,7 +35,7 @@ public interface PageRestService {
         PageForm form,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue(DEFAULT_MAX) Integer max,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
