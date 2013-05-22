@@ -4,15 +4,14 @@
  */
 package nl.vpro.api.rs.v2.profile;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import nl.vpro.api.profile.ProfileService;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.profile.Profile;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Roelof Jan Koekoek
@@ -31,7 +30,7 @@ public class ProfileRestServiceImpl implements ProfileRestService {
     @Override
     public Result<Profile> list(Integer offset, Integer max) {
         List<Profile> profiles = new ArrayList<>(profileService.getProfiles());
-        return new Result<>(profiles.subList(offset, offset + max), offset, profiles.size());
+        return new Result<>(profiles.subList(offset, Math.min(profiles.size(), offset + max)), offset, profiles.size());
     }
 
     @Override
