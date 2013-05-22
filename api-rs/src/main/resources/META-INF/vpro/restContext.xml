@@ -15,6 +15,7 @@
       <array>
         <value>woord</value>
         <value>wetenschap</value>
+        <value>geschiedenis</value>
         <value>vpro</value>
       </array>
     </constructor-arg>
