@@ -4,13 +4,13 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import org.springframework.stereotype.Service;
-
 import nl.vpro.api.rs.v2.exception.BadRequest;
 import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
+import org.springframework.stereotype.Service;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -24,7 +24,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     private final MockMediaRestService mocks = new MockMediaRestService();
 
     @Override
-    public Result<MediaObject> find(
+    public SearchResult<MediaObject> find(
         String profile,
         Integer offset,
         Integer limit,
@@ -37,7 +37,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> find(
+    public SearchResult<MediaObject> find(
         MediaForm form,
         String profile,
         Integer offset,

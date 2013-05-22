@@ -1,24 +1,24 @@
 package nl.vpro.api.rs.v2.media;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-
+import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.SearchResult;
+import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.domain.media.Program;
 import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
 
-import nl.vpro.api.rs.v2.AbstractServiceImplTest;
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -41,15 +41,18 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
+        TypeReference<SearchResult<MediaObject>> typeRef = new TypeReference<SearchResult<MediaObject>>() {
         };
+        System.out.println(response.getContentAsString());
 
-        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+
+
+        SearchResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(10), result.getSize());
 
-        MediaObject object = result.getList().get(0);
-        assertEquals("Main title", object.getMainTitle());
+        SearchResultItem<? extends MediaObject> object = result.getList().get(0);
+        assertEquals("Main title", object.getResult().getMainTitle());
     }
 
 
@@ -60,15 +63,15 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
-        assertEquals(response.getErrorMessage(), 200, response.getStatus());
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
-        Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
+        SearchResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), SearchResult.class);
 
         assertEquals(Integer.valueOf(10), result.getSize());
 
-        MediaObject object = result.getList().get(0);
-        assertEquals("Main title", object.getMainTitle());
+        SearchResultItem<? extends MediaObject> object = result.getList().get(0);
+        assertEquals("Main title", object.getResult().getMainTitle());
 
     }
 
@@ -82,9 +85,6 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         mapper.writeValue(out, form);
         request.content(out.toByteArray());
-        System.out.println(new String(out.toByteArray()));
-
-        System.out.println(mapper.readValue(new String(out.toByteArray()), MediaForm.class));
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
@@ -94,10 +94,10 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
 
-        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
+        TypeReference<SearchResult<MediaObject>> typeRef = new TypeReference<SearchResult<MediaObject>>() {
         };
 
-        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        SearchResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(10), result.getSize());
     }
 
@@ -122,7 +122,7 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
 
-        Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
+        SearchResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), SearchResult.class);
         assertEquals(Integer.valueOf(10), result.getSize());
     }
 

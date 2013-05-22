@@ -1,14 +1,17 @@
 package nl.vpro.api.rs.v2.media;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.SearchResult;
+import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.ProgramType;
+
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Michiel Meeuwissen
@@ -18,13 +21,14 @@ class MockMediaRestService implements MediaRestService {
     private static int listSizes = 100;
 
     @Override
-    public Result<MediaObject> find(String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+    public SearchResult<MediaObject> find(String profile, Integer offset, Integer max, boolean mock) {
+        return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, listSizes);
     }
 
     @Override
-    public Result<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+    public SearchResult<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
+        List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
+        return new SearchResult<>(list, offset, listSizes);
     }
 
     @Override
@@ -70,6 +74,25 @@ class MockMediaRestService implements MediaRestService {
     @Override
     public Result<MediaObject> findRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
         return findRelated(id, profile, offset, max, mock);
+    }
+
+    protected <T> List<SearchResultItem<T>> mockSearchItems(final List<T> list) {
+        return new AbstractList<SearchResultItem<T>>() {
+
+            @Override
+            public SearchResultItem<T> get(int index) {
+                SearchResultItem<T> result = new SearchResultItem<>(list.get(index));
+                result.setScore(0.5f);
+                //
+                return result;
+            }
+
+            @Override
+            public int size() {
+                return list.size();
+            }
+        };
+
     }
 
     protected List<MediaObject> mockList(int total, int offset, int max) {
