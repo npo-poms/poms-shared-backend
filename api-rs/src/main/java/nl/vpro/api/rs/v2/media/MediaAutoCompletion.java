@@ -15,7 +15,7 @@ import org.codehaus.enunciate.jaxrs.StatusCodes;
 
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.Suggestion;
-import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.api.media.MediaSearch;
 
 /**
  *
@@ -33,7 +33,7 @@ public interface MediaAutoCompletion {
     @POST
     @Path("/titles")
     Result<Suggestion> search(
-        MediaForm form,
+        MediaSearch form,
         @QueryParam("profile") String profile
     );
 }

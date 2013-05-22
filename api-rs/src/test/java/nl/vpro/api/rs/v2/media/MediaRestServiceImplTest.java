@@ -1,5 +1,18 @@
 package nl.vpro.api.rs.v2.media;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+
+import org.codehaus.jackson.type.TypeReference;
+import org.jboss.resteasy.mock.MockHttpRequest;
+import org.jboss.resteasy.mock.MockHttpResponse;
+import org.junit.Test;
+
 import nl.vpro.api.rs.v2.AbstractServiceImplTest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
@@ -8,17 +21,6 @@ import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
-import org.codehaus.jackson.type.TypeReference;
-import org.jboss.resteasy.mock.MockHttpRequest;
-import org.jboss.resteasy.mock.MockHttpResponse;
-import org.junit.Test;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -79,7 +81,6 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
     @Test
     public void testSearch() throws Exception {
         MockHttpRequest request = MockHttpRequest.post("/media?mock=true");
-        request.contentType(MediaType.APPLICATION_JSON);
 
         MediaForm form = new MediaForm();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
