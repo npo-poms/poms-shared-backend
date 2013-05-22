@@ -20,7 +20,7 @@ class MockMediaRestService implements MediaRestService {
     public SearchResult<MediaObject> find(String profile, Integer offset, Integer max, boolean mock) {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         SearchResult<MediaObject> result = new SearchResult<>(list, offset, listSizes);
-        result.setSearchFacets(Arrays.asList(new FacetResult("foo", Arrays.asList(new FacetResultItem("a", 100)))));
+        result.setBroadcasterFacetResult(Arrays.asList(new FacetResultItem("VPRO", 100)));
         return result;
     }
 
@@ -28,7 +28,7 @@ class MockMediaRestService implements MediaRestService {
     public SearchResult<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         SearchResult<MediaObject> result = new SearchResult<>(list, offset, listSizes);
-        result.setSearchFacets(Arrays.asList(new FacetResult("foo", Arrays.asList(new FacetResultItem("a", 100)))));
+        result.setBroadcasterFacetResult(Arrays.asList(new FacetResultItem("VPRO", 100)));
         return result;
     }
 
