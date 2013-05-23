@@ -19,7 +19,7 @@ class MockMediaRestService implements MediaRestService {
     @Override
     public SearchResult<MediaObject> find(String profile, Integer offset, Integer max, boolean mock) {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
-        SearchResult<MediaObject> result = new SearchResult<>(list, offset, listSizes);
+        SearchResult<MediaObject> result = new SearchResult<>(list, offset, max, listSizes);
         result.setBroadcasterFacetResult(Arrays.asList(new FacetResultItem("VPRO", 100)));
         return result;
     }
@@ -27,7 +27,7 @@ class MockMediaRestService implements MediaRestService {
     @Override
     public SearchResult<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
-        SearchResult<MediaObject> result = new SearchResult<>(list, offset, listSizes);
+        SearchResult<MediaObject> result = new SearchResult<>(list, offset, max, listSizes);
         result.setBroadcasterFacetResult(Arrays.asList(new FacetResultItem("VPRO", 100)));
         return result;
     }
@@ -44,12 +44,12 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public Result<MediaObject> findMembers(String id, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+        return new Result<>(mockList(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override
     public Result<Program> findEpisodes(String id, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<>(mockEpisodes(listSizes, offset, max), offset, listSizes);
+        return new Result<>(mockEpisodes(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override
@@ -59,7 +59,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public Result<MediaObject> findDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+        return new Result<>(mockList(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override
@@ -69,7 +69,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public Result<MediaObject> findRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
-        return new Result<>(mockList(listSizes, offset, max), offset, listSizes);
+        return new Result<>(mockList(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override

@@ -24,18 +24,18 @@ public class PageRestServiceImpl implements PageRestService {
 
 
     @Override
-    public SearchResult<Page> find(String profile,  Integer offset, Integer limit, boolean mock) {
+    public SearchResult<Page> find(String profile,  Integer offset, Integer max, boolean mock) {
         if (mock) {
-            return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, limit)), offset, listSizes);
+            return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
         } else {
             throw new UnsupportedOperationException("TODO");
         }
     }
 
     @Override
-    public SearchResult<Page> find(PageForm form, String profile, Integer offset, Integer limit, boolean mock) {
+    public SearchResult<Page> find(PageForm form, String profile, Integer offset, Integer max, boolean mock) {
         if (mock) {
-            return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, limit)), offset, listSizes);
+            return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max,  listSizes);
         } else {
             throw new UnsupportedOperationException("TODO");
         }

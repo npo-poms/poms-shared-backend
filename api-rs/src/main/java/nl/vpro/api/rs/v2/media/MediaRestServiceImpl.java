@@ -27,10 +27,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     public SearchResult<MediaObject> find(
         String profile,
         Integer offset,
-        Integer limit,
+        Integer max,
         boolean mock) {
         if(mock) {
-            return mocks.find(profile, offset, limit, true);
+            return mocks.find(profile, offset, max, true);
         } else {
             throw new UnsupportedOperationException("TODO");
         }
@@ -41,10 +41,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         MediaForm form,
         String profile,
         Integer offset,
-        Integer limit,
+        Integer max,
         boolean mock) {
         if(mock) {
-            return mocks.find(form, profile, offset, limit, true);
+            return mocks.find(form, profile, offset, max, true);
         }
 
         throw new UnsupportedOperationException("TODO");

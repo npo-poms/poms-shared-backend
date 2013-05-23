@@ -16,24 +16,24 @@
 
 This document provides guidelines and examples for VPRO Web APIs, encouraging consistency, maintainability, and best practices across applications. VPRO APIs aim to balance a truly RESTful API interface with a positive developer experience (DX).
 
-This is a direct clone from the White House API standards found here:
+This is a based on the White House API standards found here:
 [White House Web API Standards](https://github.com/WhiteHouse/api-standards)
 
 ## Pragmatic REST
 
-These guidelines aim to support a truly RESTful API. Here are a few exceptions:
+These guidelines aim to support a RESTful API. Here are a few exceptions:
 * Put the version number of the API in the URL (see examples below). Don’t accept any requests that do not specify a version number.
 * Allow users to request formats like JSON or XML like this:
     * http://api.vpro.nl/v1/magazines.json (???)
     * http://api.vpro.nl/v1/magazines.xml (???)
+* We support also Accept-headers so you can also do:
+    * http://api.vpro.nl/v1/magazines
 
-## RESTful URLs
+## URLs
 
-### General guidelines for RESTful URLs
-* A URL identifies a resource.
+### General guidelines for  URLs
 * URLs should include nouns, not verbs.
 * Use plural nouns only for consistency (no singular nouns).
-* Use HTTP verbs (GET, POST, PUT, DELETE) to operate on the collections and elements.
 * You shouldn’t need to go deeper than resource/identifier/resource.
 * Put the version number at the base of your URL, for example http://example.com/v1/path/to/resource.
 * URL v. header:
@@ -139,6 +139,7 @@ Use three simple, common response codes indicating (1) success, (2) failure due 
 * Maintain APIs at least one version back.
 
 
+
 ## Record limits
 
 * If no max is specified, return results with a default max.
@@ -147,17 +148,13 @@ Use three simple, common response codes indicating (1) success, (2) failure due 
     * offset=50 means, ‘skip fifty records’
     * max=25 means, ‘return at most 25 records’
 
-Information about record limits should also be included in the Example resonse. Example:
+Information about record limits should also be included in the Example response. Example:
 
     {
-        "metadata": {
-            "resultset": {
-                "count": 50,
-                "offset": 25,
-                "max": 25
-            }
-        },
-        "results": [
+      "count": 50,
+      "offset": 25,
+      "max": 25,
+      "list": [
             { .. }
         ]
     }
@@ -175,14 +172,10 @@ Information about record limits should also be included in the Example resonse. 
 Example: http://api.vpro.nl/api/v1/magazines.json
 
     {
-        "metadata": {
-            "resultset": {
-                "count": 123,
-                "offset": 0,
-                "max": 10
-            }
-        },
-        "results": [
+        "count": 123,
+        "offset": 0,
+        "max": 10,
+        "list": [
             {
                 "id": "1234",
                 "type": "magazine",
@@ -230,26 +223,35 @@ Example: http://api.vpro.nl/api/v1/magazines/[id].json
         "created": "1231621302"
     }
 
+### POST /magazines
 
+Posting to a list performs a search. You post a form object. Depending
+on the content-type of the request you can post this in JSON or in
+XML.
 
-### POST /magazines/[id]/articles
+You can e.g. post something like this
 
-Example: Create – POST  http://api.vpro.nl/api/v1/magazines/[id]/articles
-
-    {
-        "title": "Raising Revenue",
-        "author_first_name": "Jane",
-        "author_last_name": "Smith",
-        "author_email": "jane.smith@api.vpro.nl",
-        "year": "2012"
-        "month": "August"
-        "day": "18"
-        "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eget ante ut augue scelerisque ornare. Aliquam tempus rhoncus quam vel luctus. Sed scelerisque fermentum fringilla. Suspendisse tincidunt nisl a metus feugiat vitae vestibulum enim vulputate. Quisque vehicula dictum elit, vitae cursus libero auctor sed. Vestibulum fermentum elementum nunc. Proin aliquam erat in turpis vehicula sit amet tristique lorem blandit. Nam augue est, bibendum et ultrices non, interdum in est. Quisque gravida orci lobortis... "
-
+{
+    "highlight": false,
+    "searches": {
+        "broadcasters": [
+            {
+                "partial": false,
+                "value": "VPRO"
+            }
+        ]
     }
+}
+
+
+So, we don't support the creation of new documents in a RESTfull
+manner.
+
+
 
 
 ## Mock Responses
+
 It is suggested that each resource accept a 'mock' parameter on the testing server. Passing this parameter should return a mock data response (bypassing the backend).
 
 Implementing this feature early in development ensures that the API will exhibit consistent behavior, supporting a test driven development methodology.
