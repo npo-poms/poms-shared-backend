@@ -1,6 +1,7 @@
 package nl.vpro.api.rs.v2.page;
 
 import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.page.Page;
@@ -39,15 +40,15 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<SearchResult<Page>> typeRef = new TypeReference<SearchResult<Page>>() {
+        TypeReference<Result<Page>> typeRef = new TypeReference<Result<Page>>() {
         };
-        SearchResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
-        assertEquals(Integer.valueOf(0), pages.getOffset());
-        assertEquals(Integer.valueOf(100), pages.getTotal());
-        assertEquals("Groot brein in klein dier", pages.getList().get(0).getResult().getTitle());
-        assertEquals("urn:vpro:media:program:1234", pages.getList().get(0).getResult().getMediaIds().get(0));
+        assertEquals(Long.valueOf(0), pages.getOffset());
+        assertEquals(Long.valueOf(100), pages.getTotal());
+        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
+        assertEquals("urn:vpro:media:program:1234", pages.getList().get(0).getMediaIds().get(0));
 
 
     }
@@ -62,12 +63,12 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage()+  " " + response.getContentAsString(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
-        SearchResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), SearchResult.class);
+        Result<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
-        assertEquals(Integer.valueOf(0), pages.getOffset());
-        assertEquals(Integer.valueOf(100), pages.getTotal());
-        assertEquals("Groot brein in klein dier", pages.getList().get(0).getResult().getTitle());
+        assertEquals(Long.valueOf(0), pages.getOffset());
+        assertEquals(Long.valueOf(100), pages.getTotal());
+        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
 
 
     }
@@ -91,8 +92,8 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         SearchResult<Page> pages = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
-        assertEquals(Integer.valueOf(0), pages.getOffset());
-        assertEquals(Integer.valueOf(100), pages.getTotal());
+        assertEquals(Long.valueOf(0), pages.getOffset());
+        assertEquals(Long.valueOf(100), pages.getTotal());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getResult().getTitle());
 
     }
@@ -116,8 +117,8 @@ public class PageRestServiceImplTest extends AbstractServiceImplTest {
         SearchResult<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), SearchResult.class);
 
         assertEquals(Integer.valueOf(50), pages.getSize());
-        assertEquals(Integer.valueOf(0), pages.getOffset());
-        assertEquals(Integer.valueOf(100), pages.getTotal());
+        assertEquals(Long.valueOf(0), pages.getOffset());
+        assertEquals(Long.valueOf(100), pages.getTotal());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getResult().getTitle());
 
 
