@@ -3,12 +3,15 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.26.xsd">
   <disable-rule id="jersey.warnings"/>
+  <api-classes>
+    <exclude pattern="nl.vpro.api.rs.v2.profile.**"></exclude>
+  </api-classes>
   <api-import pattern="nl.vpro.domain.media.Program" seekSource="true"/>
-  <api-import pattern="nl.vpro.domain.media.search.MediaForm" seekSource="true"/>
   <api-import pattern="nl.vpro.domain.user.Broadcaster" seekSource="true"/>
 
   <!--<api-import pattern="nl.vpro.domain.image.Image" seekSource="true"/>-->
-  <api-import pattern="nl.vpro.api.rs.v2.**" seekSource="true"/>
+  <api-import pattern="nl.vpro.api.rs.v2.media.MediaRestService" seekSource="true"/>
+  <api-import pattern="nl.vpro.api.rs.v2.page.PageRestService" seekSource="true"/>
   <deployment host="api.vpro.nl" context="v2"/>
   <namespaces>
     <namespace id="api"    uri="urn:vpro:api:2013" />
