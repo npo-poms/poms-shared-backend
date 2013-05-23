@@ -3,10 +3,10 @@ package nl.vpro.api.rs.v2.media;
 import nl.vpro.api.rs.v2.AbstractServiceImplTest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
-import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.api.TextMatcher;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaSearch;
+import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Michiel Meeuwissen
@@ -31,9 +32,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
+    MediaService mediaService = mock(MediaService.class);
+
     @Override
     protected Object getTestObject() {
-        return new MediaRestServiceImpl();
+        return new MediaRestServiceImpl(mediaService);
     }
 
     @Test
@@ -44,18 +47,16 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<SearchResult<MediaObject>> typeRef = new TypeReference<SearchResult<MediaObject>>() {
+        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
         };
-        System.out.println(response.getContentAsString());
 
 
-
-        SearchResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(10), result.getSize());
 
-        SearchResultItem<? extends MediaObject> object = result.getList().get(0);
-        assertEquals("Main title", object.getResult().getMainTitle());
+        MediaObject object = result.getList().get(0);
+        assertEquals("Main title", object.getMainTitle());
     }
 
 
@@ -69,12 +70,12 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
-        SearchResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), SearchResult.class);
+        Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
 
         assertEquals(Integer.valueOf(10), result.getSize());
 
-        SearchResultItem<? extends MediaObject> object = result.getList().get(0);
-        assertEquals("Main title", object.getResult().getMainTitle());
+        MediaObject object = result.getList().get(0);
+        assertEquals("Main title", object.getMainTitle());
 
     }
 
