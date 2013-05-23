@@ -5,6 +5,7 @@
 package nl.vpro.api.rs.v2.media;
 
 import nl.vpro.api.rs.v2.exception.BadRequest;
+import nl.vpro.api.rs.v2.exception.ServerError;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.media.MediaForm;
@@ -63,11 +64,15 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.load(id, true);
         }
-        MediaObject mediaObject = mediaService.load(id);
-        if (mediaObject == null) {
-            throw new BadRequest("No media for id " + id);
+        try {
+            MediaObject mediaObject = mediaService.load(id);
+            if (mediaObject == null) {
+                throw new BadRequest("No media for id " + id);
+            }
+            return mediaObject;
+        } catch(Exception e) {
+            throw new ServerError(e);
         }
-        return mediaObject;
     }
 
     @Override
@@ -83,7 +88,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if (mock) {
             return mocks.findMembers(form, id, profile, offset, max, true);
         }
-        return mediaService.findMembers(id, profile, form, offset, max);
+        try {
+            return mediaService.findMembers(id, profile, form, offset, max);
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
     }
 
     @Override
@@ -91,7 +100,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.listEpisodes(id, profile, offset, max, true);
         }
-        return mediaService.findEpisodes(id, profile, null, offset, max).asResult();
+        try {
+            return mediaService.findEpisodes(id, profile, null, offset, max).asResult();
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
     }
 
     @Override
@@ -99,7 +112,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if (mock) {
             return mocks.findEpisodes(form, id, profile, offset, max, true);
         }
-        return mediaService.findEpisodes(id, profile, form, offset, max);
+        try {
+            return mediaService.findEpisodes(id, profile, form, offset, max);
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
 
     }
 
@@ -108,7 +125,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.listDescendants(id, profile, offset, max, true);
         }
-        return mediaService.findDescendants(id, profile, null, offset, max).asResult();
+        try {
+            return mediaService.findDescendants(id, profile, null, offset, max).asResult();
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
     }
 
     @Override
@@ -116,7 +137,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if (mock) {
             return mocks.findDescendants(form, id, profile, offset, max, true);
         }
-        return mediaService.findDescendants(id, profile, form, offset, max);
+        try {
+            return mediaService.findDescendants(id, profile, form, offset, max);
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
 
 
     }
@@ -126,7 +151,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if (mock) {
             return mocks.listRelated(id, profile, offset, max, true);
         }
-        return mediaService.findRelated(id, profile, null, offset, max).asResult();
+        try {
+            return mediaService.findRelated(id, profile, null, offset, max).asResult();
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
 
 
     }
@@ -136,6 +165,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         if (mock) {
             return mocks.findRelated(form, id, profile, offset, max, true);
         }
-        return mediaService.findRelated(id, profile, form, offset, max);
+        try {
+            return mediaService.findRelated(id, profile, form, offset, max);
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
     }
 }
