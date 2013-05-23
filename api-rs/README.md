@@ -78,8 +78,8 @@ These guidelines aim to support a RESTful API. Here are a few exceptions:
 | HTTP METHOD | POST            | GET       | PUT         | DELETE |
 | ----------- | --------------- | --------- | ----------- | ------ |
 | CRUD OP     | CREATE          | READ      | UPDATE      | DELETE |
-| /dogs       | Create new dogs | List dogs | Bulk update | Delete all dogs |
-| /dogs/1234  | Error           | Show Bo   | If exists, update Bo; If not, error | Delete Bo |
+| /dogs       | Search dogs     | List dogs | not supported  | not supported   |
+| /dogs/1234  | Error           | Show Bo   | not supported  | not supported   |
 
 (Example from Web API Design, by Brian Mulloy, Apigee.)
 
