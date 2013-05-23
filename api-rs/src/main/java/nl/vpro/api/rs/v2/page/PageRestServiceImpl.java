@@ -1,18 +1,20 @@
 package nl.vpro.api.rs.v2.page;
 
+import java.net.URISyntaxException;
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.NotFoundException;
+
+import org.springframework.stereotype.Service;
+
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.page.Page;
 import nl.vpro.domain.page.PageBuilder;
 import nl.vpro.domain.page.PageType;
-import org.springframework.stereotype.Service;
-
-import javax.ws.rs.NotFoundException;
-import java.net.URISyntaxException;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Michiel Meeuwissen
@@ -24,8 +26,8 @@ public class PageRestServiceImpl implements PageRestService {
 
 
     @Override
-    public SearchResult<Page> find(String profile,  Integer offset, Integer max, boolean mock) {
-        if (mock) {
+    public SearchResult<Page> find(String profile, Integer offset, Integer max, boolean mock) {
+        if(mock) {
             return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
         } else {
             throw new UnsupportedOperationException("TODO");
@@ -34,8 +36,8 @@ public class PageRestServiceImpl implements PageRestService {
 
     @Override
     public SearchResult<Page> find(PageForm form, String profile, Integer offset, Integer max, boolean mock) {
-        if (mock) {
-            return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max,  listSizes);
+        if(mock) {
+            return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
         } else {
             throw new UnsupportedOperationException("TODO");
         }
@@ -43,7 +45,7 @@ public class PageRestServiceImpl implements PageRestService {
 
     @Override
     public Page load(String id, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mockPage();
         } else {
             throw new NotFoundException();
@@ -54,7 +56,7 @@ public class PageRestServiceImpl implements PageRestService {
     protected List<Page> mockList(int total, int offset, int limit) {
         int numberOfResults = Math.min(total - offset, limit);
         List<Page> result = new ArrayList<>();
-        for (int i = 0; i < numberOfResults; i++) {
+        for(int i = 0; i < numberOfResults; i++) {
             result.add(mockPage());
         }
         return result;
@@ -80,20 +82,20 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
 
-    protected Page mockPage()  {
+    protected Page mockPage() {
         try {
             return PageBuilder.id("4b748d32-8006-4f0a-8aac-6d8d5c89a847")
-                    .title("Groot brein in klein dier")
-                    .author("superuser")
-                    .summary("Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.")
-                    .body("bla bla bla bla")
-                    .deepLink("http://www.wetenschap24.nl/nieuws/artikelen/2001/mei/Groot-brein-in-klein-dier.html")
-                    .pageType(PageType.Artikel)
-                    .brand("http://www.wetenschap24.nl", "Wetenschap 24")
-                    .mainImage("http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg")
-                    .mediaIds("urn:vpro:media:program:1234", "urn:vpro:media:group:4321")
-                    .build();
-        } catch (URISyntaxException e) {
+                .title("Groot brein in klein dier")
+                .author("superuser")
+                .summary("Een klein, harig beestje met het gewicht van een paperclip was mogelijk de directe voorouder van alle hedendaagse zoogdieren, waaronder de mens. Levend in de schaduw van de dinosaurussen kroop het diertje 195 miljoen jaar geleden tussen de planten door, op zoek naar insecten die het met zijn vlijmscherpe tandjes vermaalde. Het is de oudste zoogdierachtige die tot nu toe is gevonden.")
+                .body("bla bla bla bla")
+                .deepLink("http://www.wetenschap24.nl/nieuws/artikelen/2001/mei/Groot-brein-in-klein-dier.html")
+                .pageType(PageType.Artikel)
+                .brand("http://www.wetenschap24.nl", "Wetenschap 24")
+                .mainImage("http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg")
+                .mediaIds("urn:vpro:media:program:1234", "urn:vpro:media:group:4321")
+                .build();
+        } catch(URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }

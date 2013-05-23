@@ -1,18 +1,20 @@
 package nl.vpro.api.rs.v2;
 
-import nl.vpro.api.rs.v2.media.MediaRestService;
-import nl.vpro.api.rs.v2.media.MediaRestServiceImpl;
-import nl.vpro.resteasy.JacksonContextResolver;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.junit.Before;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import java.util.HashMap;
-import java.util.Map;
+import nl.vpro.api.rs.v2.media.MediaRestService;
+import nl.vpro.api.rs.v2.media.MediaRestServiceImpl;
+import nl.vpro.resteasy.JacksonContextResolver;
 
 /**
  * @author Michiel Meeuwissen
@@ -20,6 +22,7 @@ import java.util.Map;
  */
 public abstract class AbstractServiceImplTest {
     public static final MediaType JSON;
+
     public static final MediaType XML;
 
     static {
@@ -46,5 +49,6 @@ public abstract class AbstractServiceImplTest {
         XMLUnit.setIgnoreAttributeOrder(true);
 
     }
+
     protected abstract Object getTestObject();
 }

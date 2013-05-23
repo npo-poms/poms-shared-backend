@@ -1,13 +1,16 @@
 package nl.vpro.api.rs.v2.media;
 
+import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.ProgramType;
-
-import java.util.*;
 
 /**
  * @author Michiel Meeuwissen
