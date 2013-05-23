@@ -13,6 +13,7 @@ import nl.vpro.domain.media.Program;
 import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
@@ -24,7 +25,7 @@ import java.net.URISyntaxException;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -34,13 +35,48 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
     MediaService mediaService = mock(MediaService.class);
 
+    @Before
+    public void resetMocks() {
+        reset(mediaService);
+    }
+
     @Override
     protected Object getTestObject() {
         return new MediaRestServiceImpl(mediaService);
     }
 
+
     @Test
     public void testList() throws Exception {
+        when(mediaService.find(isNull(String.class), isNull(MediaForm.class) , eq(0l), anyInt())).thenReturn(new SearchResult<MediaObject>());
+
+        MockHttpRequest request = MockHttpRequest.get("/media");
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        verify(mediaService).find(null, null, 0l, 10);
+    }
+
+    @Test
+    public void testListException() throws Exception {
+        when(mediaService.find(isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt())).thenThrow(new RuntimeException("Er is wat misgegaan"));
+
+        MockHttpRequest request = MockHttpRequest.get("/media");
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        verify(mediaService).find(null, null, 0l, 10);
+
+        nl.vpro.domain.api.Error result = mapper.readValue(response.getContentAsString(), nl.vpro.domain.api.Error.class);
+
+        assertEquals("Er is wat misgegaan", result.getMessage());
+        assertEquals(Integer.valueOf(500), result.getStatus());
+
+
+    }
+
+    @Test
+    public void testListMock() throws Exception {
         MockHttpRequest request = MockHttpRequest.get("/media?mock=true");
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);

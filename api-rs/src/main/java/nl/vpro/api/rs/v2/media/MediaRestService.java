@@ -43,7 +43,7 @@ public interface MediaRestService {
     @Path("/")
     Result<MediaObject> list(
             @QueryParam("profile") String profile,
-            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
             @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -52,7 +52,7 @@ public interface MediaRestService {
     SearchResult<MediaObject> find(
         MediaForm form,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -80,7 +80,7 @@ public interface MediaRestService {
     Result<MediaObject> listMembers(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -98,7 +98,7 @@ public interface MediaRestService {
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -115,7 +115,7 @@ public interface MediaRestService {
     Result<Program> listEpisodes(
             @PathParam("id") String id,
             @QueryParam("profile") String profile,
-            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
             @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -133,7 +133,7 @@ public interface MediaRestService {
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -150,7 +150,7 @@ public interface MediaRestService {
     Result<MediaObject> listDescendants(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -168,7 +168,7 @@ public interface MediaRestService {
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -185,7 +185,7 @@ public interface MediaRestService {
     Result<MediaObject> listRelated(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
@@ -203,7 +203,7 @@ public interface MediaRestService {
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 }

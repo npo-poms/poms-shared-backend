@@ -17,17 +17,17 @@ import java.util.List;
  * @since 2.0
  */
 class MockMediaRestService implements MediaRestService {
-    private static int listSizes = 100;
+    private static long listSizes = 100l;
 
     @Override
-    public Result<MediaObject> list(String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> list(String profile, Long offset, Integer max, boolean mock) {
         List<MediaObject> list = mockList(listSizes, offset, max);
         Result<MediaObject> result = new Result<>(list, offset, max, listSizes);
         return result;
     }
 
     @Override
-    public SearchResult<MediaObject> find(MediaForm form, String profile, Integer offset, Integer max, boolean mock) {
+    public SearchResult<MediaObject> find(MediaForm form, String profile, Long offset, Integer max, boolean mock) {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         SearchResult<MediaObject> result = new SearchResult<>(list, offset, max, listSizes);
         result.setBroadcasterFacetResult(Arrays.asList(new FacetResultItem("VPRO", 100)));
@@ -40,43 +40,43 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> listMembers(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> listMembers(String id, String profile, Long offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override
-    public SearchResult<MediaObject> findMembers(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+    public SearchResult<MediaObject> findMembers(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
         return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
     }
 
     @Override
-    public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<Program> listEpisodes(String id, String profile, Long offset, Integer max, boolean mock) {
         return new Result<>(mockEpisodes(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override
-    public SearchResult<Program> findEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+    public SearchResult<Program> findEpisodes(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
         return new SearchResult<>(mockSearchItems(mockEpisodes(listSizes, offset, max)), offset, max, listSizes);
 
     }
 
     @Override
-    public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> listDescendants(String id, String profile, Long offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override
-    public SearchResult<MediaObject> findDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+    public SearchResult<MediaObject> findDescendants(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
         return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
     }
 
     @Override
-    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
+    public Result<MediaObject> listRelated(String id, String profile, Long offset, Integer max, boolean mock) {
         return new Result<>(mockList(listSizes, offset, max), offset, max, listSizes);
     }
 
     @Override
-    public SearchResult<MediaObject> findRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+    public SearchResult<MediaObject> findRelated(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
         return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
     }
 
@@ -99,8 +99,8 @@ class MockMediaRestService implements MediaRestService {
 
     }
 
-    protected List<MediaObject> mockList(int total, int offset, int max) {
-        int numberOfResults = Math.min(total - offset, max);
+    protected List<MediaObject> mockList(long total, long offset, int max) {
+        long numberOfResults = Math.min(total - offset, max);
         List<MediaObject> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
             result.add(build(i));
@@ -120,8 +120,8 @@ class MockMediaRestService implements MediaRestService {
         }
     }
 
-    protected List<Program> mockEpisodes(int total, int offset, int max) {
-        int numberOfResults = Math.min(total - offset, max);
+    protected List<Program> mockEpisodes(long total, long offset, int max) {
+        long numberOfResults = Math.min(total - offset, max);
         List<Program> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
             result.add(MediaTestDataBuilder.program().constrained().type(ProgramType.BROADCAST).build());

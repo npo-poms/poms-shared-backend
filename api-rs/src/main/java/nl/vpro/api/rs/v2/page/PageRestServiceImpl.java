@@ -21,11 +21,11 @@ import java.util.List;
  */
 @Service
 public class PageRestServiceImpl implements PageRestService {
-    private static int listSizes = 100;
+    private static long listSizes = 100l;
 
 
     @Override
-    public Result<Page> list(String profile, Integer offset, Integer max, boolean mock) {
+    public Result<Page> list(String profile, Long offset, Integer max, boolean mock) {
         if(mock) {
             return new Result<>(mockList(listSizes, offset, max), offset, max, listSizes);
         } else {
@@ -34,7 +34,7 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
     @Override
-    public SearchResult<Page> find(PageForm form, String profile, Integer offset, Integer max, boolean mock) {
+    public SearchResult<Page> find(PageForm form, String profile, Long offset, Integer max, boolean mock) {
         if(mock) {
             return new SearchResult<>(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
         } else {
@@ -52,8 +52,8 @@ public class PageRestServiceImpl implements PageRestService {
 
     }
 
-    protected List<Page> mockList(int total, int offset, int limit) {
-        int numberOfResults = Math.min(total - offset, limit);
+    protected List<Page> mockList(long total, long offset, int limit) {
+        long numberOfResults = Math.min(total - offset, limit);
         List<Page> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
             result.add(mockPage());
