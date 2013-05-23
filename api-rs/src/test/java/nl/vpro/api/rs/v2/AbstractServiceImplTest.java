@@ -1,20 +1,16 @@
 package nl.vpro.api.rs.v2;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-
+import nl.vpro.resteasy.JacksonContextResolver;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.junit.Before;
 
-import nl.vpro.api.rs.v2.media.MediaRestService;
-import nl.vpro.api.rs.v2.media.MediaRestServiceImpl;
-import nl.vpro.resteasy.JacksonContextResolver;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Michiel Meeuwissen
@@ -39,7 +35,6 @@ public abstract class AbstractServiceImplTest {
     @Before
     public void setup() throws Exception {
         ContextResolver<ObjectMapper> contextResolver = new JacksonContextResolver();
-        MediaRestService testObject = new MediaRestServiceImpl();
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
         mapper = contextResolver.getContext(ObjectMapper.class);
         dispatcher.getRegistry().addSingletonResource(getTestObject());
