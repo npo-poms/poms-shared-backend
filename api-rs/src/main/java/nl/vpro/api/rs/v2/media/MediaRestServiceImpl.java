@@ -8,8 +8,10 @@ import nl.vpro.api.rs.v2.exception.BadRequest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,6 +25,14 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     private final MockMediaRestService mocks = new MockMediaRestService();
 
+    private final MediaService mediaService;
+
+    @Autowired
+    public MediaRestServiceImpl(MediaService mediaService) {
+        this.mediaService = mediaService;
+
+    }
+
     @Override
     public Result<MediaObject> list(
             String profile,
@@ -31,9 +41,8 @@ public class MediaRestServiceImpl implements MediaRestService {
             boolean mock) {
         if(mock) {
             return mocks.list(profile, offset, max, true);
-        } else {
-            throw new UnsupportedOperationException("TODO");
         }
+        return mediaService.find(profile, null, offset, max).asResult();
     }
 
     @Override
@@ -46,8 +55,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.find(form, profile, offset, max, true);
         }
-
-        throw new UnsupportedOperationException("TODO");
+        return mediaService.find(profile, form, offset, max);
     }
 
     @Override
@@ -55,8 +63,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.load(id, true);
         }
-
-        throw new BadRequest("No media for id " + id);
+        MediaObject mediaObject = mediaService.load(id);
+        if (mediaObject == null) {
+            throw new BadRequest("No media for id " + id);
+        }
+        return mediaObject;
     }
 
     @Override
@@ -64,8 +75,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.listMembers(id, profile, offset, max, true);
         }
-
-        throw new UnsupportedOperationException();
+        return mediaService.findMembers(id, profile, null, offset, max).asResult();
     }
 
     @Override
@@ -73,57 +83,59 @@ public class MediaRestServiceImpl implements MediaRestService {
         if (mock) {
             return mocks.findMembers(form, id, profile, offset, max, true);
         }
-
-        throw new UnsupportedOperationException();
+        return mediaService.findMembers(id, profile, form, offset, max);
     }
 
     @Override
     public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer max, boolean mock) {
         if(mock) {
             return mocks.listEpisodes(id, profile, offset, max, true);
-        } else {
-            throw new UnsupportedOperationException();
         }
+        return mediaService.findEpisodes(id, profile, null, offset, max).asResult();
     }
 
     @Override
     public SearchResult<Program> findEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return null;
+        if (mock) {
+            return mocks.findEpisodes(form, id, profile, offset, max, true);
+        }
+        return mediaService.findEpisodes(id, profile, form, offset, max);
+
     }
 
     @Override
-    public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer limit, boolean mock) {
+    public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer max, boolean mock) {
         if(mock) {
-            return mocks.listDescendants(id, profile, offset, limit, true);
-        } else {
-            throw new UnsupportedOperationException();
+            return mocks.listDescendants(id, profile, offset, max, true);
         }
+        return mediaService.findDescendants(id, profile, null, offset, max).asResult();
     }
 
     @Override
     public SearchResult<MediaObject> findDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
         if (mock) {
             return mocks.findDescendants(form, id, profile, offset, max, true);
-        } else {
-            throw new UnsupportedOperationException();
         }
+        return mediaService.findDescendants(id, profile, form, offset, max);
+
+
     }
 
     @Override
     public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
         if (mock) {
             return mocks.listRelated(id, profile, offset, max, true);
-        } else {
-            throw new UnsupportedOperationException();
         }
+        return mediaService.findRelated(id, profile, null, offset, max).asResult();
+
+
     }
 
     @Override
     public SearchResult<MediaObject> findRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
         if (mock) {
             return mocks.findRelated(form, id, profile, offset, max, true);
-        } else {
-            throw new UnsupportedOperationException();
         }
+        return mediaService.findRelated(id, profile, form, offset, max);
     }
 }
