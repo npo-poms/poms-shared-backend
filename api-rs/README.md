@@ -40,7 +40,7 @@ These guidelines aim to support a RESTful API. Here are a few exceptions:
     * If it changes the logic you write to handle the response, put it in the URL.
     * If it doesn’t change the logic for each response, like OAuth info, put it in the header.
 * Specify optional fields in a comma separated list.
-* Formats should be in the form of api/v2/resource/{id}.json
+* Formats should be in the form of v2/resource/{id}.json
 
 ### Good URL examples
 * List of magazines:
@@ -169,7 +169,7 @@ Information about record limits should also be included in the Example response.
 
 ### GET /magazines
 
-Example: http://api.vpro.nl/api/v1/magazines.json
+Example: http://api.vpro.nl/v1/magazines.json
 
     {
         "count": 123,
@@ -210,7 +210,7 @@ Example: http://api.vpro.nl/api/v1/magazines.json
 
 ### GET /magazines/[id]
 
-Example: http://api.vpro.nl/api/v1/magazines/[id].json
+Example: http://api.vpro.nl/v1/magazines/[id].json
 
     {
         "id": "1234",
