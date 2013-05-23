@@ -182,7 +182,6 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         dispatcher.invoke(request, response);
         assertEquals(response.getErrorMessage(), 400, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
-        System.out.println(response.getContentAsString());
 
         nl.vpro.domain.api.Error error = mapper.readValue(response.getContentAsString(), nl.vpro.domain.api.Error.class);
         assertEquals(Integer.valueOf(400), error.getStatus());

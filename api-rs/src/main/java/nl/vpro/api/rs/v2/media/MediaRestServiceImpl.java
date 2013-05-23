@@ -64,15 +64,16 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.load(id, true);
         }
+        MediaObject mediaObject = null;
         try {
-            MediaObject mediaObject = mediaService.load(id);
-            if (mediaObject == null) {
-                throw new BadRequest("No media for id " + id);
-            }
-            return mediaObject;
+            mediaObject = mediaService.load(id);
         } catch(Exception e) {
             throw new ServerError(e);
         }
+        if (mediaObject == null) {
+            throw new BadRequest("No media for id " + id);
+        }
+        return mediaObject;
     }
 
     @Override
