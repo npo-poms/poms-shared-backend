@@ -24,13 +24,13 @@ public class MediaRestServiceImpl implements MediaRestService {
     private final MockMediaRestService mocks = new MockMediaRestService();
 
     @Override
-    public SearchResult<MediaObject> find(
-        String profile,
-        Integer offset,
-        Integer max,
-        boolean mock) {
+    public Result<MediaObject> list(
+            String profile,
+            Integer offset,
+            Integer max,
+            boolean mock) {
         if(mock) {
-            return mocks.find(profile, offset, max, true);
+            return mocks.list(profile, offset, max, true);
         } else {
             throw new UnsupportedOperationException("TODO");
         }
@@ -60,54 +60,70 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public Result<MediaObject> findMembers(String id, String profile, Integer offset, Integer limit, boolean mock) {
+    public Result<MediaObject> listMembers(String id, String profile, Integer offset, Integer max, boolean mock) {
         if(mock) {
-            return mocks.findMembers(id, profile, offset, limit, true);
+            return mocks.listMembers(id, profile, offset, max, true);
         }
 
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Result<MediaObject> findMembers(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return null;
+    public SearchResult<MediaObject> findMembers(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        if (mock) {
+            return mocks.findMembers(form, id, profile, offset, max, true);
+        }
+
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public Result<Program> findEpisodes(String id, String profile, Integer offset, Integer limit, boolean mock) {
+    public Result<Program> listEpisodes(String id, String profile, Integer offset, Integer max, boolean mock) {
         if(mock) {
-            return mocks.findEpisodes(id, profile, offset, limit, true);
+            return mocks.listEpisodes(id, profile, offset, max, true);
         } else {
             throw new UnsupportedOperationException();
         }
     }
 
     @Override
-    public Result<Program> findEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+    public SearchResult<Program> findEpisodes(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
         return null;
     }
 
     @Override
-    public Result<MediaObject> findDescendants(String id, String profile, Integer offset, Integer limit, boolean mock) {
+    public Result<MediaObject> listDescendants(String id, String profile, Integer offset, Integer limit, boolean mock) {
         if(mock) {
-            return mocks.findDescendants(id, profile, offset, limit, true);
+            return mocks.listDescendants(id, profile, offset, limit, true);
         } else {
             throw new UnsupportedOperationException();
         }
     }
 
     @Override
-    public Result<MediaObject> findDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return null;
+    public SearchResult<MediaObject> findDescendants(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        if (mock) {
+            return mocks.findDescendants(form, id, profile, offset, max, true);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override
-    public Result<MediaObject> findRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
-        return null;
+    public Result<MediaObject> listRelated(String id, String profile, Integer offset, Integer max, boolean mock) {
+        if (mock) {
+            return mocks.listRelated(id, profile, offset, max, true);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     @Override
-    public Result<MediaObject> findRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
-        return null;
+    public SearchResult<MediaObject> findRelated(MediaForm form, String id, String profile, Integer offset, Integer max, boolean mock) {
+        if (mock) {
+            return mocks.findRelated(form, id, profile, offset, max, true);
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 }

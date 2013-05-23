@@ -5,6 +5,7 @@
 package nl.vpro.api.rs.v2.page;
 
 import nl.vpro.domain.api.Constants;
+import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.page.Page;
@@ -23,11 +24,11 @@ public interface PageRestService {
 
     @GET
     @Path("/")
-    SearchResult<Page> find(
-        @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+    Result<Page> list(
+            @QueryParam("profile") String profile,
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+            @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     @Path("/")

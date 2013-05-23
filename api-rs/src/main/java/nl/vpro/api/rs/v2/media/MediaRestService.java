@@ -4,18 +4,17 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-
-import org.codehaus.enunciate.jaxrs.ResponseCode;
-import org.codehaus.enunciate.jaxrs.StatusCodes;
-
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
+import org.codehaus.enunciate.jaxrs.ResponseCode;
+import org.codehaus.enunciate.jaxrs.StatusCodes;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
@@ -42,11 +41,11 @@ public interface MediaRestService {
 
     @GET
     @Path("/")
-    SearchResult<MediaObject> find(
-        @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+    Result<MediaObject> list(
+            @QueryParam("profile") String profile,
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+            @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     @Path("/")
@@ -78,7 +77,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/members")
-    Result<MediaObject> findMembers(
+    Result<MediaObject> listMembers(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -95,7 +94,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/members")
-    Result<MediaObject> findMembers(
+    SearchResult<MediaObject> findMembers(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -113,12 +112,12 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/episodes")
-    Result<Program> findEpisodes(
-        @PathParam("id") String id,
-        @QueryParam("profile") String profile,
-        @QueryParam("offset") @DefaultValue("0") Integer offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+    Result<Program> listEpisodes(
+            @PathParam("id") String id,
+            @QueryParam("profile") String profile,
+            @QueryParam("offset") @DefaultValue("0") Integer offset,
+            @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+            @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * @param id      existing urn or mid
@@ -130,7 +129,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/episodes")
-    Result<Program> findEpisodes(
+    SearchResult<Program> findEpisodes(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -148,7 +147,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/descendants")
-    Result<MediaObject> findDescendants(
+    Result<MediaObject> listDescendants(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -165,7 +164,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/descendants")
-    Result<MediaObject> findDescendants(
+    SearchResult<MediaObject> findDescendants(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -183,7 +182,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/related")
-    Result<MediaObject> findRelated(
+    Result<MediaObject> listRelated(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Integer offset,
@@ -200,7 +199,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/related")
-    Result<MediaObject> findRelated(
+    SearchResult<MediaObject> findRelated(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
