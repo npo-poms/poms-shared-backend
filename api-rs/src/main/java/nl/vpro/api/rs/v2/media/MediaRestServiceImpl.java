@@ -89,7 +89,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.listMembers(id, profile, offset, max, true);
         }
-        return mediaService.findMembers(id, profile, null, offset, max).asResult();
+        try {
+            return mediaService.findMembers(id, profile, null, offset, max).asResult();
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
     }
 
     @Override
