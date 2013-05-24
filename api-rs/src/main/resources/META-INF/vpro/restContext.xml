@@ -38,4 +38,10 @@
     </constructor-arg>
   </bean>
 
+
+  <bean class="nl.vpro.api.cors.CorsPolicyImpl" id="corsPolicy">
+    <constructor-arg index="0" value="${cors.enabled}"/>
+    <constructor-arg index="1" value="${cors.policy}"/>
+  </bean>
+
 </beans>

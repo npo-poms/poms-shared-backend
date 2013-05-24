@@ -18,9 +18,11 @@ import javax.ws.rs.core.MediaType;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-@Path("/pages")
+@Path(PageRestService.PATH)
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface PageRestService {
+    public static final String PATH = "pages";
+
 
     @GET
     @Path("/")

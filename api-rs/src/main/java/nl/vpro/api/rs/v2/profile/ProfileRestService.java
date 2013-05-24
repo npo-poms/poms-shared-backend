@@ -4,13 +4,12 @@
  */
 package nl.vpro.api.rs.v2.profile;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-
+import nl.vpro.domain.api.profile.Profile;
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
-import nl.vpro.domain.api.profile.Profile;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Simple service to view of inspect the available site profiles.
@@ -18,13 +17,15 @@ import nl.vpro.domain.api.profile.Profile;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-@Path("/profiles")
+@Path(ProfileRestService.PATH)
 @StatusCodes({
     @ResponseCode(code = 200, condition = "success"),
     @ResponseCode(code = 400, condition = "bad request"),
     @ResponseCode(code = 500, condition = "server error")})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface ProfileRestService {
+    public static final String PATH = "profiles";
+
 
     /**
      * Returns a site profile by it's key
