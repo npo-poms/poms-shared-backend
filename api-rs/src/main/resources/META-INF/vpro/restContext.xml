@@ -7,7 +7,6 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
 
-  <context:component-scan base-package="nl.vpro.api.rs.v2"/>
 
   <bean class="nl.vpro.resteasy.JacksonContextResolver" />
 
@@ -43,5 +42,8 @@
     <constructor-arg index="0" value="${cors.enabled}"/>
     <constructor-arg index="1" value="${cors.policy}"/>
   </bean>
+
+  <context:component-scan base-package="nl.vpro.api.rs.v2"/>
+
 
 </beans>
