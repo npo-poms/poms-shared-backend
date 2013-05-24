@@ -40,6 +40,9 @@ public class MediaRestServiceImpl implements MediaRestService {
             Long offset,
             Integer max,
             boolean mock) {
+        if (mock) {
+            return mocks.list(profile, offset, max, true);
+        }
         return find(null, profile, offset, max, mock).asResult();
     }
 
@@ -98,6 +101,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Result<Program> listEpisodes(String id, String profile, Long offset, Integer max, boolean mock) {
+        if (mock) {
+            return mocks.listEpisodes(id, profile, offset, max, true);
+        }
         return findEpisodes(null, id, profile, offset, max, mock).asResult();
     }
 
@@ -116,6 +122,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Result<MediaObject> listDescendants(String id, String profile, Long offset, Integer max, boolean mock) {
+        if (mock) {
+            return mocks.listDescendants(id, profile, offset, max, true);
+        }
         return findDescendants(null, id, profile, offset, max, mock).asResult();
     }
 
@@ -135,6 +144,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Result<MediaObject> listRelated(String id, String profile, Long offset, Integer max, boolean mock) {
+        if (mock) {
+            return mocks.listRelated(id, profile, offset, max, true);
+        }
         return findRelated(null, id, profile, offset, max, mock).asResult();
     }
 

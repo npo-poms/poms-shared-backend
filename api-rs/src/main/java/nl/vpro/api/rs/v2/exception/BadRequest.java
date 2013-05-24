@@ -4,11 +4,10 @@
  */
 package nl.vpro.api.rs.v2.exception;
 
-import javax.ws.rs.core.Response;
-
+import nl.vpro.domain.api.Error;
 import org.jboss.resteasy.spi.Failure;
 
-import nl.vpro.domain.api.Error;
+import javax.ws.rs.core.Response;
 
 /**
  * @author Roelof Jan Koekoek

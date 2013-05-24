@@ -14,6 +14,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.ws.rs.core.MediaType;
@@ -58,13 +59,12 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
     }
 
     @Test
-
     public void testListException() throws Exception {
         when(mediaService.find(isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt())).thenThrow(new RuntimeException("Er is wat misgegaan"));
 
 
         MockHttpRequest request = MockHttpRequest.get("/media");
-        request.accept(MediaType.APPLICATION_XML); // TODO FAILS if json (jackson bug)
+        request.accept(MediaType.APPLICATION_XML);
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
@@ -74,6 +74,30 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
         verify(mediaService).find(null, null, 0l, 10);
 
         nl.vpro.domain.api.Error result = JAXB.unmarshal(new StringReader(response.getContentAsString()), nl.vpro.domain.api.Error.class);
+
+        assertEquals("java.lang.RuntimeException: Er is wat misgegaan", result.getMessage());
+        assertEquals(Integer.valueOf(500), result.getStatus());
+
+
+    }
+
+    @Test
+    @Ignore("Seems to fail because of a bug in jackson, which uses the parameter of the generic return type. (so now it can't marshal the error any more...)")
+    public void testListExceptionJson() throws Exception {
+        when(mediaService.find(isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt())).thenThrow(new RuntimeException("Er is wat misgegaan"));
+
+
+        MockHttpRequest request = MockHttpRequest.get("/media");
+        request.accept(MediaType.APPLICATION_JSON);
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 500, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        verify(mediaService).find(null, null, 0l, 10);
+
+        nl.vpro.domain.api.Error result = mapper.readValue(response.getContentAsString(), nl.vpro.domain.api.Error.class);
 
         assertEquals("java.lang.RuntimeException: Er is wat misgegaan", result.getMessage());
         assertEquals(Integer.valueOf(500), result.getStatus());

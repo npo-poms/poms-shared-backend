@@ -1,5 +1,6 @@
 package nl.vpro.api.rs.v2;
 
+import nl.vpro.jackson.MediaMapper;
 import nl.vpro.resteasy.JacksonContextResolver;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -36,7 +37,7 @@ public abstract class AbstractServiceImplTest {
     public void setup() throws Exception {
         ContextResolver<ObjectMapper> contextResolver = new JacksonContextResolver();
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
-        mapper = contextResolver.getContext(ObjectMapper.class);
+        mapper = MediaMapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
 
 

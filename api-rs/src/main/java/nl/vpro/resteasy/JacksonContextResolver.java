@@ -1,5 +1,6 @@
 package nl.vpro.resteasy;
 
+import nl.vpro.domain.media.MediaObject;
 import nl.vpro.jackson.MediaMapper;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -22,7 +23,11 @@ public class JacksonContextResolver implements ContextResolver<ObjectMapper> {
 
     @Override
     public ObjectMapper getContext(Class<?> objectType) {
-        return MediaMapper.INSTANCE;
+        if (MediaObject.class.isAssignableFrom(objectType)) {
+            return MediaMapper.INSTANCE;
+        } else {
+            return MediaMapper.INSTANCE;
+        }
     }
 }
 
