@@ -4,6 +4,7 @@ import nl.vpro.api.rs.v2.AbstractServiceImplTest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.page.PageForm;
+import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
 import org.codehaus.jackson.type.TypeReference;
 import org.custommonkey.xmlunit.Diff;
@@ -19,6 +20,7 @@ import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Michiel Meeuwissen
@@ -26,9 +28,12 @@ import static org.junit.Assert.assertTrue;
  */
 public class PageRestServiceImplTest extends AbstractServiceImplTest {
 
+    PageService pageService = mock(PageService.class);
+
+
     @Override
     protected Object getTestObject() {
-        return new PageRestServiceImpl();
+        return new PageRestServiceImpl(pageService);
     }
 
     @Test
