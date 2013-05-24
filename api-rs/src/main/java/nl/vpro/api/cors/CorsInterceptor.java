@@ -1,38 +1,33 @@
 package nl.vpro.api.cors;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.resteasy.annotations.interception.Precedence;
-import org.jboss.resteasy.annotations.interception.ServerInterceptor;
-import org.jboss.resteasy.spi.interception.MessageBodyWriterContext;
-import org.jboss.resteasy.spi.interception.MessageBodyWriterInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
 /**
- * User: ricojansen
- * Date: 27-04-2012
- * Time: 14:12
+ * @author rico
+ * @author Michiel Meeuwissen
  */
 @Provider
-@ServerInterceptor
-@Precedence("HEADER_DECORATOR")
-public class CorsInterceptor implements MessageBodyWriterInterceptor {
-    @Autowired
-    CorsPolicy corsPolicy;
+public class CorsInterceptor implements ContainerResponseFilter {
 
-    @Context
-    private HttpServletRequest httpServletRequest;
+    private final CorsPolicy corsPolicy;
+
+    @Autowired
+    CorsInterceptor(CorsPolicy policy) {
+        this.corsPolicy = policy;
+    }
 
     @Override
-    public void write(MessageBodyWriterContext context) throws IOException, WebApplicationException {
-        String origin = httpServletRequest.getHeader(CorsHeaders.ORIGIN);
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext context) throws IOException {
+        String origin = requestContext.getHeaderString(CorsHeaders.ORIGIN);
         if (corsPolicy.isEnabled()) {
-            String method = httpServletRequest.getMethod();
+            String method = requestContext.getMethod();
             if (StringUtils.isNotEmpty(origin)) {
                 boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
                 if (allowed) {
@@ -47,8 +42,7 @@ public class CorsInterceptor implements MessageBodyWriterInterceptor {
                 context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             }
         }
-        context.proceed();
-    }
 
+    }
 
 }

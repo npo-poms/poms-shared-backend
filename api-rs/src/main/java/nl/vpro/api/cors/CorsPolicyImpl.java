@@ -16,10 +16,10 @@ import java.util.regex.Pattern;
  * Date: 27-04-2012
  */
 public class CorsPolicyImpl implements CorsPolicy {
-    private String policyFile;
-    private boolean enabled;
+    private final String policyFile;
+    private final boolean enabled;
 
-    private Map<String, Pattern> policyTable = null;
+    private final Map<String, Pattern> policyTable;
 
     public CorsPolicyImpl(boolean enabled, String policyFile) {
         this.policyFile = policyFile;
@@ -27,10 +27,6 @@ public class CorsPolicyImpl implements CorsPolicy {
         policyTable = parseProperties();
     }
 
-    @Override
-    public boolean allowedOrigin(String origin) {
-        return allowedOriginAndMethod(origin, "GET");
-    }
 
     @Override
     public boolean allowedOriginAndMethod(String origin, String method) {
