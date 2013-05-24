@@ -40,14 +40,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             Long offset,
             Integer max,
             boolean mock) {
-        if(mock) {
-            return mocks.list(profile, offset, max, true);
-        }
-        try {
-            return mediaService.find(profile, null, offset, max).asResult();
-        } catch (Exception e) {
-            throw new ServerError(e);
-        }
+        return find(null, profile, offset, max, mock).asResult();
     }
 
     @Override
@@ -63,6 +56,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             return mediaService.find(profile, form, offset, max);
         } catch (Exception e) {
+            // This doesn't work in jackson if the result is a generic.
+            // See org.codehaus.jackson.map.type.TypeFactory#_constructType(Type type, TypeBindings context) line 487
             throw new ServerError(e);
         }
     }
@@ -86,14 +81,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Result<MediaObject> listMembers(String id, String profile, Long offset, Integer max, boolean mock) {
-        if(mock) {
-            return mocks.listMembers(id, profile, offset, max, true);
-        }
-        try {
-            return mediaService.findMembers(id, profile, null, offset, max).asResult();
-        } catch (Exception e) {
-            throw new ServerError(e);
-        }
+        return findMembers(null, id, profile, offset, max, mock).asResult();
     }
 
     @Override
@@ -110,14 +98,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Result<Program> listEpisodes(String id, String profile, Long offset, Integer max, boolean mock) {
-        if(mock) {
-            return mocks.listEpisodes(id, profile, offset, max, true);
-        }
-        try {
-            return mediaService.findEpisodes(id, profile, null, offset, max).asResult();
-        } catch (Exception e) {
-            throw new ServerError(e);
-        }
+        return findEpisodes(null, id, profile, offset, max, mock).asResult();
     }
 
     @Override
@@ -135,14 +116,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Result<MediaObject> listDescendants(String id, String profile, Long offset, Integer max, boolean mock) {
-        if(mock) {
-            return mocks.listDescendants(id, profile, offset, max, true);
-        }
-        try {
-            return mediaService.findDescendants(id, profile, null, offset, max).asResult();
-        } catch (Exception e) {
-            throw new ServerError(e);
-        }
+        return findDescendants(null, id, profile, offset, max, mock).asResult();
     }
 
     @Override
@@ -161,16 +135,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public Result<MediaObject> listRelated(String id, String profile, Long offset, Integer max, boolean mock) {
-        if (mock) {
-            return mocks.listRelated(id, profile, offset, max, true);
-        }
-        try {
-            return mediaService.findRelated(id, profile, null, offset, max).asResult();
-        } catch (Exception e) {
-            throw new ServerError(e);
-        }
-
-
+        return findRelated(null, id, profile, offset, max, mock).asResult();
     }
 
     @Override
