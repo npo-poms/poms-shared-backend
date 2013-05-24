@@ -4,17 +4,13 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.Suggestion;
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.Suggestion;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  * @author Roelof Jan Koekoek
@@ -32,6 +28,7 @@ public interface SuggestRestService {
     @Path("/")
     Result<Suggestion> all(
         @QueryParam("text") String text,
-        @QueryParam("profile") String profile
+        @QueryParam("profile") String profile,
+        @QueryParam("mock") @DefaultValue("false") boolean mock
     );
 }
