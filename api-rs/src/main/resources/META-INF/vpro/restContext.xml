@@ -37,6 +37,9 @@
     </constructor-arg>
   </bean>
 
+  <context:component-scan base-package="nl.vpro.api">
+    <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
+  </context:component-scan>
 
   <bean class="nl.vpro.api.cors.CorsPolicyImpl" id="corsPolicy">
     <constructor-arg index="0" value="${cors.enabled}"/>
