@@ -1,5 +1,6 @@
 package nl.vpro.api.cors;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -10,6 +11,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.when;
 
 /**
@@ -18,6 +20,11 @@ import static org.mockito.Mockito.when;
  */
 public class CorsInterceptorTest {
     CorsPolicy corsPolicy = mock(CorsPolicy.class);
+
+    @Before
+    public void resetMocks() {
+        reset(corsPolicy);
+    }
 
     @Test
     public void testFilter() throws Exception {
@@ -64,7 +71,8 @@ public class CorsInterceptorTest {
 
         inst.filter(request, response);
 
-        assertThat(headers).isEmpty();
+        assertThat(headers.get("Access-Control-Allow-Origin")).containsExactly("localhost");
+
     }
 
     @Test
