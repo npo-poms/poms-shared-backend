@@ -41,7 +41,7 @@ public class CorsPolicyImpl implements CorsPolicy {
 
 
     private Map<String, Pattern> parseProperties() {
-        Map<String, Pattern> table = new HashMap<String, Pattern>();
+        Map<String, Pattern> table = new HashMap<>();
         Properties properties = getPolicyProperties();
         for (Map.Entry<Object, Object> entry : properties.entrySet()) {
             String key = (String) entry.getKey();
@@ -78,6 +78,7 @@ public class CorsPolicyImpl implements CorsPolicy {
         return properties;
     }
 
+    @Override
     public boolean isEnabled() {
         return enabled;
     }
