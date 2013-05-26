@@ -75,6 +75,10 @@
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-backend-elasticsearch</artifactId>
     </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-backend-couchdb</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>nl.vpro.media</groupId>

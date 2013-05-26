@@ -3,6 +3,7 @@ package nl.vpro.api.rs.v2.media;
 import nl.vpro.api.rs.v2.AbstractServiceImplTest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
+import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.api.TextMatcher;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaSearch;
@@ -23,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
@@ -49,7 +51,8 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
     @Test
     public void testList() throws Exception {
-        when(mediaService.find(isNull(String.class), isNull(MediaForm.class) , eq(0l), anyInt())).thenReturn(new SearchResult<MediaObject>());
+        when(mediaService.find(isNull(String.class), isNull(MediaForm.class) , eq(0l), anyInt()))
+                .thenReturn(new SearchResult<>(new ArrayList<SearchResultItem<MediaObject>>(), 0l, 0, 0l));
 
         MockHttpRequest request = MockHttpRequest.get("/media");
         MockHttpResponse response = new MockHttpResponse();
@@ -60,7 +63,8 @@ public class MediaRestServiceImplTest extends AbstractServiceImplTest {
 
     @Test
     public void testListException() throws Exception {
-        when(mediaService.find(isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt())).thenThrow(new RuntimeException("Er is wat misgegaan"));
+        when(mediaService.find(isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+                .thenThrow(new RuntimeException("Er is wat misgegaan"));
 
 
         MockHttpRequest request = MockHttpRequest.get("/media");
