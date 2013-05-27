@@ -28,7 +28,7 @@ class MockMediaRestService implements MediaRestService {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         SearchResult<MediaObject> result = new SearchResult<>(list, offset, max, listSizes);
         result.setBroadcasterFacetResult(Arrays.asList(new TermFacetResultItem("vpro", 100)));
-        result.setSortDateFacetResult(Arrays.asList(new RangeFacetResultItem<>(new Date(0), new Date(), 100)));
+        result.setSortDateFacetResult(Arrays.asList(new DateFacetResultItem(new Date(0), new Date(), 100)));
         return result;
     }
 
