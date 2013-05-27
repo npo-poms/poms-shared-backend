@@ -26,7 +26,7 @@ public class ProfileRestServiceImpl implements ProfileRestService {
 
     @Override
     public Profile load(String name, boolean mock) {
-        if(mock == true) {
+        if(mock) {
             return profileService.getProfiles().first();
         }
 
