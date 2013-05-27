@@ -9,6 +9,8 @@ import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.xml.sax.SAXException;
 
 import javax.ws.rs.core.MediaType;
@@ -16,16 +18,23 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * @author Michiel Meeuwissen
  * @since 2.0
  */
+@RunWith(value = Parameterized.class)
 public class ProfileRestServiceImplTest extends AbstractRestServiceImplTest {
+
+    private boolean mock;
+
+    public ProfileRestServiceImplTest(boolean mock) {
+        this.mock = mock;
+    }
 
     static ProfileService profileService;
     @BeforeClass
@@ -34,13 +43,19 @@ public class ProfileRestServiceImplTest extends AbstractRestServiceImplTest {
         profileService = new ProfileServiceImpl("geschiedenis");
     }
 
+    @Parameterized.Parameters
+    public static Collection<Object[]> data() {
+        Object[][] data = new Object[][]{{Boolean.FALSE}, {Boolean.TRUE}};
+        return Arrays.asList(data);
+    }
+
     @Override
     protected Object getTestObject() {
         return new ProfileRestServiceImpl(profileService);
     }
     @Test
     public void testLoadJson() throws Exception {
-        MockHttpRequest request = MockHttpRequest.get("/profiles/geschiedenis");
+        MockHttpRequest request = MockHttpRequest.get("/profiles/geschiedenis?mock=" + mock);
         request.accept(MediaType.APPLICATION_JSON);
 
         MockHttpResponse response = new MockHttpResponse();
@@ -54,13 +69,13 @@ public class ProfileRestServiceImplTest extends AbstractRestServiceImplTest {
         };
 
         // TODO doesnt work
-        ///Profile profile = mapper.readValue(response.getContentAsString(), typeRef);
+        //Profile profile = mapper.readValue(response.getContentAsString(), typeRef);
 
     }
 
     @Test
     public void testLoadXml() throws Exception {
-        MockHttpRequest request = MockHttpRequest.get("/profiles/geschiedenis");
+        MockHttpRequest request = MockHttpRequest.get("/profiles/geschiedenis?mock=" + mock);
         request.accept(MediaType.APPLICATION_XML);
 
         MockHttpResponse response = new MockHttpResponse();
