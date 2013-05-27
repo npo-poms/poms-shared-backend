@@ -34,7 +34,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public MediaObject load(String id, boolean mock) {
-        return build(id.hashCode());
+        return build(id);
     }
 
     @Override
@@ -101,13 +101,16 @@ class MockMediaRestService implements MediaRestService {
         long numberOfResults = Math.min(total - offset, max);
         List<MediaObject> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
-            result.add(build(i));
+            result.add(build("" + i));
         }
         return result;
     }
 
-    protected MediaObject build(int hash) {
-        switch(hash % 3) {
+    protected MediaObject build(String id) {
+        if (id.contains("program")) return MediaTestDataBuilder.program().constrained().build();
+        if (id.contains("group")) return MediaTestDataBuilder.group().constrained().build();
+        if (id.contains("segment")) return MediaTestDataBuilder.segment().constrained().build();
+        switch(id.hashCode() % 3) {
             case 1:
                 return MediaTestDataBuilder.group().constrained().build();
             case 2:
