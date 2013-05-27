@@ -17,7 +17,7 @@ import java.util.Map;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public abstract class AbstractServiceImplTest {
+public abstract class AbstractRestServiceImplTest {
     public static final MediaType JSON;
 
     public static final MediaType XML;

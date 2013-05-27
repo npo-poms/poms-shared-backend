@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.v2.page;
 
-import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.page.PageForm;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public class PageRestServiceImplTest extends AbstractServiceImplTest {
+public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
 
     PageService pageService = mock(PageService.class);
 

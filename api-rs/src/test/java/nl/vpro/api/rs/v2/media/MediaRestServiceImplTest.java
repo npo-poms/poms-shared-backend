@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.v2.media;
 
-import nl.vpro.api.rs.v2.AbstractServiceImplTest;
+import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.SearchResultItem;
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.*;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public class MediaRestServiceImplTest extends AbstractServiceImplTest {
+public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
     MediaService mediaService = mock(MediaService.class);
 
