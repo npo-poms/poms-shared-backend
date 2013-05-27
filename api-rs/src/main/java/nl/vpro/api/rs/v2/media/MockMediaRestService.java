@@ -7,10 +7,7 @@ import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.ProgramType;
 
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -31,6 +28,7 @@ class MockMediaRestService implements MediaRestService {
         List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         SearchResult<MediaObject> result = new SearchResult<>(list, offset, max, listSizes);
         result.setBroadcasterFacetResult(Arrays.asList(new TermFacetResultItem("vpro", 100)));
+        result.setSortDateFacetResult(Arrays.asList(new RangeFacetResultItem<>(new Date(0), new Date(), 100)));
         return result;
     }
 
