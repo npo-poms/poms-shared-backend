@@ -31,6 +31,7 @@
     <constructor-arg>
       <list>
         <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository">
+          <constructor-arg ref="restTemplate" />
         </bean>
         <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
           <constructor-arg ref="esClient" />
