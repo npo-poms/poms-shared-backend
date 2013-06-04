@@ -27,14 +27,27 @@
         factory-method="buildClient"/>
 
 
+
   <bean class="nl.vpro.domain.api.media.MediaRepositoryImpl">
     <constructor-arg>
-      <list>
-        <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository" />
-        <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
+      <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository" />
+    </constructor-arg>
+    <constructor-arg>
+      <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
           <constructor-arg ref="esClient" />
-        </bean>
-      </list>
+      </bean>
+    </constructor-arg>
+    <constructor-arg>
+      <bean class="nl.vpro.domain.api.media.FallbackMediaRepositoryImpl">
+        <constructor-arg>
+          <list>
+            <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository"/>
+              <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
+                <constructor-arg ref="esClient"/>
+              </bean>
+          </list>
+        </constructor-arg>
+      </bean>
     </constructor-arg>
   </bean>
 
