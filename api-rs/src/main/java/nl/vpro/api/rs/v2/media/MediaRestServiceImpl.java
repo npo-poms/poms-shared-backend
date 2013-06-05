@@ -57,7 +57,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.find(form, profile, offset, max, true);
         }
         try {
-            return new MediaSearchResult(mediaService.find(profile, form, offset, max));
+            return mediaService.find(profile, form, offset, max);
         } catch (Exception e) {
             // This doesn't work in jackson if the result is a generic.
             // See org.codehaus.jackson.map.type.TypeFactory#_constructType(Type type, TypeBindings context) line 487
@@ -93,7 +93,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findMembers(form, id, profile, offset, max, true);
         }
         try {
-            return new MediaSearchResult(mediaService.findMembers(id, profile, form, offset, max));
+            return mediaService.findMembers(id, profile, form, offset, max);
         } catch (Exception e) {
             throw new ServerError(e);
         }
@@ -113,7 +113,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findEpisodes(form, id, profile, offset, max, true);
         }
         try {
-            return new ProgramSearchResult(mediaService.findEpisodes(id, profile, form, offset, max));
+            return mediaService.findEpisodes(id, profile, form, offset, max);
         } catch (Exception e) {
             throw new ServerError(e);
         }
@@ -134,7 +134,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findDescendants(form, id, profile, offset, max, true);
         }
         try {
-            return new MediaSearchResult(mediaService.findDescendants(id, profile, form, offset, max));
+            return mediaService.findDescendants(id, profile, form, offset, max);
         } catch (Exception e) {
             throw new ServerError(e);
         }
@@ -156,7 +156,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findRelated(form, id, profile, offset, max, true);
         }
         try {
-            return new MediaSearchResult(mediaService.findRelated(id, profile, form, offset, max));
+            return mediaService.findRelated(id, profile, form, offset, max);
         } catch (Exception e) {
             throw new ServerError(e);
         }

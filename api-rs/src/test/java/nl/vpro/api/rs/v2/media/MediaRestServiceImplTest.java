@@ -1,16 +1,15 @@
 package nl.vpro.api.rs.v2.media;
 
-import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.SearchResult;
-import nl.vpro.domain.api.SearchResultItem;
-import nl.vpro.domain.api.TextMatcher;
-import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.api.media.MediaSearch;
-import nl.vpro.domain.api.media.MediaService;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
@@ -18,14 +17,14 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.api.media.MediaSearch;
+import nl.vpro.domain.api.media.MediaService;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.domain.media.Program;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
@@ -52,7 +51,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
     @Test
     public void testList() throws Exception {
         when(mediaService.find(isNull(String.class), isNull(MediaForm.class) , eq(0l), anyInt()))
-                .thenReturn(new SearchResult<>(new ArrayList<SearchResultItem<MediaObject>>(), 0l, 0, 0l));
+                .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 0l));
 
         MockHttpRequest request = MockHttpRequest.get("/media");
         MockHttpResponse response = new MockHttpResponse();

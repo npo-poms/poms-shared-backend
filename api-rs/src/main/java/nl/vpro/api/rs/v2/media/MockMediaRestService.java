@@ -25,7 +25,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public MediaSearchResult find(MediaForm form, String profile, Long offset, Integer max, boolean mock) {
-        List<SearchResultItem<MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
+        List<SearchResultItem<? extends MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         MediaSearchResult result = new MediaSearchResult(list, offset, max, listSizes);
         result.setBroadcasterFacetResult(Arrays.asList(new TermFacetResultItem("vpro", 100)));
         result.setSortDateFacetResult(Arrays.asList(new DateFacetResultItem(new Date(0), new Date(), 100)));
@@ -78,8 +78,8 @@ class MockMediaRestService implements MediaRestService {
         return new MediaSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
     }
 
-    protected <T> List<SearchResultItem<T>> mockSearchItems(final List<T> list) {
-        return new AbstractList<SearchResultItem<T>>() {
+    protected <T extends MediaObject> List<SearchResultItem<? extends T>> mockSearchItems(final List<T> list) {
+        return new AbstractList<SearchResultItem<? extends T>>() {
 
             @Override
             public SearchResultItem<T> get(int index) {

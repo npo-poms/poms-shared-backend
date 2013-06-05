@@ -3,6 +3,7 @@ package nl.vpro.api.rs.v2.page;
 import java.net.URISyntaxException;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import nl.vpro.domain.api.PageResult;
 import nl.vpro.domain.api.PageSearchResult;
-import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.TermFacetResultItem;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
@@ -45,9 +46,11 @@ public class PageRestServiceImpl implements PageRestService {
     @Override
     public PageSearchResult find(PageForm form, String profile, Long offset, Integer max, boolean mock) {
         if(mock) {
-            return new PageSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
+            PageSearchResult result = new PageSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
+            result.setPublisherFacetResult(Arrays.asList(new TermFacetResultItem("kro", 10)));
+            return result;
         }
-        return new PageSearchResult(pageService.find(form, profile, offset, max));
+        return pageService.find(form, profile, offset, max);
     }
 
     @Override
@@ -58,7 +61,7 @@ public class PageRestServiceImpl implements PageRestService {
         return pageService.load(id);
     }
 
-    protected List<Page> mockList(long total, long offset, int limit) {
+    protected List<? extends Page> mockList(long total, long offset, int limit) {
         long numberOfResults = Math.min(total - offset, limit);
         List<Page> result = new ArrayList<>();
         for(int i = 0; i < numberOfResults; i++) {
@@ -68,12 +71,12 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
 
-    protected <T> List<SearchResultItem<T>> mockSearchItems(final List<T> list) {
-        return new AbstractList<SearchResultItem<T>>() {
+    protected List<SearchResultItem<? extends Page>> mockSearchItems(final List<? extends Page> list) {
+        return new AbstractList<SearchResultItem<? extends Page>>() {
 
             @Override
-            public SearchResultItem<T> get(int index) {
-                SearchResultItem<T> result = new SearchResultItem<>(list.get(index));
+            public SearchResultItem<Page> get(int index) {
+                SearchResultItem<Page> result = new SearchResultItem<>(list.get(index));
                 result.setScore(0.5f);
                 //
                 return result;
