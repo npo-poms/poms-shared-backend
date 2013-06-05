@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import nl.vpro.api.rs.v2.exception.ServerError;
 import nl.vpro.domain.api.PageResult;
 import nl.vpro.domain.api.PageSearchResult;
 import nl.vpro.domain.api.SearchResultItem;
@@ -50,7 +51,11 @@ public class PageRestServiceImpl implements PageRestService {
             result.setPublisherFacetResult(Arrays.asList(new TermFacetResultItem("kro", 10)));
             return result;
         }
-        return pageService.find(form, profile, offset, max);
+        try {
+            return pageService.find(form, profile, offset, max);
+        } catch (Exception e) {
+            throw new ServerError(e);
+        }
     }
 
     @Override

@@ -40,7 +40,6 @@ public interface MediaRestService {
 
 
     @GET
-    @Path("/")
     MediaResult list(
             @QueryParam("profile") String profile,
             @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -48,7 +47,6 @@ public interface MediaRestService {
             @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
-    @Path("/")
     MediaSearchResult find(
         MediaForm form,
         @QueryParam("profile") String profile,
