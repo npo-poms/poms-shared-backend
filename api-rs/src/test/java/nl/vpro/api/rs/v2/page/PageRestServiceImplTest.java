@@ -85,10 +85,11 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
         MockHttpRequest request = MockHttpRequest.post("/pages?mock=true&max=50");
         request.contentType(MediaType.APPLICATION_JSON);
         MockHttpResponse response = new MockHttpResponse();
-        PageForm form = new PageForm();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        mapper.writeValue(out, form);
-        request.content(out.toByteArray());
+
+        String pageForm = "{\"highlight\":false,\"searches\":{\"publishers\":[{\"matcherType\":\"text\",\"value\":\"kro\"}]}}";
+        request.content(pageForm.getBytes());
+
+
         dispatcher.invoke(request, response);
 
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
