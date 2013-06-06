@@ -59,8 +59,6 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             return mediaService.find(profile, form, offset, max);
         } catch (Exception e) {
-            // This doesn't work in jackson if the result is a generic.
-            // See org.codehaus.jackson.map.type.TypeFactory#_constructType(Type type, TypeBindings context) line 487
             throw new ServerError(e);
         }
     }
