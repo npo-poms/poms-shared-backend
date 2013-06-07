@@ -49,7 +49,7 @@ class MockMediaRestService implements MediaRestService {
 
     @Override
     public ProgramResult listEpisodes(String id, String profile, Long offset, Integer max, boolean mock) {
-        return new ProgramResult(mockEpisodes(listSizes, offset, max), offset, max, listSizes);
+        return findEpisodes(null, id, profile, offset, max, mock).asResult();
     }
 
     @Override
