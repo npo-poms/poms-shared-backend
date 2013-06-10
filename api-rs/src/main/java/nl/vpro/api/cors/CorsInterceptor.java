@@ -59,7 +59,9 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
     @Override
     public void filter(ContainerRequestContext request) throws IOException {
         List<String> contentTypes = request.getHeaders().get("Content-Type");
-        if (contentTypes.isEmpty() || contentTypes.equals(Arrays.asList("*/*"))) {
+        if (contentTypes == null) {
+            request.getHeaders().add("Content-Type", "application/json");
+        } else if (contentTypes.isEmpty() || contentTypes.equals(Arrays.asList("*/*"))) {
             contentTypes.clear();
             contentTypes.add("application/json");
         }
