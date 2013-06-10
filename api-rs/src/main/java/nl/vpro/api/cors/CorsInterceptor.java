@@ -51,19 +51,19 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
 
 
     /**
-     * Hack for IE.
-
-     * @param request
-     * @throws IOException
+     * Hack for IE 8 . See http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx
+     * (so this is related to cors)
      */
     @Override
     public void filter(ContainerRequestContext request) throws IOException {
-        List<String> contentTypes = request.getHeaders().get("Content-Type");
-        if (contentTypes == null) {
-            request.getHeaders().add("Content-Type", "application/json");
-        } else if (contentTypes.isEmpty() || contentTypes.equals(Arrays.asList("*/*"))) {
-            contentTypes.clear();
-            contentTypes.add("application/json");
+        if ("POST".equals(request.getMethod())) {
+            List<String> contentTypes = request.getHeaders().get("Content-Type");
+            if (contentTypes == null) {
+                request.getHeaders().add("Content-Type", "application/json");
+            } else if (contentTypes.isEmpty() || contentTypes.equals(Arrays.asList("*/*")) || contentTypes.equals(Arrays.asList("text/plain"))) {
+                contentTypes.clear();
+                contentTypes.add("application/json");
+            }
         }
     }
 }
