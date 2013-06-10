@@ -1,20 +1,24 @@
 package nl.vpro.api.cors;
 
-import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
+
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author rico
  * @author Michiel Meeuwissen
  */
 @Provider
-public class CorsInterceptor implements ContainerResponseFilter {
+public class CorsInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
 
     private final CorsPolicy corsPolicy;
 
@@ -24,25 +28,40 @@ public class CorsInterceptor implements ContainerResponseFilter {
     }
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext context) throws IOException {
-        String origin = requestContext.getHeaderString(CorsHeaders.ORIGIN);
+    public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
+        String origin = request.getHeaderString(CorsHeaders.ORIGIN);
         if (corsPolicy.isEnabled()) {
-            String method = requestContext.getMethod();
+            String method = request.getMethod();
             if (StringUtils.isNotEmpty(origin)) {
                 boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
                 if (allowed) {
-                    context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                    response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                     //ACCESS_CONTROL_ALLOW_ORIGIN_VALUE is ook beschikbaar
-                    context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
-                    context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
+                    response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
+                    response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
                 }
             }
         } else {
             if (StringUtils.isNotEmpty(origin)) {
-                context.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             }
         }
 
     }
 
+
+    /**
+     * Hack for IE.
+
+     * @param request
+     * @throws IOException
+     */
+    @Override
+    public void filter(ContainerRequestContext request) throws IOException {
+        List<String> contentTypes = request.getHeaders().get("Content-Type");
+        if (contentTypes.isEmpty() || contentTypes.equals(Arrays.asList("*/*"))) {
+            contentTypes.clear();
+            contentTypes.add("application/json");
+        }
+    }
 }
