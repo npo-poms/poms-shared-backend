@@ -1,18 +1,19 @@
 package nl.vpro.api.cors;
 
-import org.junit.Before;
-import org.junit.Test;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -95,5 +96,41 @@ public class CorsInterceptorTest {
         inst.filter(request, response);
 
         assertThat(headers).isEmpty();
+    }
+
+
+    @Test
+    public void testIEHack() throws Exception {
+
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+
+
+        ContainerRequestContext request = mock(ContainerRequestContext.class);
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getHeaders()).thenReturn(headers);
+
+        CorsInterceptor inst = new CorsInterceptor(corsPolicy);
+
+        inst.filter(request);
+
+        assertThat(request.getHeaders().get("Content-Type")).isEqualTo(Arrays.asList("application/json"));
+    }
+
+    @Test
+    public void testIEHack2() throws Exception {
+
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        headers.put("Content-Type", new ArrayList<>(Arrays.asList("text/plain")));
+
+
+        ContainerRequestContext request = mock(ContainerRequestContext.class);
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getHeaders()).thenReturn(headers);
+
+        CorsInterceptor inst = new CorsInterceptor(corsPolicy);
+
+        inst.filter(request);
+
+        assertThat(request.getHeaders().get("Content-Type")).isEqualTo(Arrays.asList("application/json"));
     }
 }
