@@ -1,7 +1,5 @@
 package nl.vpro.api.cors;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,11 +9,17 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * User: ricojansen
  * Date: 27-04-2012
  */
 public class CorsPolicyImpl implements CorsPolicy {
+    private static final Logger LOG = LoggerFactory.getLogger(CorsPolicyImpl.class);
     private final String policyFile;
     private final boolean enabled;
 
@@ -65,15 +69,9 @@ public class CorsPolicyImpl implements CorsPolicy {
             }
             properties.load(in);
         } catch (IOException ioe) {
-
+            LOG.warn(ioe.getMessage());
         } finally {
-            try {
-                if (in != null) {
-                    in.close();
-                }
-            } catch (IOException ieo) {
-
-            }
+            IOUtils.closeQuietly(in);
         }
         return properties;
     }
