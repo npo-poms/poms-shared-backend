@@ -7,11 +7,6 @@ package nl.vpro.api.rs.v2.page;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-import com.wordnik.swagger.annotations.Api;
-import com.wordnik.swagger.annotations.ApiError;
-import com.wordnik.swagger.annotations.ApiErrors;
-import com.wordnik.swagger.annotations.ApiOperation;
-
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.PageResult;
 import nl.vpro.domain.api.PageSearchResult;
@@ -33,10 +28,10 @@ public interface PageRestService {
     @GET
     @Path("/")
     PageResult list(
-            @QueryParam("profile") String profile,
-            @QueryParam("offset") @DefaultValue("0") Long offset,
-            @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-            @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     @Path("/")
