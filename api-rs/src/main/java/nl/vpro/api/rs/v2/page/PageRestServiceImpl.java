@@ -120,7 +120,7 @@ public class PageRestServiceImpl implements PageRestService {
 
     protected Page mockPage() {
         try {
-            return PageBuilder.page().id("4b748d32-8006-4f0a-8aac-6d8d5c89a847").example().build();
+            return PageBuilder.article().id("4b748d32-8006-4f0a-8aac-6d8d5c89a847").example().build();
         } catch(URISyntaxException e) {
             throw new RuntimeException(e);
         }

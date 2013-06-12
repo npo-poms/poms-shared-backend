@@ -56,7 +56,6 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(Long.valueOf(0), pages.getOffset());
         assertEquals(Long.valueOf(100), pages.getTotal());
         assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
-        assertEquals("urn:vpro:media:program:1234", pages.getList().get(0).getMediaIds().get(0));
 
 
     }
