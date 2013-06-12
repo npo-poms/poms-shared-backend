@@ -5,8 +5,6 @@
 package nl.vpro.api.rs.v2.media;
 
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.QueryParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +14,10 @@ import com.wordnik.swagger.annotations.*;
 
 import nl.vpro.api.rs.v2.exception.BadRequest;
 import nl.vpro.api.rs.v2.exception.ServerError;
-import nl.vpro.api.rs.v2.page.PageRestService;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
-import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.Program;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -44,8 +39,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     }
 
-    @GET
-    @ApiOperation(value = "Get all media", notes = "Get all media filtered on an optional profile")
+    @ApiOperation(httpMethod = "get", value = "Get all media", notes = "Get all media filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public MediaResult list(
@@ -54,14 +48,13 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
-        if (mock) {
+        if(mock) {
             return mocks.list(profile, offset, max, true);
         }
         return find(null, profile, offset, max, mock).asResult();
     }
 
-    @POST
-    @ApiOperation(value = "Find media", notes = "Find media by posting a search form. Results are filtered on an optional profile")
+    @ApiOperation(httpMethod = "post", value = "Find media", notes = "Find media by posting a search form. Results are filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public MediaSearchResult find(
@@ -84,7 +77,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
         try {
             return mediaService.find(profile, form, offset, max);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServerError(e);
         }
     }
@@ -100,7 +93,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         } catch(Exception e) {
             throw new ServerError(e);
         }
-        if (mediaObject == null) {
+        if(mediaObject == null) {
             throw new BadRequest("No media for id " + id);
         }
         return mediaObject;
@@ -112,20 +105,20 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public MediaSearchResult findMembers(MediaForm form, String id, String profile, Long  offset, Integer max, boolean mock) {
-        if (mock) {
+    public MediaSearchResult findMembers(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
+        if(mock) {
             return mocks.findMembers(form, id, profile, offset, max, true);
         }
         try {
             return mediaService.findMembers(id, profile, form, offset, max);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServerError(e);
         }
     }
 
     @Override
     public ProgramResult listEpisodes(String id, String profile, Long offset, Integer max, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.listEpisodes(id, profile, offset, max, true);
         }
         return findEpisodes(null, id, profile, offset, max, mock).asResult();
@@ -133,12 +126,12 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public ProgramSearchResult findEpisodes(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.findEpisodes(form, id, profile, offset, max, true);
         }
         try {
             return mediaService.findEpisodes(id, profile, form, offset, max);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServerError(e);
         }
 
@@ -146,7 +139,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public MediaResult listDescendants(String id, String profile, Long offset, Integer max, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.listDescendants(id, profile, offset, max, true);
         }
         return findDescendants(null, id, profile, offset, max, mock).asResult();
@@ -154,12 +147,12 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public MediaSearchResult findDescendants(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.findDescendants(form, id, profile, offset, max, true);
         }
         try {
             return mediaService.findDescendants(id, profile, form, offset, max);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServerError(e);
         }
 
@@ -168,7 +161,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public MediaResult listRelated(String id, String profile, Long offset, Integer max, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.listRelated(id, profile, offset, max, true);
         }
         return findRelated(null, id, profile, offset, max, mock).asResult();
@@ -176,12 +169,12 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @Override
     public MediaSearchResult findRelated(MediaForm form, String id, String profile, Long offset, Integer max, boolean mock) {
-        if (mock) {
+        if(mock) {
             return mocks.findRelated(form, id, profile, offset, max, true);
         }
         try {
             return mediaService.findRelated(id, profile, form, offset, max);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServerError(e);
         }
     }

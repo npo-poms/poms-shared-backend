@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.QueryParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,6 @@ import nl.vpro.domain.page.PageBuilder;
  * @since 2.0
  */
 @Service
-@Path(PageRestService.PATH)
 @Api(value = PageRestService.PATH, description = "The pages API")
 public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
@@ -38,19 +37,17 @@ public class PageRestServiceImpl implements PageRestService {
         this.pageService = pageService;
     }
 
-    @GET
-    @ApiOperation(value = "Get all pages", notes = "Get all pages filtered on an optional profile")
+    @ApiOperation(httpMethod = "get", value = "Get all pages", notes = "Get all pages filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public PageResult list(String profile, Long offset, Integer max, boolean mock) {
         if(mock) {
             return new PageResult(mockList(listSizes, offset, max), offset, max, listSizes);
         }
-         return find(null, profile, offset, max, mock).asResult();
+        return find(null, profile, offset, max, mock).asResult();
     }
 
-    @POST
-    @ApiOperation(value = "Find pages", notes = "Find pages by posting a search form. Results are filtered on an optional profile")
+    @ApiOperation(httpMethod = "post", value = "Find pages", notes = "Find pages by posting a search form. Results are filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public PageSearchResult find(
