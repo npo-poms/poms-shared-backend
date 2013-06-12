@@ -6,9 +6,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-
-
-  <bean class="nl.vpro.resteasy.JacksonContextResolver" />
+  <bean class="nl.vpro.resteasy.JacksonContextResolver"/>
 
   <!-- Create an ElasticSearch client with a nice factory bean -->
   <bean id="myESClientFactory" class="nl.vpro.elasticsearch.ESClientFactory">
@@ -23,18 +21,18 @@
     <property name="sniffCluster" value="false"/>
     <property name="clusterName" value="${elasticSearch.cluster}"/>
   </bean>
+
   <bean id="esClient" class="org.elasticsearch.client.Client" factory-bean="myESClientFactory"
         factory-method="buildClient"/>
 
 
-
   <bean class="nl.vpro.domain.api.media.MediaRepositoryImpl">
     <constructor-arg>
-      <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository" />
+      <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository"/>
     </constructor-arg>
     <constructor-arg>
       <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
-          <constructor-arg ref="esClient" />
+        <constructor-arg ref="esClient"/>
       </bean>
     </constructor-arg>
     <constructor-arg>
@@ -42,9 +40,9 @@
         <constructor-arg>
           <list>
             <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository"/>
-              <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
-                <constructor-arg ref="esClient"/>
-              </bean>
+            <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
+              <constructor-arg ref="esClient"/>
+            </bean>
           </list>
         </constructor-arg>
       </bean>
@@ -61,6 +59,5 @@
   </bean>
 
   <context:component-scan base-package="nl.vpro.api.rs.v2"/>
-
 
 </beans>
