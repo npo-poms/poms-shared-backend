@@ -36,8 +36,7 @@ import nl.vpro.domain.media.MediaObject;
     @ResponseCode(code = 500, condition = "server error")})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface MediaRestService {
-    public static final String PATH = "media";
-
+    public static final String PATH = "/media";
 
     @GET
     MediaResult list(

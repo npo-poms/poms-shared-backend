@@ -4,14 +4,23 @@
  */
 package nl.vpro.api.rs.v2.media;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.QueryParam;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.wordnik.swagger.annotations.*;
+
 import nl.vpro.api.rs.v2.exception.BadRequest;
 import nl.vpro.api.rs.v2.exception.ServerError;
+import nl.vpro.api.rs.v2.page.PageRestService;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
+import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
 
@@ -22,6 +31,7 @@ import nl.vpro.domain.media.Program;
  * @since 2.0
  */
 @Service
+@Api(value = MediaRestService.PATH, description = "The media API")
 public class MediaRestServiceImpl implements MediaRestService {
 
     private final MockMediaRestService mocks = new MockMediaRestService();
@@ -34,25 +44,41 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     }
 
+    @GET
+    @ApiOperation(value = "Get all media", notes = "Get all media filtered on an optional profile")
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public MediaResult list(
-            String profile,
-            Long offset,
-            Integer max,
-            boolean mock) {
+        @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+    ) {
         if (mock) {
             return mocks.list(profile, offset, max, true);
         }
         return find(null, profile, offset, max, mock).asResult();
     }
 
+    @POST
+    @ApiOperation(value = "Find media", notes = "Find media by posting a search form. Results are filtered on an optional profile")
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public MediaSearchResult find(
-        MediaForm form,
-        String profile,
-        Long offset,
-        Integer max,
-        boolean mock) {
+        @ApiParam(value = "Search form", required = false, defaultValue = "{\n" +
+            "   \"highlight\" : true,\n" +
+            "   \"facets\" :\n" +
+            "      {\n" +
+            "      },\n" +
+            "   \"searches\" :\n" +
+            "      {\n" +
+            "      }\n" +
+            "}") MediaForm form,
+        @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+    ) {
         if(mock) {
             return mocks.find(form, profile, offset, max, true);
         }

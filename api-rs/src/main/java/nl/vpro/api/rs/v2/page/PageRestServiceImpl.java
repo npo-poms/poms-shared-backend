@@ -6,14 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.wordnik.swagger.annotations.*;
+
 import nl.vpro.api.rs.v2.exception.ServerError;
-import nl.vpro.domain.api.PageResult;
-import nl.vpro.domain.api.PageSearchResult;
-import nl.vpro.domain.api.SearchResultItem;
-import nl.vpro.domain.api.TermFacetResultItem;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
@@ -24,9 +26,12 @@ import nl.vpro.domain.page.PageBuilder;
  * @since 2.0
  */
 @Service
+@Path(PageRestService.PATH)
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Api(value = PageRestService.PATH, description = "The pages API")
 public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
-
 
     private final PageService pageService;
 
@@ -35,7 +40,9 @@ public class PageRestServiceImpl implements PageRestService {
         this.pageService = pageService;
     }
 
-
+    @GET
+    @ApiOperation(value = "Get all pages", notes = "Get all pages filtered on an optional profile")
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public PageResult list(String profile, Long offset, Integer max, boolean mock) {
         if(mock) {
@@ -44,8 +51,29 @@ public class PageRestServiceImpl implements PageRestService {
         return find(null, profile, offset, max, mock).asResult();
     }
 
+    @POST
+    @ApiOperation(value = "Find pages", notes = "Find pages by posting a search form. Results are filtered on an optional profile")
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
-    public PageSearchResult find(PageForm form, String profile, Long offset, Integer max, boolean mock) {
+    public PageSearchResult find(
+        @ApiParam(value = "Search form", required = false, defaultValue = "{\n" +
+            "   \"highlight\" : true,\n" +
+            "   \"facets\" :\n" +
+            "      {\n" +
+            "      },\n" +
+            "   \"searches\" :\n" +
+            "      {\n" +
+            "         \"types\" :\n" +
+            "            [\n" +
+            "               \"PRODUCT\"\n" +
+            "            ]\n" +
+            "      }\n" +
+            "}") PageForm form,
+        @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+    ) {
         if(mock) {
             PageSearchResult result = new PageSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
             result.setPublisherFacetResult(Arrays.asList(new TermFacetResultItem("kro", 10)));
@@ -53,7 +81,7 @@ public class PageRestServiceImpl implements PageRestService {
         }
         try {
             return pageService.find(form, profile, offset, max);
-        } catch (Exception e) {
+        } catch(Exception e) {
             throw new ServerError(e);
         }
     }

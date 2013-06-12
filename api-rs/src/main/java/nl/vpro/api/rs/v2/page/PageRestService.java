@@ -7,6 +7,11 @@ package nl.vpro.api.rs.v2.page;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import com.wordnik.swagger.annotations.Api;
+import com.wordnik.swagger.annotations.ApiError;
+import com.wordnik.swagger.annotations.ApiErrors;
+import com.wordnik.swagger.annotations.ApiOperation;
+
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.PageResult;
 import nl.vpro.domain.api.PageSearchResult;
@@ -19,9 +24,10 @@ import nl.vpro.domain.page.Page;
  * @since 2.0
  */
 @Path(PageRestService.PATH)
+@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface PageRestService {
-    public static final String PATH = "pages";
+    public static final String PATH = "/pages";
 
 
     @GET
