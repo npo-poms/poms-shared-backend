@@ -41,6 +41,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
     @Test
     public void testList() throws Exception {
         MockHttpRequest request = MockHttpRequest.get("/pages?mock=true&max=50");
+        //request.accept(MediaType.APPLICATION_JSON);
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 

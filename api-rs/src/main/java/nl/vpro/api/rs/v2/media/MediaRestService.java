@@ -40,10 +40,10 @@ public interface MediaRestService {
 
     @GET
     MediaResult list(
-            @QueryParam("profile") String profile,
-            @QueryParam("offset") @DefaultValue("0") Long offset,
-            @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-            @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     MediaSearchResult find(

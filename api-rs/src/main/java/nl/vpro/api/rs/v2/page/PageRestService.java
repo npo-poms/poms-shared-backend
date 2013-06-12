@@ -7,6 +7,9 @@ package nl.vpro.api.rs.v2.page;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import org.codehaus.enunciate.jaxrs.ResponseCode;
+import org.codehaus.enunciate.jaxrs.StatusCodes;
+
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.PageResult;
 import nl.vpro.domain.api.PageSearchResult;
@@ -19,14 +22,16 @@ import nl.vpro.domain.page.Page;
  * @since 2.0
  */
 @Path(PageRestService.PATH)
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@StatusCodes({
+    @ResponseCode(code = 200, condition = "success"),
+    @ResponseCode(code = 400, condition = "bad request"),
+    @ResponseCode(code = 500, condition = "server error")})
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public interface PageRestService {
     public static final String PATH = "/pages";
 
 
     @GET
-    @Path("/")
     PageResult list(
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -34,7 +39,6 @@ public interface PageRestService {
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
-    @Path("/")
     PageSearchResult find(
         PageForm form,
         @QueryParam("profile") String profile,

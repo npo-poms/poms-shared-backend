@@ -27,8 +27,6 @@ import nl.vpro.domain.page.PageBuilder;
  */
 @Service
 @Path(PageRestService.PATH)
-@Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 @Api(value = PageRestService.PATH, description = "The pages API")
 public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
@@ -48,7 +46,7 @@ public class PageRestServiceImpl implements PageRestService {
         if(mock) {
             return new PageResult(mockList(listSizes, offset, max), offset, max, listSizes);
         }
-        return find(null, profile, offset, max, mock).asResult();
+         return find(null, profile, offset, max, mock).asResult();
     }
 
     @POST
