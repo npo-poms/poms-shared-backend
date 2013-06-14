@@ -14,7 +14,6 @@ import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
@@ -85,7 +84,6 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
     }
 
     @Test
-    @Ignore("Seems to fail because of a bug in jackson, which uses the parameter of the generic return type. (so now it can't marshal the error any more...)")
     public void testListExceptionJson() throws Exception {
         when(mediaService.find(isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt())).thenThrow(new RuntimeException("Er is wat misgegaan"));
 
