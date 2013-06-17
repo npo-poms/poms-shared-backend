@@ -1,8 +1,7 @@
 package nl.vpro.resteasy;
 
 import nl.vpro.domain.media.MediaObject;
-import nl.vpro.jackson.MediaMapper;
-import org.codehaus.jackson.map.ObjectMapper;
+import nl.vpro.jackson.ObjectMapper;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -15,18 +14,18 @@ import javax.ws.rs.ext.Provider;
  */
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
-public class JacksonContextResolver implements ContextResolver<ObjectMapper> {
+public class JacksonContextResolver implements ContextResolver<org.codehaus.jackson.map.ObjectMapper> {
 
     public JacksonContextResolver() throws Exception {
 
     }
 
     @Override
-    public ObjectMapper getContext(Class<?> objectType) {
+    public org.codehaus.jackson.map.ObjectMapper getContext(Class<?> objectType) {
         if (MediaObject.class.isAssignableFrom(objectType)) {
-            return MediaMapper.INSTANCE;
+            return ObjectMapper.INSTANCE;
         } else {
-            return MediaMapper.INSTANCE;
+            return ObjectMapper.INSTANCE;
         }
     }
 }
