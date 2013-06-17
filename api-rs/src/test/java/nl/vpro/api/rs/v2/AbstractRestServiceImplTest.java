@@ -1,17 +1,18 @@
 package nl.vpro.api.rs.v2;
 
-import nl.vpro.jackson.ObjectMapper;
-import nl.vpro.resteasy.JacksonContextResolver;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
 
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.junit.Before;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import java.util.HashMap;
-import java.util.Map;
+import nl.vpro.jackson.ObjectMapper;
+import nl.vpro.resteasy.JacksonContextResolver;
 
 /**
  * @author Michiel Meeuwissen
@@ -28,7 +29,7 @@ public abstract class AbstractRestServiceImplTest {
         XML = new MediaType("application", "xml", params);
     }
 
-    protected org.codehaus.jackson.map.ObjectMapper mapper;
+    protected ObjectMapper mapper;
 
 
     protected Dispatcher dispatcher = MockDispatcherFactory.createDispatcher();
