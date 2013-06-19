@@ -148,7 +148,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
 
         assertEquals("4b748d32-8006-4f0a-8aac-6d8d5c89a847", page.getPid());
         assertEquals("http://www.wetenschap24.nl/.imaging/stk/wetenschap/vtk-imagegallery-normal/media/wetenschap/noorderlicht/artikelen/2001/May/3663525/original/3663525.jpeg",
-                page.getImage().getUrl());
+                page.getImage().getImageUrl());
 
     }
 
