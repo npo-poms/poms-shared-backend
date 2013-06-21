@@ -1,9 +1,14 @@
 package nl.vpro.api.rs.v2.profile;
 
-import nl.vpro.api.profile.ProfileService;
-import nl.vpro.api.profile.ProfileServiceImpl;
-import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
-import nl.vpro.domain.api.profile.Profile;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBException;
+
 import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
@@ -13,13 +18,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.xml.sax.SAXException;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBException;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Arrays;
-import java.util.Collection;
+import nl.vpro.api.profile.ProfileService;
+import nl.vpro.api.profile.ProfileServiceImpl;
+import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
+import nl.vpro.domain.api.profile.Profile;
 
 import static org.junit.Assert.*;
 
@@ -40,7 +42,7 @@ public class ProfileRestServiceImplTest extends AbstractRestServiceImplTest {
     @BeforeClass
     public static void setupProfileService() throws JAXBException, IOException, SAXException {
         // not really needed to mock, we have a real profile service
-        profileService = new ProfileServiceImpl("geschiedenis");
+        profileService = new ProfileServiceImpl();
     }
 
     @Parameterized.Parameters
