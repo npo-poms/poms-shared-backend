@@ -28,7 +28,7 @@
 
   <bean class="nl.vpro.domain.api.media.MediaRepositoryImpl">
     <constructor-arg>
-      <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository"/>
+      <bean class="nl.vpro.domain.api.media.CouchdbMediaRepositoryImpl"/>
     </constructor-arg>
     <constructor-arg>
       <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
@@ -39,7 +39,7 @@
       <bean class="nl.vpro.domain.api.media.FallbackMediaRepositoryImpl">
         <constructor-arg>
           <list>
-            <bean class="nl.vpro.domain.api.media.CouchdbMediaRepository"/>
+            <bean class="nl.vpro.domain.api.media.CouchdbMediaRepositoryImpl"/>
             <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
               <constructor-arg ref="esClient"/>
             </bean>
