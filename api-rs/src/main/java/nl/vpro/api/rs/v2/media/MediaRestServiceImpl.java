@@ -11,6 +11,8 @@ import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
@@ -62,11 +64,16 @@ public class MediaRestServiceImpl implements MediaRestService {
         return find(null, profile, offset, max, mock).asResult();
     }
 
+    @ApiOperation(httpMethod = "get", value = "Retrieve changes", notes = "Retrieve all media changes since a certain update sequence.\n" +
+        "By submitting an optional profile argument only changes for this argument are omitted.")
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
+    @GET
+    @Path("/changes")
     public void changes(
-        @QueryParam("profile") String profile,
-        @QueryParam("since") Long since,
-        @QueryParam("max") Integer max,
+        @ApiParam @QueryParam("profile") String profile,
+        @ApiParam @QueryParam("since") Long since,
+        @ApiParam(defaultValue = "10") @QueryParam("max") Integer max,
         @Context HttpServletRequest request,
         @Context HttpServletResponse response) throws IOException {
 
