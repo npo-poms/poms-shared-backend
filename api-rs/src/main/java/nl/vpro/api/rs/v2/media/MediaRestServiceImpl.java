@@ -4,9 +4,18 @@
  */
 package nl.vpro.api.rs.v2.media;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 
+import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +27,7 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.jackson.ObjectMapper;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -52,6 +62,34 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.list(profile, offset, max, true);
         }
         return find(null, profile, offset, max, mock).asResult();
+    }
+
+    @Override
+    public void changes(
+        @QueryParam("profile") String profile,
+        @QueryParam("since") Long since,
+        @QueryParam("max") Integer max,
+        @Context HttpServletRequest request,
+        @Context HttpServletResponse response) throws IOException {
+
+        if(true) { // TODO mock
+            response.setContentType("application/json");
+            PrintWriter writer = response.getWriter();
+            writer.write("{\"changes\": [\n");
+            Iterator<Change> changes = mediaService.changes(profile, since, max);
+            boolean first = true;
+            while(changes.hasNext()) {
+                if(!first) {
+                    writer.write(",\n");
+                } else {
+                    first = false;
+                }
+                Change change = changes.next();
+                writer.write(ObjectMapper.INSTANCE.writeValueAsString(change));
+            }
+            writer.write("\n]}");
+            writer.close();
+        }
     }
 
     @ApiOperation(httpMethod = "post", value = "Find media", notes = "Find media by posting a search form. Results are filtered on an optional profile")

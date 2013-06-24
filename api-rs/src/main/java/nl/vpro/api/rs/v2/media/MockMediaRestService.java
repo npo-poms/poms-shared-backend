@@ -1,6 +1,12 @@
 package nl.vpro.api.rs.v2.media;
 
+import java.io.IOException;
 import java.util.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
@@ -21,6 +27,11 @@ class MockMediaRestService implements MediaRestService {
         List<MediaObject> list = mockList(listSizes, offset, max);
         MediaResult result = new MediaResult(list, offset, max, listSizes);
         return result;
+    }
+
+    @Override
+    public void changes(String profile, Long since, Integer max, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // TODO
     }
 
     @Override

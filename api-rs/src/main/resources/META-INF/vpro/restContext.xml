@@ -8,47 +8,26 @@
 
   <bean class="nl.vpro.resteasy.JacksonContextResolver"/>
 
-  <!-- Create an ElasticSearch client with a nice factory bean -->
-  <bean id="myESClientFactory" class="nl.vpro.elasticsearch.ESClientFactory">
-    <property name="transportAddresses">
-      <list>
-        <bean class="nl.vpro.api.util.UrlProvider">
-          <constructor-arg name="host" value="${elasticSearch.host}"/>
-          <constructor-arg name="port" value="${elasticSearch.port}"/>
-        </bean>
-      </list>
-    </property>
-    <property name="sniffCluster" value="false"/>
-    <property name="clusterName" value="${elasticSearch.cluster}"/>
-  </bean>
-
-  <bean id="esClient" class="org.elasticsearch.client.Client" factory-bean="myESClientFactory"
-        factory-method="buildClient"/>
-
-
-  <bean class="nl.vpro.domain.api.media.MediaRepositoryImpl">
-    <constructor-arg>
-      <bean class="nl.vpro.domain.api.media.CouchdbMediaRepositoryImpl"/>
-    </constructor-arg>
-    <constructor-arg>
-      <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
-        <constructor-arg ref="esClient"/>
-      </bean>
-    </constructor-arg>
+  <bean id="mainMediaRepository" class="nl.vpro.domain.api.media.MediaRepositoryImpl">
+    <constructor-arg ref="couchdbMediaRepository"/>
+    <constructor-arg ref="elasticMediaRepository"/>
     <constructor-arg>
       <bean class="nl.vpro.domain.api.media.FallbackMediaRepositoryImpl">
         <constructor-arg>
           <list>
-            <bean class="nl.vpro.domain.api.media.CouchdbMediaRepositoryImpl"/>
-            <bean class="nl.vpro.domain.api.media.ElasticMediaRepository">
-              <constructor-arg ref="esClient"/>
-            </bean>
+            <ref bean="couchdbMediaRepository"/>
+            <ref bean="elasticMediaRepository"/>
           </list>
         </constructor-arg>
       </bean>
     </constructor-arg>
   </bean>
 
+  <bean id="mediaService" class="nl.vpro.domain.api.media.MediaServiceImpl">
+    <constructor-arg ref="profileService"/>
+    <constructor-arg ref="mainMediaRepository"/>
+    <constructor-arg ref="couchdbMediaRepository"/>
+  </bean>
   <context:component-scan base-package="nl.vpro.api">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
   </context:component-scan>

@@ -4,7 +4,12 @@
  */
 package nl.vpro.api.rs.v2.media;
 
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.codehaus.enunciate.jaxrs.ResponseCode;
@@ -44,6 +49,15 @@ public interface MediaRestService {
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
+
+    @GET
+    @Path("/changes")
+    void changes(
+        @QueryParam("profile") String profile,
+        @QueryParam("since") Long since,
+        @QueryParam("max") Integer max,
+        @Context HttpServletRequest request,
+        @Context HttpServletResponse response) throws IOException;
 
     @POST
     MediaSearchResult find(
@@ -110,11 +124,11 @@ public interface MediaRestService {
     @GET
     @Path("/{id}/episodes")
     ProgramResult listEpisodes(
-            @PathParam("id") String id,
-            @QueryParam("profile") String profile,
-            @QueryParam("offset") @DefaultValue("0") Long offset,
-            @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-            @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @PathParam("id") String id,
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * @param id      existing urn or mid
