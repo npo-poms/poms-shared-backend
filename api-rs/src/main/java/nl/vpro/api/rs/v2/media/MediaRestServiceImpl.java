@@ -50,7 +50,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @ApiOperation(httpMethod = "get", value = "Get all media", notes = "Get all media filtered on an optional profile")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     public MediaResult list(
         @ApiParam(required = false) @QueryParam("profile") String profile,
@@ -66,7 +66,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "get", value = "Retrieve changes", notes = "Retrieve all media changes since a certain update sequence.\n" +
         "By submitting an optional profile argument only changes for this argument are omitted.")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     @GET
     @Path("/changes")
@@ -98,7 +98,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @ApiOperation(httpMethod = "post", value = "Find media", notes = "Find media by posting a search form. Results are filtered on an optional profile")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     public MediaSearchResult find(
         @ApiParam(value = "Search form", required = false, defaultValue = "{\n" +
