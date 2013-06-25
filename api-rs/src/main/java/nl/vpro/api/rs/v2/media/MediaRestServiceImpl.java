@@ -77,7 +77,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @Context HttpServletRequest request,
         @Context HttpServletResponse response) throws IOException {
 
-        if(true) { // TODO mock
+        if(true) { // TODO xml / mock
             response.setContentType("application/json");
             PrintWriter writer = response.getWriter();
             writer.write("{\"changes\": [\n");
