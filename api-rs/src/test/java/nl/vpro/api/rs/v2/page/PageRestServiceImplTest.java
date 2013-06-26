@@ -192,5 +192,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
 
 //        Assertions.assertThat(response.getContentAsString()).isEqualTo(expected);
 
+        Diff diff = XMLUnit.compareXML(expected, response.getContentAsString());
+        assertTrue(diff.toString() + " " + response.getContentAsString(), diff.similar());
     }
 }
