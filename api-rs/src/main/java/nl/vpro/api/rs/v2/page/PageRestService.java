@@ -30,7 +30,6 @@ import nl.vpro.domain.page.Page;
 public interface PageRestService {
     public static final String PATH = "/pages";
 
-
     @GET
     PageResult list(
         @QueryParam("profile") String profile,
@@ -45,18 +44,5 @@ public interface PageRestService {
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
-
-    /**
-     * Retrieves a page by it's id.
-     *
-     * @param id   existing id for a page
-     * @param mock whether to return a mock object
-     */
-    @GET
-    @Path("/{id}")
-    Page load(
-        @PathParam("id") String id,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
-
 
 }

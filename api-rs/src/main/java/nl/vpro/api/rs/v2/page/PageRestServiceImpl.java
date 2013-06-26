@@ -30,6 +30,18 @@ import nl.vpro.domain.page.PageBuilder;
 public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
 
+    private static final String DEMO_FORM = "{\n" +
+        "   \"highlight\" : true,\n" +
+        "   \"searches\" :\n" +
+        "      {\n" +
+        "         \"text\" : \"Tegenlicht\",\n" +
+        "         \"types\" :\n" +
+        "            [\n" +
+        "               \"ARTICLE\"\n" +
+        "            ]\n" +
+        "      }\n" +
+        "}";
+
     private final PageService pageService;
 
     @Autowired
@@ -51,19 +63,7 @@ public class PageRestServiceImpl implements PageRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
     public PageSearchResult find(
-        @ApiParam(value = "Search form", required = false, defaultValue = "{\n" +
-            "   \"highlight\" : true,\n" +
-            "   \"facets\" :\n" +
-            "      {\n" +
-            "      },\n" +
-            "   \"searches\" :\n" +
-            "      {\n" +
-            "         \"types\" :\n" +
-            "            [\n" +
-            "               \"PRODUCT\"\n" +
-            "            ]\n" +
-            "      }\n" +
-            "}") PageForm form,
+        @ApiParam(value = "Search form", required = false, defaultValue = DEMO_FORM) PageForm form,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -79,14 +79,6 @@ public class PageRestServiceImpl implements PageRestService {
         } catch(Exception e) {
             throw new ServerError(e);
         }
-    }
-
-    @Override
-    public Page load(String id, boolean mock) {
-        if(mock) {
-            return mockPage();
-        }
-        return pageService.load(id);
     }
 
     protected List<? extends Page> mockList(long total, long offset, int limit) {
