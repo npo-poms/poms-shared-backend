@@ -7,7 +7,7 @@ package nl.vpro.api.rs.v2.profile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import nl.vpro.api.profile.ProfileService;
+import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.Profile;
 
 /**

@@ -18,8 +18,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.xml.sax.SAXException;
 
-import nl.vpro.api.profile.ProfileService;
-import nl.vpro.api.profile.ProfileServiceImpl;
+import nl.vpro.domain.api.profile.ProfileService;
+import nl.vpro.domain.api.profile.ProfileServiceImpl;
 import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.profile.Profile;
 
