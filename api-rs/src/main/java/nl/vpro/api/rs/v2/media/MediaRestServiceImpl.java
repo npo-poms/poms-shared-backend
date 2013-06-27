@@ -65,7 +65,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @ApiOperation(httpMethod = "get", value = "Retrieve changes", notes = "Retrieve all media changes since a certain update sequence.\n" +
-        "By submitting an optional profile argument only changes for this argument are omitted.")
+            "By submitting an optional profile argument only changes for this argument are omitted.")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     @GET
