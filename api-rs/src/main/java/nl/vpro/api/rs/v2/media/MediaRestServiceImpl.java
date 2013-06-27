@@ -71,17 +71,20 @@ public class MediaRestServiceImpl implements MediaRestService {
     @GET
     @Path("/changes")
     public void changes(
-        @ApiParam @QueryParam("profile") String profile,
-        @ApiParam @QueryParam("since") Long since,
-        @ApiParam(defaultValue = "10") @QueryParam("max") Integer max,
+        @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam(required = false) @QueryParam("since") Long since,
+        @ApiParam(defaultValue = "asc", required = false) @QueryParam("order") @DefaultValue("asc") String sOrder,
+        @ApiParam(defaultValue = "10", required = false) @QueryParam("max") Integer max,
         @Context HttpServletRequest request,
         @Context HttpServletResponse response) throws IOException {
+
+        Order order = Order.valueOf(sOrder.toUpperCase());
 
         if(true) { // TODO xml / mock
             response.setContentType("application/json");
             PrintWriter writer = response.getWriter();
             writer.write("{\"changes\": [\n");
-            Iterator<Change> changes = mediaService.changes(profile, since, max);
+            Iterator<Change> changes = mediaService.changes(profile, since, order, max);
             boolean first = true;
             while(changes.hasNext()) {
                 if(!first) {

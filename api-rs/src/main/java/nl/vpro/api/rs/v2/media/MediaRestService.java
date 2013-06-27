@@ -15,6 +15,11 @@ import javax.ws.rs.core.MediaType;
 import org.codehaus.enunciate.jaxrs.ResponseCode;
 import org.codehaus.enunciate.jaxrs.StatusCodes;
 
+import com.wordnik.swagger.annotations.ApiError;
+import com.wordnik.swagger.annotations.ApiErrors;
+import com.wordnik.swagger.annotations.ApiOperation;
+import com.wordnik.swagger.annotations.ApiParam;
+
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.media.MediaObject;
@@ -55,6 +60,7 @@ public interface MediaRestService {
     void changes(
         @QueryParam("profile") String profile,
         @QueryParam("since") Long since,
+        @QueryParam("order") @DefaultValue("asc") String order,
         @QueryParam("max") Integer max,
         @Context HttpServletRequest request,
         @Context HttpServletResponse response) throws IOException;
