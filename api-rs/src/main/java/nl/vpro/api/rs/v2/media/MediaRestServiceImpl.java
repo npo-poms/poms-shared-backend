@@ -66,10 +66,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     public MediaResult list(
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+            @ApiParam(required = false) @QueryParam("profile") String profile,
+            @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
+            @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+            @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
             return mocks.list(profile, offset, max, true);
@@ -86,12 +86,12 @@ public class MediaRestServiceImpl implements MediaRestService {
     @GET
     @Path("/changes")
     public void changes(
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(required = false) @QueryParam("since") Long since,
-        @ApiParam(defaultValue = "asc", required = false) @QueryParam("order") @DefaultValue("asc") String sOrder,
-        @ApiParam(defaultValue = "10", required = false) @QueryParam("max") Integer max,
-        @Context HttpServletRequest request,
-        @Context HttpServletResponse response) throws IOException {
+            @ApiParam(required = false) @QueryParam("profile") String profile,
+            @ApiParam(required = false) @QueryParam("since") Long since,
+            @ApiParam(defaultValue = "asc", required = false) @QueryParam("order") @DefaultValue("asc") String sOrder,
+            @ApiParam(defaultValue = "10", required = false) @QueryParam("max") Integer max,
+            @Context HttpServletRequest request,
+            @Context HttpServletResponse response) throws IOException {
 
         Order order = Order.valueOf(sOrder.toUpperCase());
 
@@ -121,11 +121,11 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     public MediaSearchResult find(
-        @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+            @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
+            @ApiParam(required = false) @QueryParam("profile") String profile,
+            @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
+            @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+            @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
             return mocks.find(form, profile, offset, max, true);
@@ -141,6 +141,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             value = "Load media",
             notes = "Load one media object by id. The media id is the Media object's URN")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}")
     @Override
     public MediaObject load(
             @ApiParam(required = true) @QueryParam("id") String id,
@@ -164,6 +165,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             value = "Load members",
             notes = "Load all members of a certain media object. Often the media object would be a group.")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/members")
     @Override
     public MediaResult listMembers(
             @ApiParam(required = true) @QueryParam("id") String id,
@@ -180,6 +182,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             notes = "Search in the members of a media object"
     )
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/members")
     @Override
     public MediaSearchResult findMembers(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
@@ -203,6 +206,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             value = "List episodes",
             notes = "List the episodes of a media group")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/episodes")
     @Override
     public ProgramResult listEpisodes(
             @ApiParam(required = true) @QueryParam("id") String id,
@@ -221,6 +225,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             value = "Find eposides",
             notes = "Search in the episodes of the media group")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/episodes")
     @Override
     public ProgramSearchResult findEpisodes(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
@@ -245,6 +250,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             value = "List descendants",
             notes = "List all descendants of a certain media group. That means all its members and all the members of those and so on")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/descendants")
     @Override
     public MediaResult listDescendants(
             @ApiParam(required = true) @QueryParam("id") String id,
@@ -261,8 +267,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "post",
             value = "Find descendants",
-            notes = "Search in all descendants of a certain media gorup")
+            notes = "Search in all descendants of a certain media group")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/descendants")
     @Override
     public MediaSearchResult findDescendants(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
@@ -288,6 +295,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             value = "List related",
             notes = "List all media objects that are related to another one.")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/related")
     @Override
     public MediaResult listRelated(
             @ApiParam(required = true) @QueryParam("id") String id,
@@ -306,6 +314,8 @@ public class MediaRestServiceImpl implements MediaRestService {
             value = "Find related",
             notes = "Search in all media objects that are related to another one."
     )
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @Path("/{id}/related")
     @Override
     public MediaSearchResult findRelated(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
