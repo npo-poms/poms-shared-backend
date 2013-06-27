@@ -39,16 +39,15 @@ import nl.vpro.jackson.ObjectMapper;
 @Api(value = MediaRestService.PATH, description = "The media API")
 public class MediaRestServiceImpl implements MediaRestService {
 
-    private static final String DEFAULT_FORM = "{\n" +
-            "\" +\n" +
-            "                    \"   \\\"highlight\\\" : true,\\n\" +\n" +
-            "                    \"   \\\"facets\\\" :\\n\" +\n" +
-            "                    \"      {\\n\" +\n" +
-            "                    \"      },\\n\" +\n" +
-            "                    \"   \\\"searches\\\" :\\n\" +\n" +
-            "                    \"      {\\n\" +\n" +
-            "                    \"      }\\n\" +\n" +
-            "                    \"}";
+    private static final String
+            DEFAULT_FORM =
+            "{\n" +
+                    "   \"highlight\" : true,\n" +
+                    "   \"facets\" :\n"  +
+                    "      {\n},\n" +
+                    "   \"searches\" :\n" +
+                    "      {\n},\n" +
+                    "}";
 
     private final MockMediaRestService mocks = new MockMediaRestService();
 
