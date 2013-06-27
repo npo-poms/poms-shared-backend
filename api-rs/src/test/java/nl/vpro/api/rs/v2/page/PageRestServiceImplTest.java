@@ -5,12 +5,8 @@ import java.io.StringReader;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBContext;
 
 import org.codehaus.jackson.type.TypeReference;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.fest.assertions.Assertions;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
@@ -23,8 +19,6 @@ import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -134,7 +128,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
 
 
     }
-
+/* get calls were dropped
     @Test
     public void testGet() throws Exception {
         MockHttpRequest request = MockHttpRequest.get("/pages/123?mock=true");
@@ -194,5 +188,5 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
 
         Diff diff = XMLUnit.compareXML(expected, response.getContentAsString());
         assertTrue(diff.toString() + " " + response.getContentAsString(), diff.similar());
-    }
+    }*/
 }
