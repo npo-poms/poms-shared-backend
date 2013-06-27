@@ -5,7 +5,7 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.core.Context;
 
 import nl.vpro.domain.api.*;
@@ -30,7 +30,7 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public void changes(String profile, Long since, Integer max, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void changes(String profile, Long since, @DefaultValue("asc") String order, Integer max, @Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
         // TODO
     }
 
