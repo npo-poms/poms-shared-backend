@@ -5,16 +5,20 @@ package nl.vpro.api.cors;
  * Date: 01-05-2012
  */
 
-import nl.vpro.api.rs.v2.media.MediaRestService;
-import nl.vpro.api.rs.v2.page.PageRestService;
-import nl.vpro.api.rs.v2.profile.ProfileRestService;
-import org.springframework.stereotype.Controller;
-
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.Path;
 
+import org.springframework.stereotype.Controller;
+
+import com.wordnik.swagger.annotations.Api;
+
+import nl.vpro.api.rs.v2.media.MediaRestService;
+import nl.vpro.api.rs.v2.page.PageRestService;
+import nl.vpro.api.rs.v2.profile.ProfileRestService;
+
 @Controller
 @Path(OptionsController.PATH)
+@Api(value = PageRestService.PATH, description = "Cors -controller")
 public class OptionsController {
 
     /**
