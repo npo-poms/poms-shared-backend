@@ -14,12 +14,13 @@ import org.springframework.stereotype.Service;
 
 import com.wordnik.swagger.annotations.*;
 
-import nl.vpro.api.rs.v2.exception.ServerError;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
 import nl.vpro.domain.page.PageBuilder;
+
+import static nl.vpro.api.rs.v2.Util.exception;
 
 /**
  * @author Michiel Meeuwissen
@@ -50,7 +51,7 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
     @ApiOperation(httpMethod = "get", value = "Get all pages", notes = "Get all pages filtered on an optional profile")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     public PageResult list(
         @ApiParam(required = false) @QueryParam("profile") String profile,
@@ -61,11 +62,15 @@ public class PageRestServiceImpl implements PageRestService {
         if(mock) {
             return new PageResult(mockList(listSizes, offset, max), offset, max, listSizes);
         }
-        return find(null, profile, offset, max, mock).asResult();
+        try {
+            return find(null, profile, offset, max, mock).asResult();
+        } catch(Exception e) {
+            throw exception(e);
+        }
     }
 
     @ApiOperation(httpMethod = "post", value = "Find pages", notes = "Find pages by posting a search form. Results are filtered on an optional profile")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     public PageSearchResult find(
         @ApiParam(value = "Search form", required = false, defaultValue = DEMO_FORM) PageForm form,
@@ -82,7 +87,7 @@ public class PageRestServiceImpl implements PageRestService {
         try {
             return pageService.find(form, profile, offset, max);
         } catch(Exception e) {
-            throw new ServerError(e);
+            throw exception(e);
         }
     }
 

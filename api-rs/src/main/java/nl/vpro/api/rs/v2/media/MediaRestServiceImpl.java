@@ -29,6 +29,8 @@ import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.jackson.ObjectMapper;
 
+import static nl.vpro.api.rs.v2.Util.exception;
+
 /**
  * See https://jira.vpro.nl/browse/API-92
  *
@@ -130,7 +132,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             return mediaService.find(profile, form, offset, max);
         } catch(Exception e) {
-            throw new ServerError(e);
+            throw exception(e);
         }
     }
 
@@ -150,7 +152,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             mediaObject = mediaService.load(id);
         } catch(Exception e) {
-            throw new ServerError(e);
+            throw exception(e);
         }
         if(mediaObject == null) {
             throw new BadRequest("No media for id " + id);
@@ -172,6 +174,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         return findMembers(null, id, profile, offset, max, mock).asResult();
+
     }
 
     @ApiOperation(httpMethod = "post",
@@ -195,7 +198,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             return mediaService.findMembers(id, profile, form, offset, max);
         } catch(Exception e) {
-            throw new ServerError(e);
+            throw exception(e);
         }
     }
 
@@ -238,7 +241,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             return mediaService.findEpisodes(id, profile, form, offset, max);
         } catch(Exception e) {
-            throw new ServerError(e);
+            throw exception(e);
         }
 
     }
@@ -282,7 +285,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             return mediaService.findDescendants(id, profile, form, offset, max);
         } catch(Exception e) {
-            throw new ServerError(e);
+            throw exception(e);
         }
 
 
@@ -328,7 +331,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             return mediaService.findRelated(id, profile, form, offset, max);
         } catch(Exception e) {
-            throw new ServerError(e);
+            throw exception(e);
         }
     }
 }
