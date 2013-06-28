@@ -52,7 +52,12 @@ public class PageRestServiceImpl implements PageRestService {
     @ApiOperation(httpMethod = "get", value = "Get all pages", notes = "Get all pages filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 404, reason = "Server error")})
     @Override
-    public PageResult list(String profile, Long offset, Integer max, boolean mock) {
+    public PageResult list(
+        @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+    ) {
         if(mock) {
             return new PageResult(mockList(listSizes, offset, max), offset, max, listSizes);
         }
