@@ -22,59 +22,22 @@
       <artifactId>enunciate-core-annotations</artifactId>
       <version>1.26.2</version>
     </dependency>
-
     <dependency>
       <groupId>nl.vpro.api</groupId>
-      <artifactId>api-domain</artifactId>
+      <artifactId>api-backend</artifactId>
     </dependency>
-<!--
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-domain</artifactId>
-      <classifier>sources</classifier>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
--->
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-media</artifactId>
     </dependency>
-<!--
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-media</artifactId>
-      <classifier>sources</classifier>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
--->
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-pages</artifactId>
     </dependency>
-<!--
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-pages</artifactId>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
-    </dependency>
--->
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-profiles</artifactId>
     </dependency>
-
-  <!--  <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-profiles</artifactId>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
-      <version>${project.version}</version>
-    </dependency>
--->
-
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-backend-elasticsearch</artifactId>
@@ -83,7 +46,6 @@
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-backend-couchdb</artifactId>
     </dependency>
-
     <dependency>
       <groupId>nl.vpro.media</groupId>
       <artifactId>media-domain</artifactId>
