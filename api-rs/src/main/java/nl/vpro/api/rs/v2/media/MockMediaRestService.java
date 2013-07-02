@@ -37,10 +37,10 @@ class MockMediaRestService implements MediaRestService {
     @Override
     public MediaSearchResult find(MediaForm form, String profile, Long offset, Integer max, boolean mock) {
         List<SearchResultItem<? extends MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
-        MediaSearchResult result = new MediaSearchResult(list, offset, max, listSizes);
-        result.setBroadcasterFacetResult(Arrays.asList(new TermFacetResultItem("vpro", 100)));
-        result.setSortDateFacetResult(Arrays.asList(new DateFacetResultItem(new Date(0), new Date(), 100)));
-        return result;
+        MediaFacetsResult facetsResult = new MediaFacetsResult();
+        facetsResult.setBroadcasterFacetResult(Arrays.asList(new TermFacetResultItem("vpro", 100)));
+        facetsResult.setSortDateFacetResult(Arrays.asList(new DateFacetResultItem(new Date(0), new Date(), 100)));
+        return new MediaSearchResult(list, facetsResult, offset, max, listSizes);
     }
 
     @Override

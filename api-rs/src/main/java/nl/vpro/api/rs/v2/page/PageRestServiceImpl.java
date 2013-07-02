@@ -81,7 +81,9 @@ public class PageRestServiceImpl implements PageRestService {
     ) {
         if(mock) {
             PageSearchResult result = new PageSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
-            result.setBroadcasterFacetResult(Arrays.asList(new TermFacetResultItem("kro", 10)));
+            PageFacetsResult facets= new PageFacetsResult();
+            facets.setBroadcasterFacetResult(Arrays.asList(new TermFacetResultItem("kro", 10)));
+            result.setFacets(facets);
             return result;
         }
         try {
