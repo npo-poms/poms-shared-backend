@@ -196,6 +196,8 @@ public class MediaServiceImpl implements MediaService {
 
         if (avType != null) queryBuilder.must(QueryBuilders.termQuery("avType", avType.name().toLowerCase()));
 
+        queryBuilder.must(QueryBuilders.prefixQuery("locations.urn", "urn")); // Only return media with at least one location
+
         sourceBuilder.query(queryBuilder);
 
         sourceBuilder.sort("sortDate", SortOrder.DESC);
