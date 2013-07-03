@@ -25,7 +25,7 @@ public interface MediaRestService {
 
     @GET
     @Path("program/{urn}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public Program getProgram(@PathParam("urn") String urn);
 
     /**
@@ -39,22 +39,22 @@ public interface MediaRestService {
      */
     @GET
     @Path("program/{urn}/related")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public List<MediaObject> relatedForProgram(@PathParam("urn") String programUrn, @QueryParam("profile") String profile, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     @GET
     @Path("program/replay")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType);
 
     @GET
     @Path("program/replay/all")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public MediaSearchResultItemIterator getAllReplayableProgram(@QueryParam("type") String avType);
 
     @GET
     @Path("program/{urn}/annotations")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public Annotations getAnnotationsForProgram(@PathParam("urn") String urn);
 
     /**
@@ -68,7 +68,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("group/{urn}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public Group getGroup(
             @PathParam("urn") String urn,
             @QueryParam("members") @DefaultValue("false") boolean addMembers,
@@ -88,12 +88,12 @@ public interface MediaRestService {
      */
     @GET
     @Path("segment/{urn}/related")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public List<MediaObject> relatedForSegment(@PathParam("urn") String groupUrn, @QueryParam("profile") String profile, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     @GET
     @Path("segment/{urn}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public Segment getSegment(@PathParam("urn") String urn) throws ServerErrorException, NotFoundException;
 
     /**
@@ -107,7 +107,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("group/{urn}/related")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public List<MediaObject> relatedForGroup(@PathParam("urn") String groupUrn, @QueryParam("profile") String profile, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     /**
@@ -118,7 +118,7 @@ public interface MediaRestService {
      */
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public List<MediaObject> getMediaObjects(@FormParam("urn") List<String> urns);
 
     /**
@@ -132,7 +132,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("search")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public MediaSearchResult search(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
     /**
@@ -144,7 +144,7 @@ public interface MediaRestService {
 
     @GET
     @Path("search/{profile}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF-8")
     public MediaSearchResult searchWithProfile(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("tags") String tags, @QueryParam("offset") Integer offset, @QueryParam("max") Integer maxResult);
 
 
@@ -155,7 +155,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("get/{profile}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public MediaSearchResultItemIterator getProfile(@PathParam("profile") String profileName);
 
     /**
@@ -168,7 +168,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("search/suggest")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public SearchSuggestions searchSuggestions(@QueryParam("q") String termPrefix, @QueryParam("tags") String tags);
 
     /**
@@ -178,7 +178,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("search/suggest/{profile}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public SearchSuggestions searchSuggestionsWithProfile(@QueryParam("q") String queryString, @QueryParam("tags") String tags, @PathParam("profile") String profileName);
 
     /**
@@ -194,13 +194,13 @@ public interface MediaRestService {
     @POST
     @Path("search/es/{index}")
     @Deprecated
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public String searchES(@PathParam("index") String index, @FormParam("query") String query, @FormParam("documentTypes") String typesAsString);
 
     /*
     @GET
     @Path("program/{urn}/subtitles")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public Subtitle searchSubtitles(@PathParam("urn") String urn,
                                     @QueryParam("q") String term);
 */

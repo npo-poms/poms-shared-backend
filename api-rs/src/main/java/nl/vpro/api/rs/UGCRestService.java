@@ -10,6 +10,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
  * User: rico
@@ -22,12 +23,12 @@ public interface UGCRestService {
 
     @GET
     @Path("annotation/{urn}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
     public Annotation getAnnotation(@PathParam("urn") String id);
 
     @GET
     @Path("annotation/bypart/{urn}")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
     public Annotation getAnnotationByPart(@PathParam("urn") String id);
 
 }

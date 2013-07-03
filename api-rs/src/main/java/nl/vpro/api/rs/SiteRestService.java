@@ -22,29 +22,29 @@ public interface SiteRestService {
 
     @GET
     @Path("{profile}/view")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
     public GenericSearchResult view(@PathParam("profile") String profileName,  @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("max") Integer maxResult, @QueryParam("constraints") List<String> constraints, @QueryParam("facets") List<String> facets, @QueryParam("order") List<String> sortFields);
 
     @GET
     @Path("{profile}/search")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
     public GenericSearchResult search(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("offset") @DefaultValue("0") Integer offset, @QueryParam("max") Integer maxResult, @QueryParam("constraints") List<String> constraints, @QueryParam("facets") List<String> facets,@QueryParam("order") List<String> sortFields,  @QueryParam("response") String response);
 
 
     @GET
     @Path("{profile}/search/suggest")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
     public SearchSuggestions searchSuggestions(@PathParam("profile") String profileName, @QueryParam("q") String queryString, @QueryParam("constraints") List<String> constraints);
 
     @POST
     @Path("{profile}/search")
     @Consumes("application/json")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
     public GenericSearchResult search(@PathParam("profile") String profileName, SearchQuery searchQuery);
 
     @POST
     @Path("{profile}/search")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
     public GenericSearchResult search(@PathParam("profile") String profileName, @FormParam("query") String searchQueryAsJson);
 }

@@ -17,7 +17,7 @@ public interface DisqusRestService {
 
     @GET
     @Path("details/{sitename}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
     public Map<String, DisqusThreadInfo> getDetails(@PathParam("sitename") String siteName, @QueryParam("id") String... ids);
 
 
