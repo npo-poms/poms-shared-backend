@@ -47,15 +47,6 @@
 
   <bean id="jacksonHttpMessageConverter"
         class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
-    <property name="supportedMediaTypes">
-      <list>
-        <bean class="org.springframework.http.MediaType">
-          <constructor-arg index="0" value="application"/>
-          <constructor-arg index="1" value="json"/>
-        </bean>
-      </list>
-    </property>
-
     <property name="objectMapper">
       <bean class="nl.vpro.jackson.MediaMapper"/>
     </property>
