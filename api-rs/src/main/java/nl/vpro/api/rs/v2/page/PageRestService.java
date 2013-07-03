@@ -4,17 +4,15 @@
  */
 package nl.vpro.api.rs.v2.page;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-
-import org.codehaus.enunciate.jaxrs.ResponseCode;
-import org.codehaus.enunciate.jaxrs.StatusCodes;
-
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.PageResult;
 import nl.vpro.domain.api.PageSearchResult;
 import nl.vpro.domain.api.page.PageForm;
-import nl.vpro.domain.page.Page;
+import org.codehaus.enunciate.jaxrs.ResponseCode;
+import org.codehaus.enunciate.jaxrs.StatusCodes;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -26,7 +24,7 @@ import nl.vpro.domain.page.Page;
     @ResponseCode(code = 200, condition = "success"),
     @ResponseCode(code = 400, condition = "bad request"),
     @ResponseCode(code = 500, condition = "server error")})
-@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@Produces({MediaType.APPLICATION_JSON + "; charset=UTF-8", MediaType.APPLICATION_XML + "; charset=UTF-8"})
 public interface PageRestService {
     public static final String PATH = "/pages";
 
