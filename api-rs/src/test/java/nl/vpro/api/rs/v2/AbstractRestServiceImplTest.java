@@ -24,9 +24,8 @@ public abstract class AbstractRestServiceImplTest {
     public static final MediaType XML;
 
     static {
-        Map<String, String> params = new HashMap<>();
-        JSON = new MediaType("application", "json", params);
-        XML = new MediaType("application", "xml", params);
+        JSON = new MediaType("application", "json", "utf-8");
+        XML = new MediaType("application", "xml", "utf-8");
     }
 
     protected ObjectMapper mapper;

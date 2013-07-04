@@ -44,7 +44,7 @@ import nl.vpro.domain.media.MediaObject;
     @ResponseCode(code = 200, condition = "success"),
     @ResponseCode(code = 400, condition = "bad request"),
     @ResponseCode(code = 500, condition = "server error")})
-@Produces({MediaType.APPLICATION_JSON + "; charset=UTF-8", MediaType.APPLICATION_XML + "; charset=UTF-8"})
+@Produces({MediaType.APPLICATION_JSON + "; charset=utf-8", MediaType.APPLICATION_XML + "; charset=utf-8"})
 public interface MediaRestService {
     public static final String PATH = "/media";
 
