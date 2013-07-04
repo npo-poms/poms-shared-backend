@@ -10,10 +10,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +19,6 @@ import org.springframework.stereotype.Service;
 import com.wordnik.swagger.annotations.*;
 
 import nl.vpro.api.rs.v2.exception.BadRequest;
-import nl.vpro.api.rs.v2.exception.ServerError;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
@@ -143,7 +139,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}")
     @Override
     public MediaObject load(
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock) {
         if(mock) {
             return mocks.load(id, true);
@@ -167,7 +163,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/members")
     @Override
     public MediaResult listMembers(
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -186,7 +182,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findMembers(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -209,7 +205,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/episodes")
     @Override
     public ProgramResult listEpisodes(
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -229,7 +225,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public ProgramSearchResult findEpisodes(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -253,7 +249,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/descendants")
     @Override
     public MediaResult listDescendants(
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -273,7 +269,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findDescendants(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -298,7 +294,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/related")
     @Override
     public MediaResult listRelated(
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
@@ -319,7 +315,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findRelated(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-            @ApiParam(required = true) @QueryParam("id") String id,
+            @ApiParam(required = true) @PathParam("id") String id,
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
             @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
