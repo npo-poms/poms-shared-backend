@@ -23,12 +23,12 @@ public interface UGCRestService {
 
     @GET
     @Path("annotation/{urn}")
-    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF-8")
     public Annotation getAnnotation(@PathParam("urn") String id);
 
     @GET
     @Path("annotation/bypart/{urn}")
-    @Produces(MediaType.APPLICATION_JSON+" charset=UTF-8")
+    @Produces(MediaType.APPLICATION_JSON+"; charset=UTF-8")
     public Annotation getAnnotationByPart(@PathParam("urn") String id);
 
 }
