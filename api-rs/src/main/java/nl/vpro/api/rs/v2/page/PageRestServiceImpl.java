@@ -32,16 +32,21 @@ public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
 
     private static final String DEMO_FORM = "{\n" +
-        "   \"highlight\" : true,\n" +
-        "   \"searches\" :\n" +
-        "      {\n" +
-        "         \"text\" : \"Tegenlicht\",\n" +
-        "         \"types\" :\n" +
-        "            [\n" +
-        "               \"ARTICLE\"\n" +
+        "    \"facets\": {\n" +
+        "        \"sortDates\": {\n" +
+        "            \"presets\": [\n" +
+        "                \"LAST_WEEK\", \"LAST_YEAR\", \"BEFORE_LAST_YEAR\"\n" +
         "            ]\n" +
-        "      }\n" +
-        "}";
+        "        }\n" +
+        "    },\n" +
+        "    \"highlight\": true,\n" +
+        "    \"searches\": {\n" +
+        "        \"text\": \"Tegenlicht\",\n" +
+        "        \"types\": [\n" +
+        "            \"ARTICLE\"\n" +
+        "        ]\n" +
+        "    }\n" +
+        "}\n";
 
     private final PageService pageService;
 
