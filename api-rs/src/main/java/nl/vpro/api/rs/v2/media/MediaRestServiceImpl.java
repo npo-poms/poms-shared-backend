@@ -38,12 +38,22 @@ import static nl.vpro.api.rs.v2.Util.exception;
 public class MediaRestServiceImpl implements MediaRestService {
 
     private static final String DEFAULT_FORM = "{\n" +
-            "   \"highlight\" : true,\n" +
-            "   \"facets\" :\n"  +
-            "      {\n},\n" +
-            "   \"searches\" :\n" +
-            "      {\n},\n" +
-            "}";
+        "    \"facets\": {\n" +
+        "        \"sortDates\": {\n" +
+        "            \"presets\": [\n" +
+        "                \"LAST_WEEK\", \"LAST_YEAR\", \"BEFORE_LAST_YEAR\"\n" +
+        "            ]\n" +
+        "        }\n" +
+        "    },\n" +
+        "    \"highlight\": true, \n" +
+        "    \"searches\": {\n" +
+        "        \"descendantOf\": [\n" +
+        "            {\n" +
+        "                \"value\": \"urn:vpro:media:group:72709\"\n" +
+        "            }\n" +
+        "        ]\n" +
+        "    }\n" +
+        "}";
 
     private final MockMediaRestService mocks = new MockMediaRestService();
 
