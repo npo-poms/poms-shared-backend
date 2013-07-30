@@ -32,7 +32,6 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -63,6 +62,9 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+
+import static org.elasticsearch.index.query.QueryBuilders.prefixQuery;
+import static org.elasticsearch.index.query.QueryBuilders.termQuery;
 
 /**
  * User: rico
@@ -192,11 +194,16 @@ public class MediaServiceImpl implements MediaService {
         if (offset != null) sourceBuilder.from(offset);
 
         final BoolQueryBuilder queryBuilder = new BoolQueryBuilder()
-            .must(QueryBuilders.prefixQuery("urn", "urn:vpro:media:program")); // Only return programs
+            .must(prefixQuery("urn", "urn:vpro:media:program")); // Only return programs, no groups
 
-        if (avType != null) queryBuilder.must(QueryBuilders.termQuery("avType", avType.name().toLowerCase()));
+        if (avType != null) {
+            queryBuilder.must(termQuery("avType", avType.name().toLowerCase()));
+        }
 
-        queryBuilder.must(QueryBuilders.prefixQuery("locations.urn", "urn")); // Only return media with at least one location
+        queryBuilder.must(prefixQuery("locations.urn", "urn")); // Only return media with at least one location
+
+        queryBuilder.mustNot(termQuery("type", MediaType.ALBUM.name())); // Exclude albums
+        queryBuilder.mustNot(termQuery("type", MediaType.TRACK.name())); // Exclude tracks
 
         sourceBuilder.query(queryBuilder);
 
