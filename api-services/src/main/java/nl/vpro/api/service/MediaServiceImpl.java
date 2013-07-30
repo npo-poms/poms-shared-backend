@@ -202,9 +202,9 @@ public class MediaServiceImpl implements MediaService {
 
         queryBuilder.must(prefixQuery("locations.urn", "urn")); // Only return media with at least one location
 
-        queryBuilder.mustNot(termQuery("type", MediaType.BROADCAST.name())); // TODO: this is just for testing
-        queryBuilder.mustNot(termQuery("type", MediaType.ALBUM.name())); // Exclude albums
-        queryBuilder.mustNot(termQuery("type", MediaType.TRACK.name())); // Exclude tracks
+        queryBuilder.mustNot(termQuery("type", MediaType.BROADCAST.name().toLowerCase())); // TODO: this is just for testing
+        queryBuilder.mustNot(termQuery("type", MediaType.ALBUM.name().toLowerCase())); // Exclude albums
+        queryBuilder.mustNot(termQuery("type", MediaType.TRACK.name().toLowerCase())); // Exclude tracks
 
         sourceBuilder.query(queryBuilder);
 
