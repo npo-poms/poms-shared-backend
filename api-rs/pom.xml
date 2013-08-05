@@ -10,7 +10,6 @@
 
   <groupId>nl.vpro.api</groupId>
   <artifactId>api-rs</artifactId>
-  <packaging>war</packaging>
 
   <dependencies>
     <dependency>
