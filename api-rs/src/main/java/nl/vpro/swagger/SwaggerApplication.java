@@ -54,7 +54,7 @@ public class SwaggerApplication extends Application {
         singletons.add(mediaRestService);
     }
 
-    private static void inject(Object... services) {
+    public static void inject(Object... services) {
         singletons.addAll(Arrays.asList(services));
     }
 }

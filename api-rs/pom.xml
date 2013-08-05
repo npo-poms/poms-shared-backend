@@ -17,11 +17,6 @@
       <artifactId>swagger-jaxrs_2.9.1</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core-annotations</artifactId>
-      <version>1.26.2</version>
-    </dependency>
-    <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-backend</artifactId>
     </dependency>
@@ -113,24 +108,6 @@
 
   <build>
     <plugins>
-      <!--
-      <plugin>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>maven-enunciate-plugin</artifactId>
-        <version>1.26.2</version>
-        <executions>
-          <execution>
-            <configuration>
-              <docsDir>${project.build.directory}/${project.name}-${project.version}/docs/</docsDir>
-            </configuration>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>docs</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>

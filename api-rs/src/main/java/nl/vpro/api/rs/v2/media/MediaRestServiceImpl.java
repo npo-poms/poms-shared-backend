@@ -87,9 +87,9 @@ public class MediaRestServiceImpl implements MediaRestService {
             notes = "Retrieve all media changes since a certain update sequence.\n" +
                     "By submitting an optional profile argument only changes for this argument are emitted.")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
-    @Override
     @GET
     @Path("/changes")
+    @Override
     public void changes(
             @ApiParam(required = false) @QueryParam("profile") String profile,
             @ApiParam(required = false) @QueryParam("since") Long since,
