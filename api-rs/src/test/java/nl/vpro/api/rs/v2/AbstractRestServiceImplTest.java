@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.v2;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -24,8 +24,11 @@ public abstract class AbstractRestServiceImplTest {
     public static final MediaType XML;
 
     static {
-        JSON = new MediaType("application", "json", "utf-8");
-        XML = new MediaType("application", "xml", "utf-8");
+        Map<String, String> parameters = new LinkedHashMap<String, String>();
+        parameters.put("charset", "UTF-8");
+
+        JSON = new MediaType("application", "json", parameters);
+        XML = new MediaType("application", "xml", parameters);
     }
 
     protected ObjectMapper mapper;
