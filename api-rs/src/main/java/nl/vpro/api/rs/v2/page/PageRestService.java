@@ -4,26 +4,19 @@
  */
 package nl.vpro.api.rs.v2.page;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.PageResult;
 import nl.vpro.domain.api.PageSearchResult;
 import nl.vpro.domain.api.page.PageForm;
-import org.codehaus.enunciate.jaxrs.ResponseCode;
-import org.codehaus.enunciate.jaxrs.StatusCodes;
-
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 
 /**
- *
  * @author Michiel Meeuwissen
  * @since 2.0
  */
 @Path(PageRestService.PATH)
-@StatusCodes({
-    @ResponseCode(code = 200, condition = "success"),
-    @ResponseCode(code = 400, condition = "bad request"),
-    @ResponseCode(code = 500, condition = "server error")})
 @Produces({MediaType.APPLICATION_JSON + "; charset=utf-8", MediaType.APPLICATION_XML + "; charset=utf-8"})
 public interface PageRestService {
     public static final String PATH = "/pages";
