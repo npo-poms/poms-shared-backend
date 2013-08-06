@@ -8,12 +8,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.wordnik.swagger.annotations.*;
@@ -24,6 +26,7 @@ import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.jackson.ObjectMapper;
+import nl.vpro.swagger.SwaggerApplication;
 
 import static nl.vpro.api.rs.v2.Util.exception;
 
@@ -59,10 +62,20 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     private final MediaService mediaService;
 
+    @Value("${api.media.expose}")
+    private boolean expose;
+
     @Autowired
     public MediaRestServiceImpl(MediaService mediaService) {
         this.mediaService = mediaService;
 
+    }
+
+    @PostConstruct
+    private void init() {
+        if(expose) {
+            SwaggerApplication.inject(this);
+        }
     }
 
     @ApiOperation(httpMethod = "get",

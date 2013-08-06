@@ -6,10 +6,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.wordnik.swagger.annotations.*;
@@ -19,6 +21,7 @@ import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
 import nl.vpro.domain.page.PageBuilder;
+import nl.vpro.swagger.SwaggerApplication;
 
 import static nl.vpro.api.rs.v2.Util.exception;
 
@@ -50,9 +53,19 @@ public class PageRestServiceImpl implements PageRestService {
 
     private final PageService pageService;
 
+    @Value("${api.page.expose}")
+    private boolean expose;
+
     @Autowired
     PageRestServiceImpl(PageService pageService) {
         this.pageService = pageService;
+    }
+
+    @PostConstruct
+    private void init() {
+        if(expose) {
+            SwaggerApplication.inject(this);
+        }
     }
 
     @ApiOperation(httpMethod = "get", value = "Get all pages", notes = "Get all pages filtered on an optional profile")

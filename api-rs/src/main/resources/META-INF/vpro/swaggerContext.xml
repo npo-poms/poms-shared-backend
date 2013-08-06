@@ -8,7 +8,7 @@
   <bean class="com.wordnik.swagger.jaxrs.listing.ApiListingResourcePlain"/>
   <bean class="com.wordnik.swagger.jaxrs.listing.ApiListingResourceXML"/>
 
-  <bean class="nl.vpro.swagger.SwaggerApplication"/>
+  <!--<bean class="nl.vpro.swagger.SwaggerApplication"/>-->
 
   <bean class="nl.vpro.swagger.SwaggerConfigReader">
     <property name="basePath" value="${swagger.basePath}"/>

@@ -25,8 +25,7 @@ import nl.vpro.api.rs.v2.page.PageRestService;
 public class SwaggerApplication extends Application {
     private static final Set<Object> singletons = new HashSet<>();
 
-    @PostConstruct
-    private void init() {
+    static {
         JaxrsApiReader.setFormatString("");
     }
 
@@ -42,16 +41,6 @@ public class SwaggerApplication extends Application {
     @Override
     public Set<Object> getSingletons() {
         return singletons;
-    }
-
-    @Autowired
-    private void inject(PageRestService pageRestService) {
-        singletons.add(pageRestService);
-    }
-
-    @Autowired
-    private void inject(MediaRestService mediaRestService) {
-        singletons.add(mediaRestService);
     }
 
     public static void inject(Object... services) {
