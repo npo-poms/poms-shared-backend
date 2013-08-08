@@ -86,63 +86,27 @@ public class MediaRestServiceImpl implements MediaRestService {
         notes = "Get all media filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
-    public MediaResult list(
+    public Response list(
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock,
-        Response response
+        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
-            return mocks.list(profile, properties, offset, max, true, response);
+            return mocks.list(profile, properties, offset, max, true);
         }
-        MediaResult result = find(null, profile, properties, offset, max, mock).asResult();
+
+        MediaSearchResult searchResult = mediaService.find(profile, null, offset, max);
         if(properties == null) {
-            return result;
-        }
-
-        response.ok(MediaTransferResult.create(result, new PropertySelection(properties))).build();
-        return null;
-    }
-
-    @ApiOperation(httpMethod = "get",
-        value = "Retrieve changes",
-        notes = "Retrieve all media changes since a certain update sequence.\n" +
-            "By submitting an optional profile argument only changes for this argument are emitted.")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
-    @GET
-    @Path("/changes")
-    @Override
-    public void changes(
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam(required = false) @QueryParam("since") Long since,
-        @ApiParam(defaultValue = "asc", required = false) @QueryParam("order") @DefaultValue("asc") String sOrder,
-        @ApiParam(defaultValue = "10", required = false) @QueryParam("max") Integer max,
-        @Context HttpServletRequest request,
-        @Context HttpServletResponse response) throws IOException {
-
-        Order order = Order.valueOf(sOrder.toUpperCase());
-
-        if(true) { // TODO xml / mock
-            response.setContentType("application/json");
-            PrintWriter writer = response.getWriter();
-            writer.write("{\"changes\": [\n");
-            Iterator<Change> changes = mediaService.changes(profile, since, order, max);
-            boolean first = true;
-            while(changes.hasNext()) {
-                if(!first) {
-                    writer.write(",\n");
-                } else {
-                    first = false;
-                }
-                Change change = changes.next();
-                writer.write(ObjectMapper.INSTANCE.writeValueAsString(change));
+            try {
+                return Response.ok(searchResult.asResult()).build();
+            } catch(Exception e) {
+                throw exception(e);
             }
-            writer.write("\n]}");
-            writer.close();
         }
+
+        return Response.ok(MediaTransferResult.create(searchResult.asResult(), new PropertySelection(properties))).build();
     }
 
     @ApiOperation(httpMethod = "post",
@@ -150,7 +114,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         notes = "Find media object by posting a search form. Results are filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
-    public MediaSearchResult find(
+    public Response find(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
@@ -162,7 +126,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.find(form, profile, properties, offset, max, true);
         }
         try {
-            return mediaService.find(profile, form, offset, max);
+            return Response.ok(mediaService.find(profile, form, offset, max)).build();
         } catch(Exception e) {
             throw exception(e);
         }
@@ -206,7 +170,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/members")
     @Override
-    public MediaResult listMembers(
+    public Response listMembers(
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
@@ -214,8 +178,13 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
-        return findMembers(null, id, profile, properties, offset, max, mock).asResult();
 
+        try {
+            MediaSearchResult searchResult = mediaService.findMembers(id, profile, null, offset, max);
+            return Response.ok(searchResult.asResult()).build();
+        } catch(Exception e) {
+            throw exception(e);
+        }
     }
 
     @ApiOperation(httpMethod = "post",
@@ -225,7 +194,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/members")
     @Override
-    public MediaSearchResult findMembers(
+    public Response findMembers(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
@@ -238,7 +207,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findMembers(form, id, profile, properties, offset, max, true);
         }
         try {
-            return mediaService.findMembers(id, profile, form, offset, max);
+            return Response.ok(mediaService.findMembers(id, profile, form, offset, max)).build();
         } catch(Exception e) {
             throw exception(e);
         }
@@ -250,7 +219,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/episodes")
     @Override
-    public ProgramResult listEpisodes(
+    public Response listEpisodes(
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
@@ -261,7 +230,13 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.listEpisodes(id, profile, properties, offset, max, true);
         }
-        return findEpisodes(null, id, profile, properties, offset, max, mock).asResult();
+
+        try {
+            ProgramSearchResult searchResult = mediaService.findEpisodes(id, profile, null, offset, max);
+            return Response.ok(searchResult.asResult()).build();
+        } catch(Exception e) {
+            throw exception(e);
+        }
     }
 
     @ApiOperation(httpMethod = "post",
@@ -270,7 +245,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/episodes")
     @Override
-    public ProgramSearchResult findEpisodes(
+    public Response findEpisodes(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile, @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
@@ -282,7 +257,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findEpisodes(form, id, profile, properties, offset, max, true);
         }
         try {
-            return mediaService.findEpisodes(id, profile, form, offset, max);
+            return Response.ok(mediaService.findEpisodes(id, profile, form, offset, max)).build();
         } catch(Exception e) {
             throw exception(e);
         }
@@ -295,7 +270,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/descendants")
     @Override
-    public MediaResult listDescendants(
+    public Response listDescendants(
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
@@ -306,7 +281,12 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.listDescendants(id, profile, properties, offset, max, true);
         }
-        return findDescendants(null, id, profile, properties, offset, max, mock).asResult();
+        try {
+            MediaSearchResult searchResult = mediaService.findDescendants(id, profile, null, offset, max);
+            return Response.ok(searchResult.asResult()).build();
+        } catch(Exception e) {
+            throw exception(e);
+        }
     }
 
     @ApiOperation(httpMethod = "post",
@@ -315,7 +295,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/descendants")
     @Override
-    public MediaSearchResult findDescendants(
+    public Response findDescendants(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
@@ -328,7 +308,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findDescendants(form, id, profile, properties, offset, max, true);
         }
         try {
-            return mediaService.findDescendants(id, profile, form, offset, max);
+            return Response.ok(mediaService.findDescendants(id, profile, form, offset, max)).build();
         } catch(Exception e) {
             throw exception(e);
         }
@@ -342,7 +322,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/related")
     @Override
-    public MediaResult listRelated(
+    public Response listRelated(
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
@@ -353,7 +333,12 @@ public class MediaRestServiceImpl implements MediaRestService {
         if(mock) {
             return mocks.listRelated(id, profile, properties, offset, max, true);
         }
-        return findRelated(null, id, profile, properties, offset, max, mock).asResult();
+        try {
+            MediaSearchResult searchResult = mediaService.findRelated(id, profile, null, offset, max);
+            return Response.ok(searchResult.asResult()).build();
+        } catch(Exception e) {
+            throw exception(e);
+        }
     }
 
     @ApiOperation(httpMethod = "post",
@@ -363,7 +348,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}/related")
     @Override
-    public MediaSearchResult findRelated(
+    public Response findRelated(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
@@ -376,9 +361,49 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findRelated(form, id, profile, properties, offset, max, true);
         }
         try {
-            return mediaService.findRelated(id, profile, form, offset, max);
+            return Response.ok(mediaService.findRelated(id, profile, form, offset, max)).build();
         } catch(Exception e) {
             throw exception(e);
         }
+    }
+
+    @ApiOperation(httpMethod = "get",
+        value = "Retrieve changes",
+        notes = "Retrieve all media changes since a certain update sequence.\n" +
+            "By submitting an optional profile argument only changes for this argument are emitted.")
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @GET
+    @Path("/changes")
+    @Override
+    public Response changes(
+        @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = false) @QueryParam("since") Long since,
+        @ApiParam(defaultValue = "asc", required = false) @QueryParam("order") @DefaultValue("asc") String sOrder,
+        @ApiParam(defaultValue = "10", required = false) @QueryParam("max") Integer max,
+        @Context HttpServletRequest request,
+        @Context HttpServletResponse response) throws IOException {
+
+        Order order = Order.valueOf(sOrder.toUpperCase());
+
+        if(true) { // TODO xml / mock
+            response.setContentType("application/json");
+            PrintWriter writer = response.getWriter();
+            writer.write("{\"changes\": [\n");
+            Iterator<Change> changes = mediaService.changes(profile, since, order, max);
+            boolean first = true;
+            while(changes.hasNext()) {
+                if(!first) {
+                    writer.write(",\n");
+                } else {
+                    first = false;
+                }
+                Change change = changes.next();
+                writer.write(ObjectMapper.INSTANCE.writeValueAsString(change));
+            }
+            writer.write("\n]}");
+            writer.close();
+        }
+        return null;
     }
 }

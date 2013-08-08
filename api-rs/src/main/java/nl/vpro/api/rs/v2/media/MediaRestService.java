@@ -40,27 +40,15 @@ public interface MediaRestService {
     public static final String PATH = "/media";
 
     @GET
-    MediaResult list(
+    Response list(
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock,
-        Response response);
-
-    @GET
-    @Path("/changes")
-    void changes(
-        @QueryParam("profile") String profile,
-        @QueryParam("properties") String properties,
-        @QueryParam("since") Long since,
-        @QueryParam("order") @DefaultValue("asc") String order,
-        @QueryParam("max") Integer max,
-        @Context HttpServletRequest request,
-        @Context HttpServletResponse response) throws IOException;
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
-    MediaSearchResult find(
+    Response find(
         MediaForm form,
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
@@ -92,7 +80,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/members")
-    MediaResult listMembers(
+    Response listMembers(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
@@ -110,7 +98,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/members")
-    MediaSearchResult findMembers(
+    Response findMembers(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -129,7 +117,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/episodes")
-    ProgramResult listEpisodes(
+    Response listEpisodes(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
@@ -147,7 +135,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/episodes")
-    ProgramSearchResult findEpisodes(
+    Response findEpisodes(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -166,7 +154,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/descendants")
-    MediaResult listDescendants(
+    Response listDescendants(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
@@ -184,7 +172,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/descendants")
-    MediaSearchResult findDescendants(
+    Response findDescendants(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -203,7 +191,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/related")
-    MediaResult listRelated(
+    Response listRelated(
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
@@ -221,7 +209,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/related")
-    MediaSearchResult findRelated(
+    Response findRelated(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -229,4 +217,15 @@ public interface MediaRestService {
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
+
+    @GET
+    @Path("/changes")
+    Response changes(
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("since") Long since,
+        @QueryParam("order") @DefaultValue("asc") String order,
+        @QueryParam("max") Integer max,
+        @Context HttpServletRequest request,
+        @Context HttpServletResponse response) throws IOException;
 }

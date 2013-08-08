@@ -24,24 +24,19 @@ class MockMediaRestService implements MediaRestService {
     private static long listSizes = 100l;
 
     @Override
-    public MediaResult list(String profile, String properties, Long offset, Integer max, boolean mock, Response response) {
+    public Response list(String profile, String properties, Long offset, Integer max, boolean mock) {
         List<MediaObject> list = mockList(listSizes, offset, max);
         MediaResult result = new MediaResult(list, offset, max, listSizes);
-        return result;
+        return Response.ok(result).build();
     }
 
     @Override
-    public void changes(String profile, String properties, Long since, @DefaultValue("asc") String order, Integer max, @Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
-        // TODO
-    }
-
-    @Override
-    public MediaSearchResult find(MediaForm form, String profile, String properties, Long offset, Integer max, boolean mock) {
+    public Response find(MediaForm form, String profile, String properties, Long offset, Integer max, boolean mock) {
         List<SearchResultItem<? extends MediaObject>> list = mockSearchItems(mockList(listSizes, offset, max));
         MediaFacetsResult facetsResult = new MediaFacetsResult();
         facetsResult.setBroadcasters(Arrays.asList(new TermFacetResultItem("vpro", 100)));
         facetsResult.setSortDates(Arrays.asList(new DateFacetResultItem("LAST_YEAR", new Date(0), new Date(), 100)));
-        return new MediaSearchResult(list, facetsResult, offset, max, listSizes);
+        return Response.ok(new MediaSearchResult(list, facetsResult, offset, max, listSizes)).build();
     }
 
     @Override
@@ -50,44 +45,50 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public MediaResult listMembers(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return new MediaResult(mockList(listSizes, offset, max), offset, max, listSizes);
+    public Response listMembers(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new MediaResult(mockList(listSizes, offset, max), offset, max, listSizes)).build();
     }
 
     @Override
-    public MediaSearchResult findMembers(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return new MediaSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
+    public Response findMembers(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new MediaSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes)).build();
     }
 
     @Override
-    public ProgramResult listEpisodes(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return findEpisodes(null, id, profile, properties, offset, max, mock).asResult();
+    public Response listEpisodes(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new ProgramSearchResult(mockSearchItems(mockEpisodes(listSizes, offset, max)), offset, max, listSizes).asResult()).build();
     }
 
     @Override
-    public ProgramSearchResult findEpisodes(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return new ProgramSearchResult(mockSearchItems(mockEpisodes(listSizes, offset, max)), offset, max, listSizes);
+    public Response findEpisodes(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new ProgramSearchResult(mockSearchItems(mockEpisodes(listSizes, offset, max)), offset, max, listSizes)).build();
 
     }
 
     @Override
-    public MediaResult listDescendants(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return new MediaResult(mockList(listSizes, offset, max), offset, max, listSizes);
+    public Response listDescendants(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new MediaResult(mockList(listSizes, offset, max), offset, max, listSizes)).build();
     }
 
     @Override
-    public MediaSearchResult findDescendants(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return new MediaSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
+    public Response findDescendants(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new MediaSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes)).build();
     }
 
     @Override
-    public MediaResult listRelated(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return new MediaResult(mockList(listSizes, offset, max), offset, max, listSizes);
+    public Response listRelated(String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new MediaResult(mockList(listSizes, offset, max), offset, max, listSizes)).build();
     }
 
     @Override
-    public MediaSearchResult findRelated(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
-        return new MediaSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
+    public Response findRelated(MediaForm form, String id, String profile, String properties, Long offset, Integer max, boolean mock) {
+        return Response.ok(new MediaSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes)).build();
+    }
+
+    @Override
+    public Response changes(String profile, String properties, Long since, @DefaultValue("asc") String order, Integer max, @Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
+        // TODO
+        return null;
     }
 
     protected <T extends MediaObject> List<SearchResultItem<? extends T>> mockSearchItems(final List<T> list) {
