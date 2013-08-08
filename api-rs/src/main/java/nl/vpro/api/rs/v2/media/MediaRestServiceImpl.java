@@ -175,14 +175,13 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}")
     @Override
-    public MediaObject load(
+    public Response load(
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock,
-        Response response
+        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
-            return mocks.load(id, properties, true, response);
+            return mocks.load(id, properties, true);
         }
 
         MediaObject mediaObject;
@@ -195,11 +194,10 @@ public class MediaRestServiceImpl implements MediaRestService {
             throw new BadRequest("No media for id " + id);
         }
         if(properties == null) {
-            return mediaObject;
+            return Response.ok(mediaObject).build();
         }
 
-        response.ok(MediaTransfer.create(mediaObject, new PropertySelection(properties)));
-        return null;
+        return Response.ok(MediaTransfer.create(mediaObject, new PropertySelection(properties))).build();
     }
 
     @ApiOperation(httpMethod = "get",

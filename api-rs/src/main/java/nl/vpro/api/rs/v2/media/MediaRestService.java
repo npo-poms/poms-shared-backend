@@ -77,11 +77,10 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}")
-    MediaObject load(
+    Response load(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
-        @QueryParam("mock") @DefaultValue("false") boolean mock,
-        Response response);
+        @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
      * @param id      existing urn or mid

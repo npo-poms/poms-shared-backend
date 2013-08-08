@@ -45,8 +45,8 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public MediaObject load(String id, String properties, boolean mock, Response response) {
-        return build(id);
+    public Response load(String id, String properties, boolean mock) {
+        return Response.ok(build(id)).build();
     }
 
     @Override
