@@ -42,25 +42,12 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.media</groupId>
-      <artifactId>media-domain</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.media</groupId>
-      <artifactId>media-domain</artifactId>
-      <version>${media.version}</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
+      <artifactId>media-transfer</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.media</groupId>
       <artifactId>media-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.user</groupId>
-      <artifactId>user-domain</artifactId>
-      <version>${user.version}</version>
-      <classifier>sources</classifier>
-      <scope>provided</scope>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>nl.vpro.shared</groupId>
@@ -105,17 +92,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <archiveClasses>true</archiveClasses>
-          <attachClasses>true</attachClasses>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
