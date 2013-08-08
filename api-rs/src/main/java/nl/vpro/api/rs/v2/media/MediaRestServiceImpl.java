@@ -102,7 +102,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return result;
         }
 
-        response.ok(MediaTransferResult.create(result, new PropertySelection(properties)));
+        response.ok(MediaTransferResult.create(result, new PropertySelection(properties))).build();
         return null;
     }
 
