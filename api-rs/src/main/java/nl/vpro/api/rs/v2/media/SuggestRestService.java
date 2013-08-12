@@ -22,7 +22,7 @@ public interface SuggestRestService {
     @Path("/")
     Result<Suggestion> all(
         @QueryParam("text") String text,
-        @QueryParam("profile") String profile,
+        @QueryParam("pf") String profile,
         @QueryParam("mock") @DefaultValue("false") boolean mock
     );
 }

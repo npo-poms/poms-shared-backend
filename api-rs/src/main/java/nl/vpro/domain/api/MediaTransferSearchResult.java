@@ -23,19 +23,21 @@ import nl.vpro.transfer.media.PropertySelection;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "mediaSearchResultType")
 @XmlRootElement(name = "mediaSearchResult")
-public class MediaTransferSearchResult<T extends MediaObject> extends SearchResult<MediaTransfer<T>> {
+public class MediaTransferSearchResult extends GenericMediaTransferSearchResult<MediaObject, MediaTransfer<MediaObject>> {
 
-/*
-    public MediaTransferSearchResult(List<SearchResultItem<MediaTransfer<T>>> list, Long offset, Integer max, Long total) {
+    public MediaTransferSearchResult(List<SearchResultItem<? extends MediaTransfer<MediaObject>>> list, Long offset, Integer max, Long total) {
         super(list, offset, max, total);
     }
 
-    public static MediaTransferSearchResult create(MediaResult result, PropertySelection selection) {
-        List<MediaTransfer> optimised = new ArrayList<>(result.getList().size());
-        for(MediaObject mediaObject : result.getList()) {
-            optimised.add(MediaTransfer.create(mediaObject, selection));
+    public static MediaTransferSearchResult create(MediaSearchResult result, PropertySelection selection) {
+        List<SearchResultItem<? extends MediaTransfer<MediaObject>>> optimised = new ArrayList<>(result.getList().size());
+        for(SearchResultItem<? extends MediaObject> searchResultItem : result.getList()) {
+            optimised.add(new SearchResultItem<>(
+                MediaTransfer.create(searchResultItem.getResult(), selection),
+                searchResultItem.getScore(),
+                searchResultItem.getHighlights()
+            ));
         }
         return new MediaTransferSearchResult(optimised, result.getOffset(), result.getMax(), result.getTotal());
     }
-*/
 }

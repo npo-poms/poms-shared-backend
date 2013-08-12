@@ -87,10 +87,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
     public Response list(
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -116,10 +116,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response find(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -141,7 +141,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response load(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -172,10 +172,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listMembers(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
 
@@ -197,10 +197,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     public Response findMembers(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -221,10 +221,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listEpisodes(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -248,9 +248,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     public Response findEpisodes(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile, @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile, @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -272,10 +272,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listDescendants(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -298,10 +298,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     public Response findDescendants(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -324,10 +324,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listRelated(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -351,10 +351,10 @@ public class MediaRestServiceImpl implements MediaRestService {
     public Response findRelated(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
+        @ApiParam @QueryParam("o") @DefaultValue("0") Long offset,
+        @ApiParam @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -376,11 +376,11 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/changes")
     @Override
     public Response changes(
-        @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = false) @QueryParam("pf") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("pp") String properties,
         @ApiParam(required = false) @QueryParam("since") Long since,
         @ApiParam(defaultValue = "asc", required = false) @QueryParam("order") @DefaultValue("asc") String sOrder,
-        @ApiParam(defaultValue = "10", required = false) @QueryParam("max") Integer max,
+        @ApiParam(defaultValue = "10", required = false) @QueryParam("m") Integer max,
         @Context HttpServletRequest request,
         @Context HttpServletResponse response) throws IOException {
 
