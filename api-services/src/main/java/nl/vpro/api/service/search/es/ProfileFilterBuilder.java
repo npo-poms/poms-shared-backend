@@ -124,7 +124,7 @@ public class ProfileFilterBuilder extends BaseFilterBuilder {
         }
 
         for (String broadcaster : mediaSearchFilter.getBroadcasters()) {
-            fbl.add(termFilter("broadcasters", broadcaster.toLowerCase()));
+            fbl.add(termFilter("broadcasters", broadcaster));
         }
 
         for (AvType avType : mediaSearchFilter.getAvTypes()) {
