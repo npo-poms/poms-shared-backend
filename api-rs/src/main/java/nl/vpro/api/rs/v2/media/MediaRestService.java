@@ -41,19 +41,19 @@ public interface MediaRestService {
 
     @GET
     Response list(
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     Response find(
         MediaForm form,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -67,7 +67,7 @@ public interface MediaRestService {
     @Path("/{id}")
     Response load(
         @PathParam("id") String id,
-        @QueryParam("pp") String properties,
+        @QueryParam("properties") String properties,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -82,10 +82,10 @@ public interface MediaRestService {
     @Path("/{id}/members")
     Response listMembers(
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -101,10 +101,10 @@ public interface MediaRestService {
     Response findMembers(
         MediaForm form,
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -119,10 +119,10 @@ public interface MediaRestService {
     @Path("/{id}/episodes")
     Response listEpisodes(
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -138,10 +138,10 @@ public interface MediaRestService {
     Response findEpisodes(
         MediaForm form,
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -156,10 +156,10 @@ public interface MediaRestService {
     @Path("/{id}/descendants")
     Response listDescendants(
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -175,10 +175,10 @@ public interface MediaRestService {
     Response findDescendants(
         MediaForm form,
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -193,10 +193,10 @@ public interface MediaRestService {
     @Path("/{id}/related")
     Response listRelated(
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     /**
@@ -212,20 +212,20 @@ public interface MediaRestService {
     Response findRelated(
         MediaForm form,
         @PathParam("id") String id,
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @GET
     @Path("/changes")
     Response changes(
-        @QueryParam("pf") String profile,
-        @QueryParam("pp") String properties,
+        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
         @QueryParam("since") Long since,
         @QueryParam("order") @DefaultValue("asc") String order,
-        @QueryParam("m") Integer max,
+        @QueryParam("max") Integer max,
         @Context HttpServletRequest request,
         @Context HttpServletResponse response) throws IOException;
 }

@@ -13,9 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.Program;
 import nl.vpro.transfer.media.MediaTransfer;
-import nl.vpro.transfer.media.ProgramTransfer;
 import nl.vpro.transfer.media.ProgramTransfer;
 import nl.vpro.transfer.media.PropertySelection;
 
@@ -24,8 +22,8 @@ import nl.vpro.transfer.media.PropertySelection;
  * @since 1.0
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "mediaSearchResultType")
-@XmlRootElement(name = "mediaSearchResult")
+@XmlType(name = "programSearchResultType")
+@XmlRootElement(name = "programSearchResult")
 public class ProgramTransferSearchResult extends GenericMediaTransferSearchResult<Program, MediaTransfer<Program>> {
 
     public ProgramTransferSearchResult(List<SearchResultItem<? extends MediaTransfer<Program>>> list, Long offset, Integer max, Long total) {

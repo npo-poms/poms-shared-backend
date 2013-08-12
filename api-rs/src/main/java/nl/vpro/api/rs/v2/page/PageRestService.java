@@ -23,17 +23,17 @@ public interface PageRestService {
 
     @GET
     PageResult list(
-        @QueryParam("pf") String profile,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
     PageSearchResult find(
         PageForm form,
-        @QueryParam("pf") String profile,
-        @QueryParam("o") @DefaultValue("0") Long offset,
-        @QueryParam("m") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @QueryParam("profile") String profile,
+        @QueryParam("offset") @DefaultValue("0") Long offset,
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
 }
