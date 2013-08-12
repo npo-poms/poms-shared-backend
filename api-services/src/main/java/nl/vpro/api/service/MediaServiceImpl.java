@@ -197,13 +197,13 @@ public class MediaServiceImpl implements MediaService {
             .must(prefixQuery("urn", "urn:vpro:media:program")); // Only return programs, no groups
 
         if (avType != null) {
-            queryBuilder.must(termQuery("avType", avType.name().toLowerCase()));
+            queryBuilder.must(termQuery("avType", avType.name()));
         }
 
         queryBuilder.must(prefixQuery("locations.urn", "urn")); // Only return media with at least one location
 
-        queryBuilder.mustNot(termQuery("type", MediaType.ALBUM.name().toLowerCase())); // Exclude albums
-        queryBuilder.mustNot(termQuery("type", MediaType.TRACK.name().toLowerCase())); // Exclude tracks
+        queryBuilder.mustNot(termQuery("type", MediaType.ALBUM.name())); // Exclude albums
+        queryBuilder.mustNot(termQuery("type", MediaType.TRACK.name())); // Exclude tracks
 
         sourceBuilder.query(queryBuilder);
 

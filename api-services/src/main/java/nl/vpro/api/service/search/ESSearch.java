@@ -134,8 +134,8 @@ public class ESSearch extends AbstractSearch {
         SearchRequest request = new SearchRequest(pomsIndexName);
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         BoolQueryBuilder queryBuilder = new BoolQueryBuilder();
-        queryBuilder.must(termQuery("mediaType", MediaType.ARCHIVE.toString().toLowerCase()));
-        queryBuilder.must(termQuery("mainTitle", archiveName));
+        queryBuilder.must(termQuery("type", MediaType.ARCHIVE.toString()));
+        queryBuilder.must(termQuery("titles.value", archiveName));
 
         request.types("poms");
         request.source(searchBuilder);
