@@ -43,10 +43,8 @@ public abstract class AbstractRestServiceImplTest {
         mapper = ObjectMapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
 
-
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreAttributeOrder(true);
-
     }
 
     protected abstract Object getTestObject();

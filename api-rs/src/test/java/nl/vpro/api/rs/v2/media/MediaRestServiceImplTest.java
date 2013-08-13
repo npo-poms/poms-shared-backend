@@ -25,6 +25,7 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -260,6 +261,9 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
     @Test
     public void testGetMembers() throws URISyntaxException, IOException {
+        when(mediaService.findMembers(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+            .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
+
         MockHttpRequest request = MockHttpRequest.get("/media/123/members?mock=true");
 
         MockHttpResponse response = new MockHttpResponse();
@@ -268,12 +272,11 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
+        TypeReference<MediaResult> typeRef = new TypeReference<MediaResult>() {
         };
 
-        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
-        assertEquals(Integer.valueOf(10), result.getSize());
-
+        MediaResult result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertThat(result.getTotal()).isEqualTo(10);
     }
 
     @Test
