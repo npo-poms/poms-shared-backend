@@ -4,16 +4,21 @@
  */
 package nl.vpro.api.rs.v2.exception;
 
-import nl.vpro.domain.api.Error;
-import org.jboss.resteasy.spi.Failure;
-
 import javax.ws.rs.core.Response;
 
+import org.jboss.resteasy.spi.Failure;
+
+import nl.vpro.domain.api.Error;
+
 /**
+ * Use Responses.youErrorMethod for better RestEasy handling
+ *
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
+@Deprecated
 public class BadRequest extends Failure {
+
     private final static int CODE = 400;
 
     public BadRequest(String message) {

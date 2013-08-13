@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 
 import com.wordnik.swagger.annotations.*;
 
-import nl.vpro.api.rs.v2.exception.BadRequest;
+import nl.vpro.api.rs.v2.Responses;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
@@ -148,7 +148,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             MediaObject mediaObject = mediaService.load(id);
             if(mediaObject == null) {
-                throw new BadRequest("No media for id " + id);
+                return Responses.mediaNotFound(id);
             }
 
             if(properties == null) {
