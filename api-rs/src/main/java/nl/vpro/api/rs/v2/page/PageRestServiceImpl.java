@@ -53,7 +53,7 @@ public class PageRestServiceImpl implements PageRestService {
 
     private final PageService pageService;
 
-    @Value("${api.page.expose}")
+    @Value("${api.pages.expose}")
     private boolean expose;
 
     @Autowired
