@@ -11,6 +11,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang.StringUtils;
+import org.jboss.resteasy.core.interception.PreMatchContainerRequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -30,11 +31,15 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
         String origin = request.getHeaderString(CorsHeaders.ORIGIN);
-        if (corsPolicy.isEnabled()) {
+        if(corsPolicy.isEnabled()) {
             String method = request.getMethod();
-            if (StringUtils.isNotEmpty(origin)) {
+            if(StringUtils.isNotEmpty(origin)) {
+                Object corsHeader = ((PreMatchContainerRequestContext)request).getHttpRequest().getAttribute("HasCorsHeaders");
+                boolean hasCorsHeaders = corsHeader != null && Boolean.TRUE.equals(corsHeader);
+
                 boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
-                if (allowed) {
+
+                if(allowed && !hasCorsHeaders) {
                     response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                     //ACCESS_CONTROL_ALLOW_ORIGIN_VALUE is ook beschikbaar
                     response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
@@ -42,7 +47,7 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
                 }
             }
         } else {
-            if (StringUtils.isNotEmpty(origin)) {
+            if(StringUtils.isNotEmpty(origin)) {
                 response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
             }
         }
@@ -56,11 +61,12 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
      */
     @Override
     public void filter(ContainerRequestContext request) throws IOException {
-        if ("POST".equals(request.getMethod())) {
+
+        if("POST".equals(request.getMethod())) {
             List<String> contentTypes = request.getHeaders().get("Content-Type");
-            if (contentTypes == null) {
+            if(contentTypes == null) {
                 request.getHeaders().add("Content-Type", "application/json");
-            } else if (contentTypes.isEmpty() || contentTypes.equals(Arrays.asList("*/*")) || contentTypes.equals(Arrays.asList("text/plain"))) {
+            } else if(contentTypes.isEmpty() || contentTypes.equals(Arrays.asList("*/*")) || contentTypes.equals(Arrays.asList("text/plain"))) {
                 contentTypes.clear();
                 contentTypes.add("application/json");
             }

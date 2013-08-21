@@ -71,7 +71,6 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Autowired
     public MediaRestServiceImpl(MediaService mediaService) {
         this.mediaService = mediaService;
-
     }
 
     @PostConstruct
