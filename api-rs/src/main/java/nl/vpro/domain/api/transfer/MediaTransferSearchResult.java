@@ -2,19 +2,17 @@
  * Copyright (C) 2013 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.domain.api;
+package nl.vpro.domain.api.transfer;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
+import nl.vpro.domain.api.MediaSearchResult;
+import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.media.MediaObject;
-import nl.vpro.transfer.media.MediaTransfer;
-import nl.vpro.transfer.media.PropertySelection;
+import nl.vpro.transfer.media.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -23,6 +21,7 @@ import nl.vpro.transfer.media.PropertySelection;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "mediaSearchResultType")
 @XmlRootElement(name = "mediaSearchResult")
+@XmlSeeAlso({ProgramTransfer.class, GroupTransfer.class, SegmentTransfer.class})
 public class MediaTransferSearchResult extends GenericMediaTransferSearchResult<MediaObject, MediaTransfer<MediaObject>> {
 
     public MediaTransferSearchResult(List<SearchResultItem<? extends MediaTransfer<MediaObject>>> list, Long offset, Integer max, Long total) {

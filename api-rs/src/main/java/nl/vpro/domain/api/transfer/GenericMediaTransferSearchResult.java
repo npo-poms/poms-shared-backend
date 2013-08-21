@@ -2,16 +2,19 @@
  * Copyright (C) 2013 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.domain.api;
+package nl.vpro.domain.api.transfer;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
+import nl.vpro.domain.api.MediaFacetsResult;
+import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.transfer.media.MediaTransfer;
-import nl.vpro.transfer.media.PropertySelection;
 
 /**
  * @author Roelof Jan Koekoek

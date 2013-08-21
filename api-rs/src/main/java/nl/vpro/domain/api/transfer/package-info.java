@@ -5,7 +5,7 @@
         elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED,
         attributeFormDefault = javax.xml.bind.annotation.XmlNsForm.UNQUALIFIED
 )
-package nl.vpro.domain.api;
+package nl.vpro.domain.api.transfer;
 
 import javax.xml.bind.annotation.XmlNs;
 import javax.xml.bind.annotation.XmlSchema;

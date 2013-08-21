@@ -2,7 +2,7 @@
  * Copyright (C) 2013 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.domain.api;
+package nl.vpro.domain.api.transfer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.api.ProgramResult;
 import nl.vpro.domain.media.Program;
 import nl.vpro.transfer.media.MediaTransfer;
 import nl.vpro.transfer.media.ProgramTransfer;
@@ -23,6 +23,9 @@ import nl.vpro.transfer.media.PropertySelection;
 @XmlRootElement(name = "mediaResult")
 @XmlType(name = "mediaResultType")
 public class ProgramTransferResult extends Result<MediaTransfer> {
+
+    protected ProgramTransferResult() {
+    }
 
     public ProgramTransferResult(List<? extends ProgramTransfer> list, Long offset, Integer max, Long total) {
         super(list, offset, max, total);

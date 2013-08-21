@@ -115,11 +115,11 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
+        TypeReference<nl.vpro.domain.api.transfer.Result<MediaObject>> typeRef = new TypeReference<nl.vpro.domain.api.transfer.Result<MediaObject>>() {
         };
 
 
-        Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
+        nl.vpro.domain.api.transfer.Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
 
         assertEquals(Integer.valueOf(10), result.getSize());
 
@@ -138,7 +138,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
-        Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);
+        nl.vpro.domain.api.transfer.Result<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), nl.vpro.domain.api.transfer.Result.class);
 
         assertEquals(Integer.valueOf(10), result.getSize());
 
@@ -289,10 +289,10 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<Result<Program>> typeRef = new TypeReference<Result<Program>>() {
+        TypeReference<nl.vpro.domain.api.transfer.Result<Program>> typeRef = new TypeReference<nl.vpro.domain.api.transfer.Result<Program>>() {
         };
 
-        Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
+        nl.vpro.domain.api.transfer.Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(10), result.getSize());
     }
 
@@ -306,10 +306,10 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
-        TypeReference<Result<MediaObject>> typeRef = new TypeReference<Result<MediaObject>>() {
+        TypeReference<nl.vpro.domain.api.transfer.Result<MediaObject>> typeRef = new TypeReference<nl.vpro.domain.api.transfer.Result<MediaObject>>() {
         };
 
-        Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
+        nl.vpro.domain.api.transfer.Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(10), result.getSize());
     }
 

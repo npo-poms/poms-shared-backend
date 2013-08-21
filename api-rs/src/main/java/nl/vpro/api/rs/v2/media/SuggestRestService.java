@@ -7,7 +7,7 @@ package nl.vpro.api.rs.v2.media;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.transfer.Result;
 import nl.vpro.domain.api.Suggestion;
 
 /**
