@@ -12,7 +12,7 @@ import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
 
 import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
-import nl.vpro.domain.api.transfer.Result;
+import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;

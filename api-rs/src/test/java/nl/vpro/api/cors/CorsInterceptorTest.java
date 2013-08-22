@@ -13,7 +13,9 @@ import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Michiel Meeuwissen
@@ -25,32 +27,6 @@ public class CorsInterceptorTest {
     @Before
     public void resetMocks() {
         reset(corsPolicy);
-    }
-
-    @Test
-    public void testFilter() throws Exception {
-
-        MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
-
-        when(corsPolicy.isEnabled()).thenReturn(Boolean.TRUE);
-        when(corsPolicy.allowedOriginAndMethod(anyString(), anyString())).thenReturn(Boolean.TRUE);
-
-
-        ContainerRequestContext request = mock(ContainerRequestContext.class);
-        ContainerResponseContext response  = mock(ContainerResponseContext.class);
-        when(request.getHeaderString(CorsHeaders.ORIGIN)).thenReturn("localhost");
-        when(request.getMethod()).thenReturn("GET");
-        when(response.getHeaders()).thenReturn(headers);
-
-        CorsInterceptor inst = new CorsInterceptor(corsPolicy);
-
-        inst.filter(request, response);
-
-        assertThat(headers.get("Access-Control-Allow-Headers")).containsExactly("x-http-method-override, origin, content-type, accept");
-        assertThat(headers.get("Access-Control-Allow-Origin")).containsExactly("localhost");
-        assertThat(headers.get("Access-Control-Allow-Methods")).containsExactly("GET, HEAD, OPTIONS, POST");
-
-
     }
 
     @Test
@@ -75,29 +51,6 @@ public class CorsInterceptorTest {
         assertThat(headers.get("Access-Control-Allow-Origin")).containsExactly("localhost");
 
     }
-
-    @Test
-    public void testFilterNotAllowed() throws Exception {
-
-        MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
-
-        when(corsPolicy.isEnabled()).thenReturn(Boolean.TRUE);
-        when(corsPolicy.allowedOriginAndMethod(anyString(), anyString())).thenReturn(Boolean.FALSE);
-
-
-        ContainerRequestContext request = mock(ContainerRequestContext.class);
-        ContainerResponseContext response = mock(ContainerResponseContext.class);
-        when(request.getHeaderString(CorsHeaders.ORIGIN)).thenReturn("localhost");
-        when(request.getMethod()).thenReturn("GET");
-        when(response.getHeaders()).thenReturn(headers);
-
-        CorsInterceptor inst = new CorsInterceptor(corsPolicy);
-
-        inst.filter(request, response);
-
-        assertThat(headers).isEmpty();
-    }
-
 
     @Test
     public void testIEHack() throws Exception {
