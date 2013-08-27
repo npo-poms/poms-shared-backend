@@ -26,7 +26,6 @@
   <bean id="mediaService" class="nl.vpro.domain.api.media.MediaServiceImpl">
     <constructor-arg ref="profileService"/>
     <constructor-arg ref="mainMediaRepository"/>
-    <constructor-arg ref="couchdbMediaRepository"/>
   </bean>
 
   <context:component-scan base-package="nl.vpro.api">
