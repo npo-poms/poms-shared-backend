@@ -11,16 +11,6 @@
   <bean id="mainMediaRepository" class="nl.vpro.domain.api.media.MediaRepositoryImpl">
     <constructor-arg ref="couchdbMediaRepository"/>
     <constructor-arg ref="elasticMediaRepository"/>
-    <constructor-arg>
-      <bean class="nl.vpro.domain.api.media.FallbackMediaRepositoryImpl">
-        <constructor-arg>
-          <list>
-            <ref bean="couchdbMediaRepository"/>
-            <ref bean="elasticMediaRepository"/>
-          </list>
-        </constructor-arg>
-      </bean>
-    </constructor-arg>
   </bean>
 
   <bean id="mediaService" class="nl.vpro.domain.api.media.MediaServiceImpl">
