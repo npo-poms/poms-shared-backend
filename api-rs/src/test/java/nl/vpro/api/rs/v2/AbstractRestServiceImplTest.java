@@ -33,7 +33,6 @@ public abstract class AbstractRestServiceImplTest {
 
     protected ObjectMapper mapper;
 
-
     protected Dispatcher dispatcher = MockDispatcherFactory.createDispatcher();
 
     @Before
