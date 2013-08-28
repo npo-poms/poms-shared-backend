@@ -44,6 +44,7 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
                     //ACCESS_CONTROL_ALLOW_ORIGIN_VALUE is ook beschikbaar
                     response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
                     response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
+                    response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
                 }
             }
         } else {
