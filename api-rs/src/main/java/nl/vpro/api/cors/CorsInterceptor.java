@@ -34,13 +34,9 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
         if(corsPolicy.isEnabled()) {
             String method = request.getMethod();
             if(StringUtils.isNotEmpty(origin)) {
-                // Hack which allows someone downstream to set their own headers
-                Object corsHeader = ((PreMatchContainerRequestContext)request).getHttpRequest().getAttribute("HasCorsHeaders");
-                boolean hasCorsHeaders = corsHeader != null && Boolean.TRUE.equals(corsHeader);
-
                 boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
 
-                if(allowed && !hasCorsHeaders) {
+                if(allowed) {
                     response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                     //ACCESS_CONTROL_ALLOW_ORIGIN_VALUE is ook beschikbaar
                     response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
