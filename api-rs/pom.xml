@@ -29,6 +29,10 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
+      <artifactId>api-stats</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
       <artifactId>api-profiles</artifactId>
     </dependency>
     <dependency>
