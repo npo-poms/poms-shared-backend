@@ -18,8 +18,8 @@ import nl.vpro.api.rs.v2.Responses;
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.MediaResult;
 import nl.vpro.domain.api.transfer.MediaTransferResult;
-import nl.vpro.statistic.StatsService;
-import nl.vpro.statistic.media.PlayService;
+import nl.vpro.domain.statistic.StatsService;
+import nl.vpro.domain.statistic.media.PlayService;
 import nl.vpro.swagger.SwaggerApplication;
 import nl.vpro.transfer.media.PropertySelection;
 
