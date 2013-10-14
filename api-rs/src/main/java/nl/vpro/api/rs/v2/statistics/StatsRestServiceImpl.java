@@ -65,7 +65,7 @@ public class StatsRestServiceImpl implements StatsRestService {
         try {
             period = StatsService.Period.valueOf(periodString);
         } catch(IllegalArgumentException e) {
-            return Responses.clientError("Can't parse period '{}'");
+            return Responses.clientError("Can't parse period '{}'", periodString);
         }
 
         MediaResult result = playService.mediaScoreOverall(period, offset, max);
