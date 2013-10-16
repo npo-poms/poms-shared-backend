@@ -26,6 +26,10 @@ public class Responses {
         return Response.ok(new nl.vpro.domain.api.Error(CLIENT_ERROR, "No page for id " + id)).status(CLIENT_ERROR).build();
     }
 
+    public static Response profileNotFound(String name) {
+        return Response.ok(new nl.vpro.domain.api.Error(CLIENT_ERROR, "No profile for name " + name)).status(CLIENT_ERROR).build();
+    }
+
     public static Response clientError(String message, String... args) {
         return Response.ok(new nl.vpro.domain.api.Error(CLIENT_ERROR, MessageFormatter.arrayFormat(message, args).getMessage())).status(CLIENT_ERROR).build();
     }

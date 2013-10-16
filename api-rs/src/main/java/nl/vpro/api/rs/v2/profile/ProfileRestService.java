@@ -6,6 +6,7 @@ package nl.vpro.api.rs.v2.profile;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import nl.vpro.domain.api.profile.Profile;
 
@@ -18,7 +19,7 @@ import nl.vpro.domain.api.profile.Profile;
 @Path(ProfileRestService.PATH)
 @Produces({MediaType.APPLICATION_JSON + "; charset=utf-8", MediaType.APPLICATION_XML + "; charset=utf-8"})
 public interface ProfileRestService {
-    public static final String PATH = "profiles";
+    public static final String PATH = "/profiles";
 
 
     /**
@@ -29,7 +30,7 @@ public interface ProfileRestService {
      */
     @GET
     @Path("/{name}")
-    Profile load(
+    Response load(
         @PathParam("name") String name,
         @QueryParam("mock") @DefaultValue("false") boolean mock
     );

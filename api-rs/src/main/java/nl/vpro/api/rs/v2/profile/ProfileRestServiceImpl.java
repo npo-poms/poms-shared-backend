@@ -5,11 +5,18 @@
 package nl.vpro.api.rs.v2.profile;
 
 import javax.annotation.PostConstruct;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.wordnik.swagger.annotations.*;
+
+import nl.vpro.api.rs.v2.Responses;
+import nl.vpro.api.rs.v2.media.MediaRestService;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.swagger.SwaggerApplication;
@@ -19,6 +26,9 @@ import nl.vpro.swagger.SwaggerApplication;
  * @since 2.0
  */
 @Service
+@Path(ProfileRestService.PATH)
+@Produces({MediaType.APPLICATION_XML + "; charset=utf-8"})
+@Api(value = ProfileRestService.PATH, description = "The profiles API")
 public class ProfileRestServiceImpl implements ProfileRestService {
 
     final private ProfileService profileService;
@@ -38,13 +48,28 @@ public class ProfileRestServiceImpl implements ProfileRestService {
         }
     }
 
+    @GET
+    @Path("/{name}")
+    @ApiOperation(httpMethod = "get",
+        value = "Get a profile",
+        notes = "Gets a profile by its name")
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
-    public Profile load(String name, boolean mock) {
+    public Response load(
+        @ApiParam(required = true) @PathParam("name") String name,
+        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+    ) {
         if(mock) {
-            return profileService.getProfiles().first();
+            Response.ok(profileService.getProfiles().first()).build();
         }
 
-        return profileService.getProfile(name);
+        Profile profile = profileService.getProfile(name);
+
+        if(profile == null) {
+            return Responses.profileNotFound(name);
+        }
+
+        return Response.ok(profile).build();
     }
 
 }
