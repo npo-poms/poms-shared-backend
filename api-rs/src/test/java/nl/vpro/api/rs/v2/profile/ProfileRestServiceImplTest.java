@@ -70,8 +70,7 @@ public class ProfileRestServiceImplTest extends AbstractRestServiceImplTest {
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
-        assertEquals(response.getErrorMessage(), 200, response.getStatus());
-        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+        assertEquals(response.getErrorMessage(), 406, response.getStatus());
     }
 
     @Test
