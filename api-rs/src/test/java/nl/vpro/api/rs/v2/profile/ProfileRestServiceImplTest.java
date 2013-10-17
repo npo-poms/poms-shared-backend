@@ -1,6 +1,5 @@
 package nl.vpro.api.rs.v2.profile;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,25 +7,20 @@ import java.util.TreeSet;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBException;
 
-import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
-import org.xml.sax.SAXException;
 
-import nl.vpro.domain.api.profile.ProfileService;
-import nl.vpro.domain.api.profile.ProfileServiceImpl;
 import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.profile.Profile;
+import nl.vpro.domain.api.profile.ProfileService;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
