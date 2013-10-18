@@ -42,6 +42,35 @@ public enum Profile {
         }
     },
 
+    HUMAN("human", "", "") {
+        @Override
+        public SearchFilter createFilterQuery() {
+            return new SearchFilterList(BooleanOp.AND)
+                .add(new MediaSearchFilter().addBroadcaster("HUMAN"))
+                .add(new MediaHasImageFilter("images.urn", "urn"));
+        }
+
+        @Override
+        public List<String> getSearchFields() {
+            return new ArrayList<String>();
+        }
+
+        @Override
+        public List<Float> getSearchBoosting() {
+            return new ArrayList<Float>();
+        }
+
+        @Override
+        public String getScoreField() {
+            return null;
+        }
+
+        @Override
+        public Map<String, Float> getScoreTable() {
+            return null;
+        }
+    },
+
     WETENSCHAP24("wetenschap24", "", "w24") {
         @Override
         public SearchFilter createFilterQuery() {
