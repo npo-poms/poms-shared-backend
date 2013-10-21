@@ -50,7 +50,7 @@ public interface MediaRestService {
     @GET
     @Path("program/replay/all")
     @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
-    public MediaSearchResultItemIterator getAllReplayableProgram(@QueryParam("type") String avType);
+    public MediaSearchResultItemIterator getAllReplayableProgram(@QueryParam("type") String avType, @QueryParam("profile") String profile);
 
     @GET
     @Path("program/{urn}/annotations")

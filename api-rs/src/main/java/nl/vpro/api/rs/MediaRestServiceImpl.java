@@ -9,6 +9,7 @@ import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.rs.util.StringUtil;
 import nl.vpro.api.service.MediaService;
+import nl.vpro.api.service.Profile;
 import nl.vpro.api.service.search.filterbuilder.BooleanOp;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
 import nl.vpro.api.transfer.*;
@@ -63,8 +64,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public MediaSearchResultItemIterator getAllReplayableProgram(final String avType) {
-        return new MediaSearchResultItemIterator(new WrappedIterator<Program, MediaSearchResultItem>(mediaService.getAllReplayablePrograms(getAvType(avType))) {
+    public MediaSearchResultItemIterator getAllReplayableProgram(final String avType, String profileName) {
+        return new MediaSearchResultItemIterator(new WrappedIterator<Program, MediaSearchResultItem>(mediaService.getAllReplayablePrograms(getAvType(avType), profileName)) {
             @Override
             public MediaSearchResultItem next() {
                 return new MediaSearchResultItem(wrapped.next());
