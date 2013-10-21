@@ -5,6 +5,7 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.*;
+import nl.vpro.api.domain.media.Location;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.search.Search;
@@ -222,9 +223,13 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Iterator<Program> getAllReplayablePrograms(AvType avType) {
+    public Iterator<Program> getAllReplayablePrograms(AvType avType, String profileName) {
         try {
-            URL requestUrl = new URL(getReplayableProgramsCouchdbUrl(null, null, avType, true));
+            Profile profile = profileService.getProfile(profileName);
+            // HACK, broadcaster is not really the same as the name of the profile.
+            String broadcaster = profile.getName().toUpperCase();
+
+            URL requestUrl = new URL(getReplayableProgramsCouchdbUrl(null, null, avType, true, broadcaster));
 
             InputStream inputStream = requestUrl.openStream();
             final ObjectMapper m = new ObjectMapper();
@@ -255,7 +260,8 @@ public class MediaServiceImpl implements MediaService {
                             try {
                                 final Program program = m.readValue(jsonNode, Program.class);
                                 final List<Image> images = program.getImages();
-                                if (images != null && !images.isEmpty()) {
+                                final List<Location> locations = program.getLocations();
+                                if (images != null && !images.isEmpty() && locations!=null && !locations.isEmpty()) {
                                     next = program;
                                     break;
                                 }
@@ -289,7 +295,7 @@ public class MediaServiceImpl implements MediaService {
         return programList;
     }
 
-    private String getReplayableProgramsCouchdbUrl(Integer offset, Integer max, AvType avType, boolean includeDocs) {
+    private String getReplayableProgramsCouchdbUrl(Integer offset, Integer max, AvType avType, boolean includeDocs, String broadcaster) {
         Options options = new Options();
         options.reduce(false);
         options.descending(true);
@@ -307,12 +313,12 @@ public class MediaServiceImpl implements MediaService {
         Calendar now = createNowWithHourPrecision();
         final String view;
         if (avType == null) {
-            options.startKey(new Object[]{"VPRO", now.getTimeInMillis()});
-            options.endKey((new Object[]{"VPRO"}));
+            options.startKey(new Object[]{broadcaster, now.getTimeInMillis()});
+            options.endKey((new Object[]{broadcaster}));
             view = couchdbViewReplayableRrogramsByFirstBroadcasting;
         } else {
-            options.startKey(new Object[]{"VPRO", avType.toString(), now.getTimeInMillis()});
-            options.endKey((new Object[]{"VPRO", avType.toString()}));
+            options.startKey(new Object[]{broadcaster, avType.toString(), now.getTimeInMillis()});
+            options.endKey((new Object[]{broadcaster, avType.toString()}));
             view = couchdbViewReplayableRrogramsByAvtype;
         }
         return createCouchdbViewUrl(view, options);

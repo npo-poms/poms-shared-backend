@@ -38,7 +38,7 @@ public interface MediaService {
      */
     ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType);
 
-    Iterator<Program> getAllReplayablePrograms(AvType avType);
+    Iterator<Program> getAllReplayablePrograms(AvType avType, String profile);
 
     /**
      * @param id
