@@ -228,11 +228,13 @@ public class MediaServiceImpl implements MediaService {
             Profile profile = profileService.getProfile(profileName);
             // HACK, broadcaster is not really the same as the name of the profile.
             String broadcaster = profile.getName().toUpperCase();
+            if (broadcaster.isEmpty()) {
+                broadcaster = "VPRO";
+            }
 
             URL requestUrl = new URL(getReplayableProgramsCouchdbUrl(null, null, avType, true, broadcaster));
 
             InputStream inputStream = requestUrl.openStream();
-            final ObjectMapper m = new ObjectMapper();
 
             Iterator<JsonNode> iterator = new CouchdbViewIterator(inputStream);
             return new WrappedIterator<JsonNode, Program>(iterator) {
@@ -258,7 +260,7 @@ public class MediaServiceImpl implements MediaService {
                         while (wrapped.hasNext()) {
                             JsonNode jsonNode = wrapped.next();
                             try {
-                                final Program program = m.readValue(jsonNode, Program.class);
+                                final Program program = MediaMapper.INSTANCE.readValue(jsonNode, Program.class);
                                 final List<Image> images = program.getImages();
                                 final List<Location> locations = program.getLocations();
                                 if (images != null && !images.isEmpty() && locations!=null && !locations.isEmpty()) {
