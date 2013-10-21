@@ -47,7 +47,8 @@ public enum Profile {
         public SearchFilter createFilterQuery() {
             return new SearchFilterList(BooleanOp.AND)
                 .add(new MediaSearchFilter().addBroadcaster("HUMAN"))
-                .add(new MediaHasImageFilter("images.urn", "urn"));
+                .add(new MediaHasImageFilter("images.urn", "urn"))
+                .add(new MediaHasLocationFilter("locations.urn", "urn"));
         }
 
         @Override
@@ -154,7 +155,8 @@ public enum Profile {
         public SearchFilter createFilterQuery() {
             return new SearchFilterList(BooleanOp.AND)
                 .add(new MediaSearchFilter().addBroadcaster("VPRO"))
-                .add(new MediaHasImageFilter("images.urn", "urn"));
+                .add(new MediaHasImageFilter("images.urn", "urn"))
+                .add(new MediaHasLocationFilter("locations.urn", "urn"));
         }
 
         @Override
