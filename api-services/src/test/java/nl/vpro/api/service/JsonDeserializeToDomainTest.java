@@ -110,7 +110,7 @@ public class JsonDeserializeToDomainTest {
             assertEquals(1330615422470L, group.getLastModified().getTime());
             assertTrue(group.isEmbeddable());
             assertEquals("urn:vpro:media:group:12879828", group.getUrn());
-            assertEquals(GroupType.ALBUM, group.getType());
+            assertEquals(GroupType.ALBUM.name(), group.getType());
             assertTrue(group.isIsOrdered());
 
             assertEquals(1, group.getDescriptions().size());
