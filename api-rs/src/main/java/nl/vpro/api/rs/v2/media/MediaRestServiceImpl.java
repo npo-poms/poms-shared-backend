@@ -135,8 +135,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiOperation(httpMethod = "get",
         value = "Load media",
         notes = "Load media by id. The media id is the Media object's URN")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"),
-    @ApiError(code = 500, reason = "Server error")})
+    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Path("/{id}")
     @Override
     public Response load(
