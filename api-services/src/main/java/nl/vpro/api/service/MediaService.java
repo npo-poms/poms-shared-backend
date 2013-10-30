@@ -36,7 +36,7 @@ public interface MediaService {
      * that has (a) location(s) attached to it, so it is playable.
      * The programs are sorted by first broadcast date descending.
      */
-    ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType);
+    ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType, String profile);
 
     Iterator<Program> getAllReplayablePrograms(AvType avType, String profile);
 

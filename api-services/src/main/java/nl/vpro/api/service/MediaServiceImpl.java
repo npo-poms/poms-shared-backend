@@ -5,7 +5,6 @@
 package nl.vpro.api.service;
 
 import nl.vpro.api.domain.media.*;
-import nl.vpro.api.domain.media.Location;
 import nl.vpro.api.domain.media.support.MediaObjectType;
 import nl.vpro.api.domain.media.support.MediaUtil;
 import nl.vpro.api.service.search.Search;
@@ -13,13 +12,17 @@ import nl.vpro.api.service.search.es.ProfileFilterBuilder;
 import nl.vpro.api.service.search.filterbuilder.MediaSearchFilter;
 import nl.vpro.api.service.search.filterbuilder.SearchFilter;
 import nl.vpro.api.service.search.filterbuilder.TagFilter;
-import nl.vpro.api.transfer.*;
+import nl.vpro.api.transfer.MediaSearchResult;
+import nl.vpro.api.transfer.MediaSearchResultItem;
+import nl.vpro.api.transfer.ProgramList;
+import nl.vpro.api.transfer.SearchSuggestions;
 import nl.vpro.api.util.CouchdbViewIterator;
 import nl.vpro.api.util.MediaObjectIterator;
 import nl.vpro.api.util.UrlProvider;
 import nl.vpro.domain.ugc.annotation.Annotation;
 import nl.vpro.jackson.MediaMapper;
 import nl.vpro.util.FilteringIterator;
+import nl.vpro.util.Helper;
 import nl.vpro.util.WrappedIterator;
 import nl.vpro.util.rs.error.NotFoundException;
 import nl.vpro.util.rs.error.ServerErrorException;
@@ -184,18 +187,24 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType) {
+    public ProgramList getReplayablePrograms(Integer max, Integer offset, AvType avType, String profileName) {
         final SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        Profile profile;
 
-        final Profile vpro = profileService.getProfile("vpro");
-        final FilterBuilder filterBuilder = new ProfileFilterBuilder(vpro);
-        sourceBuilder.filter(filterBuilder);
+        if (Helper.isEmpty(profileName)) {
+            profileName = "vpro";
+        }
+        profile = profileService.getProfile(profileName);
+        if (profile != null) {
+            final FilterBuilder filterBuilder = new ProfileFilterBuilder(profile);
+            sourceBuilder.filter(filterBuilder);
+        }
 
-        if (max    != null) sourceBuilder.size(max);
+        if (max != null) sourceBuilder.size(max);
         if (offset != null) sourceBuilder.from(offset);
 
         final BoolQueryBuilder queryBuilder = new BoolQueryBuilder()
-            .must(prefixQuery("urn", "urn:vpro:media:program")); // Only return programs, no groups
+                .must(prefixQuery("urn", "urn:vpro:media:program")); // Only return programs, no groups
 
         if (avType != null) {
             queryBuilder.must(termQuery("avType", avType.name()));
@@ -241,6 +250,7 @@ public class MediaServiceImpl implements MediaService {
                 private final Logger log = LoggerFactory.getLogger(MediaService.class);
 
                 Program next;
+
                 @Override
                 public Program next() {
                     findNext();
@@ -249,6 +259,7 @@ public class MediaServiceImpl implements MediaService {
                     next = null;
                     return result;
                 }
+
                 @Override
                 public boolean hasNext() {
                     findNext();
@@ -263,7 +274,7 @@ public class MediaServiceImpl implements MediaService {
                                 final Program program = MediaMapper.INSTANCE.readValue(jsonNode, Program.class);
                                 final List<Image> images = program.getImages();
                                 final List<Location> locations = program.getLocations();
-                                if (images != null && !images.isEmpty() && locations!=null && !locations.isEmpty()) {
+                                if (images != null && !images.isEmpty() && locations != null && !locations.isEmpty()) {
                                     next = program;
                                     break;
                                 }
@@ -442,7 +453,7 @@ public class MediaServiceImpl implements MediaService {
         options.includeDocs(true);
 
         URL couchdb = new URL(couchdbUrlprovider.getUrl()
-            + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
+                + "/_design/media/_view/by-ancestor-and-type?reduce=false&startkey=[\"" + urn + "\"]&endkey=[\"" + urn + "\",{}]&inclusive_end=true&include_docs=true");
         InputStream inputStream = couchdb.openStream();
 
         SearchFilter searchFilter = profile.createFilterQuery();
@@ -458,8 +469,7 @@ public class MediaServiceImpl implements MediaService {
                             MediaSearchResultItem.class);
                 }
             };
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("Profile is not a media profile.");
         }
     }
@@ -647,8 +657,8 @@ public class MediaServiceImpl implements MediaService {
 
         @Override
         public int compare(Program media, Program media1) {
-            if (media.getSortDate()!=null) {
-                if (media1.getSortDate()!=null) {
+            if (media.getSortDate() != null) {
+                if (media1.getSortDate() != null) {
                     return media.getSortDate().compareTo(media1.getSortDate());
                 } else {
                     return 1;
