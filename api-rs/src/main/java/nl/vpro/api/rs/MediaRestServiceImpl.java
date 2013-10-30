@@ -59,8 +59,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @Override
-    public ProgramList getRecentReplayablePrograms(Integer maxResult, Integer offset, String avType) {
-        return mediaService.getReplayablePrograms(maxResult, offset, StringUtils.isEmpty(avType) ? null : AvType.valueOf(avType.toUpperCase()));
+    public ProgramList getRecentReplayablePrograms(Integer maxResult, Integer offset, String avType, String profileName) {
+        return mediaService.getReplayablePrograms(maxResult, offset, StringUtils.isEmpty(avType) ? null : AvType.valueOf(avType.toUpperCase()), profileName);
     }
 
     @Override

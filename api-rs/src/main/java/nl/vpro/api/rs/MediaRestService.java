@@ -45,7 +45,7 @@ public interface MediaRestService {
     @GET
     @Path("program/replay")
     @Produces(MediaType.APPLICATION_JSON+"; charset=UTF8")
-    public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType);
+    public ProgramList getRecentReplayablePrograms(@QueryParam("max") Integer maxResult, @QueryParam("offset") Integer offset, @QueryParam("type") String avType, @QueryParam("profile") String profile);
 
     @GET
     @Path("program/replay/all")
