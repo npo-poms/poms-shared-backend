@@ -86,4 +86,10 @@ public class Result<T> implements Iterable<T> {
     public Iterator<T> iterator() {
         return Collections.unmodifiableList(getList()).iterator();
     }
+
+    @Override
+    public String toString() {
+        return "" + getList();
+
+    }
 }
