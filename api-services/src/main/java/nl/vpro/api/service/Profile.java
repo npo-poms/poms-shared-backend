@@ -130,14 +130,15 @@ public enum Profile {
                     .add(contentRules);
         }
 
-        public List<String> getSearchFields() {
-            return Arrays.asList("title", "subTitle", "description", "programTitles", "genres", "tags", "broadcasters");
-        }
+			@Override
+			public List<String> getSearchFields() {
+				return Arrays.asList("title", "subTitle", "description", "programTitles", "genres", "tags", "broadcasters");
+			}
 
-        @Override
-        public List<Float> getSearchBoosting() {
-            return Arrays.asList(3.0f, 2.0f, 1.5f, 2.0f, 1.0f, 1.0f, 2.0f);
-        }
+			@Override
+			public List<Float> getSearchBoosting() {
+				return Arrays.asList(3.0f, 2.0f, 1.5f, 2.0f, 1.0f, 1.0f, 2.0f);
+			}
 
         @Override
         public String getScoreField() {
