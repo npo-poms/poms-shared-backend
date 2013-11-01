@@ -137,7 +137,8 @@ public class ESSearch extends AbstractSearch {
         queryBuilder.must(termQuery("type", MediaType.ARCHIVE.toString()));
         queryBuilder.must(termQuery("titles.value", archiveName));
 
-        request.types("poms");
+        request.types("poms"
+		);
         request.source(searchBuilder);
         MediaSearchResult result = executeQuery(request, 0, MediaSearchResult.class);
         if (result.getNumFound() > 0) {
@@ -322,7 +323,7 @@ public class ESSearch extends AbstractSearch {
 
         try {
             SearchResponse response = searchResponseFuture.actionGet(timeoutInSeconds, TimeUnit.SECONDS);
-            return (T) conversionService.convert(new SearchResponseExtender(response, offset), targetType);
+            return conversionService.convert(new SearchResponseExtender(response, offset), targetType);
         } catch (Throwable e) {
             throw new ServerErrorException("Something went wrong performing an elastic search operation:" + e.getMessage(), e);
         }
