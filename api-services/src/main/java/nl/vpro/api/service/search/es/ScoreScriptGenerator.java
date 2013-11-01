@@ -15,7 +15,7 @@ import java.util.Map;
 public class ScoreScriptGenerator {
 
     public static String generate(String field, Map<String, Float> scoreTable) {
-        StringBuffer script = new StringBuffer();
+        StringBuilder script = new StringBuilder();
 
         script.append("scoreTable = [");
         boolean first = true;
