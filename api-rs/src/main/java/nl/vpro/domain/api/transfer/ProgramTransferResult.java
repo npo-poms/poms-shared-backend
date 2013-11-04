@@ -20,8 +20,8 @@ import nl.vpro.transfer.media.PropertySelection;
  * @author Roelof Jan Koekoek
  * @since 1.0
  */
-@XmlRootElement(name = "mediaResult")
-@XmlType(name = "mediaResultType")
+@XmlRootElement(name = "programResult")
+@XmlType(name = "programResultType")
 public class ProgramTransferResult extends Result<MediaTransfer> {
 
     protected ProgramTransferResult() {
