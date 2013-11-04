@@ -20,6 +20,7 @@ import nl.vpro.transfer.media.*;
  * @since 1.0
  */
 @XmlRootElement(name = "mediaResult")
+@XmlType(name = "mediaResultType")
 @XmlSeeAlso({ProgramTransfer.class, GroupTransfer.class, SegmentTransfer.class})
 public class MediaTransferResult extends Result<MediaTransfer> {
 
