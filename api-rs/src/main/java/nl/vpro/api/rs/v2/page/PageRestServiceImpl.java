@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,13 +18,12 @@ import org.springframework.stereotype.Service;
 import com.wordnik.swagger.annotations.*;
 
 import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.Error;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
 import nl.vpro.domain.page.PageBuilder;
 import nl.vpro.swagger.SwaggerApplication;
-
-import static nl.vpro.api.rs.v2.Util.exception;
 
 /**
  * @author Michiel Meeuwissen
@@ -71,26 +71,26 @@ public class PageRestServiceImpl implements PageRestService {
     @ApiOperation(httpMethod = "get", value = "Get all pages", notes = "Get all pages filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
-    public PageResult list(
+    public Response list(
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
-            return new PageResult(mockList(listSizes, offset, max), offset, max, listSizes);
+            return Response.ok(new PageResult(mockList(listSizes, offset, max), offset, max, listSizes)).build();
         }
         try {
-            return find(null, profile, offset, max, mock).asResult();
+            return Response.ok(pageService.find(null, profile, offset, max).asResult()).build();
         } catch(Exception e) {
-            throw exception(e);
+            return Response.ok(new Error(200, e.getMessage())).status(200).build();
         }
     }
 
     @ApiOperation(httpMethod = "post", value = "Find pages", notes = "Find pages by posting a search form. Results are filtered on an optional profile")
     @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
     @Override
-    public PageSearchResult find(
+    public Response find(
         @ApiParam(value = "Search form", required = false, defaultValue = DEMO_FORM) PageForm form,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -102,12 +102,12 @@ public class PageRestServiceImpl implements PageRestService {
             PageFacetsResult facets = new PageFacetsResult();
             facets.setBroadcasters(Arrays.asList(new TermFacetResultItem("kro", 10)));
             result.setFacets(facets);
-            return result;
+            return Response.ok(result).build();
         }
         try {
-            return pageService.find(form, profile, offset, max);
+            return Response.ok(pageService.find(form, profile, offset, max)).build();
         } catch(Exception e) {
-            throw exception(e);
+            return Response.ok(new Error(500, e.getMessage())).status(500).build();
         }
     }
 

@@ -6,10 +6,9 @@ package nl.vpro.api.rs.v2.page;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import nl.vpro.domain.api.Constants;
-import nl.vpro.domain.api.PageResult;
-import nl.vpro.domain.api.PageSearchResult;
 import nl.vpro.domain.api.page.PageForm;
 
 /**
@@ -22,14 +21,14 @@ public interface PageRestService {
     public static final String PATH = "/pages";
 
     @GET
-    PageResult list(
+    Response list(
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
         @QueryParam("mock") @DefaultValue("false") boolean mock);
 
     @POST
-    PageSearchResult find(
+    Response find(
         PageForm form,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Long offset,
