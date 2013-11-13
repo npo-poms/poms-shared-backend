@@ -1,10 +1,7 @@
 package nl.vpro.api.rs.v2.page;
 
 import java.net.URISyntaxException;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.DefaultValue;
@@ -83,7 +80,7 @@ public class PageRestServiceImpl implements PageRestService {
         try {
             return Response.ok(pageService.find(null, profile, offset, max).asResult()).build();
         } catch(Exception e) {
-            return Response.ok(new Error(200, e.getMessage())).status(200).build();
+            return Response.ok(new Error(200, e)).status(200).build();
         }
     }
 
@@ -101,13 +98,14 @@ public class PageRestServiceImpl implements PageRestService {
             PageSearchResult result = new PageSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
             PageFacetsResult facets = new PageFacetsResult();
             facets.setBroadcasters(Arrays.asList(new TermFacetResultItem("kro", 10)));
+            facets.setSortDates(Arrays.asList(new DateFacetResultItem("LAST_WEEK", new Date(System.currentTimeMillis() - 3600 * 47 * 7), new Date(), 20)));
             result.setFacets(facets);
             return Response.ok(result).build();
         }
         try {
             return Response.ok(pageService.find(form, profile, offset, max)).build();
         } catch(Exception e) {
-            return Response.ok(new Error(500, e.getMessage())).status(500).build();
+            return Response.ok(new Error(500, e)).status(500).build();
         }
     }
 
