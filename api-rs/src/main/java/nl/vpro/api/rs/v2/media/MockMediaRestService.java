@@ -86,7 +86,7 @@ class MockMediaRestService implements MediaRestService {
     }
 
     @Override
-    public Response changes(String profile, String properties, Long since, @DefaultValue("asc") String order, Integer max, @Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
+    public Response changes(String profile, Long since, @DefaultValue("asc") String order, Integer max, @Context HttpServletRequest request, @Context HttpServletResponse response) throws IOException {
         // TODO
         return null;
     }

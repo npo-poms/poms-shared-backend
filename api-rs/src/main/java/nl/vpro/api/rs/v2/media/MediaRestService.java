@@ -13,11 +13,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.wordnik.swagger.annotations.ApiParam;
-
-import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.media.MediaObject;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
@@ -222,7 +219,6 @@ public interface MediaRestService {
     @Path("/changes")
     Response changes(
         @QueryParam("profile") String profile,
-        @QueryParam("properties") String properties,
         @QueryParam("since") Long since,
         @QueryParam("order") @DefaultValue("asc") String order,
         @QueryParam("max") Integer max,
