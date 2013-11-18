@@ -42,7 +42,7 @@ public class PageRestServiceImpl implements PageRestService {
         "    \"highlight\": true,\n" +
         "    \"searches\": {\n" +
         "        \"text\": \"Tegenlicht\",\n" +
-        "        \"types\": [\n" +
+        "        \"pageTypes\": [\n" +
         "            \"ARTICLE\"\n" +
         "        ]\n" +
         "    }\n" +

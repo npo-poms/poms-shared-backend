@@ -22,7 +22,7 @@ import nl.vpro.domain.api.media.MediaForm;
  * statements and it is mainly document oriented. Most calls will return a full media document and there are no separate
  * calls for sub-resources.
  * <p/>
- * The API returns three media instance types: Programs, Groups and Segments. A Program result always includes it's
+ * The API returns three media instance pageTypes: Programs, Groups and Segments. A Program result always includes it's
  * contained Segments, but it is possible to retrieve Segments on there own. This is useful when a Segment occurs
  * on a playlist for example.
  * <p/>
