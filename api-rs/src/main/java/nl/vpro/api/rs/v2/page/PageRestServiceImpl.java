@@ -104,6 +104,7 @@ public class PageRestServiceImpl implements PageRestService {
         }
         try {
             return Response.ok(pageService.find(form, profile, offset, max)).build();
+
         } catch(Exception e) {
             return Response.ok(new Error(500, e)).status(500).build();
         }
