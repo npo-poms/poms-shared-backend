@@ -19,15 +19,15 @@ public class Responses {
     private final static int SERVER_ERROR = 500;
 
     public static Response mediaNotFound(String id) {
-        return Response.ok(new nl.vpro.domain.api.Error(CLIENT_ERROR, "No media for id " + id)).status(CLIENT_ERROR).build();
+        return Response.ok(new nl.vpro.domain.api.Error(404, "No media for id " + id)).status(CLIENT_ERROR).build();
     }
 
     public static Response pageNotFound(String id) {
-        return Response.ok(new nl.vpro.domain.api.Error(CLIENT_ERROR, "No page for id " + id)).status(CLIENT_ERROR).build();
+        return Response.ok(new nl.vpro.domain.api.Error(404, "No page for id " + id)).status(CLIENT_ERROR).build();
     }
 
     public static Response profileNotFound(String name) {
-        return Response.ok(new nl.vpro.domain.api.Error(CLIENT_ERROR, "No profile for name " + name)).status(CLIENT_ERROR).build();
+        return Response.ok(new nl.vpro.domain.api.Error(404, "No profile for name " + name)).status(CLIENT_ERROR).build();
     }
 
     public static Response clientError(String message, String... args) {

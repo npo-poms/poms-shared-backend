@@ -4,16 +4,15 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Iterator;
-
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -179,6 +178,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
         try {
             MediaSearchResult searchResult = mediaService.findMembers(id, profile, null, offset, max);
+            if (searchResult == null) {
+                return Responses.mediaNotFound(id);
+            }
             return filteredAsMediaResult(searchResult, properties);
         } catch(Exception e) {
             throw exception(e);
