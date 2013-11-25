@@ -177,6 +177,9 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
 
+        if (mock) {
+            return mocks.listMembers(id, profile, properties, offset, max, true);
+        }
         try {
             MediaObject parent = mediaService.load(id);
             if (parent == null) {
@@ -303,6 +306,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
 
         try {
+            MediaObject parent = mediaService.load(id);
+            if (parent == null) {
+                return Responses.mediaNotFound(id);
+            }
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, null, offset, max);
             return filteredAsMediaSearchResult(descendants, properties);
         } catch(Exception e) {
@@ -329,6 +336,10 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findDescendants(form, id, profile, properties, offset, max, true);
         }
         try {
+            MediaObject parent = mediaService.load(id);
+            if (parent == null) {
+                return Responses.mediaNotFound(id);
+            }
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
             return filteredAsMediaSearchResult(descendants, properties);
         } catch(Exception e) {
