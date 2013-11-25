@@ -59,7 +59,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         "    \"searches\": {\n" +
         "        \"descendantOf\": [\n" +
         "            {\n" +
-        "                \"value\": \"urn:vpro:media:group:72709\"\n" +
+        "                \"value\": \"urn:vpro:media:group:72709\",\n" +
+        "                \"match\": \"MUST\"\n" +
         "            }\n" +
         "        ]\n" +
         "    }\n" +
