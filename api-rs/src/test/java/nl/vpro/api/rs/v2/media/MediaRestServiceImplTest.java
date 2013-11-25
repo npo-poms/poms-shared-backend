@@ -264,6 +264,8 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         when(mediaService.findMembers(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
             .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
 
+        when(mediaService.load("123")).thenReturn(new Program());
+
         MockHttpRequest request = MockHttpRequest.get("/media/123/members?mock=true");
 
         MockHttpResponse response = new MockHttpResponse();
