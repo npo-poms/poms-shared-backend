@@ -18,9 +18,11 @@ import org.junit.Test;
 
 import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.Error;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaSearch;
 import nl.vpro.domain.api.media.MediaService;
+import nl.vpro.domain.media.Group;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
@@ -266,7 +268,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
         when(mediaService.load("123")).thenReturn(new Program());
 
-        MockHttpRequest request = MockHttpRequest.get("/media/123/members?mock=true");
+        MockHttpRequest request = MockHttpRequest.get("/media/123/members");
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
@@ -281,9 +283,38 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         assertThat(result.getTotal()).isEqualTo(10);
     }
 
+
+    @Test
+    public void testGetMembersNotFound() throws URISyntaxException, IOException {
+        when(mediaService.findMembers(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+            .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
+
+        when(mediaService.load("123")).thenReturn(null);
+
+        MockHttpRequest request = MockHttpRequest.get("/media/123/members");
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 400, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        TypeReference<Error> typeRef = new TypeReference<Error>() {
+        };
+
+        Error result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertThat(result.getMessage()).isEqualTo("No media for id 123");
+    }
+
     @Test
     public void testGetEpisodes() throws URISyntaxException, IOException {
-        MockHttpRequest request = MockHttpRequest.get("/media/123/episodes?mock=true");
+
+        when(mediaService.findEpisodes(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+            .thenReturn(new ProgramSearchResult(new ArrayList<SearchResultItem<? extends Program>>(), 0l, 0, 10l));
+
+        when(mediaService.load("123")).thenReturn(new Group());
+
+        MockHttpRequest request = MockHttpRequest.get("/media/123/episodes");
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
@@ -295,12 +326,40 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         };
 
         nl.vpro.domain.api.transfer.Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
-        assertEquals(Integer.valueOf(10), result.getSize());
+        assertEquals(Long.valueOf(10), result.getTotal());
+    }
+
+    @Test
+    public void testGetEpisodesNotFound() throws URISyntaxException, IOException {
+
+        when(mediaService.findEpisodes(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+            .thenReturn(new ProgramSearchResult(new ArrayList<SearchResultItem<? extends Program>>(), 0l, 0, 10l));
+
+        when(mediaService.load("123")).thenReturn(null);
+
+        MockHttpRequest request = MockHttpRequest.get("/media/123/episodes");
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 400, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        TypeReference<Error> typeRef = new TypeReference<Error>() {
+        };
+
+        Error result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertThat(result.getMessage()).isEqualTo("No media for id 123");
     }
 
     @Test
     public void testGetDescendants() throws URISyntaxException, IOException {
-        MockHttpRequest request = MockHttpRequest.get("/media/123/descendants?mock=true");
+        when(mediaService.findDescendants(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+            .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
+
+        when(mediaService.load("123")).thenReturn(new Group());
+
+        MockHttpRequest request = MockHttpRequest.get("/media/123/descendants");
 
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
@@ -312,8 +371,31 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         };
 
         nl.vpro.domain.api.transfer.Result<Program> result = mapper.readValue(response.getContentAsString(), typeRef);
-        assertEquals(Integer.valueOf(10), result.getSize());
+        assertEquals(Long.valueOf(10), result.getTotal());
     }
 
+
+    @Test
+    public void testGetDescendantsNotFound() throws URISyntaxException, IOException {
+        when(mediaService.findDescendants(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+            .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
+
+        when(mediaService.load("123")).thenReturn(null);
+
+
+        MockHttpRequest request = MockHttpRequest.get("/media/123/descendants");
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assertEquals(response.getErrorMessage(), 400, response.getStatus());
+        assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
+
+        TypeReference<Error> typeRef = new TypeReference<Error>() {
+        };
+
+        Error result = mapper.readValue(response.getContentAsString(), typeRef);
+        assertThat(result.getMessage()).isEqualTo("No media for id 123");
+    }
 
 }
