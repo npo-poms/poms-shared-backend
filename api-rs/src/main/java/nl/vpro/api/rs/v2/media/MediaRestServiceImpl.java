@@ -4,15 +4,16 @@
  */
 package nl.vpro.api.rs.v2.media;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -177,10 +178,11 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
 
         try {
-            MediaSearchResult searchResult = mediaService.findMembers(id, profile, null, offset, max);
-            if (searchResult == null) {
+            MediaObject parent = mediaService.load(id);
+            if (parent == null) {
                 return Responses.mediaNotFound(id);
             }
+            MediaSearchResult searchResult = mediaService.findMembers(id, profile, null, offset, max);
             return filteredAsMediaResult(searchResult, properties);
         } catch(Exception e) {
             throw exception(e);
@@ -207,7 +209,14 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findMembers(form, id, profile, properties, offset, max, true);
         }
         try {
+            MediaObject parent = mediaService.load(id);
+            if (parent == null) {
+                return Responses.mediaNotFound(id);
+            }
             MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
+            if (members == null) {
+                return Responses.mediaNotFound(id);
+            }
             return filteredAsMediaSearchResult(members, properties);
         } catch(Exception e) {
             throw exception(e);
@@ -233,6 +242,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
 
         try {
+            MediaObject parent = mediaService.load(id);
+            if (parent == null) {
+                return Responses.mediaNotFound(id);
+            }
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, null, offset, max);
             return filteredAsProgramResult(episodes, properties);
         } catch(Exception e) {
@@ -259,6 +272,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
 
         try {
+            MediaObject parent = mediaService.load(id);
+            if (parent == null) {
+                return Responses.mediaNotFound(id);
+            }
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
             return filteredAsProgramSearchResult(episodes, properties);
         } catch(Exception e) {
