@@ -182,11 +182,13 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.listMembers(id, profile, properties, offset, max, true);
         }
         try {
-            MediaObject parent = mediaService.load(id);
-            if (parent == null) {
-                return Responses.mediaNotFound(id);
-            }
+
             MediaSearchResult searchResult = mediaService.findMembers(id, profile, null, offset, max);
+            if (searchResult.getSize() == 0) {
+                if ( mediaService.load(id) == null) {
+                    return Responses.mediaNotFound(id);
+                }
+            }
             return filteredAsMediaResult(searchResult, properties);
         } catch(Exception e) {
             throw exception(e);
@@ -213,13 +215,15 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findMembers(form, id, profile, properties, offset, max, true);
         }
         try {
-            MediaObject parent = mediaService.load(id);
-            if (parent == null) {
-                return Responses.mediaNotFound(id);
-            }
             MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
             if (members == null) {
                 return Responses.mediaNotFound(id);
+            }
+            if (members.getSize() == 0) {
+                MediaObject parent = mediaService.load(id);
+                if (parent == null) {
+                    return Responses.mediaNotFound(id);
+                }
             }
             return filteredAsMediaSearchResult(members, properties);
         } catch(Exception e) {
@@ -246,11 +250,13 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
 
         try {
-            MediaObject parent = mediaService.load(id);
-            if (parent == null) {
-                return Responses.mediaNotFound(id);
-            }
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, null, offset, max);
+            if (episodes.getSize() == 0) {
+                MediaObject parent = mediaService.load(id);
+                if (parent == null) {
+                    return Responses.mediaNotFound(id);
+                }
+            }
             return filteredAsProgramResult(episodes, properties);
         } catch(Exception e) {
             throw exception(e);
@@ -276,11 +282,13 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
 
         try {
-            MediaObject parent = mediaService.load(id);
-            if (parent == null) {
-                return Responses.mediaNotFound(id);
-            }
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
+            if (episodes.getSize() == 0) {
+                MediaObject parent = mediaService.load(id);
+                if (parent == null) {
+                    return Responses.mediaNotFound(id);
+                }
+            }
             return filteredAsProgramSearchResult(episodes, properties);
         } catch(Exception e) {
             throw exception(e);
@@ -307,11 +315,14 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
 
         try {
-            MediaObject parent = mediaService.load(id);
-            if (parent == null) {
-                return Responses.mediaNotFound(id);
-            }
+
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, null, offset, max);
+            if (descendants.getSize() == 0) {
+                MediaObject parent = mediaService.load(id);
+                if (parent == null) {
+                    return Responses.mediaNotFound(id);
+                }
+            }
             return filteredAsMediaSearchResult(descendants, properties);
         } catch(Exception e) {
             throw exception(e);
@@ -337,11 +348,13 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mocks.findDescendants(form, id, profile, properties, offset, max, true);
         }
         try {
-            MediaObject parent = mediaService.load(id);
-            if (parent == null) {
-                return Responses.mediaNotFound(id);
-            }
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
+            if (descendants.getSize() == 0) {
+                MediaObject parent = mediaService.load(id);
+                if (parent == null) {
+                    return Responses.mediaNotFound(id);
+                }
+            }
             return filteredAsMediaSearchResult(descendants, properties);
         } catch(Exception e) {
             throw exception(e);
@@ -349,6 +362,8 @@ public class MediaRestServiceImpl implements MediaRestService {
 
 
     }
+
+
 
     @ApiOperation(httpMethod = "get",
         value = "List related",
