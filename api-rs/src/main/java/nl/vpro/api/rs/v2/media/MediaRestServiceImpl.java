@@ -184,6 +184,9 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
 
             MediaSearchResult searchResult = mediaService.findMembers(id, profile, null, offset, max);
+            if (searchResult == null) {
+                return Responses.mediaNotFound(id);
+            }
             if (searchResult.getSize() == 0) {
                 if ( mediaService.load(id) == null) {
                     return Responses.mediaNotFound(id);
