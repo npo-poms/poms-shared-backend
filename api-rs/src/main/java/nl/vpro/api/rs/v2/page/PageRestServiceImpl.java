@@ -27,7 +27,7 @@ import nl.vpro.swagger.SwaggerApplication;
  * @since 2.0
  */
 @Service
-@Api(value = "Pages")
+@Api(value = PageRestService.PATH, position = 1)
 public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
 
@@ -65,7 +65,11 @@ public class PageRestServiceImpl implements PageRestService {
         }
     }
 
-    @ApiOperation(httpMethod = "get", value = "Get all pages", notes = "Get all pages filtered on an optional profile")
+    @ApiOperation(httpMethod = "get",
+        value = "Get all pages",
+        notes = "Get all pages filtered on an optional profile",
+        position = 0
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response list(
@@ -84,7 +88,11 @@ public class PageRestServiceImpl implements PageRestService {
         }
     }
 
-    @ApiOperation(httpMethod = "post", value = "Find pages", notes = "Find pages by posting a search form. Results are filtered on an optional profile")
+    @ApiOperation(httpMethod = "post",
+        value = "Find pages",
+        notes = "Find pages by posting a search form. Results are filtered on an optional profile",
+        position = 1
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response find(

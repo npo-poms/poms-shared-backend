@@ -44,7 +44,7 @@ import static nl.vpro.api.rs.v2.Util.exception;
  * @since 2.0
  */
 @Service
-@Api(value = "Media")
+@Api(value = MediaRestService.PATH, position = 0)
 public class MediaRestServiceImpl implements MediaRestService {
 
     private static final String DEFAULT_FORM = "{\n" +
@@ -87,7 +87,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "get",
         value = "Get all media",
-        notes = "Get all media filtered on an optional profile")
+        notes = "Get all media filtered on an optional profile",
+        position = 0
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response list(
@@ -111,7 +113,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "post",
         value = "Find media objects",
-        notes = "Find media object by posting a search form. Results are filtered on an optional profile")
+        notes = "Find media object by posting a search form. Results are filtered on an optional profile",
+        position = 1
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response find(
@@ -135,7 +139,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "get",
         value = "Load media",
-        notes = "Load media by id. The media id is the Media object's URN")
+        notes = "Load media by id. The media id is the Media object's URN",
+        position = 2
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}")
     @Override
@@ -165,7 +171,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "get",
         value = "Load members",
-        notes = "Load all members of a certain media object. Often the media object would be a group.")
+        notes = "Load all members of a certain media object. Often the media object would be a group.",
+        position = 3
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/members")
     @Override
@@ -200,7 +208,8 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "post",
         value = "Find members",
-        notes = "Search in the members of a media object"
+        notes = "Search in the members of a media object",
+        position = 4
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/members")
@@ -236,7 +245,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "get",
         value = "List episodes",
-        notes = "List the episodes of a media group")
+        notes = "List the episodes of a media group",
+        position = 5
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/episodes")
     @Override
@@ -268,7 +279,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "post",
         value = "Find eposides",
-        notes = "Search in the episodes of the media group")
+        notes = "Search in the episodes of the media group",
+        position = 6
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/episodes")
     @Override
@@ -301,7 +314,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "get",
         value = "List descendants",
-        notes = "List all descendants of a certain media group. That means all its members and all the members of those and so on")
+        notes = "List all descendants of a certain media group. That means all its members and all the members of those and so on",
+        position = 7
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/descendants")
     @Override
@@ -334,7 +349,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "post",
         value = "Find descendants",
-        notes = "Search in all descendants of a certain media group")
+        notes = "Search in all descendants of a certain media group",
+        position = 8
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/descendants")
     @Override
@@ -370,7 +387,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "get",
         value = "List related",
-        notes = "List all media objects that are related to another one.")
+        notes = "List all media objects that are related to another one.",
+        position = 9
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/related")
     @Override
@@ -395,7 +414,8 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     @ApiOperation(httpMethod = "post",
         value = "Find related",
-        notes = "Search in all media objects that are related to another one."
+        notes = "Search in all media objects that are related to another one.",
+        position = 10
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}/related")
@@ -423,7 +443,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiOperation(httpMethod = "get",
         value = "Retrieve changes",
         notes = "Retrieve all media changes since a certain update sequence.\n" +
-            "By submitting an optional profile argument only changes for this argument are emitted.")
+            "By submitting an optional profile argument only changes for this argument are emitted.",
+        position = 11
+    )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @GET
     @Path("/changes")

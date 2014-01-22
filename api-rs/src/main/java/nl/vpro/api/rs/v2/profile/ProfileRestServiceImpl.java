@@ -28,7 +28,7 @@ import nl.vpro.swagger.SwaggerApplication;
 @Service
 @Path(ProfileRestService.PATH)
 @Produces({MediaType.APPLICATION_XML + "; charset=utf-8"})
-@Api(value = "Profiles")
+@Api(value = ProfileRestService.PATH, position = 3)
 public class ProfileRestServiceImpl implements ProfileRestService {
 
     final private ProfileService profileService;

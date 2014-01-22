@@ -28,7 +28,7 @@ import nl.vpro.transfer.media.PropertySelection;
  * @since 2.1
  */
 @Service
-@Api(value = "Stats")
+@Api(value = StatsRestService.PATH, position = 4)
 public class StatsRestServiceImpl implements StatsRestService {
 
     @Value("${api.stats.expose}")
