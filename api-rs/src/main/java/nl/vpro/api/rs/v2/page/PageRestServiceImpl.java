@@ -27,7 +27,7 @@ import nl.vpro.swagger.SwaggerApplication;
  * @since 2.0
  */
 @Service
-@Api(value = PageRestService.PATH, description = "The pages API")
+@Api(value = "Pages")
 public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
 

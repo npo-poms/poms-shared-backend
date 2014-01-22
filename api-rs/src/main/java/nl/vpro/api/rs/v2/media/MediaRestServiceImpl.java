@@ -44,7 +44,7 @@ import static nl.vpro.api.rs.v2.Util.exception;
  * @since 2.0
  */
 @Service
-@Api(value = MediaRestService.PATH, description = "The media API")
+@Api(value = "Media")
 public class MediaRestServiceImpl implements MediaRestService {
 
     private static final String DEFAULT_FORM = "{\n" +
