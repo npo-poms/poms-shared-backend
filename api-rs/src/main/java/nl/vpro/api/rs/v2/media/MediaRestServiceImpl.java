@@ -66,8 +66,6 @@ public class MediaRestServiceImpl implements MediaRestService {
         "    }\n" +
         "}";
 
-    private final MockMediaRestService mocks = new MockMediaRestService();
-
     private final MediaService mediaService;
 
     @Value("${api.media.expose}")
@@ -93,26 +91,20 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response list(
-        @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.list(profile, properties, offset, max, true);
-        }
-
         try {
-            MediaSearchResult searchResult = mediaService.find(profile, null, offset, max);
-            return filteredAsMediaResult(searchResult, properties);
+            MediaResult searchResult = mediaService.list(offset, max);
+            return filteredMediaResult(searchResult, properties);
         } catch(Exception e) {
             throw exception(e);
         }
     }
 
     @ApiOperation(httpMethod = "post",
-        value = "Find media objects",
+        value = "Find media",
         notes = "Find media object by posting a search form. Results are filtered on an optional profile",
         position = 1
     )
@@ -123,12 +115,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.find(form, profile, properties, offset, max, true);
-        }
         try {
             MediaSearchResult result = mediaService.find(profile, form, offset, max);
             return filteredAsMediaSearchResult(result, properties);
@@ -138,8 +126,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     }
 
     @ApiOperation(httpMethod = "get",
-        value = "Load media",
-        notes = "Load media by id. The media id is the Media object's URN",
+        value = "Load entity",
+        notes = "Load media by its id",
         position = 2
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
@@ -147,13 +135,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response load(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties
     ) {
-        if(mock) {
-            return mocks.load(id, properties, true);
-        }
-
         try {
             MediaObject mediaObject = mediaService.load(id);
             if(mediaObject == null) {
@@ -179,36 +162,30 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listMembers(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-
-        if (mock) {
-            return mocks.listMembers(id, profile, properties, offset, max, true);
-        }
         try {
 
-            MediaSearchResult searchResult = mediaService.findMembers(id, profile, null, offset, max);
-            if (searchResult == null) {
+            MediaResult result = mediaService.listMembers(id, offset, max);
+            if (result == null) {
                 return Responses.mediaNotFound(id);
             }
-            if (searchResult.getSize() == 0) {
+            if (result.getSize() == 0) {
                 if ( mediaService.load(id) == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
-            return filteredAsMediaResult(searchResult, properties);
+            return filteredMediaResult(result, properties);
         } catch(Exception e) {
             throw exception(e);
         }
     }
 
     @ApiOperation(httpMethod = "post",
-        value = "Find members",
-        notes = "Search in the members of a media object",
+        value = "Filter members",
+        notes = "Search in the members of a media object (note: filtering purges all duplicate elements)",
         position = 4
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
@@ -220,12 +197,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.findMembers(form, id, profile, properties, offset, max, true);
-        }
         try {
             MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
             if (members == null) {
@@ -253,33 +226,27 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listEpisodes(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.listEpisodes(id, profile, properties, offset, max, true);
-        }
-
         try {
-            ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, null, offset, max);
+            ProgramResult episodes = mediaService.listEpisodes(id, offset, max);
             if (episodes.getSize() == 0) {
                 MediaObject parent = mediaService.load(id);
                 if (parent == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
-            return filteredAsProgramResult(episodes, properties);
+            return filteredProgramResult(episodes, properties);
         } catch(Exception e) {
             throw exception(e);
         }
     }
 
     @ApiOperation(httpMethod = "post",
-        value = "Find eposides",
-        notes = "Search in the episodes of the media group",
+        value = "Filter eposides",
+        notes = "Search in the episodes of the media group (note: filtering purges all duplicate elements)",
         position = 6
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
@@ -290,13 +257,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile, @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.findEpisodes(form, id, profile, properties, offset, max, true);
-        }
-
         try {
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
             if (episodes.getSize() == 0) {
@@ -322,34 +284,28 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listDescendants(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.listDescendants(id, profile, properties, offset, max, true);
-        }
-
         try {
 
-            MediaSearchResult descendants = mediaService.findDescendants(id, profile, null, offset, max);
+            MediaResult descendants = mediaService.listDescendants(id, offset, max);
             if (descendants.getSize() == 0) {
                 MediaObject parent = mediaService.load(id);
                 if (parent == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
-            return filteredAsMediaSearchResult(descendants, properties);
+            return filteredMediaResult(descendants, properties);
         } catch(Exception e) {
             throw exception(e);
         }
     }
 
     @ApiOperation(httpMethod = "post",
-        value = "Find descendants",
-        notes = "Search in all descendants of a certain media group",
+        value = "Filter descendants",
+        notes = "Search in all descendants of a certain media group (note: filtering purges all duplicate elements)",
         position = 8
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
@@ -361,12 +317,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.findDescendants(form, id, profile, properties, offset, max, true);
-        }
         try {
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
             if (descendants.getSize() == 0) {
@@ -379,11 +331,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         } catch(Exception e) {
             throw exception(e);
         }
-
-
     }
-
-
 
     @ApiOperation(httpMethod = "get",
         value = "List related",
@@ -395,26 +343,21 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public Response listRelated(
         @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.listRelated(id, profile, properties, offset, max, true);
-        }
         try {
-            MediaSearchResult related = mediaService.findRelated(id, profile, null, offset, max);
-            return filteredAsMediaResult(related, properties);
+            MediaResult related = mediaService.listRelated(id, offset, max);
+            return filteredMediaResult(related, properties);
         } catch(Exception e) {
             throw exception(e);
         }
     }
 
     @ApiOperation(httpMethod = "post",
-        value = "Find related",
-        notes = "Search in all media objects that are related to another one.",
+        value = "Filter related",
+        notes = "Search in all media objects that are related to another one (note: filtering purges all duplicate elements)",
         position = 10
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
@@ -426,12 +369,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return mocks.findRelated(form, id, profile, properties, offset, max, true);
-        }
         try {
             MediaSearchResult related = mediaService.findRelated(id, profile, form, offset, max);
             return filteredAsMediaSearchResult(related, properties);
@@ -481,12 +420,28 @@ public class MediaRestServiceImpl implements MediaRestService {
         return null;
     }
 
+    private Response filteredMediaResult(MediaResult result, String properties) {
+        if(properties == null) {
+            return Response.ok(result).build();
+        }
+
+        return Response.ok(MediaTransferResult.create(result, new PropertySelection(properties))).build();
+    }
+
     private Response filteredAsMediaResult(MediaSearchResult searchResult, String properties) {
         if(properties == null) {
             return Response.ok(searchResult.asResult()).build();
         }
 
         return Response.ok(MediaTransferResult.create(searchResult.asResult(), new PropertySelection(properties))).build();
+    }
+
+    private Response filteredProgramResult(ProgramResult result, String properties) {
+        if(properties == null) {
+            return Response.ok(result).build();
+        }
+
+        return Response.ok(ProgramTransferResult.create(result, new PropertySelection(properties))).build();
     }
 
     private Response filteredAsProgramResult(ProgramSearchResult searchResult, String properties) {

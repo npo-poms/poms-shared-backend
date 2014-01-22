@@ -33,7 +33,7 @@ public class ProfileRestServiceImpl implements ProfileRestService {
 
     final private ProfileService profileService;
 
-    @Value("${api.profile.expose}")
+    @Value("${api.profiles.expose}")
     private boolean expose;
 
     @Autowired
@@ -57,12 +57,8 @@ public class ProfileRestServiceImpl implements ProfileRestService {
     @Override
     public Response load(
         @ApiParam(required = true) @PathParam("name") String name,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @QueryParam("since") boolean since
     ) {
-        if(mock) {
-            Response.ok(profileService.getProfiles().first()).build();
-        }
-
         Profile profile = profileService.getProfile(name);
 
         if(profile == null) {

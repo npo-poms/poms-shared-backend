@@ -38,11 +38,10 @@ public interface MediaRestService {
 
     @GET
     Response list(
-        @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     @POST
     Response find(
@@ -50,47 +49,42 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * Retrieve a media resource, either a Program, Group or Segment, by it's id.
      *
      * @param id   existing urn or mid
-     * @param mock whether to return a mock object
      * @return full Program, Group or Segment
      */
     @GET
     @Path("/{id}")
     Response load(
         @PathParam("id") String id,
-        @QueryParam("properties") String properties,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("properties") String properties
+    );
 
     /**
      * @param id      existing urn or mid
-     * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @GET
     @Path("/{id}/members")
     Response listMembers(
         @PathParam("id") String id,
-        @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * @param id      existing urn or mid
      * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @POST
@@ -101,33 +95,29 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * @param id      existing urn or mid
-     * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @GET
     @Path("/{id}/episodes")
     Response listEpisodes(
         @PathParam("id") String id,
-        @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * @param id      existing urn or mid
      * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @POST
@@ -138,33 +128,29 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * @param id      existing urn or mid
-     * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @GET
     @Path("/{id}/descendants")
     Response listDescendants(
         @PathParam("id") String id,
-        @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * @param id      existing urn or mid
      * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @POST
@@ -175,33 +161,29 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * @param id      existing urn or mid
-     * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @GET
     @Path("/{id}/related")
     Response listRelated(
         @PathParam("id") String id,
-        @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     /**
      * @param id      existing urn or mid
      * @param profile
      * @param offset
      * @param max
-     * @param mock
      * @return
      */
     @POST
@@ -212,8 +194,8 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+    );
 
     @GET
     @Path("/changes")

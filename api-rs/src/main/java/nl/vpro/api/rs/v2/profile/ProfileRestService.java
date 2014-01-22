@@ -32,6 +32,6 @@ public interface ProfileRestService {
     @Path("/{name}")
     Response load(
         @PathParam("name") String name,
-        @QueryParam("mock") @DefaultValue("false") boolean mock
+        @QueryParam("since") boolean since
     );
 }
