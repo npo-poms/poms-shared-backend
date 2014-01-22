@@ -28,10 +28,6 @@ import nl.vpro.api.rs.v2.page.PageRestService;
 public class SwaggerApplication extends Application {
     private static final Set<Object> singletons = new HashSet<>();
 
-    static {
-        JaxrsApiReader.setFormatString("");
-    }
-
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> set = new HashSet<Class<?>>();

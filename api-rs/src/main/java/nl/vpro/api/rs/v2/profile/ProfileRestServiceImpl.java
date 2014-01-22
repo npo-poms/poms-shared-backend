@@ -53,7 +53,7 @@ public class ProfileRestServiceImpl implements ProfileRestService {
     @ApiOperation(httpMethod = "get",
         value = "Get a profile",
         notes = "Gets a profile by its name")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response load(
         @ApiParam(required = true) @PathParam("name") String name,

@@ -66,7 +66,7 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
     @ApiOperation(httpMethod = "get", value = "Get all pages", notes = "Get all pages filtered on an optional profile")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response list(
         @ApiParam(required = false) @QueryParam("profile") String profile,
@@ -85,7 +85,7 @@ public class PageRestServiceImpl implements PageRestService {
     }
 
     @ApiOperation(httpMethod = "post", value = "Find pages", notes = "Find pages by posting a search form. Results are filtered on an optional profile")
-    @ApiErrors(value = {@ApiError(code = 400, reason = "Bad request"), @ApiError(code = 500, reason = "Server error")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response find(
         @ApiParam(value = "Search form", required = false, defaultValue = DEMO_FORM) PageForm form,
