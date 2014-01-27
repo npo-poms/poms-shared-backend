@@ -11,7 +11,9 @@ import org.slf4j.helpers.MessageFormatter;
 /**
  * @author Roelof Jan Koekoek
  * @since 1.0
+ * @deprecated use exceptions for error handling
  */
+@Deprecated
 public class Responses {
 
     private final static int CLIENT_ERROR = 400;

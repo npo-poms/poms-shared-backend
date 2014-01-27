@@ -6,7 +6,6 @@ package nl.vpro.api.rs.v2.profile;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import nl.vpro.domain.api.profile.Profile;
 
@@ -21,7 +20,6 @@ import nl.vpro.domain.api.profile.Profile;
 public interface ProfileRestService {
     public static final String PATH = "/profiles";
 
-
     /**
      * Returns a site profile by it's key
      *
@@ -30,8 +28,8 @@ public interface ProfileRestService {
      */
     @GET
     @Path("/{name}")
-    Response load(
+    Profile load(
         @PathParam("name") String name,
-        @QueryParam("since") boolean since
+        @QueryParam("timestamp") Long timestamp
     );
 }

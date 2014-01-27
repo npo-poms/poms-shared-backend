@@ -104,12 +104,12 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         MockHttpRequest request = MockHttpRequest.get("/media?mock=true");
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
+
         assertEquals(response.getErrorMessage(), 200, response.getStatus());
         assertEquals(JSON, response.getOutputHeaders().get("Content-Type").get(0));
 
         TypeReference<nl.vpro.domain.api.transfer.Result<MediaObject>> typeRef = new TypeReference<nl.vpro.domain.api.transfer.Result<MediaObject>>() {
         };
-
 
         nl.vpro.domain.api.transfer.Result<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
 

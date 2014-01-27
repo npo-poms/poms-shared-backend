@@ -4,10 +4,11 @@
  */
 package nl.vpro.api.rs.v2.profile;
 
+import java.util.Date;
+
 import javax.annotation.PostConstruct;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.wordnik.swagger.annotations.*;
 
-import nl.vpro.api.rs.v2.Responses;
-import nl.vpro.api.rs.v2.media.MediaRestService;
-import nl.vpro.domain.api.profile.ProfileService;
+import nl.vpro.api.rs.v2.exception.Exceptions;
 import nl.vpro.domain.api.profile.Profile;
+import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.swagger.SwaggerApplication;
 
 /**
@@ -27,11 +27,11 @@ import nl.vpro.swagger.SwaggerApplication;
  */
 @Service
 @Path(ProfileRestService.PATH)
-@Produces({MediaType.APPLICATION_XML + "; charset=utf-8"})
+@Produces({MediaType.APPLICATION_XML + "; charset=utf-8", MediaType.APPLICATION_JSON})
 @Api(value = ProfileRestService.PATH, position = 3)
 public class ProfileRestServiceImpl implements ProfileRestService {
 
-    final private ProfileService profileService;
+    private final ProfileService profileService;
 
     @Value("${api.profiles.expose}")
     private boolean expose;
@@ -51,21 +51,31 @@ public class ProfileRestServiceImpl implements ProfileRestService {
     @GET
     @Path("/{name}")
     @ApiOperation(httpMethod = "get",
-        value = "Get a profile",
-        notes = "Gets a profile by its name")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
+        value = "Load a profile",
+        notes = "Retrieve a profile by its name and an optional point in time")
+    @ApiResponses(value = {
+        @ApiResponse(code = 400, message = "Client error"),
+        @ApiResponse(code = 500, message = "Server error")
+    })
     @Override
-    public Response load(
+    public Profile load(
         @ApiParam(required = true) @PathParam("name") String name,
-        @QueryParam("since") boolean since
+        @ApiParam(required = false, value = "Optional timestamp in millis from 1970") @QueryParam("time") Long time
     ) {
-        Profile profile = profileService.getProfile(name);
+        Profile answer;
 
-        if(profile == null) {
-            return Responses.profileNotFound(name);
+        if(time != null) {
+            Date timestamp = new Date(time);
+            answer = profileService.getProfile(name, timestamp);
+        } else {
+            answer = profileService.getProfile(name);
         }
 
-        return Response.ok(profile).build();
+        if(answer != null) {
+            return answer;
+        }
+
+        throw Exceptions.notFound("Profile not found");
     }
 
 }

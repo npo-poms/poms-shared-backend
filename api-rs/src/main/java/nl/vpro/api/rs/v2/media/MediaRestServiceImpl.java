@@ -169,11 +169,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
 
             MediaResult result = mediaService.listMembers(id, offset, max);
-            if (result == null) {
+            if(result == null) {
                 return Responses.mediaNotFound(id);
             }
-            if (result.getSize() == 0) {
-                if ( mediaService.load(id) == null) {
+            if(result.getSize() == 0) {
+                if(mediaService.load(id) == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
@@ -201,12 +201,12 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
         try {
             MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
-            if (members == null) {
+            if(members == null) {
                 return Responses.mediaNotFound(id);
             }
-            if (members.getSize() == 0) {
+            if(members.getSize() == 0) {
                 MediaObject parent = mediaService.load(id);
-                if (parent == null) {
+                if(parent == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
@@ -232,9 +232,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
         try {
             ProgramResult episodes = mediaService.listEpisodes(id, offset, max);
-            if (episodes.getSize() == 0) {
+            if(episodes.getSize() == 0) {
                 MediaObject parent = mediaService.load(id);
-                if (parent == null) {
+                if(parent == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
@@ -261,9 +261,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
         try {
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
-            if (episodes.getSize() == 0) {
+            if(episodes.getSize() == 0) {
                 MediaObject parent = mediaService.load(id);
-                if (parent == null) {
+                if(parent == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
@@ -291,9 +291,9 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
 
             MediaResult descendants = mediaService.listDescendants(id, offset, max);
-            if (descendants.getSize() == 0) {
+            if(descendants.getSize() == 0) {
                 MediaObject parent = mediaService.load(id);
-                if (parent == null) {
+                if(parent == null) {
                     return Responses.mediaNotFound(id);
                 }
             }
@@ -321,9 +321,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
         try {
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
-            if (descendants.getSize() == 0) {
+            if(descendants.getSize() == 0) {
                 MediaObject parent = mediaService.load(id);
-                if (parent == null) {
+                if(parent == null) {
                     return Responses.mediaNotFound(id);
                 }
             }

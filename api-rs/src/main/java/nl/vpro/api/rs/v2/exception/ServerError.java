@@ -13,6 +13,7 @@ import javax.ws.rs.core.Response;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
+@Deprecated
 public class ServerError extends Failure {
     private final static int CODE = 500;
 

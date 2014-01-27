@@ -11,7 +11,6 @@ import org.jboss.resteasy.spi.Failure;
 import nl.vpro.domain.api.Error;
 
 /**
- * Use Responses.youErrorMethod for better RestEasy handling
  *
  * @author Roelof Jan Koekoek
  * @since 2.0
