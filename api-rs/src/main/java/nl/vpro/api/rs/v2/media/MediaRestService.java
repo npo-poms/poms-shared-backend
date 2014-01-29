@@ -13,7 +13,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import nl.vpro.domain.api.Constants;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 
 /**
@@ -37,14 +37,14 @@ public interface MediaRestService {
     public static final String PATH = "/media";
 
     @GET
-    Response list(
+    MediaResult list(
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     );
 
     @POST
-    Response find(
+    MediaSearchResult find(
         MediaForm form,
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
@@ -66,6 +66,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param offset
      * @param max
@@ -73,7 +74,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/members")
-    Response listMembers(
+    MediaResult listMembers(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -81,6 +82,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param profile
      * @param offset
@@ -89,7 +91,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/members")
-    Response findMembers(
+    MediaSearchResult findMembers(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -99,6 +101,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param offset
      * @param max
@@ -106,7 +109,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/episodes")
-    Response listEpisodes(
+    ProgramResult listEpisodes(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -114,6 +117,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param profile
      * @param offset
@@ -122,7 +126,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/episodes")
-    Response findEpisodes(
+    ProgramSearchResult findEpisodes(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -132,6 +136,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param offset
      * @param max
@@ -139,7 +144,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/descendants")
-    Response listDescendants(
+    MediaResult listDescendants(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -147,6 +152,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param profile
      * @param offset
@@ -155,7 +161,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/descendants")
-    Response findDescendants(
+    MediaSearchResult findDescendants(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
@@ -165,6 +171,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param offset
      * @param max
@@ -172,7 +179,7 @@ public interface MediaRestService {
      */
     @GET
     @Path("/{id}/related")
-    Response listRelated(
+    MediaResult listRelated(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -180,6 +187,7 @@ public interface MediaRestService {
     );
 
     /**
+     *
      * @param id      existing urn or mid
      * @param profile
      * @param offset
@@ -188,7 +196,7 @@ public interface MediaRestService {
      */
     @POST
     @Path("/{id}/related")
-    Response findRelated(
+    MediaSearchResult findRelated(
         MediaForm form,
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
