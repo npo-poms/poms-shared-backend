@@ -54,9 +54,9 @@ public class ProfileRestServiceImpl implements ProfileRestService {
         value = "Load a profile",
         notes = "Retrieve a profile by its name and an optional point in time")
     @ApiResponses(value = {
-        @ApiResponse(code = 400, message = "Client error"),
-        @ApiResponse(code = 500, message = "Server error")
-    })
+            @ApiResponse(code = 400, message = "Client error"),
+            @ApiResponse(code = 500, message = "Server error")
+            })
     @Override
     public Profile load(
         @ApiParam(required = true) @PathParam("name") String name,
@@ -77,5 +77,4 @@ public class ProfileRestServiceImpl implements ProfileRestService {
 
         throw Exceptions.notFound("Profile not found");
     }
-
 }
