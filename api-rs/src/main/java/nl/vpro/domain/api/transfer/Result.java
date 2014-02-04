@@ -4,11 +4,13 @@
  */
 package nl.vpro.domain.api.transfer;
 
+import nl.vpro.domain.api.MediaResult;
+import nl.vpro.domain.api.ProgramResult;
+
+import javax.xml.bind.annotation.*;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.xml.bind.annotation.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -16,7 +18,7 @@ import javax.xml.bind.annotation.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "resultType", propOrder = {"list"})
-@XmlSeeAlso({ProgramTransferResult.class, MediaTransferResult.class})
+@XmlSeeAlso({ProgramResult.class, MediaResult.class})
 public class Result<T> implements Iterable<T> {
 
     @XmlAttribute

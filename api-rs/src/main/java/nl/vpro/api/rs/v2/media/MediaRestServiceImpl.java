@@ -4,31 +4,31 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Iterator;
+import com.wordnik.swagger.annotations.*;
+import nl.vpro.api.rs.v2.exception.Exceptions;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.api.media.MediaService;
+import nl.vpro.domain.api.transfer.ResultFilter;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.bind.Jackson2Mapper;
+import nl.vpro.swagger.SwaggerApplication;
+import nl.vpro.transfer.media.MediaObjectPropertySelectionFunction;
+import nl.vpro.transfer.media.PropertySelection;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.wordnik.swagger.annotations.*;
-
-import nl.vpro.api.rs.v2.exception.Exceptions;
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.api.media.MediaService;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.bind.Jackson2Mapper;
-import nl.vpro.swagger.SwaggerApplication;
-
+import static nl.vpro.api.rs.v2.Util.exception;
 import static nl.vpro.api.rs.v2.exception.Exceptions.serverError;
 
 /**
@@ -73,14 +73,14 @@ public class MediaRestServiceImpl implements MediaRestService {
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
-    public MediaResult list(
+   public MediaResult list(
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return mediaService.list(offset, max);
-//            return filteredMediaResult(searchResult, properties);
+            MediaResult searchResult = mediaService.list(offset, max);
+            return properties==null ? searchResult : ResultFilter.filter(searchResult, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -102,8 +102,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
 
         try {
-            return mediaService.find(profile, form, offset, max);
-//            return filteredAsMediaSearchResult(result, properties);
+            MediaSearchResult result = mediaService.find(profile, form, offset, max);
+            return properties == null ? result : ResultFilter.filter(result, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -121,15 +121,16 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties
     ) {
-        MediaObject mediaObject = handleNotFound(id);
-
-/*
+        try {
+            MediaObject mediaObject = handleNotFound(id);
             if(properties == null) {
-                return Response.ok(mediaObject).build();
+                return mediaObject;
             }
-            return Response.ok(MediaTransfer.create(mediaObject, new PropertySelection(properties))).build();
-*/
-        return mediaObject;
+            mediaObject = new MediaObjectPropertySelectionFunction(new PropertySelection(properties)).apply(mediaObject);
+            return mediaObject;
+        } catch(Exception e) {
+            throw exception(e);
+        }
     }
 
     @ApiOperation(httpMethod = "get",
@@ -146,11 +147,16 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        handleNotFound(id);
-
         try {
-            return mediaService.listMembers(id, offset, max);
-//            return filteredMediaResult(result, properties);
+
+            MediaResult result = mediaService.listMembers(id, offset, max);
+            if(result == null) {
+                throw Exceptions.notFound("No members found for id %s ", id);
+            }
+            if(result.getSize() == 0) {
+                handleNotFound(id);
+            }
+            return properties == null ? result : ResultFilter.filter(result, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -173,8 +179,15 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return mediaService.findMembers(id, profile, form, offset, max);
-//            return filteredAsMediaSearchResult(members, properties);
+            MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
+
+            if(members == null) {
+                throw Exceptions.notFound("No members found for id %s ", id);
+            }
+            if(members.getSize() == 0) {
+                handleNotFound(id);
+            }
+            return properties == null ? members : ResultFilter.filter(members, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -195,8 +208,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return mediaService.listEpisodes(id, offset, max);
-//            return filteredProgramResult(episodes, properties);
+            ProgramResult episodes = mediaService.listEpisodes(id, offset, max);
+            if(episodes.getSize() == 0) {
+                handleNotFound(id);
+            }
+            return properties == null ? episodes : ResultFilter.filter(episodes, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -218,8 +234,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return mediaService.findEpisodes(id, profile, form, offset, max);
-//            return filteredAsProgramSearchResult(episodes, properties);
+            ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
+            if(episodes.getSize() == 0) {
+                handleNotFound(id);
+            }
+            return properties == null ? episodes : ResultFilter.filter(episodes, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -242,8 +261,11 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
         try {
 
-            return mediaService.listDescendants(id, offset, max);
-//            return filteredMediaResult(descendants, properties);
+            MediaResult descendants = mediaService.listDescendants(id, offset, max);
+            if(descendants.getSize() == 0) {
+                handleNotFound(id);
+            }
+            return properties == null ? descendants : ResultFilter.filter(descendants, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -266,8 +288,12 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return mediaService.findDescendants(id, profile, form, offset, max);
-//            return filteredAsMediaSearchResult(descendants, properties);
+            MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
+            if(descendants.getSize() == 0) {
+                handleNotFound(id);
+            }
+            return properties == null ? descendants : ResultFilter.filter(descendants, properties);
+
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -282,14 +308,14 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/related")
     @Override
     public MediaResult listRelated(
-        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = true) @PathParam("id") String id,
+        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return mediaService.listRelated(id, offset, max);
-//            return filteredMediaResult(related, properties);
+            MediaResult related = mediaService.listRelated(id, offset, max);
+            return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -312,8 +338,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return mediaService.findRelated(id, profile, form, offset, max);
-//            return filteredAsMediaSearchResult(related, properties);
+            MediaSearchResult related = mediaService.findRelated(id, profile, form, offset, max);
+            return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -329,7 +355,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @GET
     @Path("/changes")
     @Override
-    public Response changes(
+    public Change changes(
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(required = false) @QueryParam("since") Long since,
         @ApiParam(defaultValue = "asc", required = false) @QueryParam("order") @DefaultValue("asc") String sOrder,
@@ -359,7 +385,6 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
         return null;
     }
-
     private MediaObject handleNotFound(String id) {
         MediaObject answer = mediaService.load(id);
         if(answer == null) {
@@ -368,54 +393,5 @@ public class MediaRestServiceImpl implements MediaRestService {
 
         return answer;
     }
-
-/*
-    private Response filteredMediaResult(MediaResult result, String properties) {
-        if(properties == null) {
-            return Response.ok(result).build();
-        }
-
-        return Response.ok(MediaTransferResult.create(result, new PropertySelection(properties))).build();
-    }
-
-    private Response filteredAsMediaResult(MediaSearchResult searchResult, String properties) {
-        if(properties == null) {
-            return Response.ok(searchResult.asResult()).build();
-        }
-
-        return Response.ok(MediaTransferResult.create(searchResult.asResult(), new PropertySelection(properties))).build();
-    }
-
-    private Response filteredProgramResult(ProgramResult result, String properties) {
-        if(properties == null) {
-            return Response.ok(result).build();
-        }
-
-        return Response.ok(ProgramTransferResult.create(result, new PropertySelection(properties))).build();
-    }
-
-    private Response filteredAsProgramResult(ProgramSearchResult searchResult, String properties) {
-        if(properties == null) {
-            return Response.ok(searchResult.asResult()).build();
-        }
-
-        return Response.ok(ProgramTransferResult.create(searchResult.asResult(), new PropertySelection(properties))).build();
-    }
-
-    private Response filteredAsMediaSearchResult(MediaSearchResult searchResult, String properties) {
-        if(properties == null) {
-            return Response.ok(searchResult).build();
-        }
-
-        return Response.ok(MediaTransferSearchResult.create(searchResult, new PropertySelection(properties))).build();
-    }
-
-    private Response filteredAsProgramSearchResult(ProgramSearchResult searchResult, String properties) {
-        if(properties == null) {
-            return Response.ok(searchResult).build();
-        }
-
-        return Response.ok(ProgramTransferSearchResult.create(searchResult, new PropertySelection(properties))).build();
-    }
-*/
+    
 }

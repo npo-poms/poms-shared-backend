@@ -4,18 +4,16 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import java.io.IOException;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.media.MediaObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.media.MediaObject;
+import java.io.IOException;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
@@ -84,7 +82,6 @@ public interface MediaRestService {
     );
 
     /**
-     *
      * @param id      existing urn or mid
      * @param profile
      * @param offset
@@ -209,7 +206,7 @@ public interface MediaRestService {
 
     @GET
     @Path("/changes")
-    Response changes(
+    Change changes(
         @QueryParam("profile") String profile,
         @QueryParam("since") Long since,
         @QueryParam("order") @DefaultValue("asc") String order,

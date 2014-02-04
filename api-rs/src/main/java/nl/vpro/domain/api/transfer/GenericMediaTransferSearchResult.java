@@ -4,17 +4,15 @@
  */
 package nl.vpro.domain.api.transfer;
 
-import java.util.List;
+import nl.vpro.domain.api.MediaFacetsResult;
+import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.media.MediaObject;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
-
-import nl.vpro.domain.api.MediaFacetsResult;
-import nl.vpro.domain.api.SearchResultItem;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.transfer.media.MediaTransfer;
+import java.util.List;
 
 /**
  * @author Roelof Jan Koekoek
@@ -22,7 +20,7 @@ import nl.vpro.transfer.media.MediaTransfer;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "genericMediaSearchResultType", propOrder = {"facets"})
-public abstract class GenericMediaTransferSearchResult<M extends MediaObject, T extends MediaTransfer<M>> extends SearchResult<T> {
+public abstract class GenericMediaTransferSearchResult<T extends MediaObject> extends SearchResult<T> {
 
     @XmlElement
     private MediaFacetsResult facets;

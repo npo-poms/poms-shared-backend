@@ -1,16 +1,17 @@
 package nl.vpro.domain.api.transfer;
 
 
-import java.util.AbstractList;
-import java.util.List;
+import nl.vpro.domain.api.MediaSearchResult;
+import nl.vpro.domain.api.ProgramSearchResult;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.SearchResultItem;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.SearchResultItem;
+import java.util.AbstractList;
+import java.util.List;
 
 /**
  * @author Michiel Meeuwissen
@@ -19,7 +20,7 @@ import nl.vpro.domain.api.SearchResultItem;
 
 @XmlType(name = "searchResultType")
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlSeeAlso({MediaTransferSearchResult.class, ProgramTransferSearchResult.class})
+@XmlSeeAlso({MediaSearchResult.class, ProgramSearchResult.class})
 public class SearchResult<S> extends Result<SearchResultItem<? extends S>> {
 
     public SearchResult() {
