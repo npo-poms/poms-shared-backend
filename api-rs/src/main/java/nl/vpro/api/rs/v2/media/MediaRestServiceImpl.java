@@ -26,7 +26,7 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
-import nl.vpro.jackson.Jackson2PageMapper;
+import nl.vpro.domain.media.bind.Jackson2Mapper;
 import nl.vpro.swagger.SwaggerApplication;
 
 import static nl.vpro.api.rs.v2.exception.Exceptions.serverError;
@@ -352,7 +352,7 @@ public class MediaRestServiceImpl implements MediaRestService {
                     first = false;
                 }
                 Change change = changes.next();
-                writer.write(Jackson2PageMapper.INSTANCE.writeValueAsString(change));
+                writer.write(Jackson2Mapper.INSTANCE.writeValueAsString(change));
             }
             writer.write("\n]}");
             writer.close();

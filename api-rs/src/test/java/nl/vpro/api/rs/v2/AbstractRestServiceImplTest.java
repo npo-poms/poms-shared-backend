@@ -13,6 +13,7 @@ import org.junit.Before;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nl.vpro.domain.media.bind.Jackson2Mapper;
 import nl.vpro.resteasy.JacksonContextResolver;
 
 /**
@@ -40,7 +41,7 @@ public abstract class AbstractRestServiceImplTest {
     public void setup() throws Exception {
         ContextResolver<ObjectMapper> contextResolver = new JacksonContextResolver();
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
-        mapper = Jackson2PageMapper.INSTANCE;
+        mapper = Jackson2Mapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
 
         XMLUnit.setIgnoreWhitespace(true);
