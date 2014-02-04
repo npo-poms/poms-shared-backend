@@ -11,7 +11,8 @@ import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.junit.Before;
 
-import nl.vpro.jackson.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import nl.vpro.resteasy.JacksonContextResolver;
 
 /**
@@ -37,9 +38,9 @@ public abstract class AbstractRestServiceImplTest {
 
     @Before
     public void setup() throws Exception {
-        ContextResolver<org.codehaus.jackson.map.ObjectMapper> contextResolver = new JacksonContextResolver();
+        ContextResolver<ObjectMapper> contextResolver = new JacksonContextResolver();
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
-        mapper = ObjectMapper.INSTANCE;
+        mapper = Jackson2PageMapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
 
         XMLUnit.setIgnoreWhitespace(true);

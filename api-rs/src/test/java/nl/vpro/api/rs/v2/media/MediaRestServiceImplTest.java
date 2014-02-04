@@ -10,19 +10,22 @@ import java.util.Arrays;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
 
-import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.Error;
+import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaSearch;
 import nl.vpro.domain.api.media.MediaService;
+import nl.vpro.domain.api.transfer.*;
 import nl.vpro.domain.media.Group;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;

@@ -6,10 +6,11 @@ import java.io.StringReader;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
 
-import org.codehaus.jackson.type.TypeReference;
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Test;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import nl.vpro.api.rs.v2.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.Result;

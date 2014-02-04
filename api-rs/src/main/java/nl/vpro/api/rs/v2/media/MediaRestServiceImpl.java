@@ -21,17 +21,15 @@ import org.springframework.stereotype.Service;
 
 import com.wordnik.swagger.annotations.*;
 
-import nl.vpro.api.rs.v2.Responses;
+import nl.vpro.api.rs.v2.exception.Exceptions;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
-import nl.vpro.jackson.ObjectMapper;
+import nl.vpro.jackson.Jackson2PageMapper;
 import nl.vpro.swagger.SwaggerApplication;
-import nl.vpro.transfer.media.MediaTransfer;
-import nl.vpro.transfer.media.PropertySelection;
 
-import static nl.vpro.api.rs.v2.Util.exception;
+import static nl.vpro.api.rs.v2.exception.Exceptions.serverError;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -44,21 +42,10 @@ import static nl.vpro.api.rs.v2.Util.exception;
 public class MediaRestServiceImpl implements MediaRestService {
 
     private static final String DEFAULT_FORM = "{\n" +
-        "    \"facets\": {\n" +
-        "        \"sortDates\": {\n" +
-        "            \"presets\": [\n" +
-        "                \"LAST_WEEK\", \"LAST_YEAR\", \"BEFORE_LAST_YEAR\"\n" +
-        "            ]\n" +
+        "    \"searches\" : {\n" +
+        "        \"text\" : {\n" +
+        "                \"value\" : \"Argos\"\n" +
         "        }\n" +
-        "    },\n" +
-        "    \"highlight\": true, \n" +
-        "    \"searches\": {\n" +
-        "        \"descendantOf\": [\n" +
-        "            {\n" +
-        "                \"value\": \"urn:vpro:media:group:72709\",\n" +
-        "                \"match\": \"MUST\"\n" +
-        "            }\n" +
-        "        ]\n" +
         "    }\n" +
         "}";
 
@@ -87,7 +74,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public MediaResult list(
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -95,7 +82,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.list(offset, max);
 //            return filteredMediaResult(searchResult, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -109,15 +96,16 @@ public class MediaRestServiceImpl implements MediaRestService {
     public MediaSearchResult find(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
         @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
+
         try {
             return mediaService.find(profile, form, offset, max);
 //            return filteredAsMediaSearchResult(result, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -129,23 +117,19 @@ public class MediaRestServiceImpl implements MediaRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Path("/{id}")
     @Override
-    public Response load(
-        @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties
+    public MediaObject load(
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties
     ) {
-        try {
-            MediaObject mediaObject = mediaService.load(id);
-            if(mediaObject == null) {
-                return Responses.mediaNotFound(id);
-            }
+        MediaObject mediaObject = handleNotFound(id);
 
+/*
             if(properties == null) {
                 return Response.ok(mediaObject).build();
             }
             return Response.ok(MediaTransfer.create(mediaObject, new PropertySelection(properties))).build();
-        } catch(Exception e) {
-            throw exception(e);
-        }
+*/
+        return mediaObject;
     }
 
     @ApiOperation(httpMethod = "get",
@@ -157,17 +141,18 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/members")
     @Override
     public MediaResult listMembers(
-        @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
-        try {
+        handleNotFound(id);
 
+        try {
             return mediaService.listMembers(id, offset, max);
 //            return filteredMediaResult(result, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -181,9 +166,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findMembers(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = true) @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -191,7 +176,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.findMembers(id, profile, form, offset, max);
 //            return filteredAsMediaSearchResult(members, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -204,8 +189,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/episodes")
     @Override
     public ProgramResult listEpisodes(
-        @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -213,7 +198,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.listEpisodes(id, offset, max);
 //            return filteredProgramResult(episodes, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -227,8 +212,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public ProgramSearchResult findEpisodes(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(required = false) @QueryParam("profile") String profile, @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(required = false) @QueryParam("profile") String profile, @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -236,7 +221,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.findEpisodes(id, profile, form, offset, max);
 //            return filteredAsProgramSearchResult(episodes, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
 
     }
@@ -250,8 +235,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/descendants")
     @Override
     public MediaResult listDescendants(
-        @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -260,7 +245,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.listDescendants(id, offset, max);
 //            return filteredMediaResult(descendants, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -274,9 +259,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findDescendants(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = true) @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -284,7 +269,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.findDescendants(id, profile, form, offset, max);
 //            return filteredAsMediaSearchResult(descendants, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -297,8 +282,8 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/related")
     @Override
     public MediaResult listRelated(
-        @ApiParam(required = true) @PathParam("id") String id,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -306,7 +291,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.listRelated(id, offset, max);
 //            return filteredMediaResult(related, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -320,9 +305,9 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findRelated(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = true) @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
-        @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
@@ -330,7 +315,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             return mediaService.findRelated(id, profile, form, offset, max);
 //            return filteredAsMediaSearchResult(related, properties);
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -367,12 +352,21 @@ public class MediaRestServiceImpl implements MediaRestService {
                     first = false;
                 }
                 Change change = changes.next();
-                writer.write(ObjectMapper.INSTANCE.writeValueAsString(change));
+                writer.write(Jackson2PageMapper.INSTANCE.writeValueAsString(change));
             }
             writer.write("\n]}");
             writer.close();
         }
         return null;
+    }
+
+    private MediaObject handleNotFound(String id) {
+        MediaObject answer = mediaService.load(id);
+        if(answer == null) {
+            throw new Exceptions().notFound("No media for id {}", id);
+        }
+
+        return answer;
     }
 
 /*

@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.media.MediaObject;
 
 /**
  * Endpoint which facilitates RPC like requests on media content. This API intents to capture meaningful and frequent
@@ -55,12 +56,13 @@ public interface MediaRestService {
     /**
      * Retrieve a media resource, either a Program, Group or Segment, by it's id.
      *
+     *
      * @param id   existing urn or mid
      * @return full Program, Group or Segment
      */
     @GET
     @Path("/{id}")
-    Response load(
+    MediaObject load(
         @PathParam("id") String id,
         @QueryParam("properties") String properties
     );

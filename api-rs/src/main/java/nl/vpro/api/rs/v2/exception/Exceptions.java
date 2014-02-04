@@ -6,6 +6,7 @@ package nl.vpro.api.rs.v2.exception;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
 
 import org.jboss.resteasy.spi.InternalServerErrorException;
@@ -23,5 +24,9 @@ public class Exceptions {
 
     public static BadRequestException queryParamNotFound(String message, Object... args) {
         return new BadRequestException(MessageFormatter.arrayFormat(message, args).getMessage());
+    }
+
+    public static ServerErrorException serverError(String message, Object... args) {
+        return new ServerErrorException(MessageFormatter.arrayFormat(message, args).getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
     }
 }

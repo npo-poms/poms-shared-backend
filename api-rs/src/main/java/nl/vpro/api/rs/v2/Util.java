@@ -8,6 +8,7 @@ import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
+@Deprecated
 public class Util {
 
     public static RuntimeException exception(Exception e) {

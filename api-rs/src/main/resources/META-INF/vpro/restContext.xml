@@ -8,16 +8,6 @@
 
   <bean class="nl.vpro.resteasy.JacksonContextResolver"/>
 
-  <bean id="mainMediaRepository" class="nl.vpro.domain.api.media.MediaRepositoryImpl">
-    <constructor-arg ref="couchdbMediaRepository"/>
-    <constructor-arg ref="elasticMediaRepository"/>
-  </bean>
-
-  <bean id="mediaService" class="nl.vpro.domain.api.media.MediaServiceImpl">
-    <constructor-arg ref="profileService"/>
-    <constructor-arg ref="mainMediaRepository"/>
-  </bean>
-
   <context:component-scan base-package="nl.vpro.api">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
     <context:include-filter type="annotation" expression="javax.ws.rs.NameBinding"/>
