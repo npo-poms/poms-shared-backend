@@ -148,14 +148,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
 
             MediaResult result = mediaService.listMembers(id, offset, max);
-            if(result == null) {
-                throw Exceptions.notFound("No members found for id %s ", id);
-            }
-            if(result.getSize() == 0) {
-                handleNotFound(id);
-            }
+
             return properties == null ? result : ResultFilter.filter(result, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -179,6 +175,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
+
             MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
 
             if(members == null) {
@@ -208,6 +206,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
+
             ProgramResult episodes = mediaService.listEpisodes(id, offset, max);
             if(episodes.getSize() == 0) {
                 handleNotFound(id);
@@ -234,6 +234,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
+
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
             if(episodes.getSize() == 0) {
                 handleNotFound(id);
@@ -260,6 +262,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
 
             MediaResult descendants = mediaService.listDescendants(id, offset, max);
             if(descendants.getSize() == 0) {
@@ -288,6 +291,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
+
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
             if(descendants.getSize() == 0) {
                 handleNotFound(id);
@@ -314,6 +319,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
+
             MediaResult related = mediaService.listRelated(id, offset, max);
             return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
@@ -338,6 +345,8 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
     ) {
         try {
+            handleNotFound(id);
+
             MediaSearchResult related = mediaService.findRelated(id, profile, form, offset, max);
             return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
