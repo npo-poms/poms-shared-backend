@@ -75,7 +75,7 @@ public class PageRestServiceImpl implements PageRestService {
     public Response list(
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {
@@ -99,7 +99,7 @@ public class PageRestServiceImpl implements PageRestService {
         @ApiParam(value = "Search form", required = false, defaultValue = DEMO_FORM) PageForm form,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max,
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max,
         @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
     ) {
         if(mock) {

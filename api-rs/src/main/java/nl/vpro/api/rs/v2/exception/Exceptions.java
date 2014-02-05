@@ -22,7 +22,7 @@ public class Exceptions {
         return new NotFoundException(MessageFormatter.arrayFormat(message, args).getMessage());
     }
 
-    public static BadRequestException queryParamNotFound(String message, Object... args) {
+    public static BadRequestException badRequest(String message, Object... args) {
         return new BadRequestException(MessageFormatter.arrayFormat(message, args).getMessage());
     }
 

@@ -38,8 +38,9 @@ public interface MediaRestService {
     @GET
     MediaResult list(
         @QueryParam("properties") String properties,
+        @QueryParam("sort") @DefaultValue("asc") String sort,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
     @POST
@@ -48,16 +49,9 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
-    /**
-     * Retrieve a media resource, either a Program, Group or Segment, by it's id.
-     *
-     *
-     * @param id   existing urn or mid
-     * @return full Program, Group or Segment
-     */
     @GET
     @Path("/{id}")
     MediaObject load(
@@ -65,29 +59,16 @@ public interface MediaRestService {
         @QueryParam("properties") String properties
     );
 
-    /**
-     *
-     * @param id      existing urn or mid
-     * @param offset
-     * @param max
-     * @return
-     */
     @GET
     @Path("/{id}/members")
     MediaResult listMembers(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
+        @QueryParam("sort") @DefaultValue("asc") String sort,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
-    /**
-     * @param id      existing urn or mid
-     * @param profile
-     * @param offset
-     * @param max
-     * @return
-     */
     @POST
     @Path("/{id}/members")
     MediaSearchResult findMembers(
@@ -96,7 +77,7 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
     /**
@@ -111,8 +92,9 @@ public interface MediaRestService {
     ProgramResult listEpisodes(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
+        @QueryParam("sort") @DefaultValue("asc") String sort,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
     /**
@@ -131,33 +113,19 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
-    /**
-     *
-     * @param id      existing urn or mid
-     * @param offset
-     * @param max
-     * @return
-     */
     @GET
     @Path("/{id}/descendants")
     MediaResult listDescendants(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
+        @QueryParam("sort") @DefaultValue("asc") String sort,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
-    /**
-     *
-     * @param id      existing urn or mid
-     * @param profile
-     * @param offset
-     * @param max
-     * @return
-     */
     @POST
     @Path("/{id}/descendants")
     MediaSearchResult findDescendants(
@@ -166,33 +134,19 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
-    /**
-     *
-     * @param id      existing urn or mid
-     * @param offset
-     * @param max
-     * @return
-     */
     @GET
     @Path("/{id}/related")
     MediaResult listRelated(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
+        @QueryParam("sort") @DefaultValue("asc") String sort,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
-    /**
-     *
-     * @param id      existing urn or mid
-     * @param profile
-     * @param offset
-     * @param max
-     * @return
-     */
     @POST
     @Path("/{id}/related")
     MediaSearchResult findRelated(
@@ -201,7 +155,7 @@ public interface MediaRestService {
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
     @GET

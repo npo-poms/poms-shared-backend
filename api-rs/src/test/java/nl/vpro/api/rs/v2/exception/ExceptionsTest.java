@@ -35,7 +35,7 @@ public class ExceptionsTest {
 
     @Test
     public void testQueryParamNotFound() throws Exception {
-        Exception exception = Exceptions.queryParamNotFound("the message");
+        Exception exception = Exceptions.badRequest("the message");
 
         assertThat(exception).isInstanceOf(BadRequestException.class);
         assertThat(exception.getMessage()).isEqualTo("the message");
@@ -43,7 +43,7 @@ public class ExceptionsTest {
 
     @Test
     public void testQueryParamNotFoundWithArgs() throws Exception {
-        Exception exception = Exceptions.queryParamNotFound("the message {}", "arg");
+        Exception exception = Exceptions.badRequest("the message {}", "arg");
 
         assertThat(exception).isInstanceOf(BadRequestException.class);
         assertThat(exception.getMessage()).isEqualTo("the message arg");

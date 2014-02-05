@@ -5,6 +5,7 @@
 package nl.vpro.api.rs.v2.statistics;
 
 import com.wordnik.swagger.annotations.*;
+
 import nl.vpro.api.rs.v2.Responses;
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.MediaResult;
@@ -13,6 +14,7 @@ import nl.vpro.domain.statistic.StatsService;
 import nl.vpro.domain.statistic.media.PlayService;
 import nl.vpro.swagger.SwaggerApplication;
 import nl.vpro.transfer.media.PropertySelection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -57,7 +59,7 @@ public class StatsRestServiceImpl implements StatsRestService {
         @ApiParam(value = "On of hour/day/week") @QueryParam("period") @DefaultValue("hour") String periodString,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         StatsService.Period period;
         try {
@@ -82,7 +84,7 @@ public class StatsRestServiceImpl implements StatsRestService {
         @ApiParam(value = "On of hour/day/week") @QueryParam("period") @DefaultValue("hour") String periodString,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         StatsService.Period period;
         try {
@@ -107,7 +109,7 @@ public class StatsRestServiceImpl implements StatsRestService {
         @ApiParam(value = "On of hour/day/week") @QueryParam("period") @DefaultValue("hour") String periodString,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         StatsService.Period period;
         try {

@@ -7,6 +7,7 @@ package nl.vpro.api.rs.v2.media;
 import com.wordnik.swagger.annotations.*;
 import nl.vpro.api.rs.v2.exception.Exceptions;
 import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.api.transfer.ResultFilter;
@@ -23,6 +24,7 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -75,11 +77,14 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
    public MediaResult list(
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+        @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaResult searchResult = mediaService.list(offset, max);
+            handleToManyResults(max);
+
+            MediaResult searchResult = mediaService.list(parseOrder(sort), offset, max);
             return properties==null ? searchResult : ResultFilter.filter(searchResult, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -98,8 +103,9 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
+        handleToManyResults(max);
 
         try {
             MediaSearchResult result = mediaService.find(profile, form, offset, max);
@@ -144,13 +150,15 @@ public class MediaRestServiceImpl implements MediaRestService {
     public MediaResult listMembers(
         @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+        @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
-            MediaResult result = mediaService.listMembers(id, offset, max);
+            MediaResult result = mediaService.listMembers(parseOrder(sort), id, offset, max);
 
             return properties == null ? result : ResultFilter.filter(result, properties);
         } catch(Exception e) {
@@ -172,10 +180,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
             MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
 
@@ -202,16 +211,16 @@ public class MediaRestServiceImpl implements MediaRestService {
     public ProgramResult listEpisodes(
         @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+        @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
-            ProgramResult episodes = mediaService.listEpisodes(id, offset, max);
-            if(episodes.getSize() == 0) {
-                handleNotFound(id);
-            }
+            ProgramResult episodes = mediaService.listEpisodes(parseOrder(sort), id, offset, max);
+
             return properties == null ? episodes : ResultFilter.filter(episodes, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -231,15 +240,14 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile, @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
             ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
-            if(episodes.getSize() == 0) {
-                handleNotFound(id);
-            }
+
             return properties == null ? episodes : ResultFilter.filter(episodes, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -256,18 +264,18 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/descendants")
     @Override
     public MediaResult listDescendants(
-        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "14Jeugd0845geb") @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+        @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
-            MediaResult descendants = mediaService.listDescendants(id, offset, max);
-            if(descendants.getSize() == 0) {
-                handleNotFound(id);
-            }
+            MediaResult descendants = mediaService.listDescendants(parseOrder(sort), id, offset, max);
+
             return properties == null ? descendants : ResultFilter.filter(descendants, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -288,15 +296,14 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
             MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
-            if(descendants.getSize() == 0) {
-                handleNotFound(id);
-            }
+
             return properties == null ? descendants : ResultFilter.filter(descendants, properties);
 
         } catch(Exception e) {
@@ -315,13 +322,15 @@ public class MediaRestServiceImpl implements MediaRestService {
     public MediaResult listRelated(
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
+        @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
-            MediaResult related = mediaService.listRelated(id, offset, max);
+            MediaResult related = mediaService.listRelated(parseOrder(sort), id, offset, max);
             return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -342,10 +351,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             handleNotFound(id);
+            handleToManyResults(max);
 
             MediaSearchResult related = mediaService.findRelated(id, profile, form, offset, max);
             return properties == null ? related : ResultFilter.filter(related, properties);
@@ -402,5 +412,19 @@ public class MediaRestServiceImpl implements MediaRestService {
 
         return answer;
     }
-    
+
+    private void handleToManyResults(Integer max) {
+        if(max > Constants.MAX_RESULTS) {
+            throw new Exceptions().badRequest("Requesting more than {} results is not allowed. Use a pager!", Constants.MAX_RESULTS);
+        }
+    }
+
+    private Order parseOrder(String order) {
+        try {
+            return Order.valueOf(order.toUpperCase());
+        } catch(IllegalArgumentException e) {
+            throw new Exceptions().badRequest("Invalid order \"{}\"", order);
+        }
+    }
+
 }

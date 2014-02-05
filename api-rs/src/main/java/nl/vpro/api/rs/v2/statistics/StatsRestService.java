@@ -25,7 +25,7 @@ public interface StatsRestService {
         @QueryParam("period") @DefaultValue("hour") String period,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
     @GET
@@ -35,7 +35,7 @@ public interface StatsRestService {
         @QueryParam("period") @DefaultValue("hour") String period,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
     @GET
@@ -45,7 +45,7 @@ public interface StatsRestService {
         @QueryParam("period") @DefaultValue("hour") String period,
         @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.MAX_RESULTS_STRING) Integer max
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
 }

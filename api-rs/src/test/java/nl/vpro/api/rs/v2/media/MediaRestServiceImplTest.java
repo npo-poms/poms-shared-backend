@@ -61,13 +61,13 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
-        verify(mediaService).list(0l, 10);
+        verify(mediaService).list(Order.ASC, 0l, 10);
     }
 
     @Test
     public void testListException() throws Exception {
-        when(mediaService.list(eq(0l), anyInt()))
-                .thenThrow(new RuntimeException("Er is wat misgegaan"));
+        when(mediaService.list(eq(Order.ASC), eq(0l), anyInt()))
+            .thenThrow(new RuntimeException("Er is wat misgegaan"));
 
 
         MockHttpRequest request = MockHttpRequest.get("/media");
@@ -86,7 +86,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
     @Test
     public void testListExceptionJson() throws Exception {
-        when(mediaService.list(eq(0l), anyInt())).thenThrow(new RuntimeException("Er is wat misgegaan"));
+        when(mediaService.list(eq(Order.ASC), eq(0l), anyInt())).thenThrow(new RuntimeException("Er is wat misgegaan"));
 
         MockHttpRequest request = MockHttpRequest.get("/media");
         request.accept(MediaType.APPLICATION_JSON);
