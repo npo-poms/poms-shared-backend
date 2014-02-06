@@ -23,7 +23,9 @@ import com.wordnik.swagger.annotations.*;
 import nl.vpro.api.rs.v2.exception.Exceptions;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.api.media.MediaFormBuilder;
 import nl.vpro.domain.api.media.MediaService;
+import nl.vpro.domain.api.media.MediaSortOrder;
 import nl.vpro.domain.api.transfer.ResultFilter;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.bind.Jackson2Mapper;
@@ -157,10 +159,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaResult result = mediaService.listMembers(parseOrder(sort), id, offset, max);
+            MediaResult result = mediaService.listMembers(media, parseOrder(sort), offset, max);
 
             return properties == null ? result : ResultFilter.filter(result, properties);
         } catch(Exception e) {
@@ -185,17 +187,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
+            MediaSearchResult members = mediaService.findMembers(media, profile, form, offset, max);
 
-            if(members == null) {
-                throw notFound("No members found for id %s ", id);
-            }
-            if(members.getSize() == 0) {
-                handleNotFound(id);
-            }
             return properties == null ? members : ResultFilter.filter(members, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -218,10 +214,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            ProgramResult episodes = mediaService.listEpisodes(parseOrder(sort), id, offset, max);
+            ProgramResult episodes = mediaService.listEpisodes(media, parseOrder(sort), offset, max);
 
             return properties == null ? episodes : ResultFilter.filter(episodes, properties);
         } catch(Exception e) {
@@ -245,10 +241,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            ProgramSearchResult episodes = mediaService.findEpisodes(id, profile, form, offset, max);
+            ProgramSearchResult episodes = mediaService.findEpisodes(media, profile, form, offset, max);
 
             return properties == null ? episodes : ResultFilter.filter(episodes, properties);
         } catch(Exception e) {
@@ -273,10 +269,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaResult descendants = mediaService.listDescendants(parseOrder(sort), id, offset, max);
+            MediaResult descendants = mediaService.listDescendants(media, parseOrder(sort), offset, max);
 
             return properties == null ? descendants : ResultFilter.filter(descendants, properties);
         } catch(Exception e) {
@@ -301,10 +297,10 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaSearchResult descendants = mediaService.findDescendants(id, profile, form, offset, max);
+            MediaSearchResult descendants = mediaService.findDescendants(media, profile, form, offset, max);
 
             return properties == null ? descendants : ResultFilter.filter(descendants, properties);
 
@@ -324,15 +320,15 @@ public class MediaRestServiceImpl implements MediaRestService {
     public MediaResult listRelated(
         @ApiParam(required = true) @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties <a href=\"#!/media/load_get_0\">See Media API</a>", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaResult related = mediaService.listRelated(parseOrder(sort), id, offset, max);
+            MediaResult related = mediaService.findRelated(media, null, null, offset, max).asResult();
+
             return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -356,10 +352,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            handleNotFound(id);
+            MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaSearchResult related = mediaService.findRelated(id, profile, form, offset, max);
+            MediaSearchResult related = mediaService.findRelated(media, profile, form, offset, max);
+
             return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());

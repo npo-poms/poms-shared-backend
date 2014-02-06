@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+
 import java.io.IOException;
 
 /**
@@ -81,8 +82,7 @@ public interface MediaRestService {
     );
 
     /**
-     *
-     * @param id      existing urn or mid
+     * @param id     existing urn or mid
      * @param offset
      * @param max
      * @return
@@ -98,7 +98,6 @@ public interface MediaRestService {
     );
 
     /**
-     *
      * @param id      existing urn or mid
      * @param profile
      * @param offset
@@ -142,7 +141,6 @@ public interface MediaRestService {
     MediaResult listRelated(
         @PathParam("id") String id,
         @QueryParam("properties") String properties,
-        @QueryParam("sort") @DefaultValue("asc") String sort,
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
