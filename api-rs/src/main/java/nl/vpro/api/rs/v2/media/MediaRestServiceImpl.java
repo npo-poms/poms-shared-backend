@@ -4,10 +4,24 @@
  */
 package nl.vpro.api.rs.v2.media;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.wordnik.swagger.annotations.*;
+
 import nl.vpro.api.rs.v2.exception.Exceptions;
 import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.api.transfer.ResultFilter;
@@ -16,21 +30,9 @@ import nl.vpro.domain.media.bind.Jackson2Mapper;
 import nl.vpro.swagger.SwaggerApplication;
 import nl.vpro.transfer.media.MediaObjectPropertySelectionFunction;
 import nl.vpro.transfer.media.PropertySelection;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.*;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Iterator;
-
-import static nl.vpro.api.rs.v2.Util.exception;
+import static nl.vpro.api.rs.v2.exception.Exceptions.badRequest;
+import static nl.vpro.api.rs.v2.exception.Exceptions.notFound;
 import static nl.vpro.api.rs.v2.exception.Exceptions.serverError;
 
 /**
@@ -75,7 +77,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
-   public MediaResult list(
+    public MediaResult list(
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -85,7 +87,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             handleToManyResults(max);
 
             MediaResult searchResult = mediaService.list(parseOrder(sort), offset, max);
-            return properties==null ? searchResult : ResultFilter.filter(searchResult, properties);
+            return properties == null ? searchResult : ResultFilter.filter(searchResult, properties);
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -135,7 +137,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             mediaObject = new MediaObjectPropertySelectionFunction(new PropertySelection(properties)).apply(mediaObject);
             return mediaObject;
         } catch(Exception e) {
-            throw exception(e);
+            throw serverError(e.getMessage());
         }
     }
 
@@ -148,7 +150,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/members")
     @Override
     public MediaResult listMembers(
-        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "POMS_S_TVGELDERLAND_133433") @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -176,7 +178,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findMembers(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "POMS_S_TVGELDERLAND_133433") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -189,7 +191,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             MediaSearchResult members = mediaService.findMembers(id, profile, form, offset, max);
 
             if(members == null) {
-                throw Exceptions.notFound("No members found for id %s ", id);
+                throw notFound("No members found for id %s ", id);
             }
             if(members.getSize() == 0) {
                 handleNotFound(id);
@@ -209,7 +211,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Path("/{id}/episodes")
     @Override
     public ProgramResult listEpisodes(
-        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "14Jnl0700n1") @PathParam("id") String id,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("sort") @DefaultValue("asc") String sort,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -237,7 +239,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public ProgramSearchResult findEpisodes(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "14Jnl0700n1") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile, @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -292,7 +294,7 @@ public class MediaRestServiceImpl implements MediaRestService {
     @Override
     public MediaSearchResult findDescendants(
         @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-        @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
+        @ApiParam(required = true, defaultValue = "14Jeugd0845geb") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
@@ -404,10 +406,11 @@ public class MediaRestServiceImpl implements MediaRestService {
         }
         return null;
     }
+
     private MediaObject handleNotFound(String id) {
         MediaObject answer = mediaService.load(id);
         if(answer == null) {
-            throw new Exceptions().notFound("No media for id {}", id);
+            throw notFound("No media for id {}", id);
         }
 
         return answer;
@@ -415,7 +418,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
     private void handleToManyResults(Integer max) {
         if(max > Constants.MAX_RESULTS) {
-            throw new Exceptions().badRequest("Requesting more than {} results is not allowed. Use a pager!", Constants.MAX_RESULTS);
+            throw badRequest("Requesting more than {} results is not allowed. Use a pager!", Constants.MAX_RESULTS);
         }
     }
 
