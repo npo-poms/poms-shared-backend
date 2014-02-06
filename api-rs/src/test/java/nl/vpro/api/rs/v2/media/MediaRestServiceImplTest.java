@@ -35,7 +35,9 @@ import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
-/**           ´
+/**
+ * ´
+ *
  * @author Michiel Meeuwissen
  * @since 2.0
  */
@@ -256,7 +258,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
     @Test
     public void testGetMembers() throws URISyntaxException, IOException {
-        when(mediaService.findMembers(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+        when(mediaService.findMembers(any(MediaObject.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
             .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
 
         when(mediaService.load("123")).thenReturn(new Program());
@@ -279,7 +281,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
     @Test
     public void testGetMembersNotFound() throws URISyntaxException, IOException {
-        when(mediaService.findMembers(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+        when(mediaService.findMembers(any(MediaObject.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
             .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
 
         when(mediaService.load("123")).thenReturn(null);
@@ -302,7 +304,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
     @Test
     public void testGetEpisodes() throws URISyntaxException, IOException {
 
-        when(mediaService.findEpisodes(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+        when(mediaService.findEpisodes(any(MediaObject.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
             .thenReturn(new ProgramSearchResult(new ArrayList<SearchResultItem<? extends Program>>(), 0l, 0, 10l));
 
         when(mediaService.load("123")).thenReturn(new Group());
@@ -325,7 +327,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
     @Test
     public void testGetEpisodesNotFound() throws URISyntaxException, IOException {
 
-        when(mediaService.findEpisodes(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+        when(mediaService.findEpisodes(any(MediaObject.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
             .thenReturn(new ProgramSearchResult(new ArrayList<SearchResultItem<? extends Program>>(), 0l, 0, 10l));
 
         when(mediaService.load("123")).thenReturn(null);
@@ -347,7 +349,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
     @Test
     public void testGetDescendants() throws URISyntaxException, IOException {
-        when(mediaService.findDescendants(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+        when(mediaService.findDescendants(any(MediaObject.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
             .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
 
         when(mediaService.load("123")).thenReturn(new Group());
@@ -370,7 +372,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
     @Test
     public void testGetDescendantsNotFound() throws URISyntaxException, IOException {
-        when(mediaService.findDescendants(any(String.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
+        when(mediaService.findDescendants(any(MediaObject.class), isNull(String.class), isNull(MediaForm.class), eq(0l), anyInt()))
             .thenReturn(new MediaSearchResult(new ArrayList<SearchResultItem<? extends MediaObject>>(), 0l, 0, 10l));
 
         when(mediaService.load("123")).thenReturn(null);

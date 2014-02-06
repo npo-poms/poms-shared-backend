@@ -23,9 +23,7 @@ import com.wordnik.swagger.annotations.*;
 import nl.vpro.api.rs.v2.exception.Exceptions;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.api.media.MediaFormBuilder;
 import nl.vpro.domain.api.media.MediaService;
-import nl.vpro.domain.api.media.MediaSortOrder;
 import nl.vpro.domain.api.transfer.ResultFilter;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.bind.Jackson2Mapper;
@@ -327,7 +325,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaResult related = mediaService.findRelated(media, null, null, offset, max).asResult();
+            MediaResult related = mediaService.findRelated(media, null, null, max).asResult();
 
             return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {
@@ -348,14 +346,13 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(required = true, defaultValue = "AVRO_1656037") @PathParam("id") String id,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
-        @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
             MediaObject media = handleNotFound(id);
             handleToManyResults(max);
 
-            MediaSearchResult related = mediaService.findRelated(media, profile, form, offset, max);
+            MediaSearchResult related = mediaService.findRelated(media, profile, form, max);
 
             return properties == null ? related : ResultFilter.filter(related, properties);
         } catch(Exception e) {

@@ -152,7 +152,6 @@ public interface MediaRestService {
         @PathParam("id") String id,
         @QueryParam("profile") String profile,
         @QueryParam("properties") String properties,
-        @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
