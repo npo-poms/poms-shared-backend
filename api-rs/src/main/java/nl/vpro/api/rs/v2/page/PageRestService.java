@@ -24,15 +24,13 @@ public interface PageRestService {
     Response list(
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max);
 
     @POST
     Response find(
         PageForm form,
         @QueryParam("profile") String profile,
         @QueryParam("offset") @DefaultValue("0") Long offset,
-        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max,
-        @QueryParam("mock") @DefaultValue("false") boolean mock);
+        @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max);
 
 }

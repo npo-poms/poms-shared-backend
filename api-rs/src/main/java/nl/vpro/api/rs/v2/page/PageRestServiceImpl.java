@@ -20,6 +20,7 @@ import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
 import nl.vpro.domain.page.PageBuilder;
+import nl.vpro.domain.page.PageType;
 import nl.vpro.swagger.SwaggerApplication;
 
 /**
@@ -75,12 +76,8 @@ public class PageRestServiceImpl implements PageRestService {
     public Response list(
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            return Response.ok(new PageResult(mockList(listSizes, offset, max), offset, max, listSizes)).build();
-        }
         try {
             return Response.ok(pageService.find(null, profile, offset, max).asResult()).build();
         } catch(Exception e) {
@@ -99,17 +96,8 @@ public class PageRestServiceImpl implements PageRestService {
         @ApiParam(value = "Search form", required = false, defaultValue = DEMO_FORM) PageForm form,
         @ApiParam(required = false) @QueryParam("profile") String profile,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
-        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max,
-        @ApiParam @QueryParam("mock") @DefaultValue("false") boolean mock
+        @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        if(mock) {
-            PageSearchResult result = new PageSearchResult(mockSearchItems(mockList(listSizes, offset, max)), offset, max, listSizes);
-            PageFacetsResult facets = new PageFacetsResult();
-            facets.setBroadcasters(Arrays.asList(new TermFacetResultItem("kro", 10)));
-            facets.setSortDates(Arrays.asList(new DateFacetResultItem("LAST_WEEK", new Date(System.currentTimeMillis() - 3600 * 47 * 7), new Date(), 20)));
-            result.setFacets(facets);
-            return Response.ok(result).build();
-        }
         try {
             return Response.ok(pageService.find(form, profile, offset, max)).build();
 
@@ -117,16 +105,6 @@ public class PageRestServiceImpl implements PageRestService {
             return Response.ok(new Error(500, e)).status(500).build();
         }
     }
-
-    protected List<? extends Page> mockList(long total, long offset, int limit) {
-        long numberOfResults = Math.min(total - offset, limit);
-        List<Page> result = new ArrayList<>();
-        for(int i = 0; i < numberOfResults; i++) {
-            result.add(mockPage());
-        }
-        return result;
-    }
-
 
     protected List<SearchResultItem<? extends Page>> mockSearchItems(final List<? extends Page> list) {
         return new AbstractList<SearchResultItem<? extends Page>>() {
@@ -144,14 +122,5 @@ public class PageRestServiceImpl implements PageRestService {
                 return list.size();
             }
         };
-    }
-
-
-    protected Page mockPage() {
-        try {
-            return PageBuilder.article().pid("4b748d32-8006-4f0a-8aac-6d8d5c89a847").example().build();
-        } catch(URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
