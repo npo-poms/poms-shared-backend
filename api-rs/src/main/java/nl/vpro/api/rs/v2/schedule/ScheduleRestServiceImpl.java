@@ -6,6 +6,7 @@ package nl.vpro.api.rs.v2.schedule;
 
 import com.wordnik.swagger.annotations.*;
 import nl.vpro.api.rs.v2.exception.Exceptions;
+import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.ScheduleResult;
 import nl.vpro.domain.api.ScheduleSearchResult;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import java.util.Date;
 
@@ -62,15 +64,15 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     public ScheduleResult list(
-            String channel,
-            Net net,
+            @QueryParam("channel") String channel,
+            @QueryParam("net") Net net,
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
             @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
-            String sort,
-            Long offset,
-            Integer max
+            @QueryParam("sort") @DefaultValue("asc") String sort,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         Channel chan = Channel.valueOf(channel);
         // TODO handle properties != null
@@ -86,10 +88,10 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     public ScheduleSearchResult find(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
-            String profile,
+            @QueryParam("profile") String profile,
             @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
-            Long offset,
-            Integer max
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         // TODO handle properties != null
         return scheduleService.find(form, profile, offset, max);
