@@ -26,7 +26,7 @@ import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.api.transfer.ResultFilter;
 import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.bind.Jackson2Mapper;
+import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.swagger.SwaggerApplication;
 import nl.vpro.transfer.media.MediaObjectPropertySelectionFunction;
 import nl.vpro.transfer.media.PropertySelection;

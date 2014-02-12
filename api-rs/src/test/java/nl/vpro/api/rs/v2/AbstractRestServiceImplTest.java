@@ -13,7 +13,7 @@ import org.junit.Before;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import nl.vpro.domain.media.bind.Jackson2Mapper;
+import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.resteasy.JacksonContextResolver;
 
 /**
