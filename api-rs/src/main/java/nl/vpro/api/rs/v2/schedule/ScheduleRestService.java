@@ -9,7 +9,6 @@ import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.ScheduleResult;
 import nl.vpro.domain.api.ScheduleSearchResult;
 import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.media.Net;
 import nl.vpro.resteasy.DateFormat;
 import nl.vpro.resteasy.ISO8601Format;
 
@@ -37,8 +36,8 @@ public interface ScheduleRestService {
 
     @GET
     public ScheduleResult list(
-            @QueryParam("channel") String channel,
-            @QueryParam("net") Net net,
+            @ApiParam(value = "Channel name e.g NED1", required = false) @QueryParam("channel") String channel,
+            @ApiParam(value = "Net name e.g. ZAPP", required = false)  @QueryParam("net") String net,
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") @DateFormat("yyyy-MM-dd") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") @ISO8601Format Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") @ISO8601Format Date stop,

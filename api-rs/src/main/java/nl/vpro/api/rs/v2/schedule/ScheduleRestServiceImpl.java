@@ -64,8 +64,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     public ScheduleResult list(
-            @QueryParam("channel") String channel,
-            @QueryParam("net") Net net,
+            @ApiParam(value = "Channel name e.g NED1", required = false) @QueryParam("channel") String channel,
+            @ApiParam(value = "Net name e.g. ZAPP", required = false)  @QueryParam("net") String net,
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
@@ -74,10 +74,16 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        Channel chan = Channel.valueOf(channel);
+        Channel chan = null;
+        Net thenet = null;
+        if (channel!=null) {
+            chan = Channel.valueOf(channel);
+        } else if (net!=null) {
+            thenet = new Net(net);
+        }
         // TODO handle properties != null
         Order order = parseOrder(sort);
-        return scheduleService.list(chan, net, guideDay, start, stop, order, offset, max);
+        return scheduleService.list(chan, thenet, guideDay, start, stop, order, offset, max);
     }
 
     @ApiOperation(httpMethod = "post",
