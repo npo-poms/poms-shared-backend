@@ -11,6 +11,7 @@ import java.io.Writer;
 import javax.xml.bind.JAXB;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.vpro.domain.media.MediaTestDataBuilder;
@@ -22,6 +23,7 @@ import static nl.vpro.fest.assertions.MediaAssertions.assertThat;
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
+@Ignore("Won't run when classes are loaded yet")
 public class ApiMediaFilterTest {
 
     private InstrumentMediaFilters instrument = new InstrumentMediaFilters();
