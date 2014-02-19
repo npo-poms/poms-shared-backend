@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import com.wordnik.swagger.annotations.*;
 
 import nl.vpro.api.rs.v2.exception.Exceptions;
+import nl.vpro.api.rs.v2.filter.ApiMediaFilter;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaService;
@@ -87,7 +88,14 @@ public class MediaRestServiceImpl implements MediaRestService {
             handleToManyResults(max);
 
             MediaResult searchResult = mediaService.list(parseOrder(sort), offset, max);
-            return properties == null ? searchResult : ResultFilter.filter(searchResult, properties);
+
+            if(properties != null) {
+                ApiMediaFilter.get().filter(properties.split(properties));
+            } else {
+                ApiMediaFilter.get().clear();
+            }
+
+            return searchResult;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -131,10 +139,13 @@ public class MediaRestServiceImpl implements MediaRestService {
     ) {
         try {
             MediaObject mediaObject = handleNotFound(id);
-            if(properties == null) {
-                return mediaObject;
+
+            if(properties != null) {
+                ApiMediaFilter.get().filter(properties.split(","));
+            } else {
+                ApiMediaFilter.get().clear();
             }
-            mediaObject = new MediaObjectPropertySelectionFunction(new PropertySelection(properties)).apply(mediaObject);
+
             return mediaObject;
         } catch(Exception e) {
             throw serverError(e.getMessage());
