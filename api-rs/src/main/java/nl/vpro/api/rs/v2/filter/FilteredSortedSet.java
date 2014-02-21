@@ -4,10 +4,10 @@
  */
 package nl.vpro.api.rs.v2.filter;
 
-import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -94,20 +94,17 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
         return false;
     }
 
-    @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
-            int index = 0;
+            boolean first = true;
 
             Iterator<T> wrappedIterator = wrapped.iterator();
 
-            private T next;
-
             @Override
             public boolean hasNext() {
-                if(filter.none(property)) {
+                if (filter.none(property)) {
                     return false;
-                } else if(index++ == 0) {
+                } else if (first) {
                     return wrappedIterator.hasNext();
                 }
                 return wrappedIterator.hasNext() && filter.all(property);
@@ -115,12 +112,16 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
             @Override
             public T next() {
-                return wrappedIterator.next();
+                if (hasNext()) {
+                    first = false;
+                    return wrappedIterator.next();
+                }
+                throw new NoSuchElementException();
             }
 
             @Override
             public void remove() {
-                iterator().remove();
+                throw new UnsupportedOperationException();
             }
         };
     }

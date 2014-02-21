@@ -4,16 +4,14 @@
  */
 package nl.vpro.api.rs.v2.filter;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.jboss.resteasy.plugins.spring.SpringContextLoaderListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Roelof Jan Koekoek
@@ -56,7 +54,8 @@ public class InstrumentMediaFilters {
                             log.debug("Instrumenting SortedSet {}", f.getFieldName());
                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v2.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                         } else if("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
-                            // TODO
+                            log.debug("Instrumenting SortedSet {}", f.getFieldName());
+                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v2.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                         } else {
                             log.debug("Instrumenting {}", f.getFieldName());
                             f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.v2.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");

@@ -13,7 +13,7 @@ import java.util.*;
  * User: rico
  * Date: 20/02/2014
  */
-public class FilteredList <T> extends AbstractFiltered<List<T>> implements List<T> {
+public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T> {
     private static final Logger log = LoggerFactory.getLogger(FilteredSortedSet.class);
 
     protected FilteredList(String property, List<T> wrapped) {
@@ -21,33 +21,39 @@ public class FilteredList <T> extends AbstractFiltered<List<T>> implements List<
     }
 
     public static <T> FilteredList<T> wrap(String property, Object wrapped) {
-        if(!(wrapped instanceof List)) {
+        if (!(wrapped instanceof List)) {
             throw new IllegalArgumentException("Can only wrap a SortedSet");
         }
 
         log.debug("Wrapping {}", wrapped);
 
-        if(wrapped instanceof List) {
-            if(!(((FilteredList)wrapped).property).equals(property)) {
+        if (wrapped instanceof List) {
+            if (!(((FilteredList) wrapped).property).equals(property)) {
                 throw new IllegalArgumentException("Can't wrap different properties");
             }
 
-            return (FilteredList<T>)wrapped;
+            return (FilteredList<T>) wrapped;
         }
 
-        return new FilteredList<>(property, (List<T>)wrapped);
+        return new FilteredList<>(property, (List<T>) wrapped);
     }
 
 
     @Override
     public int size() {
+        if (filter.all(property)) {
+            return wrapped.size();
+        } else if (filter.one(property)) {
+            return 1;
+        }
         return 0;
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size() == 0;
     }
+
 
     @Override
     public boolean contains(Object o) {
@@ -56,27 +62,55 @@ public class FilteredList <T> extends AbstractFiltered<List<T>> implements List<
 
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new Iterator<T>() {
+            boolean first = true;
+
+            Iterator<T> wrappedIterator = wrapped.iterator();
+
+            @Override
+            public boolean hasNext() {
+                if (filter.none(property)) {
+                    return false;
+                } else if (first) {
+                    return wrappedIterator.hasNext();
+                }
+                return wrappedIterator.hasNext() && filter.all(property);
+            }
+
+            @Override
+            public T next() {
+                if (hasNext()) {
+                    first = false;
+                    return wrappedIterator.next();
+                }
+                throw new NoSuchElementException();
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        return wrapped.toArray();
     }
 
     @Override
     public <T1> T1[] toArray(T1[] a) {
-        return null;
+        return wrapped.toArray(a);
     }
 
     @Override
     public boolean add(T t) {
-        return false;
+        return wrapped.add(t);
     }
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        return wrapped.remove(o);
     }
 
     @Override
@@ -106,51 +140,148 @@ public class FilteredList <T> extends AbstractFiltered<List<T>> implements List<
 
     @Override
     public void clear() {
-
+        wrapped.clear();
     }
 
     @Override
     public T get(int index) {
-        return null;
+        if (filter.all(property)) {
+            return wrapped.get(index);
+        } else if (filter.one(property)) {
+            if (index == 0) {
+                return wrapped.get(0);
+            }
+        }
+        throw new IndexOutOfBoundsException();
     }
 
     @Override
     public T set(int index, T element) {
-        return null;
+        if (filter.all(property)) {
+            return wrapped.set(index, element);
+        } else if (filter.one(property)) {
+            if (index == 0) {
+                return wrapped.set(0, element);
+            }
+        }
+        throw new IndexOutOfBoundsException();
     }
 
     @Override
     public void add(int index, T element) {
-
+        wrapped.add(index, element);
     }
 
     @Override
     public T remove(int index) {
-        return null;
+        return wrapped.remove(index);
     }
 
     @Override
     public int indexOf(Object o) {
-        return 0;
+        return wrapped.indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return 0;
+        return wrapped.indexOf(o);
     }
 
     @Override
     public ListIterator<T> listIterator() {
-        return null;
+        return new FilteredListIterator();
     }
 
     @Override
     public ListIterator<T> listIterator(int index) {
-        return null;
+        return new FilteredListIterator(index);
     }
 
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        return null;
+        return wrapped.subList(fromIndex, toIndex);
+    }
+
+    private class FilteredListIterator implements ListIterator<T> {
+        private int startIndex = 0;
+        private int currentIndex = 0;
+        private int endIndex = 0;
+        private int lastIndexUsed = -1;
+
+        FilteredListIterator() {
+            this(0);
+        }
+
+        FilteredListIterator(int start) {
+            startIndex = start;
+            currentIndex = start;
+            if (filter.all(property)) {
+                endIndex = wrapped.size();
+            } else if (filter.one(property)) {
+                endIndex = 1;
+            } else if (filter.none(property)) {
+                endIndex = -1;
+            } else {
+                endIndex = wrapped.size();
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return currentIndex < endIndex;
+        }
+
+        @Override
+        public T next() {
+            if (hasNext()) {
+                lastIndexUsed = currentIndex;
+                return wrapped.get(currentIndex++);
+            }
+            throw new NoSuchElementException();
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            return currentIndex > startIndex;
+        }
+
+        @Override
+        public T previous() {
+            if (hasPrevious()) {
+                currentIndex--;
+                lastIndexUsed = currentIndex;
+                return wrapped.get(currentIndex);
+            }
+            throw new NoSuchElementException();
+        }
+
+        @Override
+        public int nextIndex() {
+            return this.currentIndex - this.startIndex;
+        }
+
+        @Override
+        public int previousIndex() {
+            return this.currentIndex - this.startIndex - 1;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void set(T t) {
+            if (lastIndexUsed >= 0) {
+                wrapped.set(lastIndexUsed, t);
+            } else {
+                throw new IllegalStateException("must call next() or previous() before a call to set()");
+            }
+        }
+
+        @Override
+        public void add(T t) {
+            wrapped.add(t);
+        }
     }
 }
