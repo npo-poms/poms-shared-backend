@@ -4,37 +4,29 @@
  */
 package nl.vpro.api.rs.v2.media;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Iterator;
+import com.wordnik.swagger.annotations.*;
+import nl.vpro.api.rs.v2.exception.Exceptions;
+import nl.vpro.api.rs.v2.filter.ApiMediaFilter;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.api.media.MediaService;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.swagger.SwaggerApplication;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.wordnik.swagger.annotations.*;
-
-import nl.vpro.api.rs.v2.exception.Exceptions;
-import nl.vpro.api.rs.v2.filter.ApiMediaFilter;
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.media.MediaForm;
-import nl.vpro.domain.api.media.MediaService;
-import nl.vpro.domain.api.transfer.ResultFilter;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.swagger.SwaggerApplication;
-import nl.vpro.transfer.media.MediaObjectPropertySelectionFunction;
-import nl.vpro.transfer.media.PropertySelection;
-
-import static nl.vpro.api.rs.v2.exception.Exceptions.badRequest;
-import static nl.vpro.api.rs.v2.exception.Exceptions.notFound;
-import static nl.vpro.api.rs.v2.exception.Exceptions.serverError;
+import static nl.vpro.api.rs.v2.exception.Exceptions.*;
 
 /**
  * See https://jira.vpro.nl/browse/API-92
@@ -89,11 +81,7 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             MediaResult searchResult = mediaService.list(parseOrder(sort), offset, max);
 
-            if(properties != null) {
-                ApiMediaFilter.get().filter(properties.split(properties));
-            } else {
-                ApiMediaFilter.get().clear();
-            }
+            ApiMediaFilter.set(properties);
 
             return searchResult;
         } catch(Exception e) {
@@ -119,7 +107,8 @@ public class MediaRestServiceImpl implements MediaRestService {
 
         try {
             MediaSearchResult result = mediaService.find(profile, form, offset, max);
-            return properties == null ? result : ResultFilter.filter(result, properties);
+            ApiMediaFilter.set(properties);
+            return result;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -140,11 +129,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         try {
             MediaObject mediaObject = handleNotFound(id);
 
-            if(properties != null) {
-                ApiMediaFilter.get().filter(properties.split(","));
-            } else {
-                ApiMediaFilter.get().clear();
-            }
+            ApiMediaFilter.set(properties);
 
             return mediaObject;
         } catch(Exception e) {
@@ -173,7 +158,8 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             MediaResult result = mediaService.listMembers(media, parseOrder(sort), offset, max);
 
-            return properties == null ? result : ResultFilter.filter(result, properties);
+            ApiMediaFilter.set(properties);
+            return result;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -200,8 +186,9 @@ public class MediaRestServiceImpl implements MediaRestService {
             handleToManyResults(max);
 
             MediaSearchResult members = mediaService.findMembers(media, profile, form, offset, max);
+            ApiMediaFilter.set(properties);
 
-            return properties == null ? members : ResultFilter.filter(members, properties);
+            return members;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -228,7 +215,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             ProgramResult episodes = mediaService.listEpisodes(media, parseOrder(sort), offset, max);
 
-            return properties == null ? episodes : ResultFilter.filter(episodes, properties);
+            ApiMediaFilter.set(properties);
+
+            return episodes;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -255,7 +244,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             ProgramSearchResult episodes = mediaService.findEpisodes(media, profile, form, offset, max);
 
-            return properties == null ? episodes : ResultFilter.filter(episodes, properties);
+            ApiMediaFilter.set(properties);
+
+            return episodes;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -283,7 +274,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             MediaResult descendants = mediaService.listDescendants(media, parseOrder(sort), offset, max);
 
-            return properties == null ? descendants : ResultFilter.filter(descendants, properties);
+            ApiMediaFilter.set(properties);
+
+            return descendants;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -311,8 +304,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             MediaSearchResult descendants = mediaService.findDescendants(media, profile, form, offset, max);
 
-            return properties == null ? descendants : ResultFilter.filter(descendants, properties);
+            ApiMediaFilter.set(properties);
 
+            return descendants;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -338,7 +332,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             MediaResult related = mediaService.findRelated(media, null, null, max).asResult();
 
-            return properties == null ? related : ResultFilter.filter(related, properties);
+            ApiMediaFilter.set(properties);
+
+            return related;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }
@@ -365,7 +361,9 @@ public class MediaRestServiceImpl implements MediaRestService {
 
             MediaSearchResult related = mediaService.findRelated(media, profile, form, max);
 
-            return properties == null ? related : ResultFilter.filter(related, properties);
+            ApiMediaFilter.set(properties);
+
+            return related;
         } catch(Exception e) {
             throw serverError(e.getMessage());
         }

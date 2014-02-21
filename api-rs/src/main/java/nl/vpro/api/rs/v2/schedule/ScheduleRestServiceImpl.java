@@ -6,6 +6,7 @@ package nl.vpro.api.rs.v2.schedule;
 
 import com.wordnik.swagger.annotations.*;
 import nl.vpro.api.rs.v2.exception.Exceptions;
+import nl.vpro.api.rs.v2.filter.ApiMediaFilter;
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.ScheduleResult;
@@ -81,7 +82,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         } else if (net!=null) {
             thenet = new Net(net);
         }
-        // TODO handle properties != null
+        ApiMediaFilter.set(properties);
         Order order = parseOrder(sort);
         return scheduleService.list(chan, thenet, guideDay, start, stop, order, offset, max);
     }
@@ -99,7 +100,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        // TODO handle properties != null
+        ApiMediaFilter.set(properties);
         return scheduleService.find(form, profile, offset, max);
     }
 
@@ -110,4 +111,5 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             throw new Exceptions().badRequest("Invalid order \"{}\"", order);
         }
     }
+
 }

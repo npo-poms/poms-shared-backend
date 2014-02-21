@@ -30,6 +30,14 @@ public class ApiMediaFilter {
         localFilter.remove();
     }
 
+    public static void set(String properties) {
+        if(properties != null) {
+            get().filter(properties.split(","));
+        } else {
+            get().clear();
+        }
+    }
+
     public void clear() {
         properties.clear();
     }
@@ -41,7 +49,7 @@ public class ApiMediaFilter {
 
     public void add(String... properties) {
         for(String property : properties) {
-            this.properties.add(property.toLowerCase());
+            this.properties.add(property.toLowerCase().trim());
         }
     }
 
@@ -56,4 +64,5 @@ public class ApiMediaFilter {
     public boolean none(String property) {
         return !all(property) && !one(property);
     }
+
 }
