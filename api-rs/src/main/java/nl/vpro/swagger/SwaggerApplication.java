@@ -8,15 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.ws.rs.core.Application;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.wordnik.swagger.jaxrs.JaxrsApiReader;
-
-import nl.vpro.api.rs.v2.media.MediaRestService;
-import nl.vpro.api.rs.v2.page.PageRestService;
 
 /**
  * Static helper to expose a dummy JAX-RS Application. Swagger needs such an application to expose the API docs for

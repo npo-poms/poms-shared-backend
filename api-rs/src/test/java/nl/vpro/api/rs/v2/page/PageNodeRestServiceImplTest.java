@@ -28,14 +28,14 @@ import static org.mockito.Mockito.mock;
  * @since 2.0
  */
 @Ignore("Fis this when we start working on the page API it's outdated")
-public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
+public class PageNodeRestServiceImplTest extends AbstractRestServiceImplTest {
 
     PageService pageService = mock(PageService.class);
 
 
     @Override
     protected Object getTestObject() {
-        return new PageRestServiceImpl(pageService);
+        return new PageNodeRestServiceImpl(pageService);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 
-        assertEquals(response.getErrorMessage()+  " " + response.getContentAsString(), 200, response.getStatus());
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
         assertEquals(XML, response.getOutputHeaders().get("Content-Type").get(0));
 
         Result<Page> pages = JAXB.unmarshal(new StringReader(response.getContentAsString()), Result.class);

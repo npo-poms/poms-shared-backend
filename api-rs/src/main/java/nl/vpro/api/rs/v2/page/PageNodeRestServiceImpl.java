@@ -1,6 +1,5 @@
 package nl.vpro.api.rs.v2.page;
 
-import java.net.URISyntaxException;
 import java.util.*;
 
 import javax.annotation.PostConstruct;
@@ -19,8 +18,6 @@ import nl.vpro.domain.api.Error;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
 import nl.vpro.domain.page.Page;
-import nl.vpro.domain.page.PageBuilder;
-import nl.vpro.domain.page.PageType;
 import nl.vpro.swagger.SwaggerApplication;
 
 /**
@@ -28,8 +25,8 @@ import nl.vpro.swagger.SwaggerApplication;
  * @since 2.0
  */
 @Service
-@Api(value = PageRestService.PATH, position = 1)
-public class PageRestServiceImpl implements PageRestService {
+@Api(value = PageNodeRestService.PATH, position = 2)
+public class PageNodeRestServiceImpl implements PageNodeRestService {
     private static long listSizes = 100l;
 
     private static final String DEMO_FORM = "{\n" +
@@ -55,7 +52,7 @@ public class PageRestServiceImpl implements PageRestService {
     private boolean expose;
 
     @Autowired
-    PageRestServiceImpl(PageService pageService) {
+    PageNodeRestServiceImpl(PageService pageService) {
         this.pageService = pageService;
     }
 
@@ -104,23 +101,5 @@ public class PageRestServiceImpl implements PageRestService {
         } catch(Exception e) {
             return Response.ok(new Error(500, e)).status(500).build();
         }
-    }
-
-    protected List<SearchResultItem<? extends Page>> mockSearchItems(final List<? extends Page> list) {
-        return new AbstractList<SearchResultItem<? extends Page>>() {
-
-            @Override
-            public SearchResultItem<Page> get(int index) {
-                SearchResultItem<Page> result = new SearchResultItem<>(list.get(index));
-                result.setScore(0.5f);
-                //
-                return result;
-            }
-
-            @Override
-            public int size() {
-                return list.size();
-            }
-        };
     }
 }

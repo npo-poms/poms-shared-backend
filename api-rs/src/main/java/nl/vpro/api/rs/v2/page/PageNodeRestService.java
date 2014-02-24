@@ -15,9 +15,9 @@ import nl.vpro.domain.api.page.PageForm;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-@Path(PageRestService.PATH)
+@Path(PageNodeRestService.PATH)
 @Produces({MediaType.APPLICATION_JSON + "; charset=utf-8", MediaType.APPLICATION_XML + "; charset=utf-8"})
-public interface PageRestService {
+public interface PageNodeRestService {
     public static final String PATH = "/pages";
 
     @GET
