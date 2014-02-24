@@ -4,9 +4,6 @@
  */
 package nl.vpro.api.rs.v2.filter;
 
-
-import nl.vpro.domain.constraint.AbstractFilter;
-
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0

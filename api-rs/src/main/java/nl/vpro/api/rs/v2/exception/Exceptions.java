@@ -9,7 +9,6 @@ import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.spi.InternalServerErrorException;
 import org.slf4j.helpers.MessageFormatter;
 
 /**

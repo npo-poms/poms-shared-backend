@@ -11,7 +11,6 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang.StringUtils;
-import org.jboss.resteasy.core.interception.PreMatchContainerRequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
