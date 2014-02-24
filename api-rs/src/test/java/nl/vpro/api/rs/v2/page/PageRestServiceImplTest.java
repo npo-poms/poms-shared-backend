@@ -28,14 +28,14 @@ import static org.mockito.Mockito.mock;
  * @since 2.0
  */
 @Ignore("Fis this when we start working on the page API it's outdated")
-public class PageNodeRestServiceImplTest extends AbstractRestServiceImplTest {
+public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
 
     final PageService pageService = mock(PageService.class);
 
 
     @Override
     protected Object getTestObject() {
-        return new PageNodeRestServiceImpl(pageService);
+        return new PageRestServiceImpl(pageService);
     }
 
     @Test
