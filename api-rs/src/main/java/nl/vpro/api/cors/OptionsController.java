@@ -13,12 +13,12 @@ import org.springframework.stereotype.Controller;
 import com.wordnik.swagger.annotations.Api;
 
 import nl.vpro.api.rs.v2.media.MediaRestService;
-import nl.vpro.api.rs.v2.page.PageNodeRestService;
+import nl.vpro.api.rs.v2.page.PageRestService;
 import nl.vpro.api.rs.v2.profile.ProfileRestService;
 
 @Controller
 @Path(OptionsController.PATH)
-@Api(value = PageNodeRestService.PATH, description = "Cors -controller")
+@Api(value = PageRestService.PATH, description = "Cors -controller")
 public class OptionsController {
 
     /**
@@ -27,7 +27,7 @@ public class OptionsController {
      */
     public static final String PATH =
         "{path : (" + MediaRestService.PATH +
-            "|" + PageNodeRestService.PATH +
+            "|" + PageRestService.PATH +
             "|" + ProfileRestService.PATH +
             ")/.*}";
 

@@ -1,7 +1,5 @@
 package nl.vpro.api.rs.v2.page;
 
-import java.util.*;
-
 import javax.annotation.PostConstruct;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
@@ -17,7 +15,6 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.Error;
 import nl.vpro.domain.api.page.PageForm;
 import nl.vpro.domain.api.page.PageService;
-import nl.vpro.domain.page.Page;
 import nl.vpro.swagger.SwaggerApplication;
 
 /**
@@ -25,8 +22,8 @@ import nl.vpro.swagger.SwaggerApplication;
  * @since 2.0
  */
 @Service
-@Api(value = PageNodeRestService.PATH, position = 2)
-public class PageNodeRestServiceImpl implements PageNodeRestService {
+@Api(value = PageRestService.PATH, position = 2)
+public class PageRestServiceImpl implements PageRestService {
     private static long listSizes = 100l;
 
     private static final String DEMO_FORM = "{\n" +
@@ -52,7 +49,7 @@ public class PageNodeRestServiceImpl implements PageNodeRestService {
     private boolean expose;
 
     @Autowired
-    PageNodeRestServiceImpl(PageService pageService) {
+    PageRestServiceImpl(PageService pageService) {
         this.pageService = pageService;
     }
 
