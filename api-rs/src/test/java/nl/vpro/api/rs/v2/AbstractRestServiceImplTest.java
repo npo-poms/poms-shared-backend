@@ -26,7 +26,7 @@ public abstract class AbstractRestServiceImplTest {
     public static final MediaType XML;
 
     static {
-        Map<String, String> parameters = new LinkedHashMap<String, String>();
+        Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("charset", "utf-8");
 
         JSON = new MediaType("application", "json", parameters);
