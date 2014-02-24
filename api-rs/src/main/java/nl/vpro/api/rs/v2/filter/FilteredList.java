@@ -27,7 +27,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
         log.debug("Wrapping {}", wrapped);
 
-        if (wrapped instanceof List) {
+        if (wrapped instanceof FilteredList) {
             if (!(((FilteredList) wrapped).property).equals(property)) {
                 throw new IllegalArgumentException("Can't wrap different properties");
             }

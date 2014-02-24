@@ -82,9 +82,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         } else if (net!=null) {
             thenet = new Net(net);
         }
-        ApiMediaFilter.set(properties);
+
         Order order = parseOrder(sort);
-        return scheduleService.list(chan, thenet, guideDay, start, stop, order, offset, max);
+        ScheduleResult result = scheduleService.list(chan, thenet, guideDay, start, stop, order, offset, max);
+
+        ApiMediaFilter.set(properties);
+
+        return result;
     }
 
     @ApiOperation(httpMethod = "post",
@@ -100,8 +104,11 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
+        ScheduleSearchResult result =  scheduleService.find(form, profile, offset, max);
+
         ApiMediaFilter.set(properties);
-        return scheduleService.find(form, profile, offset, max);
+
+        return result;
     }
 
     private Order parseOrder(String order) {

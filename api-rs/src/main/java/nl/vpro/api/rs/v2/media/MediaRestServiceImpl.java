@@ -159,6 +159,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             MediaResult result = mediaService.listMembers(media, parseOrder(sort), offset, max);
 
             ApiMediaFilter.set(properties);
+
             return result;
         } catch(Exception e) {
             throw serverError(e.getMessage());
@@ -186,6 +187,7 @@ public class MediaRestServiceImpl implements MediaRestService {
             handleToManyResults(max);
 
             MediaSearchResult members = mediaService.findMembers(media, profile, form, offset, max);
+
             ApiMediaFilter.set(properties);
 
             return members;

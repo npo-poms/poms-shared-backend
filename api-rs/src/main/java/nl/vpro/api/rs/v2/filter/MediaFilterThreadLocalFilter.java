@@ -20,7 +20,7 @@ public class MediaFilterThreadLocalFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         try {
             ApiMediaFilter.get().clear();
-            doFilter(request, response, chain);
+            chain.doFilter(request, response);
         } finally {
             ApiMediaFilter.removeFilter();
         }
