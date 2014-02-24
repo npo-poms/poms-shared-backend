@@ -30,7 +30,7 @@ import static org.mockito.Mockito.mock;
 @Ignore("Fis this when we start working on the page API it's outdated")
 public class PageNodeRestServiceImplTest extends AbstractRestServiceImplTest {
 
-    PageService pageService = mock(PageService.class);
+    final PageService pageService = mock(PageService.class);
 
 
     @Override

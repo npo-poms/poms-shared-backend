@@ -35,7 +35,7 @@ public abstract class AbstractRestServiceImplTest {
 
     protected ObjectMapper mapper;
 
-    protected Dispatcher dispatcher = MockDispatcherFactory.createDispatcher();
+    protected final Dispatcher dispatcher = MockDispatcherFactory.createDispatcher();
 
     @Before
     public void setup() throws Exception {

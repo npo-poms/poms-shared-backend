@@ -98,7 +98,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
         return new Iterator<T>() {
             boolean first = true;
 
-            Iterator<T> wrappedIterator = wrapped.iterator();
+            final Iterator<T> wrappedIterator = wrapped.iterator();
 
             @Override
             public boolean hasNext() {

@@ -65,7 +65,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
         return new Iterator<T>() {
             boolean first = true;
 
-            Iterator<T> wrappedIterator = wrapped.iterator();
+            final Iterator<T> wrappedIterator = wrapped.iterator();
 
             @Override
             public boolean hasNext() {

@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
  */
 public class ProfileRestServiceImplTest extends AbstractRestServiceImplTest {
 
-    private ProfileService profileService = Mockito.mock(ProfileService.class);
+    private final ProfileService profileService = Mockito.mock(ProfileService.class);
 
     @Override
     protected Object getTestObject() {

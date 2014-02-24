@@ -40,7 +40,7 @@ public class ApiMediaFilter {
         singularToPlural.put("descendantofholder", "descendantof");
     }
 
-    private static ThreadLocal<ApiMediaFilter> localFilter = new ThreadLocal<ApiMediaFilter>() {
+    private static final ThreadLocal<ApiMediaFilter> localFilter = new ThreadLocal<ApiMediaFilter>() {
         @Override
         protected ApiMediaFilter initialValue() {
             return new ApiMediaFilter();

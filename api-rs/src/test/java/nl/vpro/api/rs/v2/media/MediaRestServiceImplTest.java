@@ -44,7 +44,7 @@ import static org.mockito.Mockito.*;
 @Ignore("fix these when we no longer return response objects!!!") // TODO
 public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
-    MediaService mediaService = mock(MediaService.class);
+    final MediaService mediaService = mock(MediaService.class);
 
     @Before
     public void resetMocks() {

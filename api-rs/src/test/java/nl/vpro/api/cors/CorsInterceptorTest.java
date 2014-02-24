@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
  * @since 2.0
  */
 public class CorsInterceptorTest {
-    CorsPolicy corsPolicy = mock(CorsPolicy.class);
+    final CorsPolicy corsPolicy = mock(CorsPolicy.class);
 
     @Before
     public void resetMocks() {
