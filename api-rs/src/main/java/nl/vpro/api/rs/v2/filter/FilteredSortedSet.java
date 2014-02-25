@@ -91,7 +91,12 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public boolean contains(Object o) {
-        throw new UnsupportedOperationException();
+        if (filter.one(property)) {
+            return wrapped.size()>0 && (wrapped.first().equals(o));
+        } else if (filter.none(property)) {
+            return false;
+        }
+        return wrapped.contains(o);
     }
 
     public Iterator<T> iterator() {

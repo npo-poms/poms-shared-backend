@@ -57,7 +57,12 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public boolean contains(Object o) {
-        throw new UnsupportedOperationException();
+        if (filter.one(property)) {
+            return wrapped.size()>0 && (wrapped.get(0).equals(o));
+        } else if (filter.none(property)) {
+            return false;
+        }
+        return wrapped.contains(o);
     }
 
     @Override
