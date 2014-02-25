@@ -50,12 +50,12 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public SortedSet<T> headSet(T toElement) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -91,7 +91,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public boolean contains(Object o) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     public Iterator<T> iterator() {
@@ -148,26 +148,26 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean addAll(Collection<? extends T> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void clear() {
-
+         wrapped.clear();
     }
 }
