@@ -52,7 +52,11 @@ public class InstrumentMediaFilters {
                             // Always show
                         } else if("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
                             log.debug("Instrumenting SortedSet {}", f.getFieldName());
-                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v2.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                            if (f.getFieldName().equals("titles")) {
+                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v2.filter.FilteredSortedTitleSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                            } else {
+                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v2.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                            }
                         } else if("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
                             log.debug("Instrumenting SortedSet {}", f.getFieldName());
                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v2.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
