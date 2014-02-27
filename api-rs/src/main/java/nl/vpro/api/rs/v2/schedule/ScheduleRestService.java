@@ -36,8 +36,32 @@ public interface ScheduleRestService {
 
     @GET
     public ScheduleResult list(
-            @ApiParam(value = "Channel name e.g NED1", required = false) @QueryParam("channel") String channel,
-            @ApiParam(value = "Net name e.g. ZAPP", required = false)  @QueryParam("net") String net,
+            @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") @DateFormat("yyyy-MM-dd") Date guideDay,
+            @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") @ISO8601Format Date start,
+            @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") @ISO8601Format Date stop,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @QueryParam("sort") @DefaultValue("asc") String sort,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+    );
+
+    @GET
+    @Path("/channel/{channel}")
+    public ScheduleResult listChannel(
+            @ApiParam(value = "Channel name e.g NED1", required = true) @PathParam("channel") String channel,
+            @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") @DateFormat("yyyy-MM-dd") Date guideDay,
+            @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") @ISO8601Format Date start,
+            @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") @ISO8601Format Date stop,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @QueryParam("sort") @DefaultValue("asc") String sort,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+    );
+
+    @GET
+    @Path("/net/{net}")
+    public ScheduleResult listNet(
+            @ApiParam(value = "Net name e.g. ZAPP", required = true)  @PathParam("net") String net,
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") @DateFormat("yyyy-MM-dd") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") @ISO8601Format Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") @ISO8601Format Date stop,

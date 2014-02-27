@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import java.util.Date;
 
@@ -65,8 +67,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     public ScheduleResult list(
-            @ApiParam(value = "Channel name e.g NED1", required = false) @QueryParam("channel") String channel,
-            @ApiParam(value = "Net name e.g. ZAPP", required = false)  @QueryParam("net") String net,
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
@@ -75,16 +75,59 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        Channel chan = null;
-        Net thenet = null;
-        if (channel!=null) {
-            chan = Channel.valueOf(channel);
-        } else if (net!=null) {
-            thenet = new Net(net);
-        }
-
         Order order = parseOrder(sort);
-        ScheduleResult result = scheduleService.list(chan, thenet, guideDay, start, stop, order, offset, max);
+        ScheduleResult result = scheduleService.list(null, null, guideDay, start, stop, order, offset, max);
+
+        ApiMediaFilter.set(properties);
+
+        return result;
+    }
+
+    @ApiOperation(httpMethod = "get",
+            value = "List scheduled media for a Channel",
+            notes = "",
+            position = 0
+    )
+    @Path("/channel/{channel}")
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
+    public ScheduleResult listChannel(
+            @ApiParam(required = true, defaultValue = "NED1") @PathParam("channel") String channel,
+            @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
+            @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
+            @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @QueryParam("sort") @DefaultValue("asc") String sort,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+    ) {
+        Order order = parseOrder(sort);
+        Channel chan = Channel.valueOf(channel);
+        ScheduleResult result = scheduleService.list(chan, null, guideDay, start, stop, order, offset, max);
+
+        ApiMediaFilter.set(properties);
+
+        return result;
+    }
+
+    @ApiOperation(httpMethod = "get",
+            value = "List scheduled media for a Net",
+            notes = "",
+            position = 0
+    )
+    @Path("/net/{net}")
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
+    public ScheduleResult listNet(
+            @ApiParam(required = true, defaultValue = "ZAPP") @PathParam("net") String net,
+            @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
+            @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
+            @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @QueryParam("sort") @DefaultValue("asc") String sort,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+    ) {
+        Order order = parseOrder(sort);
+        ScheduleResult result = scheduleService.list(null, new Net(net), guideDay, start, stop, order, offset, max);
 
         ApiMediaFilter.set(properties);
 
