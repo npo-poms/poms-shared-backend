@@ -14,7 +14,7 @@ import java.util.SortedSet;
 /**
  * @author rico
  * @date 24/02/2014
- * @since version
+ * @since 3.0
  */
 public class FilteredSortedTitleSet extends FilteredSortedSet<Title> {
     protected FilteredSortedTitleSet(String property, SortedSet<Title> wrapped) {
