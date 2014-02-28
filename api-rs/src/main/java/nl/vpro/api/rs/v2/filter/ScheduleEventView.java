@@ -4,7 +4,6 @@
  */
 package nl.vpro.api.rs.v2.filter;
 
-import com.google.common.collect.Sets;
 import nl.vpro.domain.media.ScheduleEvent;
 
 import java.util.SortedSet;
@@ -19,6 +18,6 @@ public class ScheduleEventView {
         if (!(wrapped instanceof SortedSet)) {
             throw new IllegalArgumentException("Can only wrap a SortedSet");
         }
-        return Sets.filter((SortedSet<ScheduleEvent>) wrapped, new ScheduleEventViewPredicate());
+        return new ScheduleEventViewSortedSet((SortedSet<ScheduleEvent>)wrapped);
     }
 }

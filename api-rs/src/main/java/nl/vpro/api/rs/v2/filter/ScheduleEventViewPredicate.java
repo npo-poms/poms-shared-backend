@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import javax.annotation.Nullable;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -21,7 +20,7 @@ import java.util.Date;
 /**
  * @author rico
  * @date 27/02/2014
- * @since version
+ * @since 3.0
  */
 public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
     private static final Logger log = LoggerFactory.getLogger(ScheduleEventViewPredicate.class);
@@ -57,7 +56,7 @@ public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
     }
 
     @Override
-    public boolean apply(@Nullable ScheduleEvent input) {
+    public boolean apply(ScheduleEvent input) {
         return (stop == null || input.getStart().compareTo(stop) <= 0);
     }
 
