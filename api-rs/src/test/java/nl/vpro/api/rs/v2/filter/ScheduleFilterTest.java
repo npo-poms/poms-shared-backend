@@ -6,6 +6,7 @@ package nl.vpro.api.rs.v2.filter;
 
 import nl.vpro.domain.media.*;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ public class ScheduleFilterTest {
     }
 
     @Test
+    @Ignore
     public void testFilter() {
         Program program = MediaTestDataBuilder.ProgramTestDataBuilder.program().withScheduleEvents().withMid().build();
         Calendar calendar = Calendar.getInstance();
@@ -57,4 +59,5 @@ public class ScheduleFilterTest {
 
         assertThat(schedule.getScheduleEvents().size()).isEqualTo(4);
     }
+
 }
