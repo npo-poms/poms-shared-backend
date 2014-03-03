@@ -51,6 +51,7 @@ public class ScheduleEventViewSortedSetTest {
         assertThat(filteredEvents.size()).isEqualTo(4);
     }
 
+    @Test
     public void testFilteredSetApiUser() {
         Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_USER"));
         SecurityContext context = SecurityContextHolder.getContext();
