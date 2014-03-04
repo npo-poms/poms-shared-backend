@@ -91,7 +91,7 @@ public class InstrumentMediaFilters {
                     @Override
                     public void edit(FieldAccess f) throws CannotCompileException {
                         if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() && f.getFieldName().equals("scheduleEvents")) {
-                            log.debug("Instrumenting ScheduleEvents for {}", f.getClassName());
+                            log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v2.filter.ScheduleEventView.wrap($proceed($$));");
                         }
 
