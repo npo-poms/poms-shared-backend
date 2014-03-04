@@ -71,6 +71,19 @@ public interface ScheduleRestService {
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     );
 
+    @GET
+    @Path("/broadcaster/{broadcaster}")
+    public ScheduleResult listBroadcaster(
+            @ApiParam(value = "Broadcaster e.g. NTR", required = true)  @PathParam("broadcaster") String broadcaster,
+            @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") @DateFormat("yyyy-MM-dd") Date guideDay,
+            @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") @ISO8601Format Date start,
+            @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") @ISO8601Format Date stop,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @QueryParam("sort") @DefaultValue("asc") String sort,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+    );
+
     @POST
     public ScheduleSearchResult find(
             MediaForm form,

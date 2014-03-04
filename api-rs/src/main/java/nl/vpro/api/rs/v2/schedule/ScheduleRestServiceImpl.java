@@ -76,7 +76,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         Order order = parseOrder(sort);
-        ScheduleResult result = scheduleService.list(null, null, guideDay, start, stop, order, offset, max);
+        ScheduleResult result = scheduleService.list(guideDay, start, stop, order, offset, max);
 
         ApiMediaFilter.set(properties);
 
@@ -102,7 +102,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     ) {
         Order order = parseOrder(sort);
         Channel chan = Channel.valueOf(channel);
-        ScheduleResult result = scheduleService.list(chan, null, guideDay, start, stop, order, offset, max);
+        ScheduleResult result = scheduleService.list(chan, guideDay, start, stop, order, offset, max);
 
         ApiMediaFilter.set(properties);
 
@@ -127,7 +127,32 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         Order order = parseOrder(sort);
-        ScheduleResult result = scheduleService.list(null, new Net(net), guideDay, start, stop, order, offset, max);
+        ScheduleResult result = scheduleService.list(new Net(net), guideDay, start, stop, order, offset, max);
+
+        ApiMediaFilter.set(properties);
+
+        return result;
+    }
+
+    @ApiOperation(httpMethod = "get",
+            value = "List scheduled media for a broadcaster",
+            notes = "",
+            position = 0
+    )
+    @Path("/broadcaster/{broadcaster}")
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
+    public ScheduleResult listBroadcaster(
+            @ApiParam(value = "Broadcaster e.g. NTR", required = true)  @PathParam("broadcaster") String broadcaster,
+            @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
+            @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
+            @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @QueryParam("sort") @DefaultValue("asc") String sort,
+            @QueryParam("offset") @DefaultValue("0") Long offset,
+            @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+    ) {
+        Order order = parseOrder(sort);
+        ScheduleResult result = scheduleService.list(broadcaster, guideDay, start, stop, order, offset, max);
 
         ApiMediaFilter.set(properties);
 
