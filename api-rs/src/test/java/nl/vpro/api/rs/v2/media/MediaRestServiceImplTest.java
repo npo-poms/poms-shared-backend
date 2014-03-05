@@ -25,7 +25,6 @@ import nl.vpro.domain.api.SearchResult;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.MediaSearch;
 import nl.vpro.domain.api.media.MediaService;
-import nl.vpro.domain.api.transfer.*;
 import nl.vpro.domain.media.Group;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
@@ -175,7 +174,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
         SearchResult<MediaObject> result = mapper.readValue(response.getContentAsString(), typeRef);
         assertEquals(Integer.valueOf(10), result.getSize());
-        assertEquals("foo", result.getList().get(0).getHighlights().get(0).getTerm());
+        assertEquals("foo", result.getItems().get(0).getHighlights().get(0).getTerm());
 
     }
 
@@ -202,7 +201,7 @@ public class MediaRestServiceImplTest extends AbstractRestServiceImplTest {
 
         SearchResult<MediaObject> result = JAXB.unmarshal(new StringReader(response.getContentAsString()), SearchResult.class);
         assertEquals(Integer.valueOf(10), result.getSize());
-        assertEquals("foo", result.getList().get(0).getHighlights().get(0).getTerm());
+        assertEquals("foo", result.getItems().get(0).getHighlights().get(0).getTerm());
     }
 
     @Test

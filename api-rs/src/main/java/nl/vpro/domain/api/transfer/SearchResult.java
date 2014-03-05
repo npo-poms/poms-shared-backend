@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+
 import java.util.AbstractList;
 import java.util.List;
 
@@ -41,9 +42,10 @@ public class SearchResult<S> extends Result<SearchResultItem<? extends S>> {
         return new AbstractList<S>() {
             @Override
             public S get(int index) {
-                SearchResultItem<? extends S> item = SearchResult.this.getList().get(index);
+                SearchResultItem<? extends S> item = SearchResult.this.getItems().get(index);
                 return item == null ? null : item.getResult();
             }
+
             @Override
             public int size() {
                 return SearchResult.this.getSize();

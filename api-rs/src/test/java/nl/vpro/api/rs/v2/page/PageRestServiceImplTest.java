@@ -55,7 +55,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Long.valueOf(0), pages.getOffset());
         assertEquals(Long.valueOf(100), pages.getTotal());
-        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
+        assertEquals("Groot brein in klein dier", pages.getItems().get(0).getTitle());
 
 
     }
@@ -75,7 +75,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Long.valueOf(0), pages.getOffset());
         assertEquals(Long.valueOf(100), pages.getTotal());
-        assertEquals("Groot brein in klein dier", pages.getList().get(0).getTitle());
+        assertEquals("Groot brein in klein dier", pages.getItems().get(0).getTitle());
 
 
     }
@@ -102,7 +102,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Long.valueOf(0), pages.getOffset());
         assertEquals(Long.valueOf(100), pages.getTotal());
-        assertEquals("Groot brein in klein dier", pages.getList().get(0).getResult().getTitle());
+        assertEquals("Groot brein in klein dier", pages.getItems().get(0).getResult().getTitle());
 
     }
 
@@ -127,7 +127,7 @@ public class PageRestServiceImplTest extends AbstractRestServiceImplTest {
         assertEquals(Integer.valueOf(50), pages.getSize());
         assertEquals(Long.valueOf(0), pages.getOffset());
         assertEquals(Long.valueOf(100), pages.getTotal());
-        assertEquals("Groot brein in klein dier", pages.getList().get(0).getResult().getTitle());
+        assertEquals("Groot brein in klein dier", pages.getItems().get(0).getResult().getTitle());
 
 
     }

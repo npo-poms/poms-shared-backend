@@ -14,7 +14,11 @@ public class FilteredObject<T> extends AbstractFiltered<T> {
         super(property, wrapped);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> FilteredObject<T> wrap(String property, T object) {
+        if(object instanceof FilteredObject) {
+            return (FilteredObject<T>)object;
+        }
         return new FilteredObject<>(property, object);
     }
 
