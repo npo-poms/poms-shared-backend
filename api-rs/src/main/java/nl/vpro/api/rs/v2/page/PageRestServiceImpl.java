@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.wordnik.swagger.annotations.*;
 
+import nl.vpro.api.rs.v2.filter.ApiMediaFilter;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.Error;
 import nl.vpro.domain.api.page.PageForm;
@@ -68,12 +69,16 @@ public class PageRestServiceImpl implements PageRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response list(
-        @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            return Response.ok(pageService.find(null, profile, offset, max).asResult()).build();
+            PageSearchResult result = pageService.find(null, null, offset, max);
+
+            ApiMediaFilter.set(properties);
+
+            return Response.ok(result.asResult()).build();
         } catch(Exception e) {
             return Response.ok(new Error(200, e)).status(200).build();
         }
@@ -89,12 +94,17 @@ public class PageRestServiceImpl implements PageRestService {
     public Response find(
         @ApiParam(value = "Search form", required = false, defaultValue = DEMO_FORM) PageForm form,
         @ApiParam(required = false) @QueryParam("profile") String profile,
+        @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
         @ApiParam @QueryParam("offset") @DefaultValue("0") Long offset,
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        try {
-            return Response.ok(pageService.find(form, profile, offset, max)).build();
 
+        try {
+            PageSearchResult result = pageService.find(form, profile, offset, max);
+
+            ApiMediaFilter.set(properties);
+
+            return Response.ok(result).build();
         } catch(Exception e) {
             return Response.ok(new Error(500, e)).status(500).build();
         }

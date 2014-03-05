@@ -22,7 +22,7 @@ public interface PageRestService {
 
     @GET
     Response list(
-        @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max);
 
@@ -30,6 +30,7 @@ public interface PageRestService {
     Response find(
         PageForm form,
         @QueryParam("profile") String profile,
+        @QueryParam("properties") String properties,
         @QueryParam("offset") @DefaultValue("0") Long offset,
         @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max);
 
