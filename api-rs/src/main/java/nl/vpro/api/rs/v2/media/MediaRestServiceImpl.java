@@ -5,6 +5,7 @@
 package nl.vpro.api.rs.v2.media;
 
 import com.wordnik.swagger.annotations.*;
+
 import nl.vpro.api.rs.v2.exception.Exceptions;
 import nl.vpro.api.rs.v2.filter.ApiMediaFilter;
 import nl.vpro.domain.api.*;
@@ -13,6 +14,7 @@ import nl.vpro.domain.api.media.MediaService;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.swagger.SwaggerApplication;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -127,7 +130,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties
     ) {
         try {
-            MediaObject mediaObject = handleNotFound(id);
+            MediaObject mediaObject = getMediaHandleNotFound(id);
 
             ApiMediaFilter.set(properties);
 
@@ -153,7 +156,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             MediaResult result = mediaService.listMembers(media, parseOrder(sort), offset, max);
@@ -183,7 +186,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             MediaSearchResult members = mediaService.findMembers(media, profile, form, offset, max);
@@ -212,7 +215,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             ProgramResult episodes = mediaService.listEpisodes(media, parseOrder(sort), offset, max);
@@ -241,7 +244,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             ProgramSearchResult episodes = mediaService.findEpisodes(media, profile, form, offset, max);
@@ -271,7 +274,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             MediaResult descendants = mediaService.listDescendants(media, parseOrder(sort), offset, max);
@@ -301,7 +304,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             MediaSearchResult descendants = mediaService.findDescendants(media, profile, form, offset, max);
@@ -329,7 +332,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             MediaResult related = mediaService.findRelated(media, null, null, max).asResult();
@@ -358,7 +361,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         @ApiParam @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         try {
-            MediaObject media = handleNotFound(id);
+            MediaObject media = getMediaHandleNotFound(id);
             handleToManyResults(max);
 
             MediaSearchResult related = mediaService.findRelated(media, profile, form, max);
@@ -412,7 +415,7 @@ public class MediaRestServiceImpl implements MediaRestService {
         return null;
     }
 
-    private MediaObject handleNotFound(String id) {
+    private MediaObject getMediaHandleNotFound(String id) {
         MediaObject answer = mediaService.load(id);
         if(answer == null) {
             throw notFound("No media for id {}", id);

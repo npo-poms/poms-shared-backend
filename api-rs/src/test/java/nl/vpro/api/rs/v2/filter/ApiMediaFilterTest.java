@@ -26,7 +26,7 @@ import static nl.vpro.fest.assertions.MediaAssertions.assertThat;
 @Ignore("Won't run when classes are loaded yet")
 public class ApiMediaFilterTest {
 
-    private InstrumentMediaFilters instrument = new InstrumentMediaFilters();
+    private MediaPropertiesFilters instrument = new MediaPropertiesFilters();
 
     @Before()
     public void setUp() {

@@ -7,13 +7,13 @@
                http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
   <!-- Instrument classes before they get loaded by the application. (Reloading classes is not possible) -->
-  <bean id="instrumentMediaFilters" class="nl.vpro.api.rs.v2.filter.InstrumentMediaFilters"/>
+  <bean id="instrumentMediaFilters" class="nl.vpro.api.rs.v2.filter.MediaPropertiesFilters"/>
 
   <security:authentication-manager alias="authenticationManager">
-      <security:authentication-provider user-service-ref="userService" />
+    <security:authentication-provider user-service-ref="userService"/>
   </security:authentication-manager>
 
-  <security:global-method-security pre-post-annotations="enabled" />
+  <security:global-method-security pre-post-annotations="enabled"/>
 
   <bean id="userService" class="org.mockito.Mockito" factory-method="mock">
     <constructor-arg value="org.springframework.security.core.userdetails.UserDetailsService"/>
