@@ -29,7 +29,7 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
-      <artifactId>api-backend</artifactId>
+      <artifactId>api-backend-profiles</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
