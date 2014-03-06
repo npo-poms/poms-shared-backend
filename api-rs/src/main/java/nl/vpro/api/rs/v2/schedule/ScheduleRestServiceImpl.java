@@ -70,7 +70,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
-            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") @DefaultValue("none") String properties,
             @QueryParam("sort") @DefaultValue("asc") String sort,
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -95,7 +95,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
-            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") @DefaultValue("none") String properties,
             @QueryParam("sort") @DefaultValue("asc") String sort,
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -121,7 +121,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
-            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") @DefaultValue("none") String properties,
             @QueryParam("sort") @DefaultValue("asc") String sort,
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -146,7 +146,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = "Guide day in simple ISO8601 format, ie 2014-02-27", required = false) @QueryParam("guideDay") Date guideDay,
             @ApiParam(value = "Start time in full ISO8601 format, ie 2014-02-27T07:06:00Z", required = false) @QueryParam("start") Date start,
             @ApiParam(value = "Stop time in full ISO8601 format, ie 2014-02-28T22:06:00Z", required = false) @QueryParam("stop") Date stop,
-            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") @DefaultValue("none") String properties,
             @QueryParam("sort") @DefaultValue("asc") String sort,
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -168,7 +168,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ScheduleSearchResult find(
             @ApiParam(value = "Search form", required = false, defaultValue = DEFAULT_FORM) MediaForm form,
             @QueryParam("profile") String profile,
-            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") String properties,
+            @ApiParam(value = "Optimise media result for these returned properties", required = false) @QueryParam("properties") @DefaultValue("none") String properties,
             @QueryParam("offset") @DefaultValue("0") Long offset,
             @QueryParam("max") @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
