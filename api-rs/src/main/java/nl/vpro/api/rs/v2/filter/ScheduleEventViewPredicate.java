@@ -35,6 +35,7 @@ public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
             if (roleName != null) {
                 switch (roleName) {
                     case "ROLE_API_USER":
+                    case "ROLE_API_SUPERUSER":
                     case "ROLE_API_SUPERCLIENT":
                     case "ROLE_API_SUPERPROCESS":
                         daysToAdd = -1;
