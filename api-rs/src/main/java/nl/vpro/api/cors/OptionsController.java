@@ -12,9 +12,9 @@ import org.springframework.stereotype.Controller;
 
 import com.wordnik.swagger.annotations.Api;
 
-import nl.vpro.api.rs.v2.media.MediaRestService;
-import nl.vpro.api.rs.v2.page.PageRestService;
-import nl.vpro.api.rs.v2.profile.ProfileRestService;
+import nl.vpro.api.rs.v3.media.MediaRestService;
+import nl.vpro.api.rs.v3.page.PageRestService;
+import nl.vpro.api.rs.v3.profile.ProfileRestService;
 
 @Controller
 @Path(OptionsController.PATH)

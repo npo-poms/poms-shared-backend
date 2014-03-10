@@ -18,6 +18,6 @@
     <constructor-arg index="1" value="${cors.policy}"/>
   </bean>
 
-  <context:component-scan base-package="nl.vpro.api.rs.v2"/>
+  <context:component-scan base-package="nl.vpro.api.rs.v3"/>
 
 </beans>
