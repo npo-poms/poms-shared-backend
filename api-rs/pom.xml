@@ -29,31 +29,11 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
-      <artifactId>api-backend-profiles</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-media</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-pages</artifactId>
+      <artifactId>api-domain</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-stats</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-profiles</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-backend-elasticsearch</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-backend-couchdb</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.media</groupId>
@@ -111,9 +91,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-config</artifactId>
-        <scope>test</scope>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
