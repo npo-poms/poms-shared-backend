@@ -53,7 +53,7 @@ public class StatsRestServiceImpl implements StatsRestService {
     @ApiOperation(httpMethod = "get",
         value = "Top media overall",
         notes = "High score list containing the most played media")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Client error"), @ApiResponse(code = 404, message = "Not found"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response stats(
         @ApiParam(value = "On of hour/day/week") @QueryParam("period") @DefaultValue("hour") String periodString,
@@ -77,7 +77,7 @@ public class StatsRestServiceImpl implements StatsRestService {
     @ApiOperation(httpMethod = "get",
         value = "Top media per broadcaster",
         notes = "High score list containing the most played media per broadcaster")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Client error"), @ApiResponse(code = 404, message = "Not found"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response statsPerBroadcaster(
         @ApiParam(required = true, defaultValue = "VPRO") @PathParam("broadcaster") String broadcaster,
@@ -102,7 +102,7 @@ public class StatsRestServiceImpl implements StatsRestService {
     @ApiOperation(httpMethod = "get",
         value = "Top media per portal",
         notes = "High score list containing the most played media per portal")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"), @ApiResponse(code = 500, message = "Server error")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Client error"), @ApiResponse(code = 404, message = "Not found"), @ApiResponse(code = 500, message = "Server error")})
     @Override
     public Response statsPerPortal(
         @ApiParam(required = true, defaultValue = "VproNL") @PathParam("portal") String portal,
