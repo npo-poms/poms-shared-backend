@@ -21,5 +21,5 @@ public class CorsHeaders {
     // Response Header Values
     public static final String ACCESS_CONTROL_ALLOW_ORIGIN_VALUE = "http://*.vpro.nl";
     public static final String ACCESS_CONTROL_ALLOW_METHODS_VALUE = "GET, HEAD, OPTIONS, POST, DELETE";
-    public static final String ACCESS_CONTROL_ALLOW_HEADERS_VALUE = "accept, authorization, content-type, cookie, origin, x-http-method-override, x-npo-date, x-npo-mid, x-npo-url";
+    public static final String ACCESS_CONTROL_ALLOW_HEADERS_VALUE = "accept, authorization, content-type, cookie, origin, x-http-method-override, x-npo-date, x-npo-mid, x-npo-url, x-origin";
 }
