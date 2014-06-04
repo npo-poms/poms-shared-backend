@@ -28,4 +28,5 @@ public class Exceptions {
     public static ServerErrorException serverError(String message, Object... args) {
         return new ServerErrorException(MessageFormatter.arrayFormat(message, args).getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
     }
+
 }
