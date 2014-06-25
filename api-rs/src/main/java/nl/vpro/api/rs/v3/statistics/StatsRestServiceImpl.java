@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
  * @author Roelof Jan Koekoek
  * @since 2.1
  */
-@Service
+//@Service
 @Api(value = StatsRestService.PATH, position = 4)
 public class StatsRestServiceImpl implements StatsRestService {
 
