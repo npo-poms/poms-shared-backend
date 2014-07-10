@@ -3,7 +3,7 @@
   <parent>
     <artifactId>api-parent</artifactId>
     <groupId>nl.vpro.api</groupId>
-    <version>3.0.3-SNAPSHOT</version>
+    <version>3.2-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -50,6 +50,10 @@
     <dependency>
       <groupId>org.elasticsearch</groupId>
       <artifactId>elasticsearch</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-hibernatevalidator-provider</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
