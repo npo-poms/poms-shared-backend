@@ -31,25 +31,8 @@
       <artifactId>api-domain</artifactId>
     </dependency>
     <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-stats</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.media</groupId>
-      <artifactId>media-transfer</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.media</groupId>
-      <artifactId>media-test</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
       <groupId>nl.vpro.shared</groupId>
       <artifactId>shared-util</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
