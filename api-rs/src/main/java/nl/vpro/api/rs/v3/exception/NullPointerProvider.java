@@ -16,8 +16,8 @@ import org.slf4j.LoggerFactory;
  * @since 3.0
  */
 @Provider
-public class NulPointerProvider implements ExceptionMapper<NullPointerException> {
-    private static final Logger log = LoggerFactory.getLogger(NulPointerProvider.class);
+public class NullPointerProvider implements ExceptionMapper<NullPointerException> {
+    private static final Logger log = LoggerFactory.getLogger(NullPointerProvider.class);
 
     @Override
     public Response toResponse(NullPointerException exception) {
