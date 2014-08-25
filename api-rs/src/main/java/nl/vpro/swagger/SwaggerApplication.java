@@ -5,6 +5,7 @@
 package nl.vpro.swagger;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public class SwaggerApplication extends Application {
 
     @Override
     public Set<Object> getSingletons() {
-        return singletons;
+        return Collections.unmodifiableSet(singletons);
     }
 
     /**
