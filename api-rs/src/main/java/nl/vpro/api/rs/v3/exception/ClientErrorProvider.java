@@ -21,7 +21,7 @@ public class ClientErrorProvider implements ExceptionMapper<ClientErrorException
     public Response toResponse(ClientErrorException exception) {
         int statusCode = exception.getResponse().getStatus();
         return Response.ok(
-            new nl.vpro.domain.api.Error(statusCode, exception.getMessage())).type(MediaType.APPLICATION_XML).status(statusCode).build();
+            new nl.vpro.domain.api.Error(statusCode, exception.getMessage())).status(statusCode).build();
     }
 
 }
