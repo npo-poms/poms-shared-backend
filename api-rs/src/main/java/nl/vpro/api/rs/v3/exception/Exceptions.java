@@ -24,14 +24,4 @@ public class Exceptions {
     public static BadRequestException badRequest(String message, Object... args) {
         return new BadRequestException(MessageFormatter.arrayFormat(message, args).getMessage());
     }
-
-    public static ServerErrorException serverError(String message, Object... args) {
-        return new ServerErrorException(MessageFormatter.arrayFormat(message, args).getMessage(), Response.Status.INTERNAL_SERVER_ERROR);
-    }
-
-    public static ServerErrorException serverError(Throwable t) {
-        //    //   "Failed to deserialize exception response from stream" without "org.elasticsearch.transport.TransportSerializationException" does not immediately make clear that it has something to do with elastic search.
-        return serverError(t.getClass().getName() + ": " + t.getMessage());
-    }
-
 }
