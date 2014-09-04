@@ -31,7 +31,7 @@ public class Exceptions {
 
     public static ServerErrorException serverError(Throwable t) {
         //    //   "Failed to deserialize exception response from stream" without "org.elasticsearch.transport.TransportSerializationException" does not immediately make clear that it has something to do with elastic search.
-        return serverError(t.getClass().getName() + ":" + t.getMessage());
+        return serverError(t.getClass().getName() + ": " + t.getMessage());
     }
 
 }
