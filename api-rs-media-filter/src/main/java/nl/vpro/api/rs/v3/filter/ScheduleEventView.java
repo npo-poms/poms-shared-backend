@@ -4,9 +4,9 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import nl.vpro.domain.media.ScheduleEvent;
-
 import java.util.SortedSet;
+
+import nl.vpro.domain.media.ScheduleEvent;
 
 /**
  * @author rico
