@@ -15,5 +15,9 @@
       <groupId>nl.vpro.media</groupId>
       <artifactId>media-domain</artifactId>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+    </dependency>
   </dependencies>
 </project>
