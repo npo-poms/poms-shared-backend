@@ -1,8 +1,7 @@
 package nl.vpro.api.cors;
 
 /**
- * User: ricojansen
- * Date: 27-04-2012
+ * @author ricojansen
  */
 public class CorsHeaders {
     // Request Headers

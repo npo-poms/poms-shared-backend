@@ -4,6 +4,7 @@
  */
 package nl.vpro.api.rs.v3.exception;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -17,12 +18,12 @@ import org.slf4j.LoggerFactory;
  */
 @Provider
 public class NullPointerProvider implements ExceptionMapper<NullPointerException> {
-    private static final Logger log = LoggerFactory.getLogger(NullPointerProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NullPointerProvider.class);
 
     @Override
     public Response toResponse(NullPointerException exception) {
-        log.error("Wrapped a null pointer", exception);
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getMessage())).status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        LOG.error("Wrapped a null pointer", exception);
+        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getMessage())).status(Response.Status.INTERNAL_SERVER_ERROR).type(MediaType.APPLICATION_JSON).build();
     }
 
 }
