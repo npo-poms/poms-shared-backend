@@ -1,5 +1,6 @@
 package nl.vpro.api.rs.v3.exception;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -14,7 +15,7 @@ public class DefaultExceptionMapper implements ExceptionMapper<Throwable> {
 
     @Override
     public Response toResponse(Throwable exception) {
-        return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage())).build();
+        return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage())).type(MediaType.APPLICATION_JSON).build();
     }
 
 }
