@@ -15,20 +15,15 @@ import org.slf4j.LoggerFactory;
  * @since 3.3
  */
 @Provider
-public class DefaultExceptionMapper implements ExceptionMapper<Throwable> {
+public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionMapper.class);
 
 
     @Override
-    public Response toResponse(Throwable exception) {
-        if (exception instanceof Failure) {
-            // mapped already
-            return null;
-        } else {
-            LOG.warn("Wrapped an {} {}", exception.getClass().getName(), exception.getMessage());
-            return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage())).type(MediaType.APPLICATION_JSON).build();
-        }
+    public Response toResponse(Exception exception) {
+        LOG.warn("Wrapped an {} {}", exception.getClass().getName(), exception.getMessage());
+        return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage())).build();
     }
 
 }

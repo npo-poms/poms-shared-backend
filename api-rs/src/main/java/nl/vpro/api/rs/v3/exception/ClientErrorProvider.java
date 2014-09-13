@@ -5,7 +5,6 @@
 package nl.vpro.api.rs.v3.exception;
 
 import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
