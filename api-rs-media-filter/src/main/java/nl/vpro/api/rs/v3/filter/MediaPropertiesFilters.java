@@ -104,8 +104,7 @@ public class MediaPropertiesFilters {
                 ctClass.toClass();
             }
         } catch(CannotCompileException | NotFoundException e) {
-            // schedule event stuff is optional
-            LOG.warn(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 
