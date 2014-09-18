@@ -104,7 +104,9 @@ public class MediaPropertiesFilters {
                 ctClass.toClass();
             }
         } catch(CannotCompileException | NotFoundException e) {
-            throw new RuntimeException(e);
+            // schedule event stuff is optional
+            // It is not used in the player api, so it does have ScheduleEventView.
+            LOG.warn(e.getMessage());
         }
     }
 
