@@ -4,16 +4,15 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import nl.vpro.domain.media.support.TextualType;
-import nl.vpro.domain.media.support.Title;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.SortedSet;
 
+import nl.vpro.domain.media.support.TextualType;
+import nl.vpro.domain.media.support.Title;
+
 /**
  * @author rico
- * @date 24/02/2014
  * @since 3.0
  */
 public class FilteredSortedTitleSet extends FilteredSortedSet<Title> {
