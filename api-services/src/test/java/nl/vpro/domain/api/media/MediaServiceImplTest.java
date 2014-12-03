@@ -12,6 +12,7 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.constraint.media.Filter;
+import nl.vpro.domain.constraint.media.MediaConstraints;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 
