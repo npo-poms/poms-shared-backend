@@ -23,6 +23,11 @@
       <artifactId>javassist</artifactId>
     </dependency>
     <dependency>
+      <!-- Should come with Resteasy -->
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
     </dependency>
