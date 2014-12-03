@@ -8,17 +8,13 @@
     <version>3.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>api-media</artifactId>
-  <name>api-media</name>
+  <artifactId>api-services</artifactId>
+  <name>api-services</name>
 
   <dependencies>
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-domain</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-profiles</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.media</groupId>
