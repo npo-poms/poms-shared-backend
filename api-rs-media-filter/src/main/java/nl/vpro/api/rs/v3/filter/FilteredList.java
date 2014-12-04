@@ -207,6 +207,11 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
         return wrapped.subList(fromIndex, toIndex);
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(wrapped);
+    }
+
     private class FilteredListIterator implements ListIterator<T> {
         private int startIndex = 0;
 
