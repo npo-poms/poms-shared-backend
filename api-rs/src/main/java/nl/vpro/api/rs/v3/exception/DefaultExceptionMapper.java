@@ -26,7 +26,7 @@ public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
             return null;
         } else {
             LOG.warn("Wrapped an {} {}", exception.getClass().getName(), exception.getMessage());
-            return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage())).build();
+            return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception)).build();
         }
     }
 
