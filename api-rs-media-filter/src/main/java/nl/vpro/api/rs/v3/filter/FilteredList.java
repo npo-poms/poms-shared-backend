@@ -10,11 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * User: rico
- * Date: 20/02/2014
+ * @author rico
  */
 public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T> {
-    private static final Logger log = LoggerFactory.getLogger(FilteredSortedSet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FilteredSortedSet.class);
 
     protected FilteredList(String property, List<T> wrapped) {
         super(property, wrapped);
@@ -25,7 +24,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
             throw new IllegalArgumentException("Can only wrap a SortedSet");
         }
 
-        log.debug("Wrapping {}", wrapped);
+        LOG.debug("Wrapping {}", wrapped);
 
         if(wrapped instanceof FilteredList) {
             if(!(((FilteredList)wrapped).property).equals(property)) {
