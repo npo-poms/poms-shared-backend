@@ -41,7 +41,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-hibernatevalidator-provider</artifactId>
+      <artifactId>resteasy-validator-provider-11</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.ejb</groupId> <!-- dependency of resteasy (a bit silly) -->
