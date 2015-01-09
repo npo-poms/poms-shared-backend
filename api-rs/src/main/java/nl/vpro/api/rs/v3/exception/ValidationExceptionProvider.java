@@ -4,14 +4,17 @@
  */
 package nl.vpro.api.rs.v3.exception;
 
-import org.jboss.resteasy.api.validation.ResteasyConstraintViolation;
-import org.jboss.resteasy.api.validation.ResteasyViolationException;
+
+import java.util.List;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.annotation.XmlElement;
-import java.util.List;
+
+import org.jboss.resteasy.api.validation.ResteasyConstraintViolation;
+import org.jboss.resteasy.api.validation.ResteasyViolationException;
+
 
 /**
  * @author rico
