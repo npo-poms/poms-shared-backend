@@ -20,7 +20,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Michiel Meeuwissen
  */
 @Provider
-@Priority(Priorities.HEADER_DECORATOR)
+@Priority(Priorities.AUTHORIZATION)
 public class CorsInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
 
     private final CorsPolicy corsPolicy;
