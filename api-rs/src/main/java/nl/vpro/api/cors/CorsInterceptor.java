@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -18,6 +20,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Michiel Meeuwissen
  */
 @Provider
+@Priority(Priorities.HEADER_DECORATOR)
 public class CorsInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
 
     private final CorsPolicy corsPolicy;
