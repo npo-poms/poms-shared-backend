@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -11,7 +12,6 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author rico
@@ -22,7 +22,7 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
 
     private final CorsPolicy corsPolicy;
 
-    @Autowired
+    @Inject
     CorsInterceptor(CorsPolicy policy) {
         this.corsPolicy = policy;
     }
