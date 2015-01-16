@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
@@ -54,7 +55,8 @@ public class MediaServiceImplTest {
             MediaConstraints.hasImage()
         ));
         profileDefinition = new ProfileDefinition<>(filter);
-        when(profileService.getMediaProfileDefinition(eq("vpro"))).thenReturn(profileDefinition);
+        Profile profile = new Profile("vpro", null, profileDefinition);
+        when(profileService.getProfile(eq("vpro"))).thenReturn(profile);
     }
 
     @Test
