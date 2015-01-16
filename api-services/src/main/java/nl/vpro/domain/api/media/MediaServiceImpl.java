@@ -10,7 +10,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.Change;
+import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
@@ -118,16 +120,17 @@ public class MediaServiceImpl implements MediaService {
         return owner != null ? MediaType.getMediaType(owner) : null;
     }
 
-    protected ProfileDefinition<MediaObject> getProfile(String profile) throws ProfileNotFoundException {
-        ProfileDefinition<MediaObject> def = null;
-        if (profile != null) {
-            def = profileService.getMediaProfileDefinition(profile);
-            if (def == null) {
-                throw new ProfileNotFoundException(profile);
-            }
+    private ProfileDefinition<MediaObject> getProfile(String profile) {
+        if (profile == null || "".equals(profile) // handy for scripting (profile=$2 and so on...)
+            ) {
+            return null;
         }
-        return def;
-    }
+        Profile p = profileService.getProfile(profile);
+        if (p == null) {
+            throw new ProfileNotFoundException(profile);
+        }
+        return p.getMediaProfile();
 
+    }
 
 }
