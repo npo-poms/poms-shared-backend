@@ -18,7 +18,6 @@ import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
-import nl.vpro.util.MaxOffsetIterator;
 
 /**
  * @author Roelof Jan Koekoek
@@ -71,7 +70,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max) throws ProfileNotFoundException {
-        return new MaxOffsetIterator<>(mediaRepository.iterate(getProfile(profile), form), max, offset);
+        return mediaRepository.iterate(getProfile(profile), form, max, offset);
     }
 
     @Override
