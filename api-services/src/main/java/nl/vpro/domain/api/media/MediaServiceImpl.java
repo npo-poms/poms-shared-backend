@@ -7,7 +7,10 @@ package nl.vpro.domain.api.media;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Named;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import nl.vpro.domain.api.Change;
@@ -41,7 +44,8 @@ public class MediaServiceImpl implements MediaService {
     public MediaServiceImpl(
         ProfileService profileService,
         MediaRepository mediaRepository,
-        MediaSearchRepository mediaSearchRepository, QuerySearchRepository querySearchRepository) {
+        MediaSearchRepository mediaSearchRepository,
+        @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository) {
         this.profileService = profileService;
         this.mediaRepository = mediaRepository;
         this.mediaSearchRepository = mediaSearchRepository;
