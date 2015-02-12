@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 
 import nl.vpro.domain.api.Change;
 import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
+import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
 
@@ -32,15 +34,25 @@ public class MediaServiceImpl implements MediaService {
 
     private final MediaSearchRepository mediaSearchRepository;
 
+    private final QuerySearchRepository querySearchRepository;
+
+
     @Autowired
     public MediaServiceImpl(
         ProfileService profileService,
         MediaRepository mediaRepository,
-        MediaSearchRepository mediaSearchRepository) {
+        MediaSearchRepository mediaSearchRepository, QuerySearchRepository querySearchRepository) {
         this.profileService = profileService;
         this.mediaRepository = mediaRepository;
         this.mediaSearchRepository = mediaSearchRepository;
+        this.querySearchRepository = querySearchRepository;
     }
+
+    @Override
+    public SuggestResult suggest(String input, String profile, Integer max) {
+        return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
+    }
+
 
     @Override
     public Iterator<Change> changes(final String profile, final Long since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {

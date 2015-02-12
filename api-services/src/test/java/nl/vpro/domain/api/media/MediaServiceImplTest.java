@@ -12,6 +12,7 @@ import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
+import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.constraint.media.Filter;
 import nl.vpro.domain.constraint.media.MediaConstraints;
 import nl.vpro.domain.media.MediaObject;
@@ -33,7 +34,10 @@ public class MediaServiceImplTest {
 
     private final ProfileService profileService = Mockito.mock(ProfileService.class);
 
-    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository);
+    private final QuerySearchRepository querySearchRepository = Mockito.mock(QuerySearchRepository.class);
+
+
+    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository);
 
 
     private ProfileDefinition<MediaObject> profileDefinition = new ProfileDefinition<>();
