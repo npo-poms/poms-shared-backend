@@ -11,9 +11,7 @@ import nl.vpro.domain.api.page.PageForm;
 @Provider
 public class PageFormValidatingReader extends AbstractValidatingReader<PageForm> {
 
-    @Override
-    Class<PageForm> getClassToRead() {
-        return PageForm.class;
-
+    public PageFormValidatingReader() {
+        super(PageForm.class);
     }
 }
