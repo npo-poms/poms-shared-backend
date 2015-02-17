@@ -29,14 +29,15 @@ import javax.xml.validation.SchemaFactory;
 @Consumes("application/xml")
 public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T> {
 
-    abstract Class<T> getClassToRead();
 
-    private final Schema schema;
+    private final Unmarshaller unmarshaller;
+    private final Class<T> classToRead;
 
-    public AbstractValidatingReader() {
+    public AbstractValidatingReader(Class<T> classToRead) {
+        this.classToRead = classToRead;
         try {
             SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            JAXBContext context = JAXBContext.newInstance(getClassToRead());
+            JAXBContext context = JAXBContext.newInstance(this.classToRead);
             final DOMResult[] result = new DOMResult[1];
             result[0] = new DOMResult();
             context.generateSchema(new SchemaOutputResolver() {
@@ -46,22 +47,23 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
                     return result[0];
                 }
             });
-            schema = sf.newSchema(new DOMSource(result[0].getNode()));
+            Schema schema = sf.newSchema(new DOMSource(result[0].getNode()));
+            unmarshaller = JAXBContext.newInstance(this.classToRead).createUnmarshaller();
+            unmarshaller.setSchema(schema);
         } catch (Exception e) {
+
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return type.isAssignableFrom(getClassToRead());
+        return type.isAssignableFrom(classToRead);
     }
 
 
     protected T unmarshal(InputStream inputStream) throws JAXBException {
-        Unmarshaller unmarshaller = JAXBContext.newInstance(getClassToRead()).createUnmarshaller();
-        unmarshaller.setSchema(schema);
-        return unmarshaller.unmarshal(new StreamSource(inputStream), getClassToRead()).getValue();
+        return unmarshaller.unmarshal(new StreamSource(inputStream), classToRead).getValue();
     }
 
     @Override
