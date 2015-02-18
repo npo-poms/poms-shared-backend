@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -71,7 +72,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
         try {
             return unmarshal(entityStream);
         } catch (JAXBException e) {
-            throw new IOException(e);
+            throw new BadRequestException(e);
         }
     }
 }
