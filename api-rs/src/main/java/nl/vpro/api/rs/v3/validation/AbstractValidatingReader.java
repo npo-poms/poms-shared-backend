@@ -39,20 +39,29 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     private static final Logger LOG = LoggerFactory.getLogger(AbstractValidatingReader.class);
 
 
-    private final Unmarshaller unmarshaller;
     private final Class<T> classToRead;
+    private Schema schema;
+
+
+    private final ThreadLocal<Unmarshaller> unmarshaller = new ThreadLocal<Unmarshaller>() {
+        @Override
+        public Unmarshaller initialValue() {
+            try {
+                Unmarshaller result = JAXBContext.newInstance(AbstractValidatingReader.this.classToRead).createUnmarshaller();
+                result.setSchema(schema);
+                return result;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    };
 
     @Value("${xml.input.validate}")
     private boolean doValidate = true;
 
     public AbstractValidatingReader(Class<T> classToRead) {
         this.classToRead = classToRead;
-        try {
-            unmarshaller = JAXBContext.newInstance(this.classToRead).createUnmarshaller();
 
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @PostConstruct
@@ -70,8 +79,8 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
                     return result[0];
                 }
             });
-            Schema schema = sf.newSchema(new DOMSource(result[0].getNode()));
-            unmarshaller.setSchema(schema);
+            schema = sf.newSchema(new DOMSource(result[0].getNode()));
+
         } else {
             LOG.info("XML inputs for " + this.getClass().getName() + " will not be validated (Setting xml.input.validate=false)");
         }
@@ -87,7 +96,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
 
     public final T unmarshal(InputStream inputStream) throws JAXBException {
-        return unmarshaller.unmarshal(new StreamSource(inputStream), classToRead).getValue();
+        return unmarshaller.get().unmarshal(new StreamSource(inputStream), classToRead).getValue();
     }
 
     @Override
