@@ -104,7 +104,12 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
         try {
             return unmarshal(entityStream);
         } catch (JAXBException e) {
-            throw new BadRequestException(e);
+            Throwable c = e.getLinkedException();
+            if (c == null) {
+                c = e;
+            }
+            LOG.warn(c.getMessage());
+            throw new BadRequestException(c.getMessage(), e);
         }
     }
 }
