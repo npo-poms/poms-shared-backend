@@ -50,6 +50,15 @@ public class MediaPropertiesFilters {
                 ctClass.instrument(new ExprEditor() {
                     @Override
                     public void edit(FieldAccess f) throws CannotCompileException {
+                        try {
+                            CtField field = f.getField();
+                            if ((field.getModifiers() & Modifier.STATIC) != 0) {
+                                // ignore static fields
+                                return;
+                            }
+                        }  catch (NotFoundException nfe) {
+                            LOG.error(nfe.getMessage());
+                        }
                         if(ignoreFields.contains(f.getFieldName())) {
                             // Always show
                         } else if("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
