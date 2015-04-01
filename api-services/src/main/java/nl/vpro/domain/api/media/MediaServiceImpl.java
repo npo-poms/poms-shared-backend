@@ -69,8 +69,8 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public MediaObject load(String id) {
-        return mediaRepository.load(id);
+    public <T extends MediaObject> T findByMid(String mid) {
+        return mediaRepository.findByMid(mid);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaType getType(final String id) {
-        MediaObject owner = load(id);
+        MediaObject owner = findByMid(id);
         return owner != null ? MediaType.getMediaType(owner) : null;
     }
 
