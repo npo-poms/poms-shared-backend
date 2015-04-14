@@ -28,6 +28,7 @@ public class MediaFilterThreadLocalFilter implements Filter {
                 ip = req.getRemoteAddr();
             }
             MDC.put("remoteHost", ip);
+
             ApiMediaFilter.get().clear();
             chain.doFilter(request, response);
         } finally {
