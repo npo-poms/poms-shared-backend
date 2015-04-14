@@ -9,6 +9,7 @@ import java.io.IOException;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
 /**
@@ -27,6 +28,9 @@ public class MediaFilterThreadLocalFilter implements Filter {
             if (ip == null || "".equals(ip)) {
                 ip = req.getRemoteAddr();
             }
+            String query = req.getQueryString();
+            String path = req.getRequestURI().substring(req.getContextPath().length());
+            MDC.put("request", req.getMethod() + " " + path + (StringUtils.isEmpty(query) ? "" : ("?" + query)));
             MDC.put("remoteHost", ip);
 
             ApiMediaFilter.get().clear();
