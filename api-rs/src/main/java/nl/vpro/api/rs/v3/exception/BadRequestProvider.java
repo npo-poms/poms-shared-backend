@@ -21,9 +21,13 @@ public class BadRequestProvider implements ExceptionMapper<BadRequestException> 
 
     @Override
     public Response toResponse(BadRequestException exception) {
-        String message = exception.getCause().getMessage();
+        Throwable cause = exception;
+        if (exception.getCause() != null) {
+            cause = exception.getCause();
+        }
+        String message = cause.getMessage();
         if (message == null) {
-            Throwable cause = exception.getCause().getCause();
+            cause = cause.getCause();
             if (cause != null) {
                 if (cause instanceof SAXParseException) {
                     message = cause.toString();
