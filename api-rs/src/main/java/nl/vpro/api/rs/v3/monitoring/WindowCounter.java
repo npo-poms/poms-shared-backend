@@ -19,8 +19,8 @@ public class WindowCounter {
 
     private AtomicInteger count = new AtomicInteger(0);
 
-    public int incrementAndGet() {
-        return count.incrementAndGet();
+    public void increment() {
+        count.incrementAndGet();
     }
 
     public float getRatio(TimeUnit unit) {
