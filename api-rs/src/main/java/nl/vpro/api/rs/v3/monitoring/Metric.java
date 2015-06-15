@@ -4,15 +4,15 @@
  */
 package nl.vpro.api.rs.v3.monitoring;
 
-import java.util.Collection;
-import java.util.List;
-
 /**
  * @author Roelof Jan Koekoek
  * @since 3.7
  */
-public interface NewRelicReporter {
+public interface Metric {
 
-    Collection<? extends Metric> getMetrics();
+    String getName();
 
+    String getUnit();
+
+    float getValue();
 }

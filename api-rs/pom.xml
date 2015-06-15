@@ -12,11 +12,20 @@
   <dependencies>
     <dependency>
       <groupId>com.newrelic.agent.java</groupId>
+      <artifactId>newrelic-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.newrelic.agent.java</groupId>
       <artifactId>newrelic-agent</artifactId>
     </dependency>
     <dependency>
       <groupId>com.wordnik</groupId>
       <artifactId>swagger-jaxrs_2.10</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ext.newrelic</groupId>
+      <artifactId>newrelic-publish</artifactId>
+      <version>2.0.1</version>
     </dependency>
     <dependency>
       <groupId>org.aspectj</groupId>
@@ -37,6 +46,11 @@
     <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.user</groupId>
+      <artifactId>user-backend-npo</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>

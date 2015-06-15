@@ -41,4 +41,6 @@ public class WindowCounter {
 
         return ratio;
     }
+
+
 }
