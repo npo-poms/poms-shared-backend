@@ -43,7 +43,7 @@ public class MediaServiceImpl implements MediaService {
     public MediaServiceImpl(
         ProfileService profileService,
         MediaRepository mediaRepository,
-        MediaSearchRepository mediaSearchRepository,
+        @Named("npoApiMediaSearchRepository") MediaSearchRepository mediaSearchRepository,
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository) {
         this.profileService = profileService;
         this.mediaRepository = mediaRepository;
