@@ -10,21 +10,10 @@
   <artifactId>api-rs</artifactId>
 
   <dependencies>
-    <dependency>
-      <groupId>com.newrelic.agent.java</groupId>
-      <artifactId>newrelic-api</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>com.wordnik</groupId>
       <artifactId>swagger-jaxrs_2.10</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjweaver</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -38,10 +27,6 @@
       <groupId>nl.vpro.user</groupId>
       <artifactId>user-backend-npo</artifactId>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>nl.vpro.shared</groupId>
-      <artifactId>shared-newrelic</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
