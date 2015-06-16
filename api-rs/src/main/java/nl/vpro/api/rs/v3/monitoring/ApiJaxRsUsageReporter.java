@@ -22,7 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import nl.vpro.newrelic.agent.NewRelicReporter;
-import nl.vpro.newrelic.agent.RateMetric;
+import nl.vpro.newrelic.agent.WindowedMetric;
 import nl.vpro.spring.security.ldap.LdapEditor;
 
 /**
@@ -35,7 +35,7 @@ public class ApiJaxRsUsageReporter implements NewRelicReporter {
 
     private static final String UNIT = "calls/second";
 
-    private final ConcurrentHashMap<String, RateMetric> counters = new ConcurrentHashMap<>(20);
+    private final ConcurrentHashMap<String, WindowedMetric> counters = new ConcurrentHashMap<>(20);
 
     @Before("execution(* nl.vpro.api.rs.v3.**.*RestService.*(..))")
 //    @Before("execution(* nl.vpro.api.rs.v3.media.MediaRestService.*(..)) or execution(* nl.vpro.api.rs.v3.page.PageRestService.*(..)) or execution(* nl.vpro.api.rs.v3.schedule.ScheduleRestService.*(..)) or execution(* nl.vpro.api.rs.v3.profile.ProfileRestService.*(..)) or execution(* nl.vpro.api.rs.v3.tvvod.TVVodRestService.*(..))")
@@ -57,7 +57,7 @@ public class ApiJaxRsUsageReporter implements NewRelicReporter {
     }
 
     @Override
-    public Collection<RateMetric> getMetrics() {
+    public Collection<WindowedMetric> getMetrics() {
         LOG.debug("Providing metrics {}", counters.values());
         return counters.values();
     }
@@ -91,10 +91,10 @@ public class ApiJaxRsUsageReporter implements NewRelicReporter {
     }
 
     private void increment(String key) {
-        RateMetric windowCounter = counters.get(key);
+        WindowedMetric windowCounter = counters.get(key);
         if(windowCounter == null) {
             LOG.debug("Adding NewRelic counter {}/{}", key, UNIT);
-            counters.putIfAbsent(key, new RateMetric(key, UNIT, TimeUnit.SECONDS));
+            counters.putIfAbsent(key, new WindowedMetric(key, UNIT, TimeUnit.SECONDS));
         } else {
             LOG.debug("Incrementing NewRelic counter {}/{}", key, UNIT);
         }
