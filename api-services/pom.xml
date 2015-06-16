@@ -10,6 +10,10 @@
 
   <artifactId>api-services</artifactId>
   <name>api-services</name>
+  <description>
+    Currently only contains an implementation of nl.vpro.domain.api.media.MediaService, which is otherwise completely backend agnostic.
+    It can be backed by ES and couchdb, but e.g. also by an api client.
+  </description>
 
   <dependencies>
     <dependency>
