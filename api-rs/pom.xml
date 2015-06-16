@@ -35,10 +35,6 @@
       <artifactId>api-domain</artifactId>
     </dependency>
     <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-security</artifactId>
-    </dependency>
-    <dependency>
       <groupId>nl.vpro.user</groupId>
       <artifactId>user-backend-npo</artifactId>
       <scope>provided</scope>
