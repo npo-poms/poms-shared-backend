@@ -26,7 +26,7 @@
 
   <bean id="apiJaxRsUsageReporter" class="nl.vpro.api.rs.v3.monitoring.ApiJaxRsUsageReporter"/>
 
-  <bean class="nl.vpro.api.rs.v3.monitoring.NewRelicRunner">
+  <bean class="nl.vpro.newrelic.agent.NewRelicRunner">
     <property name="reporters">
       <list>
         <ref bean="apiJaxRsUsageReporter"/>
