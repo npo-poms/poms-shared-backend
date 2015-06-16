@@ -47,6 +47,9 @@ public class ApiJaxRsUsageReporter implements NewRelicReporter {
 
         final String principalId = getPrincipalId(authentication);
 
+        countSummary();
+        countSummary(principalId);
+
         final String path = getMetricPath(joinPoint).toString();
         countUser(path, principalId);
         countMethod(path, principalId);
@@ -56,6 +59,14 @@ public class ApiJaxRsUsageReporter implements NewRelicReporter {
     public Collection<WindowedMetric> getMetrics() {
         LOG.debug("Providing metrics {}", counters.values());
         return counters.values();
+    }
+
+    private void countSummary() {
+        increment("Usage/Total");
+    }
+
+    private void countSummary(String principalId) {
+        increment("Usage/Account/" + principalId);
     }
 
     private void countUser(String path, String principalId) {
@@ -78,6 +89,19 @@ public class ApiJaxRsUsageReporter implements NewRelicReporter {
         increment(sb.toString());
     }
 
+    private void increment(String key) {
+        WindowedMetric windowCounter = counters.get(key);
+        if(windowCounter == null) {
+            LOG.debug("Adding NewRelic counter {}/{}", key, UNIT);
+            counters.putIfAbsent(key, new WindowedMetric(key, UNIT, TimeUnit.SECONDS));
+        } else {
+            LOG.debug("Incrementing NewRelic counter {}/{}", key, UNIT);
+        }
+
+        windowCounter = counters.get(key);
+        windowCounter.increment();
+    }
+
     private String getPrincipalId(Authentication authentication) {
         final Object principal = authentication.getPrincipal();
 
@@ -89,17 +113,6 @@ public class ApiJaxRsUsageReporter implements NewRelicReporter {
         } else throw new IllegalArgumentException("No support for principal type " + principal.getClass());
 
         return principalId;
-    }
-
-    private void increment(String key) {
-        WindowedMetric windowCounter = counters.get(key);
-        if(windowCounter == null) {
-            LOG.debug("Adding NewRelic counter {}/{}", key, UNIT);
-            counters.putIfAbsent(key, new WindowedMetric(key, UNIT, TimeUnit.SECONDS));
-        }
-
-        windowCounter = counters.get(key);
-        windowCounter.increment();
     }
 
     private StringBuilder getMetricPath(JoinPoint joinPoint) {
