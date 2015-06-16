@@ -3,10 +3,8 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:aop="http://www.springframework.org/schema/aop"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
   <bean class="nl.vpro.resteasy.JacksonContextResolver"/>
 
@@ -22,15 +20,4 @@
 
   <context:component-scan base-package="nl.vpro.api.rs.v3"/>
 
-  <aop:aspectj-autoproxy/>
-
-  <bean id="apiJaxRsUsageReporter" class="nl.vpro.api.rs.v3.monitoring.ApiJaxRsUsageReporter"/>
-
-  <bean class="nl.vpro.newrelic.agent.NewRelicRunner">
-    <property name="reporters">
-      <list>
-        <ref bean="apiJaxRsUsageReporter"/>
-      </list>
-    </property>
-  </bean>
 </beans>
