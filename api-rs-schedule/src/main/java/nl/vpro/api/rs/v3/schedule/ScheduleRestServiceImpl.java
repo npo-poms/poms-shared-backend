@@ -75,7 +75,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     private final ScheduleService scheduleService;
 
-    @Value("${api.media.expose}")
+    @Value("${api.schedule.expose}")
     private boolean expose;
 
     @Autowired
