@@ -30,6 +30,11 @@ public class ValidationExceptionProvider implements ExceptionMapper<ResteasyViol
             public List<ResteasyConstraintViolation> getViolations() {
                 return e.getViolations();
             }
+
+            @Override
+            public String toString() {
+                return (super.toString() + ":" + getViolations()).replace('\r', ' ');
+            }
         }).status(Response.Status.BAD_REQUEST).build();
     }
 
