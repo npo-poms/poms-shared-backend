@@ -47,42 +47,48 @@ public class MediaPropertiesFilters {
             CtClass[] ctClasses = cp.get(classNames);
 
             for(final CtClass ctClass : ctClasses) {
-                ctClass.instrument(new ExprEditor() {
-                    @Override
-                    public void edit(FieldAccess f) throws CannotCompileException {
-                        try {
-                            CtField field = f.getField();
-                            if ((field.getModifiers() & Modifier.STATIC) != 0) {
-                                // ignore static fields
-                                return;
+                try {
+                    ctClass.instrument(new ExprEditor() {
+                        @Override
+                        public void edit(FieldAccess f) throws CannotCompileException {
+                            try {
+                                CtField field = f.getField();
+                                if ((field.getModifiers() & Modifier.STATIC) != 0) {
+                                    // ignore static fields
+                                    return;
+                                }
+                            } catch (NotFoundException nfe) {
+                                LOG.error(nfe.getMessage());
                             }
-                        }  catch (NotFoundException nfe) {
-                            LOG.error(nfe.getMessage());
-                        }
-                        if(ignoreFields.contains(f.getFieldName())) {
-                            // Always show
-                        } else if("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
-                            LOG.debug("Instrumenting SortedSet {}", f.getFieldName());
-                            if(f.getFieldName().equals("titles")) {
-                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                            if (ignoreFields.contains(f.getFieldName())) {
+                                // Always show
+                            } else if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
+                                LOG.debug("Instrumenting SortedSet {}", f.getFieldName());
+                                if (f.getFieldName().equals("titles")) {
+                                    f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                } else {
+                                    f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                }
+                            } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
+                                LOG.debug("Instrumenting SortedSet {}", f.getFieldName());
+                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                             } else {
-                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                LOG.debug("Instrumenting {}", f.getFieldName());
+                                try {
+                                    f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.v3.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
+                                } catch (RuntimeException wtf) {
+                                    LOG.error(wtf.getMessage());
+                                } catch (Exception e) {
+                                    LOG.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + e.getMessage(), e);
+                                }
                             }
-                        } else if("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
-                            LOG.debug("Instrumenting SortedSet {}", f.getFieldName());
-                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
-                        } else {
-                            LOG.debug("Instrumenting {}", f.getFieldName());
-							try {
-								f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.v3.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
-							} catch (Exception e){
-								LOG.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + e.getMessage(), e);
-							}
                         }
-                    }
-                });
+                    });
 
-                ctClass.toClass();
+                    ctClass.toClass();
+                } catch (RuntimeException wtf ){
+                    LOG.error(wtf.getMessage());
+                }
             }
         } catch(CannotCompileException | NotFoundException e) {
             throw new RuntimeException(e);
