@@ -28,5 +28,9 @@
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-rs-media-filter</artifactId>
     </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs-schedule-filter</artifactId>
+    </dependency>
   </dependencies>
 </project>
