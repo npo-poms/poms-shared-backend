@@ -106,17 +106,21 @@ public class MediaPropertiesFilters {
             CtClass[] ctClasses = cp.get(classNames);
 
             for(CtClass ctClass : ctClasses) {
-                ctClass.instrument(new ExprEditor() {
-                    @Override
-                    public void edit(FieldAccess f) throws CannotCompileException {
-                        if("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() && f.getFieldName().equals("scheduleEvents")) {
-                            LOG.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
-                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.ScheduleEventView.wrap($proceed($$));");
-                        }
+                try {
+                    ctClass.instrument(new ExprEditor() {
+                        @Override
+                        public void edit(FieldAccess f) throws CannotCompileException {
+                            if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() && f.getFieldName().equals("scheduleEvents")) {
+                                LOG.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
+                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.ScheduleEventView.wrap($proceed($$));");
+                            }
 
-                    }
-                });
-                ctClass.toClass();
+                        }
+                    });
+                    ctClass.toClass();
+                } catch (RuntimeException wtf) {
+                    LOG.warn(wtf.getMessage());
+                }
             }
         } catch(CannotCompileException | NotFoundException e) {
             // schedule event stuff is optional
