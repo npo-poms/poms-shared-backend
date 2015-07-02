@@ -4,7 +4,7 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import nl.vpro.domain.media.*;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.Ignore;
@@ -20,13 +20,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import nl.vpro.domain.media.*;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * @author rico
- * @date 28/02/2014
  * @since 3.0
  */
 
@@ -45,7 +44,7 @@ public class ScheduleFilterTest {
     }
 
     @Test
-    @Ignore
+    @Ignore("See nl.vpro.api.rs.v3.filter.ScheduleEventViewSortedSetTest for how it's done.")
     public void testFilter() {
         Program program = MediaTestDataBuilder.ProgramTestDataBuilder.program().withScheduleEvents().withMid().build();
         Calendar calendar = Calendar.getInstance();

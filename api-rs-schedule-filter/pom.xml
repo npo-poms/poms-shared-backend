@@ -16,12 +16,21 @@
       <artifactId>media-domain</artifactId>
     </dependency>
     <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs-media-filter</artifactId>
+    </dependency>
+    <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
