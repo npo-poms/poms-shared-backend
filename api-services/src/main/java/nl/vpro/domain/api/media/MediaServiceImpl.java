@@ -38,7 +38,6 @@ public class MediaServiceImpl implements MediaService {
 
     private final QuerySearchRepository querySearchRepository;
 
-
     @Autowired
     public MediaServiceImpl(
         ProfileService profileService,
@@ -55,7 +54,6 @@ public class MediaServiceImpl implements MediaService {
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
-
 
     @Override
     public Iterator<Change> changes(final String profile, final Long since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
