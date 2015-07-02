@@ -32,5 +32,10 @@
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-rs-schedule-filter</artifactId>
     </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs</artifactId>
+      <classifier>tests</classifier>
+    </dependency>
   </dependencies>
 </project>
