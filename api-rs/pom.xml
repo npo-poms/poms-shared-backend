@@ -24,6 +24,10 @@
       <artifactId>api-domain</artifactId>
     </dependency>
     <dependency>
+      <groupId>nl.vpro.shared</groupId>
+      <artifactId>shared-resteasy</artifactId>
+    </dependency>
+    <dependency>
       <groupId>nl.vpro.user</groupId>
       <artifactId>user-backend-npo</artifactId>
       <scope>provided</scope>
