@@ -4,6 +4,7 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -11,8 +12,6 @@ import javax.annotation.PostConstruct;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -542,15 +541,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     private static Date guideDayStart(Date guideDay) {
-        DateTimeZone timeZone = DateTimeZone.forID("Europe/Amsterdam");
-        DateTime dateTime = new DateTime(guideDay, timeZone);
-        return dateTime.withHourOfDay(6).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0).toDate();
+        ZonedDateTime zoned = guideDay.toInstant().atZone(ScheduleService.ZONE_ID);
+        return new Date(ScheduleService.guideDayStart(zoned.toLocalDate()).toEpochSecond() * 1000);
     }
 
     private static Date guideDayStop(Date guideDay) {
-        DateTimeZone timeZone = DateTimeZone.forID("Europe/Amsterdam");
-        DateTime dateTime = new DateTime(guideDay, timeZone);
-        return dateTime.withHourOfDay(6).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0).plusDays(1).toDate();
+        ZonedDateTime zoned = guideDay.toInstant().atZone(ScheduleService.ZONE_ID);
+        return new Date(ScheduleService.guideDayStop(zoned.toLocalDate()).toEpochSecond() * 1000);
     }
 
     private Order parseOrder(String order) {

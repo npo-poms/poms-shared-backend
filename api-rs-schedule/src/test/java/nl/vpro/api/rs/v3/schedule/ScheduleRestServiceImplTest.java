@@ -4,6 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.ws.rs.core.MediaType;
@@ -15,9 +18,12 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
 import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
+import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.ScheduleSearchResult;
 import nl.vpro.domain.api.media.ScheduleService;
+import nl.vpro.domain.media.Channel;
 import nl.vpro.domain.media.ScheduleEvent;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -66,6 +72,16 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         Boolean eventActive = (Boolean) method.invoke(scheduleRestService, scheduleEvent, new Date(1002100));
 
         assertThat(eventActive).isFalse();
+    }
+
+    @Test
+    public void testGuideDayStartStop() throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat(ScheduleRestService.YEAR_MONTH_DATE);
+        ScheduleRestService scheduleRestService = getTestObject();
+        Result res = scheduleRestService.listChannel(Channel.KETN.name(), formatter.parse("2015-03-28"), null, null, null, "ASC", 0l, 100);
+        Date start = new Date(ZonedDateTime.parse("2015-03-28T06:00:00+01:00").toEpochSecond() * 1000);
+        Date stop = new Date(ZonedDateTime.parse("2015-03-29T06:00:00+02:00").toEpochSecond() * 1000);
+        verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0l, 100);
     }
 
     private String MSE_2775form() {
