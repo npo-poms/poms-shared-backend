@@ -17,6 +17,7 @@ import nl.vpro.domain.constraint.media.Filter;
 import nl.vpro.domain.constraint.media.MediaConstraints;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.util.FilteringIterator;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -106,7 +107,7 @@ public class MediaServiceImplTest {
 
     @Test(expected = ProfileNotFoundException.class)
     public void testIterateProfileNotFound() {
-        target.iterate("notfound", null, 0l, 10);
+        target.iterate("notfound", null, 0l, 10, FilteringIterator.KeepAlive.of((c) -> {}));
     }
 
     @Test(expected = ProfileNotFoundException.class)
