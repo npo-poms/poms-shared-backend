@@ -22,6 +22,7 @@ import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
+import nl.vpro.util.FilteringIterator;
 
 /**
  * @author Roelof Jan Koekoek
@@ -82,8 +83,8 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, Long keepalive) throws ProfileNotFoundException {
-        return mediaRepository.iterate(getProfile(profile), form, max, offset, keepalive);
+    public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
+        return mediaRepository.iterate(getProfile(profile), form, max, offset, keepAlive);
     }
 
     @Override
