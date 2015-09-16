@@ -6,6 +6,7 @@ package nl.vpro.domain.api.media;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.inject.Named;
 
@@ -131,6 +132,12 @@ public class MediaServiceImpl implements MediaService {
     public MediaType getType(final String id) {
         MediaObject owner = findByMid(id);
         return owner != null ? MediaType.getMediaType(owner) : null;
+    }
+
+    @Override
+    public Optional<String> redirect(String mid) {
+        return mediaRepository.redirect(mid);
+
     }
 
     private ProfileDefinition<MediaObject> getProfile(String profile) {
