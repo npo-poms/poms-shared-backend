@@ -107,7 +107,7 @@ public class MediaServiceImplTest {
 
     @Test(expected = ProfileNotFoundException.class)
     public void testIterateProfileNotFound() {
-        target.iterate("notfound", null, 0l, 10, FilteringIterator.keepAlive((c) -> {}));
+        target.iterate("notfound", null, 0l, 10, FilteringIterator.keepAliveWithoutBreaks((c) -> {}));
     }
 
     @Test(expected = ProfileNotFoundException.class)
