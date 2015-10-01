@@ -4,13 +4,13 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import com.google.common.base.Predicate;
-import nl.vpro.domain.media.ScheduleEvent;
-
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.SortedSet;
+import java.util.function.Predicate;
+
+import nl.vpro.domain.media.ScheduleEvent;
 
 /**
  * @author rico
@@ -25,7 +25,7 @@ public class ScheduleEventViewSortedSet implements SortedSet<ScheduleEvent> {
     public ScheduleEventViewSortedSet(SortedSet<ScheduleEvent> wrapped) {
         this.wrapped = wrapped;
         for(ScheduleEvent event : wrapped) {
-            if(!predicate.apply(event)) {
+            if(!predicate.test(event)) {
                 wrapped.remove(event);
             }
         }
@@ -94,7 +94,7 @@ public class ScheduleEventViewSortedSet implements SortedSet<ScheduleEvent> {
 
     @Override
     public boolean add(ScheduleEvent scheduleEvent) {
-        if(predicate.apply(scheduleEvent)) {
+        if(predicate.test(scheduleEvent)) {
             return wrapped.add(scheduleEvent);
         }
         return false;

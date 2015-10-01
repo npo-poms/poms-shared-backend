@@ -7,6 +7,7 @@ package nl.vpro.api.rs.v3.filter;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.function.Predicate;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -14,8 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import com.google.common.base.Predicate;
 
 import nl.vpro.domain.media.ScheduleEvent;
 
@@ -59,7 +58,7 @@ public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
     }
 
     @Override
-    public boolean apply(ScheduleEvent input) {
+    public boolean test(ScheduleEvent input) {
         return (stop == null || input.getStart().compareTo(stop) <= 0);
     }
 
