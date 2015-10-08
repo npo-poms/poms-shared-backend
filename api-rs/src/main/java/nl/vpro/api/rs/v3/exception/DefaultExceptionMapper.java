@@ -8,6 +8,8 @@ import org.jboss.resteasy.spi.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.vpro.api.util.Errors;
+
 /**
  * Catch all other exeption and show them as a server error
  * @author Michiel Meeuwissen
@@ -15,6 +17,8 @@ import org.slf4j.LoggerFactory;
  */
 @Provider
 public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
+
+
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionMapper.class);
 
@@ -25,8 +29,11 @@ public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
             // E.g. a DefaultOptionsMethodException. If you catch those, CORS wont' work any more.
             return null;
         } else {
-            LOG.warn("Wrapped an {} {}", exception.getClass().getName(), exception.getMessage());
-            return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception)).build();
+            Errors.QueryState query = Errors.LATEST_QUERY.get();
+            Errors.clearState();
+
+            LOG.warn("For {}. Wrapped an {} {}", query, exception.getClass().getName(), exception.getMessage());
+            return Response.serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), query.toString(), exception)).build();
         }
     }
 
