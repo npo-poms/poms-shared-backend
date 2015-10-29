@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -105,7 +106,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
-        @QueryParam(OFFSET) @DefaultValue(ZERO) Long offset,
+        @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         max = handleTooManyResults(max);
@@ -134,10 +135,10 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleSearchResult find(
-            @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM) MediaForm form,
+            @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM) MediaForm form,
             @QueryParam(PROFILE) String profile,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
-            @QueryParam(OFFSET) @DefaultValue(ZERO) Long offset,
+            @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
             @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         max = handleTooManyResults(max);
