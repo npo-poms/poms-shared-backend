@@ -20,7 +20,7 @@ import org.mockito.ArgumentCaptor;
 import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.media.MediaForm;
+import nl.vpro.domain.api.media.ScheduleForm;
 import nl.vpro.domain.api.media.ScheduleSearchResult;
 import nl.vpro.domain.api.media.ScheduleService;
 import nl.vpro.domain.media.Channel;
@@ -78,10 +78,10 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     public void testGuideDayStartStop() throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat(ScheduleRestService.YEAR_MONTH_DATE);
         ScheduleRestService scheduleRestService = getTestObject();
-        Result res = scheduleRestService.listChannel(Channel.KETN.name(), formatter.parse("2015-03-28"), null, null, null, "ASC", 0l, 100);
+        Result res = scheduleRestService.listChannel(Channel.KETN.name(), formatter.parse("2015-03-28"), null, null, null, "ASC", 0L, 100);
         Date start = new Date(ZonedDateTime.parse("2015-03-28T06:00:00+01:00").toEpochSecond() * 1000);
         Date stop = new Date(ZonedDateTime.parse("2015-03-29T06:00:00+02:00").toEpochSecond() * 1000);
-        verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0l, 100);
+        verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0L, 100);
     }
 
     private String MSE_2775form() {
@@ -151,7 +151,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     private void MSE_2775(String form) throws URISyntaxException, IOException {
 
 
-        when(scheduleService.find(any(MediaForm.class), anyString(), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+        when(scheduleService.find(any(ScheduleForm.class), anyString(), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
 
         {
             MockHttpRequest request = MockHttpRequest.post("/schedule");
@@ -166,10 +166,10 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
             dispatcher.invoke(request, response);
             assertThat(response.getStatus()).isEqualTo(200);
 
-            ArgumentCaptor<MediaForm> argument = ArgumentCaptor.forClass(MediaForm.class);
+            ArgumentCaptor<ScheduleForm> argument = ArgumentCaptor.forClass(ScheduleForm.class);
 
             verify(scheduleService).find(argument.capture(), anyString(), anyLong(), anyInt());
-            assertThat(argument.getValue().getSearches().getScheduleEvents().getBegin().getTime()).isEqualTo(1435733201098l);
+            assertThat(argument.getValue().getSearches().getScheduleEvents().getBegin().getTime()).isEqualTo(1435733201098L);
         }
     }
     @Test

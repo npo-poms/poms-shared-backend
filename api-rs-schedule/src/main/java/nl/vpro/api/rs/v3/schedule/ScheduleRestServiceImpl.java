@@ -26,10 +26,10 @@ import nl.vpro.api.rs.v3.filter.ApiMediaFilter;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.ScheduleResult;
 import nl.vpro.domain.api.media.ScheduleSearchResult;
 import nl.vpro.domain.api.media.ScheduleService;
+import nl.vpro.domain.api.media.ScheduleForm;
 import nl.vpro.domain.media.Channel;
 import nl.vpro.domain.media.Net;
 import nl.vpro.domain.media.ScheduleEvent;
@@ -135,7 +135,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleSearchResult find(
-            @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM) MediaForm form,
+            @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM) ScheduleForm form,
             @QueryParam(PROFILE) String profile,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
             @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
