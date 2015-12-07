@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
 
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
@@ -20,9 +21,7 @@ import org.mockito.ArgumentCaptor;
 import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.media.ScheduleForm;
-import nl.vpro.domain.api.media.ScheduleSearchResult;
-import nl.vpro.domain.api.media.ScheduleService;
+import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.Channel;
 import nl.vpro.domain.media.ScheduleEvent;
 
@@ -180,6 +179,50 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     @Test
     public void MSE_2775_2() throws IOException, URISyntaxException {
         MSE_2775(MSE2775_formCorrected());
+
+    }
+
+    @Test
+    public void NPA_202_scheduleform() throws URISyntaxException {
+        when(scheduleService.find(any(ScheduleForm.class), anyString(), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+
+        MockHttpRequest request = MockHttpRequest.post("/schedule");
+        request.contentType(MediaType.APPLICATION_XML);
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JAXB.marshal(new ScheduleForm(), out);;
+        request.content(out.toByteArray());
+
+        dispatcher.invoke(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(200);
+
+    }
+
+    @Test
+    public void NPA_202_mediaform() throws URISyntaxException {
+        when(scheduleService.find(any(ScheduleForm.class), anyString(), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+
+        MockHttpRequest request = MockHttpRequest.post("/schedule");
+        request.contentType(MediaType.APPLICATION_XML);
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        MediaForm form = new MediaForm();
+        form.setSearches(new MediaSearch());
+
+        JAXB.marshal(form, out);
+
+        System.out.println(new String(out.toByteArray()));
+
+        request.content(out.toByteArray());
+
+        dispatcher.invoke(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(200);
 
     }
 

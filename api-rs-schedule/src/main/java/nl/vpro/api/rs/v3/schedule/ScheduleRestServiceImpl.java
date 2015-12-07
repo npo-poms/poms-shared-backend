@@ -135,11 +135,12 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleSearchResult find(
-            @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM) ScheduleForm form,
-            @QueryParam(PROFILE) String profile,
-            @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
-            @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
-            @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+        @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM)
+        ScheduleForm form,
+        @QueryParam(PROFILE) String profile,
+        @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
+        @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
+        @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         max = handleTooManyResults(max);
 
