@@ -57,7 +57,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     };
 
     @Value("${xml.input.validate}")
-    private boolean doValidate = true;
+    protected boolean doValidate = true;
 
     public AbstractValidatingReader(Class<T> classToRead) {
         this.classToRead = classToRead;
@@ -104,12 +104,16 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
         try {
             return unmarshal(entityStream);
         } catch (JAXBException e) {
-            Throwable c = e.getLinkedException();
-            if (c == null) {
-                c = e;
-            }
-            LOG.warn(c.getMessage());
-            throw new BadRequestException(c.getMessage(), e);
+            throw badRequestException(e);
         }
+    }
+
+    protected BadRequestException  badRequestException(JAXBException e) {
+        Throwable c = e.getLinkedException();
+        if (c == null) {
+            c = e;
+        }
+        LOG.warn(c.getMessage());
+        return new BadRequestException(c.getMessage(), e);
     }
 }
