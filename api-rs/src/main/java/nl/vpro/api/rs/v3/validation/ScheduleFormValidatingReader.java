@@ -31,9 +31,6 @@ public class ScheduleFormValidatingReader extends AbstractValidatingReader<Sched
 
 
     MediaFormValidatingReader mediaFormValidatingReader = new MediaFormValidatingReader();
-    {
-        mediaFormValidatingReader.setDoValidate(false);
-    }
 
     public ScheduleFormValidatingReader() {
         super(ScheduleForm.class);
