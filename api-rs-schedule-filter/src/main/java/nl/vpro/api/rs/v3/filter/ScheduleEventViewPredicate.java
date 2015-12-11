@@ -4,18 +4,18 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.function.Predicate;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import nl.vpro.domain.media.Schedule;
 import nl.vpro.domain.media.ScheduleEvent;
 
 /**
@@ -63,9 +63,9 @@ public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
     }
 
     private static Date guideDayStart(Date guideDay) {
-        DateTimeZone timeZone = DateTimeZone.forID("Europe/Amsterdam");
-        DateTime dateTime = new DateTime(guideDay, timeZone);
-        return dateTime.withHourOfDay(6).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0).plusDays(1).toDate();
+        ZonedDateTime dateTime = guideDay.toInstant().atZone(Schedule.ZONE_ID).toLocalDate().atTime(Schedule.START_OF_SCHEDULE).plusDays(1).atZone(Schedule.ZONE_ID);
+        return Date.from(dateTime.toInstant());
+
     }
 
 }
