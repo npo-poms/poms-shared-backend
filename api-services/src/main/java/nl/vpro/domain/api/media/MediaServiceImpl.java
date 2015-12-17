@@ -6,6 +6,7 @@ package nl.vpro.domain.api.media;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -76,6 +77,11 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public List<MediaObject> loadAll(List<String> ids) {
         return mediaRepository.loadAll(ids);
+    }
+
+    @Override
+    public RedirectList redirects() {
+        return mediaRepository.redirects();
     }
 
     @Override
