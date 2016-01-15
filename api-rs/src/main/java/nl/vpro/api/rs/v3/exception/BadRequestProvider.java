@@ -36,7 +36,10 @@ public class BadRequestProvider implements ExceptionMapper<BadRequestException> 
                 }
             }
         }
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), message)).status(Response.Status.BAD_REQUEST).build();
+        return Response
+                .ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), message))
+                .status(Response.Status.BAD_REQUEST)
+                .build();
 
     }
 

@@ -17,7 +17,10 @@ public class IllegalArgumentProvider implements ExceptionMapper<IllegalArgumentE
 
     @Override
     public Response toResponse(IllegalArgumentException exception) {
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), exception)).status(Response.Status.BAD_REQUEST).build();
+        return Response
+                .ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), exception))
+                .status(Response.Status.BAD_REQUEST)
+                .build();
     }
 
 }

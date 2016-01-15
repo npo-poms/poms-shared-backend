@@ -23,7 +23,10 @@ public class NullPointerProvider implements ExceptionMapper<NullPointerException
     @Override
     public Response toResponse(NullPointerException exception) {
         LOG.error("Wrapped a null pointer", exception);
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception)).status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        return Response
+                .ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception))
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .build();
     }
 
 }

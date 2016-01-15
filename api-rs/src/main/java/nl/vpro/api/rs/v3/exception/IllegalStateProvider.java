@@ -4,12 +4,12 @@
  */
 package nl.vpro.api.rs.v3.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Roelof Jan Koekoek
@@ -22,7 +22,10 @@ public class IllegalStateProvider implements ExceptionMapper<IllegalStateExcepti
     @Override
     public Response toResponse(IllegalStateException exception) {
         log.error("Wrapped a illegal state", exception);
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getMessage())).status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        return Response
+                .ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getMessage()))
+                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .build();
     }
 
 }

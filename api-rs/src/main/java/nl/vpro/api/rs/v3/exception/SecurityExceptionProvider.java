@@ -17,7 +17,10 @@ public class SecurityExceptionProvider implements ExceptionMapper<SecurityExcept
 
     @Override
     public Response toResponse(SecurityException exception) {
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.FORBIDDEN.getStatusCode(), exception.getMessage())).status(Response.Status.FORBIDDEN).build();
+        return Response
+                .ok(new nl.vpro.domain.api.Error(Response.Status.FORBIDDEN.getStatusCode(), exception.getMessage()))
+                .status(Response.Status.FORBIDDEN)
+                .build();
     }
 
 }

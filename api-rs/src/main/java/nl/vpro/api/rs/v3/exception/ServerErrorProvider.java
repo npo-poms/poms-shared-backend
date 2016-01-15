@@ -18,8 +18,9 @@ public class ServerErrorProvider implements ExceptionMapper<ServerErrorException
 
     @Override
     public Response toResponse(ServerErrorException exception) {
-        return Response.serverError().entity(
-                new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception)).build();
+        return Response
+                .serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception))
+                .build();
     }
 
 }

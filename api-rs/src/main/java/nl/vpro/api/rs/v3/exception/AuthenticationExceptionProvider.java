@@ -19,7 +19,10 @@ public class AuthenticationExceptionProvider implements ExceptionMapper<Authenti
 
     @Override
     public Response toResponse(AuthenticationException exception) {
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.UNAUTHORIZED.getStatusCode(), exception.getMessage())).status(Response.Status.UNAUTHORIZED).build();
+        return Response
+                .ok(new nl.vpro.domain.api.Error(Response.Status.UNAUTHORIZED.getStatusCode(), exception.getMessage()))
+                .status(Response.Status.UNAUTHORIZED)
+                .build();
     }
 
 }

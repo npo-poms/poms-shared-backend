@@ -24,8 +24,9 @@ import org.jboss.resteasy.api.validation.ResteasyViolationException;
 public class ValidationExceptionProvider implements ExceptionMapper<ResteasyViolationException> {
     @Override
     public Response toResponse(final ResteasyViolationException e) {
-
-        return Response.ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), "There were one or more constraint violations") {
+        final String violationsAsString = e.getViolations().toString().replace('\r', ' ');
+        return Response
+                .ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), violationsAsString) {
             @XmlElement
             public List<ResteasyConstraintViolation> getViolations() {
                 return e.getViolations();
@@ -33,9 +34,11 @@ public class ValidationExceptionProvider implements ExceptionMapper<ResteasyViol
 
             @Override
             public String toString() {
-                return (super.toString() + ":" + getViolations()).replace('\r', ' ');
+                return (super.toString() + ":" + violationsAsString);
             }
-        }).status(Response.Status.BAD_REQUEST).build();
+        })
+                .status(Response.Status.BAD_REQUEST)
+                .build();
     }
 
 }

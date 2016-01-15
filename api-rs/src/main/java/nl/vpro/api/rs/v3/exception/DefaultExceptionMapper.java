@@ -24,8 +24,11 @@ public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
             return null;
         } else {
             LOG.warn("Wrapped an {} root cause {}", exception.getClass().getName(), exception.getMessage());
-            Response.Status status = Response.Status.BAD_REQUEST;
-            return Response.status(status).entity(new nl.vpro.domain.page.Error(status.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage())).build();
+            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+            return Response
+                    .status(status)
+                    .entity(new nl.vpro.domain.page.Error(status.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage()))
+                    .build();
         }
     }
 }
