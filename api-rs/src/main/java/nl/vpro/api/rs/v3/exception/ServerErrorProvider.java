@@ -9,6 +9,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -19,7 +21,8 @@ public class ServerErrorProvider implements ExceptionMapper<ServerErrorException
     @Override
     public Response toResponse(ServerErrorException exception) {
         return Response
-                .serverError().entity(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception))
+                .serverError()
+                .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
                 .build();
     }
 

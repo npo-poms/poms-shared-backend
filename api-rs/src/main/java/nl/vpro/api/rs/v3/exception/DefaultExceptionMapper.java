@@ -8,6 +8,8 @@ import org.jboss.resteasy.spi.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
 /**
  * @author Michiel Meeuwissen
  * @since 3.3
@@ -24,10 +26,9 @@ public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
             return null;
         } else {
             LOG.warn("Wrapped an {} root cause {}", exception.getClass().getName(), exception.getMessage());
-            Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
             return Response
-                    .status(status)
-                    .entity(new nl.vpro.domain.page.Error(status.getStatusCode(), exception.getClass().getName() + ": " + exception.getMessage()))
+                    .serverError()
+                    .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
                     .build();
         }
     }

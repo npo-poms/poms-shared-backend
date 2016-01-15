@@ -8,6 +8,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -18,8 +20,8 @@ public class IllegalArgumentProvider implements ExceptionMapper<IllegalArgumentE
     @Override
     public Response toResponse(IllegalArgumentException exception) {
         return Response
-                .ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), exception))
-                .status(Response.Status.BAD_REQUEST)
+                .status(BAD_REQUEST)
+                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception))
                 .build();
     }
 

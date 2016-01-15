@@ -12,6 +12,8 @@ import javax.ws.rs.ext.Provider;
 
 import org.xml.sax.SAXParseException;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -37,8 +39,8 @@ public class BadRequestProvider implements ExceptionMapper<BadRequestException> 
             }
         }
         return Response
-                .ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), message))
-                .status(Response.Status.BAD_REQUEST)
+                .status(BAD_REQUEST)
+                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, message))
                 .build();
 
     }

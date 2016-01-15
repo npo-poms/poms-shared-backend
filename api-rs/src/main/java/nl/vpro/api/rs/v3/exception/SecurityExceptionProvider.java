@@ -8,6 +8,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -18,8 +20,8 @@ public class SecurityExceptionProvider implements ExceptionMapper<SecurityExcept
     @Override
     public Response toResponse(SecurityException exception) {
         return Response
-                .ok(new nl.vpro.domain.api.Error(Response.Status.FORBIDDEN.getStatusCode(), exception.getMessage()))
-                .status(Response.Status.FORBIDDEN)
+                .status(FORBIDDEN)
+                .entity(new nl.vpro.domain.api.Error(FORBIDDEN, exception.getMessage()))
                 .build();
     }
 

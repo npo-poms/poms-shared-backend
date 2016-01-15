@@ -12,6 +12,8 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -24,8 +26,8 @@ public class NullPointerProvider implements ExceptionMapper<NullPointerException
     public Response toResponse(NullPointerException exception) {
         LOG.error("Wrapped a null pointer", exception);
         return Response
-                .ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception))
-                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .status(INTERNAL_SERVER_ERROR)
+                .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
                 .build();
     }
 

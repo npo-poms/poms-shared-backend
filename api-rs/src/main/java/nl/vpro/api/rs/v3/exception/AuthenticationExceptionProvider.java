@@ -10,6 +10,8 @@ import javax.ws.rs.ext.Provider;
 
 import org.springframework.security.core.AuthenticationException;
 
+import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+
 /**
  * @author Michiel Meeuwissen
  * @since 3.0
@@ -20,8 +22,8 @@ public class AuthenticationExceptionProvider implements ExceptionMapper<Authenti
     @Override
     public Response toResponse(AuthenticationException exception) {
         return Response
-                .ok(new nl.vpro.domain.api.Error(Response.Status.UNAUTHORIZED.getStatusCode(), exception.getMessage()))
-                .status(Response.Status.UNAUTHORIZED)
+                .status(UNAUTHORIZED)
+                .entity(new nl.vpro.domain.api.Error(UNAUTHORIZED, exception.getMessage()))
                 .build();
     }
 

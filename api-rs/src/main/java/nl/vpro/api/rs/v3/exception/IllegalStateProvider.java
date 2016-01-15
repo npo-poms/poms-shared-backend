@@ -11,6 +11,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -23,8 +25,8 @@ public class IllegalStateProvider implements ExceptionMapper<IllegalStateExcepti
     public Response toResponse(IllegalStateException exception) {
         log.error("Wrapped a illegal state", exception);
         return Response
-                .ok(new nl.vpro.domain.api.Error(Response.Status.INTERNAL_SERVER_ERROR.getStatusCode(), exception.getMessage()))
-                .status(Response.Status.INTERNAL_SERVER_ERROR)
+                .status(INTERNAL_SERVER_ERROR)
+                .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
                 .build();
     }
 

@@ -15,6 +15,8 @@ import javax.xml.bind.annotation.XmlElement;
 import org.jboss.resteasy.api.validation.ResteasyConstraintViolation;
 import org.jboss.resteasy.api.validation.ResteasyViolationException;
 
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+
 
 /**
  * @author rico
@@ -26,7 +28,8 @@ public class ValidationExceptionProvider implements ExceptionMapper<ResteasyViol
     public Response toResponse(final ResteasyViolationException e) {
         final String violationsAsString = e.getViolations().toString().replace('\r', ' ');
         return Response
-                .ok(new nl.vpro.domain.api.Error(Response.Status.BAD_REQUEST.getStatusCode(), violationsAsString) {
+                .status(BAD_REQUEST)
+                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, violationsAsString) {
             @XmlElement
             public List<ResteasyConstraintViolation> getViolations() {
                 return e.getViolations();
@@ -37,7 +40,6 @@ public class ValidationExceptionProvider implements ExceptionMapper<ResteasyViol
                 return (super.toString() + ":" + violationsAsString);
             }
         })
-                .status(Response.Status.BAD_REQUEST)
                 .build();
     }
 
