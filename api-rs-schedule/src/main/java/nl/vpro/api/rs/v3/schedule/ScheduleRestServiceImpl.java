@@ -5,6 +5,7 @@
 package nl.vpro.api.rs.v3.schedule;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -26,10 +27,10 @@ import nl.vpro.api.rs.v3.filter.ApiMediaFilter;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.media.ScheduleForm;
 import nl.vpro.domain.api.media.ScheduleResult;
 import nl.vpro.domain.api.media.ScheduleSearchResult;
 import nl.vpro.domain.api.media.ScheduleService;
-import nl.vpro.domain.api.media.ScheduleForm;
 import nl.vpro.domain.media.Channel;
 import nl.vpro.domain.media.Net;
 import nl.vpro.domain.media.ScheduleEvent;
@@ -537,10 +538,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     private static Channel getChannel(String channel) {
-        // todo (poms 3.2)
-        // return Channel.getByEnumValue(channel)
-        //return Channel.valuesOf(Arrays.asList(channel)).get(0);
-        return Channel.valueOf(channel);
+        return Channel.valuesOf(Collections.singletonList(channel)).get(0);
     }
 
     private static Date guideDayStart(Date guideDay) {
