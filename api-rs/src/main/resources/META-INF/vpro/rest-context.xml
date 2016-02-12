@@ -20,4 +20,6 @@
 
   <context:component-scan base-package="nl.vpro.api.rs.v3"/>
 
+  <bean class="nl.vpro.resteasy.DateParamConverterProvider" />
+
 </beans>
