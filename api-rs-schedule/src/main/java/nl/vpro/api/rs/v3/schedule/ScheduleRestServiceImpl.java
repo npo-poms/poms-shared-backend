@@ -4,6 +4,7 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Date;
@@ -34,7 +35,6 @@ import nl.vpro.domain.api.media.ScheduleService;
 import nl.vpro.domain.media.Channel;
 import nl.vpro.domain.media.Net;
 import nl.vpro.domain.media.ScheduleEvent;
-import nl.vpro.resteasy.DateFormat;
 import nl.vpro.resteasy.ISO8601Format;
 import nl.vpro.swagger.SwaggerApplication;
 
@@ -102,7 +102,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleResult list(
-        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) @DateFormat(YEAR_MONTH_DATE) Date guideDay,
+        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
         @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
         @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
@@ -163,7 +163,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Trace(dispatcher = true)
     public ScheduleResult listForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
-            @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) @DateFormat(YEAR_MONTH_DATE) Date guideDay,
+            @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
             @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
             @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
@@ -259,7 +259,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Trace(dispatcher = true)
     public ScheduleResult listBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
-            @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) @DateFormat(YEAR_MONTH_DATE) Date guideDay,
+            @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
             @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
             @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
@@ -354,7 +354,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Trace(dispatcher = true)
     public ScheduleResult listChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
-        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) @DateFormat(YEAR_MONTH_DATE) Date guideDay,
+        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
         @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
         @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
@@ -453,7 +453,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Trace(dispatcher = true)
     public ScheduleResult listNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
-        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) @DateFormat(YEAR_MONTH_DATE) Date guideDay,
+        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
         @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
         @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
@@ -541,13 +541,15 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         return Channel.valuesOf(Collections.singletonList(channel)).get(0);
     }
 
-    private static Date guideDayStart(Date guideDay) {
-        ZonedDateTime zoned = guideDay.toInstant().atZone(ScheduleService.ZONE_ID);
+    private static Date guideDayStart(LocalDate guideDay) {
+        ZonedDateTime zoned = guideDay.atStartOfDay(ScheduleService.ZONE_ID);
         return new Date(ScheduleService.guideDayStart(zoned.toLocalDate()).toEpochSecond() * 1000);
     }
 
-    private static Date guideDayStop(Date guideDay) {
-        ZonedDateTime zoned = guideDay.toInstant().atZone(ScheduleService.ZONE_ID);
+
+
+    private static Date guideDayStop(LocalDate guideDay) {
+        ZonedDateTime zoned = guideDay.atStartOfDay(ScheduleService.ZONE_ID);
         return new Date(ScheduleService.guideDayStop(zoned.toLocalDate()).toEpochSecond() * 1000);
     }
 

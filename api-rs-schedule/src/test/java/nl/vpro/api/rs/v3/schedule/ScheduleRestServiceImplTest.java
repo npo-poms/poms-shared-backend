@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -75,9 +75,9 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
     @Test
     public void testGuideDayStartStop() throws ParseException {
-        SimpleDateFormat formatter = new SimpleDateFormat(ScheduleRestService.YEAR_MONTH_DATE);
+
         ScheduleRestService scheduleRestService = getTestObject();
-        Result res = scheduleRestService.listChannel(Channel.KETN.name(), formatter.parse("2015-03-28"), null, null, null, "ASC", 0L, 100);
+        Result res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 03, 28), null, null, null, "ASC", 0L, 100);
         Date start = new Date(ZonedDateTime.parse("2015-03-28T06:00:00+01:00").toEpochSecond() * 1000);
         Date stop = new Date(ZonedDateTime.parse("2015-03-29T06:00:00+02:00").toEpochSecond() * 1000);
         verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0L, 100);
