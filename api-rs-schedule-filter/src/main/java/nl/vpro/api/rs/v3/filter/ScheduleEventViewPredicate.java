@@ -4,8 +4,9 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Date;
 import java.util.function.Predicate;
@@ -23,9 +24,10 @@ import nl.vpro.domain.media.ScheduleEvent;
  * @since 3.0
  */
 public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
-    private static final Logger log = LoggerFactory.getLogger(ScheduleEventViewPredicate.class);
 
-    Date stop;
+    private static final Logger LOG = LoggerFactory.getLogger(ScheduleEventViewPredicate.class);
+
+    private final Instant stop;
 
     public ScheduleEventViewPredicate() {
         Collection<? extends GrantedAuthority> roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
@@ -50,16 +52,18 @@ public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
             }
         }
         if(daysToAdd > 0) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DATE, daysToAdd);
-            stop = guideDayStart(calendar.getTime());
-            log.debug("Setting stop to " + stop);
+            Instant now = Instant.now();
+            stop = now.plus(3, ChronoUnit.DAYS).plus(1, ChronoUnit.MILLIS);
+            LOG.debug("Setting stop to " + stop);
+        } else {
+            stop = null;
         }
     }
 
     @Override
     public boolean test(ScheduleEvent input) {
-        return (stop == null || input.getStart().compareTo(stop) <= 0);
+
+        return (stop == null || input.getStart().toInstant().isBefore(stop));
     }
 
     private static Date guideDayStart(Date guideDay) {
