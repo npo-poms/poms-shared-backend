@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -50,7 +51,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
         ScheduleEvent scheduleEvent = new ScheduleEvent();
         scheduleEvent.setStart(new Date(1000000));
-        scheduleEvent.setDuration(new Date(1000));
+        scheduleEvent.setDuration(Duration.ofMillis(1000));
 
         Boolean eventActive = (Boolean) method.invoke(scheduleRestService, scheduleEvent, new Date(1000100));
 
@@ -66,7 +67,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
         ScheduleEvent scheduleEvent = new ScheduleEvent();
         scheduleEvent.setStart(new Date(1000000));
-        scheduleEvent.setDuration(new Date(1000));
+        scheduleEvent.setDuration(Duration.ofMillis(1000));
 
         Boolean eventActive = (Boolean) method.invoke(scheduleRestService, scheduleEvent, new Date(1002100));
 
