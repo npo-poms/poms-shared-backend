@@ -26,11 +26,14 @@ public class Exceptions {
     }
 
     public static Integer handleTooManyResults(Integer max) {
+        return handleTooManyResults(max, Constants.MAX_RESULTS);
+    }
+    public static Integer handleTooManyResults(Integer max, Integer maxResults) {
         if (max == null){
-            return Constants.MAX_RESULTS;
+            return maxResults;
         }
-        if (max > Constants.MAX_RESULTS) {
-            throw badRequest("Requesting more than {} results is not allowed. Use a pager!", Constants.MAX_RESULTS);
+        if (maxResults != null && max > maxResults) {
+            throw badRequest("Requesting more than {} results is not allowed. Use a pager!", maxResults);
         }
         return max;
 
