@@ -570,7 +570,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         }
 
         long start = scheduleEvent.getStart().getTime();
-        long end = start + scheduleEvent.getDuration().toMillis();
+        long end = start + scheduleEvent.getDurationTime().toMillis();
         long timestamp = time.getTime();
 
         return start <= timestamp && timestamp <= end;
