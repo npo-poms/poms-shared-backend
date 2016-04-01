@@ -4,20 +4,18 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-
-import javax.xml.bind.JAXB;
-
+import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.domain.media.Program;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
+import javax.xml.bind.JAXB;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
-import static nl.vpro.fest.assertions.MediaAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Roelof Jan Koekoek
