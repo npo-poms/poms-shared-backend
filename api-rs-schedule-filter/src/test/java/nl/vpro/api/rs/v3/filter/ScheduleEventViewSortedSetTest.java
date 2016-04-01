@@ -8,7 +8,6 @@ import nl.vpro.domain.media.Channel;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.ScheduleEvent;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -21,7 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author rico
@@ -34,7 +33,7 @@ public class ScheduleEventViewSortedSetTest {
 
     @Test
     public void testFilteredSetApiClient() {
-        Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
+        Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 
@@ -54,7 +53,7 @@ public class ScheduleEventViewSortedSetTest {
 
     @Test
     public void testFilteredSetApiUser() {
-        Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_USER"));
+        Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_USER"));
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 

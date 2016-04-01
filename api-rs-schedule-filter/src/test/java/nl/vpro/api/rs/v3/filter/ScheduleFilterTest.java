@@ -4,8 +4,7 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import java.util.*;
-
+import nl.vpro.domain.media.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,9 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import nl.vpro.domain.media.*;
+import java.util.*;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author rico
@@ -38,7 +37,7 @@ public class ScheduleFilterTest {
 
     @Before
     public void init() {
-        Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
+        Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
     }
