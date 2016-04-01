@@ -4,12 +4,12 @@
  */
 package nl.vpro.api.rs.v3.exception;
 
+import org.junit.Test;
+
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 
-import org.junit.Test;
-
-import static nl.vpro.fest.assertions.MediaAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Roelof Jan Koekoek

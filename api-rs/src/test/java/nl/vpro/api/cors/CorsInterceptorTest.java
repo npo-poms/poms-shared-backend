@@ -1,28 +1,25 @@
 package nl.vpro.api.cors;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import org.junit.Before;
+import org.junit.Test;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
+import java.util.ArrayList;
+import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * @author Michiel Meeuwissen
  * @since 2.0
  */
 public class CorsInterceptorTest {
-    final CorsPolicy corsPolicy = mock(CorsPolicy.class);
+    private final CorsPolicy corsPolicy = mock(CorsPolicy.class);
 
     @Before
     public void resetMocks() {
@@ -49,7 +46,6 @@ public class CorsInterceptorTest {
         inst.filter(request, response);
 
         assertThat(headers.get("Access-Control-Allow-Origin")).containsExactly("localhost");
-
     }
 
     @Test
@@ -66,14 +62,14 @@ public class CorsInterceptorTest {
 
         inst.filter(request);
 
-        assertThat(request.getHeaders().get("Content-Type")).isEqualTo(Arrays.asList("application/json"));
+        assertThat(request.getHeaders().get("Content-Type")).containsExactly("application/json");
     }
 
     @Test
     public void testIEHack2() throws Exception {
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
-        headers.put("Content-Type", new ArrayList<>(Arrays.asList("text/plain")));
+        headers.put("Content-Type", new ArrayList<>(Collections.singletonList("text/plain")));
 
 
         ContainerRequestContext request = mock(ContainerRequestContext.class);
@@ -84,6 +80,6 @@ public class CorsInterceptorTest {
 
         inst.filter(request);
 
-        assertThat(request.getHeaders().get("Content-Type")).isEqualTo(Arrays.asList("application/json"));
+        assertThat(request.getHeaders().get("Content-Type")).containsExactly("application/json");
     }
 }
