@@ -7,6 +7,7 @@ package nl.vpro.api.rs.v3.filter;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -24,7 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Ignore("Won't run when classes are loaded yet")
 public class ApiMediaFilterTest {
 
-    private MediaPropertiesFilters instrument = new MediaPropertiesFilters();
+    @BeforeClass
+    public static void init() {
+        MediaPropertiesFilters.instrument();
+    }
+
 
     @Before()
     public void setUp() {
