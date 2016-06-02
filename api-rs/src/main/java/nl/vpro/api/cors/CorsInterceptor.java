@@ -1,8 +1,6 @@
 package nl.vpro.api.cors;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -12,8 +10,9 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
-
-import org.apache.commons.lang.StringUtils;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author rico
@@ -33,25 +32,27 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
         String origin = request.getHeaderString(CorsHeaders.ORIGIN);
-        if(corsPolicy.isEnabled()) {
-            String method = request.getMethod();
-            if(StringUtils.isNotEmpty(origin)) {
-                boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
+        boolean alreadyHasCorsHeaders = response.getHeaders().containsKey(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN);
+        if  (!alreadyHasCorsHeaders) {
+            if (corsPolicy.isEnabled()) {
+                String method = request.getMethod();
+                if (StringUtils.isNotEmpty(origin)) {
+                    boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
 
-                if(allowed) {
+                    if (allowed) {
+                        response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                        //ACCESS_CONTROL_ALLOW_ORIGIN_VALUE is ook beschikbaar
+                        response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
+                        response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
+                        response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
+                    }
+                }
+            } else {
+                if (StringUtils.isNotEmpty(origin)) {
                     response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-                    //ACCESS_CONTROL_ALLOW_ORIGIN_VALUE is ook beschikbaar
-                    response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
-                    response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
-                    response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
                 }
             }
-        } else {
-            if(StringUtils.isNotEmpty(origin)) {
-                response.getHeaders().add(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-            }
         }
-
     }
 
 
