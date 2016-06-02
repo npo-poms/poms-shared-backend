@@ -1,8 +1,10 @@
 package nl.vpro.api.cors;
 
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -34,7 +36,7 @@ public class CorsInterceptorTest {
         when(corsPolicy.isEnabled()).thenReturn(Boolean.FALSE);
         when(corsPolicy.allowedOriginAndMethod(anyString(), anyString())).thenReturn(Boolean.TRUE);
 
-
+        ResteasyProviderFactory.pushContext(HttpServletResponse.class, mock(HttpServletResponse.class));
         ContainerRequestContext request = mock(ContainerRequestContext.class);
         ContainerResponseContext response = mock(ContainerResponseContext.class);
         when(request.getHeaderString(CorsHeaders.ORIGIN)).thenReturn("localhost");

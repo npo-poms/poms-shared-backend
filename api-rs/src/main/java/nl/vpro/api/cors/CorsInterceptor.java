@@ -1,9 +1,11 @@
 package nl.vpro.api.cors;
 
 import org.apache.commons.lang.StringUtils;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -32,7 +34,8 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
         String origin = request.getHeaderString(CorsHeaders.ORIGIN);
-        boolean alreadyHasCorsHeaders = response.getHeaders().containsKey(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN);
+        HttpServletResponse realResponse = ResteasyProviderFactory.getContextData(HttpServletResponse.class);
+        boolean alreadyHasCorsHeaders = realResponse.getHeader(CorsHeaders.ACCESS_CONTROL_ALLOW_ORIGIN) != null;
         if  (!alreadyHasCorsHeaders) {
             if (corsPolicy.isEnabled()) {
                 String method = request.getMethod();
