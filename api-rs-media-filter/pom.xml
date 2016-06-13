@@ -5,7 +5,7 @@
   <parent>
     <artifactId>api-parent</artifactId>
     <groupId>nl.vpro.api</groupId>
-    <version>4.5-SNAPSHOT</version>
+    <version>4.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>api-rs-media-filter</artifactId>
