@@ -4,13 +4,14 @@
  */
 package nl.vpro.api.rs.v3.exception;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
@@ -24,7 +25,7 @@ public class NullPointerProvider implements ExceptionMapper<NullPointerException
 
     @Override
     public Response toResponse(NullPointerException exception) {
-        LOG.error("Wrapped a null pointer", exception);
+        LOG.error("Wrapped a null pointer. Request: {}", StoreRequestInThreadLocal.getRequestBody(), exception);
         return Response
                 .status(INTERNAL_SERVER_ERROR)
                 .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))

@@ -4,12 +4,14 @@
  */
 package nl.vpro.api.rs.v3.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
@@ -19,11 +21,11 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
  */
 @Provider
 public class IllegalStateProvider implements ExceptionMapper<IllegalStateException> {
-    private static final Logger log = LoggerFactory.getLogger(IllegalStateProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IllegalStateProvider.class);
 
     @Override
     public Response toResponse(IllegalStateException exception) {
-        log.error("Wrapped a illegal state", exception);
+        LOG.error("Wrapped a illegal state. For request: {}", StoreRequestInThreadLocal.getRequestBody(), exception);
         return Response
                 .status(INTERNAL_SERVER_ERROR)
                 .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))

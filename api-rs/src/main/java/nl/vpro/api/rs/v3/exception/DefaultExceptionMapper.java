@@ -8,6 +8,8 @@ import org.jboss.resteasy.spi.Failure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
+
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
 /**
@@ -25,7 +27,7 @@ public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
             // E.g. a DefaultOptionsMethodException. If you catch those, CORS wont' work any more.
             return null;
         } else {
-            LOG.warn("Wrapped an {} root cause {}", exception.getClass().getName(), exception.getMessage());
+            LOG.warn("Wrapped an {} root cause {}. Request: {}", exception.getClass().getName(), exception.getMessage(), StoreRequestInThreadLocal.getRequestBody());
             return Response
                     .serverError()
                     .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
