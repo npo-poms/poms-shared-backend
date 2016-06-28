@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.*;
 
 import org.apache.commons.io.IOUtils;
@@ -17,9 +18,10 @@ import org.apache.commons.io.IOUtils;
 public class StoreRequestInThreadLocal implements ReaderInterceptor, WriterInterceptor {
 
     public static final ThreadLocal<byte[]> REQUEST = new ThreadLocal<>();
+    public static final ThreadLocal<MultivaluedMap <String, String>> HEADERS= new ThreadLocal<>();
 
     public static String getRequestBody() {
-        return new String(REQUEST.get());
+        return String.valueOf(HEADERS.get()) + "\n" + new String(REQUEST.get());
     }
 
     @Override
@@ -27,6 +29,7 @@ public class StoreRequestInThreadLocal implements ReaderInterceptor, WriterInter
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         IOUtils.copy(context.getInputStream(), bytes);
         REQUEST.set(bytes.toByteArray());
+        HEADERS.set(context.getHeaders());
         context.setInputStream(new ByteArrayInputStream(bytes.toByteArray()));
         return context.proceed();
     }
@@ -35,6 +38,7 @@ public class StoreRequestInThreadLocal implements ReaderInterceptor, WriterInter
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
         context.proceed();
         REQUEST.remove();
+        HEADERS.remove();
 
     }
 }
