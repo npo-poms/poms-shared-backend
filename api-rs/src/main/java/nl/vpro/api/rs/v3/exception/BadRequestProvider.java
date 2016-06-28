@@ -10,7 +10,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
+
+import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -20,6 +24,9 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
  */
 @Provider
 public class BadRequestProvider implements ExceptionMapper<BadRequestException> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(BadRequestProvider.class);
+
 
     @Override
     public Response toResponse(BadRequestException exception) {
@@ -38,6 +45,7 @@ public class BadRequestProvider implements ExceptionMapper<BadRequestException> 
                 }
             }
         }
+        LOG.info("Bad request: {}. Request: {}", message, StoreRequestInThreadLocal.getRequestBody());
         return Response
                 .status(BAD_REQUEST)
                 .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, message))
