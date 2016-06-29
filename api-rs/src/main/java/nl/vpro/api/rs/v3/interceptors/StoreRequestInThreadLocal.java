@@ -21,7 +21,8 @@ public class StoreRequestInThreadLocal implements ReaderInterceptor, WriterInter
     public static final ThreadLocal<MultivaluedMap <String, String>> HEADERS= new ThreadLocal<>();
 
     public static String getRequestBody() {
-        return String.valueOf(HEADERS.get()) + "\n" + new String(REQUEST.get());
+        byte[] body = REQUEST.get();
+        return String.valueOf(HEADERS.get()) + (body == null ? "" : ("\n" + new String(body)));
     }
 
     @Override
