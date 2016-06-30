@@ -45,7 +45,7 @@ public class ScheduleFilterTest {
     @Test
     @Ignore("See nl.vpro.api.rs.v3.filter.ScheduleEventViewSortedSetTest for how it's done.")
     public void testFilter() {
-        Program program = MediaTestDataBuilder.ProgramTestDataBuilder.program().withScheduleEvents().withMid().build();
+        Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 4);
         ScheduleEvent event = new ScheduleEvent(Channel.NED3, calendar.getTime(), new Date(1000));

@@ -37,7 +37,7 @@ public class ScheduleEventViewSortedSetTest {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 
-        Program program = MediaTestDataBuilder.ProgramTestDataBuilder.program().withScheduleEvents().withMid().build();
+        Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 4);
         calendar.set(Calendar.HOUR_OF_DAY, 10);
@@ -57,7 +57,7 @@ public class ScheduleEventViewSortedSetTest {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 
-        Program program = MediaTestDataBuilder.ProgramTestDataBuilder.program().withScheduleEvents().withMid().build();
+        Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 4);
         ScheduleEvent event = new ScheduleEvent(Channel.NED3, calendar.getTime(), new Date(1000));
