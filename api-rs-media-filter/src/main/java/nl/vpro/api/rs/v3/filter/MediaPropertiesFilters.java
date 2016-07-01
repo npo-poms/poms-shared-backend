@@ -7,12 +7,11 @@ package nl.vpro.api.rs.v3.filter;
 import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Roelof Jan Koekoek
@@ -21,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class MediaPropertiesFilters {
     private static final Logger LOG = LoggerFactory.getLogger(MediaPropertiesFilters.class);
 
-    private static final List<String> ignoreFields = Arrays.asList("mid", "type", "avType", "sortDate", "isEmbeddable");
+    private static final List<String> ignoreFields = Arrays.asList("mid", "type", "avType", "sortDate", "sortDateValid", "isEmbeddable");
 
     public static void instrument() {
         instrument(
