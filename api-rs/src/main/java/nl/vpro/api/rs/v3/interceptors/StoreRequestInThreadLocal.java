@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.*;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.*;
 
@@ -15,7 +16,8 @@ import org.apache.commons.io.IOUtils;
  * @since 4.6
  */
 @Provider
-public class StoreRequestInThreadLocal implements ReaderInterceptor, WriterInterceptor {
+@PreMatching
+public class StoreRequestInThreadLocal implements ContainerRequestFilter, ContainerResponseFilter, WriterInterceptor {
 
     public static final ThreadLocal<byte[]> REQUEST = new ThreadLocal<>();
     public static final ThreadLocal<MultivaluedMap <String, String>> HEADERS= new ThreadLocal<>();
@@ -26,20 +28,25 @@ public class StoreRequestInThreadLocal implements ReaderInterceptor, WriterInter
     }
 
     @Override
-    public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        IOUtils.copy(context.getInputStream(), bytes);
-        REQUEST.set(bytes.toByteArray());
-        HEADERS.set(context.getHeaders());
-        context.setInputStream(new ByteArrayInputStream(bytes.toByteArray()));
-        return context.proceed();
-    }
-
-    @Override
     public void aroundWriteTo(WriterInterceptorContext context) throws IOException, WebApplicationException {
         context.proceed();
         REQUEST.remove();
         HEADERS.remove();
+    }
 
+    @Override
+    public void filter(ContainerRequestContext requestContext) throws IOException {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        IOUtils.copy(requestContext.getEntityStream(), bytes);
+        REQUEST.set(bytes.toByteArray());
+        HEADERS.set(requestContext.getHeaders());
+        requestContext.setEntityStream(new ByteArrayInputStream(bytes.toByteArray()));
+    }
+
+    @Override
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
+        // This is called before exceptions handlers.
+        //REQUEST.remove();
+        //HEADERS.remove();
     }
 }
