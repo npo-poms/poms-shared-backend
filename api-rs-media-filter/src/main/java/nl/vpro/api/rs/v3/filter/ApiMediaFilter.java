@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -55,8 +57,9 @@ public class ApiMediaFilter {
         localFilter.remove();
     }
 
+
     public static void set(String properties) {
-        if(properties != null) {
+        if(StringUtils.isNotBlank(properties)) {
             get().filter(properties.split(","));
         } else {
             get().clear();
