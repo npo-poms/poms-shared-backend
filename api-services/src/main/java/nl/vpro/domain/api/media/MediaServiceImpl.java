@@ -52,6 +52,16 @@ public class MediaServiceImpl implements MediaService {
     @Value("${mediaService.loadRepository}")
     private RepositoryType loadRepository = RepositoryType.COUCHDB;
 
+    @Value("${mediaService.changesRepository}")
+    private RepositoryType changesRepository = RepositoryType.COUCHDB;
+
+
+    @Value("${mediaService.redirectsRepository}")
+    private RepositoryType redirectsRepository = RepositoryType.COUCHDB;
+
+    @Value("${mediaService.membersRepository}")
+    private RepositoryType membersRepository = RepositoryType.COUCHDB;
+
     @Autowired
     public MediaServiceImpl(
         ProfileService profileService,
@@ -77,53 +87,33 @@ public class MediaServiceImpl implements MediaService {
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
-        return mediaRepository.changes(since, currentProfile, previousProfile, order, max, keepAlive);
+        return switchRepository(changesRepository).changes(since, currentProfile, previousProfile, order, max, keepAlive);
     }
 
     @Override
     public <T extends MediaObject> T findByMid(String mid) {
-        switch(loadRepository) {
-            case COUCHDB:
-                return mediaRepository.findByMid(mid);
-            case ELASTICSEARCH:
-                return mediaSearchRepository.findByMid(mid);
-            default:
-                throw new IllegalStateException();
-        }
+        return switchRepository(loadRepository).findByMid(mid);
     }
+
 
     @Override
     public List<MediaObject> loadAll(List<String> ids) {
-        switch(loadRepository) {
-            case COUCHDB:
-                return mediaRepository.loadAll(ids);
-            case ELASTICSEARCH:
-                return mediaSearchRepository.loadAll(ids);
-            default:
-                throw new IllegalStateException();
-        }
+        return switchRepository(loadRepository).loadAll(ids);
     }
 
     @Override
     public RedirectList redirects() {
-        return mediaRepository.redirects();
+        return switchRepository(redirectsRepository).redirects();
     }
 
     @Override
     public MediaResult list(Order order, Long offset, Integer max) {
-        switch(loadRepository) {
-            case COUCHDB:
-                return mediaRepository.list(order, offset, max);
-            case ELASTICSEARCH:
-                return mediaSearchRepository.list(order, offset, max);
-            default:
-                throw new IllegalStateException();
-        }
+        return switchRepository(loadRepository).list(order, offset, max);
     }
 
     @Override
     public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
-        return mediaRepository.iterate(getProfile(profile), form, max, offset, keepAlive);
+        return switchRepository(loadRepository).iterate(getProfile(profile), form, max, offset, keepAlive);
     }
 
     @Override
@@ -133,7 +123,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaResult listMembers(MediaObject media, Order order, Long offset, Integer max) {
-        return mediaRepository.listMembers(media, order, offset, max);
+        return switchRepository(membersRepository).listMembers(media, order, offset, max);
     }
 
     @Override
@@ -143,7 +133,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public ProgramResult listEpisodes(MediaObject media, Order order, Long offset, Integer max) {
-        return mediaRepository.listEpisodes(media, order, offset, max);
+        return switchRepository(membersRepository).listEpisodes(media, order, offset, max);
     }
 
     @Override
@@ -153,7 +143,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaResult listDescendants(MediaObject media, Order order, Long offset, Integer max) {
-        return mediaRepository.listDescendants(media, order, offset, max);
+        return switchRepository(membersRepository).listDescendants(media, order, offset, max);
     }
 
     @Override
@@ -174,8 +164,19 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public Optional<String> redirect(String mid) {
-        return mediaRepository.redirect(mid);
+        return switchRepository(redirectsRepository).redirect(mid);
 
+    }
+
+    private MediaRepository switchRepository(RepositoryType repository) {
+        switch (loadRepository) {
+            case COUCHDB:
+                return mediaRepository;
+            case ELASTICSEARCH:
+                return mediaSearchRepository;
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     private ProfileDefinition<MediaObject> getProfile(String profile) {
