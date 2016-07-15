@@ -32,8 +32,8 @@ import nl.vpro.util.FilteringIterator;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
+@ManagedResource(objectName = "nl.vpro.api:name=MediaService")
 @Service
-@ManagedResource(objectName = "nl.vpro.api=mediaService")
 public class MediaServiceImpl implements MediaService {
 
     public enum RepositoryType {
