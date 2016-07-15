@@ -6,12 +6,14 @@ package nl.vpro.domain.api.media;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
 import nl.vpro.domain.api.Change;
@@ -31,7 +33,13 @@ import nl.vpro.util.FilteringIterator;
  * @since 2.0
  */
 @Service
+@ManagedResource(objectName = "nl.vpro.api=mediaService")
 public class MediaServiceImpl implements MediaService {
+
+    public enum RepositoryType {
+        COUCHDB,
+        ELASTICSEARCH
+    }
 
     private final ProfileService profileService;
 
@@ -40,6 +48,9 @@ public class MediaServiceImpl implements MediaService {
     private final MediaSearchRepository mediaSearchRepository;
 
     private final QuerySearchRepository querySearchRepository;
+
+    @Value("${mediaService.loadRepository}")
+    private RepositoryType loadRepository = RepositoryType.COUCHDB;
 
     @Autowired
     public MediaServiceImpl(
@@ -71,12 +82,26 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public <T extends MediaObject> T findByMid(String mid) {
-        return mediaRepository.findByMid(mid);
+        switch(loadRepository) {
+            case COUCHDB:
+                return mediaRepository.findByMid(mid);
+            case ELASTICSEARCH:
+                return mediaSearchRepository.findByMid(mid);
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override
     public List<MediaObject> loadAll(List<String> ids) {
-        return mediaRepository.loadAll(ids);
+        switch(loadRepository) {
+            case COUCHDB:
+                return mediaRepository.loadAll(ids);
+            case ELASTICSEARCH:
+                return mediaSearchRepository.loadAll(ids);
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override
@@ -158,5 +183,15 @@ public class MediaServiceImpl implements MediaService {
         return p.getMediaProfile();
 
     }
+
+    @ManagedAttribute
+    public RepositoryType getLoadRepository() {
+        return loadRepository;
+    }
+
+    public void setLoadRepository(RepositoryType type) {
+        this.loadRepository = type;
+    }
+
 
 }
