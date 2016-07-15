@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import nl.vpro.domain.api.Change;
 import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.RepositoryType;
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -36,11 +37,6 @@ import nl.vpro.util.FilteringIterator;
 @Service
 public class MediaServiceImpl implements MediaService {
 
-    public enum RepositoryType {
-        COUCHDB,
-        ELASTICSEARCH
-    }
-
     private final ProfileService profileService;
 
     private final MediaRepository mediaRepository;
@@ -51,6 +47,9 @@ public class MediaServiceImpl implements MediaService {
 
     @Value("${mediaService.loadRepository}")
     private RepositoryType loadRepository = RepositoryType.COUCHDB;
+
+    @Value("${mediaService.listRepository}")
+    private RepositoryType listRepository = RepositoryType.COUCHDB;
 
     @Value("${mediaService.changesRepository}")
     private RepositoryType changesRepository = RepositoryType.COUCHDB;
@@ -108,12 +107,12 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaResult list(Order order, Long offset, Integer max) {
-        return switchRepository(loadRepository).list(order, offset, max);
+        return switchRepository(listRepository).list(order, offset, max);
     }
 
     @Override
     public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
-        return switchRepository(loadRepository).iterate(getProfile(profile), form, max, offset, keepAlive);
+        return switchRepository(listRepository).iterate(getProfile(profile), form, max, offset, keepAlive);
     }
 
     @Override
@@ -169,14 +168,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     private MediaRepository switchRepository(RepositoryType repository) {
-        switch (loadRepository) {
-            case COUCHDB:
-                return mediaRepository;
-            case ELASTICSEARCH:
-                return mediaSearchRepository;
-            default:
-                throw new IllegalStateException();
-        }
+        return RepositoryType.switchRepository(repository, mediaRepository, mediaSearchRepository);
     }
 
     private ProfileDefinition<MediaObject> getProfile(String profile) {
