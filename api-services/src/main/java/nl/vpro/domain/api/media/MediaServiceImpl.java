@@ -111,7 +111,14 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaResult list(Order order, Long offset, Integer max) {
-        return mediaRepository.list(order, offset, max);
+        switch(loadRepository) {
+            case COUCHDB:
+                return mediaRepository.list(order, offset, max);
+            case ELASTICSEARCH:
+                return mediaSearchRepository.list(order, offset, max);
+            default:
+                throw new IllegalStateException();
+        }
     }
 
     @Override
