@@ -112,7 +112,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
-        return switchRepository(listRepository).iterate(getProfile(profile), form, max, offset, keepAlive);
+        return switchRepository(listRepository).iterate(getProfile(profile), form, offset, max, keepAlive);
     }
 
     @Override
