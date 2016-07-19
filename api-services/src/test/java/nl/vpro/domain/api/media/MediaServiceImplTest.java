@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import nl.vpro.api.Settings;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
@@ -38,7 +39,7 @@ public class MediaServiceImplTest {
     private final QuerySearchRepository querySearchRepository = Mockito.mock(QuerySearchRepository.class);
 
 
-    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository);
+    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository, new Settings());
 
 
     private ProfileDefinition<MediaObject> profileDefinition = new ProfileDefinition<>();

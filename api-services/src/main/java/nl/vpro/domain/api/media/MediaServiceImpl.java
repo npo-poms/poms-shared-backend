@@ -11,11 +11,10 @@ import java.util.Optional;
 import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
 
+import nl.vpro.api.Settings;
 import nl.vpro.domain.api.Change;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.RepositoryType;
@@ -39,38 +38,28 @@ public class MediaServiceImpl implements MediaService {
 
     private final ProfileService profileService;
 
-    private final MediaRepository mediaRepository;
+    private final MediaRepository couchdbRepository;
 
     private final MediaSearchRepository mediaSearchRepository;
 
     private final QuerySearchRepository querySearchRepository;
 
-    @Value("${mediaService.loadRepository}")
-    private RepositoryType loadRepository = RepositoryType.COUCHDB;
-
-    @Value("${mediaService.listRepository}")
-    private RepositoryType listRepository = RepositoryType.COUCHDB;
-
-    @Value("${mediaService.changesRepository}")
-    private RepositoryType changesRepository = RepositoryType.COUCHDB;
-
-
-    @Value("${mediaService.redirectsRepository}")
-    private RepositoryType redirectsRepository = RepositoryType.COUCHDB;
-
-    @Value("${mediaService.membersRepository}")
-    private RepositoryType membersRepository = RepositoryType.COUCHDB;
+    private final Settings settings;
 
     @Autowired
     public MediaServiceImpl(
         ProfileService profileService,
-        MediaRepository mediaRepository,
+        @Named("couchDBMediaRepository") MediaRepository mediaRepository,
         MediaSearchRepository mediaSearchRepository,
-        @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository) {
+        @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
+        Settings settings
+
+        ) {
         this.profileService = profileService;
-        this.mediaRepository = mediaRepository;
+        this.couchdbRepository = mediaRepository;
         this.mediaSearchRepository = mediaSearchRepository;
         this.querySearchRepository = querySearchRepository;
+        this.settings = settings;
     }
 
     @Override
@@ -86,33 +75,33 @@ public class MediaServiceImpl implements MediaService {
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
-        return switchRepository(changesRepository).changes(since, currentProfile, previousProfile, order, max, keepAlive);
+        return switchRepository(settings.changesRepository).changes(since, currentProfile, previousProfile, order, max, keepAlive);
     }
 
     @Override
     public <T extends MediaObject> T findByMid(String mid) {
-        return switchRepository(loadRepository).findByMid(mid);
+        return switchRepository(settings.loadRepository).findByMid(mid);
     }
 
 
     @Override
     public List<MediaObject> loadAll(List<String> ids) {
-        return switchRepository(loadRepository).loadAll(ids);
+        return switchRepository(settings.loadRepository).loadAll(ids);
     }
 
     @Override
     public RedirectList redirects() {
-        return switchRepository(redirectsRepository).redirects();
+        return switchRepository(settings.redirectsRepository).redirects();
     }
 
     @Override
     public MediaResult list(Order order, Long offset, Integer max) {
-        return switchRepository(listRepository).list(order, offset, max);
+        return switchRepository(settings.listRepository).list(order, offset, max);
     }
 
     @Override
     public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
-        return switchRepository(listRepository).iterate(getProfile(profile), form, offset, max, keepAlive);
+        return switchRepository(settings.listRepository).iterate(getProfile(profile), form, offset, max, keepAlive);
     }
 
     @Override
@@ -122,7 +111,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaResult listMembers(MediaObject media, Order order, Long offset, Integer max) {
-        return switchRepository(membersRepository).listMembers(media, order, offset, max);
+        return switchRepository(settings.membersRepository).listMembers(media, order, offset, max);
     }
 
     @Override
@@ -132,7 +121,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public ProgramResult listEpisodes(MediaObject media, Order order, Long offset, Integer max) {
-        return switchRepository(membersRepository).listEpisodes(media, order, offset, max);
+        return switchRepository(settings.membersRepository).listEpisodes(media, order, offset, max);
     }
 
     @Override
@@ -142,7 +131,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaResult listDescendants(MediaObject media, Order order, Long offset, Integer max) {
-        return switchRepository(membersRepository).listDescendants(media, order, offset, max);
+        return switchRepository(settings.membersRepository).listDescendants(media, order, offset, max);
     }
 
     @Override
@@ -163,12 +152,12 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public Optional<String> redirect(String mid) {
-        return switchRepository(redirectsRepository).redirect(mid);
+        return switchRepository(settings.redirectsRepository).redirect(mid);
 
     }
 
     private MediaRepository switchRepository(RepositoryType repository) {
-        return RepositoryType.switchRepository(repository, mediaRepository, mediaSearchRepository);
+        return RepositoryType.switchRepository(repository, couchdbRepository, mediaSearchRepository);
     }
 
     private ProfileDefinition<MediaObject> getProfile(String profile) {
@@ -182,15 +171,6 @@ public class MediaServiceImpl implements MediaService {
         }
         return p.getMediaProfile();
 
-    }
-
-    @ManagedAttribute
-    public RepositoryType getLoadRepository() {
-        return loadRepository;
-    }
-
-    public void setLoadRepository(RepositoryType type) {
-        this.loadRepository = type;
     }
 
 
