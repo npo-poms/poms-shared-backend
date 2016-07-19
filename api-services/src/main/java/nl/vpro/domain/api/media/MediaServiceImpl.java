@@ -4,16 +4,6 @@
  */
 package nl.vpro.domain.api.media;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-
-import javax.inject.Named;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
-
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.Change;
 import nl.vpro.domain.api.Order;
@@ -27,6 +17,15 @@ import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
 import nl.vpro.util.FilteringIterator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
+
+import javax.inject.Named;
+import java.time.Instant;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Roelof Jan Koekoek
@@ -54,7 +53,7 @@ public class MediaServiceImpl implements MediaService {
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
         Settings settings
 
-        ) {
+    ) {
         this.profileService = profileService;
         this.couchdbRepository = mediaRepository;
         this.mediaSearchRepository = mediaSearchRepository;
@@ -68,12 +67,20 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Iterator<Change> changes(final String profile, final Long since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+    public Iterator<Change> changes(final String profile, final Long since, Instant pulishedSince, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
+        }
+
+        // TODO omschakelpunt bepalen en goed afhandelen.
+        if (pulishedSince != null && since == null) {
+            return mediaSearchRepository.changes(pulishedSince, currentProfile, previousProfile, order, max, keepAlive);
+        }
+        if (since != null && pulishedSince == null) {
+            return couchdbRepository.changes(pulishedSince, currentProfile, previousProfile, order, max, keepAlive);
         }
         return switchRepository(settings.changesRepository).changes(since, currentProfile, previousProfile, order, max, keepAlive);
     }
