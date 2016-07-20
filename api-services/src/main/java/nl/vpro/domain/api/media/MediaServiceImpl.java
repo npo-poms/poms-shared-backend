@@ -4,6 +4,17 @@
  */
 package nl.vpro.domain.api.media;
 
+import java.time.Instant;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Named;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jmx.export.annotation.ManagedResource;
+import org.springframework.stereotype.Service;
+
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.Change;
 import nl.vpro.domain.api.Order;
@@ -17,15 +28,6 @@ import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
 import nl.vpro.util.FilteringIterator;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jmx.export.annotation.ManagedResource;
-import org.springframework.stereotype.Service;
-
-import javax.inject.Named;
-import java.time.Instant;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Roelof Jan Koekoek
@@ -37,7 +39,7 @@ public class MediaServiceImpl implements MediaService {
 
     private final ProfileService profileService;
 
-    private final MediaRepository couchdbRepository;
+    private final MediaRepository mediaLoadRepository;
 
     private final MediaSearchRepository mediaSearchRepository;
 
@@ -48,14 +50,14 @@ public class MediaServiceImpl implements MediaService {
     @Autowired
     public MediaServiceImpl(
         ProfileService profileService,
-        @Named("couchDBMediaRepository") MediaRepository mediaRepository,
+        @Named("mediaLoadRepository") MediaRepository mediaRepository,
         MediaSearchRepository mediaSearchRepository,
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
         Settings settings
 
     ) {
         this.profileService = profileService;
-        this.couchdbRepository = mediaRepository;
+        this.mediaLoadRepository = mediaRepository;
         this.mediaSearchRepository = mediaSearchRepository;
         this.querySearchRepository = querySearchRepository;
         this.settings = settings;
@@ -80,7 +82,7 @@ public class MediaServiceImpl implements MediaService {
             return mediaSearchRepository.changes(pulishedSince, currentProfile, previousProfile, order, max, keepAlive);
         }
         if (since != null && pulishedSince == null) {
-            return couchdbRepository.changes(pulishedSince, currentProfile, previousProfile, order, max, keepAlive);
+            return mediaLoadRepository.changes(pulishedSince, currentProfile, previousProfile, order, max, keepAlive);
         }
         return switchRepository(settings.changesRepository).changes(since, currentProfile, previousProfile, order, max, keepAlive);
     }
@@ -164,7 +166,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     private MediaRepository switchRepository(RepositoryType repository) {
-        return RepositoryType.switchRepository(repository, couchdbRepository, mediaSearchRepository);
+        return RepositoryType.switchRepository(repository, mediaLoadRepository, mediaSearchRepository);
     }
 
     private ProfileDefinition<MediaObject> getProfile(String profile) {
