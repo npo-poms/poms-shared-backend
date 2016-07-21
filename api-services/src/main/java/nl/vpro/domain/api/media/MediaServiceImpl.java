@@ -5,6 +5,7 @@
 package nl.vpro.domain.api.media;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +28,7 @@ import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
+import nl.vpro.domain.media.Schedule;
 import nl.vpro.util.FilteringIterator;
 
 /**
@@ -68,24 +70,46 @@ public class MediaServiceImpl implements MediaService {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
+    private static long DIVIDING_SINCE = LocalDate.of(2000, 1,1).atStartOfDay(Schedule.ZONE_ID).toInstant().toEpochMilli();
+
     @Override
     public Iterator<Change> changes(final String profile, final Long since, Instant publishedSince, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+        if (since != null && publishedSince != null){
+            throw new IllegalArgumentException("Cannot use both since and publishSince arguments!");
+        }
+        if (since != null) {
+            if (since > DIVIDING_SINCE) {
+                return changes(profile, Instant.ofEpochMilli(since), order, max, keepAlive);
+            } else {
+                return changes(profile, since, order, max, keepAlive);
+            }
+        } else {
+            return changes(profile, publishedSince, order, max, keepAlive);
+        }
+    }
+
+    @Deprecated
+    protected Iterator<Change> changes(final String profile, final Long since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
-
-        // TODO omschakelpunt bepalen en goed afhandelen.
-        if (publishedSince != null && since == null) {
-            return mediaSearchRepository.changes(publishedSince, currentProfile, previousProfile, order, max, keepAlive);
-        }
-        if (since != null && publishedSince == null) {
-            return mediaLoadRepository.changes(publishedSince, currentProfile, previousProfile, order, max, keepAlive);
-        }
-        return switchRepository(settings.changesRepository).changes(since, currentProfile, previousProfile, order, max, keepAlive);
+        return mediaLoadRepository.changes(since, currentProfile, previousProfile, order, max, keepAlive);
     }
+
+
+    protected Iterator<Change> changes(final String profile, final Instant since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+        ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
+
+        ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
+        if (currentProfile == null && previousProfile == null && profile != null) {
+            throw new ProfileNotFoundException("No such media profile " + profile);
+        }
+        return mediaSearchRepository.changes(since, currentProfile, previousProfile, order, max, keepAlive);
+    }
+
 
     @Override
     public <T extends MediaObject> T findByMid(String mid) {
