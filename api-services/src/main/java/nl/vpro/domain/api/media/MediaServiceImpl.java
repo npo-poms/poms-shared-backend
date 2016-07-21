@@ -69,7 +69,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public Iterator<Change> changes(final String profile, final Long since, Instant pulishedSince, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+    public Iterator<Change> changes(final String profile, final Long since, Instant publishedSince, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
@@ -78,11 +78,11 @@ public class MediaServiceImpl implements MediaService {
         }
 
         // TODO omschakelpunt bepalen en goed afhandelen.
-        if (pulishedSince != null && since == null) {
-            return mediaSearchRepository.changes(pulishedSince, currentProfile, previousProfile, order, max, keepAlive);
+        if (publishedSince != null && since == null) {
+            return mediaSearchRepository.changes(publishedSince, currentProfile, previousProfile, order, max, keepAlive);
         }
-        if (since != null && pulishedSince == null) {
-            return mediaLoadRepository.changes(pulishedSince, currentProfile, previousProfile, order, max, keepAlive);
+        if (since != null && publishedSince == null) {
+            return mediaLoadRepository.changes(publishedSince, currentProfile, previousProfile, order, max, keepAlive);
         }
         return switchRepository(settings.changesRepository).changes(since, currentProfile, previousProfile, order, max, keepAlive);
     }
