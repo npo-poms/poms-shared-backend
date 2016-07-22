@@ -84,9 +84,10 @@ public class MediaServiceImpl implements MediaService {
             throw new IllegalArgumentException("Cannot use both since and publishSince arguments!");
         }
         if (since != null) {
-            if (since > DIVIDING_SINCE) { // Certainly using
+            if (since > DIVIDING_SINCE) { // Certainly using ES
                 return changesWitchES(profile, Instant.ofEpochMilli(since), order, max, keepAlive);
             } else {
+                // since is couchdb like, so we need to use that.
                 Iterator<Change> iterator = changesWithCouchDB(profile, since, order, max, keepAlive);
                 if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
                     iterator = Iterators.transform(iterator,
