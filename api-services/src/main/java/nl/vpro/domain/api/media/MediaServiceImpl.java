@@ -12,9 +12,13 @@ import java.util.Optional;
 
 import javax.inject.Named;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Iterators;
 
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.Change;
@@ -38,6 +42,8 @@ import nl.vpro.util.FilteringIterator;
 @ManagedResource(objectName = "nl.vpro.api:name=MediaService")
 @Service
 public class MediaServiceImpl implements MediaService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MediaServiceImpl.class);
 
     private final ProfileService profileService;
 
@@ -78,18 +84,37 @@ public class MediaServiceImpl implements MediaService {
             throw new IllegalArgumentException("Cannot use both since and publishSince arguments!");
         }
         if (since != null) {
-            if (since > DIVIDING_SINCE) {
-                return changes(profile, Instant.ofEpochMilli(since), order, max, keepAlive);
+            if (since > DIVIDING_SINCE) { // Certainly using
+                return changesWitchES(profile, Instant.ofEpochMilli(since), order, max, keepAlive);
             } else {
-                return changes(profile, since, order, max, keepAlive);
+                Iterator<Change> iterator = changesWithCouchDB(profile, since, order, max, keepAlive);
+                if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
+                    iterator = Iterators.transform(iterator,
+                        c -> {
+                            if (c != null && c.isTail()) {
+                                c.setSequence(Instant.now().toEpochMilli());
+                                LOG.info("Forcing changes repository to ES by upping sequence {}", c);
+                            }
+                            return c;
+                        }
+                    );
+
+                }
+                return iterator;
             }
         } else {
-            return changes(profile, publishedSince, order, max, keepAlive);
+            // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' any more.
+            return
+                Iterators.transform(changesWitchES(profile, publishedSince, order, max, keepAlive), c -> {
+                    if (c != null) {
+                        c.setSequence(null);
+                    }
+                    return c;});
         }
     }
 
     @Deprecated
-    protected Iterator<Change> changes(final String profile, final Long since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+    protected Iterator<Change> changesWithCouchDB(final String profile, final Long since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
@@ -100,7 +125,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-    protected Iterator<Change> changes(final String profile, final Instant since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+    protected Iterator<Change> changesWitchES(final String profile, final Instant since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
