@@ -87,7 +87,10 @@ public class MediaServiceImpl implements MediaService {
             if (since > DIVIDING_SINCE) { // Certainly using ES
                 return changesWitchES(profile, Instant.ofEpochMilli(since), order, max, keepAlive);
             } else {
-                // since is couchdb like, so we need to use that.
+
+                if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
+                    LOG.info("Since {} is couchdb like, so we need to use that, though elasticsearch is configured for changes", since);
+                }
                 Iterator<Change> iterator = changesWithCouchDB(profile, since, order, max, keepAlive);
                 if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
                     iterator = Iterators.transform(iterator,
