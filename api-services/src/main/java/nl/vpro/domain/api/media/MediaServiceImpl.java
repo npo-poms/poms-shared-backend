@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import javax.inject.Named;
@@ -103,13 +104,12 @@ public class MediaServiceImpl implements MediaService {
                             return c;
                         }
                     );
-                    iterator = new TailAdder<>(iterator, false, last -> {
-                        if (last.isTail()) {
-                            return Optional.empty();
+                    iterator = TailAdder.withFunctions(iterator, last -> {
+                        if (last != null && last.isTail()) {
+                            throw new NoSuchElementException();
                         } else {
                             Instant now = Instant.now();
-                            return Optional.of(Change.tail(now, now.toEpochMilli()));
-
+                            return Change.tail(now, now.toEpochMilli());
                         }
                     });
                 }
