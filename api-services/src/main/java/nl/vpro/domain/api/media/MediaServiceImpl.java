@@ -34,6 +34,7 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
 import nl.vpro.domain.media.Schedule;
 import nl.vpro.util.FilteringIterator;
+import nl.vpro.util.TailAdder;
 
 /**
  * @author Roelof Jan Koekoek
@@ -102,7 +103,15 @@ public class MediaServiceImpl implements MediaService {
                             return c;
                         }
                     );
+                    iterator = new TailAdder<>(iterator, false, last -> {
+                        if (last.isTail()) {
+                            return Optional.empty();
+                        } else {
+                            Instant now = Instant.now();
+                            return Optional.of(Change.tail(now, now.toEpochMilli()));
 
+                        }
+                    });
                 }
                 return iterator;
             }
