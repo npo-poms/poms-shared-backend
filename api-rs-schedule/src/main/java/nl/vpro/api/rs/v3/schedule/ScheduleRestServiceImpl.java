@@ -4,10 +4,10 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -35,7 +35,6 @@ import nl.vpro.domain.api.media.ScheduleService;
 import nl.vpro.domain.media.Channel;
 import nl.vpro.domain.media.Net;
 import nl.vpro.domain.media.ScheduleEvent;
-import nl.vpro.resteasy.ISO8601Format;
 import nl.vpro.swagger.SwaggerApplication;
 
 import static nl.vpro.api.rs.v3.exception.Exceptions.handleTooManyResults;
@@ -106,8 +105,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Trace(dispatcher = true)
     public ScheduleResult list(
         @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
-        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
+        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
@@ -167,8 +166,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ScheduleResult listForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
             @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-            @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
-            @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
+            @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+            @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
             @QueryParam(SORT) @DefaultValue(ASC) String sort,
             @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
@@ -206,7 +205,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        Date now = new Date();
+        Instant now = Instant.now();
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForAncestor(mediaId, null, now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -237,7 +236,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        Date now = new Date();
+        Instant now = Instant.now();
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForAncestor(mediaId, now, null, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -263,8 +262,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ScheduleResult listBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
             @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-            @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
-            @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
+            @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+            @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
             @QueryParam(SORT) @DefaultValue(ASC) String sort,
             @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
@@ -300,7 +299,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        Date now = new Date();
+        Instant now = Instant.now();
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, null, now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -332,7 +331,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
             @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        final Date now = new Date();
+        final Instant now = Instant.now();
         final List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, now, null, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -358,8 +357,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ScheduleResult listChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
         @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
-        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
+        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
@@ -396,7 +395,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        Date now = new Date();
+        Instant now = Instant.now();
         Channel chan = getChannel(channel);
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, null, now, Order.DESC, 0L, 1).getItems();
 
@@ -429,7 +428,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        Date now = new Date();
+        Instant now = Instant.now();
         Channel chan = getChannel(channel);
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, now, null, Order.ASC, 0L, 1).getItems();
 
@@ -457,8 +456,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ScheduleResult listNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
         @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) @ISO8601Format Date start,
-        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) @ISO8601Format Date stop,
+        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) Long offset,
@@ -494,7 +493,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        Date now = new Date();
+        Instant now = Instant.now();
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), null, now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -526,7 +525,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
         @ApiParam(value = MESSAGE_PROPERTIES, required = false) @QueryParam(PROPERTIES) @DefaultValue(NONE) String properties
     ) {
-        Date now = new Date();
+        Instant now = Instant.now();
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), now, null, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -544,16 +543,16 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         return Channel.valuesOf(Collections.singletonList(channel)).get(0);
     }
 
-    private static Date guideDayStart(LocalDate guideDay) {
+    private static Instant  guideDayStart(LocalDate guideDay) {
         ZonedDateTime zoned = guideDay.atStartOfDay(ScheduleService.ZONE_ID);
-        return new Date(ScheduleService.guideDayStart(zoned.toLocalDate()).toEpochSecond() * 1000);
+        return ScheduleService.guideDayStart(zoned.toLocalDate()).toInstant();
     }
 
 
 
-    private static Date guideDayStop(LocalDate guideDay) {
+    private static Instant guideDayStop(LocalDate guideDay) {
         ZonedDateTime zoned = guideDay.atStartOfDay(ScheduleService.ZONE_ID);
-        return new Date(ScheduleService.guideDayStop(zoned.toLocalDate()).toEpochSecond() * 1000);
+        return ScheduleService.guideDayStop(zoned.toLocalDate()).toInstant();
     }
 
     private Order parseOrder(String order) {
@@ -564,15 +563,14 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         }
     }
 
-    private boolean isActiveEvent(ScheduleEvent scheduleEvent, Date time) {
+    private boolean isActiveEvent(ScheduleEvent scheduleEvent, Instant time) {
         if (scheduleEvent == null || time == null) {
             return false;
         }
 
-        long start = scheduleEvent.getStart().getTime();
-        long end = start + scheduleEvent.getDurationTime().toMillis();
-        long timestamp = time.getTime();
+        Instant start = scheduleEvent.getStartInstant();
+        Instant end = start.plus(scheduleEvent.getDurationTime());
 
-        return start <= timestamp && timestamp <= end;
+        return ! start.isAfter(time) && end.isAfter(time);
     }
 }
