@@ -1,28 +1,31 @@
 package nl.vpro.api.rs.v3.schedule;
 
-import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
-import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.media.*;
-import nl.vpro.domain.media.Channel;
-import nl.vpro.domain.media.ScheduleEvent;
-import org.jboss.resteasy.mock.MockHttpRequest;
-import org.jboss.resteasy.mock.MockHttpResponse;
-import org.junit.After;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Date;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXB;
+
+import org.jboss.resteasy.mock.MockHttpRequest;
+import org.jboss.resteasy.mock.MockHttpResponse;
+import org.junit.After;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+
+import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
+import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.media.*;
+import nl.vpro.domain.media.Channel;
+import nl.vpro.domain.media.ScheduleEvent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -77,8 +80,8 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
         ScheduleRestService scheduleRestService = getTestObject();
         Result res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 3, 28), null, null, null, "ASC", 0L, 100);
-        Date start = new Date(ZonedDateTime.parse("2015-03-28T06:00:00+01:00").toEpochSecond() * 1000);
-        Date stop = new Date(ZonedDateTime.parse("2015-03-29T06:00:00+02:00").toEpochSecond() * 1000);
+        Instant start = ZonedDateTime.parse("2015-03-28T06:00:00+01:00").toInstant();
+        Instant stop = ZonedDateTime.parse("2015-03-29T06:00:00+02:00").toInstant();
         verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0L, 100);
     }
 
