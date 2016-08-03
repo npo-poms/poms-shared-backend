@@ -38,6 +38,8 @@ import nl.vpro.domain.media.ScheduleEvent;
 import nl.vpro.swagger.SwaggerApplication;
 
 import static nl.vpro.api.rs.v3.exception.Exceptions.handleTooManyResults;
+import static nl.vpro.domain.api.Constants.*;
+
 
 /**
  * @author rico
