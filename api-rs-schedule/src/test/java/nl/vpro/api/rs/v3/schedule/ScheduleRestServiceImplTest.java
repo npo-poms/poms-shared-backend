@@ -103,7 +103,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     public void testStartStopRequest() throws URISyntaxException {
         when(scheduleService.list(any(Channel.class), any(Instant.class), any(Instant.class), any(Order.class), anyLong(), anyInt())).thenReturn(new ScheduleResult());
 
-        MockHttpRequest request = MockHttpRequest.get("/schedule/channel/KETN?start=2016-03-05T06:00&max=100");
+        MockHttpRequest request = MockHttpRequest.get("/schedule/channel/KETN?start=2016-03-05T06:00:00&max=100");
         request.accept(MediaType.APPLICATION_XML);
 
         MockHttpResponse response = new MockHttpResponse();
