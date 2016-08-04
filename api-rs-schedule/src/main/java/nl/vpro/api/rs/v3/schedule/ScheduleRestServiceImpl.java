@@ -565,7 +565,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         }
     }
 
-    private boolean isActiveEvent(ScheduleEvent scheduleEvent, Instant time) {
+    boolean isActiveEvent(ScheduleEvent scheduleEvent, Instant time) {
         if (scheduleEvent == null || time == null) {
             return false;
         }

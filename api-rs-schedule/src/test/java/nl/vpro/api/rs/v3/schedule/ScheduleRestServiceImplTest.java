@@ -2,14 +2,12 @@ package nl.vpro.api.rs.v3.schedule;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
@@ -47,31 +45,28 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     @Test
     public void activeEvent() throws Exception {
 
-        ScheduleRestService scheduleRestService = getTestObject();
-        Method method = scheduleRestService.getClass().getDeclaredMethod("isActiveEvent", ScheduleEvent.class, Date.class);
-        method.setAccessible(true);
+        ScheduleRestServiceImpl scheduleRestService = getTestObject();
 
         ScheduleEvent scheduleEvent = new ScheduleEvent();
         scheduleEvent.setStartInstant(Instant.ofEpochMilli(1000000));
         scheduleEvent.setDuration(Duration.ofMillis(1000));
 
-        Boolean eventActive = (Boolean) method.invoke(scheduleRestService, scheduleEvent, new Date(1000100));
+        Boolean eventActive = scheduleRestService.isActiveEvent(scheduleEvent, Instant.ofEpochMilli(1000100));
 
         assertThat(eventActive).isTrue();
     }
 
     @Test
     public void inactiveEvent() throws Exception {
-        ScheduleRestService scheduleRestService = getTestObject();
+        ScheduleRestServiceImpl scheduleRestService = getTestObject();
 
-        Method method = scheduleRestService.getClass().getDeclaredMethod("isActiveEvent", ScheduleEvent.class, Date.class);
-        method.setAccessible(true);
+
 
         ScheduleEvent scheduleEvent = new ScheduleEvent();
         scheduleEvent.setStartInstant(Instant.ofEpochMilli(1000000));
         scheduleEvent.setDuration(Duration.ofMillis(1000));
 
-        Boolean eventActive = (Boolean) method.invoke(scheduleRestService, scheduleEvent, new Date(1002100));
+        Boolean eventActive = scheduleRestService.isActiveEvent(scheduleEvent, Instant.ofEpochMilli(1002100));
 
         assertThat(eventActive).isFalse();
     }
