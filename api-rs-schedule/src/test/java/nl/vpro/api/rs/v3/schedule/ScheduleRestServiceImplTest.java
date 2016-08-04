@@ -11,14 +11,18 @@ import java.time.ZonedDateTime;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
+import javax.xml.bind.JAXBException;
 
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.xml.sax.SAXException;
 
 import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
+import nl.vpro.api.rs.v3.validation.ScheduleFormValidatingReader;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.*;
@@ -36,6 +40,15 @@ import static org.mockito.Mockito.*;
 public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<ScheduleRestServiceImpl> {
 
     private final ScheduleService scheduleService = mock(ScheduleService.class);
+
+
+    @Before
+    public void setupSchedule() throws JAXBException, IOException, SAXException {
+        ScheduleFormValidatingReader reader = new ScheduleFormValidatingReader();
+        reader.setDoValidate(true);
+        reader.init();
+        dispatcher.getProviderFactory().register(reader);
+    }
 
     @After
     public void after() {
