@@ -9,6 +9,7 @@ import javax.ws.rs.ext.ContextResolver;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
+import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +18,8 @@ import nl.vpro.api.rs.v3.validation.ScheduleFormValidatingReader;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.resteasy.DateParamConverterProvider;
 import nl.vpro.resteasy.JacksonContextResolver;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Michiel Meeuwissen
@@ -59,4 +62,15 @@ public abstract class AbstractRestServiceImplTest<T> {
     }
 
     protected abstract T getTestObject();
+
+
+    protected void assert200(MockHttpResponse response) {
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
+    }
+
+
+    protected void assert400(MockHttpResponse response) {
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 400, response.getStatus());
+    }
+
 }
