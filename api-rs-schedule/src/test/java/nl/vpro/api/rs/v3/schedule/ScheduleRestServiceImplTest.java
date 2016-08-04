@@ -25,6 +25,7 @@ import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.Channel;
+import nl.vpro.domain.media.Schedule;
 import nl.vpro.domain.media.ScheduleEvent;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +52,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         method.setAccessible(true);
 
         ScheduleEvent scheduleEvent = new ScheduleEvent();
-        scheduleEvent.setStart(new Date(1000000));
+        scheduleEvent.setStartInstant(Instant.ofEpochMilli(1000000));
         scheduleEvent.setDuration(Duration.ofMillis(1000));
 
         Boolean eventActive = (Boolean) method.invoke(scheduleRestService, scheduleEvent, new Date(1000100));
@@ -67,7 +68,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         method.setAccessible(true);
 
         ScheduleEvent scheduleEvent = new ScheduleEvent();
-        scheduleEvent.setStart(new Date(1000000));
+        scheduleEvent.setStartInstant(Instant.ofEpochMilli(1000000));
         scheduleEvent.setDuration(Duration.ofMillis(1000));
 
         Boolean eventActive = (Boolean) method.invoke(scheduleRestService, scheduleEvent, new Date(1002100));
@@ -82,7 +83,36 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         Result res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 3, 28), null, null, null, "ASC", 0L, 100);
         Instant start = ZonedDateTime.parse("2015-03-28T06:00:00+01:00").toInstant();
         Instant stop = ZonedDateTime.parse("2015-03-29T06:00:00+02:00").toInstant();
+
         verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0L, 100);
+    }
+
+
+    @Test
+    public void testStartStop() throws ParseException {
+
+
+        ScheduleRestService scheduleRestService = getTestObject();
+        Result res = scheduleRestService.listChannel(Channel.KETN.name(), null, LocalDate.of(2016, 3, 5).atTime(12, 34).atZone(Schedule.ZONE_ID).toInstant(), null, null, "ASC", 0L, 100);
+        Instant start = ZonedDateTime.parse("2016-03-05T12:34:00+01:00").toInstant();
+
+        verify(scheduleService).list(Channel.KETN, start, null, Order.ASC, 0L, 100);
+    }
+
+    @Test
+    public void testStartStopRequest() throws URISyntaxException {
+        when(scheduleService.list(any(Channel.class), any(Instant.class), any(Instant.class), any(Order.class), anyLong(), anyInt())).thenReturn(new ScheduleResult());
+
+        MockHttpRequest request = MockHttpRequest.get("/schedule/channel/KETN?start=2016-03-05T06:00&max=100");
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assert200(response);
+
+        Instant start = ZonedDateTime.parse("2016-03-05T06:00:00+01:00").toInstant();
+        verify(scheduleService).list(Channel.KETN, start, null, Order.ASC, 0L, 100);
     }
 
     private String MSE_2775form() {
