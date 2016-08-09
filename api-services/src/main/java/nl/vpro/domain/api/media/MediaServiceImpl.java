@@ -216,6 +216,11 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
+    public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max) {
+        return mediaSearchRepository.findRelatedInTopspin(media, getProfile(profile), form, max);
+    }
+
+    @Override
     public MediaType getType(final String id) {
         MediaObject owner = findByMid(id);
         return owner != null ? MediaType.getMediaType(owner) : null;
