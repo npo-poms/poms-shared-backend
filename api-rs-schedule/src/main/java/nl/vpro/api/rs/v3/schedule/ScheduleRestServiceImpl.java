@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.newrelic.api.agent.Trace;
-import com.wordnik.swagger.annotations.*;
+import io.swagger.annotations.*;
 
 import nl.vpro.api.rs.v3.exception.Exceptions;
 import nl.vpro.api.rs.v3.filter.ApiMediaFilter;
