@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.resteasy.DateParamConverterProvider;
 import nl.vpro.resteasy.JacksonContextResolver;
+import nl.vpro.resteasy.LocaleParamConverterProvider;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,6 +48,8 @@ public abstract class AbstractRestServiceImplTest<T> {
         ContextResolver<ObjectMapper> contextResolver = new JacksonContextResolver();
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
         dispatcher.getProviderFactory().registerProvider(DateParamConverterProvider.class);
+        dispatcher.getProviderFactory().registerProvider(LocaleParamConverterProvider.class);
+
         mapper = Jackson2Mapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
 
