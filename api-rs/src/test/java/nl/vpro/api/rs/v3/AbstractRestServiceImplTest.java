@@ -1,5 +1,6 @@
 package nl.vpro.api.rs.v3;
 
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -65,6 +67,9 @@ public abstract class AbstractRestServiceImplTest<T> {
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
     }
 
+    protected void assert200(MockHttpServletResponse response) throws UnsupportedEncodingException {
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
+    }
 
     protected void assert400(MockHttpResponse response) {
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 400, response.getStatus());
