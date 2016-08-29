@@ -75,4 +75,7 @@ public abstract class AbstractRestServiceImplTest<T> {
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 400, response.getStatus());
     }
 
+    protected void assert404(MockHttpResponse response) {
+        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 404, response.getStatus());
+    }
 }
