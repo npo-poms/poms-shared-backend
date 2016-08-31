@@ -10,6 +10,7 @@ import javax.ws.rs.NotFoundException;
 import org.slf4j.helpers.MessageFormatter;
 
 import nl.vpro.domain.api.Constants;
+import nl.vpro.domain.constraint.PredicateTestResult;
 
 /**
  * @author Roelof Jan Koekoek
@@ -19,6 +20,10 @@ public class Exceptions {
 
     public static NotFoundException notFound(String message, Object... args) {
         return new NotFoundException(MessageFormatter.arrayFormat(message, args).getMessage());
+    }
+
+    public static NotFoundException notFound(PredicateTestResult<?> testResult) {
+        return new NotFoundInProfileException(testResult);
     }
 
     public static BadRequestException badRequest(String message, Object... args) {
