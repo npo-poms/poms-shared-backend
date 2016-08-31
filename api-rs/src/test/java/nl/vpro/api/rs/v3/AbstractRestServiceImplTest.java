@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 
+import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
@@ -22,6 +23,8 @@ import nl.vpro.resteasy.JacksonContextResolver;
 import nl.vpro.resteasy.LocaleParamConverterProvider;
 
 import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * @author Michiel Meeuwissen
@@ -75,7 +78,9 @@ public abstract class AbstractRestServiceImplTest<T> {
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 400, response.getStatus());
     }
 
-    protected void assert404(MockHttpResponse response) {
-        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 404, response.getStatus());
+    protected AbstractCharSequenceAssert<?, String> assert404(MockHttpResponse response) {
+        String result = response.getContentAsString();
+        assertEquals(response.getErrorMessage() + " " + result, 404, response.getStatus());
+        return assertThat(result);
     }
 }
