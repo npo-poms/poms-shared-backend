@@ -17,6 +17,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nl.vpro.api.rs.v3.exception.NotFoundExeptionMapper;
+import nl.vpro.api.rs.v3.exception.NotFoundInProfileException;
+import nl.vpro.api.rs.v3.exception.NotFoundInProfileExeptionMapper;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.resteasy.DateParamConverterProvider;
 import nl.vpro.resteasy.JacksonContextResolver;
@@ -54,6 +57,8 @@ public abstract class AbstractRestServiceImplTest<T> {
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
         dispatcher.getProviderFactory().registerProvider(DateParamConverterProvider.class);
         dispatcher.getProviderFactory().registerProvider(LocaleParamConverterProvider.class);
+        dispatcher.getProviderFactory().registerProvider(NotFoundExeptionMapper.class);
+        dispatcher.getProviderFactory().registerProvider(NotFoundInProfileExeptionMapper.class);
 
         mapper = Jackson2Mapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
