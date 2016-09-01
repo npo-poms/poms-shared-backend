@@ -57,8 +57,8 @@ public abstract class AbstractRestServiceImplTest<T> {
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
         dispatcher.getProviderFactory().registerProvider(DateParamConverterProvider.class);
         dispatcher.getProviderFactory().registerProvider(LocaleParamConverterProvider.class);
-        dispatcher.getProviderFactory().registerProvider(NotFoundExeptionMapper.class);
-        dispatcher.getProviderFactory().registerProvider(NotFoundInProfileExeptionMapper.class);
+        //dispatcher.getProviderFactory().registerProvider(NotFoundExeptionMapper.class);
+        //dispatcher.getProviderFactory().registerProvider(NotFoundInProfileExeptionMapper.class);
 
         mapper = Jackson2Mapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
