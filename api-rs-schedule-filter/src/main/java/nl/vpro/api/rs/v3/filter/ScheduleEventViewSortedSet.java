@@ -22,12 +22,15 @@ public class ScheduleEventViewSortedSet implements SortedSet<ScheduleEvent> {
 
     protected final SortedSet<ScheduleEvent> wrapped;
 
-    public ScheduleEventViewSortedSet(SortedSet<ScheduleEvent> wrapped) {
+    public ScheduleEventViewSortedSet(SortedSet<ScheduleEvent> wrapped, int maxResults) {
         this.wrapped = wrapped;
-        for(ScheduleEvent event : wrapped) {
-            if(!predicate.test(event)) {
-                wrapped.remove(event);
+        int count = 0;
+        Iterator<ScheduleEvent> iterator = wrapped.iterator();
+        while (iterator.hasNext()) {
+            if (!predicate.test(iterator.next()) || count >= maxResults) {
+                iterator.remove();
             }
+            count++;
         }
     }
 

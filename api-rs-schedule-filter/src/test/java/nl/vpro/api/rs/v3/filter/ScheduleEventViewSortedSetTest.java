@@ -29,11 +29,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:/nl/vpro/api/rs/v3/filter/scheduleEventViewSortedSetTest-context.xml")
 public class ScheduleEventViewSortedSetTest {
-
-
     @Test
     public void testFilteredSetApiClient() {
-        Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
+        Collection<GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 
@@ -44,16 +42,19 @@ public class ScheduleEventViewSortedSetTest {
         ScheduleEvent event = new ScheduleEvent(Channel.NED3, calendar.getTime(), new Date(1000));
         program.getScheduleEvents().add(event);
 
-        SortedSet<ScheduleEvent> events = new TreeSet<>(program.getScheduleEvents());
+        SortedSet<ScheduleEvent> events = program.getScheduleEvents();
         assertThat(events.size()).isEqualTo(5);
 
         SortedSet<ScheduleEvent> filteredEvents = ScheduleEventView.wrap(events);
         assertThat(filteredEvents.size()).isEqualTo(4);
+
+        /* Now warp the schedule Set to test for its predicate with a limit of 2 */
+        assertThat(ScheduleEventView.wrap(events, 2).size()).isEqualTo(2);
     }
 
     @Test
     public void testFilteredSetApiUser() {
-        Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_USER"));
+        Collection<GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_USER"));
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 
@@ -63,7 +64,7 @@ public class ScheduleEventViewSortedSetTest {
         ScheduleEvent event = new ScheduleEvent(Channel.NED3, calendar.getTime(), new Date(1000));
         program.getScheduleEvents().add(event);
 
-        SortedSet<ScheduleEvent> events = new TreeSet<>(program.getScheduleEvents());
+        SortedSet<ScheduleEvent> events = program.getScheduleEvents();
         assertThat(events.size()).isEqualTo(5);
 
         SortedSet<ScheduleEvent> filteredEvents = ScheduleEventView.wrap(events);
