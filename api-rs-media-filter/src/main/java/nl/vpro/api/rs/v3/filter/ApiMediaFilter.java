@@ -4,12 +4,10 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Roelof Jan Koekoek
@@ -17,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ApiMediaFilter {
 
-    private final List<String> properties = new ArrayList<>();
+    private final Map<String, Integer> properties = new HashMap<>();
 
     // List of properties that contain a different name in JSON/XML than the fieldname in the code
     private static final Map<String, String> aliasToProperty = new HashMap<>();
@@ -75,51 +73,79 @@ public class ApiMediaFilter {
         add(properties);
     }
 
+    /**
+     * Get singular name of a potential plural property name.
+     * @param name
+     * @return Singular name
+     */
+    private String getSingular(String name) {
+        String singular = null;
+        if (name.endsWith("s")) {
+            singular = name.substring(0, name.length() - 1);
+        } else if (name.endsWith("of") || name.endsWith("Of")) {
+            singular = name.substring(0, name.length() - 2);
+        } else {
+            singular = name;
+        }
+        if (singularExceptions.containsKey(name)) {
+            singular = singularExceptions.get(name);
+        }
+
+        return singular;
+
+    }
+
+    /**
+     * Add a property to the filtering API.
+     * @param properties One or more properties with the following syntax:
+     *                   - singular name (e.g. title), defaults to 1 maximum for Lists and Sets
+     *                   - plural name (e.g. segments), default to unlimited maximum for Lists and Sets
+     *                   - singular or plural name with ":" + count suffix (e.g. segments:3),
+     *                   will limit the amount of items returned of this List or Set to the given number if larger
+     *                   than the original number of items in the wrapped List or Set.
+     */
     public void add(String... properties) {
         for(String property : properties) {
             property = property.toLowerCase().trim();
-            String name = aliasToProperty.get(property);
-            if(name != null) {
-                this.properties.add(name);
-            } else {
-                this.properties.add(property);
+            String name = aliasToProperty.getOrDefault(property, property);
+            Integer max = null;
+
+            int colon = name.indexOf(':');
+            if (colon >= 1) {
+                try {
+                    max = Integer.parseInt(name.substring(colon+1));
+                } catch (NumberFormatException ex) {
+                    throw new IllegalArgumentException("Invalid max value after ':' in " + property);
+                }
+                name = name.substring(0, colon);
             }
-        }
-        if(!(this.properties.contains("title") || this.properties.contains("titles"))) {
-            this.properties.add("title");
-        }
-        if(!(this.properties.contains("broadcaster") || this.properties.contains("broadcasters"))) {
-            this.properties.add("broadcaster");
+
+            String singular = getSingular(name);
+            /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
+            this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
         }
     }
 
-    public boolean all(String property) {
-        if(singularToPlural.containsKey(property)) {
-            property = singularToPlural.get(property);
-        }
-        return properties.isEmpty() || properties.contains(property);
+    public Integer limit(String property) {
+        return properties.get(getSingular(property));
     }
 
-    public boolean one(String property) {
-        String singular;
-        if(singularToPlural.containsKey(property)) {
-            property = singularToPlural.get(property);
-        }
-        if(property.endsWith("s")) {
-            singular = property.substring(0, property.length() - 1);
-        } else if(property.endsWith("of")) {
-            singular = property.substring(0, property.length() - 2);
+    public Integer limitOrDefault(String property) {
+        String singular = getSingular(property);
+        if ("title".equals(singular) || "broadcaster".equals(singular)) {
+            /* title and broadcaster cannot be filtered */
+            return Integer.MAX_VALUE;
+        } else if (properties.isEmpty()) {
+            if ("scheduleevent".equals(singular)) {
+                /* scheduleEvent max 100 instead of defaultValue */
+                return properties.getOrDefault(singular, 100);
+            } else {
+                /* If there are no properties set, show 'em all */
+                return properties.getOrDefault(singular, Integer.MAX_VALUE);
+            }
         } else {
-            singular = property;
+            /* If there are properties, but property is not part of it, don't show it */
+            return properties.getOrDefault(singular, 0);
         }
-        if(singularExceptions.containsKey(property)) {
-            singular = singularExceptions.get(property);
-        }
-        return properties.contains(singular);
     }
-
-    public boolean none(String property) {
-        return !all(property) && !one(property);
-    }
-
 }

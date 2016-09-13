@@ -60,15 +60,19 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public T first() {
-        if(filter.none(property)) {
+        int limit = filter.limitOrDefault(property);
+        if (limit > 0) {
+            return wrapped.first();
+        } else {
             throw new NoSuchElementException();
         }
-        return wrapped.first();
     }
 
     @Override
     public T last() {
-        if(filter.all(property)) {
+        int limit = filter.limitOrDefault(property);
+        /* todo this is weird behaviour, but was previously implemented like this */
+        if (limit == Integer.MAX_VALUE) {
             return wrapped.last();
         }
         return first();
@@ -76,12 +80,10 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public int size() {
-        if(filter.all(property)) {
-            return wrapped.size();
-        } else if(filter.one(property)) {
-            return 1;
-        }
-        return 0;
+        int limit = filter.limitOrDefault(property);
+        int size = wrapped.size();
+
+        return limit < size ? limit : size;
     }
 
     @Override
@@ -91,37 +93,40 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public boolean contains(Object o) {
-        if(filter.one(property)) {
-            return wrapped.size() > 0 && (wrapped.first().equals(o));
-        } else if(filter.none(property)) {
-            return false;
+        int limit = filter.limitOrDefault(property);
+        boolean found = false;
+        if (limit > 0) {
+            for (T i : this) {
+                if (o.equals(i)) {
+                    found = true;
+                    break;
+                }
+            }
         }
-        return wrapped.contains(o);
+
+        return found;
     }
 
     public Iterator<T> iterator() {
         return new Iterator<T>() {
-            boolean first = true;
+            int count = 0;
+            int limit = filter.limitOrDefault(property);
 
             final Iterator<T> wrappedIterator = wrapped.iterator();
 
             @Override
             public boolean hasNext() {
-                if(filter.none(property)) {
-                    return false;
-                } else if(first) {
-                    return wrappedIterator.hasNext();
-                }
-                return wrappedIterator.hasNext() && filter.all(property);
+                return count < limit && wrappedIterator.hasNext();
             }
 
             @Override
             public T next() {
-                if(hasNext()) {
-                    first = false;
+                if (hasNext()) {
+                    count++;
                     return wrappedIterator.next();
+                } else {
+                    throw new NoSuchElementException();
                 }
-                throw new NoSuchElementException();
             }
 
             @Override

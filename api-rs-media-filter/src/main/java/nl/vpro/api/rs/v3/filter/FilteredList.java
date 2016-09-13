@@ -40,12 +40,9 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public int size() {
-        if(filter.all(property)) {
-            return wrapped.size();
-        } else if(filter.one(property)) {
-            return 1;
-        }
-        return 0;
+        Integer limit = filter.limitOrDefault(property);
+        int size = wrapped.size();
+        return size < limit ? size : limit;
     }
 
     @Override
@@ -56,38 +53,37 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public boolean contains(Object o) {
-        if(filter.one(property)) {
-            return wrapped.size() > 0 && (wrapped.get(0).equals(o));
-        } else if(filter.none(property)) {
+        int limit = filter.limitOrDefault(property);
+        if (limit == 0) {
             return false;
+        } else if (limit < Integer.MAX_VALUE) {
+            return wrapped.subList(0, limit).contains(o);
+        } else {
+            return wrapped.contains(o);
         }
-        return wrapped.contains(o);
     }
 
     @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
-            boolean first = true;
+            int count = 0;
+            int limit = filter.limitOrDefault(property);
 
             final Iterator<T> wrappedIterator = wrapped.iterator();
 
             @Override
             public boolean hasNext() {
-                if(filter.none(property)) {
-                    return false;
-                } else if(first) {
-                    return wrappedIterator.hasNext();
-                }
-                return wrappedIterator.hasNext() && filter.all(property);
+                return count < limit && wrappedIterator.hasNext();
             }
 
             @Override
             public T next() {
-                if(hasNext()) {
-                    first = false;
+                if (hasNext()) {
+                    count++;
                     return wrappedIterator.next();
+                } else {
+                    throw new NoSuchElementException();
                 }
-                throw new NoSuchElementException();
             }
 
             @Override
@@ -149,26 +145,22 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public T get(int index) {
-        if(filter.all(property)) {
+        int limit = filter.limitOrDefault(property);
+        if (index < limit) {
             return wrapped.get(index);
-        } else if(filter.one(property)) {
-            if(index == 0) {
-                return wrapped.get(0);
-            }
+        } else {
+            throw new IndexOutOfBoundsException();
         }
-        throw new IndexOutOfBoundsException();
     }
 
     @Override
     public T set(int index, T element) {
-        if(filter.all(property)) {
+        int limit = filter.limitOrDefault(property);
+        if (index < limit) {
             return wrapped.set(index, element);
-        } else if(filter.one(property)) {
-            if(index == 0) {
-                return wrapped.set(0, element);
-            }
+        } else {
+            throw new IndexOutOfBoundsException();
         }
-        throw new IndexOutOfBoundsException();
     }
 
     @Override
@@ -227,14 +219,15 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
         FilteredListIterator(int start) {
             startIndex = start;
             currentIndex = start;
-            if(filter.all(property)) {
-                endIndex = wrapped.size();
-            } else if(filter.one(property)) {
-                endIndex = 1;
-            } else if(filter.none(property)) {
+
+            int limit = filter.limitOrDefault(property);
+            int size = wrapped.size();
+            if (limit == 0) {
                 endIndex = -1;
+            } else if (limit < size) {
+                endIndex = limit;
             } else {
-                endIndex = wrapped.size();
+                endIndex = size();
             }
         }
 

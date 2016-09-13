@@ -20,11 +20,11 @@ public class FilteredSortedTitleSet extends FilteredSortedSet<Title> {
         super(property, wrapped);
     }
 
+    @SuppressWarnings("unchecked")
     public static FilteredSortedTitleSet wrap(String property, Object wrapped) {
         if(!(wrapped instanceof SortedSet)) {
             throw new IllegalArgumentException("Can only wrap a SortedSet");
         }
-
 
         if(wrapped instanceof FilteredSortedTitleSet) {
             if(!(((FilteredSortedSet)wrapped).property).equals(property)) {
@@ -39,20 +39,22 @@ public class FilteredSortedTitleSet extends FilteredSortedSet<Title> {
 
     @Override
     public Iterator<Title> iterator() {
-        if(filter.one(property)) {
+        int limit = filter.limitOrDefault(property);
+        if (limit < Integer.MAX_VALUE) {
             return new Iterator<Title>() {
+                Title previous = null;
                 Title next = null;
 
-                boolean done = false;
+                int count = 0;
 
-                Title previous = null;
+                boolean done = false;
 
                 final Iterator<Title> wrappedIterator = wrapped.iterator();
 
                 @Override
                 public boolean hasNext() {
                     findNext();
-                    return next != null;
+                    return count < limit && next != null;
                 }
 
                 @Override
@@ -74,6 +76,7 @@ public class FilteredSortedTitleSet extends FilteredSortedSet<Title> {
                         if(wrappedIterator.hasNext()) {
                             if(previous == null) {
                                 next = wrappedIterator.next();
+                                count++;
                             } else {
                                 if(previous.getType() == TextualType.SUB || previous.getType() == TextualType.EPISODE) {
                                     done = true;
@@ -81,6 +84,7 @@ public class FilteredSortedTitleSet extends FilteredSortedSet<Title> {
                                 }
                                 while(wrappedIterator.hasNext()) {
                                     Title title = wrappedIterator.next();
+                                    count++;
                                     if(title.getType() == TextualType.SUB || title.getType() == TextualType.EPISODE) {
                                         next = title;
                                         done = true;

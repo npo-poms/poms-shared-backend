@@ -11,18 +11,18 @@ package nl.vpro.api.rs.v3.filter;
 public class FilteredObject<T> extends AbstractFiltered<T> {
 
     protected FilteredObject(String property, T wrapped) {
-        super(property, wrapped);
+        super((property.indexOf(':') >= 0 ? property.substring(0, property.indexOf(':')) : property) + ":1", wrapped);
     }
 
     @SuppressWarnings("unchecked")
     public static <T> FilteredObject<T> wrap(String property, T object) {
-        if(object instanceof FilteredObject) {
+        if (object instanceof FilteredObject) {
             return (FilteredObject<T>)object;
         }
         return new FilteredObject<>(property, object);
     }
 
     public T value() {
-        return filter.none(property) ? null : wrapped;
+        return filter.limit(property) != null ? wrapped : null;
     }
 }
