@@ -7,6 +7,7 @@ package nl.vpro.api.rs.v3.filter;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.function.Predicate;
 
@@ -17,42 +18,11 @@ import nl.vpro.domain.media.ScheduleEvent;
  * @date 28/02/2014
  * @since 3.0
  */
-public class ScheduleEventViewSortedSet implements SortedSet<ScheduleEvent> {
+public class ScheduleEventViewSortedSet extends FilteredSortedSet<ScheduleEvent> {
     final Predicate<ScheduleEvent> predicate = new ScheduleEventViewPredicate();
 
-    protected final SortedSet<ScheduleEvent> wrapped;
-
-    public ScheduleEventViewSortedSet(SortedSet<ScheduleEvent> wrapped, int maxResults) {
-        this.wrapped = wrapped;
-        int count = 0;
-        Iterator<ScheduleEvent> iterator = wrapped.iterator();
-        while (iterator.hasNext()) {
-            if (!predicate.test(iterator.next()) || count >= maxResults) {
-                iterator.remove();
-            }
-            count++;
-        }
-    }
-
-
-    @Override
-    public Iterator<ScheduleEvent> iterator() {
-        return wrapped.iterator();
-    }
-
-    @Override
-    public int size() {
-        return wrapped.size();
-    }
-
-    @Override
-    public Comparator<? super ScheduleEvent> comparator() {
-        return wrapped.comparator();
-    }
-
-    @Override
-    public SortedSet<ScheduleEvent> subSet(ScheduleEvent fromElement, ScheduleEvent toElement) {
-        return wrapped.subSet(fromElement, toElement);
+    protected ScheduleEventViewSortedSet(String property, SortedSet<ScheduleEvent> wrapped) {
+        super(property, wrapped);
     }
 
     @Override
@@ -66,46 +36,26 @@ public class ScheduleEventViewSortedSet implements SortedSet<ScheduleEvent> {
     }
 
     @Override
-    public ScheduleEvent first() {
-        return wrapped.first();
-    }
-
-    @Override
-    public ScheduleEvent last() {
-        return wrapped.last();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return wrapped.isEmpty();
+    public boolean add(ScheduleEvent scheduleEvent) {
+        return predicate.test(scheduleEvent) && wrapped.add(scheduleEvent);
     }
 
     @Override
     public boolean contains(Object o) {
-        return wrapped.contains(o);
+        return o instanceof ScheduleEvent && predicate.test((ScheduleEvent) o) && wrapped.contains(o);
     }
 
     @Override
-    public Object[] toArray() {
-        return wrapped.toArray();
-    }
-
-    @Override
-    public <T> T[] toArray(T[] a) {
-        return wrapped.toArray(a);
-    }
-
-    @Override
-    public boolean add(ScheduleEvent scheduleEvent) {
-        if(predicate.test(scheduleEvent)) {
-            return wrapped.add(scheduleEvent);
+    public int size() {
+        int count = 0;
+        Iterator<ScheduleEvent> iterator = wrapped.iterator();
+        while (iterator.hasNext()) {
+            ScheduleEvent event = iterator.next();
+            if (predicate.test(event)) {
+                count++;
+            }
         }
-        return false;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        return wrapped.remove(o);
+        return count;
     }
 
     @Override
@@ -116,8 +66,8 @@ public class ScheduleEventViewSortedSet implements SortedSet<ScheduleEvent> {
     @Override
     public boolean addAll(Collection<? extends ScheduleEvent> c) {
         boolean modified = false;
-        for(ScheduleEvent e : c) {
-            if(add(e)) {
+        for (ScheduleEvent e : c) {
+            if (add(e)) {
                 modified = true;
             }
         }
@@ -132,10 +82,5 @@ public class ScheduleEventViewSortedSet implements SortedSet<ScheduleEvent> {
     @Override
     public boolean removeAll(Collection<?> c) {
         return wrapped.removeAll(c);
-    }
-
-    @Override
-    public void clear() {
-        wrapped.clear();
     }
 }

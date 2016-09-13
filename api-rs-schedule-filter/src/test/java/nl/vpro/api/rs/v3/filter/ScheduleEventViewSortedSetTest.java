@@ -45,11 +45,9 @@ public class ScheduleEventViewSortedSetTest {
         SortedSet<ScheduleEvent> events = program.getScheduleEvents();
         assertThat(events.size()).isEqualTo(5);
 
-        SortedSet<ScheduleEvent> filteredEvents = ScheduleEventView.wrap(events);
+        ApiMediaFilter.set("scheduleEvents:4");
+        FilteredSortedSet<ScheduleEvent> filteredEvents = ScheduleEventViewSortedSet.wrap("scheduleEvents", events);
         assertThat(filteredEvents.size()).isEqualTo(4);
-
-        /* Now warp the schedule Set to test for its predicate with a limit of 2 */
-        assertThat(ScheduleEventView.wrap(events, 2).size()).isEqualTo(2);
     }
 
     @Test
@@ -67,7 +65,8 @@ public class ScheduleEventViewSortedSetTest {
         SortedSet<ScheduleEvent> events = program.getScheduleEvents();
         assertThat(events.size()).isEqualTo(5);
 
-        SortedSet<ScheduleEvent> filteredEvents = ScheduleEventView.wrap(events);
-        assertThat(filteredEvents.size()).isEqualTo(5);
+        ApiMediaFilter.set("scheduleEvents:4");
+        FilteredSortedSet<ScheduleEvent> filteredEvents = ScheduleEventViewSortedSet.wrap("scheduleEvents", events);
+        assertThat(filteredEvents.size()).isEqualTo(4);
     }
 }

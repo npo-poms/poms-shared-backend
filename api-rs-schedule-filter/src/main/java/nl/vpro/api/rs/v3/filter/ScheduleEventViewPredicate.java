@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Date;
+import java.util.SortedSet;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
@@ -62,14 +63,11 @@ public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
 
     @Override
     public boolean test(ScheduleEvent input) {
-
-        return (stop == null || input.getStart().toInstant().isBefore(stop));
+        return stop == null || (input.getStartInstant() != null && input.getStartInstant().isBefore(stop));
     }
 
     private static Date guideDayStart(Date guideDay) {
         ZonedDateTime dateTime = guideDay.toInstant().atZone(Schedule.ZONE_ID).toLocalDate().atTime(Schedule.START_OF_SCHEDULE).plusDays(1).atZone(Schedule.ZONE_ID);
         return Date.from(dateTime.toInstant());
-
     }
-
 }
