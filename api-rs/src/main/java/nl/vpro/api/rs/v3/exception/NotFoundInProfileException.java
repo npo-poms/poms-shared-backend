@@ -13,7 +13,7 @@ public class NotFoundInProfileException extends NotFoundException  {
 
     private PredicateTestResult<?> testResult;
     public NotFoundInProfileException(PredicateTestResult<?> testResult) {
-        super(testResult.getReasonDescription(Locales.DUTCH));
+        super(testResult.getDescription(Locales.DUTCH));
         this.testResult = testResult;
     }
     public PredicateTestResult<?> getTestResult() {
