@@ -22,7 +22,7 @@ public class NotFoundInProfileExeptionMapper implements ExceptionMapper<NotFound
     @Override
     public Response toResponse(NotFoundInProfileException exception) {
         Error error = new Error(NOT_FOUND, exception.getMessage());
-        error.setPredicateTestResult(exception.getTestResult());
+        error.setTestResult(exception.getTestResult());
         return Response
                 .status(NOT_FOUND)
                 .entity(error)
