@@ -10,9 +10,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
+import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.topspin.Recommendation;
+import nl.vpro.domain.api.topspin.Recommendations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +60,8 @@ public class MediaServiceImpl implements MediaService {
 
     private final QuerySearchRepository querySearchRepository;
 
+    private final TopSpinRepository topSpinRepository;
+
     private final Settings settings;
 
     @Autowired
@@ -63,6 +70,7 @@ public class MediaServiceImpl implements MediaService {
         @Named("mediaLoadRepository") MediaRepository mediaRepository,
         MediaSearchRepository mediaSearchRepository,
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
+        @Named("topSpinRepository") TopSpinRepository topSpinRepository,
         Settings settings
 
     ) {
@@ -70,6 +78,7 @@ public class MediaServiceImpl implements MediaService {
         this.mediaLoadRepository = mediaRepository;
         this.mediaSearchRepository = mediaSearchRepository;
         this.querySearchRepository = querySearchRepository;
+        this.topSpinRepository = topSpinRepository;
         this.settings = settings;
     }
 
@@ -217,7 +226,17 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max) {
-        return mediaSearchRepository.findRelatedInTopspin(media, getProfile(profile), form, max);
+        Recommendations recommendations = topSpinRepository.getForMid(media.getMid());
+        List<MediaObject> mediaObjects = loadAll(recommendations.getRecommendations().stream().map(Recommendation::getMidRef).collect(Collectors.toList()));
+        Predicate<MediaObject> filter = (mo) -> true;
+        if (profile != null) {
+            filter = getProfile(profile);
+        }
+        if (form != null) {
+            filter = filter.and(form);
+        }
+        List<SearchResultItem<? extends MediaObject>> filtered = mediaObjects.stream().filter(filter).limit(max).map(SearchResultItem::new).collect(Collectors.toList());
+        return new MediaSearchResult(filtered, 0L, max, filtered.size());
     }
 
     @Override

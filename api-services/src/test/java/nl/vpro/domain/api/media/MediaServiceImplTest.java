@@ -38,9 +38,7 @@ public class MediaServiceImplTest {
 
     private final QuerySearchRepository querySearchRepository = Mockito.mock(QuerySearchRepository.class);
 
-
-    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository, new Settings());
-
+    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository, null, new Settings());
 
     private ProfileDefinition<MediaObject> profileDefinition = new ProfileDefinition<>();
 
