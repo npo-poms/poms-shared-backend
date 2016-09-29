@@ -15,9 +15,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
-import nl.vpro.domain.api.SearchResultItem;
-import nl.vpro.domain.api.topspin.Recommendation;
-import nl.vpro.domain.api.topspin.Recommendations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +24,14 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Iterators;
 
 import nl.vpro.api.Settings;
-import nl.vpro.domain.api.Change;
-import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.RepositoryType;
-import nl.vpro.domain.api.SuggestResult;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
+import nl.vpro.domain.api.topspin.Recommendation;
+import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
 import nl.vpro.domain.media.Schedule;
@@ -70,7 +66,7 @@ public class MediaServiceImpl implements MediaService {
         @Named("mediaLoadRepository") MediaRepository mediaRepository,
         MediaSearchRepository mediaSearchRepository,
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
-        @Named("topSpinRepository") TopSpinRepository topSpinRepository,
+        @Named TopSpinRepository topSpinRepository,
         Settings settings
 
     ) {
