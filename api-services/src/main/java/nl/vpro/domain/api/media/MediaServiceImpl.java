@@ -66,7 +66,7 @@ public class MediaServiceImpl implements MediaService {
         @Named("mediaLoadRepository") MediaRepository mediaRepository,
         MediaSearchRepository mediaSearchRepository,
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
-        @Named TopSpinRepository topSpinRepository,
+        TopSpinRepository topSpinRepository,
         Settings settings
 
     ) {
