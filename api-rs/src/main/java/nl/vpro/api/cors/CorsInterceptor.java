@@ -1,9 +1,8 @@
 package nl.vpro.api.cors;
 
-import org.apache.commons.lang.StringUtils;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
@@ -14,9 +13,11 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 /**
  * @author rico
