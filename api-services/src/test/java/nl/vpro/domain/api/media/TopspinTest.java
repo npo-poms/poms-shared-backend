@@ -1,7 +1,14 @@
 package nl.vpro.domain.api.media;
 
 
+import java.util.List;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+
 import com.google.common.collect.ImmutableList;
+
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -11,16 +18,7 @@ import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.constraint.media.BroadcasterConstraint;
 import nl.vpro.domain.constraint.media.Filter;
 import nl.vpro.domain.constraint.media.Not;
-import nl.vpro.domain.media.AVType;
-import nl.vpro.domain.media.MediaBuilder;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.ProgramType;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import java.util.List;
+import nl.vpro.domain.media.*;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.Matchers.anyListOf;
@@ -29,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 public class TopspinTest {
 
-    ESMediaRepository mediaRepository = Mockito.mock(ESMediaRepository.class);
+    MediaRepository mediaRepository = Mockito.mock(MediaRepository.class);
 
     ProfileService profileService = Mockito.mock(ProfileService.class);
 
