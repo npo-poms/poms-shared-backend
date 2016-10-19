@@ -32,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.shared</groupId>
-      <artifactId>shared-resteasy</artifactId>
+      <artifactId>vpro-shared-resteasy</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.user</groupId>
