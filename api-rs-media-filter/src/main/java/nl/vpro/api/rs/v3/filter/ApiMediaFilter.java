@@ -4,10 +4,10 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Roelof Jan Koekoek
@@ -25,6 +25,8 @@ public class ApiMediaFilter {
 
     // List of properties that don't have a regular singular name (ie stripping the 's' or 'of' doesn't result in the correct singular form).
     private static final Map<String, String> singularExceptions = new HashMap<>();
+
+    private boolean filtering = false;
 
     static {
         aliasToProperty.put("credit", "person");
@@ -53,6 +55,7 @@ public class ApiMediaFilter {
 
     public static void removeFilter() {
         localFilter.remove();
+        assert ! localFilter.get().filtering;
     }
 
 
@@ -70,6 +73,7 @@ public class ApiMediaFilter {
 
     public void filter(String... properties) {
         clear();
+        filtering = true;
         add(properties);
     }
 
@@ -79,7 +83,7 @@ public class ApiMediaFilter {
      * @return Singular name
      */
     private String getSingular(String name) {
-        String singular = null;
+        String singular;
         if (name.endsWith("s")) {
             singular = name.substring(0, name.length() - 1);
         } else if (name.endsWith("of") || name.endsWith("Of")) {
@@ -131,6 +135,9 @@ public class ApiMediaFilter {
     }
 
     public Integer limitOrDefault(String property) {
+        if (! filtering) {
+            return Integer.MAX_VALUE;
+        }
         String singular = getSingular(property);
         if ("title".equals(singular) || "broadcaster".equals(singular)) {
             /* title and broadcaster cannot be filtered */

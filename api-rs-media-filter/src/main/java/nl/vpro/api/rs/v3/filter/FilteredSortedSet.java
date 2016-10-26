@@ -107,6 +107,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
         return found;
     }
 
+    @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             int count = 0;
