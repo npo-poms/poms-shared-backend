@@ -4,6 +4,8 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
+import io.swagger.annotations.*;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -21,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.newrelic.api.agent.Trace;
-import io.swagger.annotations.*;
 
 import nl.vpro.api.rs.v3.exception.Exceptions;
 import nl.vpro.api.rs.v3.filter.ApiMediaFilter;
@@ -376,6 +377,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             start = guideDayStart(guideDay);
             stop = guideDayStop(guideDay);
         }
+        ApiMediaFilter.removeFilter();
         ScheduleResult result = scheduleService.list(chan, start, stop, order, offset, max);
 
         ApiMediaFilter.set(properties);
