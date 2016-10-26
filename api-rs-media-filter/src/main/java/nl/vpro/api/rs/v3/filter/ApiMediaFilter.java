@@ -69,11 +69,11 @@ public class ApiMediaFilter {
 
     public void clear() {
         properties.clear();
+        filtering = true;
     }
 
     public void filter(String... properties) {
         clear();
-        filtering = true;
         add(properties);
     }
 
