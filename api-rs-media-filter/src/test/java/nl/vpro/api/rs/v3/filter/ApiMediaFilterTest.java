@@ -4,8 +4,10 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
+import nl.vpro.domain.media.MediaBuilder;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.Segment;
 import nl.vpro.domain.media.exceptions.ModificationException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -15,6 +17,8 @@ import javax.xml.bind.JAXB;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -73,12 +77,14 @@ public class ApiMediaFilterTest {
 
     @Test
     public void testFilterSegments() {
-        Program program = MediaTestDataBuilder.program().withSegments().build();
+        Program program = MediaTestDataBuilder.program().mid("MID_TEST").withSegments().build();
         assertThat(program.getSegments()).hasSize(3);
+        assertThat(program.getSegments().first().getMidRef()).isNotNull();
 
         /* Singular */
         ApiMediaFilter.get().filter("segment");
         assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(1);
+        assertThat(new FilteredSortedSet<>("segment", program.getSegments()).first().getMidRef()).isNotNull();
 
         ApiMediaFilter.get().filter("segment:2");
         assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(2);
@@ -167,5 +173,13 @@ public class ApiMediaFilterTest {
 
         ApiMediaFilter.get().filter("crids:10");
         assertThat(new FilteredList<>("crids", program.getCrids())).hasSize(3);
+    }
+
+    @Test
+    public void testSegment() {
+        Segment segment = MediaBuilder.segment().midRef("ABC_DEF").build();
+        ApiMediaFilter.set(null);
+        assertThat(new FilteredObject<>("segment", segment)).isNotNull();
+        assertThat(new FilteredObject<>("segment", segment).wrapped.getMidRef()).isEqualTo("ABC_DEF");
     }
 }

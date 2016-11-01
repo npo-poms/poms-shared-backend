@@ -20,7 +20,7 @@ import java.util.List;
 public class MediaPropertiesFilters {
     private static final Logger LOG = LoggerFactory.getLogger(MediaPropertiesFilters.class);
 
-    private static final List<String> ignoreFields = Arrays.asList("mid", "type", "avType", "sortDate", "sortDateValid", "isEmbeddable");
+    private static final List<String> ignoreFields = Arrays.asList("mid", "parent", "midRef", "type", "avType", "sortDate", "sortDateValid", "isEmbeddable");
 
     public static void instrument() {
         instrument(
