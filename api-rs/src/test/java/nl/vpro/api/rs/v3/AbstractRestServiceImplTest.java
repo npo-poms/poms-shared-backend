@@ -1,11 +1,10 @@
 package nl.vpro.api.rs.v3;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
 
 import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -17,16 +16,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import nl.vpro.api.rs.v3.exception.NotFoundExeptionMapper;
-import nl.vpro.api.rs.v3.exception.NotFoundInProfileException;
-import nl.vpro.api.rs.v3.exception.NotFoundInProfileExeptionMapper;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.resteasy.DateParamConverterProvider;
 import nl.vpro.resteasy.JacksonContextResolver;
 import nl.vpro.resteasy.LocaleParamConverterProvider;
 
-import static org.junit.Assert.assertEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 
 /**
