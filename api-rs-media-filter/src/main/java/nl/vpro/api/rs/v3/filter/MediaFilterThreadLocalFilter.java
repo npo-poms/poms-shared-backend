@@ -32,10 +32,12 @@ public class MediaFilterThreadLocalFilter implements Filter {
             String path = req.getRequestURI().substring(req.getContextPath().length());
             MDC.put("request", req.getMethod() + " " + path + (StringUtils.isEmpty(query) ? "" : ("?" + query)));
             MDC.put("remoteHost", ip);
-
-            ApiMediaFilter.get().clear();
+            
+            ApiMediaFilter.removeFilter();
+            
             chain.doFilter(request, response);
         } finally {
+            
             ApiMediaFilter.removeFilter();
             MDC.clear();
         }

@@ -49,7 +49,7 @@ public class ApiMediaFilter {
         }
     };
 
-    public static ApiMediaFilter get() {
+    static ApiMediaFilter get() {
         return localFilter.get();
     }
 

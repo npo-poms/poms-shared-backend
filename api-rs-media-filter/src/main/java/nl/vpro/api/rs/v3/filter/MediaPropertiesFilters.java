@@ -20,18 +20,40 @@ import java.util.List;
 public class MediaPropertiesFilters {
     private static final Logger LOG = LoggerFactory.getLogger(MediaPropertiesFilters.class);
 
-    private static final List<String> ignoreFields = Arrays.asList("mid", "parent", "midRef", "type", "avType", "sortDate", "sortDateValid", "isEmbeddable");
+    private static final List<String> ignoreFields = Arrays.asList(
+        "mid", 
+        "parent", 
+        "midRef", 
+        "type", 
+        "avType", 
+        "sortDate", 
+        "sortDateValid", 
+        "isEmbeddable"
+    );
 
-    public static void instrument() {
-        instrument(
-            "nl.vpro.domain.media.support.PublishableObject",
-            "nl.vpro.domain.media.MediaObject",
-            "nl.vpro.domain.media.Program",
-            "nl.vpro.domain.media.Group",
-            "nl.vpro.domain.media.Segment"
-        );
+    private static final List<String> ignoreSignatures = Arrays.asList(
+        //"Ljava/util/Date;",
+        //"Ljava/lang/String;"
+    );
+    
+    private static boolean instrumented = false;
 
-        instrumentScheduleEvents("nl.vpro.domain.media.Schedule");
+
+    public static synchronized  void instrument() {
+        if (! instrumented) {
+            instrument(
+
+                "nl.vpro.domain.media.support.PublishableObject",
+                "nl.vpro.domain.media.MediaObject",
+                "nl.vpro.domain.media.Program",
+                "nl.vpro.domain.media.Group",
+                "nl.vpro.domain.media.Segment"
+            );
+            instrumentScheduleEvents("nl.vpro.domain.media.Schedule");
+            instrumented = true;
+        } else {
+            LOG.warn("Instrumented already");
+        }
 
     }
 
@@ -59,10 +81,12 @@ public class MediaPropertiesFilters {
                             } catch (NotFoundException nfe) {
                                 LOG.error(nfe.getMessage());
                             }
-                            if (ignoreFields.contains(f.getFieldName())) {
+                            String fieldName = f.getFieldName();
+                            if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
+                                LOG.debug("Always showing {}", fieldName);
                                 // Always show
                             } else if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
-                                LOG.debug("Instrumenting SortedSet {}", f.getFieldName());
+                                LOG.debug("Instrumenting SortedSet {}", fieldName);
                                 if (f.getFieldName().equals("titles")) {
                                     f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                 } else {
@@ -72,7 +96,7 @@ public class MediaPropertiesFilters {
                                 LOG.debug("Instrumenting SortedSet {}", f.getFieldName());
                                 f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                             } else {
-                                LOG.debug("Instrumenting {}", f.getFieldName());
+                                LOG.debug("Instrumenting {}", fieldName);
                                 try {
                                     f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.v3.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
                                 } catch (RuntimeException wtf) {

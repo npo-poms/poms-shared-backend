@@ -4,21 +4,20 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import nl.vpro.domain.media.MediaBuilder;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.Segment;
-import nl.vpro.domain.media.exceptions.ModificationException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import javax.xml.bind.JAXB;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.Segment;
+import nl.vpro.domain.media.exceptions.ModificationException;
+import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,16 +41,16 @@ public class ApiMediaFilterTest {
     public void testFilterObjectField() throws Exception {
         Program program = MediaTestDataBuilder.program().withSource().build();
 
-        ApiMediaFilter.get().filter("source");
+        ApiMediaFilter.set("source");
         assertThat(program.getSource()).isNotNull();
 
-        ApiMediaFilter.get().filter("titles");
+        ApiMediaFilter.set("titles");
         assertThat(program.getSource()).isNull();
     }
 
     @Test
     public void testJaxbReadWrite() throws Exception {
-        ApiMediaFilter.get().filter("titles");
+        ApiMediaFilter.set("titles");
 
         final Program program = JAXB.unmarshal(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
             "<program embeddable=\"true\" sortDate=\"1970-01-01T01:00:00.100+01:00\" creationDate=\"2014-02-18T12:13:50.123+01:00\" workflow=\"FOR PUBLICATION\" urn=\"urn:vpro:media:program:null\" xmlns=\"urn:vpro:media:2009\" xmlns:shared=\"urn:vpro:shared:2009\">\n" +
@@ -82,30 +81,30 @@ public class ApiMediaFilterTest {
         assertThat(program.getSegments().first().getMidRef()).isNotNull();
 
         /* Singular */
-        ApiMediaFilter.get().filter("segment");
+        ApiMediaFilter.set("segment");
         assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(1);
         assertThat(new FilteredSortedSet<>("segment", program.getSegments()).first().getMidRef()).isNotNull();
 
-        ApiMediaFilter.get().filter("segment:2");
+        ApiMediaFilter.set("segment:2");
         assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(2);
 
-        ApiMediaFilter.get().filter("segment:1");
+        ApiMediaFilter.set("segment:1");
         assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(1);
 
-        ApiMediaFilter.get().filter("segment:0");
+        ApiMediaFilter.set("segment:0");
         assertThat(new FilteredSortedSet<>("segment", program.getSegments())).isEmpty();
 
         /* Plural */
-        ApiMediaFilter.get().filter("segments");
+        ApiMediaFilter.set("segments");
         assertThat(new FilteredSortedSet<>("segments", program.getSegments())).hasSize(3);
 
-        ApiMediaFilter.get().filter("segments:2");
+        ApiMediaFilter.set("segments:2");
         assertThat(new FilteredSortedSet<>("segments", program.getSegments())).hasSize(2);
 
-        ApiMediaFilter.get().filter("segments:1");
+        ApiMediaFilter.set("segments:1");
         assertThat(new FilteredSortedSet<>("segments", program.getSegments())).hasSize(1);
 
-        ApiMediaFilter.get().filter("segments:0");
+        ApiMediaFilter.set("segments:0");
         assertThat(new FilteredSortedSet<>("segments", program.getSegments())).isEmpty();
     }
 
@@ -114,7 +113,7 @@ public class ApiMediaFilterTest {
         Program program = MediaTestDataBuilder.program().withType().build();
         assertThat(program.getType()).isNotNull();
 
-        ApiMediaFilter.get().filter("type");
+        ApiMediaFilter.set("type");
         assertThat(new FilteredObject<>("type", program.getType()).value()).isNotNull();
     }
 
@@ -124,27 +123,27 @@ public class ApiMediaFilterTest {
         assertThat(program.getAwards()).isNotNull();
 
         /* Should be null */
-        ApiMediaFilter.get().filter("title");
+        ApiMediaFilter.set("title");
         assertThat(new FilteredObject<>("awards", program.getAwards()).value()).isNull();
 
         /* Singular */
-        ApiMediaFilter.get().filter("award");
+        ApiMediaFilter.set("award");
         assertThat(new FilteredObject<>("award", program.getAwards()).value()).isNotNull();
 
-        ApiMediaFilter.get().filter("award:1");
+        ApiMediaFilter.set("award:1");
         assertThat(new FilteredObject<>("award", program.getAwards()).value()).isNotNull();
 
-        ApiMediaFilter.get().filter("award:10");
+        ApiMediaFilter.set("award:10");
         assertThat(new FilteredObject<>("award", program.getAwards()).value()).isNotNull();
 
         /* Plural */
-        ApiMediaFilter.get().filter("awards");
+        ApiMediaFilter.set("awards");
         assertThat(new FilteredObject<>("awards", program.getAwards()).value()).isNotNull();
 
-        ApiMediaFilter.get().filter("awards:1");
+        ApiMediaFilter.set("awards:1");
         assertThat(new FilteredObject<>("awards", program.getAwards()).value()).isNotNull();
 
-        ApiMediaFilter.get().filter("awards:10");
+        ApiMediaFilter.set("awards:10");
         assertThat(new FilteredObject<>("awards", program.getAwards()).value()).isNotNull();
     }
 
@@ -155,31 +154,40 @@ public class ApiMediaFilterTest {
         assertThat(program.getCrids()).hasSize(3);
 
         /* Singular */
-        ApiMediaFilter.get().filter("crid");
+        ApiMediaFilter.set("crid");
         assertThat(new FilteredList<>("crid", program.getCrids())).hasSize(1);
 
-        ApiMediaFilter.get().filter("crid:1");
+        ApiMediaFilter.set("crid:1");
         assertThat(new FilteredList<>("crid", program.getCrids())).hasSize(1);
 
-        ApiMediaFilter.get().filter("crid:10");
+        ApiMediaFilter.set("crid:10");
         assertThat(new FilteredList<>("crid", program.getCrids())).hasSize(3);
 
         /* Plural */
-        ApiMediaFilter.get().filter("crids");
+        ApiMediaFilter.set("crids");
         assertThat(new FilteredList<>("crids", program.getCrids())).hasSize(3);
 
-        ApiMediaFilter.get().filter("crids:1");
+        ApiMediaFilter.set("crids:1");
         assertThat(new FilteredList<>("crids", program.getCrids())).hasSize(1);
 
-        ApiMediaFilter.get().filter("crids:10");
+        ApiMediaFilter.set("crids:10");
         assertThat(new FilteredList<>("crids", program.getCrids())).hasSize(3);
     }
 
     @Test
-    public void testSegment() {
-        Segment segment = MediaBuilder.segment().midRef("ABC_DEF").build();
-        ApiMediaFilter.set(null);
-        assertThat(new FilteredObject<>("segment", segment)).isNotNull();
-        assertThat(new FilteredObject<>("segment", segment).wrapped.getMidRef()).isEqualTo("ABC_DEF");
+    public void testSegment() throws Exception {
+        ApiMediaFilter.set("");
+
+        Segment segment = Jackson2TestUtil.roundTrip(
+            MediaTestDataBuilder.segment()
+                .midRef("ABC_DEF")
+                .withLocations()
+                .build());
+        assertThat(segment.getLocations()).hasSize(4);
+        ApiMediaFilter.set("location");
+
+        assertThat(segment.getLocations()).hasSize(1);
+      
+        assertThat(segment.getMidRef()).isEqualTo("ABC_DEF");
     }
 }
