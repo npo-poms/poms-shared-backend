@@ -130,10 +130,6 @@ public class ApiMediaFilter {
         }
     }
 
-    public Integer limit(String property) {
-        return properties.get(getSingular(property));
-    }
-
     public Integer limitOrDefault(String property) {
         if (! filtering) {
             return Integer.MAX_VALUE;
@@ -152,7 +148,7 @@ public class ApiMediaFilter {
             }
         } else {
             /* If there are properties, but property is not part of it, don't show it */
-            return properties.getOrDefault(singular, 0);
+            return properties.getOrDefault(singular,  0);
         }
     }
 }

@@ -4,10 +4,11 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import javax.xml.bind.JAXB;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+
+import javax.xml.bind.JAXB;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -176,7 +177,6 @@ public class ApiMediaFilterTest {
 
     @Test
     public void testSegment() throws Exception {
-        ApiMediaFilter.set("");
 
         Segment segment = Jackson2TestUtil.roundTrip(
             MediaTestDataBuilder.segment()
@@ -187,7 +187,7 @@ public class ApiMediaFilterTest {
         ApiMediaFilter.set("location");
 
         assertThat(segment.getLocations()).hasSize(1);
-      
+
         assertThat(segment.getMidRef()).isEqualTo("ABC_DEF");
     }
 }
