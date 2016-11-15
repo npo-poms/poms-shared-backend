@@ -4,21 +4,19 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-
-import javax.xml.bind.JAXB;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
 import nl.vpro.domain.media.exceptions.ModificationException;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import javax.xml.bind.JAXB;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -54,18 +52,18 @@ public class ApiMediaFilterTest {
         ApiMediaFilter.set("titles");
 
         final Program program = JAXB.unmarshal(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-            "<program embeddable=\"true\" sortDate=\"1970-01-01T01:00:00.100+01:00\" creationDate=\"2014-02-18T12:13:50.123+01:00\" workflow=\"FOR PUBLICATION\" urn=\"urn:vpro:media:program:null\" xmlns=\"urn:vpro:media:2009\" xmlns:shared=\"urn:vpro:shared:2009\">\n" +
-            "    <scheduleEvents>\n" +
-            "        <scheduleEvent channel=\"NED3\" urnRef=\"urn:vpro:media:program:null\">\n" +
-            "            <start>1970-01-01T01:00:00.100+01:00</start>\n" +
-            "            <duration>P0DT0H0M0.200S</duration>\n" +
-            "        </scheduleEvent>\n" +
-            "        <scheduleEvent channel=\"NED3\" net=\"ZAPP\" urnRef=\"urn:vpro:media:program:null\">\n" +
-            "            <start>1970-01-04T01:00:00.300+01:00</start>\n" +
-            "            <duration>P0DT0H0M0.050S</duration>\n" +
-            "        </scheduleEvent>\n" +
-            "    </scheduleEvents>\n" +
-            "</program>"), Program.class);
+                "<program embeddable=\"true\" sortDate=\"1970-01-01T01:00:00.100+01:00\" creationDate=\"2014-02-18T12:13:50.123+01:00\" workflow=\"FOR PUBLICATION\" urn=\"urn:vpro:media:program:null\" xmlns=\"urn:vpro:media:2009\" xmlns:shared=\"urn:vpro:shared:2009\">\n" +
+                "    <scheduleEvents>\n" +
+                "        <scheduleEvent channel=\"NED3\" urnRef=\"urn:vpro:media:program:null\">\n" +
+                "            <start>1970-01-01T01:00:00.100+01:00</start>\n" +
+                "            <duration>P0DT0H0M0.200S</duration>\n" +
+                "        </scheduleEvent>\n" +
+                "        <scheduleEvent channel=\"NED3\" net=\"ZAPP\" urnRef=\"urn:vpro:media:program:null\">\n" +
+                "            <start>1970-01-04T01:00:00.300+01:00</start>\n" +
+                "            <duration>P0DT0H0M0.050S</duration>\n" +
+                "        </scheduleEvent>\n" +
+                "    </scheduleEvents>\n" +
+                "</program>"), Program.class);
 
         assertThat(program.getScheduleEvents()).isEmpty();
 
@@ -83,30 +81,31 @@ public class ApiMediaFilterTest {
 
         /* Singular */
         ApiMediaFilter.set("segment");
-        assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(1);
-        assertThat(new FilteredSortedSet<>("segment", program.getSegments()).first().getMidRef()).isNotNull();
+        assertThat(program.getSegments()).hasSize(1);
+        Segment segment = program.getSegments().first();
+        assertThat(segment.getMidRef()).isNotNull();
 
         ApiMediaFilter.set("segment:2");
-        assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(2);
+        assertThat(program.getSegments()).hasSize(2);
 
         ApiMediaFilter.set("segment:1");
-        assertThat(new FilteredSortedSet<>("segment", program.getSegments())).hasSize(1);
+        assertThat(program.getSegments()).hasSize(1);
 
         ApiMediaFilter.set("segment:0");
-        assertThat(new FilteredSortedSet<>("segment", program.getSegments())).isEmpty();
+        assertThat(program.getSegments()).isEmpty();
 
         /* Plural */
         ApiMediaFilter.set("segments");
-        assertThat(new FilteredSortedSet<>("segments", program.getSegments())).hasSize(3);
+        assertThat(program.getSegments()).hasSize(3);
 
         ApiMediaFilter.set("segments:2");
-        assertThat(new FilteredSortedSet<>("segments", program.getSegments())).hasSize(2);
+        assertThat(program.getSegments()).hasSize(2);
 
         ApiMediaFilter.set("segments:1");
-        assertThat(new FilteredSortedSet<>("segments", program.getSegments())).hasSize(1);
+        assertThat(program.getSegments()).hasSize(1);
 
         ApiMediaFilter.set("segments:0");
-        assertThat(new FilteredSortedSet<>("segments", program.getSegments())).isEmpty();
+        assertThat(program.getSegments()).isEmpty();
     }
 
     @Test
@@ -177,12 +176,11 @@ public class ApiMediaFilterTest {
 
     @Test
     public void testSegment() throws Exception {
-
         Segment segment = Jackson2TestUtil.roundTrip(
-            MediaTestDataBuilder.segment()
-                .midRef("ABC_DEF")
-                .withLocations()
-                .build());
+                MediaTestDataBuilder.segment()
+                        .midRef("ABC_DEF")
+                        .withLocations()
+                        .build());
         assertThat(segment.getLocations()).hasSize(4);
         ApiMediaFilter.set("location");
 
