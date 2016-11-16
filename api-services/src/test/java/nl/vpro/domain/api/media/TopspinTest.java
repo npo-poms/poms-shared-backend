@@ -33,7 +33,7 @@ public class TopspinTest {
 
     TopSpinRepository topSpinRepository = Mockito.mock(TopSpinRepository.class);
 
-    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, null, null, topSpinRepository, new Settings());
+    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, null, null, new SinceToTimeStampServiceImpl(), topSpinRepository,  new Settings());
 
     Program program;
 

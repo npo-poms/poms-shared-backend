@@ -5,7 +5,6 @@
 package nl.vpro.domain.api.media;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,7 +33,6 @@ import nl.vpro.domain.api.topspin.Recommendation;
 import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
-import nl.vpro.domain.media.Schedule;
 import nl.vpro.util.FilteringIterator;
 import nl.vpro.util.TailAdder;
 
@@ -60,12 +58,15 @@ public class MediaServiceImpl implements MediaService {
 
     private final Settings settings;
 
+    private final SinceToTimeStampService sinceToTimeStampService;
+
     @Autowired
     public MediaServiceImpl(
         ProfileService profileService,
         @Named("mediaLoadRepository") MediaRepository mediaRepository,
         MediaSearchRepository mediaSearchRepository,
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
+        SinceToTimeStampService sinceToTimeStampService,
         TopSpinRepository topSpinRepository,
         Settings settings
 
@@ -75,6 +76,7 @@ public class MediaServiceImpl implements MediaService {
         this.mediaSearchRepository = mediaSearchRepository;
         this.querySearchRepository = querySearchRepository;
         this.topSpinRepository = topSpinRepository;
+        this.sinceToTimeStampService = sinceToTimeStampService;
         this.settings = settings;
     }
 
@@ -83,16 +85,12 @@ public class MediaServiceImpl implements MediaService {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
-    private static long DIVIDING_SINCE = LocalDate.of(2000, 1,1).atStartOfDay(Schedule.ZONE_ID).toInstant().toEpochMilli();
 
     @Override
-    public Iterator<Change> changes(final String profile, final Long since, Instant publishedSince, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
-        if (since != null && publishedSince != null){
-            throw new IllegalArgumentException("Cannot use both since and publishSince arguments!");
-        }
-        if (since != null) {
-            if (since > DIVIDING_SINCE) { // Certainly using ES
-                return changesWitchES(profile, Instant.ofEpochMilli(since), order, max, keepAlive);
+    public Iterator<Change> changes(final String profile, final Instant since, final Order order, final Integer max, final Long keepAlive, boolean withSequences) throws ProfileNotFoundException {
+        if (withSequences) {
+            if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
+                return changesWitchES(profile, since, order, max, keepAlive);
             } else {
 
                 if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
@@ -123,7 +121,7 @@ public class MediaServiceImpl implements MediaService {
         } else {
             // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' any more.
             return
-                Iterators.transform(changesWitchES(profile, publishedSince, order, max, keepAlive), c -> {
+                Iterators.transform(changesWitchES(profile, since, order, max, keepAlive), c -> {
                     if (c != null) {
                         c.setSequence(null);
                     }
@@ -132,14 +130,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Deprecated
-    protected Iterator<Change> changesWithCouchDB(final String profile, final Long since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+    protected Iterator<Change> changesWithCouchDB(final String profile, Instant since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
-        return mediaLoadRepository.changes(since, currentProfile, previousProfile, order, max, keepAlive);
+        return mediaLoadRepository.changes(sinceToTimeStampService.getSince(since), currentProfile, previousProfile, order, max, keepAlive);
     }
 
 

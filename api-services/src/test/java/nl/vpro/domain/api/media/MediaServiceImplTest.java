@@ -4,6 +4,8 @@
  */
 package nl.vpro.domain.api.media;
 
+import java.time.Instant;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -38,7 +40,7 @@ public class MediaServiceImplTest {
 
     private final QuerySearchRepository querySearchRepository = Mockito.mock(QuerySearchRepository.class);
 
-    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository, null, new Settings());
+    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository, new SinceToTimeStampServiceImpl(), null, new Settings());
 
     private ProfileDefinition<MediaObject> profileDefinition = new ProfileDefinition<>();
 
@@ -101,7 +103,7 @@ public class MediaServiceImplTest {
 
     @Test(expected = ProfileNotFoundException.class)
     public void testChangesProfileNotFound() {
-        target.changes("notfound", 0L, null, null, 10, 100L);
+        target.changes("notfound", Instant.EPOCH, null, 10, 100L, false);
     }
 
     @Test(expected = ProfileNotFoundException.class)
