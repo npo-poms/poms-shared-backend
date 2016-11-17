@@ -7,7 +7,6 @@ package nl.vpro.domain.api.media;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -34,7 +33,6 @@ import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
 import nl.vpro.util.FilteringIterator;
-import nl.vpro.util.TailAdder;
 
 /**
  * @author Roelof Jan Koekoek
@@ -92,29 +90,13 @@ public class MediaServiceImpl implements MediaService {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
                 return changesWitchES(profile, since, order, max, keepAlive);
             } else {
-
+                Iterator<Change> iterator;
                 if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
-                    LOG.info("Since {} is couchdb like, so we need to use that, though elasticsearch is configured for changes", since);
-                }
-                Iterator<Change> iterator = changesWithCouchDB(profile, since, order, max, keepAlive);
-                if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
-                    iterator = Iterators.transform(iterator,
-                        c -> {
-                            if (c != null && c.isTail()) {
-                                c.setSequence(Instant.now().toEpochMilli());
-                                LOG.info("Forcing changes repository to ES by upping sequence {}", c);
-                            }
-                            return c;
-                        }
-                    );
-                    iterator = TailAdder.withFunctions(iterator, last -> {
-                        if (last != null && last.isTail()) {
-                            throw new NoSuchElementException();
-                        } else {
-                            Instant now = Instant.now();
-                            return Change.tail(now, now.toEpochMilli());
-                        }
-                    });
+                    Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
+                    LOG.info("Since {} is couchdb like, taking {}", since.toEpochMilli(), i);
+                    iterator = changesWitchES(profile, i, order, max, keepAlive);
+                } else {
+                    iterator = changesWithCouchDB(profile, since, order, max, keepAlive);
                 }
                 return iterator;
             }
