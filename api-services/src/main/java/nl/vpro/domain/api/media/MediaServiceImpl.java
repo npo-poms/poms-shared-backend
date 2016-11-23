@@ -115,11 +115,11 @@ public class MediaServiceImpl implements MediaService {
     protected Iterator<Change> changesWithCouchDB(final String profile, Instant since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
-        ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
+        ProfileDefinition<MediaObject> previousProfile = since == null ? null : profileService.getMediaProfileDefinition(profile, sinceToTimeStampService.getInstance(since.toEpochMilli())); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
-        return mediaLoadRepository.changes(sinceToTimeStampService.getSince(since), currentProfile, previousProfile, order, max, keepAlive);
+        return mediaLoadRepository.changes(since.toEpochMilli(),  currentProfile, previousProfile, order, max, keepAlive);
     }
 
 
