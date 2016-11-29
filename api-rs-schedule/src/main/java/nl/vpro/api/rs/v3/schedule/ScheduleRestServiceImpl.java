@@ -46,14 +46,16 @@ import static nl.vpro.domain.api.Constants.*;
  * @author rico
  */
 @Service
-@Api(
-    value = ScheduleRestService.PATH,
-    description = "see <a href='http://wiki.publiekeomroep.nl/display/npoapi/Media-+en+gids-API'>wiki</a>",
-    position = 1)
+@Api(tags = ScheduleRestService.PATH)
 @Path(ScheduleRestService.PATH)
-@Produces(
-    {MediaType.APPLICATION_JSON,
-        MediaType.APPLICATION_XML})
+@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@SwaggerDefinition(
+    tags = {
+        @Tag(
+            name = ScheduleRestService.PATH,
+            description = "<a href='http://wiki.publiekeomroep.nl/display/npoapi/Media-+and+Schedule-API'>wiki</a></p>"
+        )}
+)
 public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     private static final String CLIENT_ERROR = "Client error";
