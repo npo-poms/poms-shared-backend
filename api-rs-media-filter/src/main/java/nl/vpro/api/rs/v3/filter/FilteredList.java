@@ -57,8 +57,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
         if (limit == 0) {
             return false;
         } else if (limit < Integer.MAX_VALUE) {
-            //return wrapped.subList(0, Math.min(limit, wrapped.size())).contains(o);
-            return wrapped.subList(0, limit).contains(o);
+            return wrapped.subList(0, Math.min(limit, wrapped.size())).contains(o);
         } else {
             return wrapped.contains(o);
         }

@@ -10,7 +10,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 
 /**
  * @author Michiel Meeuwissen
- * @since 1.8
+ * @since 4.9
  */
 public class FilteredListTest {
     @Test
