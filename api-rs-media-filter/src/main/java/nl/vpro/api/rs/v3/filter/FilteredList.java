@@ -40,7 +40,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public int size() {
-        Integer limit = filter.limitOrDefault(property);
+        Integer limit = getFilter().limitOrDefault(property);
         int size = wrapped.size();
         return size < limit ? size : limit;
     }
@@ -53,7 +53,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public boolean contains(Object o) {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         if (limit == 0) {
             return false;
         } else if (limit < Integer.MAX_VALUE) {
@@ -67,7 +67,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             int count = 0;
-            int limit = filter.limitOrDefault(property);
+            int limit = getFilter().limitOrDefault(property);
 
             final Iterator<T> wrappedIterator = wrapped.iterator();
 
@@ -145,7 +145,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public T get(int index) {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         if (index < limit) {
             return wrapped.get(index);
         } else {
@@ -155,7 +155,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
 
     @Override
     public T set(int index, T element) {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         if (index < limit) {
             return wrapped.set(index, element);
         } else {
@@ -220,7 +220,7 @@ public class FilteredList<T> extends AbstractFiltered<List<T>> implements List<T
             startIndex = start;
             currentIndex = start;
 
-            int limit = filter.limitOrDefault(property);
+            int limit = getFilter().limitOrDefault(property);
             int size = wrapped.size();
             if (limit == 0) {
                 endIndex = -1;

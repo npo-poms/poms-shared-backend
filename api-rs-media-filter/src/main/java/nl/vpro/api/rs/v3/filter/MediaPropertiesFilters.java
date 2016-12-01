@@ -24,7 +24,6 @@ public class MediaPropertiesFilters {
     private static final List<String> ignoreFields = Arrays.asList(
         "mid",
         "midRef",
-        "workflow",
         "type",
         "avType",
         "sortDate",

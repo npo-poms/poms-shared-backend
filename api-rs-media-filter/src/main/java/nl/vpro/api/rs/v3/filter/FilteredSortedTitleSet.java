@@ -39,7 +39,7 @@ public class FilteredSortedTitleSet extends FilteredSortedSet<Title> {
 
     @Override
     public Iterator<Title> iterator() {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         if (limit < Integer.MAX_VALUE) {
             return new Iterator<Title>() {
                 Title previous = null;

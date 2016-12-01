@@ -11,8 +11,6 @@ package nl.vpro.api.rs.v3.filter;
 public class AbstractFiltered<T> {
     protected final T wrapped;
 
-    protected final ApiMediaFilter filter = ApiMediaFilter.get();
-
     protected String property;
 
     protected int max = Integer.MAX_VALUE;
@@ -39,4 +37,9 @@ public class AbstractFiltered<T> {
 
         this.wrapped = wrapped;
     }
+
+    protected ApiMediaFilter getFilter() {
+        return ApiMediaFilter.get();
+    }
+
 }

@@ -60,7 +60,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public T first() {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         if (limit > 0) {
             return wrapped.first();
         } else {
@@ -70,7 +70,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public T last() {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         /* todo this is weird behaviour, but was previously implemented like this */
         if (limit == Integer.MAX_VALUE) {
             return wrapped.last();
@@ -80,7 +80,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public int size() {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         int size = wrapped.size();
 
         return limit < size ? limit : size;
@@ -93,7 +93,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
 
     @Override
     public boolean contains(Object o) {
-        int limit = filter.limitOrDefault(property);
+        int limit = getFilter().limitOrDefault(property);
         boolean found = false;
         if (limit > 0) {
             for (T i : this) {
@@ -111,7 +111,7 @@ public class FilteredSortedSet<T> extends AbstractFiltered<SortedSet<T>> impleme
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             int count = 0;
-            int limit = filter.limitOrDefault(property);
+            int limit = getFilter().limitOrDefault(property);
 
             final Iterator<T> wrappedIterator = wrapped.iterator();
 

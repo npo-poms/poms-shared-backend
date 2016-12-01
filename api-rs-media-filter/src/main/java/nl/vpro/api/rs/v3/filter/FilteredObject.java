@@ -23,6 +23,6 @@ public class FilteredObject<T> extends AbstractFiltered<T> {
     }
 
     public T value() {
-        return filter.limitOrDefault(property) >  0 ? wrapped : null;
+        return getFilter().limitOrDefault(property) >  0 ? wrapped : null;
     }
 }
