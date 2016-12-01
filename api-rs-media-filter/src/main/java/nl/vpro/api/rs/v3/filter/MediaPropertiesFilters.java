@@ -4,19 +4,15 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.LoaderClassPath;
-import javassist.Modifier;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Roelof Jan Koekoek
@@ -28,6 +24,7 @@ public class MediaPropertiesFilters {
     private static final List<String> ignoreFields = Arrays.asList(
         "mid",
         "midRef",
+        "workflow",
         "type",
         "avType",
         "sortDate",
