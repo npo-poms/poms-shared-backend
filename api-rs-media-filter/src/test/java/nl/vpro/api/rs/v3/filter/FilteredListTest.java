@@ -59,6 +59,11 @@ public class FilteredListTest {
 
         assertThat(filtered).hasSize(101);
 
+        ApiMediaFilter.set("all");
+
+        assertThat(filtered).hasSize(101);
+
+
     }
 
     @Test
