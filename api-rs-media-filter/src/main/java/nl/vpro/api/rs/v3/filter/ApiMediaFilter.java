@@ -4,6 +4,7 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -28,6 +29,8 @@ public class ApiMediaFilter {
     private static final Map<String, String> singularExceptions = new HashMap<>();
 
     private boolean filtering = false;
+    private Boolean retainAll = null;
+
 
     static {
         aliasToProperty.put("credit", "person");
@@ -43,12 +46,7 @@ public class ApiMediaFilter {
         singularToPlural.put("descendantofholder", "descendantof");
     }
 
-    private static final ThreadLocal<ApiMediaFilter> localFilter = new ThreadLocal<ApiMediaFilter>() {
-        @Override
-        protected ApiMediaFilter initialValue() {
-            return new ApiMediaFilter();
-        }
-    };
+    private static final ThreadLocal<ApiMediaFilter> localFilter = ThreadLocal.withInitial(ApiMediaFilter::new);
 
     static ApiMediaFilter get() {
         return localFilter.get();
@@ -60,12 +58,16 @@ public class ApiMediaFilter {
     }
 
 
+    /**
+     * <code>null</code>: No filtering
+     * "": No filtering
+     * "all": No filtering
+     * "none": Return very limited set of properties (actually: title,broadcaster)
+     * <property>[s][:<number>],...:
+     */
     public static void set(String properties) {
-        if(StringUtils.isNotBlank(properties)) {
-            get().filter(properties.split(","));
-        } else {
-            get().clear();
-        }
+       get().filter(properties);
+
     }
 
     public static <T> T doWithout(Callable<T> callable) {
@@ -83,15 +85,6 @@ public class ApiMediaFilter {
         return result;
     }
 
-    public void clear() {
-        properties.clear();
-        filtering = true;
-    }
-
-    public void filter(String... properties) {
-        clear();
-        add(properties);
-    }
 
 
     /**
@@ -125,7 +118,7 @@ public class ApiMediaFilter {
      *                   will limit the amount of items returned of this List or Set to the given number if larger
      *                   than the original number of items in the wrapped List or Set.
      */
-    public void add(String... properties) {
+    private void add(String... properties) {
         for(String property : properties) {
             property = property.toLowerCase().trim();
             String name = aliasToProperty.getOrDefault(property, property);
@@ -145,27 +138,52 @@ public class ApiMediaFilter {
             /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
             this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
         }
+
+    }
+    private void filter(String properties) {
+        this.properties.clear();
+
+        if ("all".equals(properties)) {
+            filtering = false;
+            retainAll = null;
+            return;
+        }
+
+        filtering = true;
+        if ("".equals(properties) || properties == null) {
+            retainAll = true;
+            return;
+        }
+
+        retainAll = false;
+        if ("none".equals(properties)) {
+            properties = "";
+        }
+        add(Arrays.stream(properties.split(",")).filter(StringUtils::isNotBlank).toArray(String[]::new));
+        if (!this.properties.containsKey("title")) {
+            this.properties.put("title", 1);
+        }
+        if (!this.properties.containsKey("broadcaster")) {
+            this.properties.put("broadcaster", 1);
+        }
     }
 
-    public Integer limitOrDefault(String property) {
+    Integer limitOrDefault(String property) {
+        String singular = getSingular(property);
         if (! filtering) {
             return Integer.MAX_VALUE;
-        }
-        String singular = getSingular(property);
-        if ("title".equals(singular) || "broadcaster".equals(singular)) {
-            /* title and broadcaster cannot be filtered */
-            return Integer.MAX_VALUE;
-        } else if (properties.isEmpty()) {
-            if ("scheduleevent".equals(singular)) {
-                /* scheduleEvent max 100 instead of defaultValue */
-                return properties.getOrDefault(singular, 100);
-            } else {
-                /* If there are no properties set, show 'em all */
-                return properties.getOrDefault(singular, Integer.MAX_VALUE);
-            }
+
         } else {
-            /* If there are properties, but property is not part of it, don't show it */
-            return properties.getOrDefault(singular,  0);
+            if (retainAll) {
+                // toch maar een beetje filteren voor scheduleevents want dat zijn er nogal veel soms!
+                if ("scheduleevent".equals(singular)) {
+                    return 100;
+                } else {
+                    return Integer.MAX_VALUE;
+                }
+            } else {
+                return properties.getOrDefault(singular, 0);
+            }
         }
     }
 }
