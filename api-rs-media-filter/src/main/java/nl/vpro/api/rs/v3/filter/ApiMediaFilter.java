@@ -6,6 +6,7 @@ package nl.vpro.api.rs.v3.filter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -67,6 +68,21 @@ public class ApiMediaFilter {
         }
     }
 
+    public static <T> T doWithout(Callable<T> callable) {
+        ApiMediaFilter before = get();
+        removeFilter();
+        T result;
+        try {
+            result = callable.call();
+        } catch (RuntimeException rte) {
+            throw rte;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        localFilter.set(before);;
+        return result;
+    }
+
     public void clear() {
         properties.clear();
         filtering = true;
@@ -76,6 +92,7 @@ public class ApiMediaFilter {
         clear();
         add(properties);
     }
+
 
     /**
      * Get singular name of a potential plural property name.
