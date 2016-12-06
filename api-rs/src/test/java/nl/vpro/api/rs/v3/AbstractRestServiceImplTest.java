@@ -1,10 +1,11 @@
 package nl.vpro.api.rs.v3;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
 
 import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -35,6 +36,8 @@ public abstract class AbstractRestServiceImplTest<T> {
     public static final MediaType XML;
 
     static {
+
+
         Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("charset", "utf-8");
 
