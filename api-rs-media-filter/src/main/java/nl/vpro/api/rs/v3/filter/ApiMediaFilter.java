@@ -4,16 +4,29 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
+import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
+
 import org.apache.commons.lang3.StringUtils;
+
+import nl.vpro.domain.media.Group;
+import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.Segment;
 
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
+
+@Slf4j
 public class ApiMediaFilter {
 
     private final Map<String, Integer> properties = new HashMap<>();
@@ -157,14 +170,56 @@ public class ApiMediaFilter {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
                 this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
             } else {
-                throw new IllegalArgumentException("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + MediaPropertiesFilters.getKnownProperties());
+                throw new IllegalArgumentException("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());
             }
         }
     }
 
-    private static final Set<String> knownProperties = MediaPropertiesFilters.getKnownProperties().stream().map(String::toLowerCase).collect(Collectors.toSet());
+    private static final Set<String> KNOWN_PROPERTIES = MediaPropertiesFilters.getKnownProperties().stream().map(String::toLowerCase).collect(Collectors.toSet());
+    private static Set<String> knownPropertiesForExposure = null;
+
     private boolean hasProperty(String singular) {
-        return knownProperties.contains(singular.toLowerCase()) || knownProperties.contains(getPlural(singular).toLowerCase());
+        return KNOWN_PROPERTIES.contains(singular.toLowerCase()) || KNOWN_PROPERTIES.contains(getPlural(singular).toLowerCase());
+    }
+
+    private static synchronized  Set<String> getKnownPropertiesForExposure() {
+        if (knownPropertiesForExposure ==  null) {
+            knownPropertiesForExposure = new HashSet<>();
+            for (Class<?> t : new Class[]{Program.class, Segment.class, Group.class}) {
+                while(t != null) {
+                    XmlType annotation = t.getAnnotation(XmlType.class);
+                    if (annotation != null) {
+                        Arrays.stream(annotation.propOrder()).filter(s -> ! s.isEmpty()).forEach(s -> knownPropertiesForExposure.add(s));
+                    }
+                    for (Field f : t.getDeclaredFields()) {
+                        XmlAttribute attribute = f.getAnnotation(XmlAttribute.class);
+                        if (attribute != null) {
+                            String name = attribute.name();
+                            if (name.equals("##default")) {
+                                name = f.getName();
+                            }
+                            knownPropertiesForExposure.add(name);
+                        }
+                    }
+                    for (Method m : t.getDeclaredMethods()) {
+                        XmlAttribute attribute = m.getAnnotation(XmlAttribute.class);
+                        if (attribute != null) {
+                            String name = attribute.name();
+                            if (name.equals("##default")) {
+                                name = m.getName();
+                                if (name.startsWith("get") || name.startsWith("set")) {
+                                    name = name.substring(3);
+                                    name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
+                                }
+                            }
+                            knownPropertiesForExposure.add(name);
+                        }
+                    }
+                    t = t.getSuperclass();
+                }
+            }
+        }
+        return knownPropertiesForExposure;
     }
 
 

@@ -31,8 +31,7 @@ public class MediaPropertiesFilters {
         "sortDate",
         "sortDateValid",
         "isEmbeddable",
-        "parent",
-        "crc32"
+        "parent"
     );
 
     private static final List<String> ignoreSignatures = Arrays.asList(
@@ -62,7 +61,7 @@ public class MediaPropertiesFilters {
         }
     }
 
-    public static List<String> getKnownProperties() {
+    static List<String> getKnownProperties() {
         return Collections.unmodifiableList(knownProperties);
     }
 
@@ -86,15 +85,16 @@ public class MediaPropertiesFilters {
                                 /* Ignore static fields / methods */
                                 if ((f.getField().getModifiers() & Modifier.STATIC) == 0) {
                                     String fieldName = f.getFieldName();
-                                    if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
-                                        LOG.debug("Never filtering {}", fieldName);
-                                        return;
-                                    }
                                     if (!knownProperties.contains(fieldName)) {
                                         knownProperties.add(fieldName);
                                     } else {
                                         LOG.debug("Found {} more than once!", fieldName);
                                     }
+                                    if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
+                                        LOG.debug("Never filtering {}", fieldName);
+                                        return;
+                                    }
+
                                     if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
                                         LOG.debug("Instrumenting SortedSet {}", fieldName);
                                         if ("titles".equals(fieldName)) {

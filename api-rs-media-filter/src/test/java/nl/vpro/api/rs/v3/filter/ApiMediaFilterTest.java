@@ -4,19 +4,21 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import javax.xml.bind.JAXB;
+
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
 import nl.vpro.domain.media.exceptions.ModificationException;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import javax.xml.bind.JAXB;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -115,6 +117,17 @@ public class ApiMediaFilterTest {
 
         ApiMediaFilter.set("type");
         assertThat(new FilteredObject<>("type", program.getType()).value()).isNotNull();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFilterUnknownProperty() {
+        try {
+            ApiMediaFilter.set("bestaatniet");
+        } catch (IllegalArgumentException ia) {
+            assertThat(ia.getMessage()).startsWith("The property bestaatniet is not known.");
+            throw ia;
+        }
+
     }
 
     @Test
