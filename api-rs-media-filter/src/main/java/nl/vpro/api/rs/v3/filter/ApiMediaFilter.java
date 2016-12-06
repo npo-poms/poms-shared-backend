@@ -135,8 +135,12 @@ public class ApiMediaFilter {
             }
 
             String singular = getSingular(name);
-            /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
-            this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
+            if (MediaPropertiesFilters.getKnownProperties().contains(singular) || MediaPropertiesFilters.getKnownProperties().contains(name)) {
+                /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
+                this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
+            } else {
+                throw new IllegalArgumentException("The property " + name + " ( or " + singular + ") is now known. Known are : " + MediaPropertiesFilters.getKnownProperties());
+            }
         }
 
     }

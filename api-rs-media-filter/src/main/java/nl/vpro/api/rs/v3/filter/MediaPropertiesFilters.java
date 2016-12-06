@@ -8,7 +8,9 @@ import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -37,6 +39,8 @@ public class MediaPropertiesFilters {
         //"Ljava/lang/String;"
     );
 
+    private static final List<String> knownProperties = new ArrayList<>();
+
     private static boolean instrumented = false;
 
 
@@ -55,6 +59,11 @@ public class MediaPropertiesFilters {
             LOG.warn("Instrumented already");
         }
     }
+
+    public static List<String> getKnownProperties() {
+        return Collections.unmodifiableList(knownProperties);
+    }
+
 
     private static void instrument(String... classNames) {
         try {
@@ -75,6 +84,11 @@ public class MediaPropertiesFilters {
                                 /* Ignore static fields / methods */
                                 if ((f.getField().getModifiers() & Modifier.STATIC) == 0) {
                                     String fieldName = f.getFieldName();
+                                    if (! knownProperties.contains(fieldName)) {
+                                        knownProperties.add(fieldName);
+                                    } else {
+                                        LOG.warn("Found {} more than once!", fieldName);
+                                    }
                                     if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
                                         LOG.debug("Never filtering {}", fieldName);
                                     } else if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
