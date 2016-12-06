@@ -31,7 +31,8 @@ public class MediaPropertiesFilters {
         "sortDate",
         "sortDateValid",
         "isEmbeddable",
-        "parent"
+        "parent",
+        "crc32"
     );
 
     private static final List<String> ignoreSignatures = Arrays.asList(
@@ -85,14 +86,16 @@ public class MediaPropertiesFilters {
                                 /* Ignore static fields / methods */
                                 if ((f.getField().getModifiers() & Modifier.STATIC) == 0) {
                                     String fieldName = f.getFieldName();
-                                    if (! knownProperties.contains(fieldName)) {
+                                    if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
+                                        LOG.debug("Never filtering {}", fieldName);
+                                        return;
+                                    }
+                                    if (!knownProperties.contains(fieldName)) {
                                         knownProperties.add(fieldName);
                                     } else {
                                         LOG.debug("Found {} more than once!", fieldName);
                                     }
-                                    if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
-                                        LOG.debug("Never filtering {}", fieldName);
-                                    } else if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
+                                    if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
                                         LOG.debug("Instrumenting SortedSet {}", fieldName);
                                         if ("titles".equals(fieldName)) {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");

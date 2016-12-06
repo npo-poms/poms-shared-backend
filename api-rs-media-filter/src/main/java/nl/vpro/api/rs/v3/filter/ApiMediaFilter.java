@@ -90,21 +90,20 @@ public class ApiMediaFilter {
      * @param name
      * @return Singular name
      */
-    private String getSingular(String name) {
+    private String getSingularOrWithoutOf(String name) {
         String singular;
         if (name.endsWith("s")) {
             singular = name.substring(0, name.length() - 1);
-        } else if (name.endsWith("of") || name.endsWith("Of")) {
-            singular = name.substring(0, name.length() - 2);
         } else {
             singular = name;
         }
         if (singularExceptions.containsKey(name)) {
             singular = singularExceptions.get(name);
         }
-
         return singular;
     }
+
+
     private String getPlural(String name) {
         String plural  = singularToPlural.get(name);
         if (plural != null) {
@@ -143,7 +142,7 @@ public class ApiMediaFilter {
                 name = name.substring(0, colon);
             }
 
-            String singular = getSingular(name);
+            String singular = getSingularOrWithoutOf(name);
             if (hasProperty(singular)) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
                 this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
@@ -191,7 +190,7 @@ public class ApiMediaFilter {
     }
 
     Integer limitOrDefault(String property) {
-        String singular = getSingular(property);
+        String singular = getSingularOrWithoutOf(property);
         if (! filtering) {
             return Integer.MAX_VALUE;
 
