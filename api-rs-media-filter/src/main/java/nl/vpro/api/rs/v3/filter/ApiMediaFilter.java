@@ -127,7 +127,7 @@ public class ApiMediaFilter {
             int colon = name.indexOf(':');
             if (colon >= 1) {
                 try {
-                    max = Integer.parseInt(name.substring(colon+1));
+                    max = Integer.parseInt(name.substring(colon + 1));
                 } catch (NumberFormatException ex) {
                     throw new IllegalArgumentException("Invalid max value after ':' in " + property);
                 }
@@ -159,7 +159,10 @@ public class ApiMediaFilter {
         if ("none".equals(properties)) {
             properties = "";
         }
-        add(Arrays.stream(properties.split(",")).filter(StringUtils::isNotBlank).toArray(String[]::new));
+        add(Arrays
+            .stream(properties.split(","))
+            .filter(StringUtils::isNotBlank)
+            .toArray(String[]::new));
         if (!this.properties.containsKey("title")) {
             this.properties.put("title", 1);
         }
@@ -175,7 +178,7 @@ public class ApiMediaFilter {
 
         } else {
             if (retainAll) {
-                // toch maar een beetje filteren voor scheduleevents want dat zijn er nogal veel soms!
+                // toch maar een beetje impliciet filteren voor scheduleevents want dat zijn er nogal veel soms!
                 if ("scheduleevent".equals(singular)) {
                     return 100;
                 } else {
