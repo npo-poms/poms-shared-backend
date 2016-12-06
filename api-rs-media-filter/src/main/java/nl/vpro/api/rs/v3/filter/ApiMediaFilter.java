@@ -39,6 +39,12 @@ public class ApiMediaFilter {
         aliasToProperty.put("region", "georestriction");
         aliasToProperty.put("regions", "georestrictions");
 
+        // Makes no sense, but for backwards compatibility
+        aliasToProperty.put("descendant", "descendantOf");
+        aliasToProperty.put("episode", "episodeOf");
+        aliasToProperty.put("member", "memberOf");
+
+
         singularExceptions.put("countrie", "country");
 
         singularToPlural.put("email", "emails");
@@ -90,7 +96,7 @@ public class ApiMediaFilter {
      * @param name
      * @return Singular name
      */
-    private String getSingularOrWithoutOf(String name) {
+    private String getSingular(String name) {
         String singular;
         if (name.endsWith("s")) {
             singular = name.substring(0, name.length() - 1);
@@ -141,8 +147,12 @@ public class ApiMediaFilter {
                 }
                 name = name.substring(0, colon);
             }
-
-            String singular = getSingularOrWithoutOf(name);
+            if (name.toLowerCase().endsWith("of")) {
+                // This makes no sense at all, but for backwardscompatibility
+                // effect
+                name = name + "s";
+            }
+            String singular = getSingular(name);
             if (hasProperty(singular)) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
                 this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
@@ -190,7 +200,7 @@ public class ApiMediaFilter {
     }
 
     Integer limitOrDefault(String property) {
-        String singular = getSingularOrWithoutOf(property);
+        String singular = getSingular(property);
         if (! filtering) {
             return Integer.MAX_VALUE;
 
