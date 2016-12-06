@@ -53,6 +53,7 @@ public class MediaPropertiesFilters {
                 "nl.vpro.domain.media.Group",
                 "nl.vpro.domain.media.Segment"
             );
+            LOG.info("Instrumented media properties " + getKnownProperties());
             instrumentScheduleEvents("nl.vpro.domain.media.Schedule");
             instrumented = true;
         } else {
@@ -87,7 +88,7 @@ public class MediaPropertiesFilters {
                                     if (! knownProperties.contains(fieldName)) {
                                         knownProperties.add(fieldName);
                                     } else {
-                                        LOG.warn("Found {} more than once!", fieldName);
+                                        LOG.debug("Found {} more than once!", fieldName);
                                     }
                                     if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
                                         LOG.debug("Never filtering {}", fieldName);
