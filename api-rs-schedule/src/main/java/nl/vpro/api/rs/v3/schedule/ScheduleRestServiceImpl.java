@@ -103,7 +103,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
         @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
         @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_PROPERTIES_NONE) String properties,
+        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
