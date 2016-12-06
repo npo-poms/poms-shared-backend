@@ -4,10 +4,9 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -154,8 +153,9 @@ public class ApiMediaFilter {
         }
     }
 
+    private static final Set<String> knownProperties = MediaPropertiesFilters.getKnownProperties().stream().map(String::toLowerCase).collect(Collectors.toSet());
     private boolean hasProperty(String singular) {
-        return MediaPropertiesFilters.getKnownProperties().contains(singular) || MediaPropertiesFilters.getKnownProperties().contains(getPlural(singular));
+        return knownProperties.contains(singular.toLowerCase()) || knownProperties.contains(getPlural(singular).toLowerCase());
     }
 
 
