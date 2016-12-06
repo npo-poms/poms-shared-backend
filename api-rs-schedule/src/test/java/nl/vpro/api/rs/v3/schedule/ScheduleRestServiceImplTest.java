@@ -2,12 +2,14 @@ package nl.vpro.api.rs.v3.schedule;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXB;
@@ -23,12 +25,12 @@ import org.xml.sax.SAXException;
 
 import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
 import nl.vpro.api.rs.v3.validation.ScheduleFormValidatingReader;
+import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.Result;
+import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.api.media.*;
-import nl.vpro.domain.media.Channel;
-import nl.vpro.domain.media.Schedule;
-import nl.vpro.domain.media.ScheduleEvent;
+import nl.vpro.domain.media.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -38,6 +40,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<ScheduleRestServiceImpl> {
+
 
     private final ScheduleService scheduleService = mock(ScheduleService.class);
 
@@ -263,6 +266,42 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         dispatcher.invoke(request, response);
 
         assertThat(response.getStatus()).isEqualTo(200);
+    }
+
+
+    @Test
+    public void NPA_359() throws URISyntaxException {
+
+        Program program = MediaTestDataBuilder.program().withDescendantOf().withScheduleEvents().build();
+        ApiScheduleEvent event = new ApiScheduleEvent(program.getScheduleEvents().first(), program);
+        SearchResultItem<ApiScheduleEvent> apiScheduleEventSearchResultItem = new SearchResultItem<>(event);
+        ScheduleSearchResult result = new ScheduleSearchResult(Arrays.asList(apiScheduleEventSearchResultItem), 0L, 10, 100);
+        when(scheduleService.find(any(ScheduleForm.class), anyString(), anyLong(), anyInt())).thenReturn(result);
+
+        MockHttpRequest request = MockHttpRequest.post("/schedule?properties=none");
+
+        request.contentType(MediaType.APPLICATION_XML);
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        MediaForm form = new MediaForm();
+        form.setSearches(new MediaSearch());
+
+        JAXB.marshal(ScheduleForm.from(form), out);
+
+
+
+        request.content(out.toByteArray());
+
+        dispatcher.invoke(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(200);
+
+        System.out.println(response.getContentAsString());
+
+        ScheduleSearchResult searchResultItems  = JAXB.unmarshal(new StringReader(response.getContentAsString()), ScheduleSearchResult.class);
+
     }
 
     @Override
