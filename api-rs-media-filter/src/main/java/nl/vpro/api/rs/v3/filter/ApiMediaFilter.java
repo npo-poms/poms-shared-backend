@@ -43,7 +43,6 @@ public class ApiMediaFilter {
         singularExceptions.put("countrie", "country");
 
         singularToPlural.put("email", "emails");
-        singularToPlural.put("descendantofholder", "descendantof");
     }
 
     private static final ThreadLocal<ApiMediaFilter> localFilter = ThreadLocal.withInitial(ApiMediaFilter::new);
@@ -106,7 +105,18 @@ public class ApiMediaFilter {
         }
 
         return singular;
+    }
+    private String getPlural(String name) {
+        String plural  = singularToPlural.get(name);
+        if (plural != null) {
+            return plural;
+        }
 
+        if (name.endsWith("s")) {
+            return name;
+        } else {
+            return name + "s";
+        }
     }
 
     /**
@@ -135,15 +145,20 @@ public class ApiMediaFilter {
             }
 
             String singular = getSingular(name);
-            if (MediaPropertiesFilters.getKnownProperties().contains(singular) || MediaPropertiesFilters.getKnownProperties().contains(name)) {
+            if (hasProperty(singular)) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
                 this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
             } else {
                 throw new IllegalArgumentException("The property " + name + " ( or " + singular + ") is now known. Known are : " + MediaPropertiesFilters.getKnownProperties());
             }
         }
-
     }
+
+    private boolean hasProperty(String singular) {
+        return MediaPropertiesFilters.getKnownProperties().contains(singular) || MediaPropertiesFilters.getKnownProperties().contains(getPlural(singular));
+    }
+
+
     private void filter(String properties) {
         this.properties.clear();
 
