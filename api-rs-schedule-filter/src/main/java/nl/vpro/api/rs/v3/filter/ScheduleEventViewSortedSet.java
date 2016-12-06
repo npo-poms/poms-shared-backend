@@ -5,9 +5,6 @@
 package nl.vpro.api.rs.v3.filter;
 
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.SortedSet;
 import java.util.function.Predicate;
 
@@ -15,7 +12,6 @@ import nl.vpro.domain.media.ScheduleEvent;
 
 /**
  * @author rico
- * @date 28/02/2014
  * @since 3.0
  */
 public class ScheduleEventViewSortedSet extends FilteredSortedSet<ScheduleEvent> {
@@ -47,15 +43,9 @@ public class ScheduleEventViewSortedSet extends FilteredSortedSet<ScheduleEvent>
 
     @Override
     public int size() {
-        int count = 0;
-        Iterator<ScheduleEvent> iterator = wrapped.iterator();
-        while (iterator.hasNext()) {
-            ScheduleEvent event = iterator.next();
-            if (predicate.test(event)) {
-                count++;
-            }
-        }
-        return count;
+        return (int) wrapped.stream()
+            .filter(predicate)
+            .count();
     }
 
     @Override

@@ -4,10 +4,13 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import nl.vpro.domain.media.Channel;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.ScheduleEvent;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.SortedSet;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.security.authentication.TestingAuthenticationToken;
@@ -18,7 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import nl.vpro.domain.media.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,17 +39,15 @@ public class ScheduleEventViewSortedSetTest {
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 
         Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 4);
-        calendar.set(Calendar.HOUR_OF_DAY, 10);
-        ScheduleEvent event = new ScheduleEvent(Channel.NED3, calendar.getTime(), new Date(1000));
+        ZonedDateTime time = ZonedDateTime.now(Schedule.ZONE_ID).plusDays(4).withHour(10);
+        ScheduleEvent event = new ScheduleEvent(Channel.NED3, time.toInstant(), Duration.ofMillis(1000));
         program.getScheduleEvents().add(event);
 
         SortedSet<ScheduleEvent> events = program.getScheduleEvents();
         assertThat(events.size()).isEqualTo(5);
 
         ApiMediaFilter.set("scheduleEvents:4");
-        FilteredSortedSet<ScheduleEvent> filteredEvents = ScheduleEventViewSortedSet.wrap("scheduleEvents", events);
+        FilteredSortedSet<ScheduleEvent> filteredEvents = FilteredSortedSet.wrap("scheduleEvents", events);
         assertThat(filteredEvents.size()).isEqualTo(4);
     }
 
@@ -56,17 +57,22 @@ public class ScheduleEventViewSortedSetTest {
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
 
-        Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 4);
-        ScheduleEvent event = new ScheduleEvent(Channel.NED3, calendar.getTime(), new Date(1000));
+        Program program = MediaTestDataBuilder
+            .program()
+            .withScheduleEvents()
+            .withMid()
+            .withDescendantOf().build();
+        ZonedDateTime time = ZonedDateTime.now(Schedule.ZONE_ID).plusDays(4).withHour(10);
+        ScheduleEvent event = new ScheduleEvent(Channel.NED3, time.toInstant(), Duration.ofMillis(1000));
         program.getScheduleEvents().add(event);
 
         SortedSet<ScheduleEvent> events = program.getScheduleEvents();
         assertThat(events.size()).isEqualTo(5);
 
         ApiMediaFilter.set("scheduleEvents:4");
-        FilteredSortedSet<ScheduleEvent> filteredEvents = ScheduleEventViewSortedSet.wrap("scheduleEvents", events);
+        FilteredSortedSet<ScheduleEvent> filteredEvents = FilteredSortedSet.wrap("scheduleEvents", events);
         assertThat(filteredEvents.size()).isEqualTo(4);
+
+        assertThat(filteredEvents.first().getMediaObject().getDescendantOf()).isNotEmpty();
     }
 }
