@@ -179,7 +179,12 @@ public class ApiMediaFilter {
     private static Set<String> knownPropertiesForExposure = null;
 
     private boolean hasProperty(String singular) {
-        return KNOWN_PROPERTIES.contains(singular.toLowerCase()) || KNOWN_PROPERTIES.contains(getPlural(singular).toLowerCase());
+        if (MediaPropertiesFilters.isInstrumented()) {
+            return KNOWN_PROPERTIES.contains(singular.toLowerCase()) || KNOWN_PROPERTIES.contains(getPlural(singular).toLowerCase());
+        } else {
+            log.warn("Not instrumented");
+            return true;
+        }
     }
 
     private static synchronized  Set<String> getKnownPropertiesForExposure() {

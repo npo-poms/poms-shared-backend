@@ -64,6 +64,9 @@ public class MediaPropertiesFilters {
     static List<String> getKnownProperties() {
         return Collections.unmodifiableList(knownProperties);
     }
+    static boolean isInstrumented() {
+        return instrumented;
+    }
 
 
     private static void instrument(String... classNames) {
