@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -14,6 +15,12 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  * @since 4.9
  */
 public class FilteredListTest {
+
+    @BeforeClass
+    public static void init() {
+        MediaPropertiesFilters.instrument();
+    }
+
     @Test
     public void contains() throws Exception {
         ApiMediaFilter.set("title:1");
