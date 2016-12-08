@@ -16,9 +16,9 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class FilteredListTest {
     @Test
     public void contains() throws Exception {
-        ApiMediaFilter.set("test:1");
+        ApiMediaFilter.set("title:1");
         List<String> list = Arrays.asList("a", "b");
-        FilteredList<String> filtered = new FilteredList<>("test", list);
+        FilteredList<String> filtered = new FilteredList<>("title", list);
         assertThat(filtered.contains("b")).isFalse();
 
     }
@@ -26,9 +26,9 @@ public class FilteredListTest {
 
     @Test
     public void containsEmpty() throws Exception {
-        ApiMediaFilter.set("test:1");
+        ApiMediaFilter.set("title:1");
         List<String> list = Arrays.asList();
-        FilteredList<String> filtered = new FilteredList<>("test", list);
+        FilteredList<String> filtered = new FilteredList<>("title", list);
         assertThat(filtered.contains("b")).isFalse();
 
     }
