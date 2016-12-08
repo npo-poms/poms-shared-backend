@@ -53,9 +53,9 @@ public class MediaPropertiesFilters {
                 "nl.vpro.domain.media.Group",
                 "nl.vpro.domain.media.Segment"
             );
-            LOG.info("Instrumented media properties " + getKnownProperties());
             instrumentScheduleEvents("nl.vpro.domain.media.Schedule");
             instrumented = true;
+            LOG.info("Instrumented media properties " + getKnownProperties());
         } else {
             LOG.warn("Instrumented already");
         }
