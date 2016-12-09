@@ -4,7 +4,9 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -51,9 +53,6 @@ import static nl.vpro.domain.api.Constants.*;
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ScheduleRestServiceImpl implements ScheduleRestService {
 
-    private static final String CLIENT_ERROR = "Client error";
-    private static final String NOT_FOUND = "Not found";
-    private static final String SERVER_ERROR = "Server error";
 
     private static final String MESSAGE_GUIDE_DAY = "Guide day in simple ISO8601 format, e.g. 2014-02-27";
     private static final String MESSAGE_START = "Start time in full ISO8601 format, e.g. 2014-02-27T07:06:00Z";
@@ -97,7 +96,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         position = 0
     )
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleResult list(
         @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
@@ -131,7 +129,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             position = 1
     )
     @POST
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleSearchResult find(
         @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM)
@@ -157,7 +154,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/ancestor/{ancestor}")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleResult listForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
@@ -195,7 +191,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/ancestor/{ancestor}/now")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ApiScheduleEvent nowForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
@@ -226,7 +221,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/ancestor/{ancestor}/next")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
+
     @Trace(dispatcher = true)
     public ApiScheduleEvent nextForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
@@ -253,7 +248,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/broadcaster/{broadcaster}")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleResult listBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
@@ -288,7 +282,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             position = 6
     )
     @Path("/broadcaster/{broadcaster}/now")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
+
     @Trace(dispatcher = true)
     @GET
     public ApiScheduleEvent nowForBroadcaster(
@@ -321,7 +315,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/broadcaster/{broadcaster}/next")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ApiScheduleEvent nextForBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
@@ -348,7 +341,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/channel/{channel}")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleResult listChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
@@ -385,7 +377,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         position = 9
     )
     @Path("/channel/{channel}/now")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     @GET
     public ApiScheduleEvent nowForChannel(
@@ -419,7 +410,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/channel/{channel}/next")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ApiScheduleEvent nextForChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
@@ -448,7 +438,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/net/{net}")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ScheduleResult listNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
@@ -484,7 +473,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/net/{net}/now")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ApiScheduleEvent nowForNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
@@ -516,7 +504,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/net/{net}/next")
     @GET
-    @ApiResponses(value = {@ApiResponse(code = 400, message = CLIENT_ERROR), @ApiResponse(code = 404, message = NOT_FOUND), @ApiResponse(code = 500, message = SERVER_ERROR)})
     @Trace(dispatcher = true)
     public ApiScheduleEvent nextForNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
