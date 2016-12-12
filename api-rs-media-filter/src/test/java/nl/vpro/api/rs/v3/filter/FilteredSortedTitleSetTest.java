@@ -102,4 +102,24 @@ public class FilteredSortedTitleSetTest {
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
 
     }
+
+    @Test
+    public void testWithTextualTypesMergeOverride() {
+
+        ApiMediaFilter.set("title:sub:2,title:1");
+        Set<Title> list = new TreeSet<>(
+            Arrays.asList(
+                Title.main("mis title", OwnerType.MIS),
+                Title.main("whats'on title", OwnerType.WHATS_ON),
+                Title.sub("subtitle", OwnerType.BROADCASTER),
+                Title.sub("subtitle2", OwnerType.MIS),
+                Title.shortTitle("short", OwnerType.BROADCASTER)
+            ));
+        FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
+        assertThat(filtered).hasSize(3);
+        assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
+        assertThat(filtered.first().getTitle()).isEqualTo("mis title");
+        assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
+
+    }
 }

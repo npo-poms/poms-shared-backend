@@ -47,6 +47,7 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
         Set<TextualType> textualTypes;
         if (extras.length > 0) {
             textualTypes = Arrays.stream(extras)
+                .filter(Objects::nonNull)
                 .map(String::toUpperCase)
                 .map(TextualType::valueOf)
                 .collect(Collectors.toSet());
