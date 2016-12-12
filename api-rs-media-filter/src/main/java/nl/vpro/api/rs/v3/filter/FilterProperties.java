@@ -46,21 +46,21 @@ public interface FilterProperties {
 class FilterPropertiesImpl implements FilterProperties {
     final Integer max;
 
-    final String extra;
+    final String option;
 
     FilterPropertiesImpl(Integer max, String extra) {
         this.max = max;
-        this.extra = extra;
+        this.option = extra;
     }
 
     @Override
     public Integer get(String option) {
-        return this.extra == null || Objects.equals(this.extra, option) ? max : 0;
+        return this.option == null || Objects.equals(this.option, option) ? max : 0;
     }
 
     @Override
     public String getOption() {
-        return extra;
+        return option;
 
     }
 }

@@ -1,9 +1,6 @@
 package nl.vpro.api.rs.v3.filter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -121,6 +118,23 @@ public class FilteredSortedTitleSetTest {
         assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
         assertThat(filtered.first().getTitle()).isEqualTo("mis title");
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
+
+    }
+
+
+    @Test
+    public void implicitTitle() throws Exception {
+        ApiMediaFilter.set("none");
+        SortedSet<Title> list = new TreeSet<>(Arrays.asList(
+            Title.main("b", OwnerType.CERES),
+            Title.main("a"),
+            Title.main("c", OwnerType.MIS),
+            Title.shortTitle("a")
+        ));
+        FilteredSortedTitleSet filtered = FilteredSortedTitleSet.wrapTitles("title", list);
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.first().getTitle()).isEqualTo("a");
+
 
     }
 }

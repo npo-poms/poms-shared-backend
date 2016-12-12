@@ -44,16 +44,6 @@ public class FilteredListTest {
 
 
 
-    @Test
-    public void implicitTitle() throws Exception {
-        ApiMediaFilter.set("none");
-        List<String> list = Arrays.asList("a", "b", "c");
-        FilteredList<String> filtered = FilteredList.wrap("title", list);
-        assertThat(filtered.contains("b")).isFalse();
-        assertThat(filtered.contains("a")).isTrue();
-        assertThat(filtered).hasSize(1);
-
-    }
 
     @Test
     public void scheduleEvent() throws Exception {
