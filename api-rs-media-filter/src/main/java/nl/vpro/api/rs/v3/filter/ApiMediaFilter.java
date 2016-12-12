@@ -29,12 +29,14 @@ import nl.vpro.domain.media.Segment;
 @Slf4j
 public class ApiMediaFilter {
 
+    private boolean throwOnUnknownProperties = true;
+
     public static class FilterProperties {
         final Integer max;
 
         final String extra;
 
-        public FilterProperties(Integer max, String extra) {
+        FilterProperties(Integer max, String extra) {
             this.max = max;
             this.extra = extra;
         }
@@ -198,7 +200,7 @@ public class ApiMediaFilter {
                 name = name + "s";
             }
             String singular = getSingular(name);
-            if (hasProperty(singular)) {
+            if (hasProperty(singular) || ! throwOnUnknownProperties) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
                 this.properties.put(singular, new FilterProperties(max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE, extra));
             } else {
