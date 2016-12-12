@@ -72,7 +72,7 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
                 textualType = type;
             }
             ApiMediaFilter.FilterProperties properties = filterHelper.limitOrDefault();
-            if (properties.get(type.name()) > forSub.size()) {
+            if (properties.get(type.name().toLowerCase()) > forSub.size()) {
                 forSub.add(object);
             }
         }

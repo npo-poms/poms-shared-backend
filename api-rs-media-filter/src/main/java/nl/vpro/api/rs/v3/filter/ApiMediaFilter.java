@@ -73,7 +73,7 @@ public class ApiMediaFilter {
 
         @Override
         public Integer get(String extra) {
-            return max;
+            return this.extra == null || Objects.equals(this.extra, extra) ? max : 0;
         }
 
         @Override
@@ -223,7 +223,7 @@ public class ApiMediaFilter {
             Integer max = null;
 
             String[] split = name.split("\\:", 3);
-            String extra = null;
+            String[] extra = new String[] {null};
             name = split[0];
             if (split.length > 1) {
                 try {
@@ -233,7 +233,7 @@ public class ApiMediaFilter {
                 }
             }
             if (split.length > 2) {
-                extra = split[1];
+                extra = split[1].split("\\|");
             }
 
             if (name.toLowerCase().endsWith("of")) {
@@ -244,19 +244,21 @@ public class ApiMediaFilter {
             String singular = getSingular(name);
             if (hasProperty(singular) || ! throwOnUnknownProperties) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
-                FilterProperties newFilter = new FilterPropertiesImpl(max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE, extra);
-                FilterProperties existing = this.properties.get(singular);
-                if (existing != null) {
-                    Combined combined;
-                    if (existing instanceof Combined) {
-                        combined = (Combined) existing;
+                for (String e : extra) {
+                    FilterProperties newFilter = new FilterPropertiesImpl(max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE, e);
+                    FilterProperties existing = this.properties.get(singular);
+                    if (existing != null) {
+                        Combined combined;
+                        if (existing instanceof Combined) {
+                            combined = (Combined) existing;
+                        } else {
+                            combined = new Combined(existing);
+                            this.properties.put(singular, combined);
+                        }
+                        combined.map.put(newFilter.getExtra(), newFilter);
                     } else {
-                        combined = new Combined(existing);
-                        this.properties.put(singular, combined);
+                        this.properties.put(singular, newFilter);
                     }
-                    combined.map.put(newFilter.getExtra(), newFilter);
-                } else {
-                    this.properties.put(singular, newFilter);
                 }
             } else {
                 throw new IllegalArgumentException("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());

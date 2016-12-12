@@ -107,10 +107,7 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
 
     @Override
     public T first() {
-        if (filterHelper.limitOrDefault().get() == 0) {
-            throw new NoSuchElementException();
-        }
-        return wrapped.first();
+        return iterator().next();
 
     }
 
