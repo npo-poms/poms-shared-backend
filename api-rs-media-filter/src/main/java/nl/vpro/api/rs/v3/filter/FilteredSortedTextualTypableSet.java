@@ -43,12 +43,16 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
     }
 
     List<SortedSet<T>> groupBy() {
-        Optional<String> extra = filterHelper.extra();
-        Set<TextualType> textualTypes = extra.
-            map(s -> Arrays.stream(s.toUpperCase().split(","))
+        String[] extras = filterHelper.extras();
+        Set<TextualType> textualTypes;
+        if (extras.length > 0) {
+            textualTypes = Arrays.stream(extras)
+                .map(String::toUpperCase)
                 .map(TextualType::valueOf)
-                .collect(Collectors.toSet()))
-            .orElseGet(() -> new HashSet<>(Arrays.asList(TextualType.values())));
+                .collect(Collectors.toSet());
+        } else {
+            textualTypes = new HashSet<>(Arrays.asList(TextualType.values()));
+        }
 
         List<SortedSet<T>> result = new ArrayList<>();
         TextualType textualType = null;
@@ -64,10 +68,13 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
 
             if (forSub == null || textualType != type) {
                 forSub = new TreeSet<T>();
-                result.add(new FilteredSortedSet<T>(filterHelper, forSub));
+                result.add(forSub);
                 textualType = type;
             }
-            forSub.add(object);
+            ApiMediaFilter.FilterProperties properties = filterHelper.limitOrDefault();
+            if (properties.get(type.name()) > forSub.size()) {
+                forSub.add(object);
+            }
         }
         return result;
     }

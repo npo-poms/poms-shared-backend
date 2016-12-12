@@ -1,5 +1,6 @@
 package nl.vpro.api.rs.v3.filter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
@@ -56,6 +57,46 @@ public class FilteredSortedTitleSetTest {
             ));
         FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
         assertThat(filtered).hasSize(1);
+        assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
+        assertThat(filtered.first().getTitle()).isEqualTo("mis title");
+        assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
+
+    }
+
+    @Test
+    public void testWithTextualTypes() {
+
+        ApiMediaFilter.set("title:main|sub:1");
+        Set<Title> list = new TreeSet<>(
+            Arrays.asList(
+                Title.main("mis title", OwnerType.MIS),
+                Title.main("whats'on title", OwnerType.WHATS_ON),
+                Title.sub("subtitle", OwnerType.BROADCASTER),
+                Title.shortTitle("short", OwnerType.BROADCASTER)
+
+            ));
+        FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
+        assertThat(filtered).hasSize(2);
+        assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
+        assertThat(filtered.first().getTitle()).isEqualTo("mis title");
+        assertThat(new ArrayList<>(filtered).get(1).getTitle()).isEqualTo("subtitle");
+        assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
+
+    }
+    @Test
+    public void testWithTextualTypesMerge() {
+
+        ApiMediaFilter.set("title:main:1,title:sub:2");
+        Set<Title> list = new TreeSet<>(
+            Arrays.asList(
+                Title.main("mis title", OwnerType.MIS),
+                Title.main("whats'on title", OwnerType.WHATS_ON),
+                Title.sub("subtitle", OwnerType.BROADCASTER),
+                Title.sub("subtitle2", OwnerType.MIS),
+                Title.shortTitle("short", OwnerType.BROADCASTER)
+            ));
+        FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
+        assertThat(filtered).hasSize(3);
         assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
         assertThat(filtered.first().getTitle()).isEqualTo("mis title");
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();

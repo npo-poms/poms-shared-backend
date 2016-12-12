@@ -4,8 +4,6 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import java.util.Optional;
-
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
@@ -29,6 +27,8 @@ public class FilterHelper {
     public ApiMediaFilter.FilterProperties limitOrDefault() {
         return ApiMediaFilter.get().limitOrDefault(property);
     }
+
+
     public int limitOr(int size) {
         return Math.min(size, limitOrDefault().get());
     }
@@ -36,8 +36,8 @@ public class FilterHelper {
         return limitOrDefault().get() < Integer.MAX_VALUE;
     }
 
-    public Optional<String> extra() {
-        return Optional.ofNullable(limitOrDefault().getExtra());
+    public String[] extras() {
+        return limitOrDefault().getExtras();
     }
 
     public void assumeUnfiltered() {

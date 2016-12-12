@@ -31,30 +31,72 @@ public class ApiMediaFilter {
 
     private boolean throwOnUnknownProperties = true;
 
-    public static class FilterProperties {
+    public interface FilterProperties {
+
+        Integer get(String extra);
+
+        default Integer get() {
+            return get(null);
+        }
+
+        default String[] getExtras() {
+            return new String[0];
+        }
+
+        default String getExtra() {
+            String[] extras = getExtras();
+            if (extras == null || extras.length == 0) {
+                return null;
+            }
+            return extras[0];
+        }
+
+        static FilterProperties one(String extra) {
+            return new FilterPropertiesImpl(1, extra);
+        }
+
+        FilterProperties ONE = one(null);
+        FilterProperties NONE = new FilterPropertiesImpl(0, null);
+        FilterProperties ALL = new FilterPropertiesImpl(Integer.MAX_VALUE, null);
+    }
+
+
+    public static class FilterPropertiesImpl implements  FilterProperties {
         final Integer max;
 
         final String extra;
 
-        FilterProperties(Integer max, String extra) {
+        FilterPropertiesImpl(Integer max, String extra) {
             this.max = max;
             this.extra = extra;
         }
 
-        public Integer get() {
+        @Override
+        public Integer get(String extra) {
             return max;
         }
+
+        @Override
         public String getExtra() {
             return extra;
-        }
 
-        public static FilterProperties one(String extra) {
-            return new FilterProperties(1, extra);
         }
+    }
 
-        public static FilterProperties ONE = one(null);
-        public static FilterProperties NONE = new FilterProperties(0, null);
-        public static FilterProperties ALL = new FilterProperties(Integer.MAX_VALUE, null);
+    public static class Combined implements FilterProperties {
+        final Map<String, FilterProperties> map = new HashMap<>();
+        public Combined(FilterProperties first) {
+            map.put(first.getExtra(), first);
+        }
+        @Override
+        public Integer get(String extra) {
+            return map.getOrDefault(extra, FilterProperties.NONE).get(extra);
+        }
+        @Override
+        public String[] getExtras() {
+            Collection<FilterProperties> values = map.values();
+            return values.stream().map(FilterProperties::getExtra).toArray(String[]::new);
+        }
 
     }
 
@@ -202,7 +244,20 @@ public class ApiMediaFilter {
             String singular = getSingular(name);
             if (hasProperty(singular) || ! throwOnUnknownProperties) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
-                this.properties.put(singular, new FilterProperties(max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE, extra));
+                FilterProperties newFilter = new FilterPropertiesImpl(max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE, extra);
+                FilterProperties existing = this.properties.get(singular);
+                if (existing != null) {
+                    Combined combined;
+                    if (existing instanceof Combined) {
+                        combined = (Combined) existing;
+                    } else {
+                        combined = new Combined(existing);
+                        this.properties.put(singular, combined);
+                    }
+                    combined.map.put(newFilter.getExtra(), newFilter);
+                } else {
+                    this.properties.put(singular, newFilter);
+                }
             } else {
                 throw new IllegalArgumentException("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());
             }
@@ -285,6 +340,7 @@ public class ApiMediaFilter {
             .stream(properties.split(","))
             .filter(StringUtils::isNotBlank)
             .toArray(String[]::new));
+
         if (!this.properties.containsKey("title")) {
             this.properties.put("title", FilterProperties.one("MAIN"));
         }
@@ -302,7 +358,7 @@ public class ApiMediaFilter {
             if (retainAll) {
                 // toch maar een beetje impliciet filteren voor scheduleevents want dat zijn er nogal veel soms!
                 if ("scheduleevent".equals(singular)) {
-                    return new FilterProperties(100, null);
+                    return new FilterPropertiesImpl(100, null);
                 } else {
                     return FilterProperties.ALL;
                 }
