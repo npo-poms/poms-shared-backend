@@ -46,9 +46,14 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
         SortedSet<T> forSub = new TreeSet<T>();
         result.add(new FilteredSortedSet<T>(filterHelper, forSub));
         for (T object : wrapped) {
-            if (object.getType() != textualType) {
+            TextualType type = object.getType();
+            if (type == TextualType.EPISODE) {
+                type = TextualType.SUB;
+            }
+            if (type != textualType) {
                 forSub = new TreeSet<T>();
                 result.add(new FilteredSortedSet<T>(filterHelper, forSub));
+                textualType = type;
             }
             forSub.add(object);
         }
