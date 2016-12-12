@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import nl.vpro.domain.media.Group;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
+import nl.vpro.domain.media.support.TextualType;
 
 /**
  * @author Roelof Jan Koekoek
@@ -31,74 +32,7 @@ public class ApiMediaFilter {
 
     private boolean throwOnUnknownProperties = true;
 
-    public interface FilterProperties {
 
-        Integer get(String extra);
-
-        default Integer get() {
-            return get(null);
-        }
-
-        default String[] getExtras() {
-            return new String[0];
-        }
-
-        default String getExtra() {
-            String[] extras = getExtras();
-            if (extras == null || extras.length == 0) {
-                return null;
-            }
-            return extras[0];
-        }
-
-        static FilterProperties one(String extra) {
-            return new FilterPropertiesImpl(1, extra);
-        }
-
-        FilterProperties ONE = one(null);
-        FilterProperties NONE = new FilterPropertiesImpl(0, null);
-        FilterProperties ALL = new FilterPropertiesImpl(Integer.MAX_VALUE, null);
-    }
-
-
-    public static class FilterPropertiesImpl implements  FilterProperties {
-        final Integer max;
-
-        final String extra;
-
-        FilterPropertiesImpl(Integer max, String extra) {
-            this.max = max;
-            this.extra = extra;
-        }
-
-        @Override
-        public Integer get(String extra) {
-            return this.extra == null || Objects.equals(this.extra, extra) ? max : 0;
-        }
-
-        @Override
-        public String getExtra() {
-            return extra;
-
-        }
-    }
-
-    public static class Combined implements FilterProperties {
-        final Map<String, FilterProperties> map = new HashMap<>();
-        public Combined(FilterProperties first) {
-            map.put(first.getExtra(), first);
-        }
-        @Override
-        public Integer get(String extra) {
-            return map.getOrDefault(extra, FilterProperties.NONE).get(extra);
-        }
-        @Override
-        public String[] getExtras() {
-            Collection<FilterProperties> values = map.values();
-            return values.stream().map(FilterProperties::getExtra).toArray(String[]::new);
-        }
-
-    }
 
     private final Map<String, FilterProperties> properties = new HashMap<>();
 
@@ -233,7 +167,7 @@ public class ApiMediaFilter {
                 }
             }
             if (split.length > 2) {
-                extra = split[1].split("\\|");
+                extra = split[1].toLowerCase().split("\\|");
             }
 
             if (name.toLowerCase().endsWith("of")) {
@@ -344,7 +278,7 @@ public class ApiMediaFilter {
             .toArray(String[]::new));
 
         if (!this.properties.containsKey("title")) {
-            this.properties.put("title", FilterProperties.one("MAIN"));
+            this.properties.put("title", FilterProperties.one(TextualType.MAIN));
         }
         if (!this.properties.containsKey("broadcaster")) {
             this.properties.put("broadcaster", FilterProperties.ONE);

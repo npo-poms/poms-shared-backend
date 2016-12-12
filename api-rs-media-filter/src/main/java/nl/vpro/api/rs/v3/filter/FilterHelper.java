@@ -24,7 +24,7 @@ public class FilterHelper {
         return new FilterHelper(property);
     }
 
-    public ApiMediaFilter.FilterProperties limitOrDefault() {
+    public FilterProperties limitOrDefault() {
         return ApiMediaFilter.get().limitOrDefault(property);
     }
 
