@@ -5,6 +5,7 @@
 package nl.vpro.api.rs.v3.filter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.media.support.Typable;
@@ -42,16 +43,26 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
     }
 
     List<SortedSet<T>> groupBy() {
+        Optional<String> extra = filterHelper.extra();
+        Set<TextualType> textualTypes = extra.
+            map(s -> Arrays.stream(s.toUpperCase().split(","))
+                .map(TextualType::valueOf)
+                .collect(Collectors.toSet()))
+            .orElseGet(() -> new HashSet<>(Arrays.asList(TextualType.values())));
+
         List<SortedSet<T>> result = new ArrayList<>();
-        TextualType textualType = TextualType.MAIN;
-        SortedSet<T> forSub = new TreeSet<T>();
-        result.add(new FilteredSortedSet<T>(filterHelper, forSub));
+        TextualType textualType = null;
+        SortedSet<T> forSub = null;
         for (T object : wrapped) {
             TextualType type = object.getType();
             if (type == TextualType.EPISODE) {
                 type = TextualType.SUB;
             }
-            if (type != textualType) {
+            if (! textualTypes.contains(type)) {
+                continue;
+            }
+
+            if (forSub == null || textualType != type) {
                 forSub = new TreeSet<T>();
                 result.add(new FilteredSortedSet<T>(filterHelper, forSub));
                 textualType = type;

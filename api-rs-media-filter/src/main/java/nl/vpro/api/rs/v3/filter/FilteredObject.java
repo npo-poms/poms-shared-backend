@@ -27,6 +27,6 @@ public class FilteredObject<T> {
     }
 
     public T value() {
-        return ApiMediaFilter.get().limitOrDefault(helper.property) >  0 ? wrapped : null;
+        return ApiMediaFilter.get().limitOrDefault(helper.property).get() >  0 ? wrapped : null;
     }
 }

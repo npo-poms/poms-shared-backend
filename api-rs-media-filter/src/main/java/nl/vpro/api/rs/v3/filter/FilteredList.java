@@ -46,9 +46,7 @@ public class FilteredList<T> extends AbstractList<T>  {
 
     @Override
     public int size() {
-        Integer limit = filterHelper.limitOrDefault();
-        int size = wrapped.size();
-        return size < limit ? size : limit;
+        return filterHelper.limitOr(wrapped.size());
     }
 
     @Override

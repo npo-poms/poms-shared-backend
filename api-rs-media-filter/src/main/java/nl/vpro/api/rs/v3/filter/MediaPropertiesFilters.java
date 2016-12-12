@@ -103,7 +103,7 @@ public class MediaPropertiesFilters {
                                         if ("titles".equals(fieldName)) {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
                                         } else if ("descriptions".equals(fieldName)) {
-                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + f.getFieldName() + "\", $proceed($$));");
                                         } else {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                         }

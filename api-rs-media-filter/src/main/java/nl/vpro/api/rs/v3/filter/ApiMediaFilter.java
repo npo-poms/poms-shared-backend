@@ -29,7 +29,34 @@ import nl.vpro.domain.media.Segment;
 @Slf4j
 public class ApiMediaFilter {
 
-    private final Map<String, Integer> properties = new HashMap<>();
+    public static class FilterProperties {
+        final Integer max;
+
+        final String extra;
+
+        public FilterProperties(Integer max, String extra) {
+            this.max = max;
+            this.extra = extra;
+        }
+
+        public Integer get() {
+            return max;
+        }
+        public String getExtra() {
+            return extra;
+        }
+
+        public static FilterProperties one(String extra) {
+            return new FilterProperties(1, extra);
+        }
+
+        public static FilterProperties ONE = one(null);
+        public static FilterProperties NONE = new FilterProperties(0, null);
+        public static FilterProperties ALL = new FilterProperties(Integer.MAX_VALUE, null);
+
+    }
+
+    private final Map<String, FilterProperties> properties = new HashMap<>();
 
     // List of properties that contain a different name in JSON/XML than the fieldname in the code
     private static final Map<String, String> aliasToProperty = new HashMap<>();
@@ -151,15 +178,20 @@ public class ApiMediaFilter {
             String name = aliasToProperty.getOrDefault(property, property);
             Integer max = null;
 
-            int colon = name.indexOf(':');
-            if (colon >= 1) {
+            String[] split = name.split("\\:", 3);
+            String extra = null;
+            name = split[0];
+            if (split.length > 1) {
                 try {
-                    max = Integer.parseInt(name.substring(colon + 1));
+                    max = Integer.parseInt(split[split.length - 1]);
                 } catch (NumberFormatException ex) {
                     throw new IllegalArgumentException("Invalid max value after ':' in " + property);
                 }
-                name = name.substring(0, colon);
             }
+            if (split.length > 2) {
+                extra = split[1];
+            }
+
             if (name.toLowerCase().endsWith("of")) {
                 // This makes no sense at all, but for backwardscompatibility
                 // effect
@@ -168,7 +200,7 @@ public class ApiMediaFilter {
             String singular = getSingular(name);
             if (hasProperty(singular)) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
-                this.properties.put(singular, max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE);
+                this.properties.put(singular, new FilterProperties(max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE, extra));
             } else {
                 throw new IllegalArgumentException("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());
             }
@@ -252,28 +284,28 @@ public class ApiMediaFilter {
             .filter(StringUtils::isNotBlank)
             .toArray(String[]::new));
         if (!this.properties.containsKey("title")) {
-            this.properties.put("title", 1);
+            this.properties.put("title", FilterProperties.one("MAIN"));
         }
         if (!this.properties.containsKey("broadcaster")) {
-            this.properties.put("broadcaster", 1);
+            this.properties.put("broadcaster", FilterProperties.ONE);
         }
     }
 
-    Integer limitOrDefault(String property) {
+    FilterProperties limitOrDefault(String property) {
         String singular = getSingular(property);
         if (! filtering) {
-            return Integer.MAX_VALUE;
+            return FilterProperties.ALL;
 
         } else {
             if (retainAll) {
                 // toch maar een beetje impliciet filteren voor scheduleevents want dat zijn er nogal veel soms!
                 if ("scheduleevent".equals(singular)) {
-                    return 100;
+                    return new FilterProperties(100, null);
                 } else {
-                    return Integer.MAX_VALUE;
+                    return FilterProperties.ALL;
                 }
             } else {
-                return properties.getOrDefault(singular, 0);
+                return properties.getOrDefault(singular, FilterProperties.NONE);
             }
         }
     }

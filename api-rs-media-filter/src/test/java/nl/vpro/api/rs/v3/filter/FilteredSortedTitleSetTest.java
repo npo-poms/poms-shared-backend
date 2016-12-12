@@ -26,15 +26,39 @@ public class FilteredSortedTitleSetTest {
 
 
     @Test
-    public void test1() {
+    public void testNoTextualType() {
 
         ApiMediaFilter.set("title:1");
-        Set<Title> list = new TreeSet<>(Arrays.asList(Title.main("a", OwnerType.MIS), Title.main("b", OwnerType.WHATS_ON)));
-        System.out.println(list);
+        Set<Title> list = new TreeSet<>(
+            Arrays.asList(
+                Title.main("mis title", OwnerType.MIS),
+                Title.main("whats'on title", OwnerType.WHATS_ON),
+                Title.sub("subtitle", OwnerType.BROADCASTER)
+            ));
+        FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
+        assertThat(filtered).hasSize(2);
+        assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
+        assertThat(filtered.first().getTitle()).isEqualTo("mis title");
+        assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
+
+    }
+
+
+    @Test
+    public void testWithTextualType() {
+
+        ApiMediaFilter.set("title:main:1");
+        Set<Title> list = new TreeSet<>(
+            Arrays.asList(
+                Title.main("mis title", OwnerType.MIS),
+                Title.main("whats'on title", OwnerType.WHATS_ON),
+                Title.sub("subtitle", OwnerType.BROADCASTER)
+            ));
         FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
         assertThat(filtered).hasSize(1);
-        assertThat(filtered.contains(Title.main("a", OwnerType.MIS))).isTrue();
-        assertThat(filtered.contains(Title.main("b", OwnerType.WHATS_ON))).isFalse();
+        assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
+        assertThat(filtered.first().getTitle()).isEqualTo("mis title");
+        assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
 
     }
 }
