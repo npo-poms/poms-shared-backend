@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014 All rights reserved
  * VPRO The Netherlands
  */
@@ -168,23 +168,23 @@ public class ApiMediaFilterTest {
 
         /* Singular */
         ApiMediaFilter.set("crid");
-        assertThat(new FilteredList<>("crid", program.getCrids())).hasSize(1);
+        assertThat(FilteredList.wrap("crids", program.getCrids())).hasSize(1);
 
         ApiMediaFilter.set("crid:1");
-        assertThat(new FilteredList<>("crid", program.getCrids())).hasSize(1);
+        assertThat(FilteredList.wrap("crids", program.getCrids())).hasSize(1);
 
         ApiMediaFilter.set("crid:10");
-        assertThat(new FilteredList<>("crid", program.getCrids())).hasSize(3);
+        assertThat(FilteredList.wrap("crids", program.getCrids())).hasSize(3);
 
         /* Plural */
         ApiMediaFilter.set("crids");
-        assertThat(new FilteredList<>("crids", program.getCrids())).hasSize(3);
+        assertThat(FilteredList.wrap("crids", program.getCrids())).hasSize(3);
 
         ApiMediaFilter.set("crids:1");
-        assertThat(new FilteredList<>("crids", program.getCrids())).hasSize(1);
+        assertThat(FilteredList.wrap("crids", program.getCrids())).hasSize(1);
 
         ApiMediaFilter.set("crids:10");
-        assertThat(new FilteredList<>("crids", program.getCrids())).hasSize(3);
+        assertThat(FilteredList.wrap("crids", program.getCrids())).hasSize(3);
     }
 
     @Test

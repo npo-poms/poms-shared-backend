@@ -18,6 +18,7 @@ public class FilteredListTest {
 
     @BeforeClass
     public static void init() {
+        // Not really needed for this, but otherwise...
         MediaPropertiesFilters.instrument();
     }
 
@@ -25,7 +26,7 @@ public class FilteredListTest {
     public void contains() throws Exception {
         ApiMediaFilter.set("title:1");
         List<String> list = Arrays.asList("a", "b");
-        FilteredList<String> filtered = new FilteredList<>("title", list);
+        FilteredList<String> filtered = FilteredList.wrap("title", list);
         assertThat(filtered.contains("b")).isFalse();
 
     }
@@ -35,7 +36,7 @@ public class FilteredListTest {
     public void containsEmpty() throws Exception {
         ApiMediaFilter.set("title:1");
         List<String> list = Arrays.asList();
-        FilteredList<String> filtered = new FilteredList<>("title", list);
+        FilteredList<String> filtered = FilteredList.wrap("title", list);
         assertThat(filtered.contains("b")).isFalse();
 
     }
@@ -47,7 +48,7 @@ public class FilteredListTest {
     public void implicitTitle() throws Exception {
         ApiMediaFilter.set("none");
         List<String> list = Arrays.asList("a", "b", "c");
-        FilteredList<String> filtered = new FilteredList<>("title", list);
+        FilteredList<String> filtered = FilteredList.wrap("title", list);
         assertThat(filtered.contains("b")).isFalse();
         assertThat(filtered.contains("a")).isTrue();
         assertThat(filtered).hasSize(1);
@@ -58,7 +59,7 @@ public class FilteredListTest {
     public void scheduleEvent() throws Exception {
         ApiMediaFilter.set("");
         List<String> list = Collections.nCopies(101, "a");
-        FilteredList<String> filtered = new FilteredList<>("scheduleevent", list);
+        FilteredList<String> filtered = FilteredList.wrap("scheduleevent", list);
         assertThat(filtered.contains("a")).isTrue();
         assertThat(filtered).hasSize(100);
 
@@ -77,7 +78,7 @@ public class FilteredListTest {
     public void somethingElse() throws Exception {
         ApiMediaFilter.set("");
         List<String> list = Collections.nCopies(101, "a");
-        FilteredList<String> filtered = new FilteredList<>("somethingelse", list);
+        FilteredList<String> filtered = FilteredList.wrap("somethingelse", list);
         assertThat(filtered.contains("a")).isTrue();
         assertThat(filtered).hasSize(101);
 

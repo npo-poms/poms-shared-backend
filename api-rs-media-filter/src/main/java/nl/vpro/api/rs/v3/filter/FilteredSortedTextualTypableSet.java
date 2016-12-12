@@ -1,0 +1,60 @@
+/*
+ * Copyright (C) 2014 All rights reserved
+ * VPRO The Netherlands
+ */
+package nl.vpro.api.rs.v3.filter;
+
+import java.util.*;
+
+import nl.vpro.domain.media.support.TextualType;
+import nl.vpro.domain.media.support.Typable;
+
+/**
+ * @author rico
+ * @author Michiel Meeuwissen
+ * @since 3.0
+ */
+public  abstract class FilteredSortedTextualTypableSet<T extends Typable<TextualType>> extends FilteredSortedSet<T>   {
+
+    protected FilteredSortedTextualTypableSet(String property, SortedSet<T> wrapped) {
+        super(property, wrapped);
+
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        if (filterHelper.isFiltered()) {
+            return groupBy().stream().flatMap(Set::stream).iterator();
+        } else {
+            return wrapped.iterator();
+        }
+
+    }
+
+    @Override
+    public int size() {
+        if (filterHelper.isFiltered()) {
+            return groupBy().stream().mapToInt(Set::size).sum();
+        } else {
+            return wrapped.size();
+        }
+    }
+
+    List<SortedSet<T>> groupBy() {
+        List<SortedSet<T>> result = new ArrayList<>();
+        TextualType textualType = TextualType.MAIN;
+        SortedSet<T> forSub = new TreeSet<T>();
+        result.add(new FilteredSortedSet<T>(filterHelper, forSub));
+        for (T object : wrapped) {
+            if (object.getType() != textualType) {
+                forSub = new TreeSet<T>();
+                result.add(new FilteredSortedSet<T>(filterHelper, forSub));
+            }
+            forSub.add(object);
+        }
+        return result;
+    }
+
+
+
+}

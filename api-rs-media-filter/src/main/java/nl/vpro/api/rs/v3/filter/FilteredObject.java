@@ -8,10 +8,14 @@ package nl.vpro.api.rs.v3.filter;
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
-public class FilteredObject<T> extends AbstractFiltered<T> {
+public class FilteredObject<T> {
+
+    private final FilterHelper helper;
+    private final T wrapped;
 
     protected FilteredObject(String property, T wrapped) {
-        super((property.indexOf(':') >= 0 ? property.substring(0, property.indexOf(':')) : property) + ":1", wrapped);
+        this.helper = FilterHelper.of(property);
+        this.wrapped = wrapped;
     }
 
     @SuppressWarnings("unchecked")
@@ -23,6 +27,6 @@ public class FilteredObject<T> extends AbstractFiltered<T> {
     }
 
     public T value() {
-        return getFilter().limitOrDefault(property) >  0 ? wrapped : null;
+        return ApiMediaFilter.get().limitOrDefault(helper.property) >  0 ? wrapped : null;
     }
 }

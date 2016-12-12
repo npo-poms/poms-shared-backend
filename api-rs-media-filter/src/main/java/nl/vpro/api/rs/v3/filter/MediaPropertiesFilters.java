@@ -98,16 +98,15 @@ public class MediaPropertiesFilters {
                                         return;
                                     }
 
-                                    if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader()) {
-                                        LOG.debug("Instrumenting SortedSet {}", fieldName);
+                                    if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() || "Ljava/util/Set;".equals(f.getSignature()) && f.isReader()) {
+                                        LOG.debug("Instrumenting Set {}", fieldName);
                                         if ("titles".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
+                                        } else if ("descriptions".equals(fieldName)) {
+                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + f.getFieldName() + "\", $proceed($$));");
                                         } else {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                         }
-                                    } else if ("Ljava/util/Set;".equals(f.getSignature()) && f.isReader()) {
-                                        LOG.debug("Instrumenting SortedSet {}", fieldName);
-                                        f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                     } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
                                         LOG.debug("Instrumenting List {}", fieldName);
                                         f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
