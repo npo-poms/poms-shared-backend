@@ -187,7 +187,7 @@ public class ApiMediaFilter {
                 try {
                     max = Integer.parseInt(split[split.length - 1]);
                 } catch (NumberFormatException ex) {
-                    throw new IllegalArgumentException("Invalid max value after ':' in " + property);
+                    throw new IllegalArgumentException("Invalid max value " + split[split.length - 1] + " in " + property);
                 }
             }
             if (split.length > 2) {
