@@ -7,34 +7,34 @@ import java.util.Objects;
 
 /**
  * @author Michiel Meeuwissen
- * @since ...
+ * @since 5.0
  */
 public interface FilterProperties {
 
-    Integer get(String extra);
+    Integer get(String option);
 
     default Integer get() {
         return get(null);
     }
 
-    default String[] getExtras() {
+    default String[] getOptions() {
         return new String[0];
     }
 
-    default String getExtra() {
-        String[] extras = getExtras();
-        if (extras == null || extras.length == 0) {
+    default String getOption() {
+        String[] options = getOptions();
+        if (options == null || options.length == 0) {
             return null;
         }
-        return extras[0];
+        return options[0];
     }
 
-    static FilterProperties one(String extra) {
-        return new FilterPropertiesImpl(1, extra);
+    static FilterProperties one(String option) {
+        return new FilterPropertiesImpl(1, option);
     }
 
-    static FilterProperties one(Enum extra) {
-        return one(extra.name().toLowerCase());
+    static FilterProperties one(Enum option) {
+        return one(option.name().toLowerCase());
     }
 
     FilterProperties ONE = one((String) null);
@@ -54,12 +54,12 @@ class FilterPropertiesImpl implements FilterProperties {
     }
 
     @Override
-    public Integer get(String extra) {
-        return this.extra == null || Objects.equals(this.extra, extra) ? max : 0;
+    public Integer get(String option) {
+        return this.extra == null || Objects.equals(this.extra, option) ? max : 0;
     }
 
     @Override
-    public String getExtra() {
+    public String getOption() {
         return extra;
 
     }
@@ -70,18 +70,20 @@ class Combined implements FilterProperties {
     final Map<String, FilterProperties> map = new HashMap<>();
 
     public Combined(FilterProperties first) {
-        map.put(first.getExtra(), first);
+        map.put(first.getOption(), first);
     }
 
     @Override
-    public Integer get(String extra) {
-        return map.getOrDefault(extra, FilterProperties.NONE).get(extra);
+    public Integer get(String option) {
+        return map.getOrDefault(option,
+            map.getOrDefault(null, FilterProperties.NONE)
+        ).get(option);
     }
 
     @Override
-    public String[] getExtras() {
+    public String[] getOptions() {
         Collection<FilterProperties> values = map.values();
-        return values.stream().map(FilterProperties::getExtra).toArray(String[]::new);
+        return values.stream().map(FilterProperties::getOption).toArray(String[]::new);
     }
 
 }

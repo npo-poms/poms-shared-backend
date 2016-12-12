@@ -113,10 +113,11 @@ public class FilteredSortedTitleSetTest {
                 Title.main("whats'on title", OwnerType.WHATS_ON),
                 Title.sub("subtitle", OwnerType.BROADCASTER),
                 Title.sub("subtitle2", OwnerType.MIS),
+                Title.sub("subtitle3", OwnerType.MIS),
                 Title.shortTitle("short", OwnerType.BROADCASTER)
             ));
         FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
-        assertThat(filtered).hasSize(3);
+        assertThat(filtered).hasSize(4);
         assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
         assertThat(filtered.first().getTitle()).isEqualTo("mis title");
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();

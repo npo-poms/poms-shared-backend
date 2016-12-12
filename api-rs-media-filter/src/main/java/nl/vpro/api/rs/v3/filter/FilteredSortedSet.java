@@ -52,7 +52,7 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
         if (filterHelper.isFiltered()) {
             return new Iterator<T>() {
                 int count = 0;
-                int limit = filterHelper.limitOrDefault().get();
+                int limit = filterHelper.orDefault().get();
 
                 final Iterator<T> wrappedIterator = wrapped.iterator();
 

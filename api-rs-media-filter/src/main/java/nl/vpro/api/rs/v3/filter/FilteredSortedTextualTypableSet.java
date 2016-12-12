@@ -5,7 +5,6 @@
 package nl.vpro.api.rs.v3.filter;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.media.support.Typable;
@@ -43,16 +42,18 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
     }
 
     List<SortedSet<T>> groupBy() {
-        String[] extras = filterHelper.extras();
-        Set<TextualType> textualTypes;
-        if (extras.length > 0) {
-            textualTypes = Arrays.stream(extras)
-                .filter(Objects::nonNull)
-                .map(String::toUpperCase)
-                .map(TextualType::valueOf)
-                .collect(Collectors.toSet());
-        } else {
-            textualTypes = new HashSet<>(Arrays.asList(TextualType.values()));
+        String[] options = filterHelper.options();
+        if (options.length == 0) {
+            options = new String[]{null};
+        }
+        Set<TextualType> textualTypes = new HashSet<>();
+        for (String option : options) {
+            if (option == null) {
+                textualTypes.addAll(Arrays.asList(TextualType.values()));
+            } else {
+
+                textualTypes.add(TextualType.valueOf(option.toUpperCase()));
+            }
         }
 
         List<SortedSet<T>> result = new ArrayList<>();
@@ -72,7 +73,7 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
                 result.add(forSub);
                 textualType = type;
             }
-            FilterProperties properties = filterHelper.limitOrDefault();
+            FilterProperties properties = filterHelper.orDefault();
             if (properties.get(type.name().toLowerCase()) > forSub.size()) {
                 forSub.add(object);
             }

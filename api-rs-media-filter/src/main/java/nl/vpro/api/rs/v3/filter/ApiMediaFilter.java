@@ -189,7 +189,7 @@ public class ApiMediaFilter {
                             combined = new Combined(existing);
                             this.properties.put(singular, combined);
                         }
-                        combined.map.put(newFilter.getExtra(), newFilter);
+                        combined.map.put(newFilter.getOption(), newFilter);
                     } else {
                         this.properties.put(singular, newFilter);
                     }

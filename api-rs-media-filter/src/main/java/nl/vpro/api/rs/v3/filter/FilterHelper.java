@@ -24,20 +24,20 @@ public class FilterHelper {
         return new FilterHelper(property);
     }
 
-    public FilterProperties limitOrDefault() {
+    public FilterProperties orDefault() {
         return ApiMediaFilter.get().limitOrDefault(property);
     }
 
 
     public int limitOr(int size) {
-        return Math.min(size, limitOrDefault().get());
+        return Math.min(size, orDefault().get());
     }
     public boolean isFiltered() {
-        return limitOrDefault().get() < Integer.MAX_VALUE;
+        return orDefault().get() < Integer.MAX_VALUE;
     }
 
-    public String[] extras() {
-        return limitOrDefault().getExtras();
+    public String[] options() {
+        return orDefault().getOptions();
     }
 
     public void assumeUnfiltered() {
