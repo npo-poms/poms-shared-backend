@@ -160,10 +160,12 @@ public class ApiMediaFilter {
             String[] extra = new String[] {null};
             name = split[0];
             if (split.length > 1) {
-                try {
-                    max = Integer.parseInt(split[split.length - 1]);
-                } catch (NumberFormatException ex) {
-                    throw new IllegalArgumentException("Invalid max value " + split[split.length - 1] + " in " + property);
+                if (StringUtils.isNotBlank(split[split.length - 1])) {
+                    try {
+                        max = Integer.parseInt(split[split.length - 1]);
+                    } catch (NumberFormatException ex) {
+                        throw new IllegalArgumentException("Invalid max value " + split[split.length - 1] + " in " + property);
+                    }
                 }
             }
             if (split.length > 2) {
@@ -176,10 +178,14 @@ public class ApiMediaFilter {
                 name = name + "s";
             }
             String singular = getSingular(name);
-            if (hasProperty(singular) || ! throwOnUnknownProperties) {
+            if (max == null) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
+                max = name.equals(singular) ? 1 : Integer.MAX_VALUE;
+            }
+            if (hasProperty(singular) || ! throwOnUnknownProperties) {
+
                 for (String e : extra) {
-                    FilterProperties newFilter = new FilterPropertiesImpl(max != null ? max : name.equals(singular) ? 1 : Integer.MAX_VALUE, e);
+                    FilterProperties newFilter = new FilterPropertiesImpl(max, e);
                     FilterProperties existing = this.properties.get(singular);
                     if (existing != null) {
                         Combined combined;

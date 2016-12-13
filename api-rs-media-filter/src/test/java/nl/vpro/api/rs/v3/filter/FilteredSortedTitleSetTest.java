@@ -137,4 +137,41 @@ public class FilteredSortedTitleSetTest {
 
 
     }
+
+
+
+    @Test
+    public void testWithTextualTypeWithoutLimitSingular() {
+
+        ApiMediaFilter.set("title:main:");
+        Set<Title> list = new TreeSet<>(
+            Arrays.asList(
+                Title.main("mis title", OwnerType.MIS),
+                Title.main("whats'on title", OwnerType.WHATS_ON),
+                Title.sub("subtitle", OwnerType.BROADCASTER),
+                Title.sub("subtitle2", OwnerType.MIS),
+                Title.shortTitle("short", OwnerType.BROADCASTER)
+            ));
+        FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
+    }
+
+
+    @Test
+    public void testWithTextualTypeWithoutLimitPlural() {
+
+        ApiMediaFilter.set("titles:main:");
+        Set<Title> list = new TreeSet<>(
+            Arrays.asList(
+                Title.main("mis title", OwnerType.MIS),
+                Title.main("whats'on title", OwnerType.WHATS_ON),
+                Title.sub("subtitle", OwnerType.BROADCASTER),
+                Title.sub("subtitle2", OwnerType.MIS),
+                Title.shortTitle("short", OwnerType.BROADCASTER)
+            ));
+        FilteredSortedTextualTypableSet<Title> filtered = FilteredSortedTitleSet.wrapTitles("title", list);
+        assertThat(filtered).hasSize(2);
+        assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
+    }
 }

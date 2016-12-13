@@ -98,7 +98,7 @@ public class MediaPropertiesFilters {
                                         return;
                                     }
 
-                                    if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() || "Ljava/util/Set;".equals(f.getSignature()) && f.isReader()) {
+                                    if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
                                         LOG.debug("Instrumenting Set {}", fieldName);
                                         if ("titles".equals(fieldName)) {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
