@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2014 All rights reserved
  * VPRO The Netherlands
  */
@@ -7,6 +7,8 @@ package nl.vpro.api.rs.v3.filter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+
+import javax.validation.constraints.NotNull;
 
 import nl.vpro.util.ResortedSortedSet;
 
@@ -48,6 +50,7 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
     }
 
     @Override
+    @NotNull
     public Iterator<T> iterator() {
         if (filterHelper.isFiltered()) {
             return new Iterator<T>() {
@@ -91,18 +94,18 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
 
     @Override
     public SortedSet<T> subSet(T fromElement, T toElement) {
-        return wrapped.subSet(fromElement, toElement);
+        return new FilteredSortedSet<>(filterHelper, wrapped.subSet(fromElement, toElement));
 
     }
 
     @Override
     public SortedSet<T> headSet(T toElement) {
-        return new FilteredSortedSet<T>(filterHelper.property, wrapped.headSet(toElement));
+        return new FilteredSortedSet<T>(filterHelper, wrapped.headSet(toElement));
     }
 
     @Override
     public SortedSet<T> tailSet(T fromElement) {
-        return wrapped.tailSet(fromElement);
+        return new FilteredSortedSet<>(filterHelper, wrapped.tailSet(fromElement));
     }
 
     @Override
@@ -115,10 +118,11 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
     public T last() {
         if (filterHelper.isFiltered()) {
             Iterator<T> it = iterator();
-            for (int i = 0; i < size() - 1; i++) {
-                it.next();
+            T result = it.next();
+            while (it.hasNext()) {
+                result = it.next();
             }
-            return it.next();
+            return result;
         } else {
             return wrapped.last();
         }
