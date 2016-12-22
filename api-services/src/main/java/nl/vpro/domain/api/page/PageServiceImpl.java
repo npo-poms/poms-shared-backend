@@ -1,31 +1,23 @@
 package nl.vpro.domain.api.page;
 
 import javax.inject.Named;
-import javax.persistence.Id;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-import com.google.common.collect.Iterables;
-import nl.vpro.domain.api.IdList;
-import nl.vpro.domain.page.util.Urls;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import nl.vpro.domain.api.IdList;
 import nl.vpro.domain.api.SuggestResult;
-import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
+import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.page.Page;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Michiel Meeuwissen

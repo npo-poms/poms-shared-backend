@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2013 All rights reserved
  * VPRO The Netherlands
  */
@@ -6,6 +6,7 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
+import javax.inject.Named;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
@@ -13,10 +14,6 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.inject.Named;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -152,7 +149,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize("permitAll()")
+    //@PreAuthorize("permitAll()")
     public RedirectList redirects() {
         return switchRepository(settings.redirectsRepository).redirects();
     }
