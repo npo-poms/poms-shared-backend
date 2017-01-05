@@ -21,6 +21,7 @@ import nl.vpro.domain.media.exceptions.ModificationException;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Roelof Jan Koekoek
@@ -119,15 +120,11 @@ public class ApiMediaFilterTest {
         assertThat(new FilteredObject<>("type", program.getType()).value()).isNotNull();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testFilterUnknownProperty() {
-        try {
-            ApiMediaFilter.set("bestaatniet");
-        } catch (IllegalArgumentException ia) {
-            assertThat(ia.getMessage()).startsWith("The property bestaatniet is not known.");
-            throw ia;
-        }
-
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> ApiMediaFilter.set("bestaatniet"))
+                .withMessageStartingWith("The property bestaatniet is not known.");
     }
 
     @Test
