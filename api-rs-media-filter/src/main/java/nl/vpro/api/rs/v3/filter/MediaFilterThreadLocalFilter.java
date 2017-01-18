@@ -4,6 +4,8 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 
 import javax.servlet.*;
@@ -15,6 +17,7 @@ import org.slf4j.MDC;
 /**
  * @author rico
  */
+@Slf4j
 public class MediaFilterThreadLocalFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -32,12 +35,19 @@ public class MediaFilterThreadLocalFilter implements Filter {
             String path = req.getRequestURI().substring(req.getContextPath().length());
             MDC.put("request", req.getMethod() + " " + path + (StringUtils.isEmpty(query) ? "" : ("?" + query)));
             MDC.put("remoteHost", ip);
-            
+
             ApiMediaFilter.removeFilter();
-            
+
             chain.doFilter(request, response);
+        } catch (ServletException | IOException | RuntimeException ioe) {
+            if (ioe.getCause().getClass().getSimpleName().equals("ClientAbortException")) {
+                // NPA-346 Don't log client errors!
+                log.info("{} (cause: {} {}). Seems like the client aborted. This can be ignored", ioe.getMessage(), ioe.getCause().getClass().getName(), ioe.getCause().getMessage());
+                return;
+            }
+            throw ioe;
         } finally {
-            
+
             ApiMediaFilter.removeFilter();
             MDC.clear();
         }
