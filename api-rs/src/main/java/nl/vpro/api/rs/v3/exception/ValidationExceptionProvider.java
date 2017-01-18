@@ -5,6 +5,8 @@
 package nl.vpro.api.rs.v3.exception;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 
 import javax.ws.rs.core.Response;
@@ -14,8 +16,6 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.jboss.resteasy.api.validation.ResteasyConstraintViolation;
 import org.jboss.resteasy.api.validation.ResteasyViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
 
@@ -27,15 +27,13 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
  * @since 3.1
  */
 @Provider
+@Slf4j
 public class ValidationExceptionProvider implements ExceptionMapper<ResteasyViolationException> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ValidationExceptionProvider.class);
-
     @Override
     public Response toResponse(final ResteasyViolationException e) {
         final String violationsAsString = e.getViolations().toString().replace('\r', ' ');
 
-        LOG.info("Bad request/Violation exception: {}. Request: {}", violationsAsString, StoreRequestInThreadLocal.getRequestBody());
+        log.info("Bad request/Violation exception: {}. Request: {}", violationsAsString, StoreRequestInThreadLocal.getRequestBody());
 
         return Response
                 .status(BAD_REQUEST)
