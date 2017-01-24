@@ -37,6 +37,14 @@ public class MediaPropertiesFilters {
     private static final List<String> ignoreSignatures = Arrays.asList(
         //"Ljava/util/Date;",
         //"Ljava/lang/String;"
+        "Z", // boolean
+        "B", // byte
+        "C", // char
+        "S", // short
+        "I", // int
+        "J", // long
+        "F", // float
+        "D" // double
     );
 
     private static final List<String> knownProperties = new ArrayList<>();
@@ -115,7 +123,7 @@ public class MediaPropertiesFilters {
                                         f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.v3.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
                                     }
                                 }
-                            } catch (RuntimeException | NotFoundException wtf) {
+                            } catch (RuntimeException | NotFoundException | CannotCompileException wtf) {
                                 LOG.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + wtf.getMessage(), wtf);
                             }
                         }
