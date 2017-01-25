@@ -7,21 +7,19 @@ package nl.vpro.api.rs.v3.filter;
 import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
+@Slf4j
 public class MediaPropertiesFilters {
-    private static final Logger LOG = LoggerFactory.getLogger(MediaPropertiesFilters.class);
 
     private static final List<String> ignoreFields = Arrays.asList(
         "mid",
@@ -29,7 +27,6 @@ public class MediaPropertiesFilters {
         "type",
         "avType",
         "sortDate",
-        "sortDateValid",
         "isEmbeddable",
         "parent"
     );
@@ -63,9 +60,9 @@ public class MediaPropertiesFilters {
             );
             instrumentScheduleEvents("nl.vpro.domain.media.Schedule");
             instrumented = true;
-            LOG.info("Instrumented media properties " + getKnownProperties());
+            log.info("Instrumented media properties " + getKnownProperties());
         } else {
-            LOG.warn("Instrumented already");
+            log.warn("Instrumented already");
         }
     }
 
@@ -99,15 +96,15 @@ public class MediaPropertiesFilters {
                                     if (!knownProperties.contains(fieldName)) {
                                         knownProperties.add(fieldName);
                                     } else {
-                                        LOG.debug("Found {} more than once!", fieldName);
+                                        log.debug("Found {} more than once!", fieldName);
                                     }
                                     if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
-                                        LOG.debug("Never filtering {}", fieldName);
+                                        log.debug("Never filtering {}", fieldName);
                                         return;
                                     }
 
                                     if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
-                                        LOG.debug("Instrumenting Set {}", fieldName);
+                                        log.debug("Instrumenting Set {}", fieldName);
                                         if ("titles".equals(fieldName)) {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
                                         } else if ("descriptions".equals(fieldName)) {
@@ -116,22 +113,22 @@ public class MediaPropertiesFilters {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                         }
                                     } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
-                                        LOG.debug("Instrumenting List {}", fieldName);
+                                        log.debug("Instrumenting List {}", fieldName);
                                         f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                     } else {
-                                        LOG.debug("Instrumenting {}", fieldName);
+                                        log.debug("Instrumenting {}", fieldName);
                                         f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.v3.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
                                     }
                                 }
                             } catch (RuntimeException | NotFoundException | CannotCompileException wtf) {
-                                LOG.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + wtf.getMessage(), wtf);
+                                log.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + wtf.getMessage(), wtf);
                             }
                         }
                     });
 
                     ctClass.toClass();
                 } catch (RuntimeException wtf ){
-                    LOG.error(wtf.getMessage());
+                    log.error(wtf.getMessage());
                 }
             }
         } catch (CannotCompileException | NotFoundException e) {
@@ -155,7 +152,7 @@ public class MediaPropertiesFilters {
                         @Override
                         public void edit(FieldAccess f) throws CannotCompileException {
                             if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() && f.getFieldName().equals("scheduleEvents")) {
-                                LOG.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
+                                log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
                                 f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
                             }
 
@@ -163,13 +160,13 @@ public class MediaPropertiesFilters {
                     });
                     ctClass.toClass();
                 } catch (RuntimeException wtf) {
-                    LOG.warn(wtf.getMessage());
+                    log.warn(wtf.getMessage());
                 }
             }
         } catch(CannotCompileException | NotFoundException e) {
             // schedule event stuff is optional
             // It is not used in the player api, so it does have ScheduleEventView.
-            LOG.warn(e.getMessage());
+            log.warn(e.getMessage());
         }
     }
 
