@@ -10,7 +10,7 @@ import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.media.support.Typable;
 
 /**
- * For sets with member of the type 'Typable<TextualType>' (so {@link nl.vpro.domain.media.support.Title} and {@link nl.vpro.domain.media.support.Description}) we want the count to work _per textual type_.
+ * For sets with members of the type 'Typable<TextualType>' (so {@link nl.vpro.domain.media.support.Title} and {@link nl.vpro.domain.media.support.Description}) we want the count to work _per textual type_.
  * @author rico
  * @author Michiel Meeuwissen
  * @since 3.0
