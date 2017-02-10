@@ -4,7 +4,12 @@
  */
 package nl.vpro.api.rs.v3.filter;
 
-import nl.vpro.domain.media.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -19,7 +24,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
+import nl.vpro.domain.media.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,9 +51,7 @@ public class ScheduleFilterTest {
     @Ignore("See nl.vpro.api.rs.v3.filter.ScheduleEventViewSortedSetTest for how it's done.")
     public void testFilter() {
         Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 4);
-        ScheduleEvent event = new ScheduleEvent(Channel.NED3, calendar.getTime(), new Date(1000));
+        ScheduleEvent event = new ScheduleEvent(Channel.NED3, Instant.now().plus(Duration.ofDays(4)), Duration.ofMillis(1000));
         program.getScheduleEvents().add(event);
 
         assertThat(program.getScheduleEvents().size()).isEqualTo(5);
