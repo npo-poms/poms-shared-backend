@@ -13,6 +13,8 @@ public interface FilterProperties {
 
     Integer get(String option);
 
+    boolean fromBack();
+
     default Integer get() {
         return get(null);
     }
@@ -30,7 +32,7 @@ public interface FilterProperties {
     }
 
     static FilterProperties one(String option) {
-        return new FilterPropertiesImpl(1, option);
+        return new FilterPropertiesImpl(1, option, false);
     }
 
     static FilterProperties one(Enum option) {
@@ -38,8 +40,8 @@ public interface FilterProperties {
     }
 
     FilterProperties ONE = one((String) null);
-    FilterProperties NONE = new FilterPropertiesImpl(0, null);
-    FilterProperties ALL = new FilterPropertiesImpl(Integer.MAX_VALUE, null);
+    FilterProperties NONE = new FilterPropertiesImpl(0, null, false);
+    FilterProperties ALL = new FilterPropertiesImpl(Integer.MAX_VALUE, null, false);
 }
 
 
@@ -48,9 +50,13 @@ class FilterPropertiesImpl implements FilterProperties {
 
     final String option;
 
-    FilterPropertiesImpl(Integer max, String extra) {
+
+    final boolean fromBack;
+
+    FilterPropertiesImpl(Integer max, String extra, boolean fromBack) {
         this.max = max;
         this.option = extra;
+        this.fromBack = fromBack;
     }
 
     @Override
@@ -61,7 +67,11 @@ class FilterPropertiesImpl implements FilterProperties {
     @Override
     public String getOption() {
         return option;
+    }
 
+    @Override
+    public boolean fromBack() {
+        return fromBack;
     }
 }
 
@@ -78,6 +88,11 @@ class Combined implements FilterProperties {
         return map.getOrDefault(option,
             map.getOrDefault(null, FilterProperties.NONE)
         ).get(option);
+    }
+
+    @Override
+    public boolean fromBack() {
+        throw new UnsupportedOperationException();
     }
 
     @Override

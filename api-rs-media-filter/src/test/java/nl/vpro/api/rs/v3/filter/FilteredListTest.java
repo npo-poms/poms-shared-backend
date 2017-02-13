@@ -27,7 +27,19 @@ public class FilteredListTest {
         ApiMediaFilter.set("title:1");
         List<String> list = Arrays.asList("a", "b");
         FilteredList<String> filtered = FilteredList.wrap("title", list);
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.contains("a")).isTrue();
         assertThat(filtered.contains("b")).isFalse();
+    }
+
+    @Test
+    public void containsNegativeTruncate() throws Exception {
+        ApiMediaFilter.set("title:-1");
+        List<String> list = Arrays.asList("a", "b");
+        FilteredList<String> filtered = FilteredList.wrap("title", list);
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.contains("a")).isFalse();
+        assertThat(filtered.contains("b")).isTrue();
 
     }
 

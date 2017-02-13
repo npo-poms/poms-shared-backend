@@ -158,14 +158,20 @@ public class ApiMediaFilter {
 
             String[] split = name.split("\\:", 3);
             String[] extra = new String[] {null};
+            boolean fromBack = false;
             name = split[0];
             if (split.length > 1) {
                 if (StringUtils.isNotBlank(split[split.length - 1])) {
                     try {
-                        max = Integer.parseInt(split[split.length - 1]);
+                        int m = Integer.parseInt(split[split.length - 1]);
+                        if (m < 0) {
+                            fromBack = true;
+                        }
+                        max = Math.abs(m);
                     } catch (NumberFormatException ex) {
                         throw new IllegalArgumentException("Invalid max value " + split[split.length - 1] + " in " + property);
                     }
+
                 }
             }
             if (split.length > 2) {
@@ -185,7 +191,7 @@ public class ApiMediaFilter {
             if (hasProperty(singular) || ! throwOnUnknownProperties) {
 
                 for (String e : extra) {
-                    FilterProperties newFilter = new FilterPropertiesImpl(max, e);
+                    FilterProperties newFilter = new FilterPropertiesImpl(max, e, fromBack);
                     FilterProperties existing = this.properties.get(singular);
                     if (existing != null) {
                         Combined combined;
@@ -300,7 +306,7 @@ public class ApiMediaFilter {
             if (retainAll) {
                 // toch maar een beetje impliciet filteren voor scheduleevents want dat zijn er nogal veel soms!
                 if ("scheduleevent".equals(singular)) {
-                    return new FilterPropertiesImpl(100, null);
+                    return new FilterPropertiesImpl(100, null, true);
                 } else {
                     return FilterProperties.ALL;
                 }

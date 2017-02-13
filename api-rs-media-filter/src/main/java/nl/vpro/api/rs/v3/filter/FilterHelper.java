@@ -36,6 +36,7 @@ public class FilterHelper {
         return orDefault().get() < Integer.MAX_VALUE;
     }
 
+
     public String[] options() {
         return orDefault().getOptions();
     }

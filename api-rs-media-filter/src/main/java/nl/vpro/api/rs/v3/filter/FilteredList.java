@@ -41,7 +41,12 @@ public class FilteredList<T> extends AbstractList<T>  {
 
     @Override
     public T get(int index) {
-        return wrapped.get(index);
+        if (filterHelper.orDefault().fromBack()) {
+            return wrapped.get(wrapped.size() - size() + index);
+        } else {
+            return wrapped.get(index);
+
+        }
     }
 
     @Override

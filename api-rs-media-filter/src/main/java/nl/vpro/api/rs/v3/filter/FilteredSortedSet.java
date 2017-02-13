@@ -59,6 +59,16 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
 
                 final Iterator<T> wrappedIterator = wrapped.iterator();
 
+                {
+                    if (filterHelper.orDefault().fromBack()) {
+                        if (limit < wrapped.size()) {
+                            for (int i = wrapped.size() - limit; i > 0; i--) {
+                                wrappedIterator.next();
+                            }
+                        }
+                    }
+                }
+
                 @Override
                 public boolean hasNext() {
                     return count < limit && wrappedIterator.hasNext();
@@ -77,7 +87,6 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
         } else {
             return wrapped.iterator();
         }
-
     }
 
     @Override

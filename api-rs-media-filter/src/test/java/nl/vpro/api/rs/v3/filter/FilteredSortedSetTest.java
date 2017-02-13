@@ -31,10 +31,18 @@ public class FilteredSortedSetTest {
         Set<String> list = new HashSet<>(Arrays.asList("b", "a"));
         FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("title", list);
         assertThat(filtered).hasSize(1);
+        assertThat(filtered.contains("a")).isTrue();
         assertThat(filtered.contains("b")).isFalse();
+    }
 
-
-
+    @Test
+    public void containsFromBack() throws Exception {
+        ApiMediaFilter.set("title:-1");
+        Set<String> list = new HashSet<>(Arrays.asList("b", "a"));
+        FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("title", list);
+        assertThat(filtered).hasSize(1);
+        assertThat(filtered.contains("a")).isFalse();
+        assertThat(filtered.contains("b")).isTrue();
     }
 
 
