@@ -1,5 +1,6 @@
 package nl.vpro.api.rs.v3.filter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -60,9 +61,18 @@ public class FilteredListTest {
     @Test
     public void scheduleEvent() throws Exception {
         ApiMediaFilter.set("");
-        List<String> list = Collections.nCopies(101, "a");
+        List<String> list = new ArrayList<>();
+        list.addAll(Collections.nCopies(50, "a"));
+        list.addAll(Collections.nCopies(51, "b"));
+        List<String> expected = new ArrayList<>();
+        expected.addAll(Collections.nCopies(49, "a"));
+        expected.addAll(Collections.nCopies(51, "b"));
+
         FilteredList<String> filtered = FilteredList.wrap("scheduleevent", list);
         assertThat(filtered.contains("a")).isTrue();
+        assertThat(filtered.contains("b")).isTrue();
+        assertThat(filtered).containsExactlyElementsOf(expected);
+
         assertThat(filtered).hasSize(100);
 
         ApiMediaFilter.removeFilter();
