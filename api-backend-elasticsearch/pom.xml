@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>nl.vpro.api</groupId>
-    <artifactId>api-parent</artifactId>
+    <groupId>nl.publiekeomroep</groupId>
+    <artifactId>poms-shared-backend-parent</artifactId>
     <version>5.2-SNAPSHOT</version>
   </parent>
 
