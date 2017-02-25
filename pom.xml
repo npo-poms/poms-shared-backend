@@ -14,9 +14,9 @@
   <name>poms-shared-parent</name>
 
   <properties>
-    <poms.shared.version>${project.version}</poms.shared.version>
+    <!-- Tied to ES version! -->
+    <lucene.version>${lucene.elasticsearch.version}</lucene.version>
   </properties>
-
 
   <scm>
     <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/trunk</connection>
@@ -27,6 +27,24 @@
   <modules>
     <module>api-backend-elasticsearch</module>
   </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.shared</groupId>
+      <artifactId>vpro-shared-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <repositories>
     <repository>
