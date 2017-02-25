@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>api-backend-elasticsearch</artifactId>
+  <version>5.2-SNAPSHOT</version>
   <name>api-backend-elasticsearch</name>
 
   <dependencies>
@@ -152,4 +153,10 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</connection>
+    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</developerConnection>
+    <url>https://subversion.vpro.nl/viewvc/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</url>
+  </scm>
 </project>
