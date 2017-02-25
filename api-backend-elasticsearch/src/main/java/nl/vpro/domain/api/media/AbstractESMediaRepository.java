@@ -1,0 +1,160 @@
+package nl.vpro.domain.api.media;
+
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.FilterBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.transport.TransportSerializationException;
+import org.springframework.beans.factory.annotation.Value;
+
+import nl.vpro.domain.api.AbstractESRepository;
+import nl.vpro.domain.api.GenericMediaSearchResult;
+import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.profile.ProfileDefinition;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.util.TimeUtils;
+
+/**
+ * @author Michiel Meeuwissen
+ * @since 3.7
+ */
+@Slf4j
+@ToString(callSuper = true)
+public abstract class AbstractESMediaRepository extends AbstractESRepository<MediaObject> implements MediaLoader {
+
+
+    @Override
+    @Value("${elasticSearch.media.index}")
+    public void setIndexName(String indexName) {
+        super.setIndexName(indexName);
+    }
+
+    @Override
+    @Value("${elasticSearch.media.facetLimit}")
+    public void setFacetLimit(Integer facetLimit) {
+        super.setFacetLimit(facetLimit);
+    }
+
+
+    @Value("${elasticSearch.media.timeout}")
+    public void setTimeout(String timeout) {
+        super.setTimeOut(TimeUtils.parseDuration(timeout).orElse(Duration.ofSeconds(15)));
+    }
+
+    protected AbstractESMediaRepository(ESClientFactory client) {
+        super(client);
+    }
+
+
+    @Override
+    protected String[] getLoadTypes() {
+        return MediaESType.mediaObjects();
+    }
+
+    @Override
+    public MediaObject load(String mid) {
+        mid = redirect(mid).orElse(mid);
+        return load(mid, MediaObject.class);
+    }
+
+    @Override
+    public List<MediaObject> loadAll(List<String> ids) {
+        return loadAll(MediaObject.class, ids);
+    }
+
+
+    protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
+        ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
+        return loadAll(clazz, indexName, ids.toArray(new String[ids.size()]));
+    }
+
+
+    final protected SearchRequest searchRequest(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, FilterBuilder extraFilter, long offset, Integer max) {
+        return searchRequest(
+            getLoadTypes(),
+            profile,
+            form,
+            null,
+            extraFilter,
+            offset,
+            max);
+    }
+
+    protected SearchRequest searchRequest(
+        String[] types,
+        ProfileDefinition<MediaObject> profile,
+        AbstractMediaForm form,
+        MediaObject mediaObject,
+        FilterBuilder extraFilter,
+        long offset,
+        Integer max) {
+        SearchRequest request = new SearchRequest(indexName);
+        request.types(types);
+        request.source(searchBuilder(profile, form, mediaObject, extraFilter, offset, max));
+        return request;
+    }
+
+    final protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, FilterBuilder extraFilter, long offset, Integer max) {
+        return searchBuilder(profile, form, null, extraFilter, offset, max);
+    }
+
+    protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, MediaObject mediaObject, FilterBuilder extraFilter, long offset, Integer max) {
+        SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+
+        FilterBuilder profileFilter = ESMediaFilterBuilder.filter(profile, extraFilter);
+
+        searchBuilder.postFilter(profileFilter);
+
+        QueryBuilder queryBuilder = ESMediaQueryBuilder.query(form != null ? form.getSearches() : null);
+
+
+
+        QueryBuilder scoredBuilder = ESMediaScoreBuilder.score(queryBuilder);
+
+        searchBuilder.query(scoredBuilder);
+
+        if (form instanceof MediaForm) {
+            ESMediaSortHandler.sort(searchBuilder, (MediaForm) form, mediaObject);
+            ESMediaFacetsBuilder.facets(searchBuilder, (MediaForm) form, profileFilter);
+        }
+
+        buildHighlights(searchBuilder, form, ESMediaQueryBuilder.SEARCH_FIELDS);
+
+        handlePaging(offset, max, searchBuilder, queryBuilder, indexName);
+
+        return searchBuilder;
+    }
+
+    protected <S extends MediaObject> GenericMediaSearchResult<S> executeQuery(SearchRequest request, MediaFacets facets, long offset, Integer max, Class<S> clazz) {
+        ActionFuture<SearchResponse> searchResponseFuture = client().search(request);
+
+        try {
+            SearchResponse response = searchResponseFuture.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+
+
+            SearchHits hits = response.getHits();
+
+            List<SearchResultItem<? extends S>> adapted = adapt(hits, clazz);
+
+            MediaFacetsResult facetsResult = ESMediaFacetsHandler.extractFacets(response, facets, this);
+            return new GenericMediaSearchResult<>(adapted, facetsResult, offset, max, hits.getTotalHits());
+        } catch (TransportSerializationException e) {
+            e.getDetailedMessage();
+            log.warn(e.getMessage());
+            throw e;
+        }
+    }
+}
