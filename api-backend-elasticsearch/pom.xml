@@ -10,7 +10,6 @@
 
   <groupId>nl.vpro.api</groupId>
   <artifactId>api-backend-elasticsearch</artifactId>
-  <name>api-backend-elasticsearch</name>
 
   <dependencies>
     <dependency>
