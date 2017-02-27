@@ -8,7 +8,7 @@
 
   <groupId>nl.publiekeomroep</groupId>
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>5.2.1-SNAPSHOT</version>
+  <version>5.2.1</version>
   <packaging>pom</packaging>
 
   <name>poms-shared-parent</name>
@@ -20,9 +20,9 @@
   </properties>
 
   <scm>
-    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/branches/REL-5.2-SNAPSHOT</connection>
-    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/branches/REL-5.2-SNAPSHOT</developerConnection>
-    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared-backend/branches/REL-5.2-SNAPSHOT</url>
+    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/tags/REL-5.2.1</connection>
+    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/tags/REL-5.2.1</developerConnection>
+    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared-backend/tags/REL-5.2.1</url>
   </scm>
 
   <modules>
