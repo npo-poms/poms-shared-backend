@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>5.2.0</version>
+    <version>5.2.1-SNAPSHOT</version>
   </parent>
 
   <groupId>nl.publiekeomroep</groupId>
@@ -16,6 +16,7 @@
   <properties>
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
+    <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
   </properties>
 
   <scm>
@@ -26,6 +27,7 @@
 
   <modules>
     <module>api-backend-elasticsearch</module>
+    <module>api-backend-media-search</module>
   </modules>
 
   <dependencies>

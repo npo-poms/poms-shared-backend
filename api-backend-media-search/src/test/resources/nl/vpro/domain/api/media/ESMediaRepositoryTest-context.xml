@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <context:property-placeholder properties-ref="properties"/>
+
+
+  <bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <property name="properties">
+      <props>
+        <prop key="elasticSearch.facet.limit">20</prop>
+        <prop key="elasticSearch.timeout">100</prop>
+        <prop key="elasticSearch.media.index">apimedia</prop>
+        <prop key="mediaService.loadRepository">ELASTICSEARCH</prop>
+        <prop key="mediaService.listRepository">ELASTICSEARCH</prop>
+        <prop key="mediaService.changesRepository">ELASTICSEARCH</prop>
+        <prop key="mediaService.redirectsRepository">COUCHDB</prop>
+        <prop key="mediaService.membersRepository">ELASTICSEARCH</prop>
+        <prop key="topspin.recommendations.url">http://topspin</prop>
+        <prop key="topspin.recommendations.maxResults">5000</prop>
+      </props>
+    </property>
+  </bean>
+
+  <bean class="org.mockito.Mockito" factory-method="mock" id="clientFactory">
+    <constructor-arg value="nl.vpro.elasticsearch.ESClientFactory"/>
+  </bean>
+
+  <bean class="org.mockito.Mockito" factory-method="mock" id="couchDBMediaRepository">
+    <constructor-arg value="nl.vpro.domain.api.media.MediaRepository"/>
+  </bean>
+  <bean class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg value=" nl.vpro.domain.api.media.TopSpinRepository"/>
+  </bean>
+
+
+
+
+  <bean class="nl.vpro.domain.api.media.ESMediaRepository" id="spied" autowire-candidate="false">
+    <constructor-arg index="0" ref="clientFactory"/>
+    <constructor-arg index="1" value=""/>
+  </bean>
+
+
+  <bean class="org.mockito.Mockito" factory-method="spy" id="esMediaRepository">
+    <constructor-arg ref="spied" />
+  </bean>
+
+
+
+<bean class="nl.vpro.api.Settings"/>
+
+</beans>

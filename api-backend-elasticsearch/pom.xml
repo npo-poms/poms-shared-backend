@@ -8,6 +8,7 @@
     <version>5.2.1-SNAPSHOT</version>
   </parent>
 
+  <groupId>nl.vpro.api</groupId>
   <artifactId>api-backend-elasticsearch</artifactId>
   <version>5.2.1-SNAPSHOT</version>
   <name>api-backend-elasticsearch</name>
