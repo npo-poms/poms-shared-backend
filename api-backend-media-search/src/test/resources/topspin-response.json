@@ -1,0 +1,1653 @@
+{
+  "recommendations": [
+    {
+      "duration": 3300000,
+      "subtitle": "Stine Jensen in Denemarken",
+      "channel": "NED2",
+      "image": {
+        "imageId": "243449",
+        "title": "licht"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2013-11-10T19:25:00.000Z",
+      "midRef": "VPWON_1197858",
+      "title": "Licht op het Noorden: Denemarken",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO",
+        "HUMA"
+      ],
+      "sortDate": 1384111500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2999970,
+      "subtitle": "Aflevering 8",
+      "channel": "NED2",
+      "image": {
+        "imageId": "625679",
+        "title": "Om de oude Wereldzee"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-06-28T18:15:00.000Z",
+      "midRef": "VPWON_1230888",
+      "title": "Om de oude Wereldzee",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "IKON"
+      ],
+      "sortDate": 1435515300000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": "Afscheid van Rusland",
+      "channel": "NED2",
+      "image": {
+        "imageId": "96574",
+        "title": "Van Moskou tot Moermansk"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-08-31T17:35:00.000Z",
+      "midRef": "VPWON_1177449",
+      "title": "Van Moskou tot Moermansk (8)",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO",
+        "VPRO"
+      ],
+      "sortDate": 1346434500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2800370,
+      "subtitle": "Het gat van Mongu",
+      "channel": "NED2",
+      "image": {
+        "imageId": "769063",
+        "title": "Dwars door Afrika"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-04T14:10:00.000Z",
+      "midRef": "VPWON_1263763",
+      "title": "Dwars door Afrika",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1467641400000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2628380,
+      "subtitle": "Sathnam Sanghera",
+      "channel": "NED2",
+      "image": {
+        "imageId": "586112",
+        "title": "het groot brittannie van"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-03-15T19:14:56.000Z",
+      "midRef": "VPWON_1223403",
+      "title": "Het Groot-Brittannië van...",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1426446896000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2596990,
+      "subtitle": "Azerbeidzjan",
+      "channel": "NED2",
+      "image": {
+        "imageId": "636706",
+        "title": "De bergen achter Sotsji"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-07-31T17:35:00.000Z",
+      "midRef": "VPWON_1243273",
+      "title": "De bergen achter Sotsji",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1438364100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3000000,
+      "subtitle": "Het spoor terug",
+      "channel": "NED2",
+      "image": {
+        "imageId": "94476",
+        "title": "Van Moskou tot Magadan"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-08-21T17:35:00.000Z",
+      "midRef": "VPWON_1177440",
+      "title": "Van Moskou tot Magadan",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1345570500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2719940,
+      "subtitle": "Het gezicht van de strijd",
+      "channel": "NED2",
+      "image": {
+        "imageId": "711927",
+        "title": "arabische storm"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-02-10T19:25:00.000Z",
+      "midRef": "VARA_101377838",
+      "title": "De Arabische Storm",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1455132300000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2689220,
+      "subtitle": "Oog om oog",
+      "channel": "NED2",
+      "image": {
+        "imageId": "644286",
+        "title": "Onze man in Teheran"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-02-08T19:15:33.000Z",
+      "midRef": "VPWON_1223394",
+      "title": "Onze man in Teheran",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1423422933000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2890190,
+      "subtitle": "De weg naar huis",
+      "channel": "NED2",
+      "image": {
+        "imageId": "634083",
+        "title": "Van Bihar tot Bangalore"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-07-23T17:35:00.000Z",
+      "midRef": "VPWON_1243265",
+      "title": "Van Bihar tot Bangalore",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1437672900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": "de wraak van de tijger",
+      "channel": "NED2",
+      "image": {
+        "imageId": "70293",
+        "title": "Sumatra"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-04-22T18:25:00.000Z",
+      "midRef": "VPWON_1154378",
+      "title": "van dis in indonesië",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1335119100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3000000,
+      "subtitle": "Islam wears Prada",
+      "channel": "NED2",
+      "image": null,
+      "avType": "VIDEO",
+      "sortDateString": "2011-05-14T11:40:00.000Z",
+      "midRef": "VPWON_1158753",
+      "title": "In Turkije",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1305373200000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2625600,
+      "subtitle": "Veranderen? Jamais!",
+      "channel": "NED2",
+      "image": {
+        "imageId": "733691",
+        "title": "oznf6"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-04-24T18:15:00.000Z",
+      "midRef": "VPWON_1243843",
+      "title": "Op zoek naar Frankrijk",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1461521700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2707300,
+      "subtitle": "Op zoek naar verzoening",
+      "channel": "NED2",
+      "image": {
+        "imageId": "603185",
+        "title": "Bloedbroeders"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-04-26T18:15:00.000Z",
+      "midRef": "VARA_101372930",
+      "title": "Bloedbroeders",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1430072100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2700000,
+      "subtitle": "Griekenland - Zwakke schouders, zware lasten",
+      "channel": "NED2",
+      "image": {
+        "imageId": "124928",
+        "title": "Paul Rosenmöller en de scherpe randen van de Euro"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-12-26T21:55:00.000Z",
+      "midRef": "POW_00544549",
+      "title": "Paul Rosenmöller en de scherpe randen van de Euro",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "IKON"
+      ],
+      "sortDate": 1356558900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1800000,
+      "subtitle": "Afl. 6 Oman",
+      "channel": "NED2",
+      "image": {
+        "imageId": "40281",
+        "title": "Voorbij de Arabische lente"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-01-22T11:30:00.000Z",
+      "midRef": "NPS_1193535",
+      "title": "Voorbij de Arabische lente",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1327231800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3033390,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "482908",
+        "title": "O' Hanlons Helden"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2014-06-28T13:11:16.000Z",
+      "midRef": "VPWON_1171395",
+      "title": "O' Hanlons Helden",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1403961076000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2700000,
+      "subtitle": "Afscheid van Rusland",
+      "channel": "NED2",
+      "image": {
+        "imageId": "7178",
+        "title": "Afscheid van Rusland"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2010-04-11T18:15:00.000Z",
+      "midRef": "VPRO_1139835",
+      "title": "Afscheid van Rusland",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1271009700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 4800000,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "209132",
+        "title": "Beagle, in het kielzog van Darwin"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2013-08-14T16:25:00.000Z",
+      "midRef": "VPWON_1201708",
+      "title": "Beagle, in het kielzog van Darwin",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1376497500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": "Op zoek naar een verdwenen stad",
+      "channel": "NED2",
+      "image": {
+        "imageId": "41858",
+        "title": "Redmond"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-01-29T19:25:00.000Z",
+      "midRef": "VPWON_1156434",
+      "title": "O'Hanlons helden",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1327865100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3146090,
+      "subtitle": "De laatste muur",
+      "channel": "NED2",
+      "image": {
+        "imageId": "767015",
+        "title": "Langs de grenzen van Turkije"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-06-28T14:05:00.000Z",
+      "midRef": "VPWON_1204917",
+      "title": "Langs de grenzen van Turkije",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1467122700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": "Laurence Vielle",
+      "channel": "NED2",
+      "image": {
+        "imageId": "103400",
+        "title": "Laurence Vielle"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-09-30T18:25:00.000Z",
+      "midRef": "VPWON_1165228",
+      "title": "Laurence Vielle (Het België van)",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1349029500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3611420,
+      "subtitle": "Podium Witteman",
+      "channel": "NED2",
+      "image": {
+        "imageId": "715807",
+        "title": "Podium Witteman"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-02-21T17:10:00.000Z",
+      "midRef": "VPWON_1248707",
+      "title": "Podium Witteman",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1456074600000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3600000,
+      "subtitle": "India",
+      "channel": "NED2",
+      "image": {
+        "imageId": "230038",
+        "title": "Klimaatjagers India"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2013-10-13T18:24:15.000Z",
+      "midRef": "VPWON_1181320",
+      "title": "Klimaatjagers",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1381688655000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2870980,
+      "subtitle": "Korea",
+      "channel": "NED2",
+      "image": {
+        "imageId": "656920",
+        "title": "De muur"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-08-10T17:30:00.000Z",
+      "midRef": "VARA_101375183",
+      "title": "De Muur",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1439227800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2734450,
+      "subtitle": "Een scheve Colombiaanse schaats",
+      "channel": "NED3",
+      "image": {
+        "imageId": "775991",
+        "title": "Amor met een snor"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-28T20:00:00.000Z",
+      "midRef": "VPWON_1262588",
+      "title": "Amor met een snor",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1469736000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": "Bergen",
+      "channel": "NED2",
+      "image": {
+        "imageId": "298390",
+        "title": "Human planet"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2011-03-20T17:50:00.000Z",
+      "midRef": "NPS_1176170",
+      "title": "Human planet",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1300643400000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1792790,
+      "subtitle": "NOS Opening Jeroen Boschjaar",
+      "channel": "NED2",
+      "image": {
+        "imageId": "712889",
+        "title": "NOS Opening Jeroen Boschjaar"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-02-12T19:35:00.000Z",
+      "midRef": "POW_03057570",
+      "title": "NOS Opening Jeroen Boschjaar",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NOS"
+      ],
+      "sortDate": 1455305700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1611980,
+      "subtitle": "Ter herinnering Wim Brands",
+      "channel": "NED1",
+      "image": {
+        "imageId": "737453",
+        "title": "Boeken op reis met Wim Brands"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-04-17T09:20:00.000Z",
+      "midRef": "VPWON_1229239",
+      "title": "Boeken op reis met Wim Brands",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1460884800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2262200,
+      "subtitle": "De gulzige stad",
+      "channel": "NED2",
+      "image": {
+        "imageId": "507618",
+        "title": "Fresco's Paradijs"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2014-09-04T07:12:44.000Z",
+      "midRef": "VPWON_1223842",
+      "title": "Fresco's Paradijs",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "HUMA"
+      ],
+      "sortDate": 1409814764000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3000000,
+      "subtitle": "Na het vechten de vrijheid",
+      "channel": "NED2",
+      "image": {
+        "imageId": "442667",
+        "title": "Van Dis in Afrika"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2010-07-20T21:35:00.000Z",
+      "midRef": "VPRO_1140821",
+      "title": "Van Dis in Afrika (7)",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1279661700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2651790,
+      "subtitle": "Broedervolk",
+      "channel": "NED2",
+      "image": {
+        "imageId": "773607",
+        "title": "Grensland"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-20T17:35:00.000Z",
+      "midRef": "VPWON_1262605",
+      "title": "Grensland",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1469036100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2800260,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "505561",
+        "title": "Iedereen kan Bridgen"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2014-08-29T10:04:47.000Z",
+      "midRef": "POW_00878361",
+      "title": "Iedereen kan Bridgen",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "MAX"
+      ],
+      "sortDate": 1409306687000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": "De Van Waveren Tapes",
+      "channel": "NED2",
+      "image": {
+        "imageId": "112028",
+        "title": "Waveren"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2012-11-08T21:55:00.000Z",
+      "midRef": "VPWON_1156126",
+      "title": "Holland Doc",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1352411700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2770930,
+      "subtitle": "Joanna Lumley's Trans-Siberian Adventure",
+      "channel": "NED2",
+      "image": {
+        "imageId": "685284",
+        "title": "Joanna Lumley"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-12-30T17:55:00.000Z",
+      "midRef": "VPWON_1249606",
+      "title": "Joanna Lumley's Trans-Siberian Adventure",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "MAX"
+      ],
+      "sortDate": 1451498100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 0,
+      "subtitle": "Van Rossem in Amerika",
+      "channel": "NED2",
+      "image": {
+        "imageId": "302315",
+        "title": "Maarten van Rossem New Orleans"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2009-02-14T14:00:00.000Z",
+      "midRef": "EO_101151781",
+      "title": "Van Rossem in Amerika",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "EO"
+      ],
+      "sortDate": 1234620000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3034620,
+      "subtitle": "Natuur op 2: Wild Alaska - Zomer (2/3)",
+      "channel": "NED2",
+      "image": {
+        "imageId": "718564",
+        "title": "Natuur op 2: Wild Alaska - de laatste wildernis ijsberen"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-15T16:10:00.000Z",
+      "midRef": "POW_03056126",
+      "title": "Natuur op 2: Wild Alaska - de laatste wildernis Zomer (2/3)",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "EO",
+        "NTR"
+      ],
+      "sortDate": 1458058200000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2767260,
+      "subtitle": "Slimme Steden",
+      "channel": "NED2",
+      "image": {
+        "imageId": "742782",
+        "title": "VPRO Tegenlicht"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-28T07:15:00.000Z",
+      "midRef": "VPWON_1259489",
+      "title": "VPRO Tegenlicht",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1469690100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1536370,
+      "subtitle": "Gelderland",
+      "channel": "NED2",
+      "image": {
+        "imageId": "727936",
+        "title": "Bureau Vooroordeel"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-23T18:25:00.000Z",
+      "midRef": "VARA_101377916",
+      "title": "Bureau Vooroordeel",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1458757500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2510660,
+      "subtitle": "Hong Kong",
+      "channel": "NED2",
+      "image": {
+        "imageId": "757373",
+        "title": "De Pen & Het Zwaard"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-06-05T18:15:00.000Z",
+      "midRef": "VARA_101378924",
+      "title": "De Pen & Het Zwaard",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1465150500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2409930,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "726117",
+        "title": "Binnen bij het Boekenbal"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-18T20:10:00.000Z",
+      "midRef": "VPWON_1258942",
+      "title": "Binnen bij het Boekenbal",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1458331800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "165518",
+        "title": "Leven? Of Theater?"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2013-03-28T14:10:00.000Z",
+      "midRef": "POW_00623012",
+      "title": "Leven? Of Theater?",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "JO"
+      ],
+      "sortDate": 1364479800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2728140,
+      "subtitle": "Our house",
+      "channel": "NED2",
+      "image": {
+        "imageId": "739990",
+        "title": "Ondersteboven - Nederland in de jaren 60"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-08-01T14:10:00.000Z",
+      "midRef": "VPWON_1262769",
+      "title": "Ondersteboven - Nederland in de jaren 60",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1470060600000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2451330,
+      "subtitle": "Katoenknallers",
+      "channel": "NED2",
+      "image": {
+        "imageId": "564824",
+        "title": "katoenknallers "
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-01-16T20:12:03.000Z",
+      "midRef": "VPWON_1231625",
+      "title": "De slag om de klerewereld",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1421439123000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3731660,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "744925",
+        "title": "Podium Witteman"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-05-08T16:10:00.000Z",
+      "midRef": "VPWON_1249193",
+      "title": "Podium Witteman",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1462723800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3000060,
+      "subtitle": "Vietnam",
+      "channel": "NED3",
+      "image": {
+        "imageId": "706188",
+        "title": "De Gevaarlijkste Wegen Van De Wereld"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-30T18:50:00.000Z",
+      "midRef": "BNN_101379737",
+      "title": "De Gevaarlijkste Wegen Van De Wereld",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "BNN"
+      ],
+      "sortDate": 1469904600000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2651790,
+      "subtitle": "Wir schaffen das",
+      "channel": "NED2",
+      "image": {
+        "imageId": "686074",
+        "title": "Britta"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-12-13T19:15:00.000Z",
+      "midRef": "VPWON_1219759",
+      "title": "Het Duitsland van mijn moeder",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1450034100000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3023870,
+      "subtitle": "De avonturiers van de moderne kunst - Parijs, hoofdstad van de wereld",
+      "channel": "NED2",
+      "image": null,
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-31T16:15:00.000Z",
+      "midRef": "AT_2059893",
+      "title": "Close Up",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "AVTR"
+      ],
+      "sortDate": 1469981700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2128290,
+      "subtitle": "Nepal",
+      "channel": "NED1",
+      "image": {
+        "imageId": "768842",
+        "title": "Nepal"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-27T19:25:00.000Z",
+      "midRef": "VARA_101380346",
+      "title": "Floortje naar het einde van de wereld",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1469647500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2428690,
+      "subtitle": null,
+      "channel": "NED3",
+      "image": {
+        "imageId": "731780",
+        "title": "De Zwarte Lijst"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-04-02T20:05:00.000Z",
+      "midRef": "VPWON_1259664",
+      "title": "De Zwarte Lijst",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1459627500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 5564820,
+      "subtitle": null,
+      "channel": "NED1",
+      "image": {
+        "imageId": "776397",
+        "title": "Het Uur van de Wolf: Lee Towers - The voice of Rotterdam"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-30T12:05:00.000Z",
+      "midRef": "VPWON_1264397",
+      "title": "Het Uur van de Wolf: Lee Towers - The voice of Rotterdam",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1469880300000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1491740,
+      "subtitle": "Koken met microben",
+      "channel": "NED2",
+      "image": {
+        "imageId": "771781",
+        "title": "Koken met Van Boven"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-14T10:25:00.000Z",
+      "midRef": "VPWON_1262633",
+      "title": "Koken met Van Boven",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1468491900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2414940,
+      "subtitle": "De Mandeeërs (Iran)",
+      "channel": "NED2",
+      "image": {
+        "imageId": "776982",
+        "title": "Van Nablus naar Nineve"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-08-01T19:10:00.000Z",
+      "midRef": "VPWON_1250540",
+      "title": "Van Nablus naar Nineve",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "EO"
+      ],
+      "sortDate": 1470078600000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3900000,
+      "subtitle": "1992 - Bosnië en de waarheid",
+      "channel": "NED2",
+      "image": {
+        "imageId": "403550",
+        "title": "In Europa 1992 Bosnie"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2011-07-15T16:50:00.000Z",
+      "midRef": "VPWON_1152502",
+      "title": "In Europa",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1310748600000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1456610,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "723214",
+        "title": "Van Alle Tijden"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-11T18:50:00.000Z",
+      "midRef": "VPWON_1256953",
+      "title": "Van Alle Tijden",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1457722200000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2699970,
+      "subtitle": "In de voetsporen van Abraham Kuyper door de VS",
+      "channel": "NED2",
+      "image": {
+        "imageId": "756469",
+        "title": "Varia Americana"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-06-01T18:25:00.000Z",
+      "midRef": "VPWON_1251235",
+      "title": "Varia Americana",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "EO"
+      ],
+      "sortDate": 1464805500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2729180,
+      "subtitle": null,
+      "channel": "NED3",
+      "image": {
+        "imageId": "528026",
+        "title": "Bureau Marokko"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2014-10-23T18:59:22.000Z",
+      "midRef": "VARA_101369910",
+      "title": "Bureau Marokko",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1414090762000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2390750,
+      "subtitle": "Carl Bernstein",
+      "channel": "NED2",
+      "image": {
+        "imageId": "737755",
+        "title": "College Tour"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-04-15T19:10:00.000Z",
+      "midRef": "VPWON_1248333",
+      "title": "College Tour",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1460747400000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2859630,
+      "subtitle": "Ronald Reagan",
+      "channel": "NED2",
+      "image": {
+        "imageId": "703166",
+        "title": "Speeches"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-01-24T20:05:00.000Z",
+      "midRef": "VPWON_1201084",
+      "title": "Speeches",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1453665900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2120310,
+      "subtitle": "NOS 75 jaar na de Februaristaking",
+      "channel": "NED2",
+      "image": {
+        "imageId": "717494",
+        "title": "NOS 75 jaar na de Februaristaking"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-02-25T19:35:00.000Z",
+      "midRef": "POW_03057688",
+      "title": "NOS 75 jaar na de Februaristaking",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NOS"
+      ],
+      "sortDate": 1456428900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2419820,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "722789",
+        "title": "De Tiende van Tijl"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-10T19:30:00.000Z",
+      "midRef": "AT_2049595",
+      "title": "De Tiende van Tijl",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "AVTR"
+      ],
+      "sortDate": 1457638200000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2380790,
+      "subtitle": "Aaf Brandt Corstius",
+      "channel": "NED2",
+      "image": {
+        "imageId": "720658",
+        "title": "Verborgen verleden"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-05T19:30:00.000Z",
+      "midRef": "VPWON_1259472",
+      "title": "Verborgen verleden",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1457206200000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2100000,
+      "subtitle": "Cook Eilanden - Fiji, Vanuatu",
+      "channel": "NED3",
+      "image": {
+        "imageId": "251880",
+        "title": "Zee, zout & zeilen"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2011-07-19T22:20:00.000Z",
+      "midRef": "AVRO_1457901",
+      "title": "Zee, zout & zeilen",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "AVRO"
+      ],
+      "sortDate": 1311114000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2664490,
+      "subtitle": "De Amelanders",
+      "channel": "NED2",
+      "image": {
+        "imageId": "533786",
+        "title": "f"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2014-09-19T19:05:00.000Z",
+      "midRef": "VPWON_1214414",
+      "title": "De Hokjesman",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO",
+        "VPRO"
+      ],
+      "sortDate": 1411153500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2086940,
+      "subtitle": "Brussel",
+      "channel": "NED2",
+      "image": {
+        "imageId": "717329",
+        "title": "Hier zijn de Van Rossems"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-02-19T19:25:00.000Z",
+      "midRef": "VPWON_1246430",
+      "title": "Hier zijn de Van Rossems",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1455909900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1505370,
+      "subtitle": null,
+      "channel": "NED3",
+      "image": {
+        "imageId": "520058",
+        "title": "Reisadvies negatief"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2014-10-05T17:27:30.000Z",
+      "midRef": "KN_1662200",
+      "title": "Reisadvies negatief",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "KRO"
+      ],
+      "sortDate": 1412530050000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2719010,
+      "subtitle": "De Rotterdammers",
+      "channel": "NED2",
+      "image": {
+        "imageId": "747878",
+        "title": "De Hokjesman in Rotterdam"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-05-27T19:05:00.000Z",
+      "midRef": "VPWON_1240854",
+      "title": "De Hokjesman",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1464375900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2386780,
+      "subtitle": "VARKEN",
+      "channel": "NED2",
+      "image": {
+        "imageId": "590711",
+        "title": "varken"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-03-27T20:10:00.000Z",
+      "midRef": "VPWON_1236343",
+      "title": "De Wilde Keuken",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1427487000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 5096900,
+      "subtitle": null,
+      "channel": "NED1",
+      "image": {
+        "imageId": "758536",
+        "title": "DWDD presenteert"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-06-08T19:25:00.000Z",
+      "midRef": "VARA_101379365",
+      "title": "DWDD presenteert: Een Saluut - Mart Smeets, van Apollohal tot Rio",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VARA"
+      ],
+      "sortDate": 1465413900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1383540,
+      "subtitle": "Contact",
+      "channel": "NED3",
+      "image": {
+        "imageId": "737913",
+        "title": "Missie Aarde"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-04-17T19:45:00.000Z",
+      "midRef": "VPWON_1241078",
+      "title": "Missie Aarde",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1460922300000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 339890,
+      "subtitle": "Jan Bosma krijgt een masterclass van Robert Vuijsje",
+      "channel": "NED2",
+      "image": {
+        "imageId": "723379",
+        "title": "Jan Bosma en Robert Vuijsje"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-18T21:45:00.000Z",
+      "midRef": "VPWON_1260252",
+      "title": "Iedereen schrijft",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1458337500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1513010,
+      "subtitle": "Camembert",
+      "channel": "NED2",
+      "image": {
+        "imageId": "735385",
+        "title": "Gort a la Carte"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-05-23T17:20:00.000Z",
+      "midRef": "POW_03119387",
+      "title": "Gort à la Carte",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "MAX"
+      ],
+      "sortDate": 1464024000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1927700,
+      "subtitle": "Nog 1 keer de lucht in",
+      "channel": "NED1",
+      "image": {
+        "imageId": "758844",
+        "title": "Nederland van boven"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-06-09T20:10:00.000Z",
+      "midRef": "VPWON_1259602",
+      "title": "Nederland van boven",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1465503000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1570340,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "726052",
+        "title": "Nationale Boekenquiz 2016"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-18T18:55:00.000Z",
+      "midRef": "VPWON_1258060",
+      "title": "Nationale Boekenquiz 2016",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1458327300000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1953540,
+      "subtitle": "Arnon Grunberg",
+      "channel": "NED1",
+      "image": {
+        "imageId": "744862",
+        "title": "VPRO Boeken"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-24T09:20:00.000Z",
+      "midRef": "VPWON_1263098",
+      "title": "VPRO Boeken",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1469352000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2130570,
+      "subtitle": "Aflevering 8 Utrecht",
+      "channel": "NED1",
+      "image": {
+        "imageId": "558934",
+        "title": "NL Waterland 1 02"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-02-19T21:25:38.000Z",
+      "midRef": "VPWON_1234497",
+      "title": "Nederland Waterland",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "EO"
+      ],
+      "sortDate": 1424381138000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2744130,
+      "subtitle": "Albanië",
+      "channel": "NED3",
+      "image": {
+        "imageId": "776284",
+        "title": "Reizen Waes"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-29T18:30:00.000Z",
+      "midRef": "VPWON_1260284",
+      "title": "Reizen Waes",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1469817000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 10687050,
+      "subtitle": "Dyab Abou Jahjah",
+      "channel": "NED2",
+      "image": {
+        "imageId": "776690",
+        "title": "VPRO Zomergasten"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-31T18:15:00.000Z",
+      "midRef": "VPWON_1260814",
+      "title": "VPRO Zomergasten",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1469988900000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 58490,
+      "subtitle": "Nepal",
+      "channel": "NED2",
+      "image": null,
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-31T11:17:00.000Z",
+      "midRef": "VPWON_1257646",
+      "title": "Wilde Ganzen",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "EO"
+      ],
+      "sortDate": 1469963820000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 928540,
+      "subtitle": "Maria Barnas",
+      "channel": "NED2",
+      "image": {
+        "imageId": "776629",
+        "title": "Kunstuur"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-31T17:55:00.000Z",
+      "midRef": "AT_2064343",
+      "title": "Kunstuur",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "AVTR"
+      ],
+      "sortDate": 1469987700000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2999070,
+      "subtitle": "Into the great wide open 2013",
+      "channel": "NED1",
+      "image": {
+        "imageId": "776544",
+        "title": "VPRO Vrije Geluiden"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-07-31T08:30:00.000Z",
+      "midRef": "VPWON_1217792",
+      "title": "VPRO Vrije Geluiden",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1469953800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2114100,
+      "subtitle": "Canna Island en Schotland",
+      "channel": "NED1",
+      "image": {
+        "imageId": "639748",
+        "title": "Floortje"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2015-01-15T20:39:15.000Z",
+      "midRef": "BNN_101372381",
+      "title": "Floortje Naar Het Einde Van De Wereld",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "BNN",
+        "BNN"
+      ],
+      "sortDate": 1421354355000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "304528",
+        "title": "Klootwijk aan zee"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2011-06-12T19:05:00.000Z",
+      "midRef": "NPS_1186140",
+      "title": "Klootwijk aan zee",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "NTR"
+      ],
+      "sortDate": 1307905500000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 1808200,
+      "subtitle": null,
+      "channel": "NED2",
+      "image": {
+        "imageId": "729212",
+        "title": "Urbi et orbi"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-03-27T10:00:00.000Z",
+      "midRef": "KN_1679046",
+      "title": "Urbi et orbi",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "KRO"
+      ],
+      "sortDate": 1459072800000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 2400290,
+      "subtitle": "Ontspanning",
+      "channel": "NED2",
+      "image": {
+        "imageId": "704312",
+        "title": "DWIZD Istanbul"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-01-31T19:20:00.000Z",
+      "midRef": "VPWON_1219420",
+      "title": "De wereld in zeven dagen",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1454268000000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 3300000,
+      "subtitle": "India",
+      "channel": "NED3",
+      "image": {
+        "imageId": "226634",
+        "title": "Sunny side of sex"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2013-10-03T19:38:21.000Z",
+      "midRef": "VPWON_1200120",
+      "title": "Sunny side of sex",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "VPRO"
+      ],
+      "sortDate": 1380829101000,
+      "recommender": "janssen"
+    },
+    {
+      "duration": 514510,
+      "subtitle": "Zelfportret met bontkraag - Charley Toorop",
+      "channel": "NED2",
+      "image": {
+        "imageId": "737924",
+        "title": "Charley Toorop, Zelfportret met bontkraag, 1940"
+      },
+      "avType": "VIDEO",
+      "sortDateString": "2016-04-22T20:45:00.000Z",
+      "midRef": "AT_2054706",
+      "title": "Man en Kunst",
+      "type": "BROADCAST",
+      "broadcasters": [
+        "AVTR"
+      ],
+      "sortDate": 1461357900000,
+      "recommender": "janssen"
+    }
+  ]
+}

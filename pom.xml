@@ -27,6 +27,7 @@
 
   <modules>
     <module>api-backend-elasticsearch</module>
+    <module>api-backend-media-search</module>
   </modules>
 
   <dependencies>
