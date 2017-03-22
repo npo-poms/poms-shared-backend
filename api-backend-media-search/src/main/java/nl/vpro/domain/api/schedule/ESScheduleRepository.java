@@ -273,7 +273,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             if (count == 0) {
                 // this may happen if it broadcaster on the correct channel, and on the correct time
                 // _but not together_
-                // 1 scheduleevent has the correct channel, the other one the correct scheudleEvent.start
+                // 1 schedule event has the correct channel, the other one the correct scheduleEvent.start
                 // it doesn't really matter for now, we simply didn't add it to the result
                 log.debug("Mediaobject {} not added, since it did unexpectedly not apply to {}", mo, form);
             }
@@ -285,7 +285,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 Collections.sort(results);
                 break;
             case DESC:
-                Collections.sort(results, Comparator.reverseOrder());
+                results.sort(Comparator.reverseOrder());
                 break;
         }
 
