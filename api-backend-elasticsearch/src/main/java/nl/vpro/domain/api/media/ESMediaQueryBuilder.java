@@ -4,6 +4,8 @@
  */
 package nl.vpro.domain.api.media;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,8 +18,6 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
@@ -31,10 +31,8 @@ import nl.vpro.media.domain.es.ApiCueIndex;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
+@Slf4j
 public class ESMediaQueryBuilder extends ESQueryBuilder {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ESMediaQueryBuilder.class);
-
 
     public static final List<SearchFieldDefinition> SEARCH_FIELDS = Arrays.asList(
         new SearchFieldDefinition("broadcasters.value.text", 2f),
@@ -96,7 +94,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                     QueryBuilder subtitlesQuery = ESSubtitlesQueryBuilder.query(subtitlesSearch);
                     textQuery.should(QueryBuilders.hasChildQuery(ApiCueIndex.TYPE, subtitlesQuery)).boost(SUBTITLES.getBoost());
                 } else {
-                    LOG.debug("Searching in subtitles is disabled");
+                    log.debug("Searching in subtitles is disabled");
                 }
 
                 apply(booleanQuery, textQuery, textSearch.getMatch());
