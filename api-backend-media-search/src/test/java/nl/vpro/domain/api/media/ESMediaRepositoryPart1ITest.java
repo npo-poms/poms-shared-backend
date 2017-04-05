@@ -1,5 +1,22 @@
 package nl.vpro.domain.api.media;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import javax.xml.bind.JAXB;
+
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.index.IndexRequest;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -11,21 +28,6 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-
-import javax.xml.bind.JAXB;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
@@ -35,7 +37,7 @@ import static nl.vpro.domain.media.MediaTestDataBuilder.program;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 /**

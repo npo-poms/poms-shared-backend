@@ -308,8 +308,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         Schedule schedule;
         ScheduleEventSearch scheduleEventSearch = form.getSearches() == null ? null : form.getSearches().getScheduleEvents();
         if (scheduleEventSearch != null) {
-            Date start = scheduleEventSearch.getBegin();
-            Date stop = scheduleEventSearch.getEnd();
+            Instant  start = scheduleEventSearch.getBegin();
+            Instant stop = scheduleEventSearch.getEnd();
             Channel channel = null;
             if (StringUtils.isNotEmpty(scheduleEventSearch.getChannel())) {
                 channel = Channel.valueOf(scheduleEventSearch.getChannel());
@@ -327,7 +327,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 schedule = new Schedule(start, stop);
             }
         } else {
-            ScheduleEventSearch matcher = new ScheduleEventSearch(null, null, new Date(Long.MAX_VALUE));
+            ScheduleEventSearch matcher = new ScheduleEventSearch(null, null, Instant.MAX);
             form.getSearches().setScheduleEvents(matcher);
             schedule = new Schedule();
         }
