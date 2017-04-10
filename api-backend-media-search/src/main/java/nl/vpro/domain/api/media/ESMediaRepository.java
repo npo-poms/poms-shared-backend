@@ -105,6 +105,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
 
+    @Override
     protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         return loadAll(clazz, indexName, ids.toArray(new String[ids.size()]));
