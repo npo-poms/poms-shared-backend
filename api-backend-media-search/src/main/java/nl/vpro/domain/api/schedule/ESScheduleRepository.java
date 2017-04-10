@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -253,14 +256,15 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
         ActionFuture<SearchResponse> searchResponseFuture =
             client().search(request);
-        SearchResponse response = searchResponseFuture.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+        SearchResponse response = searchResponseFuture.actionGet(
+                timeOut.toMillis(), TimeUnit.MILLISECONDS);
 
         SearchHits hits = response.getHits();
 
         List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         List<ApiScheduleEvent> results = new ArrayList<>();
 
-        for(SearchResultItem<? extends MediaObject> mo : adapted) {
+        for (SearchResultItem<? extends MediaObject> mo : adapted) {
             int count = 0;
             for (ScheduleEvent e : mo.getResult().getScheduleEvents()) {
                 if (form.test(e)) {
@@ -280,7 +284,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
         }
 
-        switch(form.getPager().getOrder()) {
+        switch (form.getPager().getOrder()) {
             case ASC:
                 Collections.sort(results);
                 break;
