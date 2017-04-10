@@ -69,7 +69,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    private Map<String, String> redirects = new HashMap<>();
+    private Map<String, String> redirects;
 
     private Instant lastRedirectRead = Instant.EPOCH;
 
@@ -79,7 +79,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     public ESMediaRepository(ESClientFactory client, String relatedFields) {
         super(client);
         this.relatedFields = relatedFields.split(",");
-        EXECUTOR.scheduleAtFixedRate(this::refillRedirectCache, 5, 5, TimeUnit.MINUTES);
+    }
+
+    protected void fillRedirects() {
+        if (redirects == null) {
+            refillRedirectCache();
+            EXECUTOR.scheduleAtFixedRate(this::refillRedirectCache, 5, 5, TimeUnit.MINUTES);
+        }
     }
 
     @Override
@@ -365,9 +371,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public RedirectList redirects() {
+        fillRedirects();
         return new RedirectList(lastRedirectRead, lastRedirectChange, redirects);
-
-
     }
 
     synchronized void refillRedirectCache() {
@@ -383,7 +388,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             MediaObject o = i.next();
             newRedirects.put(o.getMid(), o.getMergedToRef());
         }
-        if (! redirects.equals(newRedirects)) {
+        if (! newRedirects.equals(redirects)) {
             redirects = newRedirects;
             lastRedirectChange = Instant.now();
             log.info("Read {} redirects from ES", redirects.size());
