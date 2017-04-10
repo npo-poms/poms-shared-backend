@@ -85,7 +85,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Inject
     public ESScheduleRepository(ESClientFactory client) {
         super(client);
-        this.helper = new IndexHelper(log, client, null, "setting/apimedia.json").mapping("program", "mapping/program.json");
+        this.helper = new IndexHelper(log, client, null, "setting/apimedia.json").mapping("program", "mapping/program.json").mapping("group", "mapping/group.json").mapping("segment", "mapping/segment.json");
     }
 
     @PostConstruct

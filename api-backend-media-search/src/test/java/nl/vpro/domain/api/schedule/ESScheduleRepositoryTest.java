@@ -57,6 +57,17 @@ public class ESScheduleRepositoryTest  {
         ScheduleResult result = repository.listSchedules(Channel.BBC1, date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
         assertThat(result).hasSize(1);
     }
+    
+    @Test
+    public void listSchedulesWithSubtitles() throws JsonProcessingException {
+        index(MediaBuilder.program().mid("SUBS_PROG_1").addDutchCaptions().build());
+        index(MediaBuilder.group().mid("SUBS_GROUP_1").addDutchCaptions().build());
+        index(MediaBuilder.segment().mid("SUBS_SEGMENT_1").addDutchCaptions().build());
+        
+        assertThat(repository.findByMid("SUBS_PROG_1").isHasSubtitles()).isTrue();
+        assertThat(repository.findByMid("SUBS_GROUP_1").isHasSubtitles()).isTrue();
+        assertThat(repository.findByMid("SUBS_SEGMENT_1").isHasSubtitles()).isTrue();
+    }
 
     @Test
     public void findByCrid() throws IOException {
@@ -130,10 +141,22 @@ public class ESScheduleRepositoryTest  {
         return LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(Schedule.ZONE_ID).toInstant();
     }
 
-    private void index(Program o) throws JsonProcessingException {
+    private void index(Program p) throws JsonProcessingException {
+        index(p, "program");
+    }
+    
+    private void index(Segment s) throws JsonProcessingException {
+        index(s, "segment");
+    }
+    
+    private void index(Group g) throws JsonProcessingException {
+        index(g, "group");
+    }
+    
+    private void index(MediaObject o, String mediaType) throws JsonProcessingException {
         client.prepareIndex()
                 .setIndex("media")
-                .setType("program")
+                .setType(mediaType)
                 .setId(o.getMid())
                 .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(o))
                 .get();
