@@ -36,6 +36,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
         fields.put(MediaSortField.member, "memberOf.index");
         fields.put(MediaSortField.memberAdded, "memberOf.added");
         fields.put(MediaSortField.creationDate, "creationDate");
+        fields.put(MediaSortField.lastModified, "lastModified");
     }
 
     private static final Map<MediaSortField, String> nestedFields = new HashMap<>(5);
