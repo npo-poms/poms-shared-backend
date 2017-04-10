@@ -148,7 +148,7 @@ public abstract class AbstractESRepository<T> {
             return null;
         }
         try {
-            return Jackson2Mapper.INSTANCE.readValue(response.getSourceAsString(), clazz);
+            return Jackson2Mapper.LENIENT.readValue(response.getSourceAsString(), clazz);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
