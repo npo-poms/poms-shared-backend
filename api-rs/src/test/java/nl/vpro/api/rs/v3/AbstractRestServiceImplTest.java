@@ -8,7 +8,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.assertj.core.api.AbstractCharSequenceAssert;
-import org.custommonkey.xmlunit.XMLUnit;
+
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpResponse;
@@ -62,9 +62,6 @@ public abstract class AbstractRestServiceImplTest<T> {
         mapper = Jackson2Mapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
 
-
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
     }
 
     protected abstract T getTestObject();
