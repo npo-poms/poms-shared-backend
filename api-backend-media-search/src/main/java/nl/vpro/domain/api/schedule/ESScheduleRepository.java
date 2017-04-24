@@ -224,10 +224,18 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         if (form.hasStart() || form.hasStop()) {
             RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("scheduleEvents.start");
             if (form.hasStart()) {
-                rangeQueryBuilder.from(form.getDateRange().getStart().toEpochMilli());
+                Instant start = form.getDateRange().getStartValue();
+                if (!form.getDateRange().getStart().isInclusive()) {
+                    start = start.plusMillis(1);
+                }
+                rangeQueryBuilder.from(start.toEpochMilli());
             }
             if (form.hasStop()) {
-                rangeQueryBuilder.to(form.getDateRange().getStop().toEpochMilli());
+                Instant stop = form.getDateRange().getStopValue();
+                if (!form.getDateRange().getStop().isInclusive()) {
+                    stop = stop.minusMillis(1);
+                }
+                rangeQueryBuilder.to(stop.toEpochMilli());
             }
             query.must(rangeQueryBuilder);
 
