@@ -1,8 +1,13 @@
 package nl.vpro.domain.api.suggest;
 
-import java.util.AbstractList;
-import java.util.List;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import nl.vpro.domain.api.AbstractESRepository;
+import nl.vpro.domain.api.SuggestResult;
+import nl.vpro.domain.api.Suggestion;
+import nl.vpro.domain.api.media.MediaRepository;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.jackson2.Jackson2Mapper;
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
 import org.elasticsearch.common.unit.Fuzziness;
@@ -12,14 +17,9 @@ import org.elasticsearch.search.suggest.completion.CompletionSuggestionFuzzyBuil
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import nl.vpro.domain.api.AbstractESRepository;
-import nl.vpro.domain.api.SuggestResult;
-import nl.vpro.domain.api.Suggestion;
-import nl.vpro.domain.api.media.MediaRepository;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.jackson2.Jackson2Mapper;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Roelof Jan Koekoek
@@ -27,6 +27,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
  */
 public class ESQueryRepository extends AbstractESRepository<Query> implements QuerySearchRepository {
     private static final String[] RELEVANT_TYPES = new String[]{"query"};
+    private static final Integer PROFILE_SEPARATOR_LENGTH = "||".length();
 
 
     @Override
@@ -69,7 +70,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
                 .setTTL(queryTtl) // ms
                 .execute()
                 .actionGet();
-        } catch(JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
@@ -83,38 +84,40 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
             .actionGet();
 
         Suggest suggest = response.getSuggest();
-        return adapt(suggest, profile);
+        return adapt(suggest, input, profile);
     }
 
     private SuggestBuilder.SuggestionBuilder suggestBuilder(String input, String profile, Integer max) {
+        int profilePrefixLength = profile != null ? profile.length() + PROFILE_SEPARATOR_LENGTH : 0;
         return new CompletionSuggestionFuzzyBuilder("suggest")
             .text(input)
             .field("suggest")
             .size(max)
             .setFuzziness(Fuzziness.AUTO)
-            .setFuzzyMinLength(profile != null ? profile.length() + 3 : 3);
+            .setFuzzyMinLength(profilePrefixLength + 3);
     }
 
-    private SuggestResult adapt(Suggest suggestions, final String profile) {
+    private Comparator<Suggestion> getLexicalDistanceComparator(final String input) {
+        return Comparator.comparingInt(o -> StringUtils.getLevenshteinDistance(input, o.getText()));
+    }
+
+    private SuggestResult adapt(Suggest suggestions, final String input, final String profile) {
 
         Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> esSuggestion = suggestions.getSuggestion("suggest");
-        if(esSuggestion != null && esSuggestion.getEntries().size() > 0) {
+        if (esSuggestion != null && esSuggestion.getEntries().size() > 0) {
             final List<? extends Suggest.Suggestion.Entry.Option> options = esSuggestion.getEntries().get(0).getOptions();
-            if(options != null) {
-                return new SuggestResult(new AbstractList<Suggestion>() {
-                    @Override
-                    public Suggestion get(int index) {
-                        String text = options.get(index).getText().string();
-                        return new Suggestion(profile != null ? text.substring(profile.length() + 2) : text);
-                    }
+            if (options != null) {
+                final List<Suggestion> suggestionsList = options.stream()
+                    .map(option -> {
+                        String text = option.getText().string();
+                        return new Suggestion(profile != null ? text.substring(profile.length() + PROFILE_SEPARATOR_LENGTH) : text);
+                    })
+                    .sorted(getLexicalDistanceComparator(input))
+                    .collect(Collectors.toList());
 
-                    @Override
-                    public int size() {
-                        return options.size();
-                    }
-                },
-                null,
-                options.size());
+                return new SuggestResult(suggestionsList,
+                    null,
+                    options.size());
             }
         }
 
