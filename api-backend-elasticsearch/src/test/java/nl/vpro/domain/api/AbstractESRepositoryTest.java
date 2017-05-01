@@ -19,7 +19,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.LocalClientFactory;
 
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 /**
@@ -46,7 +46,7 @@ public abstract class AbstractESRepositoryTest {
 
     @Before
     public void abstractSetup() {
-        when(broadcasterService.find(anyString())).thenAnswer(invocation -> {
+        when(broadcasterService.find(any())).thenAnswer(invocation -> {
             Object[] args = invocation.getArguments();
             String id = (String) args[0];
             return new Broadcaster(id, id + "display");

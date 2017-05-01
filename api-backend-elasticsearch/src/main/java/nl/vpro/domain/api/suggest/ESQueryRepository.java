@@ -103,7 +103,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         return Comparator.comparingInt(o -> StringUtils.getLevenshteinDistance(input, o.getText()));
     }
 
-    private SuggestResult adapt(Suggest suggestions, final String input, final String profile) {
+    SuggestResult adapt(Suggest suggestions, final String input, final String profile) {
 
         Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> esSuggestion = suggestions.getSuggestion("suggest");
         if (esSuggestion != null && esSuggestion.getEntries().size() > 0) {
