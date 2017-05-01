@@ -1,13 +1,10 @@
 package nl.vpro.domain.api.suggest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import nl.vpro.domain.api.AbstractESRepository;
-import nl.vpro.domain.api.SuggestResult;
-import nl.vpro.domain.api.Suggestion;
-import nl.vpro.domain.api.media.MediaRepository;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.jackson2.Jackson2Mapper;
-import org.apache.commons.lang.StringUtils;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.suggest.SuggestRequestBuilder;
 import org.elasticsearch.action.suggest.SuggestResponse;
 import org.elasticsearch.common.unit.Fuzziness;
@@ -17,9 +14,14 @@ import org.elasticsearch.search.suggest.completion.CompletionSuggestionFuzzyBuil
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import nl.vpro.domain.api.AbstractESRepository;
+import nl.vpro.domain.api.SuggestResult;
+import nl.vpro.domain.api.Suggestion;
+import nl.vpro.domain.api.media.MediaRepository;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.jackson2.Jackson2Mapper;
 
 /**
  * @author Roelof Jan Koekoek
