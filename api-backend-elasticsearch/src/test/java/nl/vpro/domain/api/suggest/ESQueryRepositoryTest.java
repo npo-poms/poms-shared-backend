@@ -23,28 +23,22 @@ public class ESQueryRepositoryTest {
     //https://jira.vpro.nl/browse/NPA-384
     @Test()
     public void adapt() throws Exception {
+        testAdapt("luba",
+            "cuba",
+            "dubai",
+            "libanon",
+            "libanon andere tijden",
+            "lubach"
+        );
+    }
+
+    public void testAdapt(String input, String... suggestions) throws Exception {
         ESClientFactory factory = mock(ESClientFactory.class);
         ESQueryRepository instance = new ESQueryRepository(factory);
+        org.elasticsearch.search.suggest.Suggest suggest = getSuggestResult(suggestions);
 
-
-        List<Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>>> suggestionList = new ArrayList<>();
-        Suggest.Suggestion<Suggest.Suggestion.Entry<?>> suggestEntry = new Suggest.Suggestion<>("suggest", 5);
-        suggestionList.add(suggestEntry);
-
-
-        Suggest.Suggestion.Entry suggestion = new Suggest.Suggestion.Entry(new StringText("suggestion"), 0, 10);
-        suggestEntry.addTerm(suggestion);
-
-        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new StringText("cuba"), 0.5f));
-        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new StringText("dubai"), 0.5f));
-        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new StringText("libanon"), 0.5f));
-        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new StringText("libanon andere tijden"), 0.5f));
-        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new StringText("lubach"), 0.5f));
-        org.elasticsearch.search.suggest.Suggest suggest = new org.elasticsearch.search.suggest.Suggest(suggestionList);
-
-        String input = "luba";
         SuggestResult adapt = instance.adapt(suggest, input, null);
-        assertThat(adapt.getItems()).hasSize(5);
+        assertThat(adapt.getItems()).hasSameSizeAs(suggestions);
         int prevDistance = Integer.MIN_VALUE;
         for (Suggestion sug : adapt.getItems()) {
             int distance = StringUtils.getLevenshteinDistance(input, sug.getText());
@@ -53,6 +47,34 @@ public class ESQueryRepositoryTest {
             prevDistance = distance;
         }
 
+    }
+
+    private Suggest getSuggestResult(String... text) {
+
+        List<Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>>> suggestionList = new ArrayList<>();
+        Suggest.Suggestion<Suggest.Suggestion.Entry<?>> suggestEntry = new Suggest.Suggestion<>("suggest", 5);
+        suggestionList.add(suggestEntry);
+
+
+        Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion = new Suggest.Suggestion.Entry<>(new StringText("suggestion"), 0, 10);
+        suggestEntry.addTerm(suggestion);
+
+        addOptions(suggestion, text);
+
+        org.elasticsearch.search.suggest.Suggest suggest = new org.elasticsearch.search.suggest.Suggest(suggestionList);
+        return suggest;
+
+    }
+
+    private void addOptions(Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion, String... text) {
+        for (String s : text) {
+            addOption(suggestion, s);
+        }
+    }
+
+
+    private void addOption(Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion, String text) {
+        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new StringText(text), 0.5f));
 
     }
 
