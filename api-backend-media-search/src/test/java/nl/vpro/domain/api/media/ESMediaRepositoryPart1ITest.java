@@ -80,6 +80,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
+    public void testLoad() throws IOException {
+        index(program().mainTitle("foo bar").mid("MID_FOR_LOAD").build());
+        MediaObject result = target.load("MID_FOR_LOAD");
+        assertThat(result.getMainTitle()).isEqualTo("foo bar");
+        assertThat(result.getMid()).isEqualTo("MID_FOR_LOAD");
+
+    }
+
+    @Test
     public void testText() throws IOException {
         index(program().mainTitle("foo").build());
         index(program().mainTitle("bar").build());

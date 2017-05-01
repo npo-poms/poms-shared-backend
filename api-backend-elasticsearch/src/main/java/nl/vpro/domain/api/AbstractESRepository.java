@@ -128,14 +128,19 @@ public abstract class AbstractESRepository<T> {
 
     protected T load(String id, Class<T> clazz) {
         try {
-            GetRequest getRequest = new GetRequest(getIndexName(), "_all", id);
-            ActionFuture<GetResponse> future = client().get(getRequest);
-            GetResponse response = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
-            if (loadTypes.contains(response.getType())) {
-                return transformResponse(response, clazz);
-            } else {
-                return null;
+            MultiGetRequest getRequest =
+                new MultiGetRequest();
+            for (String s : loadTypes) {
+                getRequest.add(indexName, s, id);
             }
+            ActionFuture<MultiGetResponse> future = client().multiGet(getRequest);
+            MultiGetResponse response = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+            for (MultiGetItemResponse r : response.getResponses()) {
+                if (! r.isFailed() && r.getResponse().isExists()) {
+                    return transformResponse(r.getResponse(), clazz);
+                }
+            }
+            return null;
         } catch(org.elasticsearch.indices.IndexMissingException ime) {
             return null;
         } catch(InterruptedException | ExecutionException | TimeoutException e) {
@@ -170,7 +175,9 @@ public abstract class AbstractESRepository<T> {
             }
             MultiGetRequest request = new MultiGetRequest();
             for(String id : ids) {
-                request.add(indexName, null, id);
+                for (String t : loadTypes) {
+                    request.add(indexName, t, id);
+                }
             }
             ActionFuture<MultiGetResponse> future =
                 client()
@@ -185,10 +192,8 @@ public abstract class AbstractESRepository<T> {
             Map<String, S> answerMap = new HashMap<>(responses.getResponses().length);
             for(MultiGetItemResponse response : responses) {
                 if(response.getResponse().isExists()) {
-                    if (loadTypes.contains(response.getType())) {
-                        S item = Jackson2Mapper.INSTANCE.readValue(response.getResponse().getSourceAsString(), clazz);
-                        answerMap.put(response.getId(), item);
-                    }
+                    S item = Jackson2Mapper.INSTANCE.readValue(response.getResponse().getSourceAsString(), clazz);
+                    answerMap.put(response.getId(), item);
                 }
             }
             List<S> answer = new ArrayList<>(ids.length);
