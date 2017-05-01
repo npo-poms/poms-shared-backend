@@ -22,6 +22,10 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
+      <artifactId>api-spring</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
       <artifactId>api-backend-media-search</artifactId>
     </dependency>
     <dependency>
