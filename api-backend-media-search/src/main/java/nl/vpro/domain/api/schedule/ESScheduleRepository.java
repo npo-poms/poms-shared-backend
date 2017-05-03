@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -167,7 +164,10 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     @Override
     public ScheduleResult listSchedulesForAncestor(String mediaId, Instant start, Instant stop, Order order, long offset, Integer max) {
-        throw new UnsupportedOperationException();
+        ExtendedScheduleForm form = new ExtendedScheduleForm(
+            new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
+        form.setDescendantOf(Arrays.asList(mediaId));
+        return execute(form, offset, max);
     }
 
     public boolean isCreateIndices() {
@@ -220,6 +220,11 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         }
         if (form.getMediaType() != null) {
             query.must(QueryBuilders.termQuery("type", form.getMediaType().name()));
+        }
+        if (form.getDescendantOf() != null) {
+            for (String descendantOf : form.getDescendantOf()) {
+                query.must(QueryBuilders.termQuery("descendantOf", descendantOf));
+            }
         }
         if (form.hasStart() || form.hasStop()) {
             RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("scheduleEvents.start");
