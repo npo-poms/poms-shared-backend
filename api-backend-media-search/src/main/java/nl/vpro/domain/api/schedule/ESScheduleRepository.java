@@ -20,10 +20,7 @@ import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.inject.Inject;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -202,56 +199,64 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     }
 
     private ScheduleResult execute(ExtendedScheduleForm form, long offset, Integer max) {
-        BoolQueryBuilder query = QueryBuilders.boolQuery();
-        if (form.hasChannels()) {
-            BoolQueryBuilder channelQuery = QueryBuilders.boolQuery();
-            for(Channel channel : form.getChannels()) {
-                channelQuery.should(QueryBuilders.termQuery("scheduleEvents.channel", channel.name()));
-            }
-            query.must(channelQuery);
-        }
-        if (form.getBroadcaster() != null) {
-            query.should(QueryBuilders.termQuery("broadcasters.id", form.getBroadcaster()));
-
-        }
-        if (form.getNet() != null) {
-            query.should(QueryBuilders.termQuery("scheduleEvents.net", form.getNet()));
-
-        }
-        if (form.getMediaType() != null) {
-            query.must(QueryBuilders.termQuery("type", form.getMediaType().name()));
-        }
-        if (form.getDescendantOf() != null) {
-            for (String descendantOf : form.getDescendantOf()) {
-                query.must(QueryBuilders.termQuery("descendantOf.midRef", descendantOf));
-            }
-        }
-        if (form.hasStart() || form.hasStop()) {
-            RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("scheduleEvents.start");
-            if (form.hasStart()) {
-                Instant start = form.getDateRange().getStartValue();
-                if (!form.getDateRange().getStart().isInclusive()) {
-                    start = start.plusMillis(1);
+        QueryBuilder toExecute;
+        {
+            BoolQueryBuilder query = QueryBuilders.boolQuery();
+            if (form.hasChannels()) {
+                BoolQueryBuilder channelQuery = QueryBuilders.boolQuery();
+                for (Channel channel : form.getChannels()) {
+                    channelQuery.should(QueryBuilders.termQuery("scheduleEvents.channel", channel.name()));
                 }
-                rangeQueryBuilder.from(start.toEpochMilli());
+                query.must(channelQuery);
             }
-            if (form.hasStop()) {
-                Instant stop = form.getDateRange().getStopValue();
-                if (!form.getDateRange().getStop().isInclusive()) {
-                    stop = stop.minusMillis(1);
+            if (form.getBroadcaster() != null) {
+                query.should(QueryBuilders.termQuery("broadcasters.id", form.getBroadcaster()));
+
+            }
+            if (form.getNet() != null) {
+                query.should(QueryBuilders.termQuery("scheduleEvents.net", form.getNet()));
+
+            }
+            if (form.getMediaType() != null) {
+                query.must(QueryBuilders.termQuery("type", form.getMediaType().name()));
+            }
+            if (form.getDescendantOf() != null) {
+                for (String descendantOf : form.getDescendantOf()) {
+                    query.must(QueryBuilders.termQuery("descendantOf.midRef", descendantOf));
                 }
-                rangeQueryBuilder.to(stop.toEpochMilli());
             }
-            query.must(rangeQueryBuilder);
+            if (form.hasStart() || form.hasStop()) {
+                RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("scheduleEvents.start");
+                if (form.hasStart()) {
+                    Instant start = form.getDateRange().getStartValue();
+                    if (!form.getDateRange().getStart().isInclusive()) {
+                        start = start.plusMillis(1);
+                    }
+                    rangeQueryBuilder.from(start.toEpochMilli());
+                }
+                if (form.hasStop()) {
+                    Instant stop = form.getDateRange().getStopValue();
+                    if (!form.getDateRange().getStop().isInclusive()) {
+                        stop = stop.minusMillis(1);
+                    }
+                    rangeQueryBuilder.to(stop.toEpochMilli());
+                }
+                query.must(rangeQueryBuilder);
 
-        }
-        if (form.getGuideDay() != null) {
-            query.must(QueryBuilders.termQuery("scheduleEvents.guideDay", form.getGuideDay().atStartOfDay(ScheduleService.ZONE_ID).toEpochSecond() * 1000));
-        }
+            }
+            if (form.getGuideDay() != null) {
+                query.must(QueryBuilders.termQuery("scheduleEvents.guideDay", form.getGuideDay().atStartOfDay(ScheduleService.ZONE_ID).toEpochSecond() * 1000));
+            }
 
+            if (!query.hasClauses()) {
+                toExecute = QueryBuilders.matchAllQuery();
+            } else {
+                toExecute = query;
+            }
+        }
         Long total;
         try {
-            total = executeCount(query, getIndexName());
+            total = executeCount(toExecute, getIndexName());
         } catch(InterruptedException | ExecutionException e) {
             log.error(e.getMessage(), e);
             total = null;
@@ -261,9 +266,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         request.types(getScheduleEventTypes());
 
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
-        searchBuilder.query(query);
+        searchBuilder.query(toExecute);
 
-        handlePaging(offset, max, searchBuilder, query, getIndexName());
+        handlePaging(offset, max, searchBuilder, toExecute, getIndexName());
 
         request.source(searchBuilder);
 

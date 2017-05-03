@@ -41,6 +41,25 @@ public class ESScheduleRepositoryTest  {
     }
 
     @Test
+    public void list() throws JsonProcessingException {
+        index(MediaBuilder.program().mid("DONNA_1")
+            .scheduleEvents(
+                event(Channel.BBC1, "2015-06-19T10:00:00"),
+                event(Channel.BBC1, "2015-06-18T10:00:00")
+            ).build());
+
+        index(MediaBuilder.program().mid("DONNA_2")
+            .scheduleEvents(
+                event(Channel.BBC2, "2015-06-19T10:00:00")
+            ).build());
+
+
+        ScheduleResult result = repository.listSchedules((Instant) null, null, Order.ASC, 0L, 10);
+        assertThat(result).hasSize(3);
+    }
+
+
+    @Test
     public void listSchedulesWithChannel() throws JsonProcessingException {
         index(MediaBuilder.program().mid("DONNA_1")
                 .scheduleEvents(
