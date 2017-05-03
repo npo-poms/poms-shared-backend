@@ -57,13 +57,13 @@ public class ESScheduleRepositoryTest  {
         ScheduleResult result = repository.listSchedules(Channel.BBC1, date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
         assertThat(result).hasSize(1);
     }
-    
+
     @Test
     public void listSchedulesWithSubtitles() throws JsonProcessingException {
         index(MediaBuilder.program().mid("SUBS_PROG_1").addDutchCaptions().build());
         index(MediaBuilder.group().mid("SUBS_GROUP_1").addDutchCaptions().build());
         index(MediaBuilder.segment().mid("SUBS_SEGMENT_1").addDutchCaptions().build());
-        
+
         assertThat(repository.findByMid("SUBS_PROG_1").isHasSubtitles()).isTrue();
         assertThat(repository.findByMid("SUBS_GROUP_1").isHasSubtitles()).isTrue();
         assertThat(repository.findByMid("SUBS_SEGMENT_1").isHasSubtitles()).isTrue();
@@ -130,6 +130,30 @@ public class ESScheduleRepositoryTest  {
         assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(movie);
     }
 
+
+    @Test
+    public void listSchedulesForAncestors() throws Exception {
+        Program broadcast = MediaBuilder.program().mid("p1")
+            .descendantOf("DESCENDANT1")
+            .type(ProgramType.BROADCAST)
+            .scheduleEvents(event(Channel.NED2, "2016-07-08T11:00:00"))
+            .build();
+
+        Program movie = MediaBuilder.program().mid("p2")
+            .descendantOf("DESCENDANT2")
+            .type(ProgramType.MOVIE)
+            .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
+            .build();
+
+        index(broadcast);
+        index(movie);
+
+        ScheduleResult result = repository.listSchedulesForAncestor("DESCENDANT1",
+            date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
+
+        assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(broadcast);
+    }
+
     private ScheduleEvent event(Channel c, String start) {
         ScheduleEvent event = new ScheduleEvent();
         event.setChannel(c);
@@ -144,15 +168,15 @@ public class ESScheduleRepositoryTest  {
     private void index(Program p) throws JsonProcessingException {
         index(p, "program");
     }
-    
+
     private void index(Segment s) throws JsonProcessingException {
         index(s, "segment");
     }
-    
+
     private void index(Group g) throws JsonProcessingException {
         index(g, "group");
     }
-    
+
     private void index(MediaObject o, String mediaType) throws JsonProcessingException {
         client.prepareIndex()
                 .setIndex("media")

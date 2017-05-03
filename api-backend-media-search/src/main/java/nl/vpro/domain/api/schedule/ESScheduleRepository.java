@@ -223,7 +223,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         }
         if (form.getDescendantOf() != null) {
             for (String descendantOf : form.getDescendantOf()) {
-                query.must(QueryBuilders.termQuery("descendantOf", descendantOf));
+                query.must(QueryBuilders.termQuery("descendantOf.midRef", descendantOf));
             }
         }
         if (form.hasStart() || form.hasStop()) {
