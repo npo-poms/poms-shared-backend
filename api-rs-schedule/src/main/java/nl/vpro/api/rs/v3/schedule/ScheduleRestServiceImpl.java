@@ -566,7 +566,10 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         }
 
         Instant start = scheduleEvent.getStartInstant();
-        Instant end = start.plus(scheduleEvent.getDurationTime());
+        if (scheduleEvent.getDuration() == null){
+            return false;
+        }
+        Instant end = start.plus(scheduleEvent.getDuration());
 
         return ! start.isAfter(time) && end.isAfter(time);
     }
