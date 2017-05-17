@@ -79,9 +79,9 @@ public class ESScheduleRepositoryTest  {
 
     @Test
     public void listSchedulesWithSubtitles() throws JsonProcessingException {
-        index(MediaBuilder.program().mid("SUBS_PROG_1").addDutchCaptions().build());
-        index(MediaBuilder.group().mid("SUBS_GROUP_1").addDutchCaptions().build());
-        index(MediaBuilder.segment().mid("SUBS_SEGMENT_1").addDutchCaptions().build());
+        index(MediaTestDataBuilder.program().mid("SUBS_PROG_1").withDutchCaptions().build());
+        index(MediaTestDataBuilder.group().mid("SUBS_GROUP_1").withDutchCaptions().build());
+        index(MediaTestDataBuilder.segment().mid("SUBS_SEGMENT_1").withDutchCaptions().build());
 
         assertThat(repository.findByMid("SUBS_PROG_1").isHasSubtitles()).isTrue();
         assertThat(repository.findByMid("SUBS_GROUP_1").isHasSubtitles()).isTrue();
