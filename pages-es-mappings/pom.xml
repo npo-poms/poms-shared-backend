@@ -10,7 +10,7 @@
 
   <groupId>nl.vpro.pages</groupId>
   <artifactId>pages-es-mappings</artifactId>
-  <version>5.3-SNAPSHOT</version>
+  <version>5.4-SNAPSHOT</version>
   <name>pages-es-mappings</name>
 
   <build>
@@ -41,10 +41,4 @@
       <artifactId>commons-io</artifactId>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared/branches/REL-5.3-SNAPSHOT/pages-es-mappings</connection>
-    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared/branches/REL-5.3-SNAPSHOT/pages-es-mappings</developerConnection>
-    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared/branches/REL-5.3-SNAPSHOT/pages-es-mappings</url>
-  </scm>
 </project>
