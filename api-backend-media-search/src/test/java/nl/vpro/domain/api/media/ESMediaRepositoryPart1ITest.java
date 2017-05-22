@@ -1,5 +1,7 @@
 package nl.vpro.domain.api.media;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -49,6 +51,7 @@ import static org.mockito.Mockito.when;
  * @since 3.5
  */
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
+@Slf4j
 public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Autowired
@@ -73,9 +76,14 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
     }
 
+
     @After
     public void tearDown() {
-        client.admin().indices().prepareDelete(ApiMediaIndex.NAME).execute().actionGet();
+        client.admin()
+            .indices()
+            .prepareDelete(ApiMediaIndex.NAME)
+            .execute()
+            .actionGet();
     }
 
 
@@ -116,9 +124,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         {
             SearchResult<MediaObject> result = target.find(null, form().fuzzyText("foa").build(), 0, null);
             assertThat(result.getSize()).isEqualTo(2);
+            assertThat(result.getItems().get(1).getScore()).isLessThan(result.getItems().get(0).getScore());
             assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("foa");
             assertThat(result.getItems().get(1).getResult().getMainTitle()).isEqualTo("foo");
-            assertThat(result.getItems().get(1).getScore()).isLessThan(result.getItems().get(0).getScore());
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().text("FOO").build(), 0, null);

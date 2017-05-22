@@ -9,76 +9,45 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
+import nl.vpro.domain.api.AbstractESRepositoryTest;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.ScheduleResult;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.user.Broadcaster;
-import nl.vpro.elasticsearch.LocalClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-public class ESScheduleRepositoryTest  {
-
-    protected LocalClientFactory clientFactory = new LocalClientFactory();
-    protected Client client;
+public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
 
     public ESScheduleRepository repository;
 
     @Before
     public void setup() throws IOException, ExecutionException, InterruptedException {
-        client = clientFactory.client("test");
         repository = new ESScheduleRepository(clientFactory);
-        repository.setIndexName("media");
+        repository.setIndexName(ApiMediaIndex.NAME);
         repository.createIndices().get();
     }
+
+
     @After
-    // TODO This seems horrible
-    public void shutdown() throws ExecutionException, InterruptedException {
-
-        ListenableActionFuture<SearchResponse> search = client.prepareSearch("media")
-            .setQuery(QueryBuilders.matchAllQuery())
-            .execute();
-            search.addListener(new ActionListener<SearchResponse>() {
-                @Override
-                public void onResponse(SearchResponse searchResponse) {
-                    BulkRequestBuilder builder = new BulkRequestBuilder(client);
-                    for (SearchHit hit : searchResponse.getHits().getHits()) {
-                        builder.add(client.prepareDelete("media", hit.getType(), hit.getId()).request());
-                    }
-                    builder.get();
-
-                }
-
-                @Override
-                public void onFailure(Throwable e) {
-                    log.error(e.getMessage(), e);
-
-                }
-            });
-            search.get();
-
-        ;
-
-
+    public void tearDown() {
+        client.admin()
+            .indices()
+            .prepareDelete(ApiMediaIndex.NAME)
+            .execute()
+            .actionGet();
     }
-
     @Test
     public void list() throws JsonProcessingException {
         index(MediaBuilder.program().mid("DONNA_1")
@@ -237,14 +206,14 @@ public class ESScheduleRepositoryTest  {
 
     private void index(MediaObject o, String mediaType) throws JsonProcessingException {
         client.prepareIndex()
-                .setIndex("media")
+                .setIndex(ApiMediaIndex.NAME)
                 .setType(mediaType)
                 .setId(o.getMid())
                 .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(o))
                 .get();
         client.admin()
                 .indices()
-                .refresh(new RefreshRequest("media"))
+                .refresh(new RefreshRequest(ApiMediaIndex.NAME))
                 .actionGet();
     }
 }
