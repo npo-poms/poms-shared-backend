@@ -49,6 +49,7 @@ public class ESScheduleRepositoryTest  {
         repository.createIndices().get();
     }
     @After
+    // TODO This seems horrible
     public void shutdown() throws ExecutionException, InterruptedException {
 
         ListenableActionFuture<SearchResponse> search = client.prepareSearch("media")
