@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.deletebyquery.DeleteByQueryRequest;
 import org.elasticsearch.client.Client;
 import org.junit.Before;
 import org.junit.Test;
@@ -177,7 +178,7 @@ public class ESScheduleRepositoryTest  {
         ScheduleEvent event = new ScheduleEvent();
         event.setChannel(c);
         event.setStartInstant(date(start));
-        event.setDuration(Duration.ofMillis(3600000));
+        event.setDuration(Duration.ofHours(1));
         return event;
     }
     private Instant date(String s) {

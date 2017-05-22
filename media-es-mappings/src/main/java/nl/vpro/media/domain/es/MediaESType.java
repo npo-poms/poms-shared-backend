@@ -30,6 +30,8 @@ public enum MediaESType {
 
     public static MediaESType[] MEMBERREFS= {programMemberRef, groupMemberRef, segmentMemberRef};
 
+    public static MediaESType[] REFS = {programMemberRef, groupMemberRef, segmentMemberRef, episodeRef};
+
     public static MediaESType[] DELETED_MEDIAOBJECTS = {deletedprogram, deletedgroup, deletedsegment};
 
 

@@ -249,7 +249,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
         SearchHit[] hits = response.getHits().getHits();
-        List<MediaObject> objects = loadAll(Arrays.stream(hits).map(sh -> String.valueOf(sh.getSource().get("childRef"))).collect(Collectors.toList()));
+        List<MediaObject> objects = loadAll(
+            Arrays
+                .stream(hits)
+                .map(sh -> String.valueOf(sh.getSource().get("childRef")))
+                .collect(Collectors.toList()));
 
         return new MediaResult(objects, offset, max, response.getHits().getTotalHits());
 
@@ -266,7 +270,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .setSize(max)
             .request();
 
-        GenericMediaSearchResult<MediaObject> objects = executeQuery(request, null, offset, max, MediaObject.class);
+        GenericMediaSearchResult<MediaObject> objects =
+            executeQuery(request, null, offset, max, MediaObject.class);
 
         return new MediaSearchResult(objects).asResult();
 
