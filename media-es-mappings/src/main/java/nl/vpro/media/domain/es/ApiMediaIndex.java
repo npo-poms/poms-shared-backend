@@ -15,7 +15,10 @@ public class ApiMediaIndex {
     public static String NAME = "apimedia";
 
     public static String source() {
-        return source("setting/apimedia.json");
+        return source(settings());
+    }
+    public static String settings() {
+        return "setting/apimedia.json";
     }
 
     public static String source(String name) {

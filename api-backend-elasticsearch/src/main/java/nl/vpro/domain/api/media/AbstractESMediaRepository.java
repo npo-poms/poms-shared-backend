@@ -5,9 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+
+import org.apache.http.concurrent.BasicFuture;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -24,7 +28,11 @@ import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch.IndexHelper;
+import nl.vpro.media.domain.es.ApiCueIndex;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
 
 /**
@@ -54,10 +62,40 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         super.setTimeOut(TimeUtils.parseDuration(timeout).orElse(Duration.ofSeconds(15)));
     }
 
+    private final IndexHelper helper;
+
+    protected boolean createIndices = true;
+
+
     protected AbstractESMediaRepository(ESClientFactory client) {
         super(client);
+        this.helper = new IndexHelper(log, client, null,
+            ApiMediaIndex.settings());
+        for (MediaESType type : MediaESType.values()) {
+            this.helper.mapping(type.name(), type.mapping());
+        }
+        this.helper.mapping(ApiCueIndex.TYPE, ApiCueIndex.mapping());
+
     }
 
+
+    @PostConstruct
+    public Future createIndices() {
+        helper.setIndexName(indexName);
+        if (isCreateIndices()) {
+            return ThreadPools.startUpExecutor.submit(helper::prepareIndex);
+        } else {
+            return new BasicFuture<>(null);
+        }
+    }
+
+    public boolean isCreateIndices() {
+        return createIndices;
+    }
+
+    public void setCreateIndices(boolean createIndices) {
+        this.createIndices = createIndices;
+    }
 
     @Override
     protected String[] getLoadTypes() {

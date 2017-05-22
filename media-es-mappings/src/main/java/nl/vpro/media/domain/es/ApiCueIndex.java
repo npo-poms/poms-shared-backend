@@ -12,7 +12,10 @@ public class ApiCueIndex {
 
 
     public static String typeSource() {
-        return source("mapping/cue.json");
+        return source(mapping());
+    }
+    public static String mapping() {
+        return "mapping/cue.json";
     }
 
     public static String settingSource() {

@@ -9,13 +9,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.concurrent.BasicFuture;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -32,10 +28,8 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.DateRange;
 import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.MediaESType;
-import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
 
 /**
@@ -68,9 +62,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     }
 
 
-    protected boolean createIndices = true;
-
-    private final IndexHelper helper;
 
     public ESScheduleRepository() {
         this(null);
@@ -79,18 +70,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Inject
     public ESScheduleRepository(ESClientFactory client) {
         super(client);
-        this.helper = new IndexHelper(log, client, null, "setting/apimedia.json").mapping("program", "mapping/program.json").mapping("group", "mapping/group.json").mapping("segment", "mapping/segment.json");
+
     }
 
-    @PostConstruct
-    public Future createIndices() {
-        helper.setIndexName(indexName);
-        if(isCreateIndices()) {
-            return ThreadPools.startUpExecutor.submit(helper::prepareIndex);
-        } else {
-            return new BasicFuture<>(null);
-        }
-    }
 
     @Override
     public List<MediaObject> loadAll(List<String> ids) {
@@ -167,13 +149,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         return execute(form, offset, max);
     }
 
-    public boolean isCreateIndices() {
-        return createIndices;
-    }
-
-    public void setCreateIndices(boolean createIndices) {
-        this.createIndices = createIndices;
-    }
 
     public long count() {
         return client().prepareCount(indexName).get().getCount();
