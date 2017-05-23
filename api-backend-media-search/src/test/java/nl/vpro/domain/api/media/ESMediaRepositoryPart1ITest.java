@@ -15,6 +15,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -52,6 +53,7 @@ import static org.mockito.Mockito.when;
  */
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
+@Ignore
 public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Autowired
