@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>nl.vpro.poms</groupId>
+    <artifactId>poms-parent</artifactId>
+    <version>5.3.2</version>
+  </parent>
+
+  <groupId>nl.publiekeomroep</groupId>
+  <artifactId>poms-shared-backend-parent</artifactId>
+  <version>5.3.1</version>
+  <packaging>pom</packaging>
+  <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
+
+  <name>poms-shared-parent</name>
+
+  <properties>
+    <!-- Tied to ES version! -->
+    <lucene.version>${lucene.elasticsearch.version}</lucene.version>
+    <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
+  </properties>
+
+  <scm>
+    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/tags/REL-5.3.1</connection>
+    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/tags/REL-5.3.1</developerConnection>
+    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared-backend/tags/REL-5.3.1</url>
+  </scm>
+
+  <modules>
+    <module>api-backend-elasticsearch</module>
+    <module>api-backend-media-search</module>
+
+    <module>media-es-mappings</module>
+    <module>pages-es-mappings</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.shared</groupId>
+      <artifactId>vpro-shared-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>vpro</id>
+      <url>https://nexus.vpro.nl/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>vpro</id>
+      <url>https://nexus.vpro.nl/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
+</project>
