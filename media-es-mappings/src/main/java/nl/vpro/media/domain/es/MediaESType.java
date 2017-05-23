@@ -56,6 +56,13 @@ public enum MediaESType {
     }
 
     public static String[] nonRefs() {
-        return toString(Stream.concat(Arrays.stream(MEDIAOBJECTS), Arrays.stream(DELETED_MEDIAOBJECTS)).toArray(MediaESType[]::new));
+        return toString(
+            Stream.concat(
+                Arrays.stream(MEDIAOBJECTS),
+                Arrays.stream(DELETED_MEDIAOBJECTS)
+            ).toArray(MediaESType[]::new));
+    }
+    public static String[] refs() {
+        return toString(REFS);
     }
 }
