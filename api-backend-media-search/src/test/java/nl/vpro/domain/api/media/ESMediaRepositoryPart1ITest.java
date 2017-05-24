@@ -351,7 +351,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testFindWithDurationFacet() throws Exception {
         index(program().withMid().withDuration().build());
 
-        MediaForm form = form().durationFacet(new DateRangeInterval("1minute")).build();
+        MediaForm form = form().durationFacet(new DurationRangeInterval("1minute")).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 

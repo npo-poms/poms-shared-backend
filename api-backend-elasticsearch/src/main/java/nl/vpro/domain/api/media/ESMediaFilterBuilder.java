@@ -160,7 +160,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         }
 
         {
-            DateRangeMatcherList durations = searches.getDurations();
+            DurationRangeMatcherList durations = searches.getDurations();
             // not implemented
             if(durations != null && !durations.isEmpty()) {
                 //throw new Unsuppported

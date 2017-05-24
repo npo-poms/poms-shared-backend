@@ -1,6 +1,14 @@
 package nl.vpro.domain.api;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotNull;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.core.StopFilter;
@@ -15,11 +23,7 @@ import org.apache.lucene.util.Version;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.*;
-import java.util.stream.Collectors;
+import nl.vpro.domain.api.media.DurationRangeMatcher;
 
 /**
  * @author Michiel Meeuwissen
@@ -207,10 +211,12 @@ public abstract class ESQueryBuilder {
     }
 
 
-    public static interface FieldApplier {
+    public interface FieldApplier {
         void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher matcher);
 
         void applyField(BoolQueryBuilder booleanQueryBuilder, DateRangeMatcher matcher);
+
+        void applyField(BoolQueryBuilder booleanQueryBuilder, DurationRangeMatcher matcher);
 
     }
 
@@ -229,6 +235,12 @@ public abstract class ESQueryBuilder {
 
         @Override
         public void applyField(BoolQueryBuilder booleanQueryBuilder, DateRangeMatcher matcher) {
+            QueryBuilder typeQuery = buildQuery(fieldName, matcher);
+            apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
+        }
+
+        @Override
+        public void applyField(BoolQueryBuilder booleanQueryBuilder, DurationRangeMatcher matcher) {
             QueryBuilder typeQuery = buildQuery(fieldName, matcher);
             apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
         }
@@ -261,6 +273,16 @@ public abstract class ESQueryBuilder {
             }
             apply(booleanQueryBuilder, bool, matcher.getMatch());
         }
+
+        @Override
+        public void applyField(BoolQueryBuilder booleanQueryBuilder, DurationRangeMatcher matcher) {
+            BoolQueryBuilder bool = QueryBuilders.boolQuery();
+            for (String fieldName : fieldNames) {
+                QueryBuilder extensionQuery = buildQuery(fieldName, matcher);
+                bool.should(extensionQuery);
+            }
+            apply(booleanQueryBuilder, bool, matcher.getMatch());
+        }
     }
 
     protected static <T extends MatchType> void build(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<? extends AbstractTextMatcher<T>, T> textMatchers, FieldApplier applier) {
@@ -278,6 +300,17 @@ public abstract class ESQueryBuilder {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
 
             for (DateRangeMatcher rangeMatcher : rangeMatchers) {
+                applier.applyField(sub, rangeMatcher);
+            }
+            apply(booleanQuery, sub, rangeMatchers.getMatch());
+        }
+    }
+
+    protected static void build(BoolQueryBuilder booleanQuery, DurationRangeMatcherList rangeMatchers, FieldApplier applier) {
+        if (rangeMatchers != null) {
+            BoolQueryBuilder sub = QueryBuilders.boolQuery();
+
+            for (DurationRangeMatcher rangeMatcher : rangeMatchers) {
                 applier.applyField(sub, rangeMatcher);
             }
             apply(booleanQuery, sub, rangeMatchers.getMatch());
@@ -341,6 +374,23 @@ public abstract class ESQueryBuilder {
 
         if (matcher.getEnd() != null) {
             rangeQuery.to(matcher.getEnd().getTime());
+        }
+
+        return rangeQuery;
+    }
+
+    public static QueryBuilder buildQuery(String fieldName, DurationRangeMatcher matcher) {
+        RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(fieldName);
+
+        rangeQuery.includeLower(matcher.includeBegin());
+        rangeQuery.includeUpper(matcher.includeEnd());
+
+        if (matcher.getBegin() != null) {
+            rangeQuery.from(matcher.getBegin().toMillis());
+        }
+
+        if (matcher.getEnd() != null) {
+            rangeQuery.to(matcher.getEnd().toMillis());
         }
 
         return rangeQuery;

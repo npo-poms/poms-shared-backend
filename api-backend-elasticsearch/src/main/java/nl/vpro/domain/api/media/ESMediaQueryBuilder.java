@@ -165,6 +165,11 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             public void applyField(BoolQueryBuilder booleanQueryBuilder, DateRangeMatcher matcher) {
                 throw new UnsupportedOperationException("Range location queries are not available");
             }
+
+            @Override
+            public void applyField(BoolQueryBuilder booleanQueryBuilder, DurationRangeMatcher matcher) {
+                throw new UnsupportedOperationException("Range location queries are not available");
+            }
         });
     }
 

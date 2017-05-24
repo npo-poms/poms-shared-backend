@@ -6,6 +6,7 @@ package nl.vpro.domain.api;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.function.Function;
 
@@ -25,6 +26,7 @@ import org.elasticsearch.search.facet.terms.TermsFacet;
 import nl.vpro.domain.Displayable;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
+import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.esField;
 
@@ -149,7 +151,7 @@ public abstract class ESFacetsHandler {
         return ((HasAggregations)filter).getAggregations().get(aggregationName);
     }
 
-    protected static List<DateFacetResultItem> getDateRangeFacetResultItems(DateRangeFacets<?> dateRangeFacets, String facetName, SearchResponse response, boolean asDuration) {
+    protected static List<DateFacetResultItem> getDateRangeFacetResultItems(DateRangeFacets<?> dateRangeFacets, String facetName, SearchResponse response) {
         Facets facets = response.getFacets();
         Aggregations aggregations = response.getAggregations();
 
@@ -181,7 +183,7 @@ public abstract class ESFacetsHandler {
                         Date bucketStart = bucket.getKeyAsDate().toDate();
                         Date bucketEnd = Date.from(interval.getBucketEnd(bucket.getKeyAsDate().toDate().toInstant()));
                         DateFacetResultItem entry = new DateFacetResultItem(
-                            interval.print(bucketStart.toInstant(), asDuration),
+                            interval.print(bucketStart.toInstant(), false),
                             bucketStart,
                             bucketEnd,
                             bucket.getDocCount());
@@ -198,9 +200,70 @@ public abstract class ESFacetsHandler {
         return dateFacetResultItems;
     }
 
+    protected static List<DurationFacetResultItem> getDurationRangeFacetResultItems(DurationRangeFacets<?> durationRangeFacets, String facetName, SearchResponse response) {
+        Facets facets = response.getFacets();
+        Aggregations aggregations = response.getAggregations();
+
+        if (facets == null && aggregations == null) {
+            return null;
+        }
+
+        List<DurationFacetResultItem> facetResultItems = new ArrayList<>();
+
+        if (facets != null) {
+            String prefix = facetName + ':';
+            List<RangeFacet> ranges = new ArrayList<>();
+            for (org.elasticsearch.search.facet.Facet facet : facets) {
+                if (facet.getName().startsWith(prefix)) {
+                    ranges.add((RangeFacet) facet);
+                }
+            }
+            if (!ranges.isEmpty()) {
+                facetResultItems.addAll(durationRangeFacetResult(ranges, prefix));
+            }
+        }
+
+        if (aggregations != null) {
+            for (Aggregation aggregation : aggregations) {
+                if (aggregation.getName().startsWith(facetName)) {
+                    DurationRangeInterval.Interval interval = ESInterval.parse(aggregation.getName().substring(facetName.length() + 1));
+                    Aggregation sub = ((org.elasticsearch.search.aggregations.bucket.filter.Filter) aggregation).getAggregations().get("sub");
+                    // TODO all this makes little sense
+                    for (DateHistogram.Bucket bucket : ((DateHistogram) sub).getBuckets()) {
+                        Date bucketStart = bucket.getKeyAsDate().toDate();
+                        Date bucketEnd = Date.from(interval.getBucketEnd(bucket.getKeyAsDate().toDate().toInstant()));
+                        DurationFacetResultItem entry = new DurationFacetResultItem(
+                            interval.print(bucketStart.toInstant(), true),
+                            TimeUtils.durationOf(bucketStart).orElse(null),
+                            TimeUtils.durationOf(bucketEnd).orElse(null),
+                            bucket.getDocCount());
+
+                        facetResultItems.add(entry);
+                    }
+                }
+            }
+        }
+        if (durationRangeFacets != null) {
+            // make sure the results are ordered the same as the request.
+            facetResultItems.sort(Comparator.comparingInt(resultItem -> indexOf(resultItem, durationRangeFacets.getRanges())));
+        }
+        return facetResultItems;
+    }
+
     private static int indexOf(DateFacetResultItem item, List<nl.vpro.domain.api.RangeFacet<Date>> ranges) {
         int i = 0;
         for (nl.vpro.domain.api.RangeFacet<Date> range : ranges) {
+            if (range.matches(item.getBegin(), item.getEnd())) {
+                return i;
+            }
+            i++;
+        }
+        return i;
+    }
+
+    private static int indexOf(DurationFacetResultItem item, List<nl.vpro.domain.api.RangeFacet<Duration>> ranges) {
+        int i = 0;
+        for (nl.vpro.domain.api.RangeFacet<Duration> range : ranges) {
             if (range.matches(item.getBegin(), item.getEnd())) {
                 return i;
             }
@@ -344,6 +407,36 @@ public abstract class ESFacetsHandler {
                         name.substring(prefix.length()),
                         entry.getFromAsString() != null ? new Date(from.longValue()) : null,
                         entry.getToAsString() != null ? new Date(to.longValue()) : null,
+                        entry.getCount());
+                    backing.set(index, result);
+                }
+                return result;
+            }
+
+            @Override
+            public int size() {
+                return backing.size();
+            }
+        };
+    }
+
+    protected static List<DurationFacetResultItem> durationRangeFacetResult(final List<RangeFacet> facet, final String prefix) {
+        return new AbstractList<DurationFacetResultItem>() {
+            private final List<DurationFacetResultItem> backing = new ArrayList<>(Collections.nCopies(facet.size(), (DurationFacetResultItem) null));
+
+            @Override
+            public DurationFacetResultItem get(int index) {
+                DurationFacetResultItem result = backing.get(index);
+                if (result == null) {
+                    RangeFacet range = facet.get(index);
+                    RangeFacet.Entry entry = range.getEntries().get(0);
+                    String name = range.getName();
+                    Double from = entry.getFrom();
+                    Double to = entry.getTo();
+                    result = new DurationFacetResultItem(
+                        name.substring(prefix.length()),
+                        entry.getFromAsString() != null ? Duration.ofMillis(from.longValue()) : null,
+                        entry.getToAsString() != null ? Duration.ofMillis(to.longValue()) : null,
                         entry.getCount());
                     backing.set(index, result);
                 }
