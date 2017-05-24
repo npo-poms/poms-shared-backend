@@ -216,7 +216,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
             ArgumentCaptor<ScheduleForm> argument = ArgumentCaptor.forClass(ScheduleForm.class);
 
             verify(scheduleService).find(argument.capture(), isNull(), anyLong(), anyInt());
-            assertThat(argument.getValue().getSearches().getScheduleEvents()
+            assertThat(argument.getValue().getSearches().getScheduleEvents().asList().get(0)
                 .getBegin().toEpochMilli()).isEqualTo(1435733201098L);
         }
     }
