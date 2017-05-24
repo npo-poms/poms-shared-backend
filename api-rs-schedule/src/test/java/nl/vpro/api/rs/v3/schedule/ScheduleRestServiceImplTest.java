@@ -34,10 +34,7 @@ import nl.vpro.domain.media.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.AdditionalMatchers.or;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<ScheduleRestServiceImpl> {
@@ -216,7 +213,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
             ArgumentCaptor<ScheduleForm> argument = ArgumentCaptor.forClass(ScheduleForm.class);
 
             verify(scheduleService).find(argument.capture(), isNull(), anyLong(), anyInt());
-            assertThat(argument.getValue().getSearches().getScheduleEvents().asList().get(0)
+            assertThat(argument.getValue().getSearches().getScheduleEvents().get(0)
                 .getBegin().toEpochMilli()).isEqualTo(1435733201098L);
         }
     }
