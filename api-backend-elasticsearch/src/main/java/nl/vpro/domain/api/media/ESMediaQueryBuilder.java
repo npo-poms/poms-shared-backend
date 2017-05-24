@@ -134,9 +134,11 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
 
         {
-            ScheduleEventSearch scheduleEventSearch = searches.getScheduleEvents();
-            if(scheduleEventSearch != null && scheduleEventSearch.hasSearches()) {
-                buildScheduleQuery(booleanQuery, prefix, scheduleEventSearch);
+            List<ScheduleEventSearch> scheduleEventSearches = searches.getScheduleEvents();
+            if(scheduleEventSearches != null && ! scheduleEventSearches.isEmpty()) {
+                for (ScheduleEventSearch scheduleEventSearch : scheduleEventSearches) {
+                    buildScheduleQuery(booleanQuery, prefix, scheduleEventSearch);
+                }
             }
         }
 
@@ -169,8 +171,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
     private static void buildScheduleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, ScheduleEventSearch matcher) {
         BoolQueryBuilder scheduleSub = QueryBuilders.boolQuery();
-        if(StringUtils.isNotEmpty(matcher.getChannel())) {
-            QueryBuilder channelQuery = QueryBuilders.termQuery(prefix + "scheduleEvents.channel", matcher.getChannel());
+        if(matcher.getChannel() != null) {
+            QueryBuilder channelQuery = QueryBuilders.termQuery(prefix + "scheduleEvents.channel", matcher.getChannel().name());
             scheduleSub.must(channelQuery);
         }
         if(StringUtils.isNotEmpty(matcher.getNet())) {

@@ -303,14 +303,15 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleSearchResult findSchedules(ProfileDefinition<MediaObject> profile, ScheduleForm form, long offset, Integer max) {
         Schedule schedule;
-        ScheduleEventSearch scheduleEventSearch = form.getSearches() == null ? null : form.getSearches().getScheduleEvents();
+        List<ScheduleEventSearch> scheduleEventSearches = form.getSearches() == null ? null : form.getSearches().getScheduleEvents();
+        if (scheduleEventSearches != null && scheduleEventSearches.size() > 1) {
+            throw new IllegalArgumentException();
+        }
+        ScheduleEventSearch scheduleEventSearch = scheduleEventSearches != null && ! scheduleEventSearches.isEmpty() ? scheduleEventSearches.get(0) : null;
         if (scheduleEventSearch != null) {
             Instant  start = scheduleEventSearch.getBegin();
             Instant stop = scheduleEventSearch.getEnd();
-            Channel channel = null;
-            if (StringUtils.isNotEmpty(scheduleEventSearch.getChannel())) {
-                channel = Channel.valueOf(scheduleEventSearch.getChannel());
-            }
+            Channel channel = scheduleEventSearch.getChannel();
             Net net = null;
             if (StringUtils.isNotEmpty(scheduleEventSearch.getNet())) {
                 net = new Net(scheduleEventSearch.getNet());
@@ -324,8 +325,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 schedule = new Schedule(start, stop);
             }
         } else {
-            ScheduleEventSearch matcher = new ScheduleEventSearch(null, null, Instant.MAX);
-            form.getSearches().setScheduleEvents(matcher);
+            scheduleEventSearch = new ScheduleEventSearch(null, null, Instant.MAX);
+            form.getSearches().setScheduleEvents(Arrays.asList(scheduleEventSearch));
             schedule = new Schedule();
         }
         schedule.setFiltered(true);

@@ -18,6 +18,7 @@
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
+    <poms.shared.version>5.3.3-SNAPSHOT</poms.shared.version>
   </properties>
 
   <scm>
