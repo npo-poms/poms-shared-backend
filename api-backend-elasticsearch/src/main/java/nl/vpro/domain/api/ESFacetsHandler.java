@@ -433,10 +433,13 @@ public abstract class ESFacetsHandler {
                     String name = range.getName();
                     Double from = entry.getFrom();
                     Double to = entry.getTo();
+                    Long fromMillis = Math.max(0, entry.getFromAsString() != null ? from.longValue() : 0);
+                    Long toMillis = entry.getToAsString() != null ? to.longValue() : Long.MAX_VALUE;
+
                     result = new DurationFacetResultItem(
                         name.substring(prefix.length()),
-                        entry.getFromAsString() != null ? Duration.ofMillis(from.longValue()) : null,
-                        entry.getToAsString() != null ? Duration.ofMillis(to.longValue()) : null,
+                        Duration.ofMillis(fromMillis),
+                        Duration.ofMillis(toMillis),
                         entry.getCount());
                     backing.set(index, result);
                 }
