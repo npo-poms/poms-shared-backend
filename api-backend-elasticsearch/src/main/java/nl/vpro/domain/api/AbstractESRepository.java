@@ -34,6 +34,7 @@ import org.elasticsearch.search.highlight.HighlightBuilder;
 import org.elasticsearch.search.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -41,6 +42,7 @@ import nl.vpro.domain.api.media.MediaRepository;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
+import nl.vpro.util.TimeUtils;
 
 
 /**
@@ -109,6 +111,17 @@ public abstract class AbstractESRepository<T> {
 
     public void setTimeOut(Duration timeOut) {
         this.timeOut = timeOut;
+    }
+
+
+    @ManagedAttribute
+    public String getTimeOutAsString() {
+        return String.valueOf(timeOut);
+    }
+
+    @ManagedAttribute
+    public void setTimeOutAsString(String timeOut) {
+        this.timeOut = TimeUtils.parseDuration(timeOut).orElse(this.timeOut);
     }
 
     protected final Client client() {
@@ -366,10 +379,10 @@ public abstract class AbstractESRepository<T> {
         throw new UnsupportedOperationException();
     }
 
+
     public String getIndexName() {
         return indexName;
     }
-
 
     public void setIndexName(String indexName) {
         this.indexName = indexName;
