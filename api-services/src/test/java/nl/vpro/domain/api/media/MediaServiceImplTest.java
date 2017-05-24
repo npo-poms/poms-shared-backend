@@ -22,7 +22,7 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.util.FilteringIterator;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
