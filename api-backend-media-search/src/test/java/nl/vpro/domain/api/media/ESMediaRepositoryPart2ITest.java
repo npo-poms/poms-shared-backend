@@ -1,5 +1,7 @@
 package nl.vpro.domain.api.media;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -46,6 +48,7 @@ import static org.mockito.Mockito.when;
  * @since 2.0
  */
 
+@Slf4j
 public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();
@@ -321,7 +324,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testFindWithWithPublishDateAsc() throws Exception {
-        MediaForm form = form().publishDate(LONGAGO, LONGAGO.plusSeconds(5)).sortOrder(MediaSortOrder.asc(MediaSortField.publishDate)).build();
+        MediaForm form = form()
+            .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
+            .sortOrder(MediaSortOrder.asc(MediaSortField.publishDate))
+            .build();
         SearchResult<MediaObject> result = target.find(null, form, 0, null);
 
         assertThat(result.getSize()).isEqualTo(5);
@@ -570,8 +576,11 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryTest.client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
         indexed.add(object);
-        assertThat(object.getLastPublished()).isNotNull();
+        assertThat(object.getLastPublishedInstant()).isNotNull();
         Collections.sort(indexed, (o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));
+        log.info("Indexed {} for {}", object, object.getLastPublishedInstant());
+        //log.info(Jackson2Mapper.getPrettyInstance().writeValueAsString(object));
+
         return object;
     }
 
