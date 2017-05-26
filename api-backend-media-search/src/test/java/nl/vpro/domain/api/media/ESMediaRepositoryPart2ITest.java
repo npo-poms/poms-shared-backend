@@ -558,8 +558,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
     public void testFindWithChannels() throws IOException {
         MediaSearchResult result = target.find(null, MediaFormBuilder.form()
             .scheduleEvents(
-                ScheduleEventSearch.builder().channel(Channel.NED1).build(),
-                ScheduleEventSearch.builder().channel(Channel.NED2).build()
+                ScheduleEventSearch.builder().channel(Channel.NED1).match(Match.SHOULD).build(),
+                ScheduleEventSearch.builder().channel(Channel.NED2).match(Match.SHOULD).build()
             )
             .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
             .build(), 0L, 100);
@@ -577,7 +577,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         AbstractESRepositoryTest.client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
-        Collections.sort(indexed, (o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));
+        indexed.sort((o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));
         log.info("Indexed {} for {}", object, object.getLastPublishedInstant());
         //log.info(Jackson2Mapper.getPrettyInstance().writeValueAsString(object));
 
