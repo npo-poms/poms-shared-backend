@@ -1,5 +1,7 @@
 package nl.vpro.api.rs.v3.validation;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,9 +16,8 @@ import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import nl.vpro.domain.Xmlns;
 import nl.vpro.domain.api.media.MediaForm;
 import nl.vpro.domain.api.media.ScheduleForm;
 
@@ -25,15 +26,14 @@ import nl.vpro.domain.api.media.ScheduleForm;
  * @since 4.2
  */
 @Provider
+@Slf4j
 public class ScheduleFormValidatingReader extends AbstractValidatingReader<ScheduleForm> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ScheduleFormValidatingReader.class);
 
 
     MediaFormValidatingReader mediaFormValidatingReader = new MediaFormValidatingReader();
 
     public ScheduleFormValidatingReader() {
-        super(ScheduleForm.class);
+        super(ScheduleForm.class, Xmlns.API_NAMESPACE);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class ScheduleFormValidatingReader extends AbstractValidatingReader<Sched
             if (out != null) {
                 try {
                     MediaForm form = mediaFormValidatingReader.unmarshal(new ByteArrayInputStream(out.toByteArray()));
-                    LOG.warn("Received media form on schedule form post. Accepting for backwards compatibility");
+                    log.warn("Received media form on schedule form post. Accepting for backwards compatibility");
                     return ScheduleForm.from(form);
                 } catch (JAXBException e1) {
                     throw badRequestException(e);

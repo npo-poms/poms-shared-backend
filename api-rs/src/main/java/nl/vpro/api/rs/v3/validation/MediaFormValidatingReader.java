@@ -2,6 +2,7 @@ package nl.vpro.api.rs.v3.validation;
 
 import javax.ws.rs.ext.Provider;
 
+import nl.vpro.domain.Xmlns;
 import nl.vpro.domain.api.media.MediaForm;
 
 /**
@@ -12,6 +13,6 @@ import nl.vpro.domain.api.media.MediaForm;
 public class MediaFormValidatingReader extends AbstractValidatingReader<MediaForm> {
 
     public MediaFormValidatingReader() {
-        super(MediaForm.class);
+        super(MediaForm.class, Xmlns.API_NAMESPACE);
     }
 }
