@@ -20,7 +20,7 @@ public class VaryHeadersInterceptor implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
 
-        response.getHeaders().addAll(HttpHeaders.VARY, HttpHeaders.ACCEPT);
+        response.getHeaders().addAll(HttpHeaders.VARY, HttpHeaders.ACCEPT, HttpHeaders.ACCEPT_LANGUAGE);
         boolean hasCors = response.getHeaderString(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN) != null;
         if (hasCors) {
             response.getHeaders().addAll(HttpHeaders.VARY, HttpHeaders.ORIGIN);
