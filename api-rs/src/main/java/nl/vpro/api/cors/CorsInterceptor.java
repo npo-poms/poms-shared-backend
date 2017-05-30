@@ -24,7 +24,7 @@ import org.springframework.http.MediaType;
  * @author Michiel Meeuwissen
  */
 @Provider
-@Priority(Priorities.AUTHORIZATION)
+@Priority(Priorities.AUTHENTICATION)
 public class CorsInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
 
     private final CorsPolicy corsPolicy;
