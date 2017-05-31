@@ -5,12 +5,12 @@
   <parent>
     <groupId>nl.publiekeomroep</groupId>
     <artifactId>poms-shared-backend-parent</artifactId>
-    <version>5.3.2</version>
+    <version>5.3.3-SNAPSHOT</version>
   </parent>
 
   <groupId>nl.vpro.pages</groupId>
   <artifactId>pages-es-mappings</artifactId>
-  <version>5.3.2</version>
+  <version>5.3.3-SNAPSHOT</version>
   <name>pages-es-mappings</name>
 
   <build>
@@ -43,8 +43,8 @@
   </dependencies>
 
   <scm>
-    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared/tags/REL-5.3.2/pages-es-mappings</connection>
-    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared/tags/REL-5.3.2/pages-es-mappings</developerConnection>
-    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared/tags/REL-5.3.2/pages-es-mappings</url>
+    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared/branches/REL-5.3-SNAPSHOT/pages-es-mappings</connection>
+    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared/branches/REL-5.3-SNAPSHOT/pages-es-mappings</developerConnection>
+    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared/branches/REL-5.3-SNAPSHOT/pages-es-mappings</url>
   </scm>
 </project>
