@@ -75,9 +75,23 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
     private static Program program2;
     private static Program program3;
 
+    private static Group sub_group;
+    private static Program sub_program1;
+    private static Program sub_program2;
+
+
     private static String[] testTags = {"Onderkast", "Bovenkast", "Geen kast", "Hoge kast", "Lage kast"};
 
     static List<MediaObject> indexed = new ArrayList<>();
+
+    static int indexedObjectCount = 0;
+    static int indexedProgramCount = 0;
+    static int indexedGroupCount = 0;
+
+    static Set<String> mids = new TreeSet<>();
+    static int deletedObjectCount = 0;
+    static int deletedProgramCount = 0;
+    static int deletedGroupCount = 0;
 
     /**
      * Builds a test database
@@ -94,19 +108,47 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         for (MediaESType type : MediaESType.values()) {
             client.admin().indices().preparePutMapping(ApiMediaIndex.NAME).setType(type.name()).setSource(type.source()).execute().actionGet();
         }
-        group = index(groupBuilder.workflow(Workflow.PUBLISHED).build());
-        group_ordered = index(MediaTestDataBuilder.group().constrained().lastPublished(NOW).workflow(Workflow.PUBLISHED).type(GroupType.SERIES).withMid().build());
+        group = index(groupBuilder.published().build());
+        group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid().build());
         // 2 groups
         program1 = index(programBuilder.copy()
             .publishStart(LocalDateTime.of(2017, 1, 30, 0, 0)) // sortDate is relevant for listDescendants
-            .memberOf(group, 1).memberOf(group_ordered, 7).episodeOf(group, 3).build());
+            .memberOf(group, 1)
+            .memberOf(group_ordered, 7).episodeOf(group, 3).build());
         program2 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 29, 0, 0))
-            .lastPublished(NOW).workflow(Workflow.PUBLISHED).withMid().memberOf(group_ordered, 2).build());
+            .published(NOW).withMid()
+            .memberOf(group_ordered, 2).build());
         program3 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 28, 0, 0))
-            .lastPublished(NOW).workflow(Workflow.PUBLISHED).withMid().memberOf(group_ordered, 3).build());
-        //3 programs (broadcasts)
+            .published(NOW)
+            .withMid()
+            .memberOf(group_ordered, 3).build());
+        sub_group = index(MediaTestDataBuilder.group().published()
+            .mid("sub_group")
+            .memberOf(group_ordered, 4)
+            .published(NOW)
+            .creationDate(NOW)
+            .build());
+        sub_program1 = index(programBuilder.copy()
+            .publishStart(LocalDateTime.of(2017, 1, 30, 1, 0)) // sortDate is relevant for listDescendants
+            .mid("sub_program_1")
+            .published(NOW)
+            .creationDate(NOW)
+            .memberOf(sub_group, 1)
+            .build());
+        sub_program2 = index(MediaTestDataBuilder.program().constrained()
+            .publishStart(LocalDateTime.of(2017, 1, 29, 2, 0))
+            .mid("sub_program_2")
+            .published(NOW)
+            .creationDate(NOW)
+            .memberOf(sub_group, 2).build());
+
+        // order of descendant of group_ordered by sortDate should be
+        // program3, program2, sub_program2, program1, sub_program1/sub_group
+        // by member only this is possible
+        // sub_program_1, sub_program_2, program3, sub_group, program1
+        //3 + 2 programs (broadcasts), 1 sub group
 
 
         index(MediaTestDataBuilder.group().constrained().type(GroupType.COLLECTION).mid("VPGROUP_D1").lastPublished(NOW).workflow(Workflow.DELETED).title("Deleted Group").build());
@@ -143,7 +185,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         }
         // 10 groups, and 10 programs (broadcasts)
 
-        // totals now 28 objects, 12 groups, 13 broadcasts (from which 3 deleted)
+        // totals now 30 objects, 13 groups, 15 broadcasts (from which 3 deleted)
 
 
         // index some variations
@@ -173,6 +215,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
         Map<String, String> redirects = new HashMap<>();
         when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
+
+        assertThat(indexedObjectCount).isEqualTo(indexedGroupCount + indexedProgramCount);
+        assertThat(deletedObjectCount).isEqualTo(deletedGroupCount + deletedProgramCount);
     }
 
 
@@ -186,7 +231,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
         Terms a = response.getAggregations().get("types");
         String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
-        assertThat(result).isEqualTo("deletedgroup:1,deletedprogram:2,group:13,program:17");
+        assertThat(result).isEqualTo("deletedgroup:1,deletedprogram:2,group:14,program:19");
     }
 
     @Test
@@ -210,13 +255,13 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
     @Test
     public void testList() {
         MediaResult results = target.list(Order.ASC, 0L, 1000);
-        assertThat(results).hasSize(30);
+        assertThat(results).hasSize(indexedObjectCount);
     }
 
     @Test
     public void testListWithOffset() {
         MediaResult results = target.list(Order.ASC, 10L, 1000);
-        assertThat(results).hasSize(20);
+        assertThat(results).hasSize(indexedObjectCount - 10);
 
     }
 
@@ -226,7 +271,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         List<Change> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
         assertThat(list.stream().filter(Change::isDeleted).collect(Collectors.toList())).hasSize(3);
-        assertThat(list).hasSize(33);
+        assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
     }
 
     @Test
@@ -234,7 +279,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         Iterator<Change> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, Order.DESC, Integer.MAX_VALUE, null);
         List<Change> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
-        assertThat(list).hasSize(13); // 33 minutes the 20 objects created around EPOCH
+        assertThat(list).hasSize(indexedObjectCount - 17); // 17 objects created around EPOCH
         assertThat(list.stream().filter(Change::isDeleted).collect(Collectors.toList())).hasSize(3);
     }
 
@@ -250,14 +295,14 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
     public void testIterate() {
         target.iterateBatchSize = 10;
         Iterator<MediaObject> results = target.iterate(null, null, 0L, 1000, FilteringIterator.noKeepAlive());
-        assertThat(results).hasSize(30);
+        assertThat(results).hasSize(indexedObjectCount);
     }
 
     @Test
     public void testIterateWithOffset() {
         target.iterateBatchSize = 10;
         Iterator<MediaObject> results = target.iterate(null, null, 10L, 1000, FilteringIterator.noKeepAlive());
-        assertThat(results).hasSize(20);
+        assertThat(results).hasSize(indexedObjectCount - 10);
     }
 
 
@@ -269,10 +314,20 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
     }
 
     @Test
+    public void testFindAll() throws Exception {
+        SearchResult<MediaObject> result = target.find(null, null, 0L, 100);
+        assertThat(result.asList().stream().map(MediaObject::getMid).sorted()).containsExactlyElementsOf(mids);
+
+        assertThat(result.getTotal()).isEqualTo(indexedObjectCount);
+
+    }
+
+    @Test
     public void testFind() throws Exception {
         SearchResult<MediaObject> result = target.find(null, null, 2L, 5);
 
-        assertThat(result.getTotal()).isEqualTo(30);
+
+        assertThat(result.getTotal()).isEqualTo(indexedObjectCount);
         assertThat(result.getOffset()).isEqualTo(2);
         assertThat(result.getMax()).isEqualTo(5);
         assertThat(result.getSize()).isEqualTo(5);
@@ -407,7 +462,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         SearchResult<MediaObject> result = target.find(null, form, 0, null);
 
         System.out.println("LIST" + result.getItems());
-        assertThat(result.getSize()).isEqualTo(33 - 3 /*deleted*/ - 2 /* excluded */);
+        assertThat(result.getSize()).isEqualTo(indexedObjectCount - 2 /* excluded */);
     }
 
 
@@ -417,7 +472,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         SearchResult<MediaObject> result = target.find(null, form, 0, null);
 
         // so, just the groups
-        assertThat(result.getSize()).isEqualTo(13);
+        assertThat(result.getSize()).isEqualTo(indexedGroupCount);
     }
 
 
@@ -466,7 +521,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 1L, 5);
 
-        assertThat(result.getTotal()).isEqualTo(30);
+        assertThat(result.getTotal()).isEqualTo(indexedObjectCount - 1); // One object has a different title
         SearchResultItem<? extends MediaObject> firstResult = result.getItems().get(0);
         assertThat(firstResult.getHighlights()).hasSize(1);
 //        assertThat(firstResult.getHighlights().get(0).getBody()).containsExactly("Main <em class=\"hlt1\">title</em> MIS', 'Short <em class=\"hlt1\">title</em>', 'Episode <em class=\"hlt1\">title</em> MIS");
@@ -493,13 +548,33 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testFindDescendantsOrdered() throws Exception {
-        MediaForm form = MediaFormBuilder.form().sortOrder(MediaSortOrder.asc(MediaSortField.member)).build();
-        MediaSearchResult result = target.findDescendants(group_ordered, null, form, 0L, 10);
+    public void testFindDescendantsOrderedByMember() throws Exception {
+        MediaForm form = MediaFormBuilder.form()
+            .sortOrder(MediaSortOrder.asc(MediaSortField.member)).build();
+        MediaSearchResult result =
+            target.findDescendants(group_ordered, null, form, 0L, 10);
         List<MediaObject> resultList = result.asList();
+
+        // sub_program_1, sub_program_2, program3, sub_group, program1
+
         assertThat(resultList).contains(program2, atIndex(0));
         assertThat(resultList).contains(program3, atIndex(1));
         assertThat(resultList).contains(program1, atIndex(2));
+    }
+
+    @Test
+    public void testFindDescendantsOrderedSortDate() throws Exception {
+        MediaForm form = MediaFormBuilder.form().sortOrder(MediaSortOrder.asc(MediaSortField.sortDate)).build();
+        MediaSearchResult result =
+            target.findDescendants(group_ordered, null, form, 0L, 10);
+        List<MediaObject> resultList = result.asList();
+
+        assertThat(resultList.get(0)).isEqualTo(program3);
+        assertThat(resultList.get(1)).isEqualTo(program2);
+        assertThat(resultList.get(2)).isEqualTo(sub_program2);
+        assertThat(resultList.get(3)).isEqualTo(program1);
+        assertThat(resultList.get(4)).isEqualTo(sub_program1);
+        assertThat(resultList.get(5)).isEqualTo(sub_group);
     }
 
     @Test
@@ -527,17 +602,46 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         MediaResult result = target.listDescendants(group_ordered, Order.ASC, 0L, 100);
 
         List<? extends MediaObject> resultList = result.getItems();
-        assertThat(resultList).hasSize(3);
+        assertThat(resultList).hasSize(6);
+        // program3, program2, sub_program2, program1, sub_program1/sub_group
         assertThat(resultList.get(0)).isEqualTo(program3);
         assertThat(resultList.get(1)).isEqualTo(program2);
-        assertThat(resultList.get(2)).isEqualTo(program1);
+        assertThat(resultList.get(2)).isEqualTo(sub_program2);
+        assertThat(resultList.get(3)).isEqualTo(program1);
+        assertThat(resultList.get(4)).isEqualTo(sub_program1);
+        assertThat(resultList.get(5)).isEqualTo(sub_group);
     }
 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryTest.client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
         indexed.add(object);
-        assertThat(object.getLastPublished()).isNotNull();
-        Collections.sort(indexed, (o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));
+        assertThat(object.getLastPublishedInstant()).isNotNull();
+        indexed.sort((o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));
+        if (Workflow.REVOKES.contains(object.getWorkflow())) {
+            deletedObjectCount++;
+            if (object instanceof Program) {
+                deletedProgramCount++;
+            }
+            if (object instanceof Group) {
+                deletedGroupCount++;
+            }
+            log.info("{} Indexed deleted {} for {}", deletedObjectCount, object, object.getLastPublishedInstant());
+        } else {
+            if (! mids.add(object.getMid())) {
+                throw new IllegalStateException("Object " + object + " was indexed already?");
+            }
+            indexedObjectCount++;
+            if (object instanceof Program) {
+                indexedProgramCount++;
+            }
+            if (object instanceof Group) {
+                indexedGroupCount++;
+            }
+            log.info("{} Indexed {} for {}", mids.size(), object, object.getLastPublishedInstant());
+        }
+        //log.info(Jackson2Mapper.getPrettyInstance().writeValueAsString(object));
+
+
         return object;
     }
 

@@ -264,7 +264,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         SearchRequest request = client()
             .prepareSearch(indexName)
             .setTypes(MediaESType.mediaObjects())
-            .addSort("sortDate", SortOrder.valueOf(order.name()))
+            .addSort(MediaSortField.sortDate.name(), SortOrder.valueOf(order.name()))
             .setQuery(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
             .setFrom((int) offset)
             .setSize(max)
