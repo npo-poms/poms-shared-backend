@@ -149,8 +149,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
         // order of descendant of group_ordered by sortDate should be
         // program3, program2, sub_program2, program1, sub_program1/sub_group
-        // by member only this is possible
-        // sub_program_1, sub_program_2, program3, sub_group, program1
+        // by member logical would be
+        // program2, program3, sub_group, sub_program1, sub_program2, program1
+        // or
+        // program2, program3, sub_group, program1, sub_program1, sub_program2
         //3 + 2 programs (broadcasts), 1 sub group
 
 
@@ -562,11 +564,18 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
             target.findDescendants(group_ordered, null, form, 0L, 10);
         List<MediaObject> resultList = result.asList();
 
-        // sub_program_1, sub_program_2, program3, sub_group, program1
+        // program2, program3, sub_group, sub_program1, sub_program2, program1
+        // or
+        // program2, program3, sub_group, program1, sub_program1, sub_program2
 
         assertThat(resultList).contains(program2, atIndex(0));
         assertThat(resultList).contains(program3, atIndex(1));
-        assertThat(resultList).contains(program1, atIndex(2));
+        assertThat(resultList).contains(sub_group, atIndex(2));
+        assertThat(resultList).contains(program1, atIndex(3));
+
+        // TODO: doubtfull
+        assertThat(resultList).contains(sub_program1, atIndex(4));
+        assertThat(resultList).contains(sub_program2, atIndex(5));
     }
 
     @Test
