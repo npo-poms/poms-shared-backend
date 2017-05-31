@@ -198,16 +198,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(prefix + "scheduleEvents.start");
             rangeQuery.includeLower(true);
             rangeQuery.includeUpper(matcher.includeEnd());
-
-            Long beginLong = instantToLong(matcher.getBegin());
-            if(beginLong != null) {
-                rangeQuery.from(beginLong);
-            }
-            Long endLong = instantToLong(matcher.getEnd());
-            if(endLong != null) {
-                rangeQuery.to(endLong);
-
-            }
+            rangeQuery.from(instantToLong(matcher.getBegin()));
+            rangeQuery.to(instantToLong(matcher.getEnd()));
             scheduleSub.must(rangeQuery);
         }
 
