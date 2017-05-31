@@ -6,6 +6,7 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -197,13 +198,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(prefix + "scheduleEvents.start");
             rangeQuery.includeLower(true);
             rangeQuery.includeUpper(matcher.includeEnd());
-
-            if(matcher.getBegin() != null) {
-                rangeQuery.from(matcher.getBegin().toEpochMilli());
-            }
-            if(matcher.getEnd() != null) {
-                rangeQuery.to(matcher.getEnd().toEpochMilli());
-            }
+            rangeQuery.from(instantToLong(matcher.getBegin()));
+            rangeQuery.to(instantToLong(matcher.getEnd()));
             scheduleSub.must(rangeQuery);
         }
 
@@ -211,6 +207,19 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             apply(boolQueryBuilder, scheduleSub, matcher.getMatch());
         }
     }
+
+    static private Long instantToLong(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        try {
+            return instant.toEpochMilli();
+        }  catch (ArithmeticException ignored) {
+            // See javadoc of Instant#toEpochMillis
+            return null;
+        }
+    }
+
 
     static void boostField(String field, float boost) {
         getSearchFields().forEach(definition -> {
