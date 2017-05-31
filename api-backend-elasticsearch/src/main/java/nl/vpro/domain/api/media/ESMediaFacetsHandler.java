@@ -48,10 +48,10 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             facetsResult.setTitles(getFacetResultItems(prefix + "titles.value.full", facets));
             facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), facets, MediaType.class));
             facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), facets, AVType.class));
-            facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response, false));
+            facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response));
             facetsResult.setBroadcasters(filterThreshold(getBroadcasterResultItems(prefix + "broadcasters.id", facets), request.getBroadcasters()));
             facetsResult.setTags(getFacetResultItems(prefix + "tags", facets, request.getTags()));
-            facetsResult.setDurations(getDateRangeFacetResultItems(request.getDurations(), prefix + "duration", response, true));
+            facetsResult.setDurations(getDurationRangeFacetResultItems(request.getDurations(), prefix + "duration", response));
             facetsResult.setAgeRatings(getFacetResultItemsForEnum(prefix + "ageRating", request.getAgeRatings(), facets, AgeRating.class, s -> AgeRating.xmlValueOf(s.toUpperCase()), AgeRating::getXmlValue));
             facetsResult.setContentRatings(getFacetResultItemsForEnum(prefix + "contentRatings", request.getContentRatings(), facets, ContentRating.class));
         }

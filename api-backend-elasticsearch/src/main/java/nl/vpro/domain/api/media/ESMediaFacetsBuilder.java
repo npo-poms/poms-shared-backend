@@ -68,7 +68,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             {
                 DateRangeFacets sortDates = facets.getSortDates();
-                addFacet(searchBuilder, facetFilter, prefix + "sortDate", sortDates, null, false);
+                addFacet(searchBuilder, facetFilter, prefix + "sortDate", sortDates, null);
             }
 
             {
@@ -87,8 +87,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             }
 
             {
-                DateRangeFacets durations = facets.getDurations();
-                addFacet(searchBuilder, facetFilter, prefix + "duration", durations, null, true);
+                DurationRangeFacets durations = facets.getDurations();
+                addFacet(searchBuilder, facetFilter, prefix + "duration", durations, null);
             }
 
             {

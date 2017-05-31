@@ -4,6 +4,7 @@
  */
 package nl.vpro.domain.api;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.regex.Pattern;
 
@@ -58,7 +59,7 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix, boolean asDuration) {
+    protected static void addFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix) {
         if(facet != null) {
             if(facet.getRanges() != null) {
                 for(nl.vpro.domain.api.RangeFacet<Date> range : facet.getRanges()) {
@@ -92,6 +93,49 @@ public abstract class ESFacetsBuilder {
                         searchBuilder.facet(FacetBuilders.rangeFacet(fieldName + ':' + dateRangeItem.getName()).field(fieldName).addRange(
                             dateRangeItem.getBegin() != null ? String.valueOf(dateRangeItem.getBegin().getTime()) : null,
                             dateRangeItem.getEnd() != null ? String.valueOf(dateRangeItem.getEnd().getTime()) : null
+                        )
+                            .nested(fieldPrefix)
+                            .facetFilter(filterBuilder));
+                    }
+                }
+            }
+        }
+    }
+
+    protected static void addFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, DurationRangeFacets<?> facet, String fieldPrefix) {
+        if (facet != null) {
+            if (facet.getRanges() != null) {
+                for (nl.vpro.domain.api.RangeFacet<Duration> range : facet.getRanges()) {
+                    if (range instanceof DurationRangeInterval) {
+                        ESInterval interval = ESInterval.parse(((DurationRangeInterval) range).getInterval());
+                        // TODO, zou het niet logischer zijn om de verschillende aggregatie onderdeel te laten zijn van 1 'filter-aggregatie.
+                        // Dat zou echter deze code nogal moeten verbouwen, want je moet het aggregationfilter doorgeven om er subAggregations aan te kunnen toevoegen.
+                        searchBuilder.aggregation(
+                            AggregationBuilders
+                                .filter(fieldName + '_' + interval.toString())
+                                .filter(filterBuilder)
+                                .subAggregation(
+                                    AggregationBuilders.dateHistogram("sub")
+                                        .field(fieldName)
+                                        // At least for YEARS we can make it work correctly for the CET timezone
+                                        // For months I can't get it working, because in the summer CEST is used, and I can't figure
+                                        // out how to get that correct. See /MGNL-11432
+                                        //
+                                        //.preZoneAdjustLargeInterval(true) // zou moeten werken, maar ik krijg slechts nog ES foutmeldingen dan.
+
+
+                                        // Dit werkt redelijk, maar het geeft gedoe op de grenzen: Zie https://github.com/npo-poms/api/blob/master/bash/tests/pages/bucketsearches.sh
+                                        // en NPA-183
+                                        //.postZone((asDuration || interval.unit != IntervalUnit.YEAR) ? "00:00" : "-01:00")
+
+                                        .interval(new DateHistogram.Interval(interval.getEsValue()))
+                                )
+                        );
+                    } else {
+                        RangeFacetItem<Duration> dateRangeItem = (RangeFacetItem<Duration>) range;
+                        searchBuilder.facet(FacetBuilders.rangeFacet(fieldName + ':' + dateRangeItem.getName()).field(fieldName).addRange(
+                            dateRangeItem.getBegin() != null ? String.valueOf(dateRangeItem.getBegin().toMillis()) : null,
+                            dateRangeItem.getEnd() != null ? String.valueOf(dateRangeItem.getEnd().toMillis()) : null
                         )
                             .nested(fieldPrefix)
                             .facetFilter(filterBuilder));

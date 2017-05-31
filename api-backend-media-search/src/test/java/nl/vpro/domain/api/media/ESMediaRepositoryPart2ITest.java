@@ -1,5 +1,7 @@
 package nl.vpro.domain.api.media;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -46,6 +48,7 @@ import static org.mockito.Mockito.when;
  * @since 2.0
  */
 
+@Slf4j
 public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();
@@ -175,6 +178,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
                 .creationDate(LONGAGO.plusSeconds(i))
                 .lastPublished(LONGAGO.plusSeconds(i * 2 + 1))
                 .duration(Duration.ofMillis(i * 100))
+                .scheduleEvent(Channel.values()[i % 4], NOW.plus(Duration.ofHours(i)), Duration.ofMinutes(30)) // determins sortDate too!
                 .tags("Tag " + (i % 3), testTags[i % testTags.length])
                 .locations("http://domain.com/path.mp" + i)
                 .withGenres()
@@ -365,7 +369,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testFindWithWithSortDate() throws Exception {
-        MediaForm form = form().asc(MediaSortField.sortDate).sortDate(LONGAGO,  LONGAGO.plusSeconds(2)).build();
+        MediaForm form = form().asc(MediaSortField.sortDate).sortDate(NOW,  NOW.plus(Duration.ofHours(2))).build();
         SearchResult<MediaObject> result = target.find(null, form, 0, null);
 
         assertThat(result.getSize()).isEqualTo(2);
@@ -377,7 +381,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testFindWithWithPublishDateAsc() throws Exception {
-        MediaForm form = form().publishDate(LONGAGO, LONGAGO.plusSeconds(5)).sortOrder(MediaSortOrder.asc(MediaSortField.publishDate)).build();
+        MediaForm form = form()
+            .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
+            .sortOrder(MediaSortOrder.asc(MediaSortField.publishDate))
+            .build();
         SearchResult<MediaObject> result = target.find(null, form, 0, null);
 
         assertThat(result.getSize()).isEqualTo(5);
@@ -620,6 +627,39 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         assertThat(resultList.get(4)).isEqualTo(sub_program1);
         assertThat(resultList.get(5)).isEqualTo(sub_group);
     }
+
+    @Test
+    public void testFindWithChannel() throws IOException {
+        MediaSearchResult result = target.find(null, MediaFormBuilder.form()
+            .scheduleEvents(ScheduleEventSearch.builder().channel(Channel.NED1).build())
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .build(), 0L, 100);
+
+        assertThat(result).hasSize(3);
+        assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID-0");
+        assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("MID-4");
+        assertThat(result.getItems().get(2).getResult().getMid()).isEqualTo("MID-8");
+
+    }
+
+    @Test
+    public void testFindWithChannels() throws IOException {
+        MediaSearchResult result = target.find(null, MediaFormBuilder.form()
+            .scheduleEvents(
+                ScheduleEventSearch.builder().channel(Channel.NED1).match(Match.SHOULD).build(),
+                ScheduleEventSearch.builder().channel(Channel.NED2).match(Match.SHOULD).build()
+            )
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .build(), 0L, 100);
+
+        assertThat(result).hasSize(6);
+        assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID-0");
+        assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("MID-1");
+        assertThat(result.getItems().get(2).getResult().getMid()).isEqualTo("MID-4");
+        assertThat(result.getItems().get(3).getResult().getMid()).isEqualTo("MID-5");
+
+    }
+
 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryTest.client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();

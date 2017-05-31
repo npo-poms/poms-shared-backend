@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.mlt.MoreLikeThisRequestBuilder;
@@ -31,8 +32,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedResource;
 
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
@@ -54,6 +55,7 @@ import nl.vpro.util.TailAdder;
  * @since 2.0
  */
 @Slf4j
+@ManagedResource(objectName = "nl.vpro.api:name=esMediaRepository")
 public class ESMediaRepository extends AbstractESMediaRepository implements MediaSearchRepository {
 
     private final String[] relatedFields;
@@ -61,8 +63,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     @Inject
     Settings settings;
 
-    @Autowired
-    @Qualifier("couchDBMediaRepository")
+    @Inject
+    @Named("couchDBMediaRepository")
     MediaRepository mediaRepository;
 
     int iterateBatchSize = 1000;
@@ -89,6 +91,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
+    @ManagedAttribute
     public MediaObject load(String mid) {
         mid = redirect(mid).orElse(mid);
         return load(mid, MediaObject.class);
