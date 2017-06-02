@@ -12,8 +12,6 @@
   <packaging>pom</packaging>
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
 
-  <name>poms-shared-parent</name>
-
   <properties>
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
