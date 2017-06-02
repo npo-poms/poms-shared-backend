@@ -326,6 +326,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             }
         } else {
             scheduleEventSearch = new ScheduleEventSearch(null, null, Instant.MAX);
+            if (form.getSearches() == null) {
+                form.setSearches(new MediaSearch());
+            }
             form.getSearches().setScheduleEvents(Arrays.asList(scheduleEventSearch));
             schedule = new Schedule();
         }
