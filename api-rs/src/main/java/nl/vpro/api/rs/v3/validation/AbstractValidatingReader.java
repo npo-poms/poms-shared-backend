@@ -21,7 +21,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.xml.sax.SAXException;
 
-import nl.vpro.api.util.Mappings;
+import nl.vpro.api.util.ApiMappings;
 
 /**
  * @author Michiel Meeuwissen
@@ -33,7 +33,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
     private final Class<T> classToRead;
     private final String namespace;
-    private final Mappings mappings;
+    private final ApiMappings mappings;
 
 
     private ThreadLocal<Unmarshaller> unmarshaller;
@@ -44,7 +44,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     public AbstractValidatingReader(Class<T> classToRead, String namespace) {
         this.classToRead = classToRead;
         this.namespace = namespace;
-        this.mappings = new Mappings(null);
+        this.mappings = new ApiMappings(null);
     }
 
     @PostConstruct
