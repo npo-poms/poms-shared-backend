@@ -1,10 +1,12 @@
 package nl.vpro.domain.api.page;
 
-import javax.inject.Named;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +20,7 @@ import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.page.Page;
+import nl.vpro.util.FilteringIterator;
 
 /**
  * @author Michiel Meeuwissen
@@ -112,6 +115,15 @@ public class PageServiceImpl implements PageService {
     public PageSearchResult findRelated(Page page, String profile, PageForm form, Integer max) throws ProfileNotFoundException {
         return pageSearchRepository.findRelated(page, getProfile(profile), form, max);
     }
+
+
+    @Override
+    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    public Iterator<Page> iterate(String profile, PageForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
+        return pageSearchRepository.iterate(getProfile(profile), form, offset, max, keepAlive);
+
+    }
+
 
     private ProfileDefinition<Page> getProfile(String profile) {
         if(profile == null || "".equals(profile) // handy for scripting (profile=$2 and so on...)
