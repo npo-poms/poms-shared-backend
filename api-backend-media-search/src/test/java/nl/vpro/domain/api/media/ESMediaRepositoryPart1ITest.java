@@ -1,6 +1,24 @@
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import static nl.vpro.domain.api.media.MediaFormBuilder.form;
+import static nl.vpro.domain.media.AgeRating.ALL;
+import static nl.vpro.domain.media.AgeRating._12;
+import static nl.vpro.domain.media.AgeRating._16;
+import static nl.vpro.domain.media.AgeRating._6;
+import static nl.vpro.domain.media.AgeRating._9;
+import static nl.vpro.domain.media.ContentRating.ANGST;
+import static nl.vpro.domain.media.ContentRating.DISCRIMINATIE;
+import static nl.vpro.domain.media.ContentRating.DRUGS_EN_ALCOHOL;
+import static nl.vpro.domain.media.ContentRating.GEWELD;
+import static nl.vpro.domain.media.ContentRating.GROF_TAALGEBRUIK;
+import static nl.vpro.domain.media.ContentRating.SEKS;
+import static nl.vpro.domain.media.MediaTestDataBuilder.group;
+import static nl.vpro.domain.media.MediaTestDataBuilder.program;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,8 +28,11 @@ import java.util.Optional;
 
 import javax.xml.bind.JAXB;
 
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequestBuilder;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,34 +40,61 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.vpro.api.Settings;
-import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.AbstractESRepositoryTest;
+import nl.vpro.domain.api.DateRangePreset;
+import nl.vpro.domain.api.DurationRangeInterval;
+import nl.vpro.domain.api.ExtendedMatchType;
+import nl.vpro.domain.api.ExtendedTextMatcher;
+import nl.vpro.domain.api.FacetOrder;
+import nl.vpro.domain.api.Match;
+import nl.vpro.domain.api.MultipleFacetsResult;
+import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.SearchResult;
+import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.TermFacetResultItem;
+import nl.vpro.domain.api.TermSearch;
+import nl.vpro.domain.api.TextMatcher;
+import nl.vpro.domain.api.TextMatcherList;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.classification.ClassificationServiceLocator;
-import nl.vpro.domain.constraint.media.*;
-import nl.vpro.domain.media.*;
+import nl.vpro.domain.constraint.media.AgeRatingConstraint;
+import nl.vpro.domain.constraint.media.ContentRatingConstraint;
+import nl.vpro.domain.constraint.media.Filter;
+import nl.vpro.domain.constraint.media.GenreConstraint;
+import nl.vpro.domain.constraint.media.HasAgeRatingConstraint;
+import nl.vpro.domain.constraint.media.HasImageConstraint;
+import nl.vpro.domain.constraint.media.HasLocationConstraint;
+import nl.vpro.domain.constraint.media.Not;
+import nl.vpro.domain.constraint.media.Or;
+import nl.vpro.domain.media.AVType;
+import nl.vpro.domain.media.AgeRating;
+import nl.vpro.domain.media.ContentRating;
+import nl.vpro.domain.media.Genre;
+import nl.vpro.domain.media.Group;
+import nl.vpro.domain.media.Location;
+import nl.vpro.domain.media.MediaClassificationService;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.MemberRef;
+import nl.vpro.domain.media.Platform;
+import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.ProgramType;
+import nl.vpro.domain.media.Relation;
+import nl.vpro.domain.media.RelationDefinition;
+import nl.vpro.domain.media.StandaloneMemberRef;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
-import static nl.vpro.domain.api.media.MediaFormBuilder.form;
-import static nl.vpro.domain.media.AgeRating.*;
-import static nl.vpro.domain.media.ContentRating.*;
-import static nl.vpro.domain.media.MediaTestDataBuilder.group;
-import static nl.vpro.domain.media.MediaTestDataBuilder.program;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
 /**
  *
- *  See also {@link ESMediaRepositoryPart2ITest}
- *  This test sets up de index for every test.
- *  Part2 creates a bunch of test data in @Setup. Choose what is more convenient for your new tests.
+ * See also {@link ESMediaRepositoryPart2ITest} This test sets up de index for
+ * every test. Part2 creates a bunch of test data in @Setup. Choose what is more
+ * convenient for your new tests.
+ * 
  * @author Roelof Jan Koekoek
  * @since 3.5
  */
@@ -60,15 +108,19 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     @Autowired
     private Settings settings;
 
-
     @Before
     public void setup() throws Exception {
         Mockito.reset(target.mediaRepository);
         ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
 
-        client.admin().indices().prepareCreate(ApiMediaIndex.NAME).setSettings(ApiMediaIndex.source()).execute().actionGet();
+        try {
+            client.admin().indices().prepareCreate(ApiMediaIndex.NAME).setSettings(ApiMediaIndex.source()).execute().actionGet();
+        } catch (IndexAlreadyExistsException e) {
+            log.info("Index exists");
+        }
         for (MediaESType type : MediaESType.values()) {
-            client.admin().indices().preparePutMapping(ApiMediaIndex.NAME).setType(type.name()).setSource(type.source()).execute().actionGet();
+            client.admin().indices().preparePutMapping(ApiMediaIndex.NAME).setType(type.name()).setSource(type.source())
+                    .execute().actionGet();
         }
 
         settings.setRedirectsRepository("COUCHDB");
@@ -76,16 +128,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
     }
 
-
     @After
     public void tearDown() {
-        client.admin()
-            .indices()
-            .prepareDelete(ApiMediaIndex.NAME)
-            .execute()
-            .actionGet();
+        client.admin().indices().prepareDelete(ApiMediaIndex.NAME).execute().actionGet();
     }
-
 
     @Test
     public void testLoad() throws IOException {
@@ -124,9 +170,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         {
             SearchResult<MediaObject> result = target.find(null, form().fuzzyText("foa").build(), 0, null);
             assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(1).getScore()).isLessThan(result.getItems().get(0).getScore());
-            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("foa");
-            assertThat(result.getItems().get(1).getResult().getMainTitle()).isEqualTo("foo");
+            List<? extends SearchResultItem<? extends MediaObject>> items = result.getItems();
+            assertThat(items.get(1).getScore()).isLessThan(items.get(0).getScore());
+            assertTrue(items.stream().anyMatch(item -> {return item.getResult().getMainTitle().equals("foo");}));
+            assertTrue(items.stream().anyMatch(item -> {return item.getResult().getMainTitle().equals("foa");}));
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().text("FOO").build(), 0, null);
@@ -149,7 +196,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             assertThat(result.getSize()).isEqualTo(0);
         }
         {
-            SearchResult<MediaObject> result = target.find(null, form().tags(Match.MUST, ExtendedTextMatcher.must("FOO", false)).build(), 0, null);
+            SearchResult<MediaObject> result = target.find(null,
+                    form().tags(Match.MUST, ExtendedTextMatcher.must("FOO", false)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
@@ -161,20 +209,21 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         index(program().mainTitle("t2").tags("xxx", "yyy").build());
 
         {
-            SearchResult<MediaObject> result = target.find(null, form().tags(ExtendedTextMatcher.must("fo.*", ExtendedMatchType.REGEX)).build(), 0, null);
+            SearchResult<MediaObject> result = target.find(null,
+                    form().tags(ExtendedTextMatcher.must("fo.*", ExtendedMatchType.REGEX)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
-            SearchResult<MediaObject> result = target.find(null, form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX)).build(), 0, null);
+            SearchResult<MediaObject> result = target.find(null,
+                    form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(0);
         }
         {
-            SearchResult<MediaObject> result = target.find(null, form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX, false)).build(), 0, null);
+            SearchResult<MediaObject> result = target.find(null,
+                    form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX, false)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
-
-
 
     }
 
@@ -184,20 +233,23 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         index(program().mainTitle("t2").tags("xxx", "yyy").build());
 
         {
-            SearchResult<MediaObject> result = target.find(null, form().tags(ExtendedTextMatcher.should("fo*bar", ExtendedMatchType.WILDCARD)).build(), 0, null);
+            SearchResult<MediaObject> result = target.find(null,
+                    form().tags(ExtendedTextMatcher.should("fo*bar", ExtendedMatchType.WILDCARD)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
-            SearchResult<MediaObject> result = target.find(null, form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD)).build(), 0, null);
+            SearchResult<MediaObject> result = target.find(null,
+                    form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(0);
         }
         {
-            SearchResult<MediaObject> result = target.find(null, form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD, false)).build(), 0, null);
+            SearchResult<MediaObject> result = target.find(null,
+                    form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD, false)).build(), 0,
+                    null);
             assertThat(result.getSize()).isEqualTo(1);
         }
     }
-
 
     @Test
     public void testFindWithHasImageProfile() throws Exception {
@@ -207,9 +259,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         withImages.getImages().get(0).setId(2L);
         index(withImages);
 
-        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
-            new Filter(new HasImageConstraint())
-        );
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(new Filter(new HasImageConstraint()));
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
         assertThat(result.getSize()).isEqualTo(1);
@@ -223,9 +273,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         withLocations.getLocations().first().setId(2L);
         index(withLocations);
 
-        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
-            new Filter(new HasLocationConstraint())
-        );
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(new Filter(new HasLocationConstraint()));
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
         assertThat(result.getSize()).isEqualTo(1);
@@ -233,11 +281,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testFindWithFacetOrderings() throws Exception {
-        index(program().withMid().broadcasters(
-            new Broadcaster("A"),
-            new Broadcaster("A"),
-            new Broadcaster("B")
-        ).build());
+        index(program().withMid().broadcasters(new Broadcaster("A"), new Broadcaster("A"), new Broadcaster("B"))
+                .build());
 
         {
             MediaForm countAsc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.COUNT_ASC, null)).build();
@@ -266,14 +311,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testFindWithFacetWithThreshold() throws Exception {
-        index(program().withMid().broadcasters(
-            new Broadcaster("A"),
-            new Broadcaster("B")
-        ).build());
+        index(program().withMid().broadcasters(new Broadcaster("A"), new Broadcaster("B")).build());
 
-        index(program().withMid().broadcasters(
-            new Broadcaster("A")
-        ).build());
+        index(program().withMid().broadcasters(new Broadcaster("A")).build());
 
         MediaForm form = form().broadcasterFacet(new MediaFacet(2, FacetOrder.VALUE_ASC, null)).build();
 
@@ -285,10 +325,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testFindWithFacetWithMax() throws Exception {
-        index(program().withMid().broadcasters(
-            new Broadcaster("A"),
-            new Broadcaster("B")
-        ).build());
+        index(program().withMid().broadcasters(new Broadcaster("A"), new Broadcaster("B")).build());
 
         MediaForm form = form().broadcasterFacet(new MediaFacet(null, FacetOrder.VALUE_ASC, 1)).build();
 
@@ -306,7 +343,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         assertThat(result.getFacets().getAvTypes()).isNotEmpty();
         List<TermFacetResultItem> avTypes = result.getFacets().getAvTypes();
-        for (TermFacetResultItem avType: avTypes) {
+        for (TermFacetResultItem avType : avTypes) {
             if (avType.getId().equals(AVType.VIDEO.name())) {
                 assertEquals(1, avType.getCount());
             } else {
@@ -325,7 +362,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         assertThat(result.getFacets().getTypes()).isNotEmpty();
         List<TermFacetResultItem> types = result.getFacets().getTypes();
-        for (TermFacetResultItem type: types) {
+        for (TermFacetResultItem type : types) {
             if (type.getId().equals(ProgramType.BROADCAST.name())) {
                 assertEquals(1, type.getCount());
             } else {
@@ -372,8 +409,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(first.getTerms()).hasSize(2);
     }
 
-
-
     @Test
     public void testFindWithGenreFacetWhenFiltered() throws Exception {
         index(program().withMid().genres(new Genre("3.0.1.1.6")).build());
@@ -416,7 +451,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(result.getFacets().getTags()).hasSize(3);
     }
 
-
     @Test
     public void testFindWithTagFacetIgnoreCase() throws Exception {
         index(program().withMid().tags("foo", "bar").build());
@@ -428,7 +462,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(result.getFacets().getTags()).hasSize(2);
 
     }
-
 
     @Test
     public void testFindWithTagFacetIgnoreCaseWithSelected() throws Exception {
@@ -543,14 +576,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         index(program().withMid().relations(new Relation(label, null, "Blue Note")).build());
         index(program().withMid().relations(new Relation(label, null, "blue note")).build());
-        index(program().withMid().relations(new Relation(eoLabel, null, "Evangelisch"), new Relation(label, null, "Blue NOte")).build());
+        index(program().withMid()
+                .relations(new Relation(eoLabel, null, "Evangelisch"), new Relation(label, null, "Blue NOte")).build());
 
         RelationFacet relationFacet = new RelationFacet();
         relationFacet.setName("test");
         relationFacet.setCaseSensitive(false);
 
-
-        MediaForm form = form().relationsFacet(relationFacet).relationText(label, ExtendedTextMatcher.must("blue note", false)).build();
+        MediaForm form = form().relationsFacet(relationFacet)
+                .relationText(label, ExtendedTextMatcher.must("blue note", false)).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
@@ -573,9 +607,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
         assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
 
-
     }
-
 
     @Test
     public void testFindWithRelationFacetWithSearch() throws Exception {
@@ -600,13 +632,14 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(relations.get(0)).hasSize(1);
     }
 
-
     @Test
     public void testFindWithRelationFacetWithFilter() throws Exception {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
-        index(program().withMid().broadcasters(new Broadcaster("VPRO")).relations(new Relation(label, null, "Blue Note")).build());
-        index(program().withMid().broadcasters(new Broadcaster("EO")).relations(new Relation(eoLabel, null, "Evangelisch")).build());
+        index(program().withMid().broadcasters(new Broadcaster("VPRO"))
+                .relations(new Relation(label, null, "Blue Note")).build());
+        index(program().withMid().broadcasters(new Broadcaster("EO"))
+                .relations(new Relation(eoLabel, null, "Evangelisch")).build());
 
         RelationFacet relationFacet = new RelationFacet();
         relationFacet.setName("test");
@@ -624,17 +657,23 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(relations.get(0)).hasSize(1);
     }
 
-
     @Test
     public void testWithLocationFilter() throws IOException {
 
         index(program().build()); // no locations
         final Location location1 = new Location("http://www.locations.nl/1", OwnerType.BROADCASTER);
         location1.setId(1L);
-        index(program().locations(location1).build()); // just a location with no platform
-        final Location location2 = new Location("http://www.locations.nl/2", OwnerType.BROADCASTER, Platform.INTERNETVOD);
+        index(program().locations(location1).build()); // just a location with
+                                                       // no platform
+        final Location location2 = new Location("http://www.locations.nl/2", OwnerType.BROADCASTER,
+                Platform.INTERNETVOD);
         location2.setId(2L);
-        index(program().authoritativeRecord(Platform.INTERNETVOD).locations(location2).build()); // a location with a specific platform
+        index(program().authoritativeRecord(Platform.INTERNETVOD).locations(location2).build()); // a
+                                                                                                 // location
+                                                                                                 // with
+                                                                                                 // a
+                                                                                                 // specific
+                                                                                                 // platform
 
         {
             Filter filter = new Filter();
@@ -677,7 +716,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         }
     }
 
-
     @Test
     public void testRedirectFormNull() {
         assertThat(target.redirectForm(null)).isNull();
@@ -687,16 +725,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testRedirectFormWithMediaIds() {
         redirect("abc", "xyz");
 
-        assertThat(target.redirectForm(form().mediaIds("abc", "def").build()).getSearches().getMediaIds().asList().toString())
-                .isEqualTo("[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+        assertThat(target.redirectForm(form().mediaIds("abc", "def").build()).getSearches().getMediaIds().asList()
+                .toString()).isEqualTo(
+                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
     }
 
     @Test
     public void testRedirectFormWithDescendantsOf() {
         redirect("abc", "xyz");
-        assertThat(target.redirectForm(form().descendantOfs("abc", "def").build()).getSearches().getDescendantOf().asList().toString())
-                .isEqualTo("[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+        assertThat(target.redirectForm(form().descendantOfs("abc", "def").build()).getSearches().getDescendantOf()
+                .asList().toString()).isEqualTo(
+                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
     }
 
@@ -704,8 +744,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testRedirectFormWithEpisodeOf() {
         redirect("abc", "xyz");
 
-        assertThat(target.redirectForm(form().episodeOfs("abc", "def").build()).getSearches().getEpisodeOf().asList().toString())
-                .isEqualTo("[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+        assertThat(target.redirectForm(form().episodeOfs("abc", "def").build()).getSearches().getEpisodeOf().asList()
+                .toString()).isEqualTo(
+                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
     }
 
@@ -713,8 +754,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testRedirectFormWithMemberOf() {
         redirect("abc", "xyz");
 
-        assertThat(target.redirectForm(MediaFormBuilder.form().memberOfs("abc", "def").build()).getSearches().getMemberOf().asList().toString())
-                .isEqualTo("[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+        assertThat(target.redirectForm(MediaFormBuilder.form().memberOfs("abc", "def").build()).getSearches()
+                .getMemberOf().asList().toString()).isEqualTo(
+                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
     }
 
@@ -726,8 +768,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MemberRefFacet facet = new MemberRefFacet();
         facet.setFilter(helper.getSearches());
-        assertThat(target.redirectForm(form().memberOfFacet(facet).build()).getFacets().getMemberOf().getFilter().getMemberOf().asList().toString())
-                .isEqualTo("[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+        assertThat(target.redirectForm(form().memberOfFacet(facet).build()).getFacets().getMemberOf().getFilter()
+                .getMemberOf().asList().toString()).isEqualTo(
+                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
     }
 
@@ -797,6 +840,32 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
+    public void testGenreFilter() throws IOException {
+        index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")).build());
+
+        {
+            SearchResult<MediaObject> result = target.find(null, form().build(), 0, null);
+            assertEquals(1, result.getSize().intValue());
+            assertEquals("Jeugd - Amusement",
+                    result.getItems().get(0).getResult().getGenres().first().getDisplayName());
+            assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
+        }
+
+        index(program().mainTitle("t2").genres(new Genre("3.0.1.5")).build());
+
+        ProfileDefinition<MediaObject> genreProfile = new ProfileDefinition<>(
+                new Filter(new GenreConstraint("3.0.1.5")));
+        {
+            SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
+            assertEquals(1, result.getSize().intValue());
+            assertEquals("Muziek", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
+            assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+
+        }
+
+    }
+
+    @Test
     public void testContentRatings() throws IOException {
         index(program().mainTitle("t1").contentRatings(ANGST).build());
         index(program().mainTitle("t2").contentRatings(DRUGS_EN_ALCOHOL).build());
@@ -805,9 +874,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
         assertEquals(2L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
         assertEquals(2L, (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL).build(), 0, null).getSize());
-        assertEquals(2L, (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL, SEKS).build(), 0, null).getSize());
+        assertEquals(2L,
+                (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL, SEKS).build(), 0, null).getSize());
         assertEquals(0L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
-        assertEquals(0L, (long) target.find(null, form().contentRatings(DISCRIMINATIE, SEKS).build(), 0, null).getSize());
+        assertEquals(0L,
+                (long) target.find(null, form().contentRatings(DISCRIMINATIE, SEKS).build(), 0, null).getSize());
     }
 
     @Test
@@ -817,8 +888,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertEquals(1L, (long) target.find(null, form().build(), 0, null).getSize());
         assertEquals(1L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
         assertEquals(1L, (long) target.find(null, form().ageRating(_16).build(), 0, null).getSize());
-        assertEquals(1L, (long) target.find(null, form().contentRatings(SEKS).ageRating(_16).build(), 0, null).getSize());
-        assertEquals(1L, (long) target.find(null, form().contentRatings(DISCRIMINATIE, SEKS).ageRating(_12, _16).build(), 0, null).getSize());
+        assertEquals(1L,
+                (long) target.find(null, form().contentRatings(SEKS).ageRating(_16).build(), 0, null).getSize());
+        assertEquals(1L, (long) target
+                .find(null, form().contentRatings(DISCRIMINATIE, SEKS).ageRating(_12, _16).build(), 0, null).getSize());
         assertEquals(0L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
         assertEquals(0L, (long) target.find(null, form().ageRating(_12).build(), 0, null).getSize());
     }
@@ -867,9 +940,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         index(program().mainTitle("t5").contentRatings(GEWELD, GROF_TAALGEBRUIK).build());
         index(program().mainTitle("t6").contentRatings(GROF_TAALGEBRUIK).build());
 
-        MediaSearchResult result = target.find(null, form().contentRatings(DISCRIMINATIE, SEKS, DRUGS_EN_ALCOHOL, ANGST, GEWELD, GROF_TAALGEBRUIK).contentRatingsFacet().build(), 0, null);
+        MediaSearchResult result = target.find(null,
+                form().contentRatings(DISCRIMINATIE, SEKS, DRUGS_EN_ALCOHOL, ANGST, GEWELD, GROF_TAALGEBRUIK)
+                        .contentRatingsFacet().build(),
+                0, null);
         List<TermFacetResultItem> contentRatings = result.getFacets().getContentRatings();
-        /* ANGST: 2, DISCRIMINATIE: 1, DRUGS_EN_ALCOHOL: 2, GEWELD: 1, GROF_TAALGEBRUIK: 2, SEKS: 1, alphabetically */
+        /*
+         * ANGST: 2, DISCRIMINATIE: 1, DRUGS_EN_ALCOHOL: 2, GEWELD: 1,
+         * GROF_TAALGEBRUIK: 2, SEKS: 1, alphabetically
+         */
         assertEquals(contentRatings.size(), ContentRating.values().length);
 
         assertEquals(ANGST.name(), contentRatings.get(0).getId());
@@ -886,34 +965,28 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertEquals(1, contentRatings.get(5).getCount());
     }
 
-
     @Test
     public void testFindWithAgeRatingProfile() throws Exception {
         index(program().mainTitle("sex!").contentRatings(SEKS).ageRating(_16).build());
         index(program().mainTitle("heel gewoon").build());
 
-
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
-            new Filter(new Or(new Not(new HasAgeRatingConstraint()), new AgeRatingConstraint(AgeRating.ALL), new AgeRatingConstraint(AgeRating._9), new AgeRatingConstraint(AgeRating._6)))
-        );
+                new Filter(new Or(new Not(new HasAgeRatingConstraint()), new AgeRatingConstraint(AgeRating.ALL),
+                        new AgeRatingConstraint(AgeRating._9), new AgeRatingConstraint(AgeRating._6))));
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
-
 
     @Test
     public void testFindWithContentRatingsProfile() throws Exception {
         index(program().mainTitle("sex!").contentRatings(SEKS).ageRating(_16).build());
         index(program().mainTitle("heel gewoon").build());
 
-
         ProfileDefinition<MediaObject> pornoSiteProfile = new ProfileDefinition<>(
-            new Filter(new ContentRatingConstraint(SEKS))
-        );
+                new Filter(new ContentRatingConstraint(SEKS)));
         ProfileDefinition<MediaObject> childrenSiteProfile = new ProfileDefinition<>(
-            new Filter(new Or(new Not(new HasAgeRatingConstraint()), new Not(new ContentRatingConstraint(SEKS))))
-        );
+                new Filter(new Or(new Not(new HasAgeRatingConstraint()), new Not(new ContentRatingConstraint(SEKS)))));
 
         {
             SearchResult<MediaObject> result = target.find(pornoSiteProfile, null, 0, null);
@@ -933,7 +1006,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
     }
 
-    private <T extends MediaObject> T  index(T object) throws IOException {
+    private <T extends MediaObject> T index(T object) throws IOException {
         indexMediaObject(object);
         String memberRefType = object.getClass().getSimpleName().toLowerCase() + "MemberRef";
         for (MemberRef ref : object.getMemberOf()) {
@@ -948,16 +1021,16 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     private void indexMediaObject(MediaObject object) throws IOException {
-        client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).actionGet();
+        client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid())
+                .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).actionGet();
         client.admin().indices().refresh(new RefreshRequest(ApiMediaIndex.NAME)).actionGet();
     }
 
     private void index(String type, MediaObject child, MemberRef object) throws IOException {
         String id = object.getMidRef() + "/" + object.getNumber();
         client.index(new IndexRequest(ApiMediaIndex.NAME, type, id)
-            .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(new StandaloneMemberRef(child.getMid(), object)))
-            .parent(object.getMidRef()))
-            .actionGet();
+                .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(new StandaloneMemberRef(child.getMid(), object)))
+                .parent(object.getMidRef())).actionGet();
         client.admin().indices().refresh(new RefreshRequest(ApiMediaIndex.NAME)).actionGet();
     }
 }
