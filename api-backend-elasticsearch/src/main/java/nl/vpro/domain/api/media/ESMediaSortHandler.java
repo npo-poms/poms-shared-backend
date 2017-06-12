@@ -25,27 +25,27 @@ import nl.vpro.domain.media.MediaObject;
  */
 public class ESMediaSortHandler extends ESFacetsHandler {
 
-    private static final Map<MediaSortField, String> fields = new HashMap<>(5);
+    private static final Map<MediaSortField, String> FIELDS = new HashMap<>(5);
 
     static {
-        fields.put(MediaSortField.title, "titles.value.full");
-        fields.put(MediaSortField.sortDate, "sortDate");
-        fields.put(MediaSortField.publishDate, "publishDate");
-        fields.put(MediaSortField.episode, "episodeOf.index");
-        fields.put(MediaSortField.episodeAdded, "episodeOf.added");
-        fields.put(MediaSortField.member, "memberOf.index");
-        fields.put(MediaSortField.memberAdded, "memberOf.added");
-        fields.put(MediaSortField.creationDate, "creationDate");
-        fields.put(MediaSortField.lastModified, "lastModified");
+        FIELDS.put(MediaSortField.title, "titles.value.full");
+        FIELDS.put(MediaSortField.sortDate, "sortDate");
+        FIELDS.put(MediaSortField.publishDate, "publishDate");
+        FIELDS.put(MediaSortField.episode, "episodeOf.index");
+        FIELDS.put(MediaSortField.episodeAdded, "episodeOf.added");
+        FIELDS.put(MediaSortField.member, "memberOf.index");
+        FIELDS.put(MediaSortField.memberAdded, "memberOf.added");
+        FIELDS.put(MediaSortField.creationDate, "creationDate");
+        FIELDS.put(MediaSortField.lastModified, "lastModified");
     }
 
-    private static final Map<MediaSortField, String> nestedFields = new HashMap<>(5);
+    private static final Map<MediaSortField, String> NESTED_FIELDS = new HashMap<>(5);
 
     static {
-        nestedFields.put(MediaSortField.episode, "episodeOf");
-        nestedFields.put(MediaSortField.episodeAdded, "episodeOf");
-        nestedFields.put(MediaSortField.member, "memberOf");
-        nestedFields.put(MediaSortField.memberAdded, "memberOf");
+        NESTED_FIELDS.put(MediaSortField.episode, "episodeOf");
+        NESTED_FIELDS.put(MediaSortField.episodeAdded, "episodeOf");
+        NESTED_FIELDS.put(MediaSortField.member, "memberOf");
+        NESTED_FIELDS.put(MediaSortField.memberAdded, "memberOf");
     }
 
     public static void sort(SearchSourceBuilder searchBuilder, MediaForm form, MediaObject mediaObject) {
@@ -59,18 +59,18 @@ public class ESMediaSortHandler extends ESFacetsHandler {
 
 
                 MediaSortField key = entry.getKey();
-                String field = fields.get(key);
+                String field = FIELDS.get(key);
 
                 if (field == null) {
                     throw new UnsupportedOperationException("Sorting by " + key + " is currently not supported. This may be filed as a bug!");
                 }
 
-                if (nestedFields.containsKey(key)) {
+                if (NESTED_FIELDS.containsKey(key)) {
                     sortBuilder = new FieldSortBuilder(field)
-                        .setNestedPath(nestedFields.get(key))
+                        .setNestedPath(NESTED_FIELDS.get(key))
                         .order(order(entry.getValue()));
                     if (mediaObject != null) {
-                        sortBuilder.setNestedFilter(FilterBuilders.termFilter(nestedFields.get(key) + ".midRef", mediaObject.getMid()));
+                        sortBuilder.setNestedFilter(FilterBuilders.termFilter(NESTED_FIELDS.get(key) + ".midRef", mediaObject.getMid()));
                     }
                 } else {
                     sortBuilder = new FieldSortBuilder(field)

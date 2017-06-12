@@ -283,7 +283,7 @@ public abstract class AbstractESRepository<T> {
 
 
     protected final <S extends T> S getObject(SearchHit hit, Class<S> clazz) throws IOException {
-        return Jackson2Mapper.LENIENT.readerFor(clazz).readValue(hit.getSourceAsString());
+        return Jackson2Mapper.getLenientInstance().readerFor(clazz).readValue(hit.getSourceAsString());
     }
 
 
