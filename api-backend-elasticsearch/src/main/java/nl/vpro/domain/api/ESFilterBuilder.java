@@ -138,28 +138,37 @@ public abstract class ESFilterBuilder {
 
     static protected <T> FilterBuilder doTextConstraint(TextConstraint<T> constraint) {
         boolean exactMatch = constraint.isExact();
-        String value = constraint.getValue();
+        String value = exactMatch ? constraint.getValue() : constraint.getWildcardValue();
         switch (constraint.getCaseHandling()) {
             case ASIS:
                 return exactMatch ?
                         FilterBuilders.termFilter(constraint.getESPath(), value) :
-                        FilterBuilders.queryFilter(QueryBuilders.wildcardQuery(constraint.getESPath(), '*' + value + '*'));
+                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value));
             case LOWER:
                 return exactMatch ?
                         FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()) :
-                        FilterBuilders.queryFilter(QueryBuilders.wildcardQuery(constraint.getESPath(), '*' + value.toLowerCase() + '*'));
+                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase()));
             case UPPER:
                 return exactMatch ?
                         FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase()) :
-                        FilterBuilders.queryFilter(QueryBuilders.wildcardQuery(constraint.getESPath(), '*' + value.toUpperCase() + '*'));
+                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()));
             default:
                 return exactMatch ? new OrFilterBuilder(
                         FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()),
                         FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase())
                 ) : new OrFilterBuilder(
-                        FilterBuilders.queryFilter(QueryBuilders.wildcardQuery(constraint.getESPath(), '*' + value.toLowerCase() + '*')),
-                        FilterBuilders.queryFilter(QueryBuilders.wildcardQuery(constraint.getESPath(), value.toUpperCase()))
+                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase())),
+                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()))
                 );
+        }
+    }
+
+    static QueryBuilder toWildCard(String path, String value) {
+        if (value.contains("*")) {
+            return QueryBuilders.wildcardQuery(path, value);
+        } else {
+            return QueryBuilders.prefixQuery(path, value);
+
         }
     }
 
