@@ -1,24 +1,6 @@
 package nl.vpro.domain.api.media;
 
-import static nl.vpro.domain.api.media.MediaFormBuilder.form;
-import static nl.vpro.domain.media.AgeRating.ALL;
-import static nl.vpro.domain.media.AgeRating._12;
-import static nl.vpro.domain.media.AgeRating._16;
-import static nl.vpro.domain.media.AgeRating._6;
-import static nl.vpro.domain.media.AgeRating._9;
-import static nl.vpro.domain.media.ContentRating.ANGST;
-import static nl.vpro.domain.media.ContentRating.DISCRIMINATIE;
-import static nl.vpro.domain.media.ContentRating.DRUGS_EN_ALCOHOL;
-import static nl.vpro.domain.media.ContentRating.GEWELD;
-import static nl.vpro.domain.media.ContentRating.GROF_TAALGEBRUIK;
-import static nl.vpro.domain.media.ContentRating.SEKS;
-import static nl.vpro.domain.media.MediaTestDataBuilder.group;
-import static nl.vpro.domain.media.MediaTestDataBuilder.program;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,8 +10,6 @@ import java.util.Optional;
 
 import javax.xml.bind.JAXB;
 
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequestBuilder;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
@@ -40,61 +20,35 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-import lombok.extern.slf4j.Slf4j;
 import nl.vpro.api.Settings;
-import nl.vpro.domain.api.AbstractESRepositoryTest;
-import nl.vpro.domain.api.DateRangePreset;
-import nl.vpro.domain.api.DurationRangeInterval;
-import nl.vpro.domain.api.ExtendedMatchType;
-import nl.vpro.domain.api.ExtendedTextMatcher;
-import nl.vpro.domain.api.FacetOrder;
-import nl.vpro.domain.api.Match;
-import nl.vpro.domain.api.MultipleFacetsResult;
-import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.SearchResult;
-import nl.vpro.domain.api.SearchResultItem;
-import nl.vpro.domain.api.TermFacetResultItem;
-import nl.vpro.domain.api.TermSearch;
-import nl.vpro.domain.api.TextMatcher;
-import nl.vpro.domain.api.TextMatcherList;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.classification.ClassificationServiceLocator;
-import nl.vpro.domain.constraint.media.AgeRatingConstraint;
-import nl.vpro.domain.constraint.media.ContentRatingConstraint;
-import nl.vpro.domain.constraint.media.Filter;
-import nl.vpro.domain.constraint.media.GenreConstraint;
-import nl.vpro.domain.constraint.media.HasAgeRatingConstraint;
-import nl.vpro.domain.constraint.media.HasImageConstraint;
-import nl.vpro.domain.constraint.media.HasLocationConstraint;
-import nl.vpro.domain.constraint.media.Not;
-import nl.vpro.domain.constraint.media.Or;
-import nl.vpro.domain.media.AVType;
-import nl.vpro.domain.media.AgeRating;
-import nl.vpro.domain.media.ContentRating;
-import nl.vpro.domain.media.Genre;
-import nl.vpro.domain.media.Group;
-import nl.vpro.domain.media.Location;
-import nl.vpro.domain.media.MediaClassificationService;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.MemberRef;
-import nl.vpro.domain.media.Platform;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.ProgramType;
-import nl.vpro.domain.media.Relation;
-import nl.vpro.domain.media.RelationDefinition;
-import nl.vpro.domain.media.StandaloneMemberRef;
+import nl.vpro.domain.constraint.media.*;
+import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
+import static nl.vpro.domain.api.media.MediaFormBuilder.form;
+import static nl.vpro.domain.media.AgeRating.*;
+import static nl.vpro.domain.media.ContentRating.*;
+import static nl.vpro.domain.media.MediaTestDataBuilder.group;
+import static nl.vpro.domain.media.MediaTestDataBuilder.program;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
+
 /**
  *
  * See also {@link ESMediaRepositoryPart2ITest} This test sets up de index for
  * every test. Part2 creates a bunch of test data in @Setup. Choose what is more
  * convenient for your new tests.
- * 
+ *
  * @author Roelof Jan Koekoek
  * @since 3.5
  */
@@ -860,6 +814,24 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             assertEquals(1, result.getSize().intValue());
             assertEquals("Muziek", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
             assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+
+        }
+
+    }
+
+
+    @Test
+    public void testGenreFilterWildCard() throws IOException {
+        index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")).build());
+        index(program().mainTitle("t2").genres(new Genre("3.0.1.5")).build());
+
+        ProfileDefinition<MediaObject> genreProfile = new ProfileDefinition<>(
+            new Filter(new GenreConstraint("3.0.1.1.*")));
+        {
+            SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
+            assertEquals(1, result.getSize().intValue());
+            assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
+            assertEquals("Jeugd - Amusement", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
 
         }
 
