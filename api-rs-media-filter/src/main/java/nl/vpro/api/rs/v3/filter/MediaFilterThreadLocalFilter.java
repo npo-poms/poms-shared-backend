@@ -40,7 +40,7 @@ public class MediaFilterThreadLocalFilter implements Filter {
 
             chain.doFilter(request, response);
         } catch (ServletException | IOException | RuntimeException ioe) {
-            if (ioe.getCause().getClass().getSimpleName().equals("ClientAbortException")) {
+            if (ioe.getCause() != null && ioe.getCause().getClass().getSimpleName().equals("ClientAbortException")) {
                 // NPA-346 Don't log client errors!
                 log.info("{} (cause: {} {}). Seems like the client aborted. This can be ignored", ioe.getMessage(), ioe.getCause().getClass().getName(), ioe.getCause().getMessage());
                 return;
