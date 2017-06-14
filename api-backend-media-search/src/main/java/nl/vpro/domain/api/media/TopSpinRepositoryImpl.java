@@ -1,14 +1,15 @@
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
-
 import javax.annotation.PostConstruct;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.vpro.domain.api.topspin.Recommendations;
 
 /**
@@ -32,12 +33,17 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
 
     @Override
     public Recommendations getForMid(String mid) {
-        WebTarget target = getTopSpinClient().target(topspinUrl + mid + ".json").queryParam("max", topspinMaxResults);
-        return target.request().get().readEntity(Recommendations.class);
+        String url = topspinUrl + mid + ".json";
+        WebTarget target = getTopSpinClient().target(url).queryParam("max", topspinMaxResults);
+        Response response = target.request().get();
+        if(response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+            log.warn("Could not get top spin recommendations for on url {} (status {})", url, response.getStatus());
+            return new Recommendations();
+        }
+        return response.readEntity(Recommendations.class);
     }
 
     protected Client getTopSpinClient() {
-        Client client = new ResteasyClientBuilder().build();
-        return client;
+        return new ResteasyClientBuilder().build();
     }
 }

@@ -824,17 +824,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testGenreFilterWildCard() throws IOException {
         index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")).build());
         index(program().mainTitle("t2").genres(new Genre("3.0.1.5")).build());
+        index(program().mainTitle("t3").genres(new Genre("3.0.1")).build());
+        index(program().mainTitle("t4").genres(new Genre("3.0.2")).build());
 
         ProfileDefinition<MediaObject> genreProfile = new ProfileDefinition<>(
-            new Filter(new GenreConstraint("3.0.1.1.*")));
+            new Filter(new GenreConstraint("3.0.1*")));
         {
             SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
-            assertEquals(1, result.getSize().intValue());
-            assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
-            assertEquals("Jeugd - Amusement", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
-
+            assertEquals(3, result.getSize().intValue());
         }
-
     }
 
     @Test
