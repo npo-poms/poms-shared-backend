@@ -249,6 +249,18 @@
             "hasSubtitles" : {
                 "type" : "boolean"
             },
+            "availableSubtitles": {
+                "properties": {
+                    "language": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "type": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
             "images" : {
                 "properties" : {
                     "creationDate" : {
