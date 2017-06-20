@@ -100,6 +100,8 @@ public abstract class ESFilterBuilder {
             } else {
                 return doExistsConstraint(hasPrediction);
             }
+        } else if (constraint instanceof WildTextConstraint) {
+            return doTextConstraint((WildTextConstraint<T>) constraint);
         } else if (constraint instanceof TextConstraint) {
             return doTextConstraint((TextConstraint<T>) constraint);
         } else if (constraint instanceof ExistsConstraint) {
@@ -136,31 +138,36 @@ public abstract class ESFilterBuilder {
         return booleanFilter;
     }
 
-    static protected <T> FilterBuilder doTextConstraint(TextConstraint<T> constraint) {
+
+    static protected <T> FilterBuilder doTextConstraint(WildTextConstraint<T> constraint) {
         boolean exactMatch = constraint.isExact();
         String value = exactMatch ? constraint.getValue() : constraint.getWildcardValue();
         switch (constraint.getCaseHandling()) {
             case ASIS:
                 return exactMatch ?
-                        FilterBuilders.termFilter(constraint.getESPath(), value) :
-                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value));
+                    FilterBuilders.termFilter(constraint.getESPath(), value) :
+                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value));
             case LOWER:
                 return exactMatch ?
-                        FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()) :
-                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase()));
+                    FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()) :
+                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase()));
             case UPPER:
                 return exactMatch ?
-                        FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase()) :
-                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()));
+                    FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase()) :
+                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()));
             default:
                 return exactMatch ? new OrFilterBuilder(
-                        FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()),
-                        FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase())
+                    FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()),
+                    FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase())
                 ) : new OrFilterBuilder(
-                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase())),
-                        FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()))
+                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase())),
+                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()))
                 );
         }
+    }
+
+    static protected <T> FilterBuilder doTextConstraint(TextConstraint<T> constraint) {
+        return FilterBuilders.termFilter(constraint.getESPath(), constraint.getValue());
     }
 
     static QueryBuilder toWildCard(String path, String value) {
