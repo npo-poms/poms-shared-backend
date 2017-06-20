@@ -107,6 +107,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         build(booleanQuery, searches.getAvTypes(), new SingleFieldApplier(prefix + "avType"));
         build(booleanQuery, searches.getSortDates(), new SingleFieldApplier(prefix + "sortDate"));
         build(booleanQuery, searches.getPublishDates(), new SingleFieldApplier(prefix + "publishDate"));
+        build(booleanQuery, searches.getCreationDates(), new SingleFieldApplier(prefix + "creationDate"));
+        build(booleanQuery, searches.getLastModifiedDates(), new SingleFieldApplier(prefix + "lastModified"));
         build(booleanQuery, searches.getBroadcasters(), new SingleFieldApplier(prefix + "broadcasters.id"));
         build(booleanQuery, searches.getAgeRatings(), new SingleFieldApplier(prefix + "ageRating"));
         build(booleanQuery, searches.getContentRatings(), new SingleFieldApplier(prefix + "contentRatings"));
