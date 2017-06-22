@@ -7,6 +7,7 @@ package nl.vpro.domain.api;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 
@@ -26,6 +27,7 @@ import org.elasticsearch.search.facet.terms.TermsFacet;
 import nl.vpro.domain.Displayable;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
+import nl.vpro.util.DateUtils;
 import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.esField;
@@ -180,10 +182,10 @@ public abstract class ESFacetsHandler {
                     DateRangeInterval.Interval interval = ESInterval.parse(aggregation.getName().substring(facetName.length() + 1));
                     Aggregation sub = ((org.elasticsearch.search.aggregations.bucket.filter.Filter) aggregation).getAggregations().get("sub");
                     for (DateHistogram.Bucket bucket : ((DateHistogram) sub).getBuckets()) {
-                        Date bucketStart = bucket.getKeyAsDate().toDate();
-                        Date bucketEnd = Date.from(interval.getBucketEnd(bucket.getKeyAsDate().toDate().toInstant()));
+                        Instant bucketStart = DateUtils.toInstant(bucket.getKeyAsDate().toDate());
+                        Instant bucketEnd = interval.getBucketEnd(bucketStart);
                         DateFacetResultItem entry = new DateFacetResultItem(
-                            interval.print(bucketStart.toInstant(), false),
+                            interval.print(bucketStart, false),
                             bucketStart,
                             bucketEnd,
                             bucket.getDocCount());
@@ -250,9 +252,9 @@ public abstract class ESFacetsHandler {
         return facetResultItems;
     }
 
-    private static int indexOf(DateFacetResultItem item, List<nl.vpro.domain.api.RangeFacet<Date>> ranges) {
+    private static int indexOf(DateFacetResultItem item, List<nl.vpro.domain.api.RangeFacet<Instant>> ranges) {
         int i = 0;
-        for (nl.vpro.domain.api.RangeFacet<Date> range : ranges) {
+        for (nl.vpro.domain.api.RangeFacet<Instant> range : ranges) {
             if (range.matches(item.getBegin(), item.getEnd())) {
                 return i;
             }
@@ -405,8 +407,8 @@ public abstract class ESFacetsHandler {
                     Double to = entry.getTo();
                     result = new DateFacetResultItem(
                         name.substring(prefix.length()),
-                        entry.getFromAsString() != null ? new Date(from.longValue()) : null,
-                        entry.getToAsString() != null ? new Date(to.longValue()) : null,
+                        entry.getFromAsString() != null ? Instant.ofEpochMilli(from.longValue()) : null,
+                        entry.getToAsString() != null ? Instant.ofEpochMilli(to.longValue()) : null,
                         entry.getCount());
                     backing.set(index, result);
                 }

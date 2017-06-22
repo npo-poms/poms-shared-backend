@@ -5,7 +5,7 @@
 package nl.vpro.domain.api;
 
 import java.time.Duration;
-import java.util.Date;
+import java.time.Instant;
 import java.util.regex.Pattern;
 
 import org.elasticsearch.index.query.FilterBuilder;
@@ -62,7 +62,7 @@ public abstract class ESFacetsBuilder {
     protected static void addFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix) {
         if(facet != null) {
             if(facet.getRanges() != null) {
-                for(nl.vpro.domain.api.RangeFacet<Date> range : facet.getRanges()) {
+                for(nl.vpro.domain.api.RangeFacet<Instant> range : facet.getRanges()) {
                     if(range instanceof DateRangeInterval) {
                         ESInterval interval = ESInterval.parse(((DateRangeInterval)range).getInterval());
                         // TODO, zou het niet logischer zijn om de verschillende aggregatie onderdeel te laten zijn van 1 'filter-aggregatie.
@@ -89,10 +89,10 @@ public abstract class ESFacetsBuilder {
                                 )
                         );
                     } else {
-                        RangeFacetItem<Date> dateRangeItem = (RangeFacetItem<Date>)range;
+                        RangeFacetItem<Instant> dateRangeItem = (RangeFacetItem<Instant>)range;
                         searchBuilder.facet(FacetBuilders.rangeFacet(fieldName + ':' + dateRangeItem.getName()).field(fieldName).addRange(
-                            dateRangeItem.getBegin() != null ? String.valueOf(dateRangeItem.getBegin().getTime()) : null,
-                            dateRangeItem.getEnd() != null ? String.valueOf(dateRangeItem.getEnd().getTime()) : null
+                            dateRangeItem.getBegin() != null ? String.valueOf(dateRangeItem.getBegin().toEpochMilli()) : null,
+                            dateRangeItem.getEnd() != null ? String.valueOf(dateRangeItem.getEnd().toEpochMilli()) : null
                         )
                             .nested(fieldPrefix)
                             .facetFilter(filterBuilder));

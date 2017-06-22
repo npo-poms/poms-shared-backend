@@ -369,11 +369,11 @@ public abstract class ESQueryBuilder {
         rangeQuery.includeUpper(matcher.includeEnd());
 
         if (matcher.getBegin() != null) {
-            rangeQuery.from(matcher.getBegin().getTime());
+            rangeQuery.from(matcher.getBegin().toEpochMilli());
         }
 
         if (matcher.getEnd() != null) {
-            rangeQuery.to(matcher.getEnd().getTime());
+            rangeQuery.to(matcher.getEnd().toEpochMilli());
         }
 
         return rangeQuery;
