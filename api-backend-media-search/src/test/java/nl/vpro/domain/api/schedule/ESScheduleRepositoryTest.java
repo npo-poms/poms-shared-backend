@@ -19,7 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import nl.vpro.domain.api.AbstractESRepositoryTest;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.media.ScheduleResult;
+import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -181,13 +181,94 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
         assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(broadcast);
     }
 
-    private ScheduleEvent event(Channel c, String start) {
-        ScheduleEvent event = new ScheduleEvent();
-        event.setChannel(c);
-        event.setStartInstant(date(start));
-        event.setDuration(Duration.ofHours(1));
-        return event;
+
+    @Test
+    public void findSchedulesForRerun() throws Exception {
+        Program broadcast = MediaBuilder.program().mid("p1")
+            .descendantOf("DESCENDANT1")
+            .type(ProgramType.BROADCAST)
+            .scheduleEvents(
+                event(Channel.NED2, "2016-07-08T11:00:00"),
+                rerun(Channel.NED2, "2016-07-08T14:00:00")
+            )
+            .build();
+
+        Program movie = MediaBuilder.program().mid("p2")
+            .descendantOf("DESCENDANT2")
+            .type(ProgramType.MOVIE)
+            .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
+            .build();
+
+        index(broadcast);
+        index(movie);
+
+        ScheduleForm form = ScheduleForm.from(
+            MediaForm.builder()
+                .scheduleEvents(
+                    ScheduleEventSearch.builder()
+                        .begin(date("2016-07-08T00:00:00"))
+                        .end(date("2016-07-09T00:00:00"))
+                        .rerun(true)
+                        .build()
+                ).build());
+        ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
+        assertThat(schedules).hasSize(1);
     }
+
+
+    @Test
+    public void findSchedulesForOriginal() throws Exception {
+        Program broadcast = MediaBuilder.program().mid("p1")
+            .descendantOf("DESCENDANT1")
+            .type(ProgramType.BROADCAST)
+            .scheduleEvents(
+                event(Channel.NED2, "2016-07-08T11:00:00"),
+                rerun(Channel.NED2, "2016-07-08T14:00:00")
+            )
+            .build();
+
+        Program movie = MediaBuilder.program().mid("p2")
+            .descendantOf("DESCENDANT2")
+            .type(ProgramType.MOVIE)
+            .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
+            .build();
+
+        index(broadcast);
+        index(movie);
+
+        ScheduleForm form = ScheduleForm.from(
+            MediaForm.builder()
+                .scheduleEvents(
+                    ScheduleEventSearch.builder()
+                        .begin(date("2016-07-08T00:00:00"))
+                        .end(date("2016-07-09T00:00:00"))
+                        .rerun(false)
+                        .build()
+                ).build());
+        ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
+        assertThat(schedules).hasSize(2);
+
+        assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
+
+    }
+
+    private ScheduleEvent event(Channel c, String start) {
+        return ScheduleEvent.builder()
+            .channel(c)
+            .start(date(start))
+            .duration(Duration.ofHours(1))
+            .build();
+    }
+
+    private ScheduleEvent rerun(Channel c, String start) {
+        return ScheduleEvent.builder()
+            .channel(c)
+            .start(date(start))
+            .duration(Duration.ofHours(1))
+            .repeat(Repeat.rerun())
+            .build();
+    }
+
     private Instant date(String s) {
         return LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(Schedule.ZONE_ID).toInstant();
     }

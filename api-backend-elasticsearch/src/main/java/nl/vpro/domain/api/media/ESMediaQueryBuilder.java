@@ -188,11 +188,12 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             scheduleSub.must(netQuery);
         }
         if(matcher.getRerun() != null) {
-            QueryBuilder rerunQuery = QueryBuilders.termQuery(prefix + "scheduleEvents.repeat.isRerun", true);
-            if(matcher.getRerun()) {
-                scheduleSub.must(rerunQuery);
+            if (matcher.getRerun()) {
+                scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.repeat.isRerun", true));
             } else {
-                scheduleSub.mustNot(rerunQuery);
+                // don't filter.. The propery may be missing.
+                // We filter afterwards
+                // NPA-404
             }
         }
 

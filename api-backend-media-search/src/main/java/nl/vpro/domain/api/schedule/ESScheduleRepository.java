@@ -324,6 +324,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             } else {
                 schedule = new Schedule(start, stop);
             }
+            schedule.setReruns(scheduleEventSearch.getRerun());
         } else {
             scheduleEventSearch = new ScheduleEventSearch(null, null, Instant.MAX);
             if (form.getSearches() == null) {
@@ -333,6 +334,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             schedule = new Schedule();
         }
         schedule.setFiltered(true);
+
 
         // Make sure we query enough as to get a 'full' schedule
         int maxresult = Math.max(max, MAXRESULT);
