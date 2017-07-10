@@ -87,25 +87,25 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_API_CHANGES_CLIENT', 'ROLE_API_CHANGES_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
-    public Iterator<Change> changes(final String profile,  final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences) throws ProfileNotFoundException {
+    public Iterator<Change> changes(final String profile,  final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences, Deletes deletes) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
-                return changesWitchES(profile, profileCheck, since, mid,  order, max, keepAlive);
+                return changesWitchES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes);
             } else {
                 Iterator<Change> iterator;
                 if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
                     Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
                     log.info("Since {} is couchdb like, taking {}", since.toEpochMilli(), i);
-                    iterator = changesWitchES(profile, profileCheck, i, mid, order, max, keepAlive);
+                    iterator = changesWitchES(profile, profileCheck, i, mid, order, max, keepAlive, deletes);
                 } else {
-                    iterator = changesWithCouchDB(profile, profileCheck, since, order, max, keepAlive);
+                    iterator = changesWithCouchDB(profile, profileCheck, since, order, max, keepAlive, deletes);
                 }
                 return iterator;
             }
         } else {
             // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' any more.
             return
-                Iterators.transform(changesWitchES(profile, profileCheck, since, mid, order, max, keepAlive), c -> {
+                Iterators.transform(changesWitchES(profile, profileCheck, since, mid, order, max, keepAlive, deletes), c -> {
                     if (c != null) {
                         c.setSequence(null);
                     }
@@ -114,7 +114,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Deprecated
-    protected Iterator<Change> changesWithCouchDB(final String profile, final boolean profileCheck, Instant since, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+    protected Iterator<Change> changesWithCouchDB(final String profile, final boolean profileCheck, Instant since, final Order order, final Integer max, final Long keepAlive, Deletes deletes) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? null : profileService.getMediaProfileDefinition(profile, sinceToTimeStampService.getInstance(since.toEpochMilli())); //getCombinedProfile(profile, since);
@@ -125,14 +125,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-    protected Iterator<Change> changesWitchES(final String profile, boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive) throws ProfileNotFoundException {
+    protected Iterator<Change> changesWitchES(final String profile, boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, Deletes deletes) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
-        return mediaSearchRepository.changes(since, mid, currentProfile, previousProfile, order, max, keepAlive);
+        return mediaSearchRepository.changes(since, mid, currentProfile, previousProfile, order, max, keepAlive, deletes);
     }
 
 

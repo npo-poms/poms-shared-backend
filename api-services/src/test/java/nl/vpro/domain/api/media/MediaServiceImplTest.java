@@ -103,7 +103,7 @@ public class MediaServiceImplTest {
 
     @Test(expected = ProfileNotFoundException.class)
     public void testChangesProfileNotFound() {
-        target.changes("notfound", true, Instant.EPOCH,  null, null, 10, 100L, false);
+        target.changes("notfound", true, Instant.EPOCH,  null, null, 10, 100L, false, null);
     }
 
     @Test(expected = ProfileNotFoundException.class)
