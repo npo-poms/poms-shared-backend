@@ -35,6 +35,9 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
+import com.google.common.collect.Iterators;
+import com.google.common.collect.PeekingIterator;
+
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -300,12 +303,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public Iterator<Change> changes(Instant since, ProfileDefinition<MediaObject> currentProfile, ProfileDefinition<MediaObject> previousProfile, Order order, Integer max, Long keepAlive) {
+    public Iterator<Change> changes(Instant since, String mid, ProfileDefinition<MediaObject> currentProfile, ProfileDefinition<MediaObject> previousProfile, Order order, Integer max, Long keepAlive) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
         ElasticSearchIterator<Change> i = new ElasticSearchIterator<>(client(), this::of);
-        final SearchRequestBuilder searchRequestBuilder = i.prepareSearch(indexName).addSort("publishDate", SortOrder.valueOf(order.name()));
+        final SearchRequestBuilder searchRequestBuilder =
+            i.prepareSearch(indexName)
+                .addSort("publishDate", SortOrder.valueOf(order.name()))
+                .addSort("mid", SortOrder.ASC);
 
         QueryBuilder restriction = QueryBuilders.matchAllQuery();
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
@@ -333,6 +339,19 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 return Change.tail(Instant.now());
             }
         });
+        if (since != null && mid != null) {
+            PeekingIterator<Change> peeking = Iterators.peekingIterator(iterator);
+            iterator = peeking;
+            while(true) {
+                Change peek = peeking.peek();
+                if (peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
+                    break;
+                } else {
+                    Change skipped = peeking.next();
+                    log.debug("Skipping {} because of mid parameter", skipped);
+                }
+            }
+        }
 
         return new MaxOffsetIterator<>(iterator, max, 0L, true);
     }

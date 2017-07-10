@@ -273,7 +273,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testChanges() throws IOException {
-        Iterator<Change> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, Order.ASC, Integer.MAX_VALUE, null);
+        Iterator<Change> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null);
         List<Change> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
         assertThat(list.stream().filter(Change::isDeleted).collect(Collectors.toList())).hasSize(3);
@@ -282,7 +282,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testChangesSince() throws IOException {
-        Iterator<Change> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, Order.DESC, Integer.MAX_VALUE, null);
+        Iterator<Change> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, Integer.MAX_VALUE, null);
         List<Change> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
         assertThat(list).hasSize(indexedObjectCount - 17); // 17 objects created around EPOCH
@@ -291,7 +291,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testChangesWithMax() throws IOException {
-        Iterator<Change> changes = target.changes(Instant.EPOCH, null, null, Order.DESC, 10, null);
+        Iterator<Change> changes = target.changes(Instant.EPOCH, null, null, null, Order.DESC, 10, null);
         List<Change> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
         assertThat(list).hasSize(10);
