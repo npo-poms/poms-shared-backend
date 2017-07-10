@@ -48,6 +48,7 @@ import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.util.BasicWrappedIterator;
 import nl.vpro.util.FilteringIterator;
 import nl.vpro.util.MaxOffsetIterator;
 import nl.vpro.util.TailAdder;
@@ -303,7 +304,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public Iterator<Change> changes(Instant since, String mid, ProfileDefinition<MediaObject> currentProfile, ProfileDefinition<MediaObject> previousProfile, Order order, Integer max, Long keepAlive) {
+    public Iterator<Change> changes(Instant since, String mid, ProfileDefinition<MediaObject> currentProfile, ProfileDefinition<MediaObject> previousProfile, Order order, Integer max, Long keepAlive, Deletes deletes) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
@@ -327,6 +328,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             previousProfile,
             keepAlive == null ? Long.MAX_VALUE : keepAlive
         );
+
 
         Iterator<Change> iterator = TailAdder.withFunctions(changes, (last) -> {
             if (last != null) {
@@ -352,6 +354,32 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 }
             }
         }
+        if (deletes == null) {
+            deletes = Deletes.ID_ONLY;
+        }
+        switch (deletes) {
+            case INCLUDE:
+                break;
+            case EXCLUDE:
+                iterator= FilteringIterator.<Change>builder()
+                    .wrapped(changes)
+                    .filter((c) -> c == null || !c.isDeleted())
+                    .build();
+                break;
+            case ID_ONLY:
+                iterator = new BasicWrappedIterator<Change>(changes) {
+                    @Override
+                    public Change next() {
+                        Change n = super.next();
+                        if (n.isDeleted()) {
+                            n.setMedia(null);
+                        }
+                        return n;
+                    }
+                };
+                break;
+        }
+
 
         return new MaxOffsetIterator<>(iterator, max, 0L, true);
     }
