@@ -176,7 +176,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         return searchBuilder;
     }
 
-    protected <S extends MediaObject> GenericMediaSearchResult<S> executeQuery(SearchRequest request, MediaFacets facets, long offset, Integer max, Class<S> clazz) {
+    protected <S extends MediaObject> GenericMediaSearchResult<S> executeQuery(
+        SearchRequest request, MediaFacets facets, long offset, Integer max, Class<S> clazz) {
         ActionFuture<SearchResponse> searchResponseFuture = client().search(request);
 
         try {

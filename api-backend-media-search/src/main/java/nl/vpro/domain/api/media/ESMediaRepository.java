@@ -24,10 +24,7 @@ import org.elasticsearch.action.mlt.MoreLikeThisRequestBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -245,14 +242,21 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public MediaResult listMembers(MediaObject media, Order order, long offset, Integer max) {
+    public MediaResult listMembers(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+        long offsetForES = offset;
+        int maxForES = max == null ? Integer.MAX_VALUE : max;
+        if (profile != null) {
+            offsetForES = 0;
+            maxForES = Integer.MAX_VALUE;
+        }
         SearchResponse response = client()
             .prepareSearch(indexName)
             .setTypes(MediaESType.memberRefs())
             .setQuery(QueryBuilders.termQuery("_parent", media.getMid()))
             .addSort("index", SortOrder.valueOf(order.name()))
-            .setFrom((int) offset)
-            .setSize(max).get();
+            .setFrom((int) offsetForES)
+            .setSize(maxForES)
+            .get();
 
 
         SearchHit[] hits = response.getHits().getHits();
@@ -262,12 +266,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .map(sh -> String.valueOf(sh.getSource().get("childRef")))
                 .collect(Collectors.toList()));
 
+        filterWithProfile(objects, profile, offset, max);
+
         return new MediaResult(objects, offset, max, response.getHits().getTotalHits());
 
     }
 
     @Override
-    public MediaResult listDescendants(MediaObject media, Order order, long offset, Integer max) {
+    public MediaResult listDescendants(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
         SearchRequest request = client()
             .prepareSearch(indexName)
             .setTypes(MediaESType.mediaObjects())
@@ -275,6 +281,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .setQuery(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
             .setFrom((int) offset)
             .setSize(max)
+            .setPostFilter(ESMediaFilterBuilder.filter(profile, null))
             .request();
 
         GenericMediaSearchResult<MediaObject> objects =
@@ -286,21 +293,48 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
     @Override
-    public ProgramResult listEpisodes(MediaObject media, Order order, long offset, Integer max) {
-        SearchResponse response = client()
+    public ProgramResult listEpisodes(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+        long offsetForES = offset;
+        Integer maxForES = max;
+        if (profile != null) {
+            offsetForES = 0;
+            maxForES = null;
+        }
+        SearchRequestBuilder builder = client()
             .prepareSearch(indexName)
             .setTypes(MediaESType.episodeRef.name())
             .setQuery(QueryBuilders.termQuery("_parent", media.getMid()))
             .addSort("index", SortOrder.valueOf(order.name()))
-            .setFrom((int) offset)
-            .setSize(max).get();
+            .setFrom((int) offsetForES);
 
+        if (maxForES != null) {
+            builder.setSize(maxForES);
+        } else {
+            builder.setSize(Integer.MAX_VALUE);
+        }
+
+        SearchResponse response = builder.get();
 
         SearchHit[] hits = response.getHits().getHits();
-        List<Program> objects = loadAll(Program.class, Arrays.stream(hits).map(sh -> String.valueOf(sh.getSource().get("childRef"))).collect(Collectors.toList()));
+        List<Program> objects = loadAll(Program.class, Arrays.stream(hits)
+            .map(sh -> String.valueOf(sh.getSource().get("childRef")))
+            .collect(Collectors.toList())
+        );
+        objects = filterWithProfile(objects, profile, offset, max);
+
 
         return new ProgramResult(objects, offset, max, response.getHits().getTotalHits());
 
+    }
+
+    private <T extends MediaObject> List<T> filterWithProfile(List<T> objects, ProfileDefinition<MediaObject> profile, long offset, Integer max) {
+        if (profile != null) {
+            objects.removeIf((p) -> !profile.test(p));
+            if (offset > 0 || max != null) {
+                objects = objects.subList((int) offset, max == null ? objects.size() : Math.min(max, objects.size()));
+            }
+        }
+        return objects;
     }
 
     @Override

@@ -615,7 +615,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
 
     @Test
     public void testListDescendants() throws IOException {
-        MediaResult result = target.listDescendants(group_ordered, Order.ASC, 0L, 100);
+        MediaResult result = target.listDescendants(group_ordered, null,  Order.ASC, 0L, 100);
 
         List<? extends MediaObject> resultList = result.getItems();
         assertThat(resultList).hasSize(6);
@@ -626,6 +626,27 @@ public class ESMediaRepositoryPart2ITest extends AbstractESRepositoryTest {
         assertThat(resultList.get(3)).isEqualTo(program1);
         assertThat(resultList.get(4)).isEqualTo(sub_program1);
         assertThat(resultList.get(5)).isEqualTo(sub_group);
+    }
+
+    @Test
+    public void testListDescendantsWithProfile() throws IOException {
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
+            new Filter(new BroadcasterConstraint("BNN"))
+        );
+        MediaResult result = target.listDescendants(group_ordered, omroepProfile, Order.ASC, 0L, 100);
+
+        List<? extends MediaObject> resultList = result.getItems();
+        assertThat(resultList).hasSize(5);
+        for (MediaObject o : resultList) {
+            assertThat(o.getBroadcasters()).contains(new Broadcaster("BNN"));
+        }
+        // program3, program2, sub_program2, program1, sub_program1/sub_group
+        assertThat(resultList.get(0)).isEqualTo(program3);
+        assertThat(resultList.get(1)).isEqualTo(program2);
+        assertThat(resultList.get(2)).isEqualTo(sub_program2);
+        assertThat(resultList.get(3)).isEqualTo(program1);
+        assertThat(resultList.get(4)).isEqualTo(sub_program1);
+
     }
 
     @Test

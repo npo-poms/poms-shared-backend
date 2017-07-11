@@ -729,13 +729,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testGetMembers() throws IOException {
+    public void testListMembers() throws IOException {
 
         Group group = index(group().mid("MID_0").build());
         index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 2).build());
         index(program().mid("MID_2").memberOf("MID_0", 1).build());
 
-        MediaResult result = target.listMembers(group, Order.ASC, 0L, 10);
+        MediaResult result = target.listMembers(group, null, Order.ASC, 0L, 10);
 
         assertThat(result).hasSize(3);
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
@@ -744,19 +744,84 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     }
 
+
     @Test
-    public void testGetEpisodes() throws IOException {
+    public void testListMembersWithProfile() throws IOException {
+
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
+            new Filter(new BroadcasterConstraint("BNN"))
+        );
+        Group group = index(group().mid("MID_0").build());
+        index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 3).broadcasters("BNN").build());
+        index(program().mid("MID_2").memberOf("MID_0", 1).build());
+        index(program().mid("MID_3").memberOf("MID_0", 2).broadcasters("BNN").build());
+
+
+        MediaResult result = target.listMembers(group, omroepProfile, Order.ASC, 0L, 10);
+
+        assertThat(result).hasSize(3);
+        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
+        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+
+    }
+
+
+    @Test
+    public void testListEpisodes() throws IOException {
 
         Group group = index(group().mid("MID_0").build());
         index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).build());
         index(program().mid("MID_2").episodeOf("MID_0", 1).build());
 
-        ProgramResult result = target.listEpisodes(group, Order.ASC, 0L, 10);
+        ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
 
         assertThat(result).hasSize(3);
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
         assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+    }
+
+
+    @Test
+    public void testListEpisodesWithProfile() throws IOException {
+
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
+            new Filter(new BroadcasterConstraint("BNN"))
+        );
+
+        Group group = index(group().mid("MID_0").build());
+        index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
+        index(program().mid("MID_2").episodeOf("MID_0", 1).build());
+        index(program().mid("MID_3").episodeOf("MID_0", 3).broadcasters("BNN").build());
+
+        ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 0L, 10);
+
+        assertThat(result).hasSize(3);
+        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_1");
+        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_3");
+
+    }
+
+
+    @Test
+    public void testListEpisodesWithProfileAndOffset() throws IOException {
+
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
+            new Filter(new BroadcasterConstraint("BNN"))
+        );
+
+        Group group = index(group().mid("MID_0").build());
+        index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
+        index(program().mid("MID_2").episodeOf("MID_0", 1).build());
+        index(program().mid("MID_3").episodeOf("MID_0", 3).broadcasters("BNN").build());
+
+        ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 1L, 10);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
 
     }
 
