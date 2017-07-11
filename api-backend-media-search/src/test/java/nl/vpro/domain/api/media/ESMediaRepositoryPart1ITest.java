@@ -777,6 +777,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
 
         assertThat(result).hasSize(3);
+        assertThat(result.getTotal()).isEqualTo(3);
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
         assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
@@ -798,6 +799,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 0L, 10);
 
         assertThat(result).hasSize(3);
+        assertThat(result.getTotal()).isEqualTo(3);
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_3");

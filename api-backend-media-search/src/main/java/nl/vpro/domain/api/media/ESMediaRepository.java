@@ -266,9 +266,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .map(sh -> String.valueOf(sh.getSource().get("childRef")))
                 .collect(Collectors.toList()));
 
-        filterWithProfile(objects, profile, offset, max);
+        Long total = filterWithProfile(objects, profile, offset, max);
 
-        return new MediaResult(objects, offset, max, response.getHits().getTotalHits());
+        return new MediaResult(objects, offset, max, total == null ? response.getHits().getTotalHits() : total);
 
     }
 
@@ -320,21 +320,30 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .map(sh -> String.valueOf(sh.getSource().get("childRef")))
             .collect(Collectors.toList())
         );
-        objects = filterWithProfile(objects, profile, offset, max);
 
+        Long total = filterWithProfile(objects, profile, offset, max);
 
-        return new ProgramResult(objects, offset, max, response.getHits().getTotalHits());
+        return new ProgramResult(objects, offset, max, total == null ? response.getHits().getTotalHits() : total);
 
     }
 
-    private <T extends MediaObject> List<T> filterWithProfile(List<T> objects, ProfileDefinition<MediaObject> profile, long offset, Integer max) {
+    private <T extends MediaObject> Long filterWithProfile(List<T> objects, ProfileDefinition<MediaObject> profile, long offset, Integer max) {
         if (profile != null) {
             objects.removeIf((p) -> !profile.test(p));
+            long result = objects.size();
             if (offset > 0 || max != null) {
-                objects = objects.subList((int) offset, max == null ? objects.size() : Math.min(max, objects.size()));
+                while (offset > 0 && objects.size() > 0) {
+                    objects.remove(0);
+                }
+                if (max != null) {
+                    while (objects.size() > max) {
+                        objects.remove(objects.size() - 1);
+                    }
+                }
             }
+            return result;
         }
-        return objects;
+        return null;
     }
 
     @Override
