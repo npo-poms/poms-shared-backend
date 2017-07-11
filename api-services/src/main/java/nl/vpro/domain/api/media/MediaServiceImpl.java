@@ -90,14 +90,15 @@ public class MediaServiceImpl implements MediaService {
     public Iterator<Change> changes(final String profile,  final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences, Deletes deletes) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
-                return changesWitchES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes);
+                return changesWithES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes);
             } else {
                 Iterator<Change> iterator;
                 if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
                     Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
                     log.info("Since {} is couchdb like, taking {}", since.toEpochMilli(), i);
-                    iterator = changesWitchES(profile, profileCheck, i, mid, order, max, keepAlive, deletes);
+                    iterator = changesWithES(profile, profileCheck, i, mid, order, max, keepAlive, deletes);
                 } else {
+                    //noinspection deprecation
                     iterator = changesWithCouchDB(profile, profileCheck, since, order, max, keepAlive, deletes);
                 }
                 return iterator;
@@ -105,7 +106,7 @@ public class MediaServiceImpl implements MediaService {
         } else {
             // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' any more.
             return
-                Iterators.transform(changesWitchES(profile, profileCheck, since, mid, order, max, keepAlive, deletes), c -> {
+                Iterators.transform(changesWithES(profile, profileCheck, since, mid, order, max, keepAlive, deletes), c -> {
                     if (c != null) {
                         c.setSequence(null);
                     }
@@ -125,10 +126,10 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-    protected Iterator<Change> changesWitchES(final String profile, boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, Deletes deletes) throws ProfileNotFoundException {
+    protected Iterator<Change> changesWithES(final String profile, boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, Deletes deletes) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
-        ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? null : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
+        ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? currentProfile : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
