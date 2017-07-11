@@ -176,8 +176,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
-    public MediaResult listMembers(MediaObject media, Order order, Long offset, Integer max) {
-        return switchRepository(settings.membersRepository).listMembers(media, order, offset, max);
+    public MediaResult listMembers(MediaObject media, String profile, Order order, Long offset, Integer max) {
+        return switchRepository(settings.membersRepository).listMembers(media, getProfile(profile), order, offset, max);
     }
 
     @Override
@@ -188,8 +188,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
-    public ProgramResult listEpisodes(MediaObject media, Order order, Long offset, Integer max) {
-        return switchRepository(settings.membersRepository).listEpisodes(media, order, offset, max);
+    public ProgramResult listEpisodes(MediaObject media, String profile,  Order order, Long offset, Integer max) {
+        return switchRepository(settings.membersRepository).listEpisodes(media, getProfile(profile), order, offset, max);
     }
 
     @Override
@@ -200,8 +200,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
-    public MediaResult listDescendants(MediaObject media, Order order, Long offset, Integer max) {
-        return switchRepository(settings.membersRepository).listDescendants(media, order, offset, max);
+    public MediaResult listDescendants(MediaObject media, String profile, Order order, Long offset, Integer max) {
+        return switchRepository(settings.membersRepository).listDescendants(media, getProfile(profile), order, offset, max);
     }
 
     @Override
