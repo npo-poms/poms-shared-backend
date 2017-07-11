@@ -362,12 +362,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 break;
             case EXCLUDE:
                 iterator= FilteringIterator.<Change>builder()
-                    .wrapped(changes)
+                    .wrapped(iterator)
                     .filter((c) -> c == null || !c.isDeleted())
                     .build();
                 break;
             case ID_ONLY:
-                iterator = new BasicWrappedIterator<Change>(changes) {
+                iterator = new BasicWrappedIterator<Change>(iterator) {
                     @Override
                     public Change next() {
                         Change n = super.next();
