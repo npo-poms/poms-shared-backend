@@ -5,7 +5,7 @@
   <parent>
     <groupId>nl.publiekeomroep</groupId>
     <artifactId>poms-shared-backend-parent</artifactId>
-    <version>5.4-SNAPSHOT</version>
+    <version>5.5-SNAPSHOT</version>
   </parent>
 
   <groupId>nl.vpro.api</groupId>
@@ -163,8 +163,8 @@
   </build>
 
   <scm>
-    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.4-SNAPSHOT/api-backend-elasticsearch</connection>
-    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.4-SNAPSHOT/api-backend-elasticsearch</developerConnection>
-    <url>https://subversion.vpro.nl/viewvc/nl/vpro/api/branches/REL-5.4-SNAPSHOT/api-backend-elasticsearch</url>
+    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</connection>
+    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</developerConnection>
+    <url>https://subversion.vpro.nl/viewvc/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</url>
   </scm>
 </project>
