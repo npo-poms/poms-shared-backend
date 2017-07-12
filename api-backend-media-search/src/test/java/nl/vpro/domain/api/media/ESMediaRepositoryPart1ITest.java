@@ -1086,9 +1086,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     private void index(String type, MediaObject child, MemberRef object) throws IOException {
-        String id = object.getMidRef() + "/" + object.getNumber();
-        client.index(new IndexRequest(ApiMediaIndex.NAME, type, id)
-                .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(new StandaloneMemberRef(child.getMid(), object)))
+        StandaloneMemberRef ref = new StandaloneMemberRef(child.getMid(), object);
+        client.index(new IndexRequest(ApiMediaIndex.NAME, type, ref.getId())
+                .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(ref))
                 .parent(object.getMidRef())).actionGet();
         client.admin().indices().refresh(new RefreshRequest(ApiMediaIndex.NAME)).actionGet();
     }
