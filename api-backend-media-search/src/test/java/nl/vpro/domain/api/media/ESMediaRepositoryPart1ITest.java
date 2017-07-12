@@ -3,6 +3,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -805,8 +806,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         Group group = index(group().mid("MID_0").build());
         index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).build());
         index(program().mid("MID_2").episodeOf("MID_0", 1).build());
-        index(program().mid("MID_3").episodeOf("MID_0", 3).build());
-        index(program().mid("MID_4").episodeOf("MID_0", 3).build());
+        index(program().mid("MID_3").episodeOf(MemberRef.builder().midRef("MID_0").number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
+        index(program().mid("MID_4").episodeOf(MemberRef.builder().midRef("MID_0").number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
         index(program().mid("MID_5").episodeOf("MID_0", 4).build());
 
         ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
@@ -816,8 +817,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
         assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(3).getMid()).isEqualTo("MID_3");
-        assertThat(result.getItems().get(4).getMid()).isEqualTo("MID_4");
+        assertThat(result.getItems().get(3).getMid()).isEqualTo("MID_4");
+        assertThat(result.getItems().get(4).getMid()).isEqualTo("MID_3");
         assertThat(result.getItems().get(5).getMid()).isEqualTo("MID_5");
 
     }
