@@ -126,8 +126,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             assertThat(result.getSize()).isEqualTo(2);
             List<? extends SearchResultItem<? extends MediaObject>> items = result.getItems();
             assertThat(items.get(1).getScore()).isLessThan(items.get(0).getScore());
-            assertTrue(items.stream().anyMatch(item -> {return item.getResult().getMainTitle().equals("foo");}));
-            assertTrue(items.stream().anyMatch(item -> {return item.getResult().getMainTitle().equals("foa");}));
+            assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foo")));
+            assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foa")));
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().text("FOO").build(), 0, null);
