@@ -46,6 +46,10 @@ public enum MediaESType {
         return toString(MEDIAOBJECTS);
     }
 
+    public static String memberRef(Class<?> clazz) {
+        return clazz.getSimpleName().toLowerCase() + "MemberRef";
+    }
+
 
     public static String[] memberRefs() {
         return toString(MEMBERREFS);
