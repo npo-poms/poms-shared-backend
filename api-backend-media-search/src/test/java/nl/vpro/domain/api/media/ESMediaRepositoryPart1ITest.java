@@ -753,17 +753,27 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             new Filter(new BroadcasterConstraint("BNN"))
         );
         Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 3).broadcasters("BNN").build());
+        Group unrelatedGroup = index(group().mid("MID_100").build());
+
+        index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 3).memberOf("MID_100", 3).broadcasters("BNN").build());
         index(program().mid("MID_2").memberOf("MID_0", 1).build());
         index(program().mid("MID_3").memberOf("MID_0", 2).broadcasters("BNN").build());
 
 
-        MediaResult result = target.listMembers(group, omroepProfile, Order.ASC, 0L, 10);
+        {
+            MediaResult result = target.listMembers(group, omroepProfile, Order.ASC, 0L, 10);
 
-        assertThat(result).hasSize(3);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
-        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+            assertThat(result).hasSize(3);
+            assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+            assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
+            assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+        }
+        {
+            MediaResult result = target.listMembers(unrelatedGroup, omroepProfile, Order.ASC, 0L, 10);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        }
 
     }
 
@@ -795,14 +805,21 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         Group group = index(group().mid("MID_0").build());
         index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).build());
         index(program().mid("MID_2").episodeOf("MID_0", 1).build());
+        index(program().mid("MID_3").episodeOf("MID_0", 3).build());
+        index(program().mid("MID_4").episodeOf("MID_0", 3).build());
+        index(program().mid("MID_5").episodeOf("MID_0", 4).build());
 
         ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
 
-        assertThat(result).hasSize(3);
-        assertThat(result.getTotal()).isEqualTo(3);
+        assertThat(result).hasSize(6);
+        assertThat(result.getTotal()).isEqualTo(6);
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
         assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+        assertThat(result.getItems().get(3).getMid()).isEqualTo("MID_3");
+        assertThat(result.getItems().get(4).getMid()).isEqualTo("MID_4");
+        assertThat(result.getItems().get(5).getMid()).isEqualTo("MID_5");
+
     }
 
 
@@ -1089,7 +1106,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         StandaloneMemberRef ref = new StandaloneMemberRef(child.getMid(), object);
         client.index(new IndexRequest(ApiMediaIndex.NAME, type, ref.getId())
                 .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(ref))
-                .parent(object.getMidRef())).actionGet();
+                .parent(object.getMidRef()))
+            .actionGet();
+        log.info("Indexed {} {}", type, ref.getId());
         client.admin().indices().refresh(new RefreshRequest(ApiMediaIndex.NAME)).actionGet();
     }
 }

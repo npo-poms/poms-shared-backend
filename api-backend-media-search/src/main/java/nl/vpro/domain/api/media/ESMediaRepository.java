@@ -303,6 +303,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .setTypes(types)
             .setQuery(QueryBuilders.termQuery("_parent", media.getMid()))
             .addSort("index", SortOrder.valueOf(order.name()))
+            .addSort("childRef", SortOrder.ASC)
             .setFrom((int) offsetForES);
 
         if (maxForES != null) {
