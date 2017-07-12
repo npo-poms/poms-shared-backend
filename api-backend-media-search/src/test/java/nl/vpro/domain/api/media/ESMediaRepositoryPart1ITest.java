@@ -745,6 +745,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
 
+
     @Test
     public void testListMembersWithProfile() throws IOException {
 
@@ -763,6 +764,27 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
         assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+
+    }
+
+
+    @Test
+    public void testListMembersWithProfileAndOffet() throws IOException {
+
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
+            new Filter(new BroadcasterConstraint("BNN"))
+        );
+        Group group = index(group().mid("MID_0").build());
+        index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 3).broadcasters("BNN").build());
+        index(program().mid("MID_2").memberOf("MID_0", 1).build());
+        index(program().mid("MID_3").memberOf("MID_0", 2).broadcasters("BNN").build());
+
+
+        MediaResult result = target.listMembers(group, omroepProfile, Order.ASC, 1L, 10);
+
+        assertThat(result).hasSize(2);
+        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_3");
+        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_1");
 
     }
 

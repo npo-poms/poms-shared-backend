@@ -24,7 +24,10 @@ import org.elasticsearch.action.mlt.MoreLikeThisRequestBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -45,10 +48,7 @@ import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.media.domain.es.MediaESType;
-import nl.vpro.util.BasicWrappedIterator;
-import nl.vpro.util.FilteringIterator;
-import nl.vpro.util.MaxOffsetIterator;
-import nl.vpro.util.TailAdder;
+import nl.vpro.util.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -243,32 +243,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public MediaResult listMembers(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
-        long offsetForES = offset;
-        int maxForES = max == null ? Integer.MAX_VALUE : max;
+
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.memberRefs(), media, profile, order, offset, max);
+        List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
+        Long total = queryResult.getFirst();
+
         if (profile != null) {
-            offsetForES = 0;
-            maxForES = Integer.MAX_VALUE;
+            total = filterWithProfile(objects, profile, offset, max);
         }
-        SearchResponse response = client()
-            .prepareSearch(indexName)
-            .setTypes(MediaESType.memberRefs())
-            .setQuery(QueryBuilders.termQuery("_parent", media.getMid()))
-            .addSort("index", SortOrder.valueOf(order.name()))
-            .setFrom((int) offsetForES)
-            .setSize(maxForES)
-            .get();
-
-
-        SearchHit[] hits = response.getHits().getHits();
-        List<MediaObject> objects = loadAll(
-            Arrays
-                .stream(hits)
-                .map(sh -> String.valueOf(sh.getSource().get("childRef")))
-                .collect(Collectors.toList()));
-
-        Long total = filterWithProfile(objects, profile, offset, max);
-
-        return new MediaResult(objects, offset, max, total == null ? response.getHits().getTotalHits() : total);
+        return new MediaResult(objects, offset, max, total);
 
     }
 
@@ -294,37 +277,49 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public ProgramResult listEpisodes(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(new String[]{MediaESType.episodeRef.name()}, media, profile, order, offset, max);
+        List<Program> objects = loadAll(Program.class, queryResult.getSecond());
+        Long total = queryResult.getFirst();
+
+        if (profile != null) {
+            total = filterWithProfile(objects, profile, offset, max);
+        }
+
+        return new ProgramResult(objects, offset, max, total);
+    }
+
+    private Pair<Long, List<String>> listMembersOrEpisodes(String[] types, MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
         long offsetForES = offset;
         Integer maxForES = max;
         if (profile != null) {
             offsetForES = 0;
             maxForES = null;
         }
-        SearchRequestBuilder builder = client()
+        ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSource().get("childRef"));
+
+        SearchRequestBuilder builder = iterator
             .prepareSearch(indexName)
-            .setTypes(MediaESType.episodeRef.name())
+            .setTypes(types)
             .setQuery(QueryBuilders.termQuery("_parent", media.getMid()))
             .addSort("index", SortOrder.valueOf(order.name()))
             .setFrom((int) offsetForES);
 
         if (maxForES != null) {
             builder.setSize(maxForES);
-        } else {
-            builder.setSize(Integer.MAX_VALUE);
         }
-
-        SearchResponse response = builder.get();
-
-        SearchHit[] hits = response.getHits().getHits();
-        List<Program> objects = loadAll(Program.class, Arrays.stream(hits)
-            .map(sh -> String.valueOf(sh.getSource().get("childRef")))
-            .collect(Collectors.toList())
-        );
-
-        Long total = filterWithProfile(objects, profile, offset, max);
-
-        return new ProgramResult(objects, offset, max, total == null ? response.getHits().getTotalHits() : total);
-
+        List<String> mids;
+        Long total = null;
+        if (profile == null) {
+            SearchResponse response = builder.get();
+            SearchHit[] hits = response.getHits().getHits();
+            mids = Arrays.stream(hits).map(sh -> String.valueOf(sh.getSource().get("childRef"))).collect(Collectors.toList());
+            total = response.getHits().getTotalHits();
+        } else {
+            mids = new ArrayList<>();
+            iterator.forEachRemaining(mids::add);
+        }
+        return Pair.of(total, null, mids, null);
     }
 
     private <T extends MediaObject> Long filterWithProfile(List<T> objects, ProfileDefinition<MediaObject> profile, long offset, Integer max) {
@@ -332,7 +327,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             objects.removeIf((p) -> !profile.test(p));
             long result = objects.size();
             if (offset > 0 || max != null) {
-                while (offset > 0 && objects.size() > 0) {
+                while (offset-- > 0 && objects.size() > 0) {
                     objects.remove(0);
                 }
                 if (max != null) {
