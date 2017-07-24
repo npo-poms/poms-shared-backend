@@ -352,6 +352,9 @@
           }
         }
       },
+      "isDubbed": {
+        "type": "boolean"
+      },
       "languages" : {
         "properties" : {
           "code" : {
@@ -399,6 +402,9 @@
               },
               "bitrate" : {
                 "type" : "long"
+              },
+              "bytesize": {
+                "type": "long"
               },
               "videoAttributes" : {
                 "properties" : {

@@ -359,6 +359,9 @@
           }
         }
       },
+      "isDubbed": {
+        "type": "boolean"
+      },
       "isOrdered" : {
         "type" : "boolean"
       },
@@ -409,6 +412,9 @@
               },
               "bitrate" : {
                 "type" : "long"
+              },
+              "bytesize": {
+                "type": "long"
               },
               "videoAttributes" : {
                 "properties" : {

@@ -410,6 +410,9 @@
               "bitrate" : {
                 "type" : "long"
               },
+              "bytesize": {
+                "type": "long"
+              },
               "videoAttributes" : {
                 "properties" : {
                   "aspectRatio" : {
