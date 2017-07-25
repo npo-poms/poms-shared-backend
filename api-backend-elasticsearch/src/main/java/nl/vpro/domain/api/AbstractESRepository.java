@@ -372,7 +372,9 @@ public abstract class AbstractESRepository<T> {
     }
 
     public final Optional<String> redirect(String mid) {
-        return Optional.ofNullable(getDirectsRepository().redirects().getMap().get(mid));
+        return Optional.ofNullable(
+            getDirectsRepository().redirects().getMap().get(mid)
+        );
     }
 
     protected MediaRepository getDirectsRepository() {

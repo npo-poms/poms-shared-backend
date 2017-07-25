@@ -7,7 +7,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +44,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     private static final int MAXRESULT = 100;
 
+
+    private final MediaRepository esMediaRepository;
+
     @Override
     @Value("${elasticSearch.schedule.index}")
     public void setIndexName(String indexName) {
@@ -64,12 +70,13 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
 
     public ESScheduleRepository() {
-        this(null);
+        this(null, null);
     }
 
     @Inject
-    public ESScheduleRepository(ESClientFactory client) {
+    public ESScheduleRepository(ESClientFactory client, MediaRepository esMediaRepository) {
         super(client);
+        this.esMediaRepository = esMediaRepository;
 
     }
 
@@ -88,8 +95,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 throw new RuntimeException(e);
             }
         } else {
-            /* todo */
-            //id = redirect(id).orElse(id);
+            id = redirect(id).orElse(id);
             return load(id, MediaObject.class);
         }
     }
@@ -145,7 +151,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     public ScheduleResult listSchedulesForAncestor(String mediaId, Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
-        form.setDescendantOf(Arrays.asList(mediaId));
+        form.setDescendantOf(Collections.singletonList(mediaId));
         return execute(form, offset, max);
     }
 
@@ -302,6 +308,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     @Override
     public ScheduleSearchResult findSchedules(ProfileDefinition<MediaObject> profile, ScheduleForm form, long offset, Integer max) {
+        form = redirectForm(form);
         Schedule schedule;
         List<ScheduleEventSearch> scheduleEventSearches = form.getSearches() == null ? null : form.getSearches().getScheduleEvents();
         if (scheduleEventSearches != null && scheduleEventSearches.size() > 1) {
@@ -330,7 +337,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             if (form.getSearches() == null) {
                 form.setSearches(new MediaSearch());
             }
-            form.getSearches().setScheduleEvents(Arrays.asList(scheduleEventSearch));
+            form.getSearches().setScheduleEvents(Collections.singletonList(scheduleEventSearch));
             schedule = new Schedule();
         }
         schedule.setFiltered(true);
@@ -359,4 +366,16 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         items = items.subList((int) offset, end < total ? end : total);
         return new ScheduleSearchResult(items, offset, max, total);
     }
+
+    @Override
+    protected MediaRepository getDirectsRepository() {
+        if (esMediaRepository != null) {
+            return esMediaRepository;
+        } else {
+            return super.getDirectsRepository();
+        }
+
+    }
+
+
 }

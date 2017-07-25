@@ -501,39 +501,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (form == null) {
             return null;
         }
-        redirectMediaSearch(form.getSearches());
+        super.redirectForm(form);
         if (form.getFacets() != null) {
             redirectMemberRefFacet(form.getFacets().getMemberOf());
         }
         return form;
-    }
-
-    private void redirectMediaSearch(MediaSearch search) {
-        if (search == null) {
-            return;
-        }
-        redirectTextMatchers(search.getMediaIds());
-        redirectTextMatchers(search.getDescendantOf());
-        redirectTextMatchers(search.getEpisodeOf());
-        redirectTextMatchers(search.getMemberOf());
-    }
-
-    private void redirectMemberRefSearch(MemberRefSearch search) {
-        if (search == null) {
-            return;
-        }
-        redirectTextMatchers(search.getMediaIds());
-    }
-
-
-
-    private void redirectMemberRefFacet(MemberRefFacet facet) {
-        if (facet == null) {
-            return;
-        }
-        redirectMediaSearch(facet.getFilter());
-        redirectMemberRefSearch(facet.getSubSearch());
-
     }
 
     private <S extends MediaObject> GenericMediaSearchResult<S> findAssociatedMedia(String axis, MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, Class<S> clazz) {

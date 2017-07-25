@@ -196,4 +196,45 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             throw e;
         }
     }
+
+
+    /**
+     * Changes the form to 'redirect' all occurances of mids in it.
+     */
+    protected <T extends AbstractMediaForm> T redirectForm(T form) {
+        if (form == null) {
+            return null;
+        }
+        redirectMediaSearch(form.getSearches());
+        return form;
+    }
+
+
+    protected void redirectMediaSearch(MediaSearch search) {
+        if (search == null) {
+            return;
+        }
+        redirectTextMatchers(search.getMediaIds());
+        redirectTextMatchers(search.getDescendantOf());
+        redirectTextMatchers(search.getEpisodeOf());
+        redirectTextMatchers(search.getMemberOf());
+    }
+
+    private void redirectMemberRefSearch(MemberRefSearch search) {
+        if (search == null) {
+            return;
+        }
+        redirectTextMatchers(search.getMediaIds());
+    }
+
+
+    protected void redirectMemberRefFacet(MemberRefFacet facet) {
+        if (facet == null) {
+            return;
+        }
+        redirectMediaSearch(facet.getFilter());
+        redirectMemberRefSearch(facet.getSubSearch());
+
+    }
+
 }
