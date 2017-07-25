@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.FilterBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
@@ -77,8 +78,20 @@ public class ESMediaSortHandler extends ESFacetsHandler {
                 .order(order(sortOrder.getOrder()));
             if (sortOrder instanceof TitleSortOrder) {
                 TitleSortOrder titleSortOrder = (TitleSortOrder) sortOrder;
-                if (titleSortOrder.getTextualType() != null) {
-                    sortBuilder.setNestedFilter(FilterBuilders.termFilter("titles.type", titleSortOrder.getTextualType()));
+                if (titleSortOrder.getTextualType() != null || titleSortOrder.getOwnerType() != null) {
+                    FilterBuilder nested = null;
+                    if (titleSortOrder.getTextualType() != null) {
+                        nested = FilterBuilders.termFilter("titles.type", titleSortOrder.getTextualType());
+                    }
+                    if (titleSortOrder.getOwnerType() != null) {
+                        FilterBuilder ownerFilter = FilterBuilders.termFilter("titles.owner", titleSortOrder.getOwnerType());
+                        if (nested == null) {
+                            nested = ownerFilter;
+                        } else {
+                            nested = FilterBuilders.andFilter(nested, ownerFilter);
+                        }
+                    }
+                    sortBuilder.setNestedFilter(nested);
                 }
 
             }
