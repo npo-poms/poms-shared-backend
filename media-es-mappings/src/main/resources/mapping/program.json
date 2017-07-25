@@ -1242,8 +1242,8 @@
             }
           },
           "memberOf" : {
-            "type" : "nested",
-            "include_in_parent" : true,
+            "type": "nested",
+            "include_in_parent": true,
             "properties" : {
               "added" : {
                 "type" : "date",
@@ -1505,6 +1505,8 @@
         "type" : "long"
       },
       "titles" : {
+        "type": "nested",
+        "include_in_parent": true,
         "properties" : {
           "owner" : {
             "type" : "string",

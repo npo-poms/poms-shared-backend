@@ -28,6 +28,7 @@ import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
+import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
@@ -1074,6 +1075,40 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             SearchResult<MediaObject> result = target.find(childrenSiteProfile, null, 0, null);
             assertThat(result.getSize()).isEqualTo(1);
             assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("heel gewoon");
+        }
+    }
+
+    @Test
+    // NPA-403
+    public void testSortByTitles() throws IOException {
+        index(program()
+            .mainTitle("aa")
+            .lexicoTitle("bb")
+            .mid("aa")
+            .build());
+        index(program()
+            .mainTitle("bb")
+            .lexicoTitle("aa")
+            .mid("bb")
+            .build());
+
+        {
+            MediaForm form = new MediaForm();
+            form.addSortField(TitleSortOrder.builder().textualType(TextualType.MAIN).order(Order.ASC).build());
+
+            SearchResult<MediaObject> result = target.find(null, form, 0, null);
+            assertThat(result.getSize()).isEqualTo(2);
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa");
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb");
+        }
+        {
+            MediaForm form = new MediaForm();
+            form.addSortField(TitleSortOrder.builder().textualType(TextualType.LEXICO).order(Order.ASC).build());
+
+            SearchResult<MediaObject> result = target.find(null, form, 0, null);
+            assertThat(result.getSize()).isEqualTo(2);
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
         }
     }
 

@@ -158,8 +158,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
         QueryBuilder queryBuilder = ESMediaQueryBuilder.query(form != null ? form.getSearches() : null);
 
-
-
         QueryBuilder scoredBuilder = ESMediaScoreBuilder.score(queryBuilder);
 
         searchBuilder.query(scoredBuilder);
