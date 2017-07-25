@@ -75,4 +75,33 @@
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>nl.vpro.api</groupId>
+        <artifactId>api-backend-elasticsearch</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.api</groupId>
+        <artifactId>api-domain</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.media</groupId>
+        <artifactId>media-es-mappings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.media</groupId>
+        <artifactId>media-test</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.api</groupId>
+        <artifactId>api-spring</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
