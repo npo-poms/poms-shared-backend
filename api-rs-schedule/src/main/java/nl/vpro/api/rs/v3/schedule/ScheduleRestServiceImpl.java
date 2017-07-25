@@ -143,6 +143,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     ) {
         max = handleTooManyResults(max, maxResults);
 
+
         ScheduleSearchResult result = scheduleService.find(form, profile, offset, max);
 
         ApiMediaFilter.set(properties);
