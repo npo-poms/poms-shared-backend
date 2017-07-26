@@ -176,11 +176,15 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     protected <S extends MediaObject> GenericMediaSearchResult<S> executeQuery(
         SearchRequest request, MediaFacets facets, long offset, Integer max, Class<S> clazz) {
-        ActionFuture<SearchResponse> searchResponseFuture = client().search(request);
+        ActionFuture<SearchResponse> searchResponseFuture = client()
+            .search(request)
+            ;
 
         try {
-            SearchResponse response = searchResponseFuture.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+            SearchResponse response = searchResponseFuture
 
+                .actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS)
+                ;
 
             SearchHits hits = response.getHits();
 
@@ -189,8 +193,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             MediaFacetsResult facetsResult = ESMediaFacetsHandler.extractFacets(response, facets, this);
             return new GenericMediaSearchResult<>(adapted, facetsResult, offset, max, hits.getTotalHits());
         } catch (TransportSerializationException e) {
-            e.getDetailedMessage();
-            log.warn(e.getMessage());
+            String detail = e.getDetailedMessage();
+            log.warn(e.getMessage() + ":" + detail);
             throw e;
         }
     }

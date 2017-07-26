@@ -1112,6 +1112,32 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         }
     }
 
+
+    @Test
+    // NPA-403
+    public void testSortByLexico() throws IOException {
+        index(program()
+            .mainTitle("bb")
+            //.lexicoTitle("bb") Should be implicit
+            .mid("bb")
+            .build());
+        index(program()
+            .mainTitle("aa")
+            .lexicoTitle("cc")
+            .mid("aa")
+            .build());
+        {
+            MediaForm form = new MediaForm();
+            form.addSortField(TitleSortOrder.builder().textualType(TextualType.LEXICO).order(Order.ASC).build());
+
+            SearchResult<MediaObject> result = target.find(null, form, 0, null);
+            assertThat(result.getSize()).isEqualTo(2);
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
+        }
+    }
+
+
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
         redirects.put(from, to);
