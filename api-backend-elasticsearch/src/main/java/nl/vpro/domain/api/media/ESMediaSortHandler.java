@@ -34,7 +34,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
     interface SortHandler extends BiFunction<MediaSortOrder, MediaObject, FieldSortBuilder> {
         @Override
         default FieldSortBuilder apply(MediaSortOrder order, MediaObject mediaObject) {
-            return new FieldSortBuilder(order.getSortField().name())
+            return new FieldSortBuilder(order.getField().name())
                 .order(order(order.getOrder()));
         }
     }
@@ -78,13 +78,13 @@ public class ESMediaSortHandler extends ESFacetsHandler {
                 .order(order(sortOrder.getOrder()));
             if (sortOrder instanceof TitleSortOrder) {
                 TitleSortOrder titleSortOrder = (TitleSortOrder) sortOrder;
-                if (titleSortOrder.getTextualType() != null || titleSortOrder.getOwnerType() != null) {
+                if (titleSortOrder.getType() != null || titleSortOrder.getOwner() != null) {
                     FilterBuilder nested = null;
-                    if (titleSortOrder.getTextualType() != null) {
-                        nested = FilterBuilders.termFilter("titles.type", titleSortOrder.getTextualType());
+                    if (titleSortOrder.getType() != null) {
+                        nested = FilterBuilders.termFilter("titles.type", titleSortOrder.getType());
                     }
-                    if (titleSortOrder.getOwnerType() != null) {
-                        FilterBuilder ownerFilter = FilterBuilders.termFilter("titles.owner", titleSortOrder.getOwnerType());
+                    if (titleSortOrder.getOwner() != null) {
+                        FilterBuilder ownerFilter = FilterBuilders.termFilter("titles.owner", titleSortOrder.getOwner());
                         if (nested == null) {
                             nested = ownerFilter;
                         } else {
@@ -123,9 +123,9 @@ public class ESMediaSortHandler extends ESFacetsHandler {
     public static void sort(MediaForm form, MediaObject mediaObject, Consumer<SortBuilder> consumer) {
         if (form != null && form.isSorted()) {
             for (MediaSortOrder entry : form.getSortFields()) {
-                SortHandler field = FIELDS.get(entry.getSortField());
+                SortHandler field = FIELDS.get(entry.getField());
                 if (field == null) {
-                    throw new UnsupportedOperationException("Sorting by " + entry.getSortField() + " is currently not supported. This may be filed as a bug!");
+                    throw new UnsupportedOperationException("Sorting by " + entry.getField() + " is currently not supported. This may be filed as a bug!");
                 }
                 FieldSortBuilder sortBuilder = field.apply(entry, mediaObject);
                 consumer.accept(sortBuilder);
