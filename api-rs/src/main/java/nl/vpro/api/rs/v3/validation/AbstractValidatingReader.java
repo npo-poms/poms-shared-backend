@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -33,7 +34,9 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
     private final Class<T> classToRead;
     private final String namespace;
-    private final ApiMappings mappings;
+
+    @Inject
+    private ApiMappings mappings;
 
 
     private ThreadLocal<Unmarshaller> unmarshaller;
@@ -41,10 +44,11 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     @Value("${xml.input.validate}")
     protected boolean doValidate = true;
 
+
+
     public AbstractValidatingReader(Class<T> classToRead, String namespace) {
         this.classToRead = classToRead;
         this.namespace = namespace;
-        this.mappings = new ApiMappings(null);
     }
 
     @PostConstruct
