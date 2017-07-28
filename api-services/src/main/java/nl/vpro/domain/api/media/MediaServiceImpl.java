@@ -95,7 +95,9 @@ public class MediaServiceImpl implements MediaService {
                 Iterator<Change> iterator;
                 if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
                     Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
-                    log.info("Since {} is couchdb like, taking {}", since.toEpochMilli(), i);
+                    log.info("Since {} is couchdb like, taking {}. Explicitely configured to use elastic search for changes feed. Note that client don't receive sequences.", since.toEpochMilli(), i);
+
+
                     iterator = changesWithES(profile, profileCheck, i, mid, order, max, keepAlive, deletes);
                 } else {
                     //noinspection deprecation
