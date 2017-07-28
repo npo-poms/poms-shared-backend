@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import com.google.common.collect.Iterators;
 
 import nl.vpro.api.Settings;
+import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -79,14 +80,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER', 'ROLE_API_SUPERCLIENT', 'ROLE_API_SUPERPROCESS')")
+    @PreAuthorize(Roles.API_USER)
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CHANGES_CLIENT', 'ROLE_API_CHANGES_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_CHANGES_USER)
     public Iterator<Change> changes(final String profile,  final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences, Deletes deletes) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
@@ -140,14 +141,14 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public <T extends MediaObject> T findByMid(String mid) {
         return switchRepository(settings.loadRepository).findByMid(mid);
     }
 
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public List<MediaObject> loadAll(List<String> ids) {
         return switchRepository(settings.loadRepository).loadAll(ids);
     }
@@ -159,67 +160,67 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaResult list(Order order, Long offset, Integer max) {
         return switchRepository(settings.listRepository).list(order, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
         return switchRepository(settings.listRepository).iterate(getProfile(profile), form, offset, max, keepAlive);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaSearchResult find(String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaResult listMembers(MediaObject media, String profile, Order order, Long offset, Integer max) {
         return switchRepository(settings.membersRepository).listMembers(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaSearchResult findMembers(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findMembers(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public ProgramResult listEpisodes(MediaObject media, String profile,  Order order, Long offset, Integer max) {
         return switchRepository(settings.membersRepository).listEpisodes(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public ProgramSearchResult findEpisodes(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findEpisodes(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaResult listDescendants(MediaObject media, String profile, Order order, Long offset, Integer max) {
         return switchRepository(settings.membersRepository).listDescendants(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaSearchResult findDescendants(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findDescendants(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaSearchResult findRelated(MediaObject media, String profile, MediaForm form, Integer max) {
         return mediaSearchRepository.findRelated(media, getProfile(profile), form, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max) {
         Recommendations recommendations = topSpinRepository.getForMid(media.getMid());
         List<MediaObject> mediaObjects = loadAll(recommendations.getRecommendations().stream().map(Recommendation::getMidRef).collect(Collectors.toList()));
@@ -235,7 +236,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_PLAYER', 'ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_USER)
     public MediaType getType(final String id) {
         MediaObject owner = findByMid(id);
         return owner != null ? MediaType.getMediaType(owner) : null;
