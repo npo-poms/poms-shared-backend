@@ -53,6 +53,10 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
     @PostConstruct
     public void init() throws JAXBException, IOException, SAXException {
+        if (mappings == null) {
+            log.info("No apimappings injected");
+            mappings = new ApiMappings(null);
+        }
         unmarshaller = mappings.getUnmarshaller(doValidate, this.namespace);
         if (doValidate) {
             log.info("XML inputs for " + this.getClass().getName() + " will be validated (Setting xml.input.validate=true)");
