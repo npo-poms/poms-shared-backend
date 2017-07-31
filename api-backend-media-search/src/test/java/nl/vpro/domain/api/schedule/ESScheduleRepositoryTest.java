@@ -26,6 +26,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @Slf4j
 public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
@@ -91,9 +92,9 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
         index(MediaTestDataBuilder.group().mid("SUBS_GROUP_1").withDutchCaptions().build());
         index(MediaTestDataBuilder.segment().mid("SUBS_SEGMENT_1").withDutchCaptions().build());
 
-        assertThat(repository.findByMid("SUBS_PROG_1").hasSubtitles()).isTrue();
-        assertThat(repository.findByMid("SUBS_GROUP_1").hasSubtitles()).isTrue();
-        assertThat(repository.findByMid("SUBS_SEGMENT_1").hasSubtitles()).isTrue();
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_PROG_1").hasSubtitles());
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_GROUP_1").hasSubtitles());
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_SEGMENT_1").hasSubtitles());
     }
 
     @Test
@@ -103,7 +104,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
         index(MediaBuilder.program().mid("DONNA_2").crids(cridToFind).build());
 
         assertThat(repository.load(cridToFind).getMid()).isEqualTo("DONNA_2");
-        assertThat(repository.load("DONNA_2").getMid()).isEqualTo("DONNA_2");
+        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.load("DONNA_2").getMid());
 
     }
 
