@@ -2,6 +2,7 @@ package nl.vpro.api.rs.v3.validation;
 
 import javax.ws.rs.ext.Provider;
 
+import nl.vpro.api.util.ApiMappings;
 import nl.vpro.domain.Xmlns;
 import nl.vpro.domain.api.page.PageForm;
 
@@ -14,5 +15,9 @@ public class PageFormValidatingReader extends AbstractValidatingReader<PageForm>
 
     public PageFormValidatingReader() {
         super(PageForm.class, Xmlns.API_NAMESPACE);
+    }
+
+    public PageFormValidatingReader(ApiMappings apiMappings) {
+        super(PageForm.class, Xmlns.API_NAMESPACE, apiMappings);
     }
 }

@@ -19,6 +19,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.xml.sax.SAXException;
 
@@ -38,7 +39,6 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     @Inject
     private ApiMappings mappings;
 
-
     private ThreadLocal<Unmarshaller> unmarshaller;
 
     @Value("${xml.input.validate}")
@@ -47,8 +47,13 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
 
     public AbstractValidatingReader(Class<T> classToRead, String namespace) {
+        this(classToRead, namespace, null);
+    }
+    
+    public AbstractValidatingReader(Class<T> classToRead, String namespace, ApiMappings mappings) {
         this.classToRead = classToRead;
         this.namespace = namespace;
+        this.mappings = mappings;
     }
 
     @PostConstruct

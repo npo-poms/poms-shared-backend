@@ -10,6 +10,7 @@ import javax.xml.bind.UnmarshalException;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
+import nl.vpro.api.util.ApiMappings;
 import nl.vpro.domain.api.page.PageForm;
 
 public class PageFormValidatingReaderTest {
@@ -36,7 +37,7 @@ public class PageFormValidatingReaderTest {
 
     @Test(expected = UnmarshalException.class)
     public void testReadFromInvalid() throws Exception {
-        PageFormValidatingReader reader = new PageFormValidatingReader();
+        PageFormValidatingReader reader = createReader();
         reader.setDoValidate(true);
         reader.init();
 
@@ -62,17 +63,21 @@ public class PageFormValidatingReaderTest {
 
     @Test
     public void testRead() throws Exception {
-        PageFormValidatingReader reader = new PageFormValidatingReader();
+        PageFormValidatingReader reader = createReader();
         reader.setDoValidate(true);
         reader.init();
         PageForm form = reader.unmarshal(new ByteArrayInputStream(VALID_FORM));
+    }
+
+    private PageFormValidatingReader createReader() {
+        return new PageFormValidatingReader(new ApiMappings("test"));
     }
 
     @Test
     public void testPerformance() throws JAXBException, IOException, SAXException {
         long COUNT = 10000;
         {
-            PageFormValidatingReader reader = new PageFormValidatingReader();
+            PageFormValidatingReader reader = createReader();
             reader.setDoValidate(false);
             reader.init();
             long start = System.nanoTime();
@@ -82,7 +87,7 @@ public class PageFormValidatingReaderTest {
             System.out.println("Time to unmarshal (not validating) " + (1f * TimeUnit.MILLISECONDS.convert((System.nanoTime() - start), TimeUnit.NANOSECONDS) / COUNT) + " ms/unmarshal");
         }
         {
-            PageFormValidatingReader reader = new PageFormValidatingReader();
+            PageFormValidatingReader reader = createReader();
             reader.setDoValidate(true);
             reader.init();
             long start = System.nanoTime();
