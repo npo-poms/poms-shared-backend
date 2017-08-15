@@ -1143,6 +1143,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     // NPA-403
+    // TODO fails.
     public void testSortByLexicoForOwner() throws IOException {
         index(program()
             .mainTitle("bbmis", OwnerType.MIS)
