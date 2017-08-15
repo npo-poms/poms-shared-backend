@@ -1141,6 +1141,48 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
 
+    @Test
+    // NPA-403
+    public void testSortByLexicoForOwner() throws IOException {
+        index(program()
+            .mainTitle("bbmis", OwnerType.MIS)
+            .mainTitle("cc", OwnerType.BROADCASTER)
+            .mid("bb")
+            .build());
+        index(program()
+            .mainTitle("ccmis", OwnerType.MIS)
+            .mainTitle("bb", OwnerType.BROADCASTER)
+            .mid("aa")
+            .build());
+        {
+            MediaForm form = new MediaForm();
+            form.addSortField(TitleSortOrder.builder()
+                .textualType(TextualType.LEXICO)
+                .ownerType(OwnerType.MIS)
+                .order(Order.ASC)
+                .build());
+
+            SearchResult<MediaObject> result = target.find(null, form, 0, null);
+            assertThat(result.getSize()).isEqualTo(2);
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
+        }
+        {
+            MediaForm form = new MediaForm();
+            form.addSortField(TitleSortOrder.builder()
+                .textualType(TextualType.LEXICO)
+                .ownerType(OwnerType.BROADCASTER)
+                .order(Order.ASC)
+                .build());
+
+            SearchResult<MediaObject> result = target.find(null, form, 0, null);
+            assertThat(result.getSize()).isEqualTo(2);
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa");
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb");
+        }
+    }
+
+
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
         redirects.put(from, to);
