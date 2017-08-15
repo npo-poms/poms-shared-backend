@@ -1143,7 +1143,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     // NPA-403
-    // TODO fails.
     public void testSortByLexicoForOwner() throws IOException {
         index(program()
             .mainTitle("bbmis", OwnerType.MIS)
@@ -1153,6 +1152,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         index(program()
             .mainTitle("ccmis", OwnerType.MIS)
             .mainTitle("bb", OwnerType.BROADCASTER)
+            .lexicoTitle("ccmislexico", OwnerType.NPO)
+            .lexicoTitle("bblexico", OwnerType.BROADCASTER)
             .mid("aa")
             .build());
         {
@@ -1205,8 +1206,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     private void indexMediaObject(MediaObject object) throws IOException {
+        byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
         client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid())
-                .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object))).actionGet();
+                .source(bytes))
+            .actionGet();
         client.admin().indices().refresh(new RefreshRequest(ApiMediaIndex.NAME)).actionGet();
     }
 
@@ -1215,8 +1218,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             .childRef(child.getMid())
             .memberRef(object)
             .build();
+        byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
         client.index(new IndexRequest(ApiMediaIndex.NAME, type, ref.getId())
-                .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref))
+                .source(bytes)
                 .parent(object.getMidRef()))
             .actionGet();
         log.info("Indexed {} {}", type, ref.getId());

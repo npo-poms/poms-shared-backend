@@ -76,7 +76,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
         @Override
         public FieldSortBuilder apply(MediaSortOrder sortOrder, MediaObject mediaObject) {
             FieldSortBuilder sortBuilder = new FieldSortBuilder(field)
-                .setNestedPath("titles")
+                .setNestedPath(titlesField)
                 .order(order(sortOrder.getOrder()));
             if (sortOrder instanceof TitleSortOrder) {
                 TitleSortOrder titleSortOrder = (TitleSortOrder) sortOrder;
