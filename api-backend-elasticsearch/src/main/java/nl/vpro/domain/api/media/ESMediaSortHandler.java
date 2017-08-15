@@ -69,7 +69,9 @@ public class ESMediaSortHandler extends ESFacetsHandler {
 
     @AllArgsConstructor
     static class TitleSortHandler implements SortHandler {
-        static String field = "titles.value.full";
+
+        static final String titlesField = "expandedTitles";
+        static final String field = titlesField  + ".value.full";
 
         @Override
         public FieldSortBuilder apply(MediaSortOrder sortOrder, MediaObject mediaObject) {
@@ -81,10 +83,10 @@ public class ESMediaSortHandler extends ESFacetsHandler {
                 if (titleSortOrder.getType() != null || titleSortOrder.getOwner() != null) {
                     FilterBuilder nested = null;
                     if (titleSortOrder.getType() != null) {
-                        nested = FilterBuilders.termFilter("titles.type", titleSortOrder.getType());
+                        nested = FilterBuilders.termFilter(titlesField + ".type", titleSortOrder.getType());
                     }
                     if (titleSortOrder.getOwner() != null) {
-                        FilterBuilder ownerFilter = FilterBuilders.termFilter("titles.owner", titleSortOrder.getOwner());
+                        FilterBuilder ownerFilter = FilterBuilders.termFilter(titlesField + ".owner", titleSortOrder.getOwner());
                         if (nested == null) {
                             nested = ownerFilter;
                         } else {

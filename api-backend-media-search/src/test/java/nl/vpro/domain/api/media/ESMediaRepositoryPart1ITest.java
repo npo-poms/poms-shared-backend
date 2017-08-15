@@ -16,7 +16,6 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.indices.IndexAlreadyExistsException;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1115,7 +1114,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    @Ignore
     // NPA-403
     public void testSortByLexico() throws IOException {
         index(program()
@@ -1130,7 +1128,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             .build());
         {
             MediaForm form = new MediaForm();
-            form.addSortField(TitleSortOrder.builder().textualType(TextualType.LEXICO).order(Order.ASC).build());
+            form.addSortField(TitleSortOrder.builder()
+                .textualType(TextualType.LEXICO)
+                .order(Order.ASC)
+                .build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
             assertThat(result.getSize()).isEqualTo(2);
@@ -1162,7 +1163,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     private void indexMediaObject(MediaObject object) throws IOException {
         client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid())
-                .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).actionGet();
+                .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object))).actionGet();
         client.admin().indices().refresh(new RefreshRequest(ApiMediaIndex.NAME)).actionGet();
     }
 
@@ -1172,7 +1173,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             .memberRef(object)
             .build();
         client.index(new IndexRequest(ApiMediaIndex.NAME, type, ref.getId())
-                .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(ref))
+                .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref))
                 .parent(object.getMidRef()))
             .actionGet();
         log.info("Indexed {} {}", type, ref.getId());
