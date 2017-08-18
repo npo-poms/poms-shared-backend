@@ -2,7 +2,6 @@
 
 * [Guidelines](#guidelines)
 * [Pragmatic REST](#pragmatic-rest)
-* [RESTful URLs](#restful-urls)
 * [HTTP Verbs](#http-verbs)
 * [Responses](#responses)
 * [Error handling](#error-handling)
@@ -164,8 +163,8 @@ Information about record limits should also be included in the Example response.
 ### API Resources
 
   - [GET /magazines](#get-magazines)
-  - [GET /magazines/[id]](#get-magazinesid)
-  - [POST /magazines/[id]/articles](#post-magazinesidarticles)
+  - [GET /magazines/[id]] (#get-magazinesid)
+  - [POST /magazines/[id]/articles] (#post-magazinesidarticles)
 
 ### GET /magazines
 
