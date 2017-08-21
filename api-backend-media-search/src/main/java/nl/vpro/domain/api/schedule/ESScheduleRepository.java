@@ -74,7 +74,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     }
 
     @Inject
-    public ESScheduleRepository(ESClientFactory client, MediaRepository esMediaRepository) {
+    public ESScheduleRepository(
+        ESClientFactory client,
+        MediaRepository esMediaRepository) {
         super(client);
         this.esMediaRepository = esMediaRepository;
 
