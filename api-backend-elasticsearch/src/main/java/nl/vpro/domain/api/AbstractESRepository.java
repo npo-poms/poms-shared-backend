@@ -18,7 +18,10 @@ import javax.validation.constraints.NotNull;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.count.CountRequest;
 import org.elasticsearch.action.count.CountResponse;
-import org.elasticsearch.action.get.*;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.MultiGetItemResponse;
+import org.elasticsearch.action.get.MultiGetRequest;
+import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.QuerySourceBuilder;
 import org.elasticsearch.client.Client;
@@ -35,10 +38,9 @@ import org.elasticsearch.search.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
-import nl.vpro.domain.api.media.MediaRepository;
+import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
@@ -377,7 +379,7 @@ public abstract class AbstractESRepository<T> {
         );
     }
 
-    protected MediaRepository getDirectsRepository() {
+    protected Redirector getDirectsRepository() {
         throw new UnsupportedOperationException();
     }
 

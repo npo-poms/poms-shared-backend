@@ -13,13 +13,12 @@ import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionFuzzyBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.AbstractESRepository;
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.domain.api.Suggestion;
-import nl.vpro.domain.api.media.MediaRepository;
+import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 
@@ -58,7 +57,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     }
 
     @Override
-    protected MediaRepository getDirectsRepository() {
+    protected Redirector getDirectsRepository() {
         throw new UnsupportedOperationException();
 
     }

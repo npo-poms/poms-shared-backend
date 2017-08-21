@@ -7,10 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -370,11 +367,11 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     }
 
     @Override
-    protected MediaRepository getDirectsRepository() {
+    protected Redirector getDirectsRepository() {
         if (esMediaRepository != null) {
             return esMediaRepository;
         } else {
-            return super.getDirectsRepository();
+            return RedirectList::new;
         }
 
     }

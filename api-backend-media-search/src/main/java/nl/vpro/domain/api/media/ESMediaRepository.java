@@ -104,7 +104,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    protected MediaRepository getDirectsRepository() {
+    protected Redirector getDirectsRepository() {
         return RepositoryType.switchRepository(settings.redirectsRepository, mediaRepository, this);
 
     }
