@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.IdList;
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.domain.api.profile.Profile;
@@ -46,31 +47,31 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER', 'ROLE_API_SUPERCLIENT', 'ROLE_API_SUPERPROCESS')")
+    @PreAuthorize(Roles.API_USER)
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER', 'ROLE_API_SUPERCLIENT', 'ROLE_API_SUPERPROCESS')")
+    @PreAuthorize(Roles.API_USER)
     public PageSearchResult find(PageForm form, String profile, Long offset, Integer max) {
         return pageSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER', 'ROLE_API_SUPERCLIENT', 'ROLE_API_SUPERPROCESS')")
+    @PreAuthorize(Roles.API_USER)
     public Page load(String url) {
         return pageSearchRepository.load(url);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER', 'ROLE_API_SUPERCLIENT', 'ROLE_API_SUPERPROCESS')")
+    @PreAuthorize(Roles.API_USER)
     public Page[] loadByCrid(String... crid) {
         return pageSearchRepository.loadByCrid(crid);
     }
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER', 'ROLE_API_SUPERCLIENT', 'ROLE_API_SUPERPROCESS')")
+    @PreAuthorize(Roles.API_USER)
     public List<Page> loadForIds(IdList ids) {
         String[] idArray = ids.toArray(new String[ids.size()]);
         CompletableFuture<Page[]> urlPages     = pageSearchRepository.loadByUrlsAsync(idArray);
@@ -111,14 +112,14 @@ public class PageServiceImpl implements PageService {
 
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER', 'ROLE_API_SUPERCLIENT', 'ROLE_API_SUPERPROCESS')")
+    @PreAuthorize(Roles.API_USER)
     public PageSearchResult findRelated(Page page, String profile, PageForm form, Integer max) throws ProfileNotFoundException {
         return pageSearchRepository.findRelated(page, getProfile(profile), form, max);
     }
 
 
     @Override
-    @PreAuthorize("hasAnyRole('ROLE_API_CLIENT', 'ROLE_API_SUPERCLIENT', 'ROLE_API_USER', 'ROLE_API_SUPERUSER')")
+    @PreAuthorize(Roles.API_CHANGES_USER)
     public Iterator<Page> iterate(String profile, PageForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
         return pageSearchRepository.iterate(getProfile(profile), form, offset, max, keepAlive);
 
