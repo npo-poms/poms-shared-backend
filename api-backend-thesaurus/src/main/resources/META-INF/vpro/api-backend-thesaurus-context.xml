@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+   xmlns:aop="http://www.springframework.org/schema/aop" xmlns:util="http://www.springframework.org/schema/util"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+   <context:component-scan base-package="nl.vpro.domain.api.thesaurus" />
+
+   <bean class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
+      <constructor-arg ref="gtaaKeys"></constructor-arg>
+   </bean>
+
+   <bean id="gtaaKeys" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+      <property name="ignoreResourceNotFound" value="true" />
+      <property name="locations">
+         <list>
+            <value>classpath:/gtaa-keys.properties</value>
+            <value>file:${user.home}/conf/gtaa-keys.properties</value>
+            <value>file:${user.home}/.media/gtaa-keys.properties</value>
+         </list>
+      </property>
+   </bean>
+   
+   </beans>
