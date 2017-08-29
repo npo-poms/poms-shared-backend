@@ -1,14 +1,13 @@
 {
-  "episodeRef": {
+
     "_parent": {
-      "type": "group",
-      "property": "mid"
+      "type": "group"
     },
     "dynamic": "strict",
     "properties": {
       "added": {
         "type": "date",
-        "format": "date_time"
+        "format": "epoch_millis"
       },
       "highlighted": {
         "type": "boolean"
@@ -34,5 +33,5 @@
       }
 
     }
-  }
+
 }

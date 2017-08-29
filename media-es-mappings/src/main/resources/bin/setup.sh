@@ -49,23 +49,32 @@ else
 fi
 
 echo "Echo putting $basedir to $desthost/$destindex"
+
+rm $destindex.json
 if [ "$previndex" != "" ]; then
     echo "putting settings"
-    curl -XPUT $desthost/$destindex -d @$basedir/setting/apimedia.json
+    echo '{ "settings":' > $destindex.json
+    cat $basedir/setting/apimedia.json >> $destindex.json
 fi
 
-echo
+echo ',"mappings": {' >> $destindex.json
 
 declare -a arr=( "group" "program" "segment" "deletedprogram" "deletedgroup" "deletedsegment" "cue" "programMemberRef" "groupMemberRef" "segmentMemberRef" "episodeRef" )
 
-for mapping in "${arr[@]}"
+for i in "${!arr[@]}"
 do
-    echo $mapping
-    curl -XPUT $desthost/$destindex/$mapping/_mapping -d @$basedir/mapping/$mapping.json
-    echo
+    mapping=${arr[$i]}
+    if [ $i -gt 0 ]; then
+      echo "," >> $destindex.json
+    fi
+    echo '"'$mapping'": ' >>  $destindex.json
+    cat $basedir/mapping/$mapping.json >> $destindex.json
 done
+echo -e '}\n}' >> $destindex.json
 
-echo
+echo Created $destindex.json
+
+curl -XPUT $desthost/$destindex -d@$destindex.json
 
 if [ "$previndex" != "" ] ; then
 
@@ -89,9 +98,28 @@ if [ "$previndex" != "" ] ; then
    curl -XPOST $desthost/_aliases -d "$publishalias"
 
 
-   echo -e "\nConsider:\n stream2es es  --source $desthost/$previndex --target $desthost/$destindex"
-   echo "(streams2es can be found at https://github.com/elasticsearch/stream2es)"
+   #echo -e "\nConsider:\n stream2es es  --source $desthost/$previndex --target $desthost/$destindex"
+   #echo "(streams2es can be found at https://github.com/elasticsearch/stream2es)"
 
+   reindex = "
+  "source": {
+    "remote": {
+      "host": "http://otherhost:9200",
+      "username": "user",
+      "password": "pass"
+    },
+    "index": "source",
+    "query": {
+      "match": {
+        "test": "data"
+      }
+    }
+  },
+  "dest": {
+    "index": "dest"
+  }
+}
+   "
    alias="{
     \"actions\": [
         { \"remove\": {
