@@ -60,7 +60,7 @@ do
     fi
     echo '"'$mapping'": ' >>  $destindex.json
     cat $basedir/mapping/$mapping.json >> $destindex.json
-fi
+done
 echo -e '}\n}' >> $destindex.json
 
 echo Created $destindex.json
