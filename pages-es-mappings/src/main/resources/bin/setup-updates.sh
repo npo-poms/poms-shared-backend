@@ -37,10 +37,10 @@ fi
 
 if [ "$2" == "" ] ; then
     echo "No index number found, trying to put mappings over existing ones (supposing they are compatible)"
-    destindex=apipages-publish
+    destindex=pageupdates
 else
-    previndex=apipages-$(($2-1))
-    destindex=apipages-$2
+    previndex=pageupdates-$(($2-1))
+    destindex=pageupdates-$2
 fi
 
 
@@ -48,10 +48,19 @@ fi
 rm $destindex.json
 echo "putting settings"
 echo '{ "settings":' > $destindex.json
-cat $basedir/setting/apipages.json >> $destindex.json
+cat $basedir/setting/pageupdates.json >> $destindex.json
 echo ',"mappings": {' >> $destindex.json
-echo '"page":'  >>  $destindex.json
-cat $basedir/mapping/page.json >> $destindex.json
+
+declare -a arr=( "pageupdate" "deletedpageupdate" )
+for i in "${!arr[@]}"
+do
+    mapping=${arr[$i]}
+    if [ $i -gt 0 ]; then
+      echo "," >> $destindex.json
+    fi
+    echo '"'$mapping'": ' >>  $destindex.json
+    cat $basedir/mapping/$mapping.json >> $destindex.json
+fi
 echo -e '}\n}' >> $destindex.json
 
 echo Created $destindex.json
