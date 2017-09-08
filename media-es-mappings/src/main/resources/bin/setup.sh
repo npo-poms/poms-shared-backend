@@ -54,7 +54,7 @@ rm $destindex.json
 if [ "$previndex" != "" ]; then
     echo "putting settings"
     echo '{ "settings":' > $destindex.json
-    cat $basedir/setting/apimedia.json >> $destindex.json
+    cat $basedir/es5/setting/apimedia.json >> $destindex.json
 fi
 
 echo ',"mappings": {' >> $destindex.json
@@ -68,7 +68,7 @@ do
       echo "," >> $destindex.json
     fi
     echo '"'$mapping'": ' >>  $destindex.json
-    cat $basedir/mapping/$mapping.json >> $destindex.json
+    cat $basedir/es5/mapping/$mapping.json >> $destindex.json
 done
 echo -e '}\n}' >> $destindex.json
 
