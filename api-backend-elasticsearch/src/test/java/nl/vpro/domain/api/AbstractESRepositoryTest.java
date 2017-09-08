@@ -1,10 +1,13 @@
 package nl.vpro.domain.api;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import javax.inject.Inject;
+
 import org.elasticsearch.client.Client;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -17,7 +20,7 @@ import nl.vpro.domain.media.MediaClassificationService;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
-import nl.vpro.elasticsearch.LocalClientFactory;
+import nl.vpro.elasticsearch.ESClientFactory;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -29,18 +32,25 @@ import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/broadcasterService.xml"})
-public abstract class AbstractESRepositoryTest {
+@Slf4j
+public abstract class AbstractESRepositoryTest  {
 
-    protected static LocalClientFactory clientFactory = new LocalClientFactory();
     protected static Client client;
+
+
+    @Inject
+    protected static ESClientFactory clientFactory;
+
 
     @Autowired
     BroadcasterService broadcasterService;
 
     @BeforeClass
-    public static void staticSetup() throws IOException, ExecutionException, InterruptedException {
-        clientFactory.setPath(null);
-        client = clientFactory.client("test");
+    public  void staticSetup() throws IOException, ExecutionException, InterruptedException {
+        if (client == null) {
+            client = clientFactory.client("test");
+        }
+        log.info("Built {}", client);
         ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
     }
 
@@ -55,11 +65,6 @@ public abstract class AbstractESRepositoryTest {
     }
 
 
-
-    @AfterClass
-    public static void shutdownAbstract() {
-        clientFactory.node().stop();
-    }
 
     protected static String getTypeName(MediaObject media) {
         boolean deletedType = false;

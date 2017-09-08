@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 
+import org.assertj.core.api.Assertions;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.AbstractESRepositoryTest;
@@ -24,9 +24,6 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @Slf4j
 public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
@@ -64,7 +61,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
 
 
         ScheduleResult result = repository.listSchedules((Instant) null, null, Order.ASC, 0L, 10);
-        assertThat(result).hasSize(3);
+        Assertions.assertThat(result).hasSize(3);
     }
 
 
@@ -83,7 +80,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
 
 
         ScheduleResult result = repository.listSchedules(Channel.BBC1, date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
-        assertThat(result).hasSize(1);
+        Assertions.assertThat(result).hasSize(1);
     }
 
     @Test
@@ -92,9 +89,9 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
         index(MediaTestDataBuilder.group().mid("SUBS_GROUP_1").withDutchCaptions().build());
         index(MediaTestDataBuilder.segment().mid("SUBS_SEGMENT_1").withDutchCaptions().build());
 
-        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_PROG_1").hasSubtitles());
-        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_GROUP_1").hasSubtitles());
-        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_SEGMENT_1").hasSubtitles());
+        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_PROG_1").hasSubtitles());
+        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_GROUP_1").hasSubtitles());
+        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_SEGMENT_1").hasSubtitles());
     }
 
     @Test
@@ -103,8 +100,8 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
         //String cridToFind = "criduitzending1";
         index(MediaBuilder.program().mid("DONNA_2").crids(cridToFind).build());
 
-        assertThat(repository.load(cridToFind).getMid()).isEqualTo("DONNA_2");
-        assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.load("DONNA_2").getMid());
+        Assertions.assertThat(repository.load(cridToFind).getMid()).isEqualTo("DONNA_2");
+        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.load("DONNA_2").getMid());
 
     }
 
@@ -126,15 +123,15 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
 
         {
             ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
-            assertThat(result).hasSize(2);
-            assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC1);
-            assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC2);
+            Assertions.assertThat(result).hasSize(2);
+            Assertions.assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC1);
+            Assertions.assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC2);
         }
         {  // Test order too
             ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.DESC, 0L, 10);
-            assertThat(result).hasSize(2);
-            assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC2);
-            assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC1);
+            Assertions.assertThat(result).hasSize(2);
+            Assertions.assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC2);
+            Assertions.assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC1);
         }
     }
 
@@ -155,7 +152,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
 
         ScheduleResult result = repository.listSchedulesForMediaType(MediaType.MOVIE, date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
 
-        assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(movie);
+        Assertions.assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(movie);
     }
 
 
@@ -179,7 +176,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
         ScheduleResult result = repository.listSchedulesForAncestor("DESCENDANT1",
             date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
 
-        assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(broadcast);
+        Assertions.assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(broadcast);
     }
 
 
@@ -213,7 +210,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
                         .build()
                 ).build());
         ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
-        assertThat(schedules).hasSize(1);
+        Assertions.assertThat(schedules).hasSize(1);
     }
 
 
@@ -247,9 +244,9 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
                         .build()
                 ).build());
         ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
-        assertThat(schedules).hasSize(2);
+        Assertions.assertThat(schedules).hasSize(2);
 
-        assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
+        Assertions.assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
 
     }
 

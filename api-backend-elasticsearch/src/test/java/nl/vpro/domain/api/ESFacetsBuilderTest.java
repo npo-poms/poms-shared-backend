@@ -1,6 +1,5 @@
 package nl.vpro.domain.api;
 
-import org.elasticsearch.common.joda.time.DateTime;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -11,7 +10,7 @@ public class ESFacetsBuilderTest {
     public void testEscapeFacetName() throws Exception {
         assertThat(ESFacetsBuilder.escapeFacetName("Eerste componist")).isEqualTo("Eerste__componist");
     }
-    
+
     @Test(expected = UnsupportedOperationException.class)
     public void year() {
         assertThat(ESFacetsBuilder.IntervalUnit.YEAR.getShortEs());

@@ -21,16 +21,16 @@ import nl.vpro.domain.api.*;
  */
 public class ESMediaFilterBuilder extends ESFilterBuilder {
 
-    public static FilterBuilder filter(MemberRefSearch searches, @Nonnull String axis) {
+    public static QueryBuilder filter(MemberRefSearch searches, @Nonnull String axis) {
         return filter(searches, "", axis);
     }
 
-    public static FilterBuilder filter(MemberRefSearch searches, @Nonnull String prefix, String axis) {
+    public static QueryBuilder filter(MemberRefSearch searches, @Nonnull String prefix, String axis) {
         if(searches == null) {
-            return FilterBuilders.matchAllFilter();
+            return QueryBuilders.matchAllQuery();
         }
 
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
+        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
         if(searches.getMediaIds() != null && !searches.getMediaIds().isEmpty()) {
             build(booleanFilter, searches.getMediaIds(), new SimpleFieldApplier(prefix + axis + ".midRef"));
         }
@@ -41,25 +41,25 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         return booleanFilter;
     }
 
-    public static FilterBuilder filter(RelationSearch searches, @Nonnull String axis) {
+    public static QueryBuilder filter(RelationSearch searches, @Nonnull String axis) {
         return filter(searches, "", axis);
     }
 
-    public static FilterBuilder filter(RelationSearch relationSearch, @Nonnull String prefix, String axis) {
+    public static QueryBuilder filter(RelationSearch relationSearch, @Nonnull String prefix, String axis) {
         if(relationSearch == null) {
-            return FilterBuilders.matchAllFilter();
+            return QueryBuilders.matchAllQuery();
         }
 
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
+        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
         filter(booleanFilter, relationSearch, prefix, axis);
         if (booleanFilter.hasClauses()) {
             return booleanFilter;
         } else {
-            return FilterBuilders.matchAllFilter();
+            return QueryBuilders.matchAllQuery();
         }
     }
 
-    public static void filter(BoolFilterBuilder booleanFilter, RelationSearch relationSearch, @Nonnull String prefix, String axis) {
+    public static void filter(BoolQueryBuilder booleanFilter, RelationSearch relationSearch, @Nonnull String prefix, String axis) {
 
         if(relationSearch.getTypes() != null && !relationSearch.getTypes().isEmpty()) {
             build(booleanFilter, relationSearch.getTypes(), new SimpleFieldApplier(prefix + axis + ".type"));
@@ -79,22 +79,22 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     }
 
 
-    public static FilterBuilder filter(MediaSearch searches) {
+    public static QueryBuilder filter(MediaSearch searches) {
         return filter(searches, "");
     }
 
-    public static FilterBuilder filter(MediaSearch searches, @Nonnull String prefix) {
+    public static QueryBuilder filter(MediaSearch searches, @Nonnull String prefix) {
         if(searches == null) {
-            return FilterBuilders.matchAllFilter();
+            return QueryBuilders.matchAllQuery();
         }
 
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
+        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
         boolean hasClause = false;
 
         {
             SimpleTextMatcher textSearch = searches.getText();
             if(textSearch != null && textSearch.getValue() != null) {
-                FilterBuilder textFilter = buildTextFilter(
+                QueryBuilder textFilter = buildTextFilter(
                     textSearch,
                     ESMediaQueryBuilder.SEARCH_FIELDS
                 );
@@ -197,15 +197,15 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
             return booleanFilter;
         }
 
-        return FilterBuilders.matchAllFilter();
+        return QueryBuilders.matchAllQuery();
     }
 
-    public static FilterBuilder filter(MediaSearch searches, FilterBuilder filter) {
+    public static QueryBuilder filter(MediaSearch searches, QueryBuilder filter) {
         return filter(searches, filter, "");
     }
 
-    public static FilterBuilder filter(MediaSearch searches, FilterBuilder filter, @Nonnull String prefix) {
-        if(filter == null || filter instanceof MatchAllFilterBuilder) {
+    public static QueryBuilder filter(MediaSearch searches, QueryBuilder filter, @Nonnull String prefix) {
+        if(filter == null || filter instanceof MatchAllQueryBuilder) {
             return filter(searches, prefix);
         }
 
@@ -214,32 +214,33 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         }
 
         // unwrap
-        if(filter instanceof AndFilterBuilder) {
-            return ((AndFilterBuilder)filter).add(filter(searches, prefix));
-        } else if(filter instanceof BoolFilterBuilder) {
-            return ((BoolFilterBuilder)filter).must(filter(searches, prefix));
+        if(filter instanceof BoolQueryBuilder) {
+            return ((BoolQueryBuilder)filter).must(filter(searches, prefix));
         } else {
-            return FilterBuilders.andFilter(filter(searches, prefix), filter);
+            BoolQueryBuilder bool = QueryBuilders.boolQuery();
+            bool.must(filter(searches, prefix));
+            bool.must(filter);
+            return bool;
         }
     }
 
-    static FilterBuilder buildTextFilter(SimpleTextMatcher textSearch, List<SearchFieldDefinition> searchFields) {
-        BoolFilterBuilder answer = FilterBuilders.boolFilter();
+    static QueryBuilder buildTextFilter(SimpleTextMatcher textSearch, List<SearchFieldDefinition> searchFields) {
+        BoolQueryBuilder answer = QueryBuilders.boolQuery();
         for(SearchFieldDefinition searchField : searchFields) {
-            FilterBuilder textFilter = buildFilter(searchField.getName(), textSearch);
+            QueryBuilder textFilter = buildFilter(searchField.getName(), textSearch);
             answer.should(textFilter);
         }
         return answer;
     }
 
 
-    private static void buildLocationFilter(BoolFilterBuilder boolFilterBuilder, TextMatcherList locations) {
+    private static void buildLocationFilter(BoolQueryBuilder boolFilterBuilder, TextMatcherList locations) {
         build(boolFilterBuilder, locations, new FieldApplier() {
             @Override
-            public <S extends MatchType> void applyField(BoolFilterBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher) {
-                FilterBuilder extensionFilter = buildFilter("locations.programUrl.extension", matcher, true);
+            public <S extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher) {
+                QueryBuilder extensionFilter = buildFilter("locations.programUrl.extension", matcher, true);
                 booleanQueryBuilder.should(extensionFilter);
-                FilterBuilder formatFilter = buildFilter("locations.avAttributes.avFileFormat", matcher, true);
+                QueryBuilder formatFilter = buildFilter("locations.avAttributes.avFileFormat", matcher, true);
                 booleanQueryBuilder.should(formatFilter);
             }
         });

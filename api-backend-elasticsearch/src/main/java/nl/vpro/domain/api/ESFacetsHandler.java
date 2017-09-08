@@ -17,18 +17,12 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.facet.Facets;
-import org.elasticsearch.search.facet.range.RangeFacet;
-import org.elasticsearch.search.facet.terms.TermsFacet;
 
 import nl.vpro.domain.Displayable;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
-import nl.vpro.util.DateUtils;
-import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.esField;
 
@@ -43,31 +37,31 @@ public abstract class ESFacetsHandler {
 
     protected static final String FILTER_PREFIX = "filter_";
 
-    protected static List<TermFacetResultItem> getFacetResultItems(String facetName, Facets facets) {
+    protected static List<TermFacetResultItem> getFacetResultItems(String facetName, Aggregations facets) {
         if(facets != null) {
-            TermsFacet facet = facets.facet(TermsFacet.class, facetName);
+            Aggregation facet = facets.get(facetName);
             if(facet == null) {
                 return null;
             }
-            return defaultTextFacetResult(facet);
+            return defaultTextFacetResult((MultiBucketsAggregation) facet);
         }
         return null;
     }
 
-    protected static List<TermFacetResultItem> getFacetResultItems(String facetName, Facets facets, ExtendedTextFacet<?> extendedTextFacet) {
+    protected static List<TermFacetResultItem> getFacetResultItems(String facetName, Aggregations facets, ExtendedTextFacet<?> extendedTextFacet) {
         return getFacetResultItems(esField(facetName, extendedTextFacet), facets);
 
     }
 
-    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String facetName, TextFacet<?> requestFacet, Facets facets, Class<T> enumClass, Function<String, T> valueOf, Function<T, String> xmlId) {
+    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String facetName, TextFacet<?> requestFacet, Aggregations facets, Class<T> enumClass, Function<String, T> valueOf, Function<T, String> xmlId) {
         if(facets != null) {
-            TermsFacet facet = facets.facet(TermsFacet.class, facetName);
+            Aggregation facet = facets.getAsMap().get(facetName);
             if(facet == null) {
                 return null;
             }
             Integer threshold = requestFacet.getThreshold();
             Set<T> notFound = new HashSet<T>(Arrays.asList(enumClass.getEnumConstants()));
-            List<TermFacetResultItem> result =  new ArrayList<>(enumTextFacetResult(facet, valueOf, xmlId));
+            List<TermFacetResultItem> result =  new ArrayList<>(enumTextFacetResult((MultiBucketsAggregation) facet, valueOf, xmlId));
             for (TermFacetResultItem i : result) {
                 notFound.remove(valueOf.apply(i.getId()));
             }
@@ -81,27 +75,28 @@ public abstract class ESFacetsHandler {
         return null;
     }
 
-    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String facetName, TextFacet<?> requestedFacet, Facets facets, final Class<T> enumClass) {
+    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String facetName, TextFacet<?> requestedFacet, Aggregations facets, final Class<T> enumClass) {
         return getFacetResultItemsForEnum(facetName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name);
     }
 
-    protected static List<TermFacetResultItem> getBroadcasterResultItems(String facetName, Facets facets) {
+    protected static List<TermFacetResultItem> getBroadcasterResultItems(String facetName, Aggregations facets) {
         if(facets == null) {
             return null;
         }
 
-        final TermsFacet facet = facets.facet(TermsFacet.class, facetName);
+        final Aggregation facet = facets.get(facetName);
         if(facet == null) {
             return null;
         }
 
-        return new FacetResultItemList<TermFacetResultItem>(facet) {
+
+
+        return new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>((Terms) facet) {
             @Override
-            protected TermFacetResultItem adapt(int index) {
-                TermsFacet.Entry entry = facet.getEntries().get(index);
-                String id = entry.getTerm().string();
+            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+                String id = bucket.getKeyAsString();
                 Broadcaster broadcaster = ServiceLocator.getBroadcasterService().find(id);
-                return new TermFacetResultItem(broadcaster != null ? broadcaster.getDisplayName() : id, id, entry.getCount());
+                return new TermFacetResultItem(broadcaster != null ? broadcaster.getDisplayName() : id, id, bucket.getDocCount());
             }
         };
     }
@@ -154,7 +149,7 @@ public abstract class ESFacetsHandler {
     }
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(DateRangeFacets<?> dateRangeFacets, String facetName, SearchResponse response) {
-        Facets facets = response.getFacets();
+        Aggregations facets = response.getAggregations();
         Aggregations aggregations = response.getAggregations();
 
         if(facets == null && aggregations == null) {
@@ -162,6 +157,7 @@ public abstract class ESFacetsHandler {
         }
 
         List<DateFacetResultItem> dateFacetResultItems = new ArrayList<>();
+/*
 
         if(facets != null) {
             String prefix = facetName + ':';
@@ -175,13 +171,14 @@ public abstract class ESFacetsHandler {
                 dateFacetResultItems.addAll(dateRangeFacetResult(ranges, prefix));
             }
         }
+*/
 
         if(aggregations != null) {
             for (Aggregation aggregation : aggregations) {
                 if (aggregation.getName().startsWith(facetName)) {
                     DateRangeInterval.Interval interval = ESInterval.parse(aggregation.getName().substring(facetName.length() + 1));
                     Aggregation sub = ((org.elasticsearch.search.aggregations.bucket.filter.Filter) aggregation).getAggregations().get("sub");
-                    for (DateHistogram.Bucket bucket : ((DateHistogram) sub).getBuckets()) {
+               /*     for (DateHistogram.Bucket bucket : ((DateHistogram) sub).getBuckets()) {
                         Instant bucketStart = DateUtils.toInstant(bucket.getKeyAsDate().toDate());
                         Instant bucketEnd = interval.getBucketEnd(bucketStart);
                         DateFacetResultItem entry = new DateFacetResultItem(
@@ -191,7 +188,7 @@ public abstract class ESFacetsHandler {
                             bucket.getDocCount());
 
                         dateFacetResultItems.add(entry);
-                    }
+                    }*/
                 }
             }
         }
@@ -203,27 +200,14 @@ public abstract class ESFacetsHandler {
     }
 
     protected static List<DurationFacetResultItem> getDurationRangeFacetResultItems(DurationRangeFacets<?> durationRangeFacets, String facetName, SearchResponse response) {
-        Facets facets = response.getFacets();
         Aggregations aggregations = response.getAggregations();
 
-        if (facets == null && aggregations == null) {
+        if (aggregations == null) {
             return null;
         }
 
         List<DurationFacetResultItem> facetResultItems = new ArrayList<>();
 
-        if (facets != null) {
-            String prefix = facetName + ':';
-            List<RangeFacet> ranges = new ArrayList<>();
-            for (org.elasticsearch.search.facet.Facet facet : facets) {
-                if (facet.getName().startsWith(prefix)) {
-                    ranges.add((RangeFacet) facet);
-                }
-            }
-            if (!ranges.isEmpty()) {
-                facetResultItems.addAll(durationRangeFacetResult(ranges, prefix));
-            }
-        }
 
         if (aggregations != null) {
             for (Aggregation aggregation : aggregations) {
@@ -231,6 +215,7 @@ public abstract class ESFacetsHandler {
                     DurationRangeInterval.Interval interval = ESInterval.parse(aggregation.getName().substring(facetName.length() + 1));
                     Aggregation sub = ((org.elasticsearch.search.aggregations.bucket.filter.Filter) aggregation).getAggregations().get("sub");
                     // TODO all this makes little sense
+/*
                     for (DateHistogram.Bucket bucket : ((DateHistogram) sub).getBuckets()) {
                         Date bucketStart = bucket.getKeyAsDate().toDate();
                         Date bucketEnd = Date.from(interval.getBucketEnd(bucket.getKeyAsDate().toDate().toInstant()));
@@ -242,6 +227,7 @@ public abstract class ESFacetsHandler {
 
                         facetResultItems.add(entry);
                     }
+*/
                 }
             }
         }
@@ -274,44 +260,6 @@ public abstract class ESFacetsHandler {
         return i;
     }
 
-    protected static abstract class FacetResultItemList<T extends FacetResultItem> extends AbstractList<T> {
-
-        private final TermsFacet facet;
-
-        private final List<T> backing;
-
-        public FacetResultItemList(TermsFacet facet) {
-            this.facet = facet;
-            this.backing = new ArrayList<>(Collections.nCopies(facet == null ? 0 : facet.getEntries().size(), (T)null));
-        }
-
-        @Override
-        public T get(int index) {
-            if(facet == null) {
-                throw new ArrayIndexOutOfBoundsException();
-            }
-            T result = backing.get(index);
-            if(result == null) {
-                result = adapt(index);
-                backing.set(index, result);
-            }
-
-            return result;
-        }
-
-        @Override
-        public T set(int index, T object) {
-            return backing.set(index, object);
-        }
-
-        protected abstract T adapt(int index);
-
-        @Override
-        public int size() {
-            return backing.size();
-        }
-
-    }
 
     protected static abstract class AggregationResultItemList<A extends MultiBucketsAggregation, B extends MultiBucketsAggregation.Bucket, T extends FacetResultItem> extends AbstractList<T> {
 
@@ -349,22 +297,20 @@ public abstract class ESFacetsHandler {
 
     }
 
-    protected static List<TermFacetResultItem> defaultTextFacetResult(final TermsFacet facet) {
-        return new FacetResultItemList<TermFacetResultItem>(facet) {
+    protected static List<TermFacetResultItem> defaultTextFacetResult(final MultiBucketsAggregation facet) {
+        return new AggregationResultItemList<MultiBucketsAggregation, Terms.Bucket, TermFacetResultItem>(facet) {
             @Override
-            protected TermFacetResultItem adapt(int index) {
-                TermsFacet.Entry entry = facet.getEntries().get(index);
-                return new TermFacetResultItem(entry.getTerm().string(), entry.getTerm().string(), entry.getCount());
+            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+                return new TermFacetResultItem(bucket.getKeyAsString(), bucket.getKeyAsString(), bucket.getDocCount());
             }
         };
     }
 
-    protected static <T extends Enum<T>> List<TermFacetResultItem> enumTextFacetResult(final TermsFacet facet, Function<String, T> valueOf, Function<T, String> idValue) {
-        return new FacetResultItemList<TermFacetResultItem>(facet) {
+    protected static <T extends Enum<T>> List<TermFacetResultItem> enumTextFacetResult(final MultiBucketsAggregation facet, Function<String, T> valueOf, Function<T, String> idValue) {
+        return new AggregationResultItemList<MultiBucketsAggregation, Terms.Bucket, TermFacetResultItem>(facet) {
             @Override
-            protected TermFacetResultItem adapt(int index) {
-                TermsFacet.Entry entry = facet.getEntries().get(index);
-                String value = entry.getTerm().string();
+            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+                String value = bucket.getKeyAsString();
                 String name;
 
                 try {
@@ -375,7 +321,7 @@ public abstract class ESFacetsHandler {
                     log.warn(ia.getMessage());
                     name = value;
                 }
-                return new TermFacetResultItem(name, value, entry.getCount());
+                return new TermFacetResultItem(name, value, bucket.getDocCount());
             }
         };
     }
@@ -401,7 +347,7 @@ public abstract class ESFacetsHandler {
                 DateFacetResultItem result = backing.get(index);
                 if(result == null) {
                     RangeFacet range = facet.get(index);
-                    RangeFacet.Entry entry = range.getEntries().get(0);
+                  /*  RangeFacet.Entry entry = range.getEntries().get(0);
                     String name = range.getName();
                     Double from = entry.getFrom();
                     Double to = entry.getTo();
@@ -409,9 +355,9 @@ public abstract class ESFacetsHandler {
                         name.substring(prefix.length()),
                         entry.getFromAsString() != null ? Instant.ofEpochMilli(from.longValue()) : null,
                         entry.getToAsString() != null ? Instant.ofEpochMilli(to.longValue()) : null,
-                        entry.getCount());
+                        entry.getCount());*/
                     backing.set(index, result);
-                }
+                }/**/
                 return result;
             }
 
@@ -422,7 +368,7 @@ public abstract class ESFacetsHandler {
         };
     }
 
-    protected static List<DurationFacetResultItem> durationRangeFacetResult(final List<RangeFacet> facet, final String prefix) {
+    protected static List<DurationFacetResultItem> durationRangeFacetResult(final List<Terms.Bucket> facet, final String prefix) {
         return new AbstractList<DurationFacetResultItem>() {
             private final List<DurationFacetResultItem> backing = new ArrayList<>(Collections.nCopies(facet.size(), (DurationFacetResultItem) null));
 
@@ -430,7 +376,7 @@ public abstract class ESFacetsHandler {
             public DurationFacetResultItem get(int index) {
                 DurationFacetResultItem result = backing.get(index);
                 if (result == null) {
-                    RangeFacet range = facet.get(index);
+                   /* RangeFacet range = facet.get(index);
                     RangeFacet.Entry entry = range.getEntries().get(0);
                     String name = range.getName();
                     Double from = entry.getFrom();
@@ -442,7 +388,7 @@ public abstract class ESFacetsHandler {
                         name.substring(prefix.length()),
                         Duration.ofMillis(fromMillis),
                         Duration.ofMillis(toMillis),
-                        entry.getCount());
+                        entry.getCount());*/
                     backing.set(index, result);
                 }
                 return result;

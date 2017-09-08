@@ -11,10 +11,12 @@ import java.util.Optional;
 
 import javax.xml.bind.JAXB;
 
+import org.assertj.core.api.Assertions;
+import org.elasticsearch.ResourceAlreadyExistsException;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.indices.IndexAlreadyExistsException;
-import org.junit.After;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -24,7 +26,6 @@ import org.springframework.test.context.ContextConfiguration;
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
@@ -39,9 +40,6 @@ import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.ContentRating.*;
 import static nl.vpro.domain.media.MediaTestDataBuilder.group;
 import static nl.vpro.domain.media.MediaTestDataBuilder.program;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -54,6 +52,8 @@ import static org.mockito.Mockito.when;
  * @author Roelof Jan Koekoek
  * @since 3.5
  */
+
+//@RunWith(com.carrotsearch.randomizedtesting.RandomizedRunner.class)
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
 public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
@@ -64,37 +64,43 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     @Autowired
     private Settings settings;
 
-    @Before
-    public void setup() throws Exception {
-        Mockito.reset(target.mediaRepository);
-        ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
+    //@Before
+    public  void setup() throws Exception {
+
 
         try {
-            client.admin().indices().prepareCreate(ApiMediaIndex.NAME).setSettings(ApiMediaIndex.source()).execute().actionGet();
-        } catch (IndexAlreadyExistsException e) {
+            client.admin().indices().prepareCreate(ApiMediaIndex.NAME).setSettings(ApiMediaIndex.source(), XContentType.JSON).execute().actionGet();
+        } catch (ResourceAlreadyExistsException e) {
             log.info("Index exists");
         }
         for (MediaESType type : MediaESType.values()) {
-            client.admin().indices().preparePutMapping(ApiMediaIndex.NAME).setType(type.name()).setSource(type.source())
+            client.admin()
+                .indices()
+                .preparePutMapping(ApiMediaIndex.NAME)
+                .setType(type.name())
+                .setSource(type.source(), XContentType.JSON)
                     .execute().actionGet();
         }
 
+
+    }
+
+    @Before
+    public void before() {
+        Mockito.reset(target.mediaRepository);
         settings.setRedirectsRepository("COUCHDB");
         Map<String, String> redirects = new HashMap<>();
         when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
     }
 
-    @After
-    public void tearDown() {
-        client.admin().indices().prepareDelete(ApiMediaIndex.NAME).execute().actionGet();
-    }
+
 
     @Test
     public void testLoad() throws IOException {
         index(program().mainTitle("foo bar").mid("MID_FOR_LOAD").build());
         MediaObject result = target.load("MID_FOR_LOAD");
-        assertThat(result.getMainTitle()).isEqualTo("foo bar");
-        assertThat(result.getMid()).isEqualTo("MID_FOR_LOAD");
+        Assertions.assertThat(result.getMainTitle()).isEqualTo("foo bar");
+        Assertions.assertThat(result.getMid()).isEqualTo("MID_FOR_LOAD");
 
     }
 
@@ -105,15 +111,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         {
             SearchResult<MediaObject> result = target.find(null, form().text("foo").build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().text("foa").build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(0);
+            Assertions.assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().text("FOO").build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
     }
 
@@ -125,15 +131,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         {
             SearchResult<MediaObject> result = target.find(null, form().fuzzyText("foa").build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(2);
+            Assertions.assertThat(result.getSize()).isEqualTo(2);
             List<? extends SearchResultItem<? extends MediaObject>> items = result.getItems();
-            assertThat(items.get(1).getScore()).isLessThanOrEqualTo(items.get(0).getScore());
-            assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foo")));
-            assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foa")));
+            Assertions.assertThat(items.get(1).getScore()).isLessThanOrEqualTo(items.get(0).getScore());
+            Assert.assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foo")));
+            Assert.assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foa")));
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().text("FOO").build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
     }
 
@@ -144,17 +150,17 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         {
             SearchResult<MediaObject> result = target.find(null, form().tags("foo").build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
             SearchResult<MediaObject> result = target.find(null, form().tags("FOO").build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(0);
+            Assertions.assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null,
                     form().tags(Match.MUST, ExtendedTextMatcher.must("FOO", false)).build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
 
     }
@@ -167,18 +173,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         {
             SearchResult<MediaObject> result = target.find(null,
                     form().tags(ExtendedTextMatcher.must("fo.*", ExtendedMatchType.REGEX)).build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
             SearchResult<MediaObject> result = target.find(null,
                     form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX)).build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(0);
+            Assertions.assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null,
                     form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX, false)).build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
 
     }
@@ -191,19 +197,19 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         {
             SearchResult<MediaObject> result = target.find(null,
                     form().tags(ExtendedTextMatcher.should("fo*bar", ExtendedMatchType.WILDCARD)).build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
             SearchResult<MediaObject> result = target.find(null,
                     form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD)).build(), 0, null);
-            assertThat(result.getSize()).isEqualTo(0);
+            Assertions.assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null,
                     form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD, false)).build(), 0,
                     null);
-            assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
         }
     }
 
@@ -218,7 +224,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(new Filter(new HasImageConstraint()));
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
-        assertThat(result.getSize()).isEqualTo(1);
+        Assertions.assertThat(result.getSize()).isEqualTo(1);
     }
 
     @Test
@@ -232,7 +238,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(new Filter(new HasLocationConstraint()));
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
-        assertThat(result.getSize()).isEqualTo(1);
+        Assertions.assertThat(result.getSize()).isEqualTo(1);
     }
 
     @Test
@@ -243,25 +249,25 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         {
             MediaForm countAsc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.COUNT_ASC, null)).build();
             MediaSearchResult result = target.find(null, countAsc, 0, null);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+            Assertions.assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
         }
 
         {
             MediaForm countDesc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.COUNT_DESC, null)).build();
             MediaSearchResult result = target.find(null, countDesc, 0, null);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
+            Assertions.assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
         }
 
         {
             MediaForm valueAsc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.VALUE_ASC, null)).build();
             MediaSearchResult result = target.find(null, valueAsc, 0, null);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+            Assertions.assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
         }
 
         {
             MediaForm valueDesc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.VALUE_DESC, null)).build();
             MediaSearchResult result = target.find(null, valueDesc, 0, null);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
+            Assertions.assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
         }
     }
 
@@ -275,8 +281,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getBroadcasters()).hasSize(1);
-        assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+        Assertions.assertThat(result.getFacets().getBroadcasters()).hasSize(1);
+        Assertions.assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
     }
 
     @Test
@@ -287,8 +293,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getBroadcasters()).hasSize(1);
-        assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+        Assertions.assertThat(result.getFacets().getBroadcasters()).hasSize(1);
+        Assertions.assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
     }
 
     @Test
@@ -297,13 +303,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form().avTypes(AVType.VIDEO).avTypeFacet().build(), 0, null);
 
-        assertThat(result.getFacets().getAvTypes()).isNotEmpty();
+        Assertions.assertThat(result.getFacets().getAvTypes()).isNotEmpty();
         List<TermFacetResultItem> avTypes = result.getFacets().getAvTypes();
         for (TermFacetResultItem avType : avTypes) {
             if (avType.getId().equals(AVType.VIDEO.name())) {
-                assertEquals(1, avType.getCount());
+                Assertions.assertThat(avType.getCount()).isEqualTo(1L);
             } else {
-                assertEquals(0, avType.getCount());
+                Assertions.assertThat(avType.getCount()).isEqualTo(0);
             }
         }
     }
@@ -316,13 +322,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getTypes()).isNotEmpty();
+        Assertions.assertThat(result.getFacets().getTypes()).isNotEmpty();
         List<TermFacetResultItem> types = result.getFacets().getTypes();
         for (TermFacetResultItem type : types) {
             if (type.getId().equals(ProgramType.BROADCAST.name())) {
-                assertEquals(1, type.getCount());
+                Assertions.assertThat(type.getCount()).isEqualTo(1);
             } else {
-                assertEquals(0, type.getCount());
+                Assertions.assertThat(type.getCount()).isEqualTo(0);
             }
         }
     }
@@ -335,7 +341,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getSortDates()).isNotEmpty();
+        Assertions.assertThat(result.getFacets().getSortDates()).isNotEmpty();
     }
 
     @Test
@@ -346,7 +352,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getDurations()).isNotEmpty();
+        Assertions.assertThat(result.getFacets().getDurations()).isNotEmpty();
     }
 
     @Test
@@ -358,11 +364,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getGenres()).hasSize(2);
+        Assertions.assertThat(result.getFacets().getGenres()).hasSize(2);
         final GenreFacetResultItem first = result.getFacets().getGenres().get(0);
-        assertThat(first.getValue()).isEqualTo("Documentaire - Natuur");
-        assertThat(first.getId()).isEqualTo("3.0.1.8.25");
-        assertThat(first.getTerms()).hasSize(2);
+        Assertions.assertThat(first.getValue()).isEqualTo("Documentaire - Natuur");
+        Assertions.assertThat(first.getId()).isEqualTo("3.0.1.8.25");
+        Assertions.assertThat(first.getTerms()).hasSize(2);
     }
 
     @Test
@@ -377,8 +383,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         form.getFacets().getGenres().setFilter(search);
 
         MediaSearchResult result = target.find(null, form, 0, null);
-        assertThat(result.getFacets().getGenres()).hasSize(1);
-        assertThat(result.getFacets().getGenres().get(0).getValue()).isEqualTo("Jeugd - Amusement");
+        Assertions.assertThat(result.getFacets().getGenres()).hasSize(1);
+        Assertions.assertThat(result.getFacets().getGenres().get(0).getValue()).isEqualTo("Jeugd - Amusement");
     }
 
     @Test
@@ -393,7 +399,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         form.getFacets().getGenres().setSubSearch(search);
 
         MediaSearchResult result = target.find(null, form, 0, null);
-        assertThat(result.getFacets().getGenres()).hasSize(1);
+        Assertions.assertThat(result.getFacets().getGenres()).hasSize(1);
     }
 
     @Test
@@ -404,7 +410,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getTags()).hasSize(3);
+        Assertions.assertThat(result.getFacets().getTags()).hasSize(3);
     }
 
     @Test
@@ -415,7 +421,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         MediaForm form = form().tagFacet(false).build();
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getTags()).hasSize(2);
+        Assertions.assertThat(result.getFacets().getTags()).hasSize(2);
 
     }
 
@@ -427,12 +433,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         MediaForm form = form().tagFacet(false).tags(false, "foo").build();
         MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(result.getFacets().getTags()).hasSize(2);
-        assertThat(result.getFacets().getTags().get(1).getId()).isEqualTo("foo");
-        assertThat(result.getFacets().getTags().get(1).isSelected()).isTrue();
+        Assertions.assertThat(result.getFacets().getTags()).hasSize(2);
+        Assertions.assertThat(result.getFacets().getTags().get(1).getId()).isEqualTo("foo");
+        Assertions.assertThat(result.getFacets().getTags().get(1).isSelected()).isTrue();
 
-        assertThat(result.getSelectedFacets().getTags()).hasSize(1);
-        assertThat(result.getSelectedFacets().getTags().get(0).getId()).isEqualTo("foo");
+        Assertions.assertThat(result.getSelectedFacets().getTags()).hasSize(1);
+        Assertions.assertThat(result.getSelectedFacets().getTags().get(0).getId()).isEqualTo("foo");
 
     }
 
@@ -449,9 +455,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MemberRefFacetResultItem> memberOf = result.getFacets().getMemberOf();
 
-        assertThat(memberOf).isNotEmpty();
-        assertThat(memberOf.get(0).getId()).isEqualTo(program.getMemberOf().first().getMidRef());
-        assertThat(memberOf.get(0).getValue()).isEqualTo("Group title");
+        Assertions.assertThat(memberOf).isNotEmpty();
+        Assertions.assertThat(memberOf.get(0).getId()).isEqualTo(program.getMemberOf().first().getMidRef());
+        Assertions.assertThat(memberOf.get(0).getValue()).isEqualTo("Group title");
     }
 
     @Test
@@ -464,7 +470,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MemberRefFacetResultItem> episodeOf = result.getFacets().getEpisodeOf();
 
-        assertThat(episodeOf).isNotEmpty();
+        Assertions.assertThat(episodeOf).isNotEmpty();
     }
 
     @Test
@@ -477,7 +483,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MemberRefFacetResultItem> descendantOf = result.getFacets().getDescendantOf();
 
-        assertThat(descendantOf).isNotEmpty();
+        Assertions.assertThat(descendantOf).isNotEmpty();
     }
 
     @Test
@@ -495,9 +501,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
-        assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0)).hasSize(2);
+        Assertions.assertThat(relations).isNotEmpty();
+        Assertions.assertThat(relations.get(0).getName()).isEqualTo("test");
+        Assertions.assertThat(relations.get(0)).hasSize(2);
     }
 
     @Test
@@ -518,10 +524,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
-        assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0).getFacets()).hasSize(2);
-        assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+        Assertions.assertThat(relations).isNotEmpty();
+        Assertions.assertThat(relations.get(0).getName()).isEqualTo("test");
+        Assertions.assertThat(relations.get(0).getFacets()).hasSize(2);
+        Assertions.assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
 
     }
 
@@ -546,22 +552,22 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
-        assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0).getFacets()).hasSize(2);
-        assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-        assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
-        assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
+        Assertions.assertThat(relations).isNotEmpty();
+        Assertions.assertThat(relations.get(0).getName()).isEqualTo("test");
+        Assertions.assertThat(relations.get(0).getFacets()).hasSize(2);
+        Assertions.assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+        Assertions.assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
+        Assertions.assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
 
-        assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("evangelisch");
-        assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
-        assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
+        Assertions.assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("evangelisch");
+        Assertions.assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
+        Assertions.assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
 
-        assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
-        assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
-        assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
-        assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-        assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
+        Assertions.assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
+        Assertions.assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
+        Assertions.assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
+        Assertions.assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+        Assertions.assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
 
     }
 
@@ -583,9 +589,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
-        assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0)).hasSize(1);
+        Assertions.assertThat(relations).isNotEmpty();
+        Assertions.assertThat(relations.get(0).getName()).isEqualTo("test");
+        Assertions.assertThat(relations.get(0)).hasSize(1);
     }
 
     @Test
@@ -608,9 +614,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
-        assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0)).hasSize(1);
+        Assertions.assertThat(relations).isNotEmpty();
+        Assertions.assertThat(relations.get(0).getName()).isEqualTo("test");
+        Assertions.assertThat(relations.get(0)).hasSize(1);
     }
 
     @Test
@@ -640,7 +646,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             JAXB.marshal(hasLocations, System.out);
 
             MediaSearchResult result = target.find(hasLocations, null, 0, null);
-            assertThat(result.asList()).hasSize(1);
+            Assertions.assertThat(result.asList()).hasSize(1);
         }
         {
             Filter filter = new Filter();
@@ -651,7 +657,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             JAXB.marshal(hasLocations, System.out);
 
             MediaSearchResult result = target.find(hasLocations, null, 0, null);
-            assertThat(result.asList()).hasSize(1);
+            Assertions.assertThat(result.asList()).hasSize(1);
         }
         {
             Filter filter = new Filter();
@@ -668,20 +674,20 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             JAXB.marshal(hasLocations, System.out);
 
             MediaSearchResult result = target.find(hasLocations, null, 0, null);
-            assertThat(result.asList()).hasSize(2);// FAILS NPA-298
+            Assertions.assertThat(result.asList()).hasSize(2);// FAILS NPA-298
         }
     }
 
     @Test
     public void testRedirectFormNull() {
-        assertThat(target.redirectForm(null)).isNull();
+        Assertions.assertThat(target.redirectForm(null)).isNull();
     }
 
     @Test
     public void testRedirectFormWithMediaIds() {
         redirect("abc", "xyz");
 
-        assertThat(target.redirectForm(form().mediaIds("abc", "def").build()).getSearches().getMediaIds().asList()
+        Assertions.assertThat(target.redirectForm(form().mediaIds("abc", "def").build()).getSearches().getMediaIds().asList()
                 .toString()).isEqualTo(
                         "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
@@ -690,7 +696,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     @Test
     public void testRedirectFormWithDescendantsOf() {
         redirect("abc", "xyz");
-        assertThat(target.redirectForm(form().descendantOfs("abc", "def").build()).getSearches().getDescendantOf()
+        Assertions.assertThat(target.redirectForm(form().descendantOfs("abc", "def").build()).getSearches().getDescendantOf()
                 .asList().toString()).isEqualTo(
                         "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
@@ -700,7 +706,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testRedirectFormWithEpisodeOf() {
         redirect("abc", "xyz");
 
-        assertThat(target.redirectForm(form().episodeOfs("abc", "def").build()).getSearches().getEpisodeOf().asList()
+        Assertions.assertThat(target.redirectForm(form().episodeOfs("abc", "def").build()).getSearches().getEpisodeOf().asList()
                 .toString()).isEqualTo(
                         "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
@@ -710,7 +716,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testRedirectFormWithMemberOf() {
         redirect("abc", "xyz");
 
-        assertThat(target.redirectForm(MediaFormBuilder.form().memberOfs("abc", "def").build()).getSearches()
+        Assertions.assertThat(target.redirectForm(MediaFormBuilder.form().memberOfs("abc", "def").build()).getSearches()
                 .getMemberOf().asList().toString()).isEqualTo(
                         "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
@@ -724,7 +730,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MemberRefFacet facet = new MemberRefFacet();
         facet.setFilter(helper.getSearches());
-        assertThat(target.redirectForm(form().memberOfFacet(facet).build()).getFacets().getMemberOf().getFilter()
+        Assertions.assertThat(target.redirectForm(form().memberOfFacet(facet).build()).getFacets().getMemberOf().getFilter()
                 .getMemberOf().asList().toString()).isEqualTo(
                         "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
 
@@ -739,10 +745,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaResult result = target.listMembers(group, null, Order.ASC, 0L, 10);
 
-        assertThat(result).hasSize(3);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
-        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result).hasSize(3);
+        Assertions.assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
+        Assertions.assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
 
     }
 
@@ -765,16 +771,16 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         {
             MediaResult result = target.listMembers(group, omroepProfile, Order.ASC, 0L, 10);
 
-            assertThat(result).hasSize(3);
-            assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-            assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
-            assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+            Assertions.assertThat(result).hasSize(3);
+            Assertions.assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+            Assertions.assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
+            Assertions.assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
         }
         {
             MediaResult result = target.listMembers(unrelatedGroup, omroepProfile, Order.ASC, 0L, 10);
 
-            assertThat(result).hasSize(1);
-            assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+            Assertions.assertThat(result).hasSize(1);
+            Assertions.assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         }
 
     }
@@ -794,9 +800,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         MediaResult result = target.listMembers(group, omroepProfile, Order.ASC, 1L, 10);
 
-        assertThat(result).hasSize(2);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_3");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result).hasSize(2);
+        Assertions.assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_3");
+        Assertions.assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_1");
 
     }
 
@@ -813,14 +819,14 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
 
-        assertThat(result).hasSize(6);
-        assertThat(result.getTotal()).isEqualTo(6);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
-        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(3).getMid()).isEqualTo("MID_4");
-        assertThat(result.getItems().get(4).getMid()).isEqualTo("MID_3");
-        assertThat(result.getItems().get(5).getMid()).isEqualTo("MID_5");
+        Assertions.assertThat(result).hasSize(6);
+        Assertions.assertThat(result.getTotal()).isEqualTo(6);
+        Assertions.assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
+        Assertions.assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result.getItems().get(3).getMid()).isEqualTo("MID_4");
+        Assertions.assertThat(result.getItems().get(4).getMid()).isEqualTo("MID_3");
+        Assertions.assertThat(result.getItems().get(5).getMid()).isEqualTo("MID_5");
 
     }
 
@@ -839,11 +845,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 0L, 10);
 
-        assertThat(result).hasSize(3);
-        assertThat(result.getTotal()).isEqualTo(3);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_3");
+        Assertions.assertThat(result).hasSize(3);
+        Assertions.assertThat(result.getTotal()).isEqualTo(3);
+        Assertions.assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_3");
 
     }
 
@@ -862,9 +868,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 1L, 10);
 
-        assertThat(result).hasSize(2);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
+        Assertions.assertThat(result).hasSize(2);
+        Assertions.assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+        Assertions.assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
 
     }
 
@@ -875,8 +881,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         Group group2 = index(group().mergedTo(group1).mid("MID_1").build());
         target.refillRedirectCache();
         Optional<String> result = target.redirect("MID_1");
-        assertTrue(result.isPresent());
-        assertThat(result.get()).isEqualTo("MID_0");
+        Assertions.assertThat(result.isPresent()).isTrue();
+        Assertions.assertThat(result.get()).isEqualTo("MID_0");
     }
 
     @Test
@@ -887,18 +893,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         {
             SearchResult<MediaObject> result = target.find(null, form().ageRating(_6).build(), 0, null);
-            assertEquals(1L, (long) result.getSize());
-            assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
+            Assertions.assertThat(result.getSize()).isEqualTo(1L);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("t1");
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().ageRating(_12).build(), 0, null);
-            assertEquals(1L, (long) result.getSize());
-            assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+            Assert.assertEquals(1L, (long) result.getSize());
+            Assert.assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
         }
 
-        assertEquals(2L, (long) target.find(null, form().ageRating(_6, _12).build(), 0, null).getSize());
-        assertEquals(1L, (long) target.find(null, form().ageRating(ALL).build(), 0, null).getSize());
-        assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
+        Assert.assertEquals(2L, (long) target.find(null, form().ageRating(_6, _12).build(), 0, null).getSize());
+        Assert.assertEquals(1L, (long) target.find(null, form().ageRating(ALL).build(), 0, null).getSize());
+        Assert.assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
     }
 
     @Test
@@ -907,10 +913,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         {
             SearchResult<MediaObject> result = target.find(null, form().build(), 0, null);
-            assertEquals(1, result.getSize().intValue());
-            assertEquals("Jeugd - Amusement",
+            Assert.assertEquals(1, result.getSize().intValue());
+            Assert.assertEquals("Jeugd - Amusement",
                     result.getItems().get(0).getResult().getGenres().first().getDisplayName());
-            assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
+            Assert.assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
         }
 
         index(program().mainTitle("t2").genres(new Genre("3.0.1.5")).build());
@@ -919,9 +925,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                 new Filter(new GenreConstraint("3.0.1.5")));
         {
             SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
-            assertEquals(1, result.getSize().intValue());
-            assertEquals("Muziek", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
-            assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+            Assert.assertEquals(1, result.getSize().intValue());
+            Assert.assertEquals("Muziek", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
+            Assert.assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
 
         }
 
@@ -939,7 +945,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             new Filter(new GenreConstraint("3.0.1*")));
         {
             SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
-            assertEquals(3, result.getSize().intValue());
+            Assert.assertEquals(3, result.getSize().intValue());
         }
     }
 
@@ -949,13 +955,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         index(program().mainTitle("t2").contentRatings(DRUGS_EN_ALCOHOL).build());
         index(program().mainTitle("t3").contentRatings(ANGST, DRUGS_EN_ALCOHOL).build());
 
-        assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
-        assertEquals(2L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
-        assertEquals(2L, (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL).build(), 0, null).getSize());
-        assertEquals(2L,
+        Assert.assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
+        Assert.assertEquals(2L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
+        Assert.assertEquals(2L, (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL).build(), 0, null).getSize());
+        Assert.assertEquals(2L,
                 (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL, SEKS).build(), 0, null).getSize());
-        assertEquals(0L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
-        assertEquals(0L,
+        Assert.assertEquals(0L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
+        Assert.assertEquals(0L,
                 (long) target.find(null, form().contentRatings(DISCRIMINATIE, SEKS).build(), 0, null).getSize());
     }
 
@@ -963,15 +969,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testAgeAndContentRatings() throws IOException {
         index(program().mainTitle("t1").contentRatings(SEKS).ageRating(_16).build());
 
-        assertEquals(1L, (long) target.find(null, form().build(), 0, null).getSize());
-        assertEquals(1L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
-        assertEquals(1L, (long) target.find(null, form().ageRating(_16).build(), 0, null).getSize());
-        assertEquals(1L,
+        Assert.assertEquals(1L, (long) target.find(null, form().build(), 0, null).getSize());
+        Assert.assertEquals(1L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
+        Assert.assertEquals(1L, (long) target.find(null, form().ageRating(_16).build(), 0, null).getSize());
+        Assert.assertEquals(1L,
                 (long) target.find(null, form().contentRatings(SEKS).ageRating(_16).build(), 0, null).getSize());
-        assertEquals(1L, (long) target
+        Assert.assertEquals(1L, (long) target
                 .find(null, form().contentRatings(DISCRIMINATIE, SEKS).ageRating(_12, _16).build(), 0, null).getSize());
-        assertEquals(0L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
-        assertEquals(0L, (long) target.find(null, form().ageRating(_12).build(), 0, null).getSize());
+        Assert.assertEquals(0L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
+        Assert.assertEquals(0L, (long) target.find(null, form().ageRating(_12).build(), 0, null).getSize());
     }
 
     @Test
@@ -986,26 +992,26 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         MediaSearchResult result = target.find(null, form().ageRating(ALL, _6, _12).ageRatingFacet(0).build(), 0, null);
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
 
-        assertEquals(5, ageRatings.size());
+        Assert.assertEquals(5, ageRatings.size());
 
         /* 3 x 6, 0 x 9, 2 * 12, 0 x 16, 1 * Alle Leeftijden */
-        assertEquals(3, ageRatings.get(0).getCount());
-        assertEquals(_6.getXmlValue(), ageRatings.get(0).getId());
-        assertEquals(0, ageRatings.get(1).getCount());
-        assertEquals(_9.getXmlValue(), ageRatings.get(1).getId());
-        assertEquals(2, ageRatings.get(2).getCount());
-        assertEquals(_12.getXmlValue(), ageRatings.get(2).getId());
-        assertEquals(0, ageRatings.get(3).getCount());
-        assertEquals(_16.getXmlValue(), ageRatings.get(3).getId());
-        assertEquals(1, ageRatings.get(4).getCount());
-        assertEquals(ALL.getXmlValue(), ageRatings.get(4).getId());
-        assertEquals(ALL.getDisplayName(), ageRatings.get(4).getValue());
+        Assert.assertEquals(3, ageRatings.get(0).getCount());
+        Assert.assertEquals(_6.getXmlValue(), ageRatings.get(0).getId());
+        Assert.assertEquals(0, ageRatings.get(1).getCount());
+        Assert.assertEquals(_9.getXmlValue(), ageRatings.get(1).getId());
+        Assert.assertEquals(2, ageRatings.get(2).getCount());
+        Assert.assertEquals(_12.getXmlValue(), ageRatings.get(2).getId());
+        Assert.assertEquals(0, ageRatings.get(3).getCount());
+        Assert.assertEquals(_16.getXmlValue(), ageRatings.get(3).getId());
+        Assert.assertEquals(1, ageRatings.get(4).getCount());
+        Assert.assertEquals(ALL.getXmlValue(), ageRatings.get(4).getId());
+        Assert.assertEquals(ALL.getDisplayName(), ageRatings.get(4).getValue());
 
         {
             MediaSearchResult result1 = target.find(null, form().ageRating(_16).ageRatingFacet().build(), 0, null);
-            assertEquals(1L, (long) result1.getSelectedFacets().getAgeRatings().size());
-            assertEquals(_16.getXmlValue(), result1.getSelectedFacets().getAgeRatings().get(0).getValue());
-            assertEquals(0, result1.getSelectedFacets().getAgeRatings().get(0).getCount());
+            Assert.assertEquals(1L, (long) result1.getSelectedFacets().getAgeRatings().size());
+            Assert.assertEquals(_16.getXmlValue(), result1.getSelectedFacets().getAgeRatings().get(0).getValue());
+            Assert.assertEquals(0, result1.getSelectedFacets().getAgeRatings().get(0).getCount());
         }
     }
 
@@ -1027,20 +1033,20 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
          * ANGST: 2, DISCRIMINATIE: 1, DRUGS_EN_ALCOHOL: 2, GEWELD: 1,
          * GROF_TAALGEBRUIK: 2, SEKS: 1, alphabetically
          */
-        assertEquals(contentRatings.size(), ContentRating.values().length);
+        Assert.assertEquals(contentRatings.size(), ContentRating.values().length);
 
-        assertEquals(ANGST.name(), contentRatings.get(0).getId());
-        assertEquals(2, contentRatings.get(0).getCount());
-        assertEquals(DISCRIMINATIE.name(), contentRatings.get(1).getId());
-        assertEquals(1, contentRatings.get(1).getCount());
-        assertEquals(DRUGS_EN_ALCOHOL.name(), contentRatings.get(2).getId());
-        assertEquals(2, contentRatings.get(2).getCount());
-        assertEquals(GEWELD.name(), contentRatings.get(3).getId());
-        assertEquals(1, contentRatings.get(3).getCount());
-        assertEquals(GROF_TAALGEBRUIK.name(), contentRatings.get(4).getId());
-        assertEquals(2, contentRatings.get(4).getCount());
-        assertEquals(SEKS.name(), contentRatings.get(5).getId());
-        assertEquals(1, contentRatings.get(5).getCount());
+        Assert.assertEquals(ANGST.name(), contentRatings.get(0).getId());
+        Assert.assertEquals(2, contentRatings.get(0).getCount());
+        Assert.assertEquals(DISCRIMINATIE.name(), contentRatings.get(1).getId());
+        Assert.assertEquals(1, contentRatings.get(1).getCount());
+        Assert.assertEquals(DRUGS_EN_ALCOHOL.name(), contentRatings.get(2).getId());
+        Assert.assertEquals(2, contentRatings.get(2).getCount());
+        Assert.assertEquals(GEWELD.name(), contentRatings.get(3).getId());
+        Assert.assertEquals(1, contentRatings.get(3).getCount());
+        Assert.assertEquals(GROF_TAALGEBRUIK.name(), contentRatings.get(4).getId());
+        Assert.assertEquals(2, contentRatings.get(4).getCount());
+        Assert.assertEquals(SEKS.name(), contentRatings.get(5).getId());
+        Assert.assertEquals(1, contentRatings.get(5).getCount());
     }
 
     @Test
@@ -1053,7 +1059,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                         new AgeRatingConstraint(AgeRating._9), new AgeRatingConstraint(AgeRating._6))));
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
-        assertThat(result.getSize()).isEqualTo(1);
+        Assertions.assertThat(result.getSize()).isEqualTo(1);
     }
 
     @Test
@@ -1068,13 +1074,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         {
             SearchResult<MediaObject> result = target.find(pornoSiteProfile, null, 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
-            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("sex!");
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("sex!");
         }
         {
             SearchResult<MediaObject> result = target.find(childrenSiteProfile, null, 0, null);
-            assertThat(result.getSize()).isEqualTo(1);
-            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("heel gewoon");
+            Assertions.assertThat(result.getSize()).isEqualTo(1);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("heel gewoon");
         }
     }
 
@@ -1097,18 +1103,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             form.addSortField(TitleSortOrder.builder().textualType(TextualType.MAIN).order(Order.ASC).build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
-            assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa");
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb");
+            Assertions.assertThat(result.getSize()).isEqualTo(2);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa");
+            Assertions.assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb");
         }
         {
             MediaForm form = new MediaForm();
             form.addSortField(TitleSortOrder.builder().textualType(TextualType.LEXICO).order(Order.ASC).build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
-            assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
+            Assertions.assertThat(result.getSize()).isEqualTo(2);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
+            Assertions.assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
         }
     }
 
@@ -1134,9 +1140,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                 .build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
-            assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
+            Assertions.assertThat(result.getSize()).isEqualTo(2);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
+            Assertions.assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
         }
     }
 
@@ -1165,9 +1171,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                 .build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
-            assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
+            Assertions.assertThat(result.getSize()).isEqualTo(2);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
+            Assertions.assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
         }
         {
             MediaForm form = new MediaForm();
@@ -1178,9 +1184,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                 .build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
-            assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa");
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb");
+            Assertions.assertThat(result.getSize()).isEqualTo(2);
+            Assertions.assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa");
+            Assertions.assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb");
         }
     }
 

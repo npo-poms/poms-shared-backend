@@ -8,17 +8,17 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.regex.Pattern;
 
-import org.elasticsearch.index.query.FilterBuilder;
+import org.apache.lucene.util.automaton.RegExp;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogram;
-import org.elasticsearch.search.aggregations.bucket.nested.NestedBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.facet.FacetBuilders;
-import org.elasticsearch.search.facet.terms.TermsFacet;
-import org.elasticsearch.search.facet.terms.TermsFacetBuilder;
 
 /**
  * @author Roelof Jan Koekoek
@@ -28,38 +28,39 @@ public abstract class ESFacetsBuilder {
 
     public static final String TIMEZONE = "CET";
 
-    public static final org.elasticsearch.common.joda.time.DateTimeZone DATE_TIME_ZONE = org.elasticsearch.common.joda.time.DateTimeZone.forID(TIMEZONE);
+    //public static final org.elasticsearch.common.joda.time.DateTimeZone DATE_TIME_ZONE = org.elasticsearch.common.joda.time.DateTimeZone.forID(TIMEZONE);
 
     protected static final String ROOT_FILTER = "rootFilter";
 
     protected static final String FILTER_PREFIX = "filter_";
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, TextFacet<?> facet, String fieldPrefix) {
+    protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, TextFacet<?> facet, String fieldPrefix) {
         if(facet != null) {
-            TermsFacet.ComparatorType order = ESFacets.getComparatorType(facet);
+            Terms.Order order = ESFacets.getComparatorType(facet);
 
-            TermsFacetBuilder termsFacet = FacetBuilders
-                .termsFacet(fieldName)
-                .field(fieldName)
-                .size(facet.getMax())
-                .nested(fieldPrefix)
-                .facetFilter(filterBuilder)
-                .order(order);
+            TermsAggregationBuilder termsFacet = AggregationBuilders
+                .terms("agg")
+                //.subAggregation(Aggfilter(fieldName, filterBuilder)
+                //.size(facet.getMax())
+                //.order(order)
+                //.nested(fieldPrefix)
+            ;
+
             String include = facet.getInclude();
             if (include != null) {
                 Pattern pattern = Pattern.compile(include);
-                termsFacet.regex(pattern.pattern(), pattern.flags());
+                termsFacet.includeExclude(new IncludeExclude(new RegExp(pattern.pattern(), pattern.flags()), null));
             }
             String script = facet.getScript();
             if (script != null) {
-                termsFacet.script(script);
+                termsFacet.script(new Script(script));
             }
 
-            searchBuilder.facet(termsFacet);
+            searchBuilder.aggregation(termsFacet);
         }
     }
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix) {
+    protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix) {
         if(facet != null) {
             if(facet.getRanges() != null) {
                 for(nl.vpro.domain.api.RangeFacet<Instant> range : facet.getRanges()) {
@@ -69,8 +70,7 @@ public abstract class ESFacetsBuilder {
                         // Dat zou echter deze code nogal moeten verbouwen, want je moet het aggregationfilter doorgeven om er subAggregations aan te kunnen toevoegen.
                         searchBuilder.aggregation(
                             AggregationBuilders
-                                .filter(fieldName + '_' + interval.toString())
-                                .filter(filterBuilder)
+                                .filter(fieldName + '_' + interval.toString(), filterBuilder)
                                 .subAggregation(
                                     AggregationBuilders.dateHistogram("sub")
                                         .field(fieldName)
@@ -85,24 +85,27 @@ public abstract class ESFacetsBuilder {
                                         // en NPA-183
                                         //.postZone((asDuration || interval.unit != IntervalUnit.YEAR) ? "00:00" : "-01:00")
 
-                                        .interval(new DateHistogram.Interval(interval.getEsValue()))
+                                        //.interval(AggregationBuilders.dateHistogram(interval.getEsValue()))
                                 )
                         );
                     } else {
+                        // TODO
                         RangeFacetItem<Instant> dateRangeItem = (RangeFacetItem<Instant>)range;
-                        searchBuilder.facet(FacetBuilders.rangeFacet(fieldName + ':' + dateRangeItem.getName()).field(fieldName).addRange(
-                            dateRangeItem.getBegin() != null ? String.valueOf(dateRangeItem.getBegin().toEpochMilli()) : null,
-                            dateRangeItem.getEnd() != null ? String.valueOf(dateRangeItem.getEnd().toEpochMilli()) : null
+                        searchBuilder.aggregation(AggregationBuilders.range(fieldName + ':' + dateRangeItem.getName()).field(fieldName).addRange(
+                            dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : null,
+                            dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : null
+                            )
                         )
-                            .nested(fieldPrefix)
-                            .facetFilter(filterBuilder));
+                            //.sub(fieldPrefix)
+                        //    .facetFilter(filterBuilder))
+                        ;
                     }
                 }
             }
         }
     }
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, DurationRangeFacets<?> facet, String fieldPrefix) {
+    protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, DurationRangeFacets<?> facet, String fieldPrefix) {
         if (facet != null) {
             if (facet.getRanges() != null) {
                 for (nl.vpro.domain.api.RangeFacet<Duration> range : facet.getRanges()) {
@@ -112,8 +115,7 @@ public abstract class ESFacetsBuilder {
                         // Dat zou echter deze code nogal moeten verbouwen, want je moet het aggregationfilter doorgeven om er subAggregations aan te kunnen toevoegen.
                         searchBuilder.aggregation(
                             AggregationBuilders
-                                .filter(fieldName + '_' + interval.toString())
-                                .filter(filterBuilder)
+                                .filter(fieldName + '_' + interval.toString(), filterBuilder)
                                 .subAggregation(
                                     AggregationBuilders.dateHistogram("sub")
                                         .field(fieldName)
@@ -128,17 +130,20 @@ public abstract class ESFacetsBuilder {
                                         // en NPA-183
                                         //.postZone((asDuration || interval.unit != IntervalUnit.YEAR) ? "00:00" : "-01:00")
 
-                                        .interval(new DateHistogram.Interval(interval.getEsValue()))
+                                        //.dateHistogramInterval(interval.getEsValue())
                                 )
                         );
                     } else {
                         RangeFacetItem<Duration> dateRangeItem = (RangeFacetItem<Duration>) range;
-                        searchBuilder.facet(FacetBuilders.rangeFacet(fieldName + ':' + dateRangeItem.getName()).field(fieldName).addRange(
-                            dateRangeItem.getBegin() != null ? String.valueOf(dateRangeItem.getBegin().toMillis()) : null,
-                            dateRangeItem.getEnd() != null ? String.valueOf(dateRangeItem.getEnd().toMillis()) : null
-                        )
-                            .nested(fieldPrefix)
-                            .facetFilter(filterBuilder));
+                        searchBuilder.aggregation(AggregationBuilders.range(fieldName + ':' + dateRangeItem.getName())
+                            .field(fieldName)
+                            .addRange(
+                                dateRangeItem.getBegin() != null ? Double.valueOf(dateRangeItem.getBegin().toMillis()) : null,
+                                dateRangeItem.getEnd() != null ? Double.valueOf(dateRangeItem.getEnd().toMillis()) : null
+                            ));
+                        // TODO
+                            //.nested(fieldPrefix)
+                            //.facetFilter(filterBuilder));
                     }
                 }
             }
@@ -156,15 +161,14 @@ public abstract class ESFacetsBuilder {
         return INVALID.matcher(facetName).replaceAll("__");
     }
 
-    protected static NestedBuilder getNestedBuilder(String pathPrefix, String nestedField, FilterBuilder subSearch, AggregationBuilder... subAggregations) {
-        NestedBuilder nestedBuilder = AggregationBuilders
-            .nested(escapePath(pathPrefix, nestedField))
-            .path(pathPrefix + nestedField);
+    protected static NestedAggregationBuilder getNestedBuilder(String pathPrefix, String nestedField, QueryBuilder subSearch, AggregationBuilder... subAggregations) {
+        NestedAggregationBuilder nestedBuilder = AggregationBuilders
+            .nested(escapePath(pathPrefix, nestedField), pathPrefix + nestedField)
+            ;
 
         if(subSearch != null) {
             FilterAggregationBuilder filteredAggregation = AggregationBuilders
-                .filter(FILTER_PREFIX)
-                .filter(subSearch);
+                .filter(FILTER_PREFIX, subSearch);
 
             addSubAggregations(filteredAggregation, subAggregations);
 
@@ -186,7 +190,7 @@ public abstract class ESFacetsBuilder {
         String nestedField,
         String facetField,
         TextFacet<?> facet,
-        FilterBuilder subSearch
+        QueryBuilder subSearch
     ) {
         return getFilteredTermsBuilder(pathPrefix, nestedField, facetField, facet, facetField, subSearch);
     }
@@ -198,11 +202,11 @@ public abstract class ESFacetsBuilder {
         String facetField,
         TextFacet<?> facet,
         String facetName,
-        FilterBuilder subSearch) {
+        QueryBuilder subSearch) {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
-        TermsBuilder termsBuilder =
+        TermsAggregationBuilder termsBuilder =
             AggregationBuilders.terms(escapeFacetName(facetName))
                 .field(fullFieldPath)
                 .minDocCount(facet.getThreshold() == null ? -1 : facet.getThreshold())
@@ -212,13 +216,12 @@ public abstract class ESFacetsBuilder {
         String include = facet.getInclude();
         if (include != null) {
             Pattern pattern = Pattern.compile(include);
-            termsBuilder.include(pattern.pattern(), pattern.flags());
+            termsBuilder.includeExclude(new IncludeExclude(new RegExp(pattern.pattern(), pattern.flags()), null));
         }
 
         if(subSearch != null) {
             return AggregationBuilders
-                .filter(FILTER_PREFIX + escapeFacetName(facetName))
-                .filter(subSearch)
+                .filter(FILTER_PREFIX + escapeFacetName(facetName), subSearch)
                 .subAggregation(termsBuilder);
         }
 

@@ -1,7 +1,6 @@
 package nl.vpro.domain.api;
 
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.facet.terms.TermsFacet;
 
 /**
  * @author Michiel Meeuwissen
@@ -9,20 +8,20 @@ import org.elasticsearch.search.facet.terms.TermsFacet;
  */
 public class ESFacets {
 
-    static TermsFacet.ComparatorType getComparatorType(TextFacet<?> facet) {
+    static Terms.Order getComparatorType(TextFacet<?> facet) {
         if (facet.getSort() == null) {
-            return TermsFacet.ComparatorType.COUNT;
+            return Terms.Order.count(false);
         }
         switch (facet.getSort()) {
             case VALUE_ASC:
-                return TermsFacet.ComparatorType.TERM;
+                return Terms.Order.term(true);
             case VALUE_DESC:
-                return TermsFacet.ComparatorType.REVERSE_TERM;
+                return Terms.Order.term(false);
             case COUNT_DESC:
-                return TermsFacet.ComparatorType.COUNT;
+                return Terms.Order.count(false);
             case COUNT_ASC:
             default:
-                return TermsFacet.ComparatorType.REVERSE_COUNT;
+                return Terms.Order.count(true);
         }
     }
 

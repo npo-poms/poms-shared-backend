@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.common.text.StringText;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.suggest.Suggest;
 import org.junit.Test;
 
@@ -56,7 +56,7 @@ public class ESQueryRepositoryTest {
         suggestionList.add(suggestEntry);
 
 
-        Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion = new Suggest.Suggestion.Entry<>(new StringText("suggestion"), 0, 10);
+        Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion = new Suggest.Suggestion.Entry<>(new Text("suggestion"), 0, 10);
         suggestEntry.addTerm(suggestion);
 
         addOptions(suggestion, text);
@@ -74,7 +74,7 @@ public class ESQueryRepositoryTest {
 
 
     private void addOption(Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion, String text) {
-        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new StringText(text), 0.5f));
+        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new Text(text), 0.5f));
 
     }
 

@@ -15,15 +15,19 @@ import java.util.stream.Stream;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.join.query.JoinQueryBuilders;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
 import nl.vpro.domain.api.subtitles.SubtitlesSearch;
 import nl.vpro.media.domain.es.ApiCueIndex;
+
+//import org.elasticsearch.join.query.JoinQueryBuilders;
 
 /**
  * NOTE!: There is also a {@link ESMediaFilterBuilder} equivalent that more or less contains the same code for
@@ -93,7 +97,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                     subtitlesSearch.setText(textSearch);
                     //subtitlesSearch.setLanguages(TextMatcherList.must(TextMatcher.must("nl")));
                     QueryBuilder subtitlesQuery = ESSubtitlesQueryBuilder.query(subtitlesSearch);
-                    textQuery.should(QueryBuilders.hasChildQuery(ApiCueIndex.TYPE, subtitlesQuery)).boost(SUBTITLES.getBoost());
+                    textQuery.should(JoinQueryBuilders.hasChildQuery(ApiCueIndex.TYPE, subtitlesQuery, ScoreMode.Max)).boost(SUBTITLES.getBoost());
                 } else {
                     log.debug("Searching in subtitles is disabled");
                 }

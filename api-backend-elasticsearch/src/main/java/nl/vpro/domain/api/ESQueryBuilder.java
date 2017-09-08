@@ -3,7 +3,7 @@ package nl.vpro.domain.api;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -11,13 +11,12 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.core.StopFilter;
+import org.apache.lucene.analysis.WordlistLoader;
 import org.apache.lucene.analysis.nl.DutchAnalyzer;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.util.CharArraySet;
-import org.apache.lucene.analysis.util.WordlistLoader;
+import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.Version;
 import org.elasticsearch.common.unit.Fuzziness;
@@ -39,13 +38,12 @@ public abstract class ESQueryBuilder {
 
     private static final int PHRASE_SLOP = 4;
 
-    private static Version LUCENE_VERSION = Version.LUCENE_47;
+    private static Version LUCENE_VERSION = Version.LUCENE_6_6_0;
     private static CharArraySet STOP_WORDS;
 
     static {
         try {
-            STOP_WORDS = CharArraySet.unmodifiableSet(
-                CharArraySet.copy(LUCENE_VERSION, WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(SnowballFilter.class, DutchAnalyzer.DEFAULT_STOPWORD_FILE, IOUtils.CHARSET_UTF_8), LUCENE_VERSION)));
+            STOP_WORDS = CharArraySet.unmodifiableSet(CharArraySet.copy(WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(SnowballFilter.class, DutchAnalyzer.DEFAULT_STOPWORD_FILE, Charset.forName("UTF-8")))));
         } catch (IOException ioe) {
 
         }
@@ -69,7 +67,7 @@ public abstract class ESQueryBuilder {
 
             quoted.forEach(entry -> {
                     String unquoted = entry.substring(1, entry.length() - 1);
-                    MatchQueryBuilder phraseQuery = phraseQuery(prefix, searchField, unquoted, PHRASE_FACTOR * QUOTE_FACTOR, 0);
+                    MatchPhraseQueryBuilder phraseQuery = phraseQuery(prefix, searchField, unquoted, PHRASE_FACTOR * QUOTE_FACTOR, 0);
 
                     fieldQuery.should(phraseQuery);
                     if (fuzziness != null) {
@@ -83,17 +81,19 @@ public abstract class ESQueryBuilder {
             if (quoted.size() < splitText.size()) {
                 MatchQueryBuilder matchQuery = QueryBuilders.matchQuery(prefix + searchField.getName(), textWithoutStopWords)
                     .boost(searchField.getBoost())
-                    .operator(MatchQueryBuilder.Operator.OR);
-                MatchQueryBuilder phraseQuery = phraseQuery(prefix, searchField, textSearch.getValue(), PHRASE_FACTOR, PHRASE_SLOP);
+                    .operator(Operator.OR);
+                MatchPhraseQueryBuilder phraseQuery = phraseQuery(prefix, searchField, textSearch.getValue(), PHRASE_FACTOR, PHRASE_SLOP);
 
                 fieldQuery.should(matchQuery);
                 fieldQuery.should(phraseQuery);
 
                 if (fuzziness != null) {
-                    fieldQuery.should(
+                    //TODO
+                /*    fieldQuery.should(
+
                         fuzzy(fuzziness, matchQuery)
                     );
-
+*/
                     fieldQuery.should(
                         fuzzy(fuzziness, phraseQuery)
                     );
@@ -106,10 +106,10 @@ public abstract class ESQueryBuilder {
         return answer;
     }
 
-    static MatchQueryBuilder phraseQuery(String prefix, SearchFieldDefinition searchField, String value, float boost, int slop) {
+    static MatchPhraseQueryBuilder phraseQuery(String prefix, SearchFieldDefinition searchField, String value, float boost, int slop) {
         return QueryBuilders.matchPhraseQuery(prefix + searchField.getName(), value)
             .boost(searchField.getBoost() * boost)
-            .operator(MatchQueryBuilder.Operator.OR)
+            //.(Operator.OR)
             .slop(slop);
     }
 
@@ -122,9 +122,9 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    static MatchQueryBuilder fuzzy(Fuzziness fuzziness, MatchQueryBuilder queryBuilder) {
+    static MatchPhraseQueryBuilder fuzzy(Fuzziness fuzziness, MatchPhraseQueryBuilder queryBuilder) {
         if (fuzziness != null) {
-            queryBuilder.fuzziness(fuzziness);
+            //queryBuilder.fuziness(fuzziness);
         }
         return queryBuilder;
     }
@@ -134,7 +134,7 @@ public abstract class ESQueryBuilder {
         String textWithoutStopWords = value;
         try {
             StringBuilder builder = new StringBuilder();
-            TokenStream stream = new StopFilter(LUCENE_VERSION, new StandardTokenizer(LUCENE_VERSION, new StringReader(value)), STOP_WORDS);
+            TokenStream stream = null; // TODO//new StopFilter(new GermanLightStemFilter(new ), STOP_WORDS);
             CharTermAttribute termAttribute = stream.getAttribute(CharTermAttribute.class);
             stream.reset();
             while (stream.incrementToken()) {
@@ -324,7 +324,7 @@ public abstract class ESQueryBuilder {
                 applier.applyField(query, matcher);
             }
 
-            QueryBuilder nested = QueryBuilders.nestedQuery(path, query);
+            QueryBuilder nested = QueryBuilders.nestedQuery(path, query, ScoreMode.Avg);
             apply(booleanQueryBuilder, nested, textMatchers.getMatch());
         }
     }
@@ -355,7 +355,7 @@ public abstract class ESQueryBuilder {
         build(fieldWrapper, relationSearch.getValues(), new SingleFieldApplier(prefix + "relations.value"));
         build(fieldWrapper, relationSearch.getUriRefs(), new SingleFieldApplier(prefix + "relations.uriRef"));
 
-        NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + "relations", fieldWrapper);
+        NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + "relations", fieldWrapper, ScoreMode.Max);
 
         apply(booleanQuery, nestedQuery, relationSearch.getMatch());
 

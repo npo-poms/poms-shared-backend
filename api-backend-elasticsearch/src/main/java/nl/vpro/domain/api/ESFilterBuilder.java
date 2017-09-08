@@ -2,12 +2,18 @@ package nl.vpro.domain.api;
 
 import javax.annotation.Nonnull;
 
-import org.elasticsearch.index.query.*;
+import org.apache.lucene.search.join.ScoreMode;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.*;
 import nl.vpro.domain.constraint.media.HasLocationConstraint;
 import nl.vpro.domain.constraint.media.HasPredictionConstraint;
+
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -15,7 +21,7 @@ import nl.vpro.domain.constraint.media.HasPredictionConstraint;
  */
 public abstract class ESFilterBuilder {
 
-    protected static void apply(BoolFilterBuilder answer, FilterBuilder filter, Match match) {
+    protected static void apply(BoolQueryBuilder answer, QueryBuilder filter, Match match) {
         switch (match) {
             case SHOULD:
                 answer.should(filter);
@@ -29,16 +35,16 @@ public abstract class ESFilterBuilder {
         }
     }
 
-    public static <T> FilterBuilder filter(ProfileDefinition<T> definition) {
+    public static <T> QueryBuilder filter(ProfileDefinition<T> definition) {
         if (isEmpty(definition)) {
-            return FilterBuilders.matchAllFilter();
+            return matchAllQuery();
         }
 
         return handleConstraint(definition.getFilter().getConstraint());
     }
 
-    public static <T> FilterBuilder filter(ProfileDefinition<T> definition, FilterBuilder filter) {
-        if (filter == null || filter instanceof MatchAllFilterBuilder) {
+    public static <T> QueryBuilder filter(ProfileDefinition<T> definition, QueryBuilder  filter) {
+        if (filter == null || filter instanceof MatchAllQueryBuilder) {
             return filter(definition);
         }
 
@@ -47,25 +53,26 @@ public abstract class ESFilterBuilder {
         }
 
         // unwrap
-        if (filter instanceof AndFilterBuilder) {
-            return ((AndFilterBuilder) filter).add(filter(definition));
-        } else if (filter instanceof BoolFilterBuilder) {
-            return ((BoolFilterBuilder) filter).must(filter(definition));
+        if (filter instanceof BoolQueryBuilder) {
+            return ((BoolQueryBuilder) filter).must(filter(definition));
         } else {
-            return FilterBuilders.andFilter(filter(definition), filter);
+            BoolQueryBuilder result = QueryBuilders.boolQuery();
+            result.must(filter(definition));
+            result.must(filter);
+            return result;
         }
     }
 
-    public static FilterBuilder filter(TermSearch searches, @Nonnull String axis, String field) {
+    public static QueryBuilder filter(TermSearch searches, @Nonnull String axis, String field) {
         return filter(searches, "", axis, field);
     }
 
-    public static FilterBuilder filter(TermSearch searches, @Nonnull String prefix, String axis, String field) {
+    public static QueryBuilder filter(TermSearch searches, @Nonnull String prefix, String axis, String field) {
         if(searches == null || searches.getIds() == null || searches.getIds().isEmpty()) {
-            return FilterBuilders.matchAllFilter();
+            return matchAllQuery();
         }
 
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
+        BoolQueryBuilder booleanFilter = boolQuery();
         build(booleanFilter, searches.getIds(), new SimpleFieldApplier(prefix + axis + '.' + field));
         return booleanFilter;
     }
@@ -74,7 +81,7 @@ public abstract class ESFilterBuilder {
         return definition == null || !definition.hasConstraint();
     }
 
-    static private <T> FilterBuilder handleConstraint(Constraint<T> constraint) {
+    static private <T> QueryBuilder handleConstraint(Constraint<T> constraint) {
         if (constraint instanceof AbstractAnd) {
             return doAnd((AbstractAnd<T>) constraint);
         } else if (constraint instanceof AbstractOr) {
@@ -84,19 +91,19 @@ public abstract class ESFilterBuilder {
         } else if (constraint instanceof HasLocationConstraint) {
             HasLocationConstraint hasLocation = (HasLocationConstraint) constraint;
             if (hasLocation.isNoPlatform()) {
-                BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
-                booleanFilter.must(FilterBuilders.existsFilter("locations.urn"));
-                booleanFilter.mustNot(FilterBuilders.existsFilter("locations.platform"));
-                return FilterBuilders.nestedFilter("locations", booleanFilter);
+                BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
+                booleanFilter.must(QueryBuilders.existsQuery("locations.urn"));
+                booleanFilter.mustNot(QueryBuilders.existsQuery("locations.platform"));
+                return QueryBuilders.nestedQuery("locations", booleanFilter, ScoreMode.Avg);
             } else if (hasLocation.getPlatform() != null) {
-                return FilterBuilders.termFilter(hasLocation.getESPath(), hasLocation.getPlatform());
+                return QueryBuilders.termQuery(hasLocation.getESPath(), hasLocation.getPlatform());
             } else {
                 return doExistsConstraint(hasLocation);
             }
         } else if (constraint instanceof HasPredictionConstraint) {
             HasPredictionConstraint hasPrediction = (HasPredictionConstraint) constraint;
             if (hasPrediction.getPlatform() != null) {
-                return FilterBuilders.termFilter(hasPrediction.getESPath(), hasPrediction.getPlatform());
+                return QueryBuilders.termQuery(hasPrediction.getESPath(), hasPrediction.getPlatform());
             } else {
                 return doExistsConstraint(hasPrediction);
             }
@@ -113,93 +120,96 @@ public abstract class ESFilterBuilder {
         throw new UnsupportedOperationException("No handling for " + constraint.getClass().getSimpleName());
     }
 
-    static private <T> FilterBuilder doAnd(AbstractAnd<T> and) {
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
+    static private <T> QueryBuilder doAnd(AbstractAnd<T> and) {
+        BoolQueryBuilder booleanFilter = boolQuery();
         for (Constraint<T> constraint : and.getConstraints()) {
-            FilterBuilder filter = handleConstraint(constraint);
+            QueryBuilder filter = handleConstraint(constraint);
             booleanFilter.must(filter);
         }
         return booleanFilter;
     }
 
-    static private <T> FilterBuilder doOr(AbstractOr<T> or) {
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
+    static private <T> QueryBuilder doOr(AbstractOr<T> or) {
+        BoolQueryBuilder  booleanFilter = boolQuery();
         for (Constraint<T> constraint : or.getConstraints()) {
-            FilterBuilder filter = handleConstraint(constraint);
+            QueryBuilder filter = handleConstraint(constraint);
             booleanFilter.should(filter);
         }
         return booleanFilter;
     }
 
-    static private <T> FilterBuilder doNot(AbstractNot<T> not) {
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter();
-        FilterBuilder filter = handleConstraint(not.getConstraint());
+    static private <T> QueryBuilder doNot(AbstractNot<T> not) {
+        BoolQueryBuilder booleanFilter = boolQuery();
+        QueryBuilder filter = handleConstraint(not.getConstraint());
         booleanFilter.mustNot(filter);
         return booleanFilter;
     }
 
 
-    static protected <T> FilterBuilder doTextConstraint(WildTextConstraint<T> constraint) {
+    static protected <T> QueryBuilder doTextConstraint(WildTextConstraint<T> constraint) {
         boolean exactMatch = constraint.isExact();
         String value = exactMatch ? constraint.getValue() : constraint.getWildcardValue();
         switch (constraint.getCaseHandling()) {
             case ASIS:
                 return exactMatch ?
-                    FilterBuilders.termFilter(constraint.getESPath(), value) :
-                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value));
+                    termQuery(constraint.getESPath(), value) :
+                    toWildCard(constraint.getESPath(), value);
             case LOWER:
                 return exactMatch ?
-                    FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()) :
-                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase()));
+                    termQuery(constraint.getESPath(), value.toLowerCase()) :
+                    toWildCard(constraint.getESPath(), value.toLowerCase());
             case UPPER:
                 return exactMatch ?
-                    FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase()) :
-                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()));
+                    QueryBuilders.termQuery(constraint.getESPath(), value.toUpperCase()) :
+                    toWildCard(constraint.getESPath(), value.toUpperCase());
             default:
-                return exactMatch ? new OrFilterBuilder(
-                    FilterBuilders.termFilter(constraint.getESPath(), value.toLowerCase()),
-                    FilterBuilders.termFilter(constraint.getESPath(), value.toUpperCase())
-                ) : new OrFilterBuilder(
-                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toLowerCase())),
-                    FilterBuilders.queryFilter(toWildCard(constraint.getESPath(), value.toUpperCase()))
-                );
+                BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
+                if (exactMatch) {
+                    queryBuilder.should(QueryBuilders.termQuery(constraint.getESPath(), value.toLowerCase()));
+                    queryBuilder.should(QueryBuilders.termQuery(constraint.getESPath(), value.toUpperCase()));
+
+                } else {
+                    queryBuilder.should(toWildCard(constraint.getESPath(), value.toLowerCase()));
+                    queryBuilder.should(toWildCard(constraint.getESPath(), value.toUpperCase()));
+                }
+                return queryBuilder;
         }
     }
 
-    static protected <T> FilterBuilder doTextConstraint(TextConstraint<T> constraint) {
-        return FilterBuilders.termFilter(constraint.getESPath(), constraint.getValue());
+    static protected <T> QueryBuilder doTextConstraint(TextConstraint<T> constraint) {
+        return termQuery(constraint.getESPath(), constraint.getValue());
     }
 
     static QueryBuilder toWildCard(String path, String value) {
         if (value.contains("*")) {
-            return QueryBuilders.wildcardQuery(path, value);
+            return wildcardQuery(path, value);
         } else {
-            return QueryBuilders.prefixQuery(path, value);
+            return prefixQuery(path, value);
 
         }
     }
 
-    static protected <T> FilterBuilder doDateConstraint(DateConstraint<T> constraint) {
+    static protected <T> QueryBuilder doDateConstraint(DateConstraint<T> constraint) {
         switch(constraint.getOperator()) {
             case LT:
-                return FilterBuilders.rangeFilter(constraint.getESPath()).lt(constraint.getDateAsDate().getTime());
+                return rangeQuery(constraint.getESPath()).lt(constraint.getDateAsDate().getTime());
             case LTE:
-                return FilterBuilders.rangeFilter(constraint.getESPath()).lte(constraint.getDateAsDate().getTime());
+                return rangeQuery(constraint.getESPath()).lte(constraint.getDateAsDate().getTime());
             case GT:
-                return FilterBuilders.rangeFilter(constraint.getESPath()).gt(constraint.getDateAsDate().getTime());
+                return rangeQuery(constraint.getESPath()).gt(constraint.getDateAsDate().getTime());
             case GTE:
-                return FilterBuilders.rangeFilter(constraint.getESPath()).gte(constraint.getDateAsDate().getTime());
+                return rangeQuery(constraint.getESPath()).gte(constraint.getDateAsDate().getTime());
             default:
                 throw new UnsupportedOperationException();
         }
     }
 
-    static private <T> FilterBuilder doExistsConstraint(ExistsConstraint<T> constraint) {
-        return FilterBuilders.existsFilter(constraint.getESPath());
+    static private <T> QueryBuilder doExistsConstraint(ExistsConstraint<T> constraint) {
+        return existsQuery(constraint.getESPath());
     }
 
     protected interface FieldApplier {
-        <S extends MatchType> void applyField(BoolFilterBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher);
+        <S extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher);
     }
 
 
@@ -211,8 +221,8 @@ public abstract class ESFilterBuilder {
         }
 
         @Override
-        public <S extends MatchType> void applyField(BoolFilterBuilder boolFilterBuilder, AbstractTextMatcher<S> matcher) {
-            FilterBuilder filter = buildFilter(fieldName, matcher);
+        public <S extends MatchType> void applyField(BoolQueryBuilder boolFilterBuilder, AbstractTextMatcher<S> matcher) {
+            QueryBuilder filter = buildFilter(fieldName, matcher);
             apply(boolFilterBuilder, filter, matcher.getMatch());
         }
     }
@@ -225,29 +235,29 @@ public abstract class ESFilterBuilder {
         }
 
         @Override
-        public <S extends MatchType> void applyField(BoolFilterBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher) {
-            BoolFilterBuilder bool = FilterBuilders.boolFilter();
+        public <S extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher) {
+            BoolQueryBuilder bool = QueryBuilders.boolQuery();
             for (String fieldName : fieldNames) {
-                FilterBuilder query = buildFilter(fieldName, matcher);
+                QueryBuilder query = buildFilter(fieldName, matcher);
                 apply(bool, query, Match.SHOULD);
             }
             apply(booleanQueryBuilder, bool, matcher.getMatch());
         }
     }
 
-    protected static <S extends MatchType>  void build(BoolFilterBuilder booleanQueryBuilder, AbstractTextMatcherList<? extends AbstractTextMatcher<S>, S> list, FieldApplier applier) {
-        BoolFilterBuilder append = FilterBuilders.boolFilter();
+    protected static <S extends MatchType>  void build(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<? extends AbstractTextMatcher<S>, S> list, FieldApplier applier) {
+        BoolQueryBuilder append = QueryBuilders.boolQuery();
         for (AbstractTextMatcher<S> matcher : list) {
             applier.applyField(append, matcher);
         }
         apply(booleanQueryBuilder, append, list.getMatch());
     }
 
-    protected static <S extends MatchType> FilterBuilder buildFilter(String fieldName, AbstractTextMatcher<S> matcher) {
+    protected static <S extends MatchType> QueryBuilder buildFilter(String fieldName, AbstractTextMatcher<S> matcher) {
         return buildFilter(fieldName, matcher, false);
     }
 
-    protected static <S extends MatchType> FilterBuilder buildFilter(String fieldName, AbstractTextMatcher<S> matcher, boolean makeLowerCase) {
+    protected static <S extends MatchType> QueryBuilder buildFilter(String fieldName, AbstractTextMatcher<S> matcher, boolean makeLowerCase) {
         String value = matcher.getValue();
         if (makeLowerCase) {
             value = value.toLowerCase();

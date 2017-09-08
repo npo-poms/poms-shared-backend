@@ -16,7 +16,6 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.facet.Facets;
 
 import nl.vpro.domain.api.ESFacetsBuilder;
 import nl.vpro.domain.api.ESFacetsHandler;
@@ -43,7 +42,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         MediaFacetsResult facetsResult = new MediaFacetsResult();
 
         {
-            Facets facets = response.getFacets();
+            Aggregations facets = response.getAggregations();
 
             facetsResult.setTitles(getFacetResultItems(prefix + "titles.value.full", facets));
             facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), facets, MediaType.class));
@@ -81,21 +80,21 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
     }
 
     protected static List<GenreFacetResultItem> getGenreAggregationResultItems(String prefix, Filter root) {
-        if(root == null) {
+        if (root == null) {
             return null;
         }
 
         Aggregation nested = getNestedResult(prefix, "genres", root);
 
         Terms ids = getFilteredTerms("id", nested);
-        if(ids == null) {
+        if (ids == null) {
             return null;
         }
 
         return new AggregationResultItemList<Terms, Terms.Bucket, GenreFacetResultItem>(ids) {
             @Override
             protected GenreFacetResultItem adapt(Terms.Bucket bucket) {
-                String id = bucket.getKeyAsText().string();
+                String id = bucket.getKeyAsString();
                 Genre genre = new Genre(id);
                 return new GenreFacetResultItem(
                     genre.getTerms(),
@@ -121,7 +120,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         return new AggregationResultItemList<Terms, Terms.Bucket, MemberRefFacetResultItem>(midRefs) {
             @Override
             protected MemberRefFacetResultItem adapt(Terms.Bucket bucket) {
-                String mid = bucket.getKeyAsText().string();
+                String mid = bucket.getKeyAsString();
                 MediaObject owner = mediaRepository.findByMid(mid);
                 return new MemberRefFacetResultItem(
                     owner != null ? owner.getMainTitle() : mid,
@@ -156,8 +155,8 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                             @Override
                             protected TermFacetResultItem adapt(Terms.Bucket bucket) {
                                 return new TermFacetResultItem(
-                                    bucket.getKeyAsText().toString(),
-                                    bucket.getKeyAsText().toString(),
+                                    bucket.getKeyAsString(),
+                                    bucket.getKeyAsString(),
                                     bucket.getDocCount()
                                 );
                             }

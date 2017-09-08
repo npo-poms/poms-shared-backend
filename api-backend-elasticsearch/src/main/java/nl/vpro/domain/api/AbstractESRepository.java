@@ -16,25 +16,22 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.count.CountRequest;
-import org.elasticsearch.action.count.CountResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetItemResponse;
 import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.QuerySourceBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.highlight.HighlightBuilder;
-import org.elasticsearch.search.highlight.HighlightField;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
@@ -90,7 +87,7 @@ public abstract class AbstractESRepository<T> {
                 Terms a  = response.getAggregations().get("types");
                 String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
                 log.info("{}\n{} currently contains {} items ({})", factory, getIndexName(), response.getHits().getTotalHits(), result);
-            } catch (IndexMissingException ime) {
+            } catch (IndexNotFoundException ime) {
                 log.info("{} does exist yet ({})",
                     getIndexName(), ime.getMessage());
             } catch (Exception e) {
@@ -156,7 +153,7 @@ public abstract class AbstractESRepository<T> {
                 }
             }
             return null;
-        } catch(org.elasticsearch.indices.IndexMissingException ime) {
+        } catch(IndexNotFoundException ime) {
             return null;
         } catch(InterruptedException | ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
@@ -261,12 +258,8 @@ public abstract class AbstractESRepository<T> {
     }
 
     protected long executeCount(QueryBuilder builder, String indexName) throws ExecutionException, InterruptedException {
-        CountRequest countRequest = new CountRequest();
-        countRequest.indices(indexName);
-        QuerySourceBuilder sourceBuilder = new QuerySourceBuilder();
-        countRequest.source(sourceBuilder.setQuery(builder));
-        ActionFuture<CountResponse> searchResponseFuture = client().count(countRequest);
-        return searchResponseFuture.get().getCount();
+        return client().prepareSearch(indexName).setSource(new SearchSourceBuilder().size(0).query(builder)).get().getHits().getTotalHits();
+
     }
 
     protected void buildHighlights(SearchSourceBuilder searchBuilder, Form form, List<SearchFieldDefinition> searchFields) {
@@ -279,7 +272,7 @@ public abstract class AbstractESRepository<T> {
                     highlightBuilder.field(highlight.getName(), 100, 5);
                 }
             }
-            searchBuilder.highlight(highlightBuilder);
+            searchBuilder.highlighter(highlightBuilder);
         }
     }
 

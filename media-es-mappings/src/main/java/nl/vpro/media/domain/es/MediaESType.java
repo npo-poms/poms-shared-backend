@@ -25,7 +25,7 @@ public enum MediaESType {
         return "mapping/" + name() + ".json";
     }
     public String source() {
-        return ApiMediaIndex.source(mapping());
+        return "{\"" + name() + "\" = " + ApiMediaIndex.source(mapping()) + "}";
     }
 
     public static MediaESType[] MEDIAOBJECTS = {program, group, segment};

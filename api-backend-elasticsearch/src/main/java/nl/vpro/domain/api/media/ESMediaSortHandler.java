@@ -12,8 +12,9 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
@@ -61,7 +62,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
                 .setNestedPath(nestedField)
                 .order(order(sortOrder.getOrder()));
             if (mediaObject != null) {
-                sortBuilder.setNestedFilter(FilterBuilders.termFilter(nestedField + "." + filteredField, mediaObject.getMid()));
+                sortBuilder.setNestedFilter(QueryBuilders.termQuery(nestedField + "." + filteredField, mediaObject.getMid()));
             }
             return sortBuilder;
         }
@@ -81,16 +82,19 @@ public class ESMediaSortHandler extends ESFacetsHandler {
             if (sortOrder instanceof TitleSortOrder) {
                 TitleSortOrder titleSortOrder = (TitleSortOrder) sortOrder;
                 if (titleSortOrder.getType() != null || titleSortOrder.getOwner() != null) {
-                    FilterBuilder nested = null;
+                    QueryBuilder nested = null;
                     if (titleSortOrder.getType() != null) {
-                        nested = FilterBuilders.termFilter(titlesField + ".type", titleSortOrder.getType());
+                        nested = QueryBuilders.termQuery(titlesField + ".type", titleSortOrder.getType());
                     }
                     if (titleSortOrder.getOwner() != null) {
-                        FilterBuilder ownerFilter = FilterBuilders.termFilter(titlesField + ".owner", titleSortOrder.getOwner());
+                        org.elasticsearch.index.query.TermQueryBuilder ownerFilter = QueryBuilders.termQuery(titlesField + ".owner", titleSortOrder.getOwner());
                         if (nested == null) {
                             nested = ownerFilter;
                         } else {
-                            nested = FilterBuilders.andFilter(nested, ownerFilter);
+                            BoolQueryBuilder bool = QueryBuilders.boolQuery();
+                            bool.must(nested);
+                            bool.must(ownerFilter);
+                            nested = bool;
                         }
                     }
                     sortBuilder.setNestedFilter(nested);

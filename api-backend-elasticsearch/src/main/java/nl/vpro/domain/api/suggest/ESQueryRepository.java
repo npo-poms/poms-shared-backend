@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.action.suggest.SuggestRequestBuilder;
-import org.elasticsearch.action.suggest.SuggestResponse;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.search.suggest.Suggest;
-import org.elasticsearch.search.suggest.SuggestBuilder;
-import org.elasticsearch.search.suggest.completion.CompletionSuggestionFuzzyBuilder;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -66,7 +64,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     public void index(Query query) {
         try {
             client().prepareIndex(getIndexName(), "query")
-                .setOperationThreaded(true)
+                //.setOpType(DocWriteRequest.)
                 .setSource(Jackson2Mapper.getInstance().writeValueAsString(query))
                 .setTTL(queryTtl) // ms
                 .execute()
@@ -78,24 +76,28 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     @Override
     public SuggestResult suggest(String input, String profile, Integer max) {
-        SuggestResponse response = new SuggestRequestBuilder(client())
-            .setIndices(getIndexName())
-            .addSuggestion(suggestBuilder(Query.queryId(input, profile), profile, max))
+        CompletionSuggestionBuilder response = new CompletionSuggestionBuilder("completions");
+
+        SearchResponse searchResponse = client().prepareSearch(getIndexName())
+            //.suggest(suggestBuilder(Query.queryId(input, profile), profile, max).build(asdfkl))
             .execute()
             .actionGet();
 
-        Suggest suggest = response.getSuggest();
+        Suggest suggest = searchResponse.getSuggest();
         return adapt(suggest, input, profile);
     }
 
-    private SuggestBuilder.SuggestionBuilder suggestBuilder(String input, String profile, Integer max) {
+    private CompletionSuggestionBuilder suggestBuilder(String input, String profile, Integer max) {
         int profilePrefixLength = profile != null ? profile.length() + PROFILE_SEPARATOR_LENGTH : 0;
-        return new CompletionSuggestionFuzzyBuilder("suggest")
+
+        // TODO
+        return new CompletionSuggestionBuilder("suggest")
             .text(input)
-            .field("suggest")
+            //.field("suggest")
             .size(max)
-            .setFuzziness(Fuzziness.AUTO)
-            .setFuzzyMinLength(profilePrefixLength + 3);
+            //.setFuzziness(Fuzziness.AUTO)
+            //.setFuzzyMinLength(profilePrefixLength + 3);
+        ;
     }
 
     private Comparator<Suggestion> getLexicalDistanceComparator(final String input) {

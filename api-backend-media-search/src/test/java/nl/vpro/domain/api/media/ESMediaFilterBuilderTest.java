@@ -4,17 +4,18 @@
  */
 package nl.vpro.domain.api.media;
 
+import java.io.IOException;
+
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.junit.Test;
+
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.Filter;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.junit.Test;
-
-import java.io.IOException;
 
 import static nl.vpro.domain.constraint.media.MediaConstraints.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +28,7 @@ public class ESMediaFilterBuilderTest {
 
     @Test
     public void testFilterProfileOnNullArgument() throws Exception {
-        FilterBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
+        QueryBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
         assertThat(toString(builder)).isEqualTo("{\n" +
             "  \"match_all\" : { }\n" +
             "}"
@@ -39,7 +40,7 @@ public class ESMediaFilterBuilderTest {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("vpro")
         ));
-        FilterBuilder builder = ESMediaFilterBuilder.filter(definition);
+        QueryBuilder builder = ESMediaFilterBuilder.filter(definition);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"term\" : {\n" +
@@ -64,7 +65,7 @@ public class ESMediaFilterBuilderTest {
                 hasImage()
             )
         ));
-        FilterBuilder builder = ESMediaFilterBuilder.filter(definition);
+        QueryBuilder builder = ESMediaFilterBuilder.filter(definition);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
             "  \"bool\" : {\n" +
@@ -104,7 +105,7 @@ public class ESMediaFilterBuilderTest {
 
     @Test
     public void testFilterProfileWithExtraFilterOnNullArguments() throws Exception {
-        FilterBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
+        QueryBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"match_all\" : { }\n" +
@@ -114,7 +115,7 @@ public class ESMediaFilterBuilderTest {
 
     @Test
     public void testFilterProfileWithExtraFilterOnNullProfile() throws Exception {
-        FilterBuilder builder = ESMediaFilterBuilder.filter((MediaSearch)null, FilterBuilders.termFilter("name", "value"));
+        QueryBuilder builder = ESMediaFilterBuilder.filter((MediaSearch)null, QueryBuilders.termQuery("name", "value"));
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"term\" : {\n" +
@@ -130,7 +131,7 @@ public class ESMediaFilterBuilderTest {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("Vpro")
         ));
-        FilterBuilder builder = ESMediaFilterBuilder.filter(definition, FilterBuilders.termFilter("name", "value"));
+        QueryBuilder builder = ESMediaFilterBuilder.filter(definition, QueryBuilders.termQuery("name", "value"));
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"and\" : {\n" +
@@ -153,7 +154,7 @@ public class ESMediaFilterBuilderTest {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             hasLocation("NONE")
         ));
-        FilterBuilder builder = ESMediaFilterBuilder.filter(definition, FilterBuilders.termFilter("name", "value"));
+        QueryBuilder builder = ESMediaFilterBuilder.filter(definition, QueryBuilders.termQuery("name", "value"));
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"and\" : {\n" +
@@ -188,10 +189,10 @@ public class ESMediaFilterBuilderTest {
     /**
      * In the current ES release the toString override on FilterBuilder is missing...
      */
-    private String toString(FilterBuilder builder) throws IOException {
+    private String toString(QueryBuilder builder) throws IOException {
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
         xContentBuilder.prettyPrint();
-        builder.toXContent(xContentBuilder, FilterBuilder.EMPTY_PARAMS);
+        builder.toXContent(xContentBuilder, QueryBuilder.EMPTY_PARAMS);
         return xContentBuilder.string();
     }
 }

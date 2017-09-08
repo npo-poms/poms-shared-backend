@@ -1,10 +1,10 @@
 package nl.vpro.domain.api;
 
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ListenableActionFuture;
-
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
+
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.ListenableActionFuture;
 
 public class ESUtils {
 
@@ -17,7 +17,7 @@ public class ESUtils {
             }
 
             @Override
-            public void onFailure(Throwable e) {
+            public void onFailure(Exception e) {
                 cFuture.completeExceptionally(e);
             }
         });

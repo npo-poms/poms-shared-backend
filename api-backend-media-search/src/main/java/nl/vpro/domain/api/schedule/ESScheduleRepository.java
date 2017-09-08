@@ -156,7 +156,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
 
     public long count() {
-        return client().prepareCount(indexName).get().getCount();
+        return client().prepareSearch(indexName).setSource(new SearchSourceBuilder().size(0)).get().getHits().getTotalHits();
     }
 
     private MediaObject findByCrid(String crid) throws IOException {

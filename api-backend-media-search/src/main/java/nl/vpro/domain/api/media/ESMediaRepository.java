@@ -19,22 +19,17 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.elasticsearch.action.ListenableActionFuture;
-import org.elasticsearch.action.mlt.MoreLikeThisRequestBuilder;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
-
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
@@ -176,15 +171,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     public MediaSearchResult findRelated(MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, Integer max) {
         form = redirectForm(form);
         AgeRating ageRating = media.getAgeRating();
-        BoolFilterBuilder ageRatingFilter = null;
+        BoolQueryBuilder ageRatingFilter = null;
         if (ageRating != null) {
             String ratingString = ageRating == AgeRating.ALL ? ageRating.name() : ageRating.name().substring(1);
-            ageRatingFilter = FilterBuilders.boolFilter().must(FilterBuilders.termFilter("ageRating", ratingString));
+            ageRatingFilter = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("ageRating", ratingString));
         }
 
         SearchSourceBuilder search = searchBuilder(profile, form, ageRatingFilter, 0L, 0x7ffffef);
 
-        MoreLikeThisRequestBuilder moreLikeThis = new MoreLikeThisRequestBuilder(
+      /*  MoreLikeThisRequestBuilder moreLikeThis = new MoreLikeThisRequestBuilder(
             client(),
                 indexName,
             media.getClass().getSimpleName().toLowerCase(),
@@ -208,14 +203,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             LOG_ERRORS.warn("findRelated max {}, {}, {}", max, profile, search, moreLikeThis);
             throw e;
         }
-
-        SearchResponse response = future.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+*/
+       /* SearchResponse response = future.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
 
         SearchHits hits = response.getHits();
 
         List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         //MediaSearchResults.setSelectedFacets(hits.getFa, form); // TODO
-        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits());
+        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits());*/
+       return null;
     }
 
     protected MediaObject getMediaObject(SearchHit hit) {
@@ -358,7 +354,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
             restriction = QueryBuilders.rangeQuery("publishDate").from(Date.from(since));
         }
-        searchRequestBuilder.setQuery(QueryBuilders.filteredQuery(restriction, FilterBuilders.existsFilter("publishDate")));
+        // TODO
+        //searchRequestBuilder.setQuery(QueryBuilders.filteredQuery(restriction, QueryBuilders.existsQuery("publishDate")));
 
         log.debug("Found {} changes", i.getTotalSize());
         ChangeIterator changes = new ChangeIterator(
@@ -510,7 +507,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private <S extends MediaObject> GenericMediaSearchResult<S> findAssociatedMedia(String axis, MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, Class<S> clazz) {
         String ref = media.getMid();
-        BoolFilterBuilder booleanFilter = FilterBuilders.boolFilter().must(FilterBuilders.termFilter(axis + ".midRef", ref));
+        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
 
         SearchRequest request = searchRequest(getLoadTypes(), profile, form, media, booleanFilter, offset, max);
 

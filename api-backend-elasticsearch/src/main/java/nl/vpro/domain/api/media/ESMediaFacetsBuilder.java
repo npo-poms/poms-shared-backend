@@ -6,13 +6,13 @@ package nl.vpro.domain.api.media;
 
 import javax.annotation.Nonnull;
 
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.nested.NestedBuilder;
+import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import nl.vpro.domain.api.*;
@@ -24,20 +24,20 @@ import nl.vpro.domain.media.support.TextualType;
  */
 public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
-    public static void facets(SearchSourceBuilder searchBuilder, MediaForm form, FilterBuilder profileFilter) {
+    public static void facets(SearchSourceBuilder searchBuilder, MediaForm form, QueryBuilder profileFilter) {
         buildFacets(searchBuilder, form, profileFilter, "");
     }
 
     /**
      * @param prefix        empty string of path to this field including the last dot e.g., "embeds.media."
      */
-    public static void buildFacets(SearchSourceBuilder searchBuilder, MediaForm form, FilterBuilder profileFilter, @Nonnull String prefix) {
+    public static void buildFacets(SearchSourceBuilder searchBuilder, MediaForm form, QueryBuilder profileFilter, @Nonnull String prefix) {
         if(form != null && form.isFaceted()) {
 
             MediaFacets facets = form.getFacets();
 
             // Under default ES behaviour profile filtering does not influence facet results
-            FilterBuilder facetFilter;
+            QueryBuilder facetFilter;
             if(facets.getFilter() == null) {
                 facetFilter = profileFilter;
             } else {
@@ -46,8 +46,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             // Append all aggregations to this filtered aggregation builder
             FilterAggregationBuilder aggregationBuilder = AggregationBuilders
-                .filter(ROOT_FILTER)
-                .filter(facetFilter);
+                .filter(ROOT_FILTER, facetFilter);
 
             searchBuilder.aggregation(aggregationBuilder);
 
@@ -136,7 +135,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             facet.hasSubSearch() ? ESFilterBuilder.filter(facet.getSubSearch(), pathPrefix, nestedField, facetField) : null
         );
 
-        NestedBuilder nestedBuilder = getNestedBuilder(
+        NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
             nestedField,
             null,
@@ -160,7 +159,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             facet.hasSubSearch() ? ESMediaFilterBuilder.filter(facet.getSubSearch(), pathPrefix, nestedField) : null
         );
 
-        NestedBuilder nestedBuilder = getNestedBuilder(
+        NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
             nestedField,
             null,
@@ -179,12 +178,12 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         RelationSearch subSearch = facets.getSubSearch();
         for (RelationFacet facet : facets) {
 
-            FilterBuilder filter = facet.hasSubSearch() ? ESMediaFilterBuilder.filter(facet.getSubSearch(), pathPrefix, "relations") : null;
+            QueryBuilder filter = facet.hasSubSearch() ? ESMediaFilterBuilder.filter(facet.getSubSearch(), pathPrefix, "relations") : null;
             if (subSearch != null) {
                 if (filter == null) {
                     filter = ESMediaFilterBuilder.filter(subSearch, pathPrefix, "relations");
                 } else {
-                    ESMediaFilterBuilder.filter((BoolFilterBuilder) filter, subSearch, pathPrefix, "relations");
+                    ESMediaFilterBuilder.filter((BoolQueryBuilder) filter, subSearch, pathPrefix, "relations");
                 }
             }
             AggregationBuilder termsBuilder = getFilteredRelationTermsBuilder(
@@ -195,7 +194,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 filter
             );
 
-            NestedBuilder nestedBuilder = getNestedBuilder(
+            NestedAggregationBuilder nestedBuilder = getNestedBuilder(
                 pathPrefix,
                 "relations",
                 null,
@@ -213,7 +212,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         String nestedField,
         String facetField,
         RelationFacet facet,
-        FilterBuilder subSearch
+        QueryBuilder subSearch
     ) {
         return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet), facet, facet.getName(), subSearch);
     }
@@ -224,26 +223,25 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         }
 
         for (MediaSearch search : mediaSearch) {
-            FilterBuilder facetFilter = ESMediaFilterBuilder.filter(search, pathPrefix);
+            QueryBuilder facetFilter = ESMediaFilterBuilder.filter(search, pathPrefix);
             aggregationBuilder = AggregationBuilders
-                .filter("filter_" + facetName)
-                .filter(facetFilter)
+                .filter("filter_" + facetName, facetFilter)
                 .subAggregation(aggregationBuilder);
         }
 
         return aggregationBuilder;
     }
 
-    private static void addTextualTypeFacet(SearchSourceBuilder searchBuilder, FilterBuilder filterBuilder, String fieldName, TextualType type, TextFacet facet) {
-        FilterBuilder mainTitleFilter = FilterBuilders.andFilter(
-            filterBuilder,
-            FilterBuilders.termFilter(fieldName + ".type", type.name())
-        );
+    private static void addTextualTypeFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, TextualType type, TextFacet facet) {
+        BoolQueryBuilder mainTitleFilter  = QueryBuilders.boolQuery();
+        mainTitleFilter.must(filterBuilder);
+        mainTitleFilter.must(QueryBuilders.termQuery(fieldName + ".type", type.name()));
+
 
         addFacet(searchBuilder, mainTitleFilter, fieldName + ".value.full", facet, null);
     }
 
-    private static FilterBuilder addFacetFilter(TextFacet<MediaSearch> facet, FilterBuilder filterBuilder, String prefix) {
+    private static QueryBuilder addFacetFilter(TextFacet<MediaSearch> facet, QueryBuilder filterBuilder, String prefix) {
         if(facet != null && facet.getFilter() != null) {
             filterBuilder = ESMediaFilterBuilder.filter(facet.getFilter(), filterBuilder, prefix);
         }

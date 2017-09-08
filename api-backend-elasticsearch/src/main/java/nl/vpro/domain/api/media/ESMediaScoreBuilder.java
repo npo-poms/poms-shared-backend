@@ -4,14 +4,10 @@
  */
 package nl.vpro.domain.api.media;
 
-import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.common.lucene.search.function.FiltersFunctionScoreQuery;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
-import org.elasticsearch.index.query.functionscore.factor.FactorBuilder;
-import org.elasticsearch.index.query.functionscore.gauss.GaussDecayFunctionBuilder;
-
-import nl.vpro.domain.media.MediaType;
 
 /**
  * @author Roelof Jan Koekoek
@@ -35,15 +31,16 @@ public class ESMediaScoreBuilder {
     public static QueryBuilder score(QueryBuilder query) {
         FunctionScoreQueryBuilder builder = QueryBuilders.functionScoreQuery(query);
 
+        // TODO
         builder
-            .scoreMode("sum") // Add the individual functions scores (mainly their  boost factors) below
+            .scoreMode(FiltersFunctionScoreQuery.ScoreMode.SUM) // Add the individual functions scores (mainly their  boost factors) below
             .maxBoost(maxBoost) // restrict range from 0 to 2
-            .add(FilterBuilders.existsFilter("locations"), new FactorBuilder().boostFactor(locationBoost))
-            .add(FilterBuilders.termFilter("type", MediaType.SERIES.name()), new FactorBuilder().boostFactor(seriesBoost))
-            .add(FilterBuilders.termFilter("type", MediaType.BROADCAST.name()), new FactorBuilder().boostFactor(broadcastBoost))
-            .add(new GaussDecayFunctionBuilder("sortDate", System.currentTimeMillis(), sortDateScale).setOffset(sortDateOffset).setDecay(sortDateDecay))
+          /*  .boo(QueryBuilders.existsQuery("locations"), ScoreFunctionBuilders.fieldValueFactorFunction(locationBoost))
+            .add(QueryBuilders.termQuery("type", MediaType.SERIES.name()), new FactorBuilder().boostFactor(seriesBoost))
+            .add(QueryBuilders.termQuery("type", MediaType.BROADCAST.name()), new FactorBuilder().boostFactor(broadcastBoost))
+            .add(new GaussDecayFunctionBuilder("sortDate", System.currentTimeMillis(), sortDateScale).setOffset(sortDateOffset).setDecay(sortDateDecay))*/
         ;
 
-        return builder.scoreMode("multiply");
+        return builder.scoreMode(FiltersFunctionScoreQuery.ScoreMode.MULTIPLY);
     }
 }

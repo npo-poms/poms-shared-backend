@@ -15,7 +15,6 @@ import org.apache.http.concurrent.BasicFuture;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.FilterBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -120,7 +119,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
 
-    final protected SearchRequest searchRequest(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, FilterBuilder extraFilter, long offset, Integer max) {
+    final protected SearchRequest searchRequest(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, QueryBuilder extraFilter, long offset, Integer max) {
         return searchRequest(
             getLoadTypes(),
             profile,
@@ -136,7 +135,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         ProfileDefinition<MediaObject> profile,
         AbstractMediaForm form,
         MediaObject mediaObject,
-        FilterBuilder extraFilter,
+        QueryBuilder extraFilter,
         long offset,
         Integer max) {
         SearchRequest request = new SearchRequest(indexName);
@@ -145,14 +144,14 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         return request;
     }
 
-    final protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, FilterBuilder extraFilter, long offset, Integer max) {
+    final protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, QueryBuilder extraFilter, long offset, Integer max) {
         return searchBuilder(profile, form, null, extraFilter, offset, max);
     }
 
-    protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, MediaObject mediaObject, FilterBuilder extraFilter, long offset, Integer max) {
+    protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, MediaObject mediaObject, QueryBuilder extraFilter, long offset, Integer max) {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
 
-        FilterBuilder profileFilter = ESMediaFilterBuilder.filter(profile, extraFilter);
+        QueryBuilder profileFilter = ESMediaFilterBuilder.filter(profile, extraFilter);
 
         searchBuilder.postFilter(profileFilter);
 
