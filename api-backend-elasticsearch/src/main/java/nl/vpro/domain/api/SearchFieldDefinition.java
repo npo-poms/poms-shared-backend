@@ -44,7 +44,7 @@ public class SearchFieldDefinition {
         sb.append("name='").append(name).append('\'');
         sb.append(", boost=").append(boost);
         if(highlight) {
-            sb.append(", highlight=").append(highlight);
+            sb.append(", highlighted");
         }
         sb.append('}');
         return sb.toString();
