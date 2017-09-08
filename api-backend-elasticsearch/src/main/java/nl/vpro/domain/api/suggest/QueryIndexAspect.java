@@ -4,10 +4,10 @@
  */
 package nl.vpro.domain.api.suggest;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.vpro.domain.api.Form;
 import nl.vpro.domain.api.SearchResult;
@@ -18,8 +18,8 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
  * @since 3.2
  */
 @Aspect
+@Slf4j
 public class QueryIndexAspect {
-    private static final Logger LOG = LoggerFactory.getLogger(QueryIndexAspect.class);
 
     private final ESQueryRepository queryRepository;
 
@@ -43,7 +43,7 @@ public class QueryIndexAspect {
                         profile != null ? profile.getName() : null)
                 );
             } catch(Exception e) {
-                LOG.warn("Exception while saving a search query, see root cause", e);
+                log.warn("Exception while saving a search query, see root cause", e);
             }
         }
 
