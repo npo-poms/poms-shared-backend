@@ -11,7 +11,7 @@
   <groupId>nl.vpro.api</groupId>
   <artifactId>api-backend-media-search</artifactId>
   <properties>
-    <skipIntegTests>false</skipIntegTests>
+    <skipIntegTests>${skipTests}</skipIntegTests>
     <integ.deps>${project.build.directory}/integration-tests/binaries</integ.deps>
     <integ.scratch>${project.build.directory}/integration-scratch</integ.scratch>
     <integ.http.port>9211</integ.http.port>
@@ -22,7 +22,7 @@
 
   <build>
     <!-- http://david.pilato.fr/blog/2016/10/18/elasticsearch-real-integration-tests-updated-for-ga/ -->
-  <!--  <plugins>
+    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -55,7 +55,7 @@
       <artifactId>maven-antrun-plugin</artifactId>
       <version>1.8</version>
       <executions>
-        &lt;!&ndash; start up external cluster &ndash;&gt;
+        <!-- start up external cluster -->
         <execution>
           <id>integ-setup</id>
           <phase>pre-integration-test</phase>
@@ -70,7 +70,7 @@
             </target>
           </configuration>
         </execution>
-        &lt;!&ndash; shut down external cluster &ndash;&gt;
+        <!-- shut down external cluster -->
         <execution>
           <id>integ-teardown</id>
           <phase>post-integration-test</phase>
@@ -87,7 +87,7 @@
         </execution>
       </executions>
     </plugin>
-    </plugins>-->
+    </plugins>
   </build>
 
   <dependencies>
