@@ -84,10 +84,10 @@ public class ESMediaSortHandler extends ESFacetsHandler {
                 if (titleSortOrder.getType() != null || titleSortOrder.getOwner() != null) {
                     QueryBuilder nested = null;
                     if (titleSortOrder.getType() != null) {
-                        nested = QueryBuilders.termQuery(titlesField + ".type", titleSortOrder.getType());
+                        nested = QueryBuilders.termQuery(titlesField + ".type", titleSortOrder.getType().name());
                     }
                     if (titleSortOrder.getOwner() != null) {
-                        org.elasticsearch.index.query.TermQueryBuilder ownerFilter = QueryBuilders.termQuery(titlesField + ".owner", titleSortOrder.getOwner());
+                        org.elasticsearch.index.query.TermQueryBuilder ownerFilter = QueryBuilders.termQuery(titlesField + ".owner", titleSortOrder.getOwner().name());
                         if (nested == null) {
                             nested = ownerFilter;
                         } else {
