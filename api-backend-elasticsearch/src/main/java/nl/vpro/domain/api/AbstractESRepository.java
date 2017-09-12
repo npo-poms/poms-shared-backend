@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.action.ActionFuture;
@@ -35,6 +34,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.vpro.domain.api.media.Redirector;
@@ -72,7 +72,7 @@ public abstract class AbstractESRepository<T> {
         loadTypes = new HashSet<>(Arrays.asList(getLoadTypes()));
     }
 
-    @PostConstruct
+    //@PostConstruct
     public void logIntro() {
         log.info("ES Repository {} {}", this, factory);
         ThreadPools.backgroundExecutor.execute(() -> {
@@ -80,7 +80,10 @@ public abstract class AbstractESRepository<T> {
                 SearchResponse response = client()
                     .prepareSearch(getIndexName())
                     .setTypes(getRelevantTypes())
-                    .addAggregation(AggregationBuilders.terms("types").field("_type").order(Terms.Order.term(true)))
+                    .addAggregation(AggregationBuilders.terms("types")
+                        .field("_type")
+                        .order(Terms.Order.term(true))
+                    )
                     .setSize(0)
                     .get();
 

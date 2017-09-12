@@ -139,7 +139,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
         }
 
         // add last resort
-        consumer.accept(SortBuilders.fieldSort("_score").order(SortOrder.DESC));
+        consumer.accept(SortBuilders.scoreSort());
 
     }
 

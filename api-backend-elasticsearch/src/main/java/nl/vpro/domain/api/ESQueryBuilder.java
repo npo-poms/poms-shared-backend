@@ -4,18 +4,22 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.WordlistLoader;
+import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.nl.DutchAnalyzer;
 import org.apache.lucene.analysis.snowball.SnowballFilter;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
-import org.apache.lucene.analysis.CharArraySet;
+import org.apache.lucene.collation.CollationAttributeFactory;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.util.IOUtils;
 import org.apache.lucene.util.Version;
@@ -132,11 +136,14 @@ public abstract class ESQueryBuilder {
     // NPA-186
     protected static String filterStopWords(String value) {
         String textWithoutStopWords = value;
+
         try {
             StringBuilder builder = new StringBuilder();
-            TokenStream stream = null; // TODO//new StopFilter(new GermanLightStemFilter(new ), STOP_WORDS);
+
+            CharArraySet stopSet = StopFilter.makeStopSet(Arrays.asList(STOP_WORDS), true);
+            TokenStream whitespace = new WhitespaceTokenizer(new CollationAttributeFactory(Collator.getInstance()));
+            TokenStream stream = new StopFilter(whitespace, stopSet);
             CharTermAttribute termAttribute = stream.getAttribute(CharTermAttribute.class);
-            stream.reset();
             while (stream.incrementToken()) {
                 if (builder.length() > 0) {
                     builder.append(" ");
@@ -148,6 +155,9 @@ public abstract class ESQueryBuilder {
             }
         } catch (IOException ioe) {
             log.error(ioe.getMessage());
+        } catch (IllegalStateException ise) {
+            // TODO
+            log.error(ise.getMessage());
         }
         return textWithoutStopWords;
     }

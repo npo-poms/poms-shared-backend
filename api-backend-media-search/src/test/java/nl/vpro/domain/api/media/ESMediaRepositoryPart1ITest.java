@@ -53,7 +53,6 @@ import static org.mockito.Mockito.when;
  * @since 3.5
  */
 
-//@RunWith(com.carrotsearch.randomizedtesting.RandomizedRunner.class)
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
 public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
@@ -66,10 +65,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     //@Before
     public  void setup() throws Exception {
-
-
         try {
-            client.admin().indices().prepareCreate(ApiMediaIndex.NAME).setSettings(ApiMediaIndex.source(), XContentType.JSON).execute().actionGet();
+            client.admin().indices()
+                .prepareCreate(ApiMediaIndex.NAME)
+                .setSettings(ApiMediaIndex.source(), XContentType.JSON)
+                .execute()
+                .actionGet();
         } catch (ResourceAlreadyExistsException e) {
             log.info("Index exists");
         }
