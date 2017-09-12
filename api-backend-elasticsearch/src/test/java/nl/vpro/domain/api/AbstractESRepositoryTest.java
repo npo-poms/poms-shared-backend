@@ -17,7 +17,6 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.TransportClientFactory;
-import nl.vpro.util.UrlProvider;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
