@@ -18,6 +18,7 @@ import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.junit.*;
 import org.mockito.Mockito;
@@ -42,6 +43,7 @@ import static nl.vpro.domain.media.ContentRating.*;
 import static nl.vpro.domain.media.MediaTestDataBuilder.group;
 import static nl.vpro.domain.media.MediaTestDataBuilder.program;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -83,9 +85,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                 log.info("Index exists");
             }
         }
+        client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
         boolean shouldDelete = false;
         BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
-        for (SearchHit hit : client.prepareSearch(indexName).get().getHits()) {
+        for (SearchHit hit : client.prepareSearch(indexName).setQuery(QueryBuilders.matchAllQuery()).setSize(10000).get().getHits()) {
             bulkRequestBuilder.add(client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId()));
             shouldDelete = true;
         }
@@ -916,12 +919,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         {
             SearchResult<MediaObject> result = target.find(null, form().ageRating(_12).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
-            Assert.assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+            assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
         }
 
-        Assert.assertEquals(2L, (long) target.find(null, form().ageRating(_6, _12).build(), 0, null).getSize());
-        Assert.assertEquals(1L, (long) target.find(null, form().ageRating(ALL).build(), 0, null).getSize());
-        Assert.assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
+        assertEquals(2L, (long) target.find(null, form().ageRating(_6, _12).build(), 0, null).getSize());
+        assertEquals(1L, (long) target.find(null, form().ageRating(ALL).build(), 0, null).getSize());
+        assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
     }
 
     @Test
@@ -930,10 +933,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
         {
             SearchResult<MediaObject> result = target.find(null, form().build(), 0, null);
-            Assert.assertEquals(1, result.getSize().intValue());
-            Assert.assertEquals("Jeugd - Amusement",
+            assertEquals(1, result.getSize().intValue());
+            assertEquals("Jeugd - Amusement",
                     result.getItems().get(0).getResult().getGenres().first().getDisplayName());
-            Assert.assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
+            assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
         }
 
         index(program().mainTitle("t2").genres(new Genre("3.0.1.5")).build());
@@ -942,9 +945,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                 new Filter(new GenreConstraint("3.0.1.5")));
         {
             SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
-            Assert.assertEquals(1, result.getSize().intValue());
-            Assert.assertEquals("Muziek", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
-            Assert.assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+            assertEquals(1, result.getSize().intValue());
+            assertEquals("Muziek", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
+            assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
 
         }
 
@@ -962,7 +965,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             new Filter(new GenreConstraint("3.0.1*")));
         {
             SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
-            Assert.assertEquals(3, result.getSize().intValue());
+            assertEquals(3, result.getSize().intValue());
         }
     }
 
@@ -972,13 +975,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         index(program().mainTitle("t2").contentRatings(DRUGS_EN_ALCOHOL).build());
         index(program().mainTitle("t3").contentRatings(ANGST, DRUGS_EN_ALCOHOL).build());
 
-        Assert.assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
-        Assert.assertEquals(2L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
-        Assert.assertEquals(2L, (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL).build(), 0, null).getSize());
-        Assert.assertEquals(2L,
+        assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
+        assertEquals(2L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
+        assertEquals(2L, (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL).build(), 0, null).getSize());
+        assertEquals(2L,
                 (long) target.find(null, form().contentRatings(DRUGS_EN_ALCOHOL, SEKS).build(), 0, null).getSize());
-        Assert.assertEquals(0L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
-        Assert.assertEquals(0L,
+        assertEquals(0L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
+        assertEquals(0L,
                 (long) target.find(null, form().contentRatings(DISCRIMINATIE, SEKS).build(), 0, null).getSize());
     }
 
@@ -986,15 +989,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testAgeAndContentRatings() throws IOException {
         index(program().mainTitle("t1").contentRatings(SEKS).ageRating(_16).build());
 
-        Assert.assertEquals(1L, (long) target.find(null, form().build(), 0, null).getSize());
-        Assert.assertEquals(1L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
-        Assert.assertEquals(1L, (long) target.find(null, form().ageRating(_16).build(), 0, null).getSize());
-        Assert.assertEquals(1L,
+        assertEquals(1L, (long) target.find(null, form().build(), 0, null).getSize());
+        assertEquals(1L, (long) target.find(null, form().contentRatings(SEKS).build(), 0, null).getSize());
+        assertEquals(1L, (long) target.find(null, form().ageRating(_16).build(), 0, null).getSize());
+        assertEquals(1L,
                 (long) target.find(null, form().contentRatings(SEKS).ageRating(_16).build(), 0, null).getSize());
-        Assert.assertEquals(1L, (long) target
+        assertEquals(1L, (long) target
                 .find(null, form().contentRatings(DISCRIMINATIE, SEKS).ageRating(_12, _16).build(), 0, null).getSize());
-        Assert.assertEquals(0L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
-        Assert.assertEquals(0L, (long) target.find(null, form().ageRating(_12).build(), 0, null).getSize());
+        assertEquals(0L, (long) target.find(null, form().contentRatings(ANGST).build(), 0, null).getSize());
+        assertEquals(0L, (long) target.find(null, form().ageRating(_12).build(), 0, null).getSize());
     }
 
     @Test
@@ -1009,26 +1012,26 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         MediaSearchResult result = target.find(null, form().ageRating(ALL, _6, _12).ageRatingFacet(0).build(), 0, null);
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
 
-        Assert.assertEquals(5, ageRatings.size());
+        assertEquals(5, ageRatings.size());
 
         /* 3 x 6, 0 x 9, 2 * 12, 0 x 16, 1 * Alle Leeftijden */
-        Assert.assertEquals(3, ageRatings.get(0).getCount());
-        Assert.assertEquals(_6.getXmlValue(), ageRatings.get(0).getId());
-        Assert.assertEquals(0, ageRatings.get(1).getCount());
-        Assert.assertEquals(_9.getXmlValue(), ageRatings.get(1).getId());
-        Assert.assertEquals(2, ageRatings.get(2).getCount());
-        Assert.assertEquals(_12.getXmlValue(), ageRatings.get(2).getId());
-        Assert.assertEquals(0, ageRatings.get(3).getCount());
-        Assert.assertEquals(_16.getXmlValue(), ageRatings.get(3).getId());
-        Assert.assertEquals(1, ageRatings.get(4).getCount());
-        Assert.assertEquals(ALL.getXmlValue(), ageRatings.get(4).getId());
-        Assert.assertEquals(ALL.getDisplayName(), ageRatings.get(4).getValue());
+        assertEquals(3, ageRatings.get(0).getCount());
+        assertEquals(_6.getXmlValue(), ageRatings.get(0).getId());
+        assertEquals(0, ageRatings.get(1).getCount());
+        assertEquals(_9.getXmlValue(), ageRatings.get(1).getId());
+        assertEquals(2, ageRatings.get(2).getCount());
+        assertEquals(_12.getXmlValue(), ageRatings.get(2).getId());
+        assertEquals(0, ageRatings.get(3).getCount());
+        assertEquals(_16.getXmlValue(), ageRatings.get(3).getId());
+        assertEquals(1, ageRatings.get(4).getCount());
+        assertEquals(ALL.getXmlValue(), ageRatings.get(4).getId());
+        assertEquals(ALL.getDisplayName(), ageRatings.get(4).getValue());
 
         {
             MediaSearchResult result1 = target.find(null, form().ageRating(_16).ageRatingFacet().build(), 0, null);
-            Assert.assertEquals(1L, (long) result1.getSelectedFacets().getAgeRatings().size());
-            Assert.assertEquals(_16.getXmlValue(), result1.getSelectedFacets().getAgeRatings().get(0).getValue());
-            Assert.assertEquals(0, result1.getSelectedFacets().getAgeRatings().get(0).getCount());
+            assertEquals(1L, (long) result1.getSelectedFacets().getAgeRatings().size());
+            assertEquals(_16.getXmlValue(), result1.getSelectedFacets().getAgeRatings().get(0).getValue());
+            assertEquals(0, result1.getSelectedFacets().getAgeRatings().get(0).getCount());
         }
     }
 
@@ -1050,20 +1053,20 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
          * ANGST: 2, DISCRIMINATIE: 1, DRUGS_EN_ALCOHOL: 2, GEWELD: 1,
          * GROF_TAALGEBRUIK: 2, SEKS: 1, alphabetically
          */
-        Assert.assertEquals(contentRatings.size(), ContentRating.values().length);
+        assertEquals(contentRatings.size(), ContentRating.values().length);
 
-        Assert.assertEquals(ANGST.name(), contentRatings.get(0).getId());
-        Assert.assertEquals(2, contentRatings.get(0).getCount());
-        Assert.assertEquals(DISCRIMINATIE.name(), contentRatings.get(1).getId());
-        Assert.assertEquals(1, contentRatings.get(1).getCount());
-        Assert.assertEquals(DRUGS_EN_ALCOHOL.name(), contentRatings.get(2).getId());
-        Assert.assertEquals(2, contentRatings.get(2).getCount());
-        Assert.assertEquals(GEWELD.name(), contentRatings.get(3).getId());
-        Assert.assertEquals(1, contentRatings.get(3).getCount());
-        Assert.assertEquals(GROF_TAALGEBRUIK.name(), contentRatings.get(4).getId());
-        Assert.assertEquals(2, contentRatings.get(4).getCount());
-        Assert.assertEquals(SEKS.name(), contentRatings.get(5).getId());
-        Assert.assertEquals(1, contentRatings.get(5).getCount());
+        assertEquals(ANGST.name(), contentRatings.get(0).getId());
+        assertEquals(2, contentRatings.get(0).getCount());
+        assertEquals(DISCRIMINATIE.name(), contentRatings.get(1).getId());
+        assertEquals(1, contentRatings.get(1).getCount());
+        assertEquals(DRUGS_EN_ALCOHOL.name(), contentRatings.get(2).getId());
+        assertEquals(2, contentRatings.get(2).getCount());
+        assertEquals(GEWELD.name(), contentRatings.get(3).getId());
+        assertEquals(1, contentRatings.get(3).getCount());
+        assertEquals(GROF_TAALGEBRUIK.name(), contentRatings.get(4).getId());
+        assertEquals(2, contentRatings.get(4).getCount());
+        assertEquals(SEKS.name(), contentRatings.get(5).getId());
+        assertEquals(1, contentRatings.get(5).getCount());
     }
 
     @Test
