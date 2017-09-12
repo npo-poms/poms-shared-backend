@@ -760,8 +760,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     public void testListMembers() throws IOException {
 
         Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 2).build());
-        index(program().mid("MID_2").memberOf("MID_0", 1).build());
+        index(program().mid("MID_1").memberOf(group, 0).memberOf(group, 2).build());
+        index(program().mid("MID_2").memberOf(group, 1).build());
 
         MediaResult result = target.listMembers(group, null, Order.ASC, 0L, 10);
 
@@ -1219,8 +1219,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     private <T extends MediaObject> T index(T object) throws IOException {
         indexMediaObject(object);
-        String memberRefType = object.getClass().getSimpleName().toLowerCase() + "MemberRef";
         for (MemberRef ref : object.getMemberOf()) {
+            String memberRefType = MediaESType.memberRef(ref.getOwner().getClass()).name();
             index(memberRefType, object, ref);
         }
         if (object instanceof Program) {

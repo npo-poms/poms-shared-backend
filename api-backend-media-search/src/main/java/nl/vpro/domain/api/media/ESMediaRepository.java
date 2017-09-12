@@ -240,7 +240,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     @Override
     public MediaResult listMembers(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.memberRefs(), media, profile, order, offset, max);
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.memberRef(media.getClass()).name(), media, profile, order, offset, max);
         List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
         Long total = queryResult.getFirst();
 
@@ -274,7 +274,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     @Override
     public ProgramResult listEpisodes(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(new String[]{MediaESType.episodeRef.name()}, media, profile, order, offset, max);
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.episodeRef.name(), media, profile, order, offset, max);
         List<Program> objects = loadAll(Program.class, queryResult.getSecond());
         Long total = queryResult.getFirst();
 
@@ -285,7 +285,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return new ProgramResult(objects, offset, max, total);
     }
 
-    private Pair<Long, List<String>> listMembersOrEpisodes(String[] types, MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+    private Pair<Long, List<String>> listMembersOrEpisodes(String type, MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
         long offsetForES = offset;
         Integer maxForES = max;
         if (profile != null) {
@@ -296,8 +296,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         SearchRequestBuilder builder = iterator
             .prepareSearch(indexName)
-            .setTypes(types)
-            .setQuery(QueryBuilders.termQuery("_parent", media.getMid()))
+            .setTypes(type)
+            .setQuery(QueryBuilders.parentId(type, media.getMid()))
             .addSort("index", SortOrder.valueOf(order.name()))
             .addSort("added", SortOrder.ASC)
             .addSort("childRef", SortOrder.ASC)
