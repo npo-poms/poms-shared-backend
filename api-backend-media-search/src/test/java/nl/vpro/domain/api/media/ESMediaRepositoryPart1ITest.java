@@ -15,12 +15,11 @@ import javax.xml.bind.JAXB;
 import org.elasticsearch.ResourceAlreadyExistsException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.elasticsearch.search.SearchHit;
+import org.junit.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -83,6 +82,16 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             } catch (ResourceAlreadyExistsException e) {
                 log.info("Index exists");
             }
+        }
+        boolean shouldDelete = false;
+        BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
+        for (SearchHit hit : client.prepareSearch(indexName).get().getHits()) {
+            bulkRequestBuilder.add(client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId()));
+            shouldDelete = true;
+        }
+        if (shouldDelete) {
+            client.bulk(bulkRequestBuilder.request()).get();
+            client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
         }
     }
 
