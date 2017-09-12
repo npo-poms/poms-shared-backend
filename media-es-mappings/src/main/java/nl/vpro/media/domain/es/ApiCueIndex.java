@@ -15,11 +15,11 @@ public class ApiCueIndex {
         return source(mapping());
     }
     public static String mapping() {
-        return "mapping/cue.json";
+        return "es5/mapping/cue.json";
     }
 
     public static String settingSource() {
-        return source("setting/apimedia.json");
+        return source("es5/setting/apimedia.json");
     }
 
     public static String source(String s) {

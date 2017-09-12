@@ -22,10 +22,10 @@ public enum MediaESType {
 
 
     public String mapping() {
-        return "mapping/" + name() + ".json";
+        return "es5/mapping/" + name() + ".json";
     }
     public String source() {
-        return "{\"" + name() + "\" = " + ApiMediaIndex.source(mapping()) + "}";
+        return ApiMediaIndex.source(mapping());
     }
 
     public static MediaESType[] MEDIAOBJECTS = {program, group, segment};

@@ -13,6 +13,7 @@ import javax.xml.bind.JAXB;
 
 import org.assertj.core.api.Assertions;
 import org.elasticsearch.ResourceAlreadyExistsException;
+import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -63,27 +64,20 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     @Autowired
     private Settings settings;
 
-    //@Before
+    @Before
     public  void setup() throws Exception {
         try {
-            client.admin().indices()
-                .prepareCreate(ApiMediaIndex.NAME)
-                .setSettings(ApiMediaIndex.source(), XContentType.JSON)
-                .execute()
+            CreateIndexRequestBuilder createIndexRequestBuilder = client.admin().indices()
+                .prepareCreate(target.getIndexName())
+                .setSettings(ApiMediaIndex.source(), XContentType.JSON);
+            for (MediaESType type : MediaESType.values()) {
+                createIndexRequestBuilder.addMapping(type.name(), type.source(), XContentType.JSON);
+            }
+            createIndexRequestBuilder.execute()
                 .actionGet();
         } catch (ResourceAlreadyExistsException e) {
             log.info("Index exists");
         }
-        for (MediaESType type : MediaESType.values()) {
-            client.admin()
-                .indices()
-                .preparePutMapping(ApiMediaIndex.NAME)
-                .setType(type.name())
-                .setSource(type.source(), XContentType.JSON)
-                    .execute().actionGet();
-        }
-
-
     }
 
     @Before

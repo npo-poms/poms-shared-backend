@@ -18,7 +18,7 @@ public class ApiMediaIndex {
         return source(settings());
     }
     public static String settings() {
-        return "setting/apimedia.json";
+        return "es5/setting/apimedia.json";
     }
 
     public static String source(String name) {
