@@ -12,16 +12,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.xml.bind.JAXB;
 
-import org.elasticsearch.ResourceAlreadyExistsException;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -39,7 +31,6 @@ import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
@@ -61,11 +52,11 @@ import static org.mockito.Mockito.when;
  * @since 3.5
  */
 
+@SuppressWarnings("ConstantConditions")
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
-public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
+public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryTest {
 
-    static String indexName = null;
     @Autowired
     private ESMediaRepository target;
 
@@ -75,54 +66,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     @Before
     public  void setup() throws Exception {
         if (indexName == null) {
-            indexName = target.getIndexName();
-            try {
-                CreateIndexRequestBuilder createIndexRequestBuilder = client.admin().indices()
-                    .prepareCreate(indexName)
-                    .setSettings(ApiMediaIndex.source(), XContentType.JSON);
-                for (MediaESType type : MediaESType.values()) {
-                    createIndexRequestBuilder.addMapping(type.name(), type.source(), XContentType.JSON);
-                }
-                createIndexRequestBuilder.execute()
-                    .actionGet();
-            } catch (ResourceAlreadyExistsException e) {
-                log.info("Index exists");
-            }
+            createIndex(target.getIndexName());
         }
-        client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
-        while(true) {
-            long shouldDelete = 0;
-            BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
-            for (SearchHit hit : client.prepareSearch(indexName).setQuery(QueryBuilders.matchAllQuery()).setSize(100).get().getHits()) {
-                log.info("deleting {}/{}/{}", hit.getIndex(), hit.getType(), hit.getId());
-
-                DeleteRequestBuilder deleteRequestBuilder = client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId());
-                SearchHitField routing = hit.getFields().get("_routing");
-                if (routing != null) {
-                    for (Object r : routing.getValues()) {
-                        deleteRequestBuilder.setRouting(r.toString());
-                    }
-                }
-                bulkRequestBuilder.add(deleteRequestBuilder);
-                shouldDelete++;
-            }
-            if (shouldDelete > 0) {
-                client.bulk(bulkRequestBuilder.request()).actionGet();
-                client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
-                log.info("Deleted {} ", shouldDelete);
-            } else {
-                break;
-            }
-        }
-
+        clearIndex();
     }
 
-    @AfterClass
-    public static void shutdown() throws ExecutionException, InterruptedException {
-        if (indexName != null) {
-            client.admin().indices().prepareDelete(indexName).execute().get();
-        }
-    }
+
 
     @Before
     public void before() {
@@ -135,7 +84,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testLoad() throws IOException {
+    public void testLoad() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("foo bar").mid("MID_FOR_LOAD").build());
         MediaObject result = target.load("MID_FOR_LOAD");
         assertThat(result.getMainTitle()).isEqualTo("foo bar");
@@ -144,7 +93,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testText() throws IOException {
+    public void testText() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("foo").build());
         index(program().mainTitle("bar").build());
 
@@ -163,7 +112,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testTextFuzzy() throws IOException {
+    public void testTextFuzzy() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("foo").build());
         index(program().mainTitle("foa").build());
         index(program().mainTitle("bar").build());
@@ -183,7 +132,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testFindTagText() throws IOException {
+    public void testFindTagText() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").tags("foo", "bar").build());
         index(program().mainTitle("t2").tags("xxx", "yyy").build());
 
@@ -205,7 +154,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testFindTagTextRegex() throws IOException {
+    public void testFindTagTextRegex() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").tags("foo", "bar").build());
         index(program().mainTitle("t2").tags("xxx", "yyy").build());
 
@@ -229,7 +178,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testFindTagWildcard() throws IOException {
+    public void testFindTagWildcard() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").tags("foobar", "xxxyyyy").build());
         index(program().mainTitle("t2").tags("xxx", "yyy").build());
 
@@ -659,7 +608,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testWithLocationFilter() throws IOException {
+    public void testWithLocationFilter() throws IOException, ExecutionException, InterruptedException {
 
         index(program().build()); // no locations
         final Location location1 = new Location("http://www.locations.nl/1", OwnerType.BROADCASTER);
@@ -669,12 +618,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         final Location location2 = new Location("http://www.locations.nl/2", OwnerType.BROADCASTER,
                 Platform.INTERNETVOD);
         location2.setId(2L);
-        index(program().authoritativeRecord(Platform.INTERNETVOD).locations(location2).build()); // a
-                                                                                                 // location
-                                                                                                 // with
-                                                                                                 // a
-                                                                                                 // specific
-                                                                                                 // platform
+        index(program().authoritativeRecord(Platform.INTERNETVOD).locations(location2).build()); // a location with  a specific platform
 
         {
             Filter filter = new Filter();
@@ -776,7 +720,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testListMembers() throws IOException {
+    public void testListMembers() throws IOException, ExecutionException, InterruptedException {
 
         Group group = index(group().mid("MID_0").build());
         index(program().mid("MID_1").memberOf(group, 0).memberOf(group, 2).build());
@@ -794,7 +738,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testListMembers3WithProfile() throws IOException {
+    public void testListMembers3WithProfile() throws IOException, ExecutionException, InterruptedException {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -826,7 +770,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testListMembersWithProfileAndOffet() throws IOException {
+    public void testListMembersWithProfileAndOffet() throws IOException, ExecutionException, InterruptedException {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -847,7 +791,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testListEpisodes() throws IOException {
+    public void testListEpisodes() throws IOException, ExecutionException, InterruptedException {
 
         Group group = index(season().mid("MID_0").build());
         index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf(group, 2).build());
@@ -871,7 +815,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testListEpisodesWithProfile() throws IOException {
+    public void testListEpisodesWithProfile() throws IOException, ExecutionException, InterruptedException {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -894,7 +838,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testListEpisodesWithProfileAndOffset() throws IOException {
+    public void testListEpisodesWithProfileAndOffset() throws IOException, ExecutionException, InterruptedException {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -914,7 +858,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testRedirect() throws IOException {
+    public void testRedirect() throws IOException, ExecutionException, InterruptedException {
         settings.setRedirectsRepository("ELASTICSEARCH");
         Group group1 = index(group().published().mid("MID_0").build());
         Group group2 = index(group().mergedTo(group1).mid("MID_1").build());
@@ -925,7 +869,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testAgeRating() throws IOException {
+    public void testAgeRating() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").ageRating(_6).build());
         index(program().mainTitle("t2").ageRating(_12).build());
         index(program().mainTitle("t3").ageRating(ALL).build());
@@ -947,7 +891,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testGenreFilter() throws IOException {
+    public void testGenreFilter() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")).build());
 
         {
@@ -974,7 +918,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testGenreFilterWildCard() throws IOException {
+    public void testGenreFilterWildCard() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")).build());
         index(program().mainTitle("t2").genres(new Genre("3.0.1.5")).build());
         index(program().mainTitle("t3").genres(new Genre("3.0.1")).build());
@@ -989,7 +933,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testContentRatings() throws IOException {
+    public void testContentRatings() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").contentRatings(ANGST).build());
         index(program().mainTitle("t2").contentRatings(DRUGS_EN_ALCOHOL).build());
         index(program().mainTitle("t3").contentRatings(ANGST, DRUGS_EN_ALCOHOL).build());
@@ -1005,7 +949,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     }
 
     @Test
-    public void testAgeAndContentRatings() throws IOException {
+    public void testAgeAndContentRatings() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").contentRatings(SEKS).ageRating(_16).build());
 
         assertEquals(1L, (long) target.find(null, form().build(), 0, null).getSize());
@@ -1125,7 +1069,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     // NPA-403
-    public void testSortByTitles() throws IOException {
+    public void testSortByTitles() throws IOException, ExecutionException, InterruptedException {
         index(program()
             .mainTitle("aa")
             .lexicoTitle("bb")
@@ -1160,7 +1104,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     // NPA-403
-    public void testSortByLexico() throws IOException {
+    public void testSortByLexico() throws IOException, ExecutionException, InterruptedException {
         index(program()
             .mainTitle("bb")
             //.lexicoTitle("bb") Should be implicit
@@ -1188,7 +1132,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
     @Test
     // NPA-403
-    public void testSortByLexicoForOwner() throws IOException {
+    public void testSortByLexicoForOwner() throws IOException, ExecutionException, InterruptedException {
         index(program()
             .mainTitle("bbmis", OwnerType.MIS)
             .mainTitle("cc", OwnerType.BROADCASTER)
@@ -1236,7 +1180,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
     }
 
-    private <T extends MediaObject> T index(T object) throws IOException {
+    private <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         indexMediaObject(object);
         for (MemberRef ref : object.getMemberOf()) {
             String memberRefType = MediaESType.memberRef(ref.getOwner().getClass()).name();
@@ -1250,15 +1194,16 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         return object;
     }
 
-    private void indexMediaObject(MediaObject object) throws IOException {
+    private void indexMediaObject(MediaObject object) throws IOException, ExecutionException, InterruptedException {
         byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
         client.index(new IndexRequest(indexName, getTypeName(object), object.getMid())
             .source(bytes, XContentType.JSON))
             .actionGet();
-        client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
+        refresh();
+
     }
 
-    private void index(String type, MediaObject child, MemberRef object) throws IOException {
+    private void index(String type, MediaObject child, MemberRef object) throws IOException, ExecutionException, InterruptedException {
         StandaloneMemberRef ref = StandaloneMemberRef.builder()
             .childRef(child.getMid())
             .memberRef(object)
@@ -1269,6 +1214,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
                 .parent(object.getMidRef()))
             .actionGet();
         log.info("Indexed {} {}", type, ref.getId());
-        client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
+        refresh();
     }
 }

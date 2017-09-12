@@ -2,9 +2,17 @@ package nl.vpro.domain.api;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.concurrent.ExecutionException;
+
 import javax.inject.Inject;
 
+import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHitField;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +31,14 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Michiel Meeuwissen
- * @since ...
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/broadcasterService.xml"})
 @Slf4j
 public abstract class AbstractESRepositoryTest  {
+
+    protected static String indexName = null;
 
     protected static Client client;
 
@@ -58,6 +67,40 @@ public abstract class AbstractESRepositoryTest  {
         });
     }
 
+    protected void clearIndex() {
+        client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
+        while (true) {
+            long shouldDelete = 0;
+            BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
+            for (SearchHit hit : client.prepareSearch(indexName).setQuery(QueryBuilders.matchAllQuery()).setSize(100).get().getHits()) {
+                log.info("deleting {}/{}/{}", hit.getIndex(), hit.getType(), hit.getId());
+
+                DeleteRequestBuilder deleteRequestBuilder = client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId());
+                SearchHitField routing = hit.getFields().get("_routing");
+                if (routing != null) {
+                    for (Object r : routing.getValues()) {
+                        deleteRequestBuilder.setRouting(r.toString());
+                    }
+                }
+                bulkRequestBuilder.add(deleteRequestBuilder);
+                shouldDelete++;
+            }
+            if (shouldDelete > 0) {
+                client.bulk(bulkRequestBuilder.request()).actionGet();
+                client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
+                log.info("Deleted {} ", shouldDelete);
+            } else {
+                break;
+            }
+        }
+
+    }
+
+
+    protected static void refresh() throws ExecutionException, InterruptedException {
+        client.admin().indices().refresh(new RefreshRequest(indexName)).get();
+
+    }
 
 
     protected static String getTypeName(MediaObject media) {
