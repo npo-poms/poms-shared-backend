@@ -16,11 +16,16 @@ import org.elasticsearch.ResourceAlreadyExistsException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.junit.*;
+import org.elasticsearch.search.SearchHitField;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -40,8 +45,7 @@ import nl.vpro.media.domain.es.MediaESType;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.ContentRating.*;
-import static nl.vpro.domain.media.MediaTestDataBuilder.group;
-import static nl.vpro.domain.media.MediaTestDataBuilder.program;
+import static nl.vpro.domain.media.MediaTestDataBuilder.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -86,16 +90,31 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             }
         }
         client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
-        boolean shouldDelete = false;
-        BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
-        for (SearchHit hit : client.prepareSearch(indexName).setQuery(QueryBuilders.matchAllQuery()).setSize(10000).get().getHits()) {
-            bulkRequestBuilder.add(client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId()));
-            shouldDelete = true;
+        while(true) {
+            long shouldDelete = 0;
+            BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
+            for (SearchHit hit : client.prepareSearch(indexName).setQuery(QueryBuilders.matchAllQuery()).setSize(100).get().getHits()) {
+                log.info("deleting {}/{}/{}", hit.getIndex(), hit.getType(), hit.getId());
+
+                DeleteRequestBuilder deleteRequestBuilder = client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId());
+                SearchHitField routing = hit.getFields().get("_routing");
+                if (routing != null) {
+                    for (Object r : routing.getValues()) {
+                        deleteRequestBuilder.setRouting(r.toString());
+                    }
+                }
+                bulkRequestBuilder.add(deleteRequestBuilder);
+                shouldDelete++;
+            }
+            if (shouldDelete > 0) {
+                client.bulk(bulkRequestBuilder.request()).actionGet();
+                client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
+                log.info("Deleted {} ", shouldDelete);
+            } else {
+                break;
+            }
         }
-        if (shouldDelete) {
-            client.bulk(bulkRequestBuilder.request()).get();
-            client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
-        }
+
     }
 
     @AfterClass
@@ -465,7 +484,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     @Test
     public void testFindWithMemberOfFacetWithAdditionalFields() throws Exception {
         final Group group = index(group().withMid().mainTitle("Group title").build());
-        final Program program = index(program().withMid().memberOf(group.getMid(), 1).build());
+        final Program program = index(program().withMid().memberOf(group, 1).build());
 
         when(target.mediaRepository.redirect(anyString())).thenReturn(Optional.empty());
 
@@ -775,7 +794,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
 
 
     @Test
-    public void testListMembersWithProfile() throws IOException {
+    public void testListMembers3WithProfile() throws IOException {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -783,9 +802,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         Group group = index(group().mid("MID_0").build());
         Group unrelatedGroup = index(group().mid("MID_100").build());
 
-        index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 3).memberOf("MID_100", 3).broadcasters("BNN").build());
-        index(program().mid("MID_2").memberOf("MID_0", 1).build());
-        index(program().mid("MID_3").memberOf("MID_0", 2).broadcasters("BNN").build());
+        index(program().mid("MID_1").memberOf(group, 0).memberOf(group, 3).memberOf(unrelatedGroup, 3).broadcasters("BNN").build());
+        index(program().mid("MID_2").memberOf(group, 1).build());
+        index(program().mid("MID_3").memberOf(group, 2).broadcasters("BNN").build());
 
 
         {
@@ -813,9 +832,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             new Filter(new BroadcasterConstraint("BNN"))
         );
         Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").memberOf("MID_0", 0).memberOf("MID_0", 3).broadcasters("BNN").build());
-        index(program().mid("MID_2").memberOf("MID_0", 1).build());
-        index(program().mid("MID_3").memberOf("MID_0", 2).broadcasters("BNN").build());
+        index(program().mid("MID_1").memberOf(group, 0).memberOf(group, 3).broadcasters("BNN").build());
+        index(program().mid("MID_2").memberOf(group, 1).build());
+        index(program().mid("MID_3").memberOf(group, 2).broadcasters("BNN").build());
 
 
         MediaResult result = target.listMembers(group, omroepProfile, Order.ASC, 1L, 10);
@@ -830,12 +849,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
     @Test
     public void testListEpisodes() throws IOException {
 
-        Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).build());
-        index(program().mid("MID_2").episodeOf("MID_0", 1).build());
-        index(program().mid("MID_3").episodeOf(MemberRef.builder().midRef("MID_0").number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
-        index(program().mid("MID_4").episodeOf(MemberRef.builder().midRef("MID_0").number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
-        index(program().mid("MID_5").episodeOf("MID_0", 4).build());
+        Group group = index(season().mid("MID_0").build());
+        index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf(group, 2).build());
+        index(broadcast().mid("MID_2").episodeOf(group, 1).build());
+        index(broadcast().mid("MID_3").episodeOf(MemberRef.builder().owner(group).number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
+        index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().owner(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
+        index(broadcast().mid("MID_5").episodeOf(group, 4).build());
 
         ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
 
@@ -859,9 +878,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         );
 
         Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
-        index(program().mid("MID_2").episodeOf("MID_0", 1).build());
-        index(program().mid("MID_3").episodeOf("MID_0", 3).broadcasters("BNN").build());
+        index(program().mid("MID_1").episodeOf(group, 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
+        index(program().mid("MID_2").episodeOf(group, 1).build());
+        index(program().mid("MID_3").episodeOf(group, 3).broadcasters("BNN").build());
 
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 0L, 10);
 
@@ -882,9 +901,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         );
 
         Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").episodeOf("MID_0", 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
-        index(program().mid("MID_2").episodeOf("MID_0", 1).build());
-        index(program().mid("MID_3").episodeOf("MID_0", 3).broadcasters("BNN").build());
+        index(program().mid("MID_1").episodeOf(group, 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
+        index(program().mid("MID_2").episodeOf(group, 1).build());
+        index(program().mid("MID_3").episodeOf(group, 3).broadcasters("BNN").build());
 
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 1L, 10);
 
