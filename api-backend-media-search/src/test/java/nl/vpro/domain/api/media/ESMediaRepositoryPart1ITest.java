@@ -14,7 +14,6 @@ import javax.xml.bind.JAXB;
 
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -821,10 +820,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryTest {
             new Filter(new BroadcasterConstraint("BNN"))
         );
 
-        Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").episodeOf(group, 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
-        index(program().mid("MID_2").episodeOf(group, 1).build());
-        index(program().mid("MID_3").episodeOf(group, 3).broadcasters("BNN").build());
+        Group group = index(season().mid("MID_0").build());
+        index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
+        index(broadcast().mid("MID_2").episodeOf(group, 1).build());
+        index(broadcast().mid("MID_3").episodeOf(group, 3).broadcasters("BNN").build());
 
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 0L, 10);
 
@@ -844,10 +843,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryTest {
             new Filter(new BroadcasterConstraint("BNN"))
         );
 
-        Group group = index(group().mid("MID_0").build());
-        index(program().mid("MID_1").episodeOf(group, 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
-        index(program().mid("MID_2").episodeOf(group, 1).build());
-        index(program().mid("MID_3").episodeOf(group, 3).broadcasters("BNN").build());
+        Group group = index(season().mid("MID_0").build());
+        index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf("MID_0", 2).broadcasters("BNN").build());
+        index(broadcast().mid("MID_2").episodeOf(group, 1).build());
+        index(broadcast().mid("MID_3").episodeOf(group, 3).broadcasters("BNN").build());
 
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 1L, 10);
 

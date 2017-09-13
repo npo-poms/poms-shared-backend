@@ -17,4 +17,15 @@ public class ESMediaFacetsHandlerTest {
         System.out.println(searchBuilder.toString());
     }
 
+    @Test
+    public void testAgeRatingFacet() throws Exception {
+        MediaForm form = new MediaForm();
+        MediaFacets facets = new MediaFacets();
+        facets.setAgeRatings(new MediaFacet());
+        form.setFacets(facets);
+        SearchSourceBuilder searchBuilder = SearchSourceBuilder.searchSource();
+        //ESMediaFacetsHandler.(searchBuilder, form, null, "prefix");
+        System.out.println(searchBuilder.toString());
+    }
+
 }

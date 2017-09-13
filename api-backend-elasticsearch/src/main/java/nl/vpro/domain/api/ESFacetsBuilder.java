@@ -34,29 +34,33 @@ public abstract class ESFacetsBuilder {
 
     protected static final String FILTER_PREFIX = "filter_";
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, TextFacet<?> facet, String fieldPrefix) {
+    protected static void addFacet(
+        SearchSourceBuilder searchBuilder,
+        QueryBuilder filterBuilder,
+        String fieldName,
+        TextFacet<?> facet,
+        String fieldPrefix) {
         if(facet != null) {
             Terms.Order order = ESFacets.getComparatorType(facet);
 
-            TermsAggregationBuilder termsFacet = AggregationBuilders
-                .terms("agg")
-                //.subAggregation(Aggfilter(fieldName, filterBuilder)
-                //.size(facet.getMax())
-                //.order(order)
-                //.nested(fieldPrefix)
-            ;
+            TermsAggregationBuilder aggregationBuilder = AggregationBuilders
+                .terms(fieldName)
+                .field(fieldPrefix + fieldName)
+                .order(order)
+                .size(facet.getMax());
+
 
             String include = facet.getInclude();
             if (include != null) {
                 Pattern pattern = Pattern.compile(include);
-                termsFacet.includeExclude(new IncludeExclude(new RegExp(pattern.pattern(), pattern.flags()), null));
+                aggregationBuilder.includeExclude(new IncludeExclude(new RegExp(pattern.pattern(), pattern.flags()), null));
             }
             String script = facet.getScript();
             if (script != null) {
-                termsFacet.script(new Script(script));
+                aggregationBuilder.script(new Script(script));
             }
 
-            searchBuilder.aggregation(termsFacet);
+            searchBuilder.aggregation(aggregationBuilder);
         }
     }
 
