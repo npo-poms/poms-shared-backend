@@ -45,9 +45,11 @@ public abstract class ESFacetsBuilder {
 
             TermsAggregationBuilder aggregationBuilder = AggregationBuilders
                 .terms(fieldName)
-                .field(fieldPrefix + fieldName)
+                .field(fieldName)
                 .order(order)
-                .size(facet.getMax());
+                .size(facet.getMax())
+
+                ;
 
 
             String include = facet.getInclude();
