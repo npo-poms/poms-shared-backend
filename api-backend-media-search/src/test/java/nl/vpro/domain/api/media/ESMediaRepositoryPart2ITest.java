@@ -28,11 +28,9 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
-import nl.vpro.elasticsearch.TransportClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.FilteringIterator;
-import nl.vpro.util.UrlProvider;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -101,9 +99,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
      */
     @BeforeClass
     public static void setup() throws InterruptedException, ExecutionException, IOException {
-        TransportClientFactory factory = new TransportClientFactory();
-        factory.setTransportAddresses(UrlProvider.fromUrl("http://localhost:9300"));
-        client = factory.client("test");
         target.mediaRepository = mock(MediaRepository.class);
         target.setIndexName(ApiMediaIndex.NAME + "-" + System.currentTimeMillis());
         target.settings = new Settings();

@@ -11,7 +11,7 @@
       <list>
         <bean class="nl.vpro.util.UrlProvider">
           <constructor-arg name="host" value="localhost"/>
-          <constructor-arg name="port" value="9311" />
+          <constructor-arg name="port" value="#{System.getProperty('integ.java.port')}" />
         </bean>
       </list>
     </property>

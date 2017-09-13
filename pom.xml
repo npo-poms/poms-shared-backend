@@ -17,6 +17,13 @@
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
     <poms.shared.version>5.5-SNAPSHOT</poms.shared.version>
+    <skipIntegTests>true</skipIntegTests>
+    <integ.deps>${project.build.directory}/integration-tests/binaries</integ.deps>
+    <integ.scratch>${project.build.directory}/integration-scratch</integ.scratch>
+    <integ.http.port>9211</integ.http.port>
+    <integ.java.port>9311</integ.java.port>
+    <integ.temp>${project.build.directory}/integration-tests/tmp</integ.temp>
+    <integ.cluster.name>api-test</integ.cluster.name>
   </properties>
 
   <scm>
@@ -115,4 +122,109 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <build>
+    <!-- http://david.pilato.fr/blog/2016/10/18/elasticsearch-real-integration-tests-updated-for-ga/ -->
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <property>
+              <name>integ.java.port</name>
+              <value>${integ.java.port}</value>
+            </property>
+          </systemPropertyVariables>
+          <includes>
+            <include>**/*Test.java</include>
+            <include>**/*Spec.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/*ITest.java</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <phase>integration-test</phase>
+            <configuration>
+              <excludes>
+                <exclude>none</exclude>
+              </excludes>
+              <includes>
+                <include>**/*ITest.java</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>integ-setup-dependencies</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <skip>${skipIntegTests}</skip>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.elasticsearch.distribution.zip</groupId>
+                  <artifactId>elasticsearch</artifactId>
+                  <version>${elasticsearch.version}</version>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+              <useBaseVersion>true</useBaseVersion>
+              <outputDirectory>${project.build.directory}/integration-tests/binaries</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <!-- start up external cluster -->
+          <execution>
+            <id>integ-setup</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <skip>${skipIntegTests}</skip>
+              <target>
+                <ant antfile="${project.basedir}/../src/test/ant/integration-tests.xml"
+                     target="start-external-cluster"/>
+              </target>
+            </configuration>
+          </execution>
+          <!-- shut down external cluster -->
+          <execution>
+            <id>integ-teardown</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <skip>${skipIntegTests}</skip>
+              <target>
+                <ant antfile="${project.basedir}/../src/test/ant/integration-tests.xml"
+                     target="stop-external-cluster"/>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
