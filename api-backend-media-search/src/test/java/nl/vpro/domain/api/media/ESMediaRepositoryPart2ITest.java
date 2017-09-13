@@ -684,7 +684,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryTest {
 
 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
-        AbstractESRepositoryTest.client.index(new IndexRequest(ApiMediaIndex.NAME, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
+        AbstractESRepositoryTest.client.index(new IndexRequest(indexName, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
         indexed.sort((o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));
