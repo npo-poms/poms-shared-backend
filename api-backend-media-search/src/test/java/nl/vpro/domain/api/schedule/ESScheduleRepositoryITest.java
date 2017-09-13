@@ -9,15 +9,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ExecutionException;
 
-import org.assertj.core.api.Assertions;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.*;
@@ -26,29 +22,23 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Slf4j
-public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
+public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     public ESScheduleRepository repository;
 
     @Before
     public void setup() throws IOException, ExecutionException, InterruptedException {
         repository = new ESScheduleRepository(clientFactory, null);
-        repository.setIndexName(ApiMediaIndex.NAME);
-        repository.createIndices().get();
+        repository.setIndexName(ApiMediaIndex.NAME + "-" + System.currentTimeMillis());
+        createIndexIfNecessary(repository.getIndexName());
+        clearIndex();
     }
 
-
-    @After
-    public void tearDown() {
-        client.admin()
-            .indices()
-            .prepareDelete(ApiMediaIndex.NAME)
-            .execute()
-            .actionGet();
-    }
     @Test
-    public void list() throws JsonProcessingException {
+    public void list() throws Exception {
         index(MediaBuilder.program().mid("DONNA_1")
             .scheduleEvents(
                 event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -62,12 +52,12 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
 
 
         ScheduleResult result = repository.listSchedules((Instant) null, null, Order.ASC, 0L, 10);
-        Assertions.assertThat(result).hasSize(3);
+        assertThat(result).hasSize(3);
     }
 
 
     @Test
-    public void listSchedulesWithChannel() throws JsonProcessingException {
+    public void listSchedulesWithChannel() throws Exception {
         index(MediaBuilder.program().mid("DONNA_1")
                 .scheduleEvents(
                         event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -81,34 +71,35 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
 
 
         ScheduleResult result = repository.listSchedules(Channel.BBC1, date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
-        Assertions.assertThat(result).hasSize(1);
+        assertThat(result).hasSize(1);
     }
 
     @Test
-    public void listSchedulesWithSubtitles() throws JsonProcessingException {
+    public void listSchedulesWithSubtitles() throws Exception {
         index(MediaTestDataBuilder.program().mid("SUBS_PROG_1").withDutchCaptions().build());
         index(MediaTestDataBuilder.group().mid("SUBS_GROUP_1").withDutchCaptions().build());
         index(MediaTestDataBuilder.segment().mid("SUBS_SEGMENT_1").withDutchCaptions().build());
 
-        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_PROG_1").hasSubtitles());
-        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_GROUP_1").hasSubtitles());
-        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.findByMid("SUBS_SEGMENT_1").hasSubtitles());
+        assertThat(repository.findByMid("SUBS_PROG_1").hasSubtitles()).isTrue();
+        assertThat(repository.findByMid("SUBS_GROUP_1").hasSubtitles()).isTrue();
+        assertThat(repository.findByMid("SUBS_SEGMENT_1").hasSubtitles()).isTrue();
     }
 
     @Test
-    public void findByCrid() throws IOException {
+    public void findByCrid() throws Exception {
         String cridToFind = "crid://uitzending/1";
         //String cridToFind = "criduitzending1";
         index(MediaBuilder.program().mid("DONNA_2").crids(cridToFind).build());
 
-        Assertions.assertThat(repository.load(cridToFind).getMid()).isEqualTo("DONNA_2");
-        Assertions.assertThatExceptionOfType(UnsupportedOperationException.class).isThrownBy(() -> repository.load("DONNA_2").getMid());
+        assertThat(repository.load(cridToFind).getMid()).isEqualTo("DONNA_2");
+        assertThat(repository.load("DONNA_2").getMid()).isEqualTo("DONNA_2");
+
 
     }
 
 
     @Test
-    public void listSchedulesForBroadcaster() throws JsonProcessingException {
+    public void listSchedulesForBroadcaster() throws Exception {
         index(MediaBuilder.program().mid("DONNA_1")
                 .broadcasters(new Broadcaster("VPRO"))
                 .scheduleEvents(
@@ -124,15 +115,15 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
 
         {
             ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
-            Assertions.assertThat(result).hasSize(2);
-            Assertions.assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC1);
-            Assertions.assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC2);
+            assertThat(result).hasSize(2);
+            assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC1);
+            assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC2);
         }
         {  // Test order too
             ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.DESC, 0L, 10);
-            Assertions.assertThat(result).hasSize(2);
-            Assertions.assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC2);
-            Assertions.assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC1);
+            assertThat(result).hasSize(2);
+            assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC2);
+            assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC1);
         }
     }
 
@@ -153,7 +144,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
 
         ScheduleResult result = repository.listSchedulesForMediaType(MediaType.MOVIE, date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
 
-        Assertions.assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(movie);
+        assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(movie);
     }
 
 
@@ -177,7 +168,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
         ScheduleResult result = repository.listSchedulesForAncestor("DESCENDANT1",
             date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
 
-        Assertions.assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(broadcast);
+        assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(broadcast);
     }
 
 
@@ -211,7 +202,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
                         .build()
                 ).build());
         ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
-        Assertions.assertThat(schedules).hasSize(1);
+        assertThat(schedules).hasSize(1);
     }
 
 
@@ -245,9 +236,9 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
                         .build()
                 ).build());
         ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
-        Assertions.assertThat(schedules).hasSize(2);
+        assertThat(schedules).hasSize(2);
 
-        Assertions.assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
+        assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
 
     }
 
@@ -272,28 +263,26 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
         return LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(Schedule.ZONE_ID).toInstant();
     }
 
-    private void index(Program p) throws JsonProcessingException {
+    private void index(Program p) throws JsonProcessingException, ExecutionException, InterruptedException {
         index(p, "program");
     }
 
-    private void index(Segment s) throws JsonProcessingException {
+    private void index(Segment s) throws Exception {
         index(s, "segment");
     }
 
-    private void index(Group g) throws JsonProcessingException {
+    private void index(Group g) throws JsonProcessingException, ExecutionException, InterruptedException {
         index(g, "group");
     }
 
-    private void index(MediaObject o, String mediaType) throws JsonProcessingException {
+    private void index(MediaObject o, String mediaType) throws JsonProcessingException, ExecutionException, InterruptedException {
         client.prepareIndex()
-                .setIndex(ApiMediaIndex.NAME)
+                .setIndex(indexName)
                 .setType(mediaType)
                 .setId(o.getMid())
                 .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(o), XContentType.JSON)
                 .get();
-        client.admin()
-                .indices()
-                .refresh(new RefreshRequest(ApiMediaIndex.NAME))
-                .actionGet();
+        refresh();
+
     }
 }
