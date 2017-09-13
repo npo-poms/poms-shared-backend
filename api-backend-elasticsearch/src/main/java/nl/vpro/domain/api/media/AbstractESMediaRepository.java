@@ -4,6 +4,7 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -156,7 +157,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
         QueryBuilder queryBuilder = ESMediaQueryBuilder.query(form != null ? form.getSearches() : null);
 
-        QueryBuilder scoredBuilder = ESMediaScoreBuilder.score(queryBuilder);
+        QueryBuilder scoredBuilder = ESMediaScoreBuilder.score(queryBuilder, Instant.now());
 
         searchBuilder.query(scoredBuilder);
 

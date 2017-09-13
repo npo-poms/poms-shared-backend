@@ -4,11 +4,13 @@
  */
 package nl.vpro.domain.api.media;
 
+import java.time.LocalDateTime;
+
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 
 /**
  * @author Roelof Jan Koekoek
@@ -18,33 +20,84 @@ public class ESMediaScoreBuilderTest {
 
     @Test
     public void testScore() throws Exception {
-        QueryBuilder scored = ESMediaScoreBuilder.score(QueryBuilders.matchAllQuery());
+        QueryBuilder scored = ESMediaScoreBuilder.score(QueryBuilders.matchAllQuery(), LocalDateTime.of(2017, 9, 13, 15, 12).atZone(ScheduleService.ZONE_ID).toInstant());
 
-        assertThat(scored.toString()).contains(
-            "    \"functions\" : [ {\n" +
-                "      \"filter\" : {\n" +
-                "        \"exists\" : {\n" +
-                "          \"field\" : \"locations\"\n" +
+        Jackson2TestUtil.assertThatJson(scored.toString()).isSimilarTo(
+            "{\n" +
+                "  \"function_score\" : {\n" +
+                "    \"query\" : {\n" +
+                "      \"match_all\" : {\n" +
+                "        \"boost\" : 1.0\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"functions\" : [\n" +
+                "      {\n" +
+                "        \"filter\" : {\n" +
+                "          \"exists\" : {\n" +
+                "            \"field\" : \"locations\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"field_value_factor\" : {\n" +
+                "          \"field\" : \"locations\",\n" +
+                "          \"factor\" : 2.0,\n" +
+                "          \"modifier\" : \"none\"\n" +
                 "        }\n" +
                 "      },\n" +
-                "      \"boost_factor\" : 2.0\n" +
-                "    }, {\n" +
-                "      \"filter\" : {\n" +
-                "        \"term\" : {\n" +
-                "          \"type\" : \"SERIES\"\n" +
-                "        }\n" +
+                "      {\n" +
+                "        \"filter\" : {\n" +
+                "          \"term\" : {\n" +
+                "            \"type\" : {\n" +
+                "              \"value\" : \"SERIES\",\n" +
+                "              \"boost\" : 1.0\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"weight\" : 2.5\n" +
                 "      },\n" +
-                "      \"boost_factor\" : 2.5\n" +
-                "    }, {\n" +
-                "      \"filter\" : {\n" +
-                "        \"term\" : {\n" +
-                "          \"type\" : \"BROADCAST\"\n" +
-                "        }\n" +
+                "      {\n" +
+                "        \"filter\" : {\n" +
+                "          \"term\" : {\n" +
+                "            \"type\" : {\n" +
+                "              \"value\" : \"BROADCAST\",\n" +
+                "              \"boost\" : 1.0\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"weight\" : 1.5\n" +
                 "      },\n" +
-                "      \"boost_factor\" : 1.5\n" +
-                "    }, {\n" +
-                "      \"gauss\" : {\n" +
-                "        \"sortDate\" : {\n"
+                "      {\n" +
+                "        \"filter\" : {\n" +
+                "          \"term\" : {\n" +
+                "            \"type\" : {\n" +
+                "              \"value\" : \"BROADCAST\",\n" +
+                "              \"boost\" : 1.0\n" +
+                "            }\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"weight\" : 1.5\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"filter\" : {\n" +
+                "          \"match_all\" : {\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        },\n" +
+                "        \"gauss\" : {\n" +
+                "          \"sortDate\" : {\n" +
+                "            \"origin\" : 1505308320000,\n" +
+                "            \"scale\" : 157680000000,\n" +
+                "            \"decay\" : 0.5\n" +
+                "          },\n" +
+                "          \"multi_value_mode\" : \"MIN\"\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"score_mode\" : \"multiply\",\n" +
+                "    \"max_boost\" : 2.0,\n" +
+                "    \"boost\" : 1.0\n" +
+                "  }\n" +
+                "}"
         );
     }
 }

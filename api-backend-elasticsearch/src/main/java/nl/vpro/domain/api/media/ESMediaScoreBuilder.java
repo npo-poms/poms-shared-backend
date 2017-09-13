@@ -4,10 +4,17 @@
  */
 package nl.vpro.domain.api.media;
 
+import java.time.Instant;
+
 import org.elasticsearch.common.lucene.search.function.FiltersFunctionScoreQuery;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
+
+import nl.vpro.domain.media.MediaType;
+
+import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.*;
+
 
 /**
  * @author Roelof Jan Koekoek
@@ -28,19 +35,23 @@ public class ESMediaScoreBuilder {
 
     static float maxBoost = 2.0f;
 
-    public static QueryBuilder score(QueryBuilder query) {
-        FunctionScoreQueryBuilder builder = QueryBuilders.functionScoreQuery(query);
+    public static QueryBuilder score(QueryBuilder query, Instant now) {
 
-        // TODO
+        FunctionScoreQueryBuilder.FilterFunctionBuilder[] functions = {
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(existsQuery("locations"), fieldValueFactorFunction("locations").factor(locationBoost)),
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.SERIES.name()), weightFactorFunction(seriesBoost)),
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.BROADCAST.name()), weightFactorFunction(broadcastBoost)),
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.BROADCAST.name()), weightFactorFunction(broadcastBoost)),
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(gaussDecayFunction("sortDate", now.toEpochMilli(), sortDateScale))
+                //.setOffset(sortDateOffset)
+                //.setDecay(sortDateDecay))
+        };
+        FunctionScoreQueryBuilder builder = functionScoreQuery(functions);
+
         builder
             .scoreMode(FiltersFunctionScoreQuery.ScoreMode.SUM) // Add the individual functions scores (mainly their  boost factors) below
             .maxBoost(maxBoost) // restrict range from 0 to 2
-          /*  .boo(QueryBuilders.existsQuery("locations"), ScoreFunctionBuilders.fieldValueFactorFunction(locationBoost))
-            .add(QueryBuilders.termQuery("type", MediaType.SERIES.name()), new FactorBuilder().boostFactor(seriesBoost))
-            .add(QueryBuilders.termQuery("type", MediaType.BROADCAST.name()), new FactorBuilder().boostFactor(broadcastBoost))
-            .add(new GaussDecayFunctionBuilder("sortDate", System.currentTimeMillis(), sortDateScale).setOffset(sortDateOffset).setDecay(sortDateDecay))*/
-        ;
-
+            ;
         return builder.scoreMode(FiltersFunctionScoreQuery.ScoreMode.MULTIPLY);
     }
 }
