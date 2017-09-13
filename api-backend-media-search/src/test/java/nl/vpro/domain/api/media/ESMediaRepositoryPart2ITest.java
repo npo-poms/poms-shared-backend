@@ -16,7 +16,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.springframework.test.context.ContextConfiguration;
 
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
@@ -50,7 +49,7 @@ import static org.mockito.Mockito.when;
  */
 
 @Slf4j
-public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryTest {
+public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();
     private static final Instant LONGAGO = LocalDate.of(1970, Month.JANUARY, 1).atStartOfDay().atZone(Schedule.ZONE_ID).toInstant();
@@ -683,7 +682,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryTest {
 
 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
-        AbstractESRepositoryTest.client.index(new IndexRequest(indexName, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
+        AbstractESRepositoryITest.client.index(new IndexRequest(indexName, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
         indexed.sort((o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));

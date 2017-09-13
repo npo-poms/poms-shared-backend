@@ -1,6 +1,8 @@
 package nl.vpro.media.domain.es;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -73,4 +75,9 @@ public enum MediaESType {
     public static String[] refs() {
         return toString(REFS);
     }
+
+    public static Map<String, String> mappingsAsMap() {
+        return Arrays.stream(values()).collect(Collectors.toMap(Enum::name, MediaESType::source));
+    }
+
 }

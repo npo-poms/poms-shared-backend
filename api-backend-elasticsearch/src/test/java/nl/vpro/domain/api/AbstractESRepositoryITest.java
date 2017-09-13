@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:/broadcasterService.xml", "classpath:/esclientfactory.xml"})
 @Slf4j
-public abstract class AbstractESRepositoryTest  {
+public abstract class AbstractESRepositoryITest {
 
     protected static String indexName = null;
 

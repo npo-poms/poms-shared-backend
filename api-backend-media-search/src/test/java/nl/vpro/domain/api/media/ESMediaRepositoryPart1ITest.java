@@ -54,7 +54,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("ConstantConditions")
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
-public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryTest {
+public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest {
 
     @Autowired
     private ESMediaRepository target;

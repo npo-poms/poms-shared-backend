@@ -11,12 +11,13 @@ import java.util.concurrent.ExecutionException;
 
 import org.assertj.core.api.Assertions;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import nl.vpro.domain.api.AbstractESRepositoryTest;
+import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.*;
@@ -26,7 +27,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
 @Slf4j
-public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
+public class ESScheduleRepositoryTest extends AbstractESRepositoryITest {
 
     public ESScheduleRepository repository;
 
@@ -288,7 +289,7 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
                 .setIndex(ApiMediaIndex.NAME)
                 .setType(mediaType)
                 .setId(o.getMid())
-                .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(o))
+                .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(o), XContentType.JSON)
                 .get();
         client.admin()
                 .indices()
