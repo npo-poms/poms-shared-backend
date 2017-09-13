@@ -215,7 +215,7 @@ public abstract class ESFacetsBuilder {
         TermsAggregationBuilder termsBuilder =
             AggregationBuilders.terms(escapeFacetName(facetName))
                 .field(fullFieldPath)
-                .minDocCount(facet.getThreshold() == null ? -1 : facet.getThreshold())
+                .minDocCount(facet.getThreshold() == null ? 0 : facet.getThreshold())
                 .size(facet.getMax())
                 .order(ESFacets.getTermsOrder(facet));
 

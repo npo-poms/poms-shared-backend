@@ -631,6 +631,7 @@
             "lower": {
               "type": "string",
               "analyzer": "lowercase"
+
             }
           }
         }
@@ -1379,7 +1380,8 @@
             },
             "lower": {
               "type": "string",
-              "analyzer": "lowercase"
+              "analyzer": "lowercase",
+              "fielddata": true
             }
           }
         },
@@ -1514,7 +1516,8 @@
         },
         "lower": {
           "type": "string",
-          "analyzer": "lowercase"
+          "analyzer": "lowercase",
+          "fielddata": true
         }
       }
     },

@@ -806,7 +806,8 @@
         },
         "lower" : {
           "type" : "string",
-          "analyzer" : "lowercase"
+          "analyzer" : "lowercase",
+          "fielddata": true
         }
       }
     },
