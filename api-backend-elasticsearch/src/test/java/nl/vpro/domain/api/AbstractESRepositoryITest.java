@@ -78,7 +78,7 @@ public abstract class AbstractESRepositoryITest {
         }
     }
 
-    protected static void createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings) throws InterruptedException, ExecutionException, IOException {
+    protected static String createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings) throws InterruptedException, ExecutionException, IOException {
         if (indexName == null) {
             indexName = index;
             IndexHelper
@@ -92,6 +92,7 @@ public abstract class AbstractESRepositoryITest {
                 .createIndex();
         }
         refresh();
+        return indexName;
     }
 
     protected static void clearIndex() {

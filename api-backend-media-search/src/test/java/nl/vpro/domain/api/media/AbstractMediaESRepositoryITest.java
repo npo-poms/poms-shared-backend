@@ -15,8 +15,8 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 @Slf4j
 public class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
-    protected static void createIndexIfNecessary(String index) throws InterruptedException, ExecutionException, IOException {
-        createIndexIfNecessary(index, ApiMediaIndex::source, ApiMediaIndex.mappingsAsMap());
+    protected static String createIndexIfNecessary(String index) throws InterruptedException, ExecutionException, IOException {
+        return createIndexIfNecessary(index, ApiMediaIndex::source, ApiMediaIndex.mappingsAsMap());
     }
 
 

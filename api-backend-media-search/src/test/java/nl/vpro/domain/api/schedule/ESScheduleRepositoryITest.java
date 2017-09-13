@@ -32,8 +32,8 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     @Before
     public void setup() throws IOException, ExecutionException, InterruptedException {
         repository = new ESScheduleRepository(clientFactory, null);
-        repository.setIndexName(ApiMediaIndex.NAME + "-" + System.currentTimeMillis());
-        createIndexIfNecessary(repository.getIndexName());
+        createIndexIfNecessary(ApiMediaIndex.NAME + "-" + System.currentTimeMillis());
+        repository.setIndexName(indexName);
         clearIndex();
     }
 
