@@ -3,6 +3,10 @@ package nl.vpro.pages.domain.es;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 
@@ -15,7 +19,11 @@ public class ApiPagesIndex {
     public static String NAME = "apipages";
 
     public static String source() {
-        return source("es5/setting/apipages.json");
+        return source(settings());
+    }
+
+    public static String settings() {
+        return "es5/setting/apipages.json";
     }
 
     public static String source(String s) {
@@ -30,5 +38,10 @@ public class ApiPagesIndex {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+
+    public static Map<String, Supplier<String>> mappingsAsMap() {
+        return Arrays.stream(PagesESType.values()).collect(Collectors.toMap(Enum::name, (v) -> v::source));
     }
 }

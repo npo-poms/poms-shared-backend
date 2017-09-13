@@ -76,8 +76,5 @@ public enum MediaESType {
         return toString(REFS);
     }
 
-    public static Map<String, String> mappingsAsMap() {
-        return Arrays.stream(values()).collect(Collectors.toMap(Enum::name, MediaESType::source));
-    }
 
 }

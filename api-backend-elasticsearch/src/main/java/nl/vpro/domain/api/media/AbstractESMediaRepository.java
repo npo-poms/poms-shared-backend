@@ -68,12 +68,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     protected AbstractESMediaRepository(ESClientFactory client) {
         super(client);
-        this.helper = new IndexHelper(log, client, null,
-            ApiMediaIndex.settings());
+        this.helper = new IndexHelper(log, client, null, ApiMediaIndex::source);
         for (MediaESType type : MediaESType.values()) {
-            this.helper.mapping(type.name(), type.mapping());
+            this.helper.mapping(type.name(), type::mapping);
         }
-        this.helper.mapping(ApiCueIndex.TYPE, ApiCueIndex.mapping());
+        this.helper.mapping(ApiCueIndex.TYPE, ApiCueIndex::mapping);
 
     }
 

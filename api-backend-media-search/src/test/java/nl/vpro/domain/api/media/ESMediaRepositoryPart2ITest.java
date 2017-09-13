@@ -109,7 +109,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         target.settings = new Settings();
         when(target.mediaRepository.redirect(anyString())).thenReturn(Optional.empty());
 
-        createIndex((target.getIndexName()));
+        createIndexIfNecessary(target.getIndexName());
 
         group = index(groupBuilder.published().build());
         group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid().build());

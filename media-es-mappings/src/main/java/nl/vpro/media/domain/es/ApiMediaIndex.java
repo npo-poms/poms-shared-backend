@@ -3,6 +3,10 @@ package nl.vpro.media.domain.es;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 
@@ -33,5 +37,10 @@ public class ApiMediaIndex {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+
+    public static Map<String, Supplier<String>> mappingsAsMap() {
+        return Arrays.stream(MediaESType.values()).collect(Collectors.toMap(Enum::name, (v) -> v::source));
     }
 }

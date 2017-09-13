@@ -2,7 +2,10 @@ package nl.vpro.domain.api;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
@@ -24,6 +27,7 @@ import nl.vpro.domain.media.MediaClassificationService;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
+import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.elasticsearch.TransportClientFactory;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -72,6 +76,22 @@ public abstract class AbstractESRepositoryITest {
         if (indexName != null) {
             client.admin().indices().prepareDelete(indexName).execute().get();
         }
+    }
+
+    protected static void createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings) throws InterruptedException, ExecutionException, IOException {
+        if (indexName == null) {
+            indexName = index;
+            IndexHelper
+                .builder()
+                .log(log)
+                .client((s) -> client)
+                .indexName(indexName)
+                .settings(settings)
+                .mappings(mappings)
+                .build()
+                .createIndex();
+        }
+        refresh();
     }
 
     protected static void clearIndex() {

@@ -64,9 +64,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Before
     public  void setup() throws Exception {
-        if (indexName == null) {
-            createIndex(target.getIndexName());
-        }
+        createIndexIfNecessary(target.getIndexName());
         clearIndex();
     }
 
