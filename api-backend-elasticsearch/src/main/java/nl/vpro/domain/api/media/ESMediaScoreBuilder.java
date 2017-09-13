@@ -49,6 +49,7 @@ public class ESMediaScoreBuilder {
         FunctionScoreQueryBuilder builder = functionScoreQuery(functions);
 
         builder
+
             .scoreMode(FiltersFunctionScoreQuery.ScoreMode.SUM) // Add the individual functions scores (mainly their  boost factors) below
             .maxBoost(maxBoost) // restrict range from 0 to 2
             ;
