@@ -13,7 +13,7 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
  * @since 5.5
  */
 @Slf4j
-public class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
+public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     protected static String createIndexIfNecessary(String index) throws InterruptedException, ExecutionException, IOException {
         return createIndexIfNecessary(index, ApiMediaIndex::source, ApiMediaIndex.mappingsAsMap());

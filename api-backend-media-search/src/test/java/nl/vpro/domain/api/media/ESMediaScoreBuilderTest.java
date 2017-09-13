@@ -64,26 +64,15 @@ public class ESMediaScoreBuilderTest {
                 "      },\n" +
                 "      {\n" +
                 "        \"filter\" : {\n" +
-                "          \"term\" : {\n" +
-                "            \"type\" : {\n" +
-                "              \"value\" : \"BROADCAST\",\n" +
-                "              \"boost\" : 1.0\n" +
-                "            }\n" +
-                "          }\n" +
-                "        },\n" +
-                "        \"weight\" : 1.5\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"filter\" : {\n" +
                 "          \"match_all\" : {\n" +
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
                 "        },\n" +
                 "        \"gauss\" : {\n" +
                 "          \"sortDate\" : {\n" +
-                "          \"origin\" : 1505308320000,\n" +
-                "           \"scale\" : \"157680000000ms\",\n" +
-                "           \"offset\" : \"604800000ms\",\n" +
+                "            \"origin\" : 1505308320000,\n" +
+                "            \"scale\" : \"157680000000ms\",\n" +
+                "            \"offset\" : \"604800000ms\",\n" +
                 "            \"decay\" : 0.5\n" +
                 "          },\n" +
                 "          \"multi_value_mode\" : \"MIN\"\n" +

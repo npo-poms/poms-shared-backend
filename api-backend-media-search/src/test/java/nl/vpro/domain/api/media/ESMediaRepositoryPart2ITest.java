@@ -13,7 +13,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -94,17 +94,20 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     static int deletedProgramCount = 0;
     static int deletedGroupCount = 0;
 
+
     /**
      * Builds a test database
      */
-    @BeforeClass
-    public static void setup() throws InterruptedException, ExecutionException, IOException {
+    @Override
+    protected void firstRun() throws InterruptedException, ExecutionException, IOException {
+
+        createIndexIfNecessary(ApiMediaIndex.NAME);
+
         target.mediaRepository = mock(MediaRepository.class);
-        target.setIndexName(ApiMediaIndex.NAME + "-" + System.currentTimeMillis());
         target.settings = new Settings();
         when(target.mediaRepository.redirect(anyString())).thenReturn(Optional.empty());
 
-        createIndexIfNecessary(target.getIndexName());
+        target.setIndexName(indexName);
 
         group = index(groupBuilder.published().build());
         group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid().build());

@@ -29,10 +29,15 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     public ESScheduleRepository repository;
 
+
+    @Override
+    protected void firstRun() throws Exception {
+        createIndexIfNecessary(ApiMediaIndex.NAME);
+    }
+
     @Before
     public void setup() throws IOException, ExecutionException, InterruptedException {
         repository = new ESScheduleRepository(clientFactory, null);
-        createIndexIfNecessary(ApiMediaIndex.NAME + "-" + System.currentTimeMillis());
         repository.setIndexName(indexName);
         clearIndex();
     }
@@ -285,4 +290,5 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         refresh();
 
     }
+
 }

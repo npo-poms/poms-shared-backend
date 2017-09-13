@@ -9,6 +9,7 @@ import java.time.Instant;
 
 import org.elasticsearch.common.lucene.search.function.FiltersFunctionScoreQuery;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 
 import nl.vpro.domain.media.MediaType;
@@ -38,17 +39,19 @@ public class ESMediaScoreBuilder {
     static float maxBoost = 2.0f;
 
     public static QueryBuilder score(QueryBuilder query, Instant now) {
-
         FunctionScoreQueryBuilder.FilterFunctionBuilder[] functions = {
             new FunctionScoreQueryBuilder.FilterFunctionBuilder(existsQuery("locations"), weightFactorFunction(locationBoost)),
             new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.SERIES.name()), weightFactorFunction(seriesBoost)),
             new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.BROADCAST.name()), weightFactorFunction(broadcastBoost)),
-            new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.BROADCAST.name()), weightFactorFunction(broadcastBoost)),
-            new FunctionScoreQueryBuilder.FilterFunctionBuilder(gaussDecayFunction("sortDate", now.toEpochMilli(), sortDateScale.toMillis() + "ms", sortDateOffset.toMillis() + "ms"))
-                //.setOffset(sortDateOffset)
-                //.setDecay(sortDateDecay))
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(
+                gaussDecayFunction(
+                    "sortDate",
+                    now.toEpochMilli(),
+                    sortDateScale.toMillis() + "ms",
+                    sortDateOffset.toMillis() + "ms")
+            )
         };
-        FunctionScoreQueryBuilder builder = functionScoreQuery(functions);
+        FunctionScoreQueryBuilder builder = QueryBuilders.functionScoreQuery(query, functions);
 
         builder
 

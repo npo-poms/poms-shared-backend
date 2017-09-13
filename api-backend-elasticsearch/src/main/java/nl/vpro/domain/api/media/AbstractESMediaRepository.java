@@ -64,7 +64,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     private final IndexHelper helper;
 
-    protected boolean createIndices = true;
+    protected boolean createIndices = false;
 
 
     protected AbstractESMediaRepository(ESClientFactory client) {

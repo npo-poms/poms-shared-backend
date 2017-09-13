@@ -55,7 +55,7 @@ public abstract class AbstractESRepositoryITest {
 
 
     @Before
-    public void abstractSetup() {
+    public void abstractSetup() throws Exception {
 
         if (client == null) {
             client = clientFactory.client("test");
@@ -69,7 +69,12 @@ public abstract class AbstractESRepositoryITest {
             return new Broadcaster(id, id + "display");
 
         });
+        if (indexName == null) {
+            firstRun();
+        }
     }
+
+    protected abstract void firstRun() throws Exception;
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
@@ -80,7 +85,7 @@ public abstract class AbstractESRepositoryITest {
 
     protected static String createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings) throws InterruptedException, ExecutionException, IOException {
         if (indexName == null) {
-            indexName = index;
+            indexName = "test-" + index + "-" + System.currentTimeMillis();
             IndexHelper
                 .builder()
                 .log(log)

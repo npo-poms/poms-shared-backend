@@ -30,6 +30,7 @@ import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
@@ -62,9 +63,14 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Autowired
     private Settings settings;
 
+
+    @Override
+    protected void firstRun() throws Exception {
+        createIndexIfNecessary(ApiMediaIndex.NAME);
+    }
     @Before
     public  void setup() throws Exception {
-        createIndexIfNecessary(target.getIndexName());
+        target.setIndexName(indexName);
         clearIndex();
     }
 
@@ -1213,4 +1219,5 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         log.info("Indexed {} {}", type, ref.getId());
         refresh();
     }
+
 }

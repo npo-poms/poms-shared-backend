@@ -40,6 +40,5 @@
   <bean class="nl.vpro.domain.api.media.ESMediaRepository">
     <constructor-arg ref="clientFactory" />
     <constructor-arg value="titles,descriptions"/>
-    <property name="indexName" value="apimedia-#{T(java.lang.System).currentTimeMillis()}" />
   </bean>
 </beans>
