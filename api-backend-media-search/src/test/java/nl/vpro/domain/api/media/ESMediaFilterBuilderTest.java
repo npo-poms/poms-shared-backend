@@ -30,7 +30,9 @@ public class ESMediaFilterBuilderTest {
     public void testFilterProfileOnNullArgument() throws Exception {
         QueryBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
         assertThat(toString(builder)).isEqualTo("{\n" +
-            "  \"match_all\" : { }\n" +
+            "  \"match_all\" : {\n" +
+            "    \"boost\" : 1.0\n" +
+            "  }\n" +
             "}"
         );
     }
@@ -44,7 +46,10 @@ public class ESMediaFilterBuilderTest {
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"term\" : {\n" +
-                "    \"broadcasters.id\" : \"vpro\"\n" +
+                "    \"broadcasters.id\" : {\n" +
+                "      \"value\" : \"vpro\",\n" +
+                "      \"boost\" : 1.0\n" +
+                "    }\n" +
                 "  }\n" +
                 "}"
         );
@@ -68,38 +73,68 @@ public class ESMediaFilterBuilderTest {
         QueryBuilder builder = ESMediaFilterBuilder.filter(definition);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
-            "  \"bool\" : {\n" +
-            "    \"must\" : [ {\n" +
-            "      \"term\" : {\n" +
-            "        \"broadcasters.id\" : \"VpRo\"\n" +
-            "      }\n" +
-            "    }, {\n" +
-            "      \"bool\" : {\n" +
-            "        \"should\" : [ {\n" +
-            "          \"term\" : {\n" +
-            "            \"descendantOf.midRef\" : \"POMS_S_aa12345\"\n" +
-            "          }\n" +
-            "        }, {\n" +
-            "          \"exists\" : {\n" +
-            "            \"field\" : \"images.urn\"\n" +
-            "          }\n" +
-            "        } ]\n" +
-            "      }\n" +
-            "    }, {\n" +
-            "      \"bool\" : {\n" +
-            "        \"must_not\" : {\n" +
-            "          \"term\" : {\n" +
-            "            \"type\" : \"VISUALRADIO\"\n" +
-            "          }\n" +
-            "        }\n" +
-            "      }\n" +
-            "    }, {\n" +
-            "      \"exists\" : {\n" +
-            "        \"field\" : \"images.urn\"\n" +
-            "      }\n" +
-            "    } ]\n" +
-            "  }\n" +
-            "}"
+                "  \"bool\" : {\n" +
+                "    \"must\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"broadcasters.id\" : {\n" +
+                "            \"value\" : \"VpRo\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"bool\" : {\n" +
+                "          \"should\" : [\n" +
+                "            {\n" +
+                "              \"term\" : {\n" +
+                "                \"descendantOf.midRef\" : {\n" +
+                "                  \"value\" : \"POMS_S_aa12345\",\n" +
+                "                  \"boost\" : 1.0\n" +
+                "                }\n" +
+                "              }\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"exists\" : {\n" +
+                "                \"field\" : \"images.urn\",\n" +
+                "                \"boost\" : 1.0\n" +
+                "              }\n" +
+                "            }\n" +
+                "          ],\n" +
+                "          \"disable_coord\" : false,\n" +
+                "          \"adjust_pure_negative\" : true,\n" +
+                "          \"boost\" : 1.0\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"bool\" : {\n" +
+                "          \"must_not\" : [\n" +
+                "            {\n" +
+                "              \"term\" : {\n" +
+                "                \"type\" : {\n" +
+                "                  \"value\" : \"VISUALRADIO\",\n" +
+                "                  \"boost\" : 1.0\n" +
+                "                }\n" +
+                "              }\n" +
+                "            }\n" +
+                "          ],\n" +
+                "          \"disable_coord\" : false,\n" +
+                "          \"adjust_pure_negative\" : true,\n" +
+                "          \"boost\" : 1.0\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"exists\" : {\n" +
+                "          \"field\" : \"images.urn\",\n" +
+                "          \"boost\" : 1.0\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"disable_coord\" : false,\n" +
+                "    \"adjust_pure_negative\" : true,\n" +
+                "    \"boost\" : 1.0\n" +
+                "  }\n" +
+                "}"
         );
     }
 
@@ -108,7 +143,9 @@ public class ESMediaFilterBuilderTest {
         QueryBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
-                "  \"match_all\" : { }\n" +
+                "  \"match_all\" : {\n" +
+                "    \"boost\" : 1.0\n" +
+                "  }\n" +
                 "}"
         );
     }
@@ -119,7 +156,10 @@ public class ESMediaFilterBuilderTest {
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"term\" : {\n" +
-                "    \"name\" : \"value\"\n" +
+                "    \"name\" : {\n" +
+                "      \"value\" : \"value\",\n" +
+                "      \"boost\" : 1.0\n" +
+                "    }\n" +
                 "  }\n" +
                 "}"
         );
@@ -134,16 +174,28 @@ public class ESMediaFilterBuilderTest {
         QueryBuilder builder = ESMediaFilterBuilder.filter(definition, QueryBuilders.termQuery("name", "value"));
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
-                "  \"and\" : {\n" +
-                "    \"filters\" : [ {\n" +
-                "      \"term\" : {\n" +
-                "        \"broadcasters.id\" : \"Vpro\"\n" +
+                "  \"bool\" : {\n" +
+                "    \"must\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"broadcasters.id\" : {\n" +
+                "            \"value\" : \"Vpro\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"name\" : {\n" +
+                "            \"value\" : \"value\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
                 "      }\n" +
-                "    }, {\n" +
-                "      \"term\" : {\n" +
-                "        \"name\" : \"value\"\n" +
-                "      }\n" +
-                "    } ]\n" +
+                "    ],\n" +
+                "    \"disable_coord\" : false,\n" +
+                "    \"adjust_pure_negative\" : true,\n" +
+                "    \"boost\" : 1.0\n" +
                 "  }\n" +
                 "}"
         );
@@ -157,30 +209,51 @@ public class ESMediaFilterBuilderTest {
         QueryBuilder builder = ESMediaFilterBuilder.filter(definition, QueryBuilders.termQuery("name", "value"));
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
-                "  \"and\" : {\n" +
-                "    \"filters\" : [ {\n" +
-                "      \"nested\" : {\n" +
-                "        \"filter\" : {\n" +
-                "          \"bool\" : {\n" +
-                "            \"must\" : {\n" +
-                "              \"exists\" : {\n" +
-                "                \"field\" : \"locations.urn\"\n" +
-                "              }\n" +
-                "            },\n" +
-                "            \"must_not\" : {\n" +
-                "              \"exists\" : {\n" +
-                "                \"field\" : \"locations.platform\"\n" +
-                "              }\n" +
+                "  \"bool\" : {\n" +
+                "    \"must\" : [\n" +
+                "      {\n" +
+                "        \"nested\" : {\n" +
+                "          \"query\" : {\n" +
+                "            \"bool\" : {\n" +
+                "              \"must\" : [\n" +
+                "                {\n" +
+                "                  \"exists\" : {\n" +
+                "                    \"field\" : \"locations.urn\",\n" +
+                "                    \"boost\" : 1.0\n" +
+                "                  }\n" +
+                "                }\n" +
+                "              ],\n" +
+                "              \"must_not\" : [\n" +
+                "                {\n" +
+                "                  \"exists\" : {\n" +
+                "                    \"field\" : \"locations.platform\",\n" +
+                "                    \"boost\" : 1.0\n" +
+                "                  }\n" +
+                "                }\n" +
+                "              ],\n" +
+                "              \"disable_coord\" : false,\n" +
+                "              \"adjust_pure_negative\" : true,\n" +
+                "              \"boost\" : 1.0\n" +
                 "            }\n" +
+                "          },\n" +
+                "          \"path\" : \"locations\",\n" +
+                "          \"ignore_unmapped\" : false,\n" +
+                "          \"score_mode\" : \"avg\",\n" +
+                "          \"boost\" : 1.0\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"name\" : {\n" +
+                "            \"value\" : \"value\",\n" +
+                "            \"boost\" : 1.0\n" +
                 "          }\n" +
-                "        },\n" +
-                "        \"path\" : \"locations\"\n" +
+                "        }\n" +
                 "      }\n" +
-                "    }, {\n" +
-                "      \"term\" : {\n" +
-                "        \"name\" : \"value\"\n" +
-                "      }\n" +
-                "    } ]\n" +
+                "    ],\n" +
+                "    \"disable_coord\" : false,\n" +
+                "    \"adjust_pure_negative\" : true,\n" +
+                "    \"boost\" : 1.0\n" +
                 "  }\n" +
                 "}"
         );
