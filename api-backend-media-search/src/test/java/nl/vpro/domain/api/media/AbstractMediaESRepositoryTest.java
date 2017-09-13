@@ -2,13 +2,10 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.concurrent.ExecutionException;
-
 import org.elasticsearch.ResourceAlreadyExistsException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequestBuilder;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.AfterClass;
 
 import nl.vpro.domain.api.AbstractESRepositoryTest;
 import nl.vpro.media.domain.es.ApiMediaIndex;
@@ -42,11 +39,6 @@ public class AbstractMediaESRepositoryTest extends AbstractESRepositoryTest {
     }
 
 
-    @AfterClass
-    public static void shutdown() throws ExecutionException, InterruptedException {
-        if (indexName != null) {
-            client.admin().indices().prepareDelete(indexName).execute().get();
-        }
-    }
+
 
 }

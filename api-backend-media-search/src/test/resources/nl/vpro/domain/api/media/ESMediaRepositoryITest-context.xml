@@ -36,16 +36,6 @@
 
   <bean class="nl.vpro.domain.api.media.ESMediaScoreBuilder" />
 
-  <bean id="clientFactory" class="nl.vpro.elasticsearch.TransportClientFactory">
-    <property name="transportAddresses">
-      <list>
-        <bean class="nl.vpro.util.UrlProvider">
-          <constructor-arg name="host" value="localhost" />
-          <constructor-arg name="port" value="9300" />
-        </bean>
-      </list>
-    </property>
-  </bean>
 
   <bean class="nl.vpro.domain.api.media.ESMediaRepository">
     <constructor-arg ref="clientFactory" />

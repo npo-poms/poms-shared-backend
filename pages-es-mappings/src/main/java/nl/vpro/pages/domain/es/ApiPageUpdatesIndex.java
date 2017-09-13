@@ -14,17 +14,17 @@ public class ApiPageUpdatesIndex {
 
 
     public static String source() {
-        return ApiPagesIndex.source("setting/apipages.json");
+        return ApiPagesIndex.source("es5/setting/apipages.json");
     }
 
 
 
     public static String mappingSource() {
-        return ApiPagesIndex.source("mapping/pageupdate.json");
+        return ApiPagesIndex.source("es5/mapping/pageupdate.json");
     }
 
     public static String deletedMappingSource() {
-        return ApiPagesIndex.source("mapping/deletedpageupdate.json");
+        return ApiPagesIndex.source("es5/mapping/deletedpageupdate.json");
     }
 
 }

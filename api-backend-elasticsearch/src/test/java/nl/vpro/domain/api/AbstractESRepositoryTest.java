@@ -13,9 +13,9 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -34,7 +34,7 @@ import static org.mockito.Mockito.when;
  */
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:/broadcasterService.xml"})
+@ContextConfiguration(locations = {"classpath:/broadcasterService.xml", "classpath:/esclientfactory.xml"})
 @Slf4j
 public abstract class AbstractESRepositoryTest  {
 
@@ -46,8 +46,8 @@ public abstract class AbstractESRepositoryTest  {
     protected TransportClientFactory clientFactory;
 
 
-    @Autowired
-    BroadcasterService broadcasterService;
+    @Inject
+    protected BroadcasterService broadcasterService;
 
 
     @Before
@@ -67,7 +67,14 @@ public abstract class AbstractESRepositoryTest  {
         });
     }
 
-    protected void clearIndex() {
+    @AfterClass
+    public static void shutdown() throws ExecutionException, InterruptedException {
+        if (indexName != null) {
+            client.admin().indices().prepareDelete(indexName).execute().get();
+        }
+    }
+
+    protected static void clearIndex() {
         client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
         while (true) {
             long shouldDelete = 0;

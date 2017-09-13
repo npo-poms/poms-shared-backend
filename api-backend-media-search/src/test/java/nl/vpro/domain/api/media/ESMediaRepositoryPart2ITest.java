@@ -50,7 +50,6 @@ import static org.mockito.Mockito.when;
  */
 
 @Slf4j
-@ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryTest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();

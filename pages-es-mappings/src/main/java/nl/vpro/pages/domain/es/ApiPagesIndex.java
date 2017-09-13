@@ -15,7 +15,7 @@ public class ApiPagesIndex {
     public static String NAME = "apipages";
 
     public static String source() {
-        return source("setting/apipages.json");
+        return source("es5/setting/apipages.json");
     }
 
     public static String source(String s) {

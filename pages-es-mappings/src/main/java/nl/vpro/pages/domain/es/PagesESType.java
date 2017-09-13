@@ -21,7 +21,7 @@ public enum PagesESType {
         source = name();
     }
     public String source() {
-        return ApiPagesIndex.source("mapping/" + source + ".json");
+        return ApiPagesIndex.source("es5/mapping/" + source + ".json");
     }
 
     public static String[] toString(PagesESType... types) {
