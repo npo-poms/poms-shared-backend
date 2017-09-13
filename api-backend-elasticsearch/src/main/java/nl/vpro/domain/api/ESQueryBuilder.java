@@ -3,6 +3,7 @@ package nl.vpro.domain.api;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.text.Collator;
 import java.util.*;
@@ -13,7 +14,6 @@ import javax.validation.constraints.NotNull;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.StopFilter;
-import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.WordlistLoader;
 import org.apache.lucene.analysis.core.WhitespaceTokenizer;
 import org.apache.lucene.analysis.nl.DutchAnalyzer;
@@ -140,9 +140,10 @@ public abstract class ESQueryBuilder {
         try {
             StringBuilder builder = new StringBuilder();
 
-            CharArraySet stopSet = StopFilter.makeStopSet(Arrays.asList(STOP_WORDS), true);
-            TokenStream whitespace = new WhitespaceTokenizer(new CollationAttributeFactory(Collator.getInstance()));
-            TokenStream stream = new StopFilter(whitespace, stopSet);
+            WhitespaceTokenizer whitespace = new WhitespaceTokenizer(new CollationAttributeFactory(Collator.getInstance()));
+            whitespace.setReader(new StringReader(value));
+            StopFilter stream = new StopFilter(whitespace, STOP_WORDS);
+            stream.reset();
             CharTermAttribute termAttribute = stream.getAttribute(CharTermAttribute.class);
             while (stream.incrementToken()) {
                 if (builder.length() > 0) {
