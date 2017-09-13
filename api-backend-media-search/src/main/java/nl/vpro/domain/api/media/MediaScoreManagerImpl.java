@@ -5,7 +5,6 @@
 package nl.vpro.domain.api.media;
 
 import java.util.Map;
-import java.util.Properties;
 
 import javax.annotation.PostConstruct;
 
@@ -14,6 +13,7 @@ import org.springframework.jmx.export.annotation.*;
 import org.springframework.stereotype.Component;
 
 import nl.vpro.domain.api.AbstractConfigFileScoreManager;
+import nl.vpro.util.TimeUtils;
 
 /**
  * @author Roelof Jan Koekoek
@@ -52,26 +52,26 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
 
     @ManagedAttribute
     @Override
-    public Long getSortDateScale() {
-        return ESMediaScoreBuilder.sortDateScale;
+    public String getSortDateScale() {
+        return ESMediaScoreBuilder.sortDateScale.toString();
     }
 
     @ManagedOperation
     @Override
-    public void setSortDateScale(Long sortDateScale) {
-        ESMediaScoreBuilder.sortDateScale = sortDateScale;
+    public void setSortDateScale(String  sortDateScale) {
+        ESMediaScoreBuilder.sortDateScale = TimeUtils.parseDuration(sortDateScale).orElseThrow(IllegalArgumentException::new);
     }
 
     @ManagedAttribute
     @Override
-    public Long getSortDateOffset() {
-        return ESMediaScoreBuilder.sortDateOffset;
+    public String getSortDateOffset() {
+        return ESMediaScoreBuilder.sortDateOffset.toString();
     }
 
     @ManagedOperation
     @Override
-    public void setSortDateOffset(Long sortDateOffset) {
-        ESMediaScoreBuilder.sortDateOffset = sortDateOffset;
+    public void setSortDateOffset(String sortDateOffset) {
+        ESMediaScoreBuilder.sortDateOffset = TimeUtils.parseDuration(sortDateOffset).orElseThrow(IllegalArgumentException::new);
     }
 
     @ManagedAttribute
@@ -146,26 +146,26 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
 
     @Override
     protected void loadScores() {
-        final Properties properties = loadConfig();
-        for(Map.Entry<Object, Object> entry : properties.entrySet()) {
-            if(entry.getKey().toString().startsWith(TEXT_BOOST_PREFIX)) {
-                ESMediaQueryBuilder.boostField(entry.getKey().toString().substring(TEXT_BOOST_PREFIX.length()), getBoost(entry));
+        final Map<String, String> properties = loadConfig();
+        for(Map.Entry<String, String> entry : properties.entrySet()) {
+            if(entry.getKey().startsWith(TEXT_BOOST_PREFIX)) {
+                ESMediaQueryBuilder.boostField(entry.getKey().substring(TEXT_BOOST_PREFIX.length()), Float.valueOf(entry.getValue()));
             } else {
-                switch(entry.getKey().toString()) {
+                switch(entry.getKey()) {
                     case "boost.max":
-                        setMaxBoost(getBoost(entry));
+                        setMaxBoost(Float.valueOf(entry.getValue()));
                     case "boost.type.series":
-                        setSeriesBoost(getBoost(entry));
+                        setSeriesBoost(Float.valueOf(entry.getValue()));
                     case "boost.type.broadcast":
-                        setBroadcastBoost(getBoost(entry));
+                        setBroadcastBoost(Float.valueOf(entry.getValue()));
                     case "boost.location":
-                        setLocationBoost(getBoost(entry));
+                        setLocationBoost(Float.valueOf(entry.getValue()));
                     case "sortDate.decay":
-                        setSortDateDecay(getBoost(entry));
+                        setSortDateDecay(Float.valueOf(entry.getValue()));
                     case "sortDate.scale":
-                        setSortDateScale(getLong(entry));
+                        setSortDateScale(entry.getValue());
                     case "sortDate.offset":
-                        setSortDateOffset(getLong(entry));
+                        setSortDateOffset(entry.getValue());
                 }
             }
 

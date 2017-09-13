@@ -38,11 +38,7 @@ public class ESMediaScoreBuilderTest {
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
                 "        },\n" +
-                "        \"field_value_factor\" : {\n" +
-                "          \"field\" : \"locations\",\n" +
-                "          \"factor\" : 2.0,\n" +
-                "          \"modifier\" : \"none\"\n" +
-                "        }\n" +
+                "        \"weight\" : 2.0\n" +
                 "      },\n" +
                 "      {\n" +
                 "        \"filter\" : {\n" +
@@ -85,8 +81,9 @@ public class ESMediaScoreBuilderTest {
                 "        },\n" +
                 "        \"gauss\" : {\n" +
                 "          \"sortDate\" : {\n" +
-                "            \"origin\" : 1505308320000,\n" +
-                "            \"scale\" : 157680000000,\n" +
+                "          \"origin\" : 1505308320000,\n" +
+                "           \"scale\" : \"157680000000ms\",\n" +
+                "           \"offset\" : \"604800000ms\",\n" +
                 "            \"decay\" : 0.5\n" +
                 "          },\n" +
                 "          \"multi_value_mode\" : \"MIN\"\n" +

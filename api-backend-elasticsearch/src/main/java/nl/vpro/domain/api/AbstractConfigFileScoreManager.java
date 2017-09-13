@@ -34,13 +34,10 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
 
     protected abstract void loadScores();
 
-    protected Properties loadConfig() {
+    protected Map<String, String> loadConfig() {
         Properties properties = new Properties();
         Path configPath = Paths.get(getConfigDir(), getConfigFileName());
-
         final File configFile = configPath.toFile();
-
-
 
         if(configFile.canRead()) {
             log.info("Loading properties from {}", configFile);
@@ -52,8 +49,7 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
         } else {
             log.info("The file {} cannot be read", configFile);
         }
-
-        return properties;
+        return (Map) properties;
     }
 
     protected void watchConfig() throws Exception {
@@ -77,12 +73,4 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
         monitor.start();
     }
 
-
-    protected Float getBoost(Map.Entry<Object, Object> entry) {
-        return Float.valueOf(entry.getValue().toString());
-    }
-
-    protected Long getLong(Map.Entry<Object, Object> entry) {
-        return Long.valueOf(entry.getValue().toString());
-    }
 }

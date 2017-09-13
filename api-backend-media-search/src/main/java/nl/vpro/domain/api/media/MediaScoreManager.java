@@ -12,13 +12,13 @@ import nl.vpro.domain.api.ScoreManager;
  */
 public interface MediaScoreManager extends ScoreManager {
 
-    Long getSortDateScale();
+    String getSortDateScale();
 
-    void setSortDateScale(Long sortDateScale);
+    void setSortDateScale(String sortDateScale);
 
-    Long getSortDateOffset();
+    String getSortDateOffset();
 
-    void setSortDateOffset(Long sortDateOffset);
+    void setSortDateOffset(String sortDateOffset);
 
     double getSortDateDecay();
 

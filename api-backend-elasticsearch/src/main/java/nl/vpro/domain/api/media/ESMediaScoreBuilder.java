@@ -4,6 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
+import java.time.Duration;
 import java.time.Instant;
 
 import org.elasticsearch.common.lucene.search.function.FiltersFunctionScoreQuery;
@@ -13,7 +14,8 @@ import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import nl.vpro.domain.media.MediaType;
 
 import static org.elasticsearch.index.query.QueryBuilders.*;
-import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.*;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.gaussDecayFunction;
+import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.weightFactorFunction;
 
 
 /**
@@ -21,9 +23,9 @@ import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.
  * @since 2.0
  */
 public class ESMediaScoreBuilder {
-    static Long sortDateScale = 5 * 365 * 24 * 60 * 60 * 1000L;
+    static Duration sortDateScale = Duration.ofDays(5 * 365);
 
-    static Long sortDateOffset = 7 * 24 * 60 * 60 * 1000L;
+    static Duration sortDateOffset = Duration.ofDays(7);
 
     static double sortDateDecay = 0.6;
 
@@ -38,11 +40,11 @@ public class ESMediaScoreBuilder {
     public static QueryBuilder score(QueryBuilder query, Instant now) {
 
         FunctionScoreQueryBuilder.FilterFunctionBuilder[] functions = {
-            new FunctionScoreQueryBuilder.FilterFunctionBuilder(existsQuery("locations"), fieldValueFactorFunction("locations").factor(locationBoost)),
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(existsQuery("locations"), weightFactorFunction(locationBoost)),
             new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.SERIES.name()), weightFactorFunction(seriesBoost)),
             new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.BROADCAST.name()), weightFactorFunction(broadcastBoost)),
             new FunctionScoreQueryBuilder.FilterFunctionBuilder(termQuery("type", MediaType.BROADCAST.name()), weightFactorFunction(broadcastBoost)),
-            new FunctionScoreQueryBuilder.FilterFunctionBuilder(gaussDecayFunction("sortDate", now.toEpochMilli(), sortDateScale))
+            new FunctionScoreQueryBuilder.FilterFunctionBuilder(gaussDecayFunction("sortDate", now.toEpochMilli(), sortDateScale.toMillis() + "ms", sortDateOffset.toMillis() + "ms"))
                 //.setOffset(sortDateOffset)
                 //.setDecay(sortDateDecay))
         };
