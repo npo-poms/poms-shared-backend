@@ -1,5 +1,9 @@
 package nl.vpro.media.domain.es;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+
 /**
  * @author Michiel Meeuwissen
  * @since 4.8
@@ -26,5 +30,11 @@ public class ApiCueIndex {
         return ApiMediaIndex.source(s);
     }
 
+
+    public static Map<String, Supplier<String>> mappingsAsMap() {
+        Map<String, Supplier<String>> result = new HashMap<>();
+        result.put(TYPE, ApiCueIndex::typeSource);
+        return result;
+    }
 
 }
