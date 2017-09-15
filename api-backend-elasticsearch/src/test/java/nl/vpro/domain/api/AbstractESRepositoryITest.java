@@ -56,12 +56,11 @@ public abstract class AbstractESRepositoryITest {
 
     @Before
     public void abstractSetup() throws Exception {
-
         if (client == null) {
             client = clientFactory.client("test");
+            log.info("Built {}", client);
+            ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
         }
-        log.info("Built {}", client);
-        ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
 
         when(broadcasterService.find(any())).thenAnswer(invocation -> {
             Object[] args = invocation.getArguments();

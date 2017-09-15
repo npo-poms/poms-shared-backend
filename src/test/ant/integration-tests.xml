@@ -76,16 +76,18 @@
   <macrodef name="install-plugin">
     <attribute name="home" default="${integ.scratch}/elasticsearch-${elasticsearch.version}"/>
     <attribute name="name"/>
-    <attribute name="file"/>
+    <attribute name="url"/>
     <sequential>
-      <local name="url"/>
-      <makeurl property="url" file="@{file}"/>
+      <property name="file">${integ.scratch}/@{name}.zip</property>
+      <get src="@{url}" dest="${file}"/>
+      <local name="zip"/>
+      <makeurl property="zip" file="${file}"/>
       <!-- install plugin -->
       <echo>Installing plugin @{name}...</echo>
-      <run-script script="@{home}/bin/plugin">
+      <run-script script="@{home}/bin/elasticsearch-plugin">
         <nested>
           <arg value="install"/>
-          <arg value="${url}"/>
+          <arg value="${zip}"/>
         </nested>
       </run-script>
 
@@ -290,6 +292,7 @@
     <sequential>
       <delete dir="${integ.scratch}"/>
       <unzip src="${integ.deps}/elasticsearch-${elasticsearch.version}.zip" dest="${integ.scratch}"/>
+      <install-plugin name="analysis-icu" url="https://artifacts.elastic.co/downloads/elasticsearch-plugins/analysis-icu/analysis-icu-${elasticsearch.version}.zip"/>
     </sequential>
   </target>
 

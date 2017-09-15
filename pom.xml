@@ -18,11 +18,11 @@
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
     <poms.shared.version>5.5-SNAPSHOT</poms.shared.version>
     <skipIntegTests>true</skipIntegTests>
-    <integ.deps>${project.build.directory}/integration-tests/binaries</integ.deps>
-    <integ.scratch>${project.build.directory}/integration-scratch</integ.scratch>
+    <integ.deps>${project.basedir}/../target/integration-tests/binaries</integ.deps>
+    <integ.scratch>${project.basedir}/../target/integration-scratch</integ.scratch>
     <integ.http.port>9211</integ.http.port>
     <integ.java.port>9311</integ.java.port>
-    <integ.temp>${project.build.directory}/integration-tests/tmp</integ.temp>
+    <integ.temp>${project.basedir}/../target/integration-tests/tmp</integ.temp>
     <integ.cluster.name>api-test</integ.cluster.name>
   </properties>
 
@@ -127,42 +127,6 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <systemPropertyVariables>
-            <property>
-              <name>integ.java.port</name>
-              <value>${integ.java.port}</value>
-            </property>
-          </systemPropertyVariables>
-          <includes>
-            <include>**/*Test.java</include>
-            <include>**/*Spec.java</include>
-          </includes>
-          <excludes>
-            <exclude>**/*ITest.java</exclude>
-          </excludes>
-        </configuration>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <phase>integration-test</phase>
-            <configuration>
-              <excludes>
-                <exclude>none</exclude>
-              </excludes>
-              <includes>
-                <include>**/*ITest.java</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>3.0.1</version>
         <executions>
@@ -183,7 +147,7 @@
                 </artifactItem>
               </artifactItems>
               <useBaseVersion>true</useBaseVersion>
-              <outputDirectory>${project.build.directory}/integration-tests/binaries</outputDirectory>
+              <outputDirectory>${integ.deps}</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -203,6 +167,7 @@
             <configuration>
               <skip>${skipIntegTests}</skip>
               <target>
+
                 <ant antfile="${project.basedir}/../src/test/ant/integration-tests.xml"
                      target="start-external-cluster"/>
               </target>
