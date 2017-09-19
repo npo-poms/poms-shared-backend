@@ -17,7 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import nl.vpro.beeldengeluid.gtaa.GTAARepository;
+import nl.vpro.domain.media.gtaa.GTAARepository;
 import nl.vpro.domain.media.gtaa.GTAAPerson;
 
 /**

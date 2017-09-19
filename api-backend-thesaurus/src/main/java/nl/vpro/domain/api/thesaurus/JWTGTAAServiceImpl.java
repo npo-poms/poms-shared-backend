@@ -5,8 +5,8 @@ import java.util.HashMap;
 
 
 import nl.vpro.domain.media.Person;
-import nl.vpro.domain.media.gtaa.Label;
 
+import nl.vpro.domain.media.gtaa.Label;
 import nl.vpro.rs.thesaurus.update.NewPerson;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.SigningKeyResolverAdapter;
 import lombok.extern.slf4j.Slf4j;
-import nl.vpro.beeldengeluid.gtaa.GTAARepository;
+import nl.vpro.domain.media.gtaa.GTAARepository;
 import nl.vpro.domain.media.gtaa.GTAAPerson;
 
 /**

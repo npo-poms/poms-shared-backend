@@ -42,7 +42,7 @@
        <artifactId>spring-test</artifactId>
      </dependency>
        <dependency>
-           <groupId>nl.vpro.pages</groupId>
+            <groupId>nl.vpro.pages</groupId>
            <artifactId>pages-rs-services</artifactId>
        </dependency>
    </dependencies>
