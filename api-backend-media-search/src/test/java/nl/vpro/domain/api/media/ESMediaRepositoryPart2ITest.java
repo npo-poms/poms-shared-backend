@@ -1,22 +1,6 @@
 package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-import java.time.*;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -31,6 +15,19 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.FilteringIterator;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -269,27 +266,27 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testChanges() throws IOException {
-        Iterator<Change> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null, null);
-        List<Change> list = new ArrayList<>();
+    public void testMediaChanges() throws IOException {
+        Iterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null, null);
+        List<MediaChange> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
-        assertThat(list.stream().filter(Change::isDeleted).collect(Collectors.toList())).hasSize(3);
+        assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
         assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
     }
 
     @Test
-    public void testChangesSince() throws IOException {
-        Iterator<Change> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, Integer.MAX_VALUE, null, null);
-        List<Change> list = new ArrayList<>();
+    public void testMediaChangesSince() throws IOException {
+        Iterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, Integer.MAX_VALUE, null, null);
+        List<MediaChange> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
         assertThat(list).hasSize(indexedObjectCount - 17); // 17 objects created around EPOCH
-        assertThat(list.stream().filter(Change::isDeleted).collect(Collectors.toList())).hasSize(3);
+        assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
     }
 
     @Test
-    public void testChangesWithMax() throws IOException {
-        Iterator<Change> changes = target.changes(Instant.EPOCH, null, null, null, Order.DESC, 10, null, null);
-        List<Change> list = new ArrayList<>();
+    public void testMediaChangesWithMax() throws IOException {
+        Iterator<MediaChange> changes = target.changes(Instant.EPOCH, null, null, null, Order.DESC, 10, null, null);
+        List<MediaChange> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
         assertThat(list).hasSize(10);
     }
