@@ -1,10 +1,15 @@
 package nl.vpro.domain.api.thesaurus;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.Optional;
+
+import nl.vpro.rs.thesaurus.update.NewPerson;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,11 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import nl.vpro.beeldengeluid.gtaa.GTAARepository;
-import nl.vpro.domain.api.thesaurus.GTAAKeysRepository;
-import nl.vpro.domain.api.thesaurus.JWTGTAAServiceImpl;
 import nl.vpro.domain.media.gtaa.GTAAPerson;
-import nl.vpro.domain.media.gtaa.GTAARecord;
-import nl.vpro.domain.media.gtaa.Status;
 
 /**
  * Wraps the GTAAService allowing {@link GTAAPerson}s to be submitted using JWT
@@ -38,44 +39,52 @@ public class JWTGTAAServiceImplTest {
     JWTGTAAServiceImpl jwtService = new JWTGTAAServiceImpl();
 
     @Test
-    public void testGtaaRecord() throws IOException {
+    public void submitPersonShouldCallSubmitPersonOnGTAAMock() throws IOException {
         when(keysRepo.getKeyFor("backend-1")).thenReturn(Optional.of("SECRETABC"));
 
-        GTAAPerson p = new GTAAPerson();
-        p.setGtaaRecord(new GTAARecord("http://data.beeldengeluid.nl/api/collections/beng:gtaa/1672211",
-                Status.candidate, false));
+        NewPerson p = new NewPerson();
+        String jws = jwtService.encrypt("backend-1", "SECRETABC", "user x");
+        jwtService.submitPerson(p, jws);
 
-        String jws = jwtService.encryptPerson(p, "backend-1", "SECRETABC", "user x");
-        jwtService.submitPerson(jws);
+        verify(gtaa).submit(any(GTAAPerson.class), eq("backend-1:user x"));
 
-        verify(gtaa).submit(p, "backend-1:user x");
     }
 
     @Test
     public void testGtaaUri() throws IOException {
         when(keysRepo.getKeyFor("backend-2")).thenReturn(Optional.of("SECRETCBA"));
 
-        GTAAPerson p = new GTAAPerson();
-        p.setGtaaUri("http://data.beeldengeluid.nl/api/collections/beng:gtaa/1672211");
+        NewPerson p = new NewPerson();
+        String jws = jwtService.encrypt("backend-2", "SECRETCBA", "user y");
+        jwtService.submitPerson(p, jws);
 
-        String jws = jwtService.encryptPerson(p, "backend-2", "SECRETCBA", "user y");
-        jwtService.submitPerson(jws);
-
-        verify(gtaa).submit(p, "backend-2:user y");
+        verify(gtaa).submit(any(GTAAPerson.class), eq("backend-2:user y"));
     }
+
+//    @Test
+//    public void convertNewPersonToGTAAPerson() throws IOException {
+//        JWTGTAAServiceImpl jsi = new JWTGTAAServiceImpl();
+//        NewPerson p = new NewPerson("piet", "hein", "donner");
+//        GTAAPerson g = jsi.submitPerson(p, "bla.bla.bla");
+//        System.out.println(g);
+//        assertThat(g.getGivenName()).isEqualTo("piet");
+//    }
 
     @Test
     public void testNames() throws IOException {
         when(keysRepo.getKeyFor("backend")).thenReturn(Optional.of("SECRET"));
 
-        GTAAPerson p = new GTAAPerson();
+        NewPerson p = new NewPerson();
         p.setGivenName("Sjaak");
         p.setFamilyName("de Mul");
 
-        String jws = jwtService.encryptPerson(p, "backend", "SECRET", "user z");
-        jwtService.submitPerson(jws);
-        System.out.println(jws);
-        verify(gtaa).submit(p, "backend:user z");
+        String jws = jwtService.encrypt("backend", "SECRET", "user z");
+        jwtService.submitPerson(p, jws);
+
+        GTAAPerson expected = new GTAAPerson();
+        expected.setFamilyName("de Mul");
+        expected.setGivenName("Sjaak");
+        verify(gtaa).submit(eq(expected), eq("backend:user z"));
     }
 
 }

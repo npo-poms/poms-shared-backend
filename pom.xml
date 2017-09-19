@@ -24,6 +24,7 @@
     <integ.java.port>9311</integ.java.port>
     <integ.temp>${project.basedir}/../target/integration-tests/tmp</integ.temp>
     <integ.cluster.name>api-test</integ.cluster.name>
+    <pages.version>5.5-SNAPSHOT</pages.version>
   </properties>
 
   <scm>

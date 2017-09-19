@@ -1,14 +1,18 @@
 package nl.vpro.domain.api.thesaurus;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
+
+import nl.vpro.domain.media.Person;
+import nl.vpro.domain.media.gtaa.Label;
+
+import nl.vpro.rs.thesaurus.update.NewPerson;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -23,7 +27,6 @@ import io.jsonwebtoken.SigningKeyResolverAdapter;
 import lombok.extern.slf4j.Slf4j;
 import nl.vpro.beeldengeluid.gtaa.GTAARepository;
 import nl.vpro.domain.media.gtaa.GTAAPerson;
-import nl.vpro.jackson2.Jackson2Mapper;
 
 /**
  * Wraps the {@link GTAARepository} to accept signed JWT to ensure the sender is
@@ -56,50 +59,42 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
             Object.class);
 
     /**
-     * @param jws
-     *            is unpacked, key checked, converted to a gtaa-person and submitted
+     * @param jws is unpacked, key checked, converted to a gtaa-person and submitted
      *            to the {@link GTAAService}
      */
     @Override
-    public GTAAPerson submitPerson(String jws) {
-        return saveGTAAPerson(jws);
+    public GTAAPerson submitPerson(NewPerson newPerson, String jws) {
+        JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
+        Jws<Claims> claims = parser.parseClaimsJws(StringUtils.trim(jws));
+        String creator = getCreator(claims.getHeader());
+        return gtaaService.submit(convertToPerson(newPerson), creator);
     }
 
     /**
      * Used for testing
-     *
-     * @param p
-     *            the Person to encrypt
      * @return a JWT string
      */
 
-    protected String encryptPerson(GTAAPerson p, String issuer, String key, String user) {
-        ObjectMapper mapper = Jackson2Mapper.getLenientInstance();
-        Map<String, Object> claims = mapper.convertValue(p, mapType);
+    protected String encrypt(String issuer, String key, String user) {
         String compactJws = Jwts.builder().setSubject("GTAAPerson").setHeaderParam("iss", issuer)
-                .setHeaderParam("usr", user).setClaims(claims).signWith(SignatureAlgorithm.HS512, key.getBytes())
+                .setHeaderParam("usr", user).signWith(SignatureAlgorithm.HS512, key.getBytes())
                 .compact();
         log.debug(compactJws);
         return compactJws;
     }
 
-    private GTAAPerson saveGTAAPerson(String jws) {
-        JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
-        Jws<Claims> claims = parser.parseClaimsJws(StringUtils.trim(jws));
-        String creator = getCreator(claims.getHeader());
-        return gtaaService.submit(convertClaimsToPerson(claims), creator);
-    }
 
     private String getCreator(JwsHeader<?> header) {
         Assert.notNull(header.get("usr"), "Expecting a 'usr' value in the header " + header);
         return header.get("iss") + ":" + header.get("usr");
     }
 
-    private GTAAPerson convertClaimsToPerson(Jws<Claims> claims) {
-        ObjectMapper mapper = Jackson2Mapper.getLenientInstance();
-        Claims body = claims.getBody();
-        body.remove("iat");
-        return mapper.convertValue(body, GTAAPerson.class);
-    }
+    private GTAAPerson convertToPerson(NewPerson newPerson) {
+        GTAAPerson person = new GTAAPerson(Person.builder().givenName(newPerson.getGivenName()).familyName(newPerson.getFamilyName()).build());
+        if(StringUtils.isNotBlank(newPerson.getNote())) {
+            person.setNotes(Arrays.asList(Label.forValue(newPerson.getNote())));
+        }
+        return person;
 
+    }
 }
