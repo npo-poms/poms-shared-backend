@@ -4,35 +4,9 @@
  */
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.jmx.export.annotation.ManagedAttribute;
-import org.springframework.jmx.export.annotation.ManagedResource;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
-
+import lombok.extern.slf4j.Slf4j;
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -44,6 +18,29 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.media.domain.es.MediaESType;
 import nl.vpro.util.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedResource;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.sql.Date;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author Roelof Jan Koekoek
@@ -340,11 +337,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public Iterator<Change> changes(Instant since, String mid, ProfileDefinition<MediaObject> currentProfile, ProfileDefinition<MediaObject> previousProfile, Order order, Integer max, Long keepAlive, Deletes deletes) {
+    public Iterator<MediaChange> changes(Instant since, String mid, ProfileDefinition<MediaObject> currentProfile, ProfileDefinition<MediaObject> previousProfile, Order order, Integer max, Long keepAlive, Deletes deletes) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
-        ElasticSearchIterator<Change> i = new ElasticSearchIterator<>(client(), this::of);
+        ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
         final SearchRequestBuilder searchRequestBuilder =
             i.prepareSearch(indexName)
                 .addSort("publishDate", SortOrder.valueOf(order.name()))
@@ -367,26 +364,26 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         );
 
 
-        Iterator<Change> iterator = TailAdder.withFunctions(changes, (last) -> {
+        Iterator<MediaChange> iterator = TailAdder.withFunctions(changes, (last) -> {
             if (last != null) {
                 throw new NoSuchElementException();
             }
             Instant se = changes.getPublishDate();
             if (se != null) {
-                return Change.tail(se);
+                return MediaChange.tail(se);
             } else {
-                return Change.tail(Instant.now());
+                return MediaChange.tail(Instant.now());
             }
         });
         if (since != null && mid != null) {
-            PeekingIterator<Change> peeking = Iterators.peekingIterator(iterator);
+            PeekingIterator<MediaChange> peeking = Iterators.peekingIterator(iterator);
             iterator = peeking;
             while(true) {
-                Change peek = peeking.peek();
+                MediaChange peek = peeking.peek();
                 if (peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
                     break;
                 } else {
-                    Change skipped = peeking.next();
+                    MediaChange skipped = peeking.next();
                     log.debug("Skipping {} because of mid parameter", skipped);
                 }
             }
@@ -398,16 +395,16 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             case INCLUDE:
                 break;
             case EXCLUDE:
-                iterator= FilteringIterator.<Change>builder()
+                iterator= FilteringIterator.<MediaChange>builder()
                     .wrapped(iterator)
                     .filter((c) -> c == null || !c.isDeleted())
                     .build();
                 break;
             case ID_ONLY:
-                iterator = new BasicWrappedIterator<Change>(iterator) {
+                iterator = new BasicWrappedIterator<MediaChange>(iterator) {
                     @Override
-                    public Change next() {
-                        Change n = super.next();
+                    public MediaChange next() {
+                        MediaChange n = super.next();
                         if (n.isDeleted()) {
                             n.setMedia(null);
                         }
@@ -421,7 +418,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return new MaxOffsetIterator<>(iterator, max, 0L, true);
     }
 
-    private Change of(SearchHit hit) {
+    private MediaChange of(SearchHit hit) {
         try {
             MediaObject media = getObject(hit, MediaObject.class);
             if (media == null) {
@@ -432,7 +429,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (version == -1) {
                 version = null;
             }
-            return Change.of(media, version);
+            return MediaChange.of(media, version);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -440,7 +437,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public Iterator<Change> changes(Long since, ProfileDefinition<MediaObject> current, ProfileDefinition<MediaObject> previous, Order order, Integer max, Long keepAlive) {
+    public Iterator<MediaChange> changes(Long since, ProfileDefinition<MediaObject> current, ProfileDefinition<MediaObject> previous, Order order, Integer max, Long keepAlive) {
         throw new UnsupportedOperationException("Not supported");
     }
 
