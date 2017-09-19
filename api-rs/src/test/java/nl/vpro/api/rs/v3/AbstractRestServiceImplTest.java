@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.resteasy.DateParamConverterProvider;
+import nl.vpro.resteasy.InstantParamConverter;
 import nl.vpro.resteasy.JacksonContextResolver;
 import nl.vpro.resteasy.LocaleParamConverterProvider;
 
