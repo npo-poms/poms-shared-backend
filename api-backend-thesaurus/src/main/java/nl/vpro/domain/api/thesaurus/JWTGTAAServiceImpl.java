@@ -1,32 +1,23 @@
 package nl.vpro.domain.api.thesaurus;
 
+import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Arrays;
 import java.util.HashMap;
 
-
-import nl.vpro.domain.media.Person;
-
-import nl.vpro.domain.media.gtaa.Label;
-import nl.vpro.rs.thesaurus.update.NewPerson;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.SigningKeyResolver;
-import io.jsonwebtoken.SigningKeyResolverAdapter;
-import lombok.extern.slf4j.Slf4j;
-import nl.vpro.domain.media.gtaa.GTAARepository;
+import nl.vpro.domain.media.Person;
 import nl.vpro.domain.media.gtaa.GTAAPerson;
+import nl.vpro.domain.media.gtaa.GTAARepository;
+import nl.vpro.openarchives.oai.Label;
+import nl.vpro.rs.thesaurus.update.NewPerson;
 
 /**
  * Wraps the {@link GTAARepository} to accept signed JWT to ensure the sender is
