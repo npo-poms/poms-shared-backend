@@ -178,8 +178,8 @@ public abstract class ESFacetsHandler {
                 if (aggregation.getName().startsWith(facetName)) {
                     DateRangeInterval.Interval interval = ESInterval.parse(aggregation.getName().substring(facetName.length() + 1));
                     Aggregation sub = ((org.elasticsearch.search.aggregations.bucket.filter.Filter) aggregation).getAggregations().get("sub");
-               /*     for (DateHistogram.Bucket bucket : ((DateHistogram) sub).getBuckets()) {
-                        Instant bucketStart = DateUtils.toInstant(bucket.getKeyAsDate().toDate());
+                    /*for (Histogram.Bucket bucket : ((DateHistogramAggregationBuilder)sub).getBuckets()) {
+                        Instant bucketStart = DateUtils.toInstant((Date) bucket.getKey());
                         Instant bucketEnd = interval.getBucketEnd(bucketStart);
                         DateFacetResultItem entry = new DateFacetResultItem(
                             interval.print(bucketStart, false),

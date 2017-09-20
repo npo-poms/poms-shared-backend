@@ -18,6 +18,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -74,6 +75,11 @@ public abstract class AbstractESRepositoryITest {
     }
 
     protected abstract void firstRun() throws Exception;
+
+    @BeforeClass
+    public static void staticSetup() {
+        indexName = null;
+    }
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {

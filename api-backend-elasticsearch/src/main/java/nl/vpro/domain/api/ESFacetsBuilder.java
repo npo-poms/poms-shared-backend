@@ -116,7 +116,8 @@ public abstract class ESFacetsBuilder {
             if (facet.getRanges() != null) {
                 for (nl.vpro.domain.api.RangeFacet<Duration> range : facet.getRanges()) {
                     if (range instanceof DurationRangeInterval) {
-                        ESInterval interval = ESInterval.parse(((DurationRangeInterval) range).getInterval());
+                        AbstractTemporalRangeInterval.Interval parsed = ((DurationRangeInterval)range).parsed();
+                        ESInterval interval = ESInterval.parse(parsed.toString());
                         // TODO, zou het niet logischer zijn om de verschillende aggregatie onderdeel te laten zijn van 1 'filter-aggregatie.
                         // Dat zou echter deze code nogal moeten verbouwen, want je moet het aggregationfilter doorgeven om er subAggregations aan te kunnen toevoegen.
                         searchBuilder.aggregation(
