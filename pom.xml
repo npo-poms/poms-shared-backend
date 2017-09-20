@@ -18,12 +18,12 @@
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
     <poms.shared.version>5.5-SNAPSHOT</poms.shared.version>
     <skipIntegTests>true</skipIntegTests>
-    <integ.deps>${project.basedir}/../target/integration-tests/binaries</integ.deps>
+    <!--<integ.deps>${project.basedir}/../target/integration-tests/binaries</integ.deps>
     <integ.scratch>${project.basedir}/../target/integration-scratch</integ.scratch>
     <integ.http.port>9211</integ.http.port>
     <integ.java.port>9311</integ.java.port>
     <integ.temp>${project.basedir}/../target/integration-tests/tmp</integ.temp>
-    <integ.cluster.name>api-test</integ.cluster.name>
+    <integ.cluster.name>api-test</integ.cluster.name>-->
     <pages.version>5.5-SNAPSHOT</pages.version>
   </properties>
 
@@ -124,8 +124,10 @@
     </dependencies>
   </dependencyManagement>
   <build>
-    <!-- http://david.pilato.fr/blog/2016/10/18/elasticsearch-real-integration-tests-updated-for-ga/ -->
     <plugins>
+      <!-- we doen het niet, en installeren een ES op jenkins -->
+   <!-- &lt;!&ndash; http://david.pilato.fr/blog/2016/10/18/elasticsearch-real-integration-tests-updated-for-ga/ &ndash;&gt;
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -158,7 +160,7 @@
         <artifactId>maven-antrun-plugin</artifactId>
         <version>1.8</version>
         <executions>
-          <!-- start up external cluster -->
+          &lt;!&ndash; start up external cluster &ndash;&gt;
           <execution>
             <id>integ-setup</id>
             <phase>pre-integration-test</phase>
@@ -174,7 +176,7 @@
               </target>
             </configuration>
           </execution>
-          <!-- shut down external cluster -->
+          &lt;!&ndash; shut down external cluster &ndash;&gt;
           <execution>
             <id>integ-teardown</id>
             <phase>post-integration-test</phase>
@@ -190,7 +192,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
+      </plugin>-->
     </plugins>
   </build>
 </project>

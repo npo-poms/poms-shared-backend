@@ -10,13 +10,6 @@
 
   <groupId>nl.vpro.api</groupId>
   <artifactId>api-backend-media-search</artifactId>
-  <properties>
-    <skipIntegTests>false</skipIntegTests>
-  </properties>
-
-  <build>
-
-  </build>
 
   <dependencies>
 
@@ -88,8 +81,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-
 
 
 </project>
