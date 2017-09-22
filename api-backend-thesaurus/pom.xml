@@ -45,5 +45,9 @@
             <groupId>nl.vpro.pages</groupId>
            <artifactId>pages-rs-services</artifactId>
        </dependency>
+     <dependency>
+       <groupId>nl.vpro.pages</groupId>
+       <artifactId>pages-rs-services</artifactId>
+     </dependency>
    </dependencies>
 </project>
