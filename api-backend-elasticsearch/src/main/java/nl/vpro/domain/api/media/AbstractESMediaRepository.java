@@ -29,7 +29,6 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.IndexHelper;
-import nl.vpro.media.domain.es.ApiCueIndex;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 import nl.vpro.util.ThreadPools;
@@ -75,9 +74,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             .settings(ApiMediaIndex::source)
             .mappings(ApiMediaIndex.mappingsAsMap())
             .build();
-
-        this.helper.mapping(ApiCueIndex.TYPE, ApiCueIndex::mapping);
-
     }
 
 
