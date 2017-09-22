@@ -17,4 +17,4 @@
     </property>
     <property name="clusterName" value="#{T(java.lang.System).getProperty('integ.cluster.name', 'elasticsearch')}" />
   </bean>
-  </beans>
+</beans>
