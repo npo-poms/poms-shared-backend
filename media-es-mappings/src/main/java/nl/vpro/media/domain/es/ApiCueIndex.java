@@ -22,8 +22,13 @@ public class ApiCueIndex {
         return "es5/mapping/cue.json";
     }
 
-    public static String settingSource() {
-        return source("es5/setting/apimedia.json");
+    public static String settings() {
+        return "es5/setting/apimedia.json";
+    }
+
+
+    public static String source() {
+        return source(settings());
     }
 
     public static String source(String s) {
