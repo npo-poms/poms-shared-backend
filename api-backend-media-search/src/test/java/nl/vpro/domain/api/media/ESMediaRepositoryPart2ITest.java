@@ -1,6 +1,21 @@
 package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.junit.Ignore;
+import org.junit.Test;
+
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -15,19 +30,6 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.FilteringIterator;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.time.*;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -224,7 +226,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testGroupBy() {
 
-        SearchResponse response = client.prepareSearch("apimedia")
+        SearchResponse response = client.prepareSearch(indexName)
             .addAggregation(AggregationBuilders.terms("types").field("_type").order(Terms.Order.term(true)))
             .setSize(0)
             .get();
