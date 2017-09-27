@@ -33,7 +33,7 @@
       <groupId>org.elasticsearch.test</groupId>
       <artifactId>framework</artifactId>
     </dependency>-->
-    <!-- Override POMS parent with another Lucene version used by Hibernate -->
+    <!-- Override POMS parent with another Lucene version used by Elastic search -->
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
