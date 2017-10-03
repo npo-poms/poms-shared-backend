@@ -97,10 +97,15 @@ public abstract class ESFacetsBuilder {
                     } else {
                         // TODO
                         RangeFacetItem<Instant> dateRangeItem = (RangeFacetItem<Instant>)range;
-                        searchBuilder.aggregation(AggregationBuilders.range(fieldName + ':' + dateRangeItem.getName()).field(fieldName).addRange(
-                            dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : null,
-                            dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : null
-                            )
+                        searchBuilder.aggregation(
+                            AggregationBuilders
+                                .range(fieldName + ':' + dateRangeItem.getName())
+                                .field(fieldName)
+                                .addRange(
+                                    dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : null,
+                                    dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : null
+                                )
+                                .keyed(true)
                         )
                             //.sub(fieldPrefix)
                         //    .facetFilter(filterBuilder))
