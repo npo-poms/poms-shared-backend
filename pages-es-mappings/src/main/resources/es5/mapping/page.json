@@ -1932,7 +1932,7 @@
             "type": "string",
             "analyzer": "lowercase"
           },
-          "text": {
+          "value": {
             "type": "string",
             "analyzer": "lowercase"
           },
