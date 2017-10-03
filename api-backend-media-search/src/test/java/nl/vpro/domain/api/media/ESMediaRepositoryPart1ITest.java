@@ -16,6 +16,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1176,6 +1177,30 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         }
     }
 
+    @Test
+    @Ignore("Doesn't test a thing yet. TODO: we might introduce a search on title feature?")
+    public void testFindByTitles() throws InterruptedException, ExecutionException, IOException {
+        index(program()
+            .mainTitle("abcde", OwnerType.BROADCASTER)
+            .mid("abcde")
+            .build());
+        index(program()
+            .mainTitle("aaaaa")
+            .mid("aa")
+            .build());
+        index(program()
+            .mainTitle("bbbbb")
+            .mid("bb")
+            .build());
+
+        MediaForm form = MediaForm.builder()
+            .fuzzyText("aaa")
+            .build();
+
+        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+
+        log.info("{}", result);
+    }
 
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
