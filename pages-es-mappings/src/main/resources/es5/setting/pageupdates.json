@@ -1,7 +1,5 @@
 {
-
-    "mapper" : {
-        "dynamic" : false
-    }
-
+  "mapper": {
+    "dynamic": false
+  }
 }

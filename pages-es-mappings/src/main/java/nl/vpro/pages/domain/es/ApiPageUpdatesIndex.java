@@ -2,6 +2,7 @@ package nl.vpro.pages.domain.es;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -21,7 +22,7 @@ public class ApiPageUpdatesIndex {
 
     public static Map<String, Supplier<String>> mappingsAsMap() {
         return Arrays.stream(PageUpdateESType.values())
-            .collect(Collectors.toMap(Enum::name, (v) -> v::source)
+            .collect(Collectors.toMap(Enum::name, (v) -> v::source, (k,v) -> k, TreeMap::new)
             );
     }
 

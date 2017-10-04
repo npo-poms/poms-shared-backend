@@ -8,7 +8,7 @@ import java.util.Arrays;
  */
 public enum PageUpdateESType {
     pageupdate,
-    deletedpageupdate("page")
+    deletedpageupdate("pageupdate")
     ;
 
     private final String source;
