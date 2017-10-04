@@ -11,7 +11,7 @@
     },
     "publishStart": {
       "type": "date",
-      "format": "date_time"
+      "format": "epoch_millis"
     },
     "portal": {
       "properties": {
@@ -51,16 +51,16 @@
     },
     "lastPublished": {
       "type": "date",
-      "format": "date_time"
+      "format": "epoch_millis"
     },
     "creationDate": {
       "type": "date",
-      "format": "date_time"
+      "format": "epoch_millis"
     },
     "lastModified": {
       "type": "date",
-      "format": "date_time"
-    },
+      "format": "epoch_millis"
+},
     "crids": {
       "type": "string",
       "index": "not_analyzed"

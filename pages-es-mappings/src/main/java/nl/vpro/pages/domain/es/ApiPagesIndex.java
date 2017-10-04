@@ -42,6 +42,6 @@ public class ApiPagesIndex {
 
 
     public static Map<String, Supplier<String>> mappingsAsMap() {
-        return Arrays.stream(PagesESType.values()).collect(Collectors.toMap(Enum::name, (v) -> v::source));
+        return Arrays.stream(PageESType.values()).collect(Collectors.toMap(Enum::name, (v) -> v::source));
     }
 }

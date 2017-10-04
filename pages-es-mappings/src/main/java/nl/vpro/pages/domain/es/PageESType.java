@@ -6,25 +6,25 @@ import java.util.Arrays;
  * @author Michiel Meeuwissen
  * @since 4.7
  */
-public enum PagesESType {
+public enum PageESType {
     page,
     deletedpage("page")
     ;
 
     private final String source;
 
-    PagesESType(String s) {
+    PageESType(String s) {
         source = s;
     }
 
-    PagesESType() {
+    PageESType() {
         source = name();
     }
     public String source() {
         return ApiPagesIndex.source("es5/mapping/" + source + ".json");
     }
 
-    public static String[] toString(PagesESType... types) {
+    public static String[] toString(PageESType... types) {
         return Arrays.stream(types).map(Enum::name).toArray(String[]::new);
 
     }
