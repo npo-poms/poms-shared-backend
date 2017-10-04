@@ -2,12 +2,10 @@
   "dynamic": "strict",
   "properties": {
     "mergedTo": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "ageRating": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "avAttributes": {
       "properties": {
@@ -19,8 +17,7 @@
           }
         },
         "avFileFormat": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "bitrate": {
           "type": "long"
@@ -28,16 +25,13 @@
         "videoAttributes": {
           "properties": {
             "aspectRatio": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "color": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "videoCoding": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "heigth": {
               "type": "long"
@@ -50,8 +44,7 @@
       }
     },
     "avType": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "awards": {
       "type": "string",
@@ -62,12 +55,11 @@
     "broadcasters": {
       "properties": {
         "id": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "value": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "fields": {
             "lower": {
               "type": "string",
@@ -84,18 +76,16 @@
       }
     },
     "contentRatings": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "countries": {
       "properties": {
         "code": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "value": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "fields": {
             "text": {
               "type": "string",
@@ -115,17 +105,17 @@
       "properties": {
         "familyName": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "copy_to": "credits.fullName"
         },
         "givenName": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "copy_to": "credits.fullName"
         },
         "fullName": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "fields": {
             "text": {
               "type": "string",
@@ -136,34 +126,28 @@
           }
         },
         "role": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "gtaaUri": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
     "crids": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "descendantOf": {
       "type": "nested",
       "include_in_parent": true,
       "properties": {
         "midRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "urnRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
