@@ -352,7 +352,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
         index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)).build());
 
-        MediaForm form = form().durationFacet(new DurationRangeInterval("1minute")).build();
+        DurationRangeInterval interval = new DurationRangeInterval("1minute");
+        MediaForm form = form().durationFacet(interval).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
