@@ -1,10 +1,7 @@
 package nl.vpro.domain.api;
 
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ESFacetsHandlerTest {
+/*
 
     @Test
     public void testParse() {
@@ -27,5 +24,6 @@ public class ESFacetsHandlerTest {
 
 
     }
+*/
 
 }

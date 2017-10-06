@@ -14,6 +14,7 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.HistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -120,52 +121,36 @@ public abstract class ESFacetsBuilder {
     protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, DurationRangeFacets<?> facet, String fieldPrefix) {
         if (facet != null) {
             if (facet.getRanges() != null) {
+                RangeAggregationBuilder aggregationBuilder = null;
                 for (nl.vpro.domain.api.RangeFacet<Duration> range : facet.getRanges()) {
-                    if (range instanceof DurationRangeInterval) {
-                        AbstractTemporalRangeInterval.Interval parsed = ((DurationRangeInterval)range).parsed();
-                        ESInterval interval = ESInterval.parse(parsed.toString());
-                        // TODO, zou het niet logischer zijn om de verschillende aggregatie onderdeel te laten zijn van 1 'filter-aggregatie.
-                        // Dat zou echter deze code nogal moeten verbouwen, want je moet het aggregationfilter doorgeven om er subAggregations aan te kunnen toevoegen.
-                        searchBuilder.aggregation(
-                            AggregationBuilders
-                                .filter(fieldName + '_' + interval.toString(), filterBuilder)
-                                .subAggregation(
-                                    AggregationBuilders.dateHistogram("sub")
-                                        .field(fieldName)
-                                        // At least for YEARS we can make it work correctly for the CET timezone
-                                        // For months I can't get it working, because in the summer CEST is used, and I can't figure
-                                        // out how to get that correct. See /MGNL-11432
-                                        //
-                                        //.preZoneAdjustLargeInterval(true) // zou moeten werken, maar ik krijg slechts nog ES foutmeldingen dan.
-
-
-                                        // Dit werkt redelijk, maar het geeft gedoe op de grenzen: Zie https://github.com/npo-poms/api/blob/master/bash/tests/pages/bucketsearches.sh
-                                        // en NPA-183
-                                        //.postZone((asDuration || interval.unit != IntervalUnit.YEAR) ? "00:00" : "-01:00")
-
-                                        //.dateHistogramInterval(interval.getEsValue())
-                                )
+                    if (range instanceof  DurationRangeFacetItem) {
+                        if (aggregationBuilder == null){
+                            aggregationBuilder = AggregationBuilders
+                                .range(fieldName)
+                                .field(fieldName)
+                                .keyed(true);
+                        }
+                        DurationRangeFacetItem durationRange = (DurationRangeFacetItem) range;
+                        aggregationBuilder.addRange(
+                            durationRange.getBegin() != null ? durationRange.getBegin().toMillis() : null,
+                            durationRange.getEnd() != null ? durationRange.getEnd().toMillis() : null
                         );
-                    } else {
-                        RangeFacetItem<Duration> dateRangeItem = (RangeFacetItem<Duration>) range;
-                        searchBuilder.aggregation(AggregationBuilders.range(fieldName + ':' + dateRangeItem.getName())
+                    } else if (range instanceof DurationRangeInterval) {
+                        DurationRangeInterval durationRange = (DurationRangeInterval) range;
+                        HistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
+                            .histogram(fieldName + "." + durationRange.getInterval())
+                            .interval(durationRange.parsed().getDuration().toMillis())
                             .field(fieldName)
-                            .addRange(
-                                dateRangeItem.getBegin() != null ? Double.valueOf(dateRangeItem.getBegin().toMillis()) : null,
-                                dateRangeItem.getEnd() != null ? Double.valueOf(dateRangeItem.getEnd().toMillis()) : null
-                            ));
-                        // TODO
-                            //.nested(fieldPrefix)
-                            //.facetFilter(filterBuilder));
+                            .keyed(true);
+                        searchBuilder.aggregation(histogramAggregationBuilder);
                     }
+                }
+                if (aggregationBuilder != null) {
+                    searchBuilder.aggregation(aggregationBuilder);
                 }
             }
         }
     }
-
-
-
-
 
 
     private static String VALID_FACET_CHARS = "a-zA-Z0-9_-";
@@ -266,7 +251,7 @@ public abstract class ESFacetsBuilder {
         }
 
 
-        static final Pattern PATTERN = Pattern.compile(DateRangeInterval.DATERANGE_PATTERN);
+        static final Pattern PATTERN = Pattern.compile(DateRangeInterval.TEMPORAL_AMOUNT_INTERVAL);
 
         static ESInterval parse(String input) {
             java.util.regex.Matcher matcher = PATTERN.matcher(input.toUpperCase());

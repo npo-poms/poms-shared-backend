@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -346,15 +347,62 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testFindWithDurationFacet() throws Exception {
-        index(program().withMid().withDuration().build());
+    public void testFindWithDurationFacetHistogram() throws Exception {
+        index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
+        index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
+        index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)).build());
 
         MediaForm form = form().durationFacet(new DurationRangeInterval("1minute")).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
+        for (SearchResultItem<? extends MediaObject> mo : result) {
+            System.out.println(mo.getResult().getDuration());
+        }
+
         assertThat(result.getFacets().getDurations()).isNotEmpty();
+        assertThat(result.getFacets().getDurations()).hasSize(2);
+
+        assertThat(result.getFacets().getDurations().get(0).getCount()).isEqualTo(2);
+        assertThat(result.getFacets().getDurations().get(1).getCount()).isEqualTo(1);
+
+
+
     }
+
+
+    @Test
+    public void testFindWithDurationFacet() throws Exception {
+        index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
+        index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
+        index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)).build());
+
+        MediaForm form = form().durationFacet(
+            DurationRangeFacetItem.builder()
+                .name("less than 2 hours")
+                .end(Duration.ofHours(2))
+                .build(),
+            DurationRangeFacetItem.builder()
+                .name("more than 2 hours")
+                .begin(Duration.ofHours(2))
+                .build()
+        ).build();
+
+        MediaSearchResult result = target.find(null, form, 0, null);
+
+        for (SearchResultItem<? extends MediaObject> mo : result) {
+            System.out.println(mo.getResult().getDuration());
+        }
+
+        assertThat(result.getFacets().getDurations()).isNotEmpty();
+        assertThat(result.getFacets().getDurations()).hasSize(2);
+
+        assertThat(result.getFacets().getDurations().get(0).getCount()).isEqualTo(2);
+        assertThat(result.getFacets().getDurations().get(1).getCount()).isEqualTo(1);
+
+
+    }
+
 
     @Test
     public void testFindWithGenreFacet() throws Exception {
