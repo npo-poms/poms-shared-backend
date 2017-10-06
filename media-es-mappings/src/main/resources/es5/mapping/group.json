@@ -322,7 +322,7 @@
         },
         "source": {
           "type": "string",
-          "index": "no"
+          "index": "not_analyzed"
         },
         "sourceName": {
           "type": "string"
