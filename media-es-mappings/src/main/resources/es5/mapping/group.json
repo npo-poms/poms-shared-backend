@@ -4,6 +4,9 @@
     "poSequenceInformation": {
       "type": "keyword"
     },
+    "isOrdered": {
+      "type": "boolean"
+    },
     "mergedTo": {
       "type": "keyword"
     },
