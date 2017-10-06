@@ -322,7 +322,7 @@
         },
         "source": {
           "type": "string",
-          "index": "not_analyzed"
+          "index": "no"
         },
         "sourceName": {
           "type": "string"
@@ -334,7 +334,7 @@
           "type": "keyword"
         },
         "urn": {
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "width": {
           "type": "long"
