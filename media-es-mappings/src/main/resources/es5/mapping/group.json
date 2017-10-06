@@ -569,11 +569,10 @@
           "type": "keyword"
         },
         "urn": {
-          "type": "string",
-          "index": "no"
+          "type": "keyword"
         },
         "value": {
-          "type": "string",
+          "type": "keyword",
           "fields": {
             "lower": {
               "type": "string",

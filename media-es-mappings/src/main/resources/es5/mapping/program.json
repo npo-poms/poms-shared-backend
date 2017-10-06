@@ -563,11 +563,10 @@
           "type": "keyword"
         },
         "urn": {
-          "type": "string",
-          "index": "no"
+          "type": "keyword"
         },
         "value": {
-          "type": "string",
+          "type": "keyword",
           "fields": {
             "lower": {
               "type": "string",
@@ -1020,8 +1019,8 @@
               "index": "not_analyzed"
             },
             "urn": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "text",
+              "index": false
             },
             "width": {
               "type": "long"
@@ -1141,16 +1140,13 @@
               "format": "epoch_millis"
             },
             "type": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "urn": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "workflow": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             }
           }
         },
@@ -1253,23 +1249,19 @@
           "include_in_parent": true,
           "properties": {
             "broadcaster": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "type": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "uriRef": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "urn": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "value": {
-              "type": "string",
+              "type": "text",
               "index": "not_analyzed"
             }
           }

@@ -538,11 +538,10 @@
           "type": "keyword"
         },
         "urn": {
-          "type": "string",
-          "index": "no"
+          "type": "keyword"
         },
         "value": {
-          "type": "string",
+          "type": "keyword",
           "fields": {
             "lower": {
               "type": "string",
@@ -826,8 +825,7 @@
       "type": "keyword"
     },
     "urnRef": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "websites": {
       "properties": {
@@ -838,8 +836,7 @@
       }
     },
     "workflow": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     }
   }
 }

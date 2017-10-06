@@ -17,22 +17,16 @@
       "type": "long"
     },
     "midRef": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "type": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "urnRef": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "childRef": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     }
-
   }
-
 }
