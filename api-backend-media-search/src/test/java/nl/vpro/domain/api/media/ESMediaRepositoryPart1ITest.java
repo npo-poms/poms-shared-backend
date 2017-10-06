@@ -3,6 +3,8 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +16,8 @@ import javax.xml.bind.JAXB;
 
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.runners.MethodSorters;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -56,6 +56,7 @@ import static org.mockito.Mockito.when;
 @SuppressWarnings("ConstantConditions")
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest {
 
     @Autowired
@@ -329,7 +330,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithSortDateFacet() throws Exception {
         index(program().withMid().withPublishStart().build());
 
-        MediaForm form = form().sortDateFacet(DateRangePreset.TODAY).build();
+        MediaForm form = form().sortDateFacet(
+            DateRangePreset.TODAY,
+            DateRangePreset.THIS_WEEK,
+            DateRangeFacetItem.builder()
+                .begin(Instant.now().minus(Duration.ofHours(100)))
+                .end(Instant.now())
+                .name("100hours")
+                .build()
+        ).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 

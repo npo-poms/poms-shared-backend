@@ -574,7 +574,6 @@
         },
         "value": {
           "type": "string",
-          "index": "no",
           "fields": {
             "lower": {
               "type": "string",

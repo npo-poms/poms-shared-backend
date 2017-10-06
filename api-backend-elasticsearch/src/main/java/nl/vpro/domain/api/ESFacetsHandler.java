@@ -18,6 +18,7 @@ import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
+import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import nl.vpro.domain.Displayable;
@@ -155,40 +156,26 @@ public abstract class ESFacetsHandler {
         if(facets == null && aggregations == null) {
             return null;
         }
-
         List<DateFacetResultItem> dateFacetResultItems = new ArrayList<>();
-/*
-
-        if(facets != null) {
-            String prefix = facetName + ':';
-            List<RangeFacet> ranges = new ArrayList<>();
-            for(org.elasticsearch.search.facet.Facet facet : facets) {
-                if(facet.getName().startsWith(prefix)) {
-                    ranges.add((RangeFacet)facet);
-                }
-            }
-            if(!ranges.isEmpty()) {
-                dateFacetResultItems.addAll(dateRangeFacetResult(ranges, prefix));
-            }
-        }
-*/
-
         if(aggregations != null) {
             for (Aggregation aggregation : aggregations) {
                 if (aggregation.getName().startsWith(facetName)) {
-                    DateRangeInterval.Interval interval = ESInterval.parse(aggregation.getName().substring(facetName.length() + 1));
-                    Aggregation sub = ((org.elasticsearch.search.aggregations.bucket.filter.Filter) aggregation).getAggregations().get("sub");
-                    /*for (Histogram.Bucket bucket : ((DateHistogramAggregationBuilder)sub).getBuckets()) {
-                        Instant bucketStart = DateUtils.toInstant((Date) bucket.getKey());
-                        Instant bucketEnd = interval.getBucketEnd(bucketStart);
-                        DateFacetResultItem entry = new DateFacetResultItem(
-                            interval.print(bucketStart, false),
-                            bucketStart,
-                            bucketEnd,
-                            bucket.getDocCount());
+                    Range range = (Range) aggregation;
+                    List<? extends Range.Bucket> buckets = range.getBuckets();
 
+                    //RangeFacet<Instant> interval;
+                    List<RangeFacet<Instant>> ranges = dateRangeFacets.getRanges();
+                    for (Range.Bucket bucket : buckets) {
+                        Instant bucketStart = Instant.ofEpochMilli(((Double) bucket.getFrom()).longValue());
+                        Instant bucketEnd = Instant.ofEpochMilli(((Double) bucket.getTo()).longValue());
+                        DateFacetResultItem entry = DateFacetResultItem.builder()
+                            .name(bucket.getKeyAsString()) //                             interval.print(bucketStart, false),
+                            .begin(bucketStart)
+                            .end(bucketStart)
+                            .count(bucket.getDocCount())
+                            .build();
                         dateFacetResultItems.add(entry);
-                    }*/
+                    }
                 }
             }
         }

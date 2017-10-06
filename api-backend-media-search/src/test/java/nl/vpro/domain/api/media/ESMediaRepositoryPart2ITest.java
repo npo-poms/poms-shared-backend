@@ -13,8 +13,10 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
@@ -46,6 +48,7 @@ import static org.mockito.Mockito.when;
  */
 
 @Slf4j
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();

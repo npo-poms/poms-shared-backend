@@ -15,6 +15,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
@@ -69,6 +70,11 @@ public abstract class ESFacetsBuilder {
     protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix) {
         if(facet != null) {
             if(facet.getRanges() != null) {
+                RangeAggregationBuilder aggregationBuilder = AggregationBuilders
+                    .range(fieldName)
+                    .field(fieldName)
+                    .keyed(true)
+                    ;
                 for(nl.vpro.domain.api.RangeFacet<Instant> range : facet.getRanges()) {
                     if(range instanceof DateRangeInterval) {
                         ESInterval interval = ESInterval.parse(((DateRangeInterval)range).getInterval());
@@ -97,21 +103,16 @@ public abstract class ESFacetsBuilder {
                     } else {
                         // TODO
                         RangeFacetItem<Instant> dateRangeItem = (RangeFacetItem<Instant>)range;
-                        searchBuilder.aggregation(
-                            AggregationBuilders
-                                .range(fieldName + ':' + dateRangeItem.getName())
-                                .field(fieldName)
-                                .addRange(
-                                    dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : null,
-                                    dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : null
-                                )
-                                .keyed(true)
+                        aggregationBuilder.addRange(
+                            dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : null,
+                            dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : null
                         )
                             //.sub(fieldPrefix)
                         //    .facetFilter(filterBuilder))
                         ;
                     }
                 }
+                searchBuilder.aggregation(aggregationBuilder);
             }
         }
     }
