@@ -17,7 +17,6 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -196,21 +195,15 @@ public abstract class ESFacetsHandler {
 
         List<DurationFacetResultItem> facetResultItems = new ArrayList<>();
 
-
-        if (aggregations != null) {
-            for (Aggregation aggregation : aggregations) {
-                if (aggregation.getName().startsWith(facetName)) {
-                    if (aggregation instanceof Histogram) {
-                        Histogram histogram = (Histogram) aggregation;
-                        for (Histogram.Bucket bucket : histogram.getBuckets()) {
-
-                            DurationFacetResultItem entry = DurationFacetResultItem.builder()
-                                .name(bucket.getKeyAsString())
-                                .count(bucket.getDocCount())
-                                .build();
-                            facetResultItems.add(entry);
-                        }
-                    }
+        for (Aggregation aggregation : aggregations) {
+            if (aggregation.getName().startsWith(facetName)) {
+                MultiBucketsAggregation range = (MultiBucketsAggregation) aggregation;
+                for (MultiBucketsAggregation.Bucket bucket : range.getBuckets()) {
+                    DurationFacetResultItem entry = DurationFacetResultItem.builder()
+                        .name(bucket.getKeyAsString())
+                        .count(bucket.getDocCount())
+                            .build();
+                    facetResultItems.add(entry);
                 }
             }
         }
