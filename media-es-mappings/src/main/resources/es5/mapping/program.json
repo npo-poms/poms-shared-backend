@@ -1362,7 +1362,7 @@
               "fields": {
                 "full": {
                   "type": "string",
-                  "index": "not_analysed"
+                  "index": "not_analyzed"
                 },
                 "stemmed": {
                   "type": "string",
