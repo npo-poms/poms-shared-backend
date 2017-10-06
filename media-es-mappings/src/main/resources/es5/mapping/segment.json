@@ -522,6 +522,7 @@
       "format": "epoch_millis"
     },
     "regions": {
+      "type": "string",
       "index": "not_analyzed"
     },
     "relations": {
