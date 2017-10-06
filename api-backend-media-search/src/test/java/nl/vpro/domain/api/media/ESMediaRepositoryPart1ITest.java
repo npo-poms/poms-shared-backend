@@ -399,6 +399,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(result.getFacets().getDurations().get(0).getCount()).isEqualTo(2);
         assertThat(result.getFacets().getDurations().get(1).getCount()).isEqualTo(1);
+        assertThat(result.getFacets().getDurations().get(0).getValue()).isEqualTo("less than 2 hours");
+        assertThat(result.getFacets().getDurations().get(1).getValue()).isEqualTo("more than 2 hours");
 
 
     }

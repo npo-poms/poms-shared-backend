@@ -202,7 +202,7 @@ public abstract class ESFacetsHandler {
                     DurationFacetResultItem entry = DurationFacetResultItem.builder()
                         .name(bucket.getKeyAsString())
                         .count(bucket.getDocCount())
-                            .build();
+                        .build();
                     facetResultItems.add(entry);
                 }
             }

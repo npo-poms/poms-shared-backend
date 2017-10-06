@@ -132,6 +132,7 @@ public abstract class ESFacetsBuilder {
                         }
                         DurationRangeFacetItem durationRange = (DurationRangeFacetItem) range;
                         aggregationBuilder.addRange(
+                            durationRange.getName(),
                             durationRange.getBegin() != null ? durationRange.getBegin().toMillis() : 0,
                             durationRange.getEnd() != null ? durationRange.getEnd().toMillis() : Double.MAX_VALUE
                         );
