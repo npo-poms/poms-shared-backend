@@ -206,7 +206,7 @@
       }
     },
     "exclusives": {
-      "type": "keyword"
+      "type": "keyword",
       "fields": {
         "lower": {
           "type": "string",
