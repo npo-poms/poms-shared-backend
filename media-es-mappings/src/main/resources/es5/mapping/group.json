@@ -1,775 +1,726 @@
 {
-  "dynamic" : "strict",
-  "properties" : {
-    "mergedTo" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+  "dynamic": "strict",
+  "properties": {
+    "poSequenceInformation": {
+      "type": "keyword"
     },
-    "poSequenceInformation" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "mergedTo": {
+      "type": "keyword"
     },
-    "ageRating" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "ageRating": {
+      "type": "keyword"
     },
-    "avAttributes" : {
-      "properties" : {
-        "audioAttributes" : {
-          "properties" : {
-            "numberOfChannels" : {
-              "type" : "long"
+    "avAttributes": {
+      "properties": {
+        "audioAttributes": {
+          "properties": {
+            "numberOfChannels": {
+              "type": "long"
             }
           }
         },
-        "avFileFormat" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "avFileFormat": {
+          "type": "keyword"
         },
-        "bitrate" : {
-          "type" : "long"
+        "bitrate": {
+          "type": "long"
         },
-        "videoAttributes" : {
-          "properties" : {
-            "aspectRatio" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+        "videoAttributes": {
+          "properties": {
+            "aspectRatio": {
+              "type": "keyword"
             },
-            "color" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+            "color": {
+              "type": "keyword"
             },
-            "videoCoding" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+            "videoCoding": {
+              "type": "keyword"
             },
-            "heigth" : {
-              "type" : "long"
+            "heigth": {
+              "type": "long"
             },
-            "width" : {
-              "type" : "long"
+            "width": {
+              "type": "long"
             }
           }
         }
       }
     },
-    "avType" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "avType": {
+      "type": "keyword"
     },
-    "awards" : {
-      "type" : "string",
-      "norms" : {
-        "enabled" : false
+    "awards": {
+      "type": "string",
+      "norms": {
+        "enabled": false
       }
     },
-    "broadcasters" : {
-      "properties" : {
-        "id" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "broadcasters": {
+      "properties": {
+        "id": {
+          "type": "keyword"
         },
-        "value" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "lower" : {
-              "type" : "string",
-              "analyzer" : "lowercase"
+        "value": {
+          "type": "string",
+          "index": "no",
+          "fields": {
+            "lower": {
+              "type": "string",
+              "analyzer": "lowercase"
             },
-            "text" : {
-              "type" : "string",
-              "norms" : {
-                "enabled" : false
+            "text": {
+              "type": "string",
+              "norms": {
+                "enabled": false
               }
             }
           }
         }
       }
     },
-    "contentRatings" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "contentRatings": {
+      "type": "keyword"
     },
-    "countries" : {
-      "properties" : {
-        "code" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "countries": {
+      "properties": {
+        "code": {
+          "type": "keyword"
         },
-        "value" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "text" : {
-              "type" : "string",
-              "norms" : {
-                "enabled" : false
+        "value": {
+          "type": "string",
+          "index": "no",
+          "fields": {
+            "text": {
+              "type": "string",
+              "norms": {
+                "enabled": false
               }
             }
           }
         }
       }
     },
-    "creationDate" : {
-      "type" : "date",
-      "format" : "epoch_millis"
+    "creationDate": {
+      "type": "date",
+      "format": "epoch_millis"
     },
-    "credits" : {
-      "properties" : {
-        "familyName" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "copy_to" : "credits.fullName"
+    "credits": {
+      "properties": {
+        "familyName": {
+          "type": "string",
+          "index": "no",
+          "copy_to": "credits.fullName"
         },
-        "givenName" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "copy_to" : "credits.fullName"
+        "givenName": {
+          "type": "string",
+          "index": "no",
+          "copy_to": "credits.fullName"
         },
-        "fullName" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "text" : {
-              "type" : "string",
-              "norms" : {
-                "enabled" : false
+        "fullName": {
+          "type": "string",
+          "index": "no",
+          "fields": {
+            "text": {
+              "type": "string",
+              "norms": {
+                "enabled": false
               }
             }
           }
         },
-        "role" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "role": {
+          "type": "keyword"
         },
-        "gtaaUri" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "gtaaUri": {
+          "type": "keyword"
         }
       }
     },
-    "crids" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "crids": {
+      "type": "keyword"
     },
-    "defaultElement" : {
-      "type" : "long"
-    },
-    "descendantOf" : {
-      "type" : "nested",
-      "include_in_parent" : true,
-      "properties" : {
-        "midRef" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "descendantOf": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "midRef": {
+          "type": "keyword"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         },
-        "urnRef" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "urnRef": {
+          "type": "keyword"
         }
       }
     },
-    "descriptions" : {
-      "properties" : {
-        "owner" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "descriptions": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         },
-        "value" : {
-          "type" : "string",
-          "fields" : {
-            "stemmed" : {
-              "type" : "string",
-              "analyzer" : "dutch_stemmed"
+        "value": {
+          "type": "string",
+          "fields": {
+            "stemmed": {
+              "type": "string",
+              "analyzer": "dutch_stemmed"
             }
           }
         }
       }
     },
-    "duration" : {
-      "type" : "long"
+    "duration": {
+      "type": "long"
     },
-    "email" : {
-      "type" : "string",
-      "analyzer" : "lowercase"
+    "email": {
+      "type": "string",
+      "analyzer": "lowercase"
     },
-    "embeddable" : {
-      "type" : "boolean"
+    "embeddable": {
+      "type": "boolean"
     },
-    "exclusives" : {
-      "type" : "string",
-      "index" : "not_analyzed",
-      "fields" : {
-        "lower" : {
-          "type" : "string",
-          "analyzer" : "lowercase"
+    "episodeOf": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "added": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "highlighted": {
+          "type": "boolean"
+        },
+        "index": {
+          "type": "long"
+        },
+        "midRef": {
+          "type": "keyword"
+        },
+        "type": {
+          "type": "keyword"
+        },
+        "urnRef": {
+          "type": "keyword"
         }
       }
     },
-    "genres" : {
-      "type" : "nested",
-      "include_in_parent" : true,
-      "properties" : {
-        "id" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "exclusives": {
+      "type": "keyword"
+      "fields": {
+        "lower": {
+          "type": "string",
+          "analyzer": "lowercase"
+        }
+      }
+    },
+    "genres": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "id": {
+          "type": "keyword"
         },
-        "terms" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "lower" : {
-              "type" : "string",
-              "analyzer" : "lowercase"
+        "terms": {
+          "type": "keyword",
+          "fields": {
+            "lower": {
+              "type": "string",
+              "analyzer": "lowercase"
             },
-            "text" : {
-              "type" : "string",
-              "norms" : {
-                "enabled" : false
+            "text": {
+              "type": "string",
+              "norms": {
+                "enabled": false
               }
             }
           }
         }
       }
     },
-    "availableSubtitles" : {
-      "properties" : {
-        "language" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "availableSubtitles": {
+      "properties": {
+        "language": {
+          "type": "keyword"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         }
       }
     },
-    "hasSubtitles" : {
-      "type" : "boolean"
+    "hasSubtitles": {
+      "type": "boolean"
     },
-    "images" : {
-      "properties" : {
-        "creationDate" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+    "images": {
+      "properties": {
+        "creationDate": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "description" : {
-          "type" : "string",
-          "fields" : {
-            "stemmed" : {
-              "type" : "string",
-              "analyzer" : "dutch_stemmed"
+        "description": {
+          "type": "string",
+          "fields": {
+            "stemmed": {
+              "type": "string",
+              "analyzer": "dutch_stemmed"
             }
           }
         },
-        "height" : {
-          "type" : "long"
+        "height": {
+          "type": "long"
         },
-        "highlighted" : {
-          "type" : "boolean"
+        "highlighted": {
+          "type": "boolean"
         },
-        "imageUri" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "imageUri": {
+          "type": "keyword"
         },
-        "lastModified" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "lastModified": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "offset" : {
-          "type" : "long"
+        "offset": {
+          "type": "long"
         },
-        "owner" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "owner": {
+          "type": "keyword"
         },
-        "publishStart" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "publishStart": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "publishStop" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "publishStop": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "title" : {
-          "type" : "string",
-          "norms" : {
-            "enabled" : false
+        "title": {
+          "type": "string",
+          "norms": {
+            "enabled": false
           },
-          "fields" : {
-            "stemmed" : {
-              "type" : "string",
-              "analyzer" : "dutch_stemmed",
-              "norms" : {
-                "enabled" : false
+          "fields": {
+            "stemmed": {
+              "type": "string",
+              "analyzer": "dutch_stemmed",
+              "norms": {
+                "enabled": false
               }
             }
           }
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         },
-        "credits" : {
-          "type" : "string",
-          "norms" : {
-            "enabled" : false
+        "credits": {
+          "type": "string",
+          "norms": {
+            "enabled": false
           }
         },
-        "source" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "source": {
+          "type": "string",
+          "index": "not_analyzed"
         },
-        "sourceName" : {
-          "type" : "string"
+        "sourceName": {
+          "type": "string"
         },
-        "license" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "license": {
+          "type": "keyword"
         },
-        "date" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "date": {
+          "type": "keyword"
         },
-        "urn" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "urn": {
+          "index": "not_analyzed"
         },
-        "width" : {
-          "type" : "long"
+        "width": {
+          "type": "long"
         },
-        "workflow" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "workflow": {
+          "type": "keyword"
         }
       }
     },
-    "isDubbed" : {
-      "type" : "boolean"
+    "isDubbed": {
+      "type": "boolean"
     },
-    "isOrdered" : {
-      "type" : "boolean"
-    },
-    "languages" : {
-      "properties" : {
-        "code" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "languages": {
+      "properties": {
+        "code": {
+          "type": "keyword"
         },
-        "value" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "text" : {
-              "type" : "string",
-              "norms" : {
-                "enabled" : false
+        "value": {
+          "type": "string",
+          "index": "no",
+          "fields": {
+            "text": {
+              "type": "string",
+              "norms": {
+                "enabled": false
               }
             }
           }
         }
       }
     },
-    "lastModified" : {
-      "type" : "date",
-      "format" : "epoch_millis"
+    "lastModified": {
+      "type": "date",
+      "format": "epoch_millis"
     },
-    "locations" : {
-      "type" : "nested",
-      "include_in_parent" : true,
-      "properties" : {
-        "avAttributes" : {
-          "properties" : {
-            "audioAttributes" : {
-              "properties" : {
-                "audioCoding" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+    "locations": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "avAttributes": {
+          "properties": {
+            "audioAttributes": {
+              "properties": {
+                "audioCoding": {
+                  "type": "keyword"
                 },
-                "numberOfChannels" : {
-                  "type" : "long"
+                "numberOfChannels": {
+                  "type": "long"
                 }
               }
             },
-            "avFileFormat" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+            "avFileFormat": {
+              "type": "keyword"
             },
-            "bitrate" : {
-              "type" : "long"
+            "bitrate": {
+              "type": "long"
             },
-            "bytesize" : {
-              "type" : "long"
+            "bytesize": {
+              "type": "long"
             },
-            "videoAttributes" : {
-              "properties" : {
-                "aspectRatio" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+            "videoAttributes": {
+              "properties": {
+                "aspectRatio": {
+                  "type": "keyword"
                 },
-                "color" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+                "color": {
+                  "type": "keyword"
                 },
-                "videoCoding" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+                "videoCoding": {
+                  "type": "keyword"
                 },
-                "heigth" : {
-                  "type" : "long"
+                "heigth": {
+                  "type": "long"
                 },
-                "width" : {
-                  "type" : "long"
+                "width": {
+                  "type": "long"
                 }
               }
             }
           }
         },
-        "creationDate" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "creationDate": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "duration" : {
-          "type" : "long"
+        "duration": {
+          "type": "long"
         },
-        "guciRef" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "guciRef": {
+          "type": "keyword"
         },
-        "lastModified" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "lastModified": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "offset" : {
-          "type" : "long"
+        "offset": {
+          "type": "long"
         },
-        "owner" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "owner": {
+          "type": "keyword"
         },
-        "platform" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "platform": {
+          "type": "keyword"
         },
-        "programUrl" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "extension" : {
-              "type" : "string",
-              "analyzer" : "extension"
+        "programUrl": {
+          "type": "keyword",
+          "fields": {
+            "extension": {
+              "type": "string",
+              "analyzer": "extension"
             }
           }
         },
-        "publishStart" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "publishStart": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "publishStop" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "publishStop": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         },
-        "urn" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "urn": {
+          "type": "keyword"
         },
-        "workflow" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "workflow": {
+          "type": "keyword"
         }
       }
     },
-    "memberOf" : {
-      "type" : "nested",
-      "include_in_parent" : true,
-      "properties" : {
-        "added" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+    "memberOf": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "added": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "highlighted" : {
-          "type" : "boolean"
+        "highlighted": {
+          "type": "boolean"
         },
-        "index" : {
-          "type" : "long"
+        "index": {
+          "type": "long"
         },
-        "midRef" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "midRef": {
+          "type": "keyword"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         },
-        "urnRef" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "urnRef": {
+          "type": "keyword"
         }
       }
     },
-    "mid" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "mid": {
+      "type": "keyword"
     },
-    "objectType" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "objectType": {
+      "type": "keyword"
     },
-    "portals" : {
-      "properties" : {
-        "id" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "portals": {
+      "properties": {
+        "id": {
+          "type": "keyword"
         },
-        "value" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "lower" : {
-              "type" : "string",
-              "analyzer" : "lowercase"
+        "value": {
+          "type": "string",
+          "index": "no",
+          "fields": {
+            "lower": {
+              "type": "string",
+              "analyzer": "lowercase"
             },
-            "text" : {
-              "type" : "string",
-              "analyzer" : "lowercase"
+            "text": {
+              "type": "string",
+              "analyzer": "lowercase"
             }
           }
         }
       }
     },
-    "predictions" : {
-      "properties" : {
-        "state" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "predictions": {
+      "properties": {
+        "state": {
+          "type": "keyword"
         },
-        "publishStart" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "publishStart": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "publishStop" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "publishStop": {
+          "type": "date",
+          "format": "epoch_millis"
         },
-        "platform" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "platform": {
+          "type": "keyword"
         }
       }
     },
-    "publishStart" : {
-      "type" : "date",
-      "format" : "epoch_millis"
+    "publishStart": {
+      "type": "date",
+      "format": "epoch_millis"
     },
-    "publishStop" : {
-      "type" : "date",
-      "format" : "epoch_millis"
+    "publishStop": {
+      "type": "date",
+      "format": "epoch_millis"
     },
-    "publishDate" : {
-      "type" : "date",
-      "format" : "epoch_millis"
+    "publishDate": {
+      "type": "date",
+      "format": "epoch_millis"
     },
-    "regions" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "regions": {
+      "index": "not_analyzed"
     },
-    "relations" : {
-      "type" : "nested",
-      "include_in_parent" : true,
-      "properties" : {
-        "broadcaster" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "relations": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "broadcaster": {
+          "type": "keyword"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         },
-        "uriRef" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "uriRef": {
+          "type": "keyword"
         },
-        "urn" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "urn": {
+          "type": "string",
+          "index": "no"
         },
-        "value" : {
-          "type" : "string",
-          "index" : "not_analyzed",
-          "fields" : {
-            "lower" : {
-              "type" : "string",
-              "analyzer" : "lowercase",
+        "value": {
+          "type": "string",
+          "index": "no",
+          "fields": {
+            "lower": {
+              "type": "string",
+              "analyzer": "lowercase",
               "fielddata": true
+
             }
           }
         }
       }
     },
-    "releaseYear" : {
-      "type" : "long"
+    "releaseYear": {
+      "type": "long"
     },
-    "scheduleEvents" : {
-      "properties" : {
-        "avAttributes" : {
-          "properties" : {
-            "avFileFormat" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+    "scheduleEvents": {
+      "properties": {
+        "avAttributes": {
+          "properties": {
+            "avFileFormat": {
+              "type": "keyword"
             },
-            "bitrate" : {
-              "type" : "long"
+            "bitrate": {
+              "type": "long"
             },
-            "videoAttributes" : {
-              "properties" : {
-                "aspectRatio" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+            "videoAttributes": {
+              "properties": {
+                "aspectRatio": {
+                  "type": "keyword"
                 },
-                "color" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+                "color": {
+                  "type": "keyword"
                 },
-                "videoCoding" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+                "videoCoding": {
+                  "type": "keyword"
                 },
-                "heigth" : {
-                  "type" : "long"
+                "heigth": {
+                  "type": "long"
                 },
-                "width" : {
-                  "type" : "long"
+                "width": {
+                  "type": "long"
                 }
               }
             }
           }
         },
-        "channel" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "channel": {
+          "type": "keyword"
         },
-        "duration" : {
-          "type" : "long"
+        "duration": {
+          "type": "long"
         },
-        "imi" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "imi": {
+          "type": "keyword"
         },
-        "memberOf" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "memberOf": {
+          "type": "keyword"
         },
-        "net" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "midRef": {
+          "type": "keyword"
         },
-        "offset" : {
-          "type" : "long"
+        "net": {
+          "type": "keyword"
         },
-        "poProgID" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "offset": {
+          "type": "long"
         },
-        "poSeriesID" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "poProgID": {
+          "type": "keyword"
         },
-        "primaryLifestyle" : {
-          "properties" : {
-            "value" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+        "poSeriesID": {
+          "type": "keyword"
+        },
+        "primaryLifestyle": {
+          "properties": {
+            "value": {
+              "type": "keyword"
             }
           }
         },
-        "repeat" : {
-          "properties" : {
-            "isRerun" : {
-              "type" : "boolean"
+        "repeat": {
+          "properties": {
+            "isRerun": {
+              "type": "boolean"
             },
-            "value" : {
-              "type" : "string",
-              "norms" : {
-                "enabled" : false
+            "value": {
+              "type": "string",
+              "norms": {
+                "enabled": false
               }
             }
           }
         },
-        "secondaryLifestyle" : {
-          "properties" : {
-            "value" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+        "secondaryLifestyle": {
+          "properties": {
+            "value": {
+              "type": "keyword"
             }
           }
         },
-        "guideDay" : {
-          "type" : "date",
-          "format" : "epoch_millis"
-        },
-        "eventStart" : {
-          "type" : "date",
-          "format" : "epoch_millis"
+        "guideDay": {
+          "type": "date",
+          "format": "epoch_millis"
         },
         "start": {
           "type": "long"
         },
-        "textSubtitles" : {
-          "type" : "string",
-          "norms" : {
-            "enabled" : false
+        "eventStart": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "textSubtitles": {
+          "type": "string",
+          "norms": {
+            "enabled": false
           }
         },
-        "textPage" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "textPage": {
+          "type": "string",
+          "index": "no"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "keyword"
         },
-        "urnRef" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "urnRef": {
+          "type": "keyword"
         },
-        "titles" : {
-          "properties" : {
-            "owner" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+        "titles": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
             },
-            "type" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+            "type": {
+              "type": "keyword"
             },
-            "value" : {
-              "type" : "string",
-              "norms" : {
-                "enabled" : false
+            "value": {
+              "type": "string",
+              "norms": {
+                "enabled": false
               },
-              "fields" : {
-                "full" : {
-                  "type" : "string",
-                  "index" : "not_analyzed"
+              "fields": {
+                "full": {
+                  "type": "string",
+                  "index": "no"
                 },
-                "stemmed" : {
-                  "type" : "string",
-                  "analyzer" : "dutch_stemmed",
-                  "norms" : {
-                    "enabled" : false
+                "stemmed": {
+                  "type": "string",
+                  "analyzer": "dutch_stemmed",
+                  "norms": {
+                    "enabled": false
                   }
                 }
               }
@@ -778,144 +729,830 @@
         }
       }
     },
-    "sortDate" : {
-      "type" : "date",
-      "format" : "epoch_millis"
-    },
-    "source" : {
-      "type" : "string",
-      "norms" : {
-        "enabled" : false
+    "segments": {
+      "properties": {
+        "ageRating": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "avAttributes": {
+          "properties": {
+            "avFileFormat": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "bitrate": {
+              "type": "long"
+            },
+            "videoAttributes": {
+              "properties": {
+                "aspectRatio": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "color": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "videoCoding": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "heigth": {
+                  "type": "long"
+                },
+                "width": {
+                  "type": "long"
+                }
+              }
+            }
+          }
+        },
+        "avType": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "broadcasters": {
+          "properties": {
+            "id": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "index": "not_analyzed",
+              "fields": {
+                "lower": {
+                  "type": "string",
+                  "analyzer": "lowercase"
+                },
+                "text": {
+                  "type": "string",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "contentRatings": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "countries": {
+          "properties": {
+            "code": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "index": "not_analyzed",
+              "fields": {
+                "text": {
+                  "type": "string",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "creationDate": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "credits": {
+          "properties": {
+            "familyName": {
+              "type": "string",
+              "index": "not_analyzed",
+              "copy_to": "segments.credits.fullName"
+            },
+            "givenName": {
+              "type": "string",
+              "index": "not_analyzed",
+              "copy_to": "segments.credits.fullName"
+            },
+            "fullName": {
+              "type": "string",
+              "index": "not_analyzed",
+              "fields": {
+                "text": {
+                  "type": "string",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            },
+            "role": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "gtaaUri": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "crids": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "descendantOf": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "midRef": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "urnRef": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "descriptions": {
+          "properties": {
+            "owner": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "fields": {
+                "stemmed": {
+                  "type": "string",
+                  "analyzer": "dutch_stemmed"
+                }
+              }
+            }
+          }
+        },
+        "duration": {
+          "type": "long"
+        },
+        "email": {
+          "type": "string",
+          "analyzer": "lowercase"
+        },
+        "embeddable": {
+          "type": "boolean"
+        },
+        "exclusives": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "genres": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "id": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "terms": {
+              "type": "string",
+              "index": "not_analyzed",
+              "fields": {
+                "lower": {
+                  "type": "string",
+                  "analyzer": "lowercase"
+                },
+                "text": {
+                  "type": "string",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "hasSubtitles": {
+          "type": "boolean"
+        },
+        "images": {
+          "properties": {
+            "creationDate": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "description": {
+              "type": "string",
+              "fields": {
+                "stemmed": {
+                  "type": "string",
+                  "analyzer": "dutch_stemmed"
+                }
+              }
+            },
+            "height": {
+              "type": "long"
+            },
+            "highlighted": {
+              "type": "boolean"
+            },
+            "imageUri": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "lastModified": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "offset": {
+              "type": "long"
+            },
+            "owner": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "publishStart": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "title": {
+              "type": "string",
+              "norms": {
+                "enabled": false
+              },
+              "fields": {
+                "stemmed": {
+                  "type": "string",
+                  "analyzer": "dutch_stemmed",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "credits": {
+              "type": "string",
+              "norms": {
+                "enabled": false
+              }
+            },
+            "source": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "sourceName": {
+              "type": "string"
+            },
+            "license": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "date": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "urn": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "width": {
+              "type": "long"
+            },
+            "workflow": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "isDubbed": {
+          "type": "boolean"
+        },
+        "languages": {
+          "properties": {
+            "code": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "index": "not_analyzed",
+              "fields": {
+                "text": {
+                  "type": "string",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "lastModified": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "locations": {
+          "properties": {
+            "avAttributes": {
+              "properties": {
+                "audioAttributes": {
+                  "properties": {
+                    "audioCoding": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                    },
+                    "numberOfChannels": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "avFileFormat": {
+                  "type": "keyword"
+                },
+                "bitrate": {
+                  "type": "long"
+                },
+                "videoAttributes": {
+                  "properties": {
+                    "aspectRatio": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                    },
+                    "color": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                    },
+                    "videoCoding": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                    },
+                    "heigth": {
+                      "type": "long"
+                    },
+                    "width": {
+                      "type": "long"
+                    }
+                  }
+                }
+              }
+            },
+            "creationDate": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "duration": {
+              "type": "long"
+            },
+            "lastModified": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "offset": {
+              "type": "long"
+            },
+            "owner": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "platform": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "programUrl": {
+              "type": "string",
+              "index": "not_analyzed",
+              "fields": {
+                "extension": {
+                  "type": "string",
+                  "analyzer": "extension"
+                }
+              }
+            },
+            "publishStart": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "urn": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "workflow": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "memberOf": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "added": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "highlighted": {
+              "type": "boolean"
+            },
+            "index": {
+              "type": "long"
+            },
+            "midRef": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "urnRef": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "mid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "objectType": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "midRef": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "portals": {
+          "properties": {
+            "id": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "index": "not_analyzed",
+              "fields": {
+                "lower": {
+                  "type": "string",
+                  "analyzer": "lowercase"
+                }
+              }
+            }
+          }
+        },
+        "predictions": {
+          "properties": {
+            "state": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "publishStart": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "publishStop": {
+              "type": "date",
+              "format": "epoch_millis"
+            },
+            "platform": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "publishDate": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "publishStart": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "publishStop": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "regions": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "relations": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "broadcaster": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "uriRef": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "urn": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "releaseYear": {
+          "type": "long"
+        },
+        "sortDate": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
+        "start": {
+          "type": "long"
+        },
+        "tags": {
+          "type": "string",
+          "index": "not_analyzed",
+          "fields": {
+            "text": {
+              "type": "string",
+              "norms": {
+                "enabled": false
+              }
+            },
+            "stemmed": {
+              "type": "string",
+              "analyzer": "dutch_stemmed",
+              "norms": {
+                "enabled": false
+              }
+            },
+            "lower": {
+              "type": "string",
+              "analyzer": "lowercase",
+              "fielddata": true
+            }
+          }
+        },
+        "titles": {
+          "properties": {
+            "owner": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "norms": {
+                "enabled": false
+              },
+              "fields": {
+                "full": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "stemmed": {
+                  "type": "string",
+                  "analyzer": "dutch_stemmed",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "expandedTitles": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "owner": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "norms": {
+                "enabled": false
+              },
+              "fields": {
+                "full": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "stemmed": {
+                  "type": "string",
+                  "analyzer": "dutch_stemmed",
+                  "norms": {
+                    "enabled": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        "twitter": {
+          "properties": {
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "urn": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "urnRef": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "websites": {
+          "properties": {
+            "value": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "workflow": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
       }
     },
-    "tags" : {
-      "type" : "string",
-      "index" : "not_analyzed",
-      "fields" : {
-        "text" : {
-          "type" : "string",
-          "norms" : {
-            "enabled" : false
+    "sortDate": {
+      "type": "date",
+      "format": "epoch_millis"
+    },
+    "source": {
+      "type": "string",
+      "norms": {
+        "enabled": false
+      }
+    },
+    "tags": {
+      "type": "string",
+      "index": "not_analyzed",
+      "fields": {
+        "text": {
+          "type": "string",
+          "norms": {
+            "enabled": false
           }
         },
-        "stemmed" : {
-          "type" : "string",
-          "analyzer" : "dutch_stemmed",
-          "norms" : {
-            "enabled" : false
+        "stemmed": {
+          "type": "string",
+          "analyzer": "dutch_stemmed",
+          "norms": {
+            "enabled": false
           }
         },
-        "lower" : {
-          "type" : "string",
-          "analyzer" : "lowercase",
+        "lower": {
+          "type": "string",
+          "analyzer": "lowercase",
           "fielddata": true
         }
       }
     },
-    "teletext" : {
-      "type" : "long"
+    "teletext": {
+      "type": "long"
     },
-    "titles" : {
-      "type" : "nested",
-      "include_in_parent" : true,
-      "properties" : {
-        "owner" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "titles": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "string",
+          "index": "not_analyzed"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
         },
-        "value" : {
-          "type" : "string",
-          "norms" : {
-            "enabled" : false
+        "value": {
+          "type": "string",
+          "norms": {
+            "enabled": false
           },
-          "fields" : {
-            "full" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+          "fields": {
+            "full": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "stemmed" : {
-              "type" : "string",
-              "analyzer" : "dutch_stemmed",
-              "norms" : {
-                "enabled" : false
+            "stemmed": {
+              "type": "string",
+              "analyzer": "dutch_stemmed",
+              "norms": {
+                "enabled": false
               }
             }
           }
         }
       }
     },
-    "expandedTitles" : {
-      "type" : "nested",
-      "include_in_parent" : true,
-      "properties" : {
-        "owner" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "expandedTitles": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "string",
+          "index": "not_analyzed"
         },
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
         },
-        "value" : {
-          "type" : "string",
-          "norms" : {
-            "enabled" : false
+        "value": {
+          "type": "string",
+          "norms": {
+            "enabled": false
           },
-          "fields" : {
-            "full" : {
-              "type" : "string",
-              "index" : "not_analyzed"
+          "fields": {
+            "full": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "stemmed" : {
-              "type" : "string",
-              "analyzer" : "dutch_stemmed",
-              "norms" : {
-                "enabled" : false
+            "stemmed": {
+              "type": "string",
+              "analyzer": "dutch_stemmed",
+              "norms": {
+                "enabled": false
               }
             }
           }
         }
       }
     },
-    "twitter" : {
-      "properties" : {
-        "type" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "twitter": {
+      "properties": {
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
         },
-        "value" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+        "value": {
+          "type": "string",
+          "index": "not_analyzed"
         }
       }
     },
-    "type" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "type": {
+      "type": "string",
+      "index": "not_analyzed"
     },
-    "urn" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "urn": {
+      "type": "string",
+      "index": "not_analyzed"
     },
-    "urnRef" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "urnRef": {
+      "type": "string",
+      "index": "not_analyzed"
     },
-    "websites" : {
-      "properties" : {
-        "value" : {
-          "type" : "string",
-          "index" : "not_analyzed"
+    "websites": {
+      "properties": {
+        "value": {
+          "type": "string",
+          "index": "not_analyzed"
         }
       }
     },
-    "workflow" : {
-      "type" : "string",
-      "index" : "not_analyzed"
+    "workflow": {
+      "type": "string",
+      "index": "not_analyzed"
     }
   }
 }

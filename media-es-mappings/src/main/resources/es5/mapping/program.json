@@ -154,12 +154,10 @@
     "descriptions": {
       "properties": {
         "owner": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "value": {
           "type": "string",
@@ -197,22 +195,18 @@
           "type": "long"
         },
         "midRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "urnRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
     "exclusives": {
-      "type": "string",
-      "index": "not_analyzed",
+      "type": "keyword"
       "fields": {
         "lower": {
           "type": "string",
@@ -225,12 +219,10 @@
       "include_in_parent": true,
       "properties": {
         "id": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "terms": {
-          "type": "string",
-          "index": "not_analyzed",
+          "type": "keyword",
           "fields": {
             "lower": {
               "type": "string",
@@ -249,12 +241,10 @@
     "availableSubtitles": {
       "properties": {
         "language": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
@@ -283,8 +273,7 @@
           "type": "boolean"
         },
         "imageUri": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "lastModified": {
           "type": "date",
@@ -294,8 +283,7 @@
           "type": "long"
         },
         "owner": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "publishStart": {
           "type": "date",
@@ -321,8 +309,7 @@
           }
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "credits": {
           "type": "string",
@@ -338,23 +325,19 @@
           "type": "string"
         },
         "license": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "date": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "urn": {
-          "type": "string",
           "index": "not_analyzed"
         },
         "width": {
           "type": "long"
         },
         "workflow": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
@@ -364,12 +347,11 @@
     "languages": {
       "properties": {
         "code": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "value": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "fields": {
             "text": {
               "type": "string",
@@ -394,8 +376,7 @@
             "audioAttributes": {
               "properties": {
                 "audioCoding": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "numberOfChannels": {
                   "type": "long"
@@ -403,8 +384,7 @@
               }
             },
             "avFileFormat": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "bitrate": {
               "type": "long"
@@ -415,16 +395,13 @@
             "videoAttributes": {
               "properties": {
                 "aspectRatio": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "color": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "videoCoding": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "heigth": {
                   "type": "long"
@@ -444,8 +421,7 @@
           "type": "long"
         },
         "guciRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "lastModified": {
           "type": "date",
@@ -455,16 +431,13 @@
           "type": "long"
         },
         "owner": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "platform": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "programUrl": {
-          "type": "string",
-          "index": "not_analyzed",
+          "type": "keyword",
           "fields": {
             "extension": {
               "type": "string",
@@ -481,16 +454,13 @@
           "format": "epoch_millis"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "urn": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "workflow": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
@@ -509,36 +479,30 @@
           "type": "long"
         },
         "midRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "urnRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
     "mid": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "objectType": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "portals": {
       "properties": {
         "id": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "value": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "fields": {
             "lower": {
               "type": "string",
@@ -555,8 +519,7 @@
     "predictions": {
       "properties": {
         "state": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "publishStart": {
           "type": "date",
@@ -567,8 +530,7 @@
           "format": "epoch_millis"
         },
         "platform": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
@@ -585,7 +547,6 @@
       "format": "epoch_millis"
     },
     "regions": {
-      "type": "string",
       "index": "not_analyzed"
     },
     "relations": {
@@ -593,24 +554,21 @@
       "include_in_parent": true,
       "properties": {
         "broadcaster": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "uriRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "urn": {
           "type": "string",
-          "index": "not_analyzed"
+          "index": "no"
         },
         "value": {
           "type": "string",
-          "index": "not_analyzed",
+          "index": "no",
           "fields": {
             "lower": {
               "type": "string",
@@ -630,8 +588,7 @@
         "avAttributes": {
           "properties": {
             "avFileFormat": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "bitrate": {
               "type": "long"
@@ -639,16 +596,13 @@
             "videoAttributes": {
               "properties": {
                 "aspectRatio": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "color": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "videoCoding": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "heigth": {
                   "type": "long"
@@ -661,44 +615,36 @@
           }
         },
         "channel": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "duration": {
           "type": "long"
         },
         "imi": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "memberOf": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "midRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "net": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "offset": {
           "type": "long"
         },
         "poProgID": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "poSeriesID": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "primaryLifestyle": {
           "properties": {
             "value": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             }
           }
         },
@@ -718,8 +664,7 @@
         "secondaryLifestyle": {
           "properties": {
             "value": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             }
           }
         },
@@ -742,25 +687,21 @@
         },
         "textPage": {
           "type": "string",
-          "index": "not_analyzed"
+          "index": "no"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "urnRef": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "titles": {
           "properties": {
             "owner": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "type": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "value": {
               "type": "string",
@@ -770,7 +711,7 @@
               "fields": {
                 "full": {
                   "type": "string",
-                  "index": "not_analyzed"
+                  "index": "no"
                 },
                 "stemmed": {
                   "type": "string",
@@ -1136,8 +1077,7 @@
                   }
                 },
                 "avFileFormat": {
-                  "type": "string",
-                  "index": "not_analyzed"
+                  "type": "keyword"
                 },
                 "bitrate": {
                   "type": "long"
