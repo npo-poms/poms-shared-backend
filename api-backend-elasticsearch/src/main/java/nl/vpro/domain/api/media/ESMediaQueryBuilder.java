@@ -149,6 +149,15 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             }
         }
 
+        {
+            List<TitleSearch> titleSearches = searches.getTitles();
+            if(titleSearches != null && ! titleSearches.isEmpty()) {
+                for (TitleSearch titleSearch : titleSearches) {
+                    buildTitleQuery(booleanQuery, prefix, titleSearch);
+                }
+            }
+        }
+
         if(booleanQuery.hasClauses()) {
             return booleanQuery;
         }
@@ -178,6 +187,26 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                 throw new UnsupportedOperationException("Range location queries are not available");
             }
         });
+    }
+
+
+    private static void buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch matcher) {
+        BoolQueryBuilder titleSub = QueryBuilders.boolQuery();
+        if(matcher.getOwner() != null) {
+            QueryBuilder titleQuery = QueryBuilders.termQuery(prefix + "titles.owner", matcher.getOwner().name());
+            titleSub.must(titleQuery);
+        }
+        if(matcher.getType() != null) {
+            QueryBuilder typeQuery = QueryBuilders.termQuery(prefix + "titles.type", matcher.getType().name());
+            titleSub.must(typeQuery);
+        }
+        if(matcher.getValue() != null) {
+            SingleFieldApplier titleApplier = new SingleFieldApplier("titles.value");
+            titleApplier.applyField(titleSub, matcher.getValue());
+        }
+        if(titleSub.hasClauses()) {
+            apply(boolQueryBuilder, titleSub, matcher.getMatch());
+        }
     }
 
 
@@ -214,6 +243,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             apply(boolQueryBuilder, scheduleSub, matcher.getMatch());
         }
     }
+
+
 
     static private Long instantToLong(Instant instant) {
         if (instant == null) {
