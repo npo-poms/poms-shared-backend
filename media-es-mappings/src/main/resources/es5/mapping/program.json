@@ -318,8 +318,7 @@
           }
         },
         "source": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "sourceName": {
           "type": "string"
@@ -1008,8 +1007,7 @@
               }
             },
             "source": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword"
             },
             "sourceName": {
               "type": "string"
