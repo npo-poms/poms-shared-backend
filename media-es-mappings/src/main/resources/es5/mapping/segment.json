@@ -4,6 +4,9 @@
     "mergedTo": {
       "type": "keyword"
     },
+    "midRef": {
+      "type": "keyword"
+    },
     "ageRating": {
       "type": "keyword"
     },

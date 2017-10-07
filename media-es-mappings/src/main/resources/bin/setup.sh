@@ -101,25 +101,17 @@ if [ "$previndex" != "" ] ; then
    #echo -e "\nConsider:\n stream2es es  --source $desthost/$previndex --target $desthost/$destindex"
    #echo "(streams2es can be found at https://github.com/elasticsearch/stream2es)"
 
-   reindex = "
-  "source": {
-    "remote": {
-      "host": "http://otherhost:9200",
-      "username": "user",
-      "password": "pass"
+   reindex="{
+  \"source\": {
+    \"index\": \"$previndex\"
     },
-    "index": "source",
-    "query": {
-      "match": {
-        "test": "data"
-      }
-    }
-  },
-  "dest": {
-    "index": "dest"
+   \"dest\": {
+    \"index\": \"$destindex\"
   }
-}
-   "
+}"
+   echo
+   echo curl -XPOST $desthost/_reindex -d "'$reindex'"
+
    alias="{
     \"actions\": [
         { \"remove\": {
