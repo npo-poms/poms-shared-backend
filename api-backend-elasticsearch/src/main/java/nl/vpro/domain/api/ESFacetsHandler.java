@@ -186,7 +186,10 @@ public abstract class ESFacetsHandler {
         return dateFacetResultItems;
     }
 
-    protected static List<DurationFacetResultItem> getDurationRangeFacetResultItems(DurationRangeFacets<?> durationRangeFacets, String facetName, SearchResponse response) {
+    protected static List<DurationFacetResultItem> getDurationRangeFacetResultItems(
+        DurationRangeFacets<?> durationRangeFacets, String
+        facetName,
+        SearchResponse response) {
         Aggregations aggregations = response.getAggregations();
 
         if (aggregations == null) {

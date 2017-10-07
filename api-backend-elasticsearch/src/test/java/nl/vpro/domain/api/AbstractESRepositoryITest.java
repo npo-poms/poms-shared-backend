@@ -9,17 +9,21 @@ import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
+import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.*;
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
 import org.junit.runner.RunWith;
+import org.junit.runners.model.Statement;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -46,6 +50,18 @@ public abstract class AbstractESRepositoryITest {
     protected static String indexName = null;
 
     protected static Client client;
+    @Rule
+    public TestRule noElasticSearch = new TestRule() {
+        @Override
+        public Statement apply(Statement base, Description description)  {
+            return new Statement() {
+                @Override
+                public void evaluate() throws Throwable {
+                    base.evaluate();
+                }
+            };
+        }
+    };
 
     @Inject
     protected TransportClientFactory clientFactory;
@@ -90,16 +106,23 @@ public abstract class AbstractESRepositoryITest {
 
     protected static String createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings) throws InterruptedException, ExecutionException, IOException {
         if (indexName == null) {
-            indexName = "test-" + index + "-" + System.currentTimeMillis();
-            IndexHelper
-                .builder()
-                .log(log)
-                .client((s) -> client)
-                .indexName(indexName)
-                .settings(settings)
-                .mappings(mappings)
-                .build()
-                .createIndex();
+            try {
+                NodesInfoResponse response = client.admin().cluster().nodesInfo(new NodesInfoRequest()).get();
+                log.info("" + response.getNodesMap());
+                indexName = "test-" + index + "-" + System.currentTimeMillis();
+                IndexHelper
+                    .builder()
+                    .log(log)
+                    .client((s) -> client)
+                    .indexName(indexName)
+                    .settings(settings)
+                    .mappings(mappings)
+                    .build()
+                    .createIndex();
+            } catch (NoNodeAvailableException noNodeAvailableException) {
+                log.warn("No elastic search node could be found with {}", client);
+                log.info("Please start up local elasticsearch version");
+            }
         }
         refresh();
         return indexName;

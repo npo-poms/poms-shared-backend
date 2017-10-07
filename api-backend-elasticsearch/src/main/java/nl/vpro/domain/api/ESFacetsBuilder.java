@@ -78,10 +78,10 @@ public abstract class ESFacetsBuilder {
                     ;
                 for(nl.vpro.domain.api.RangeFacet<Instant> range : facet.getRanges()) {
                     if(range instanceof DateRangeInterval) {
-                        ESInterval interval = ESInterval.parse(((DateRangeInterval)range).getInterval());
+                        //ESInterval interval = ESInterval.parse(((DateRangeInterval)range).getInterval());
                         // TODO, zou het niet logischer zijn om de verschillende aggregatie onderdeel te laten zijn van 1 'filter-aggregatie.
                         // Dat zou echter deze code nogal moeten verbouwen, want je moet het aggregationfilter doorgeven om er subAggregations aan te kunnen toevoegen.
-                        searchBuilder.aggregation(
+                      /*  searchBuilder.aggregation(
                             AggregationBuilders
                                 .filter(fieldName + '_' + interval.toString(), filterBuilder)
                                 .subAggregation(
@@ -100,13 +100,13 @@ public abstract class ESFacetsBuilder {
 
                                         //.interval(AggregationBuilders.dateHistogram(interval.getEsValue()))
                                 )
-                        );
+                        );*/
                     } else {
                         // TODO
                         RangeFacetItem<Instant> dateRangeItem = (RangeFacetItem<Instant>)range;
                         aggregationBuilder.addRange(
-                            dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : null,
-                            dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : null
+                            dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
+                            dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
                         )
                             //.sub(fieldPrefix)
                         //    .facetFilter(filterBuilder))
@@ -118,7 +118,12 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, DurationRangeFacets<?> facet, String fieldPrefix) {
+    protected static void addFacet(
+        SearchSourceBuilder searchBuilder,
+        QueryBuilder filterBuilder,
+        String fieldName,
+        DurationRangeFacets<?> facet,
+        String fieldPrefix) {
         if (facet != null) {
             if (facet.getRanges() != null) {
                 RangeAggregationBuilder aggregationBuilder = null;
@@ -140,9 +145,10 @@ public abstract class ESFacetsBuilder {
                         DurationRangeInterval durationRange = (DurationRangeInterval) range;
                         HistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
                             .histogram(fieldName + "." + durationRange.getInterval())
-                            .interval(durationRange.parsed().getDuration().toMillis())
+                            .interval(durationRange.getInterval().getDuration().toMillis())
                             .field(fieldName)
-                            .keyed(true);
+                            .format("bla")
+                            .keyed(false);
                         searchBuilder.aggregation(histogramAggregationBuilder);
                     }
                 }
@@ -241,44 +247,6 @@ public abstract class ESFacetsBuilder {
         return ESMatchType.esField(field, facet == null || facet.isCaseSensitive());
     }
 
-    static class ESInterval {
-        final IntervalUnit unit;
-
-        final int number;
-
-        private ESInterval(IntervalUnit unit, int number) {
-            this.unit = unit;
-            this.number = number;
-        }
-
-
-        static final Pattern PATTERN = Pattern.compile(DateRangeInterval.TEMPORAL_AMOUNT_INTERVAL);
-
-        static ESInterval parse(String input) {
-            java.util.regex.Matcher matcher = PATTERN.matcher(input.toUpperCase());
-
-
-            if(!matcher.matches()) {
-                throw new IllegalArgumentException(input);
-            }
-            final int number = matcher.group(1) == null ? 1 : Integer.valueOf(matcher.group(1));
-            final IntervalUnit unit = IntervalUnit.valueOf(matcher.group(2));
-            return new ESInterval(unit, number);
-        }
-
-
-        public String getEsValue() {
-            if(number == 1) {
-                return String.valueOf(unit).toLowerCase();
-            } else {
-                return String.valueOf(number) + unit.getShortEs();
-            }
-        }
-
-        public String toString() {
-            return (number != 1 ? String.valueOf(number) : "") + unit;
-        }
-    }
 
     enum IntervalUnit {
 

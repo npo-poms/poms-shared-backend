@@ -331,6 +331,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithSortDateFacet() throws Exception {
         index(program().withMid().withPublishStart().build());
 
+        // both ranges
         MediaForm form = form().sortDateFacet(
             DateRangePreset.TODAY,
             DateRangePreset.THIS_WEEK,
@@ -346,13 +347,28 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.getFacets().getSortDates()).isNotEmpty();
     }
 
+
+    @Test
+    public void testFindWithSortDateFacetHistogram() throws Exception {
+        index(program().withMid().withPublishStart().build());
+
+        // both ranges
+        MediaForm form = form().sortDateFacet(
+            new DateRangeInterval("1 year")
+        ).build();
+
+        MediaSearchResult result = target.find(null, form, 0, null);
+
+        assertThat(result.getFacets().getSortDates()).isNotEmpty();
+    }
+
     @Test
     public void testFindWithDurationFacetHistogram() throws Exception {
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
         index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)).build());
 
-        DurationRangeInterval interval = new DurationRangeInterval("1minute");
+        DurationRangeInterval interval = new DurationRangeInterval("1 hour");
         MediaForm form = form().durationFacet(interval).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
