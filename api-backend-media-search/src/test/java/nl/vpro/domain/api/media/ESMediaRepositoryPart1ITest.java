@@ -349,6 +349,20 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
 
     @Test
+    public void testFindWithSortDateFacetMonth() throws Exception {
+        index(program().withMid().withPublishStart().build());
+
+        // both ranges
+        MediaForm form = form().sortDateFacet(
+            new DateRangeInterval(1, IntervalUnit.MONTH)
+        ).build();
+
+        MediaSearchResult result = target.find(null, form, 0, null);
+
+        assertThat(result.getFacets().getSortDates()).isNotEmpty();
+    }
+
+    @Test
     public void testFindWithSortDateFacetHistogram() throws Exception {
         index(program().withMid().withPublishStart().build());
 

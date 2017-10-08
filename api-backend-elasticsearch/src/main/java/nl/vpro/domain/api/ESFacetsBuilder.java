@@ -14,6 +14,8 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.elasticsearch.search.aggregations.bucket.histogram.HistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
@@ -71,50 +73,56 @@ public abstract class ESFacetsBuilder {
     protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix) {
         if(facet != null) {
             if(facet.getRanges() != null) {
-                RangeAggregationBuilder aggregationBuilder = AggregationBuilders
-                    .range(fieldName)
-                    .field(fieldName)
-                    .keyed(true)
-                    ;
+                RangeAggregationBuilder aggregationBuilder = null;
                 for(nl.vpro.domain.api.RangeFacet<Instant> range : facet.getRanges()) {
-                    if(range instanceof DateRangeInterval) {
-                        //ESInterval interval = ESInterval.parse(((DateRangeInterval)range).getInterval());
-                        // TODO, zou het niet logischer zijn om de verschillende aggregatie onderdeel te laten zijn van 1 'filter-aggregatie.
-                        // Dat zou echter deze code nogal moeten verbouwen, want je moet het aggregationfilter doorgeven om er subAggregations aan te kunnen toevoegen.
-                      /*  searchBuilder.aggregation(
-                            AggregationBuilders
-                                .filter(fieldName + '_' + interval.toString(), filterBuilder)
-                                .subAggregation(
-                                    AggregationBuilders.dateHistogram("sub")
-                                        .field(fieldName)
-                                            // At least for YEARS we can make it work correctly for the CET timezone
-                                            // For months I can't get it working, because in the summer CEST is used, and I can't figure
-                                            // out how to get that correct. See /MGNL-11432
-                                            //
-                                            //.preZoneAdjustLargeInterval(true) // zou moeten werken, maar ik krijg slechts nog ES foutmeldingen dan.
-
-
-                                        // Dit werkt redelijk, maar het geeft gedoe op de grenzen: Zie https://github.com/npo-poms/api/blob/master/bash/tests/pages/bucketsearches.sh
-                                        // en NPA-183
-                                        //.postZone((asDuration || interval.unit != IntervalUnit.YEAR) ? "00:00" : "-01:00")
-
-                                        //.interval(AggregationBuilders.dateHistogram(interval.getEsValue()))
-                                )
-                        );*/
-                    } else {
-                        // TODO
-                        RangeFacetItem<Instant> dateRangeItem = (RangeFacetItem<Instant>)range;
+                    if (range instanceof DateRangeFacetItem) {
+                        if (aggregationBuilder == null) {
+                            aggregationBuilder = AggregationBuilders
+                                .range(fieldName)
+                                .field(fieldName)
+                                .keyed(true);
+                        }
+                        DateRangeFacetItem durationRange = (DateRangeFacetItem) range;
                         aggregationBuilder.addRange(
-                            dateRangeItem.getBegin() != null ? dateRangeItem.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
-                            dateRangeItem.getEnd() != null ? dateRangeItem.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
-                        )
-                            //.sub(fieldPrefix)
-                        //    .facetFilter(filterBuilder))
-                        ;
+                            durationRange.getName(),
+                            durationRange.getBegin() != null ? durationRange.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
+                            durationRange.getEnd() != null ? durationRange.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
+                        );
+                    } else if(range instanceof DateRangeInterval) {
+                        DateRangeInterval dateRange = (DateRangeInterval) range;
+
+                        DateHistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
+                            .dateHistogram(fieldName + "." + dateRange.getInterval())
+                            .dateHistogramInterval(from(dateRange.getInterval()))
+                            .field(fieldName)
+                            .keyed(false)
+                            ;
+                        searchBuilder.aggregation(histogramAggregationBuilder);
                     }
                 }
-                searchBuilder.aggregation(aggregationBuilder);
+                if (aggregationBuilder != null) {
+                    searchBuilder.aggregation(aggregationBuilder);
+                }
             }
+        }
+    }
+
+    protected static DateHistogramInterval from(DateRangeInterval.Interval interval) {
+        switch(interval.getUnit()) {
+            case YEAR:
+                return interval.amount == 1 ? DateHistogramInterval.YEAR : DateHistogramInterval.days(interval.amount * 365);
+            case MONTH:
+                return interval.amount == 1 ? DateHistogramInterval.MONTH : DateHistogramInterval.days(interval.amount * 30);
+            case WEEK:
+                return DateHistogramInterval.weeks(interval.amount);
+            case DAY:
+                return DateHistogramInterval.days(interval.amount);
+            case HOUR:
+                return DateHistogramInterval.hours(interval.amount);
+            case MINUTE:
+                return DateHistogramInterval.minutes(interval.amount);
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
@@ -248,38 +256,4 @@ public abstract class ESFacetsBuilder {
     }
 
 
-    enum IntervalUnit {
-
-        YEAR,
-        MONTH,
-        WEEK {
-            @Override
-            public String getShortEs() {
-                return "w";
-            }
-        },
-        DAY {
-            @Override
-            public String getShortEs() {
-                return "d";
-            }
-        },
-        HOUR {
-            @Override
-            public String getShortEs() {
-                return "h";
-            }
-        },
-        MINUTE {
-            @Override
-            public String getShortEs() {
-                return "m";
-            }
-        };
-
-        public String getShortEs() {
-            throw new UnsupportedOperationException("No multiples available for  " + this);
-        }
-
-    }
 }

@@ -13,7 +13,7 @@ public class ESFacetsBuilderTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void year() {
-        assertThat(ESFacetsBuilder.IntervalUnit.YEAR.getShortEs());
+        assertThat(IntervalUnit.YEAR.getShortEs());
     }
  /*   @Test
     public void years() {
@@ -24,7 +24,7 @@ public class ESFacetsBuilderTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void month() {
-        assertThat(ESFacetsBuilder.IntervalUnit.MONTH.getShortEs());
+        assertThat(IntervalUnit.MONTH.getShortEs());
     }
 /*
     @Test
