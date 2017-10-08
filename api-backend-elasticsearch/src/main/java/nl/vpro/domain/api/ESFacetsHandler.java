@@ -18,7 +18,6 @@ import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
-import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import nl.vpro.domain.Displayable;
@@ -160,18 +159,18 @@ public abstract class ESFacetsHandler {
         if(aggregations != null) {
             for (Aggregation aggregation : aggregations) {
                 if (aggregation.getName().startsWith(facetName)) {
-                    Range range = (Range) aggregation;
-                    List<? extends Range.Bucket> buckets = range.getBuckets();
+                    MultiBucketsAggregation multiBucketsAggregation = (MultiBucketsAggregation) aggregation;
+                    List<? extends MultiBucketsAggregation.Bucket> buckets = multiBucketsAggregation.getBuckets();
 
                     //RangeFacet<Instant> interval;
-                    List<RangeFacet<Instant>> ranges = dateRangeFacets.getRanges();
-                    for (Range.Bucket bucket : buckets) {
-                        Instant bucketStart = Instant.ofEpochMilli(((Double) bucket.getFrom()).longValue());
-                        Instant bucketEnd = Instant.ofEpochMilli(((Double) bucket.getTo()).longValue());
+                    //List<RangeFacet<Instant>> ranges = dateRangeFacets.getRanges();
+                    for (MultiBucketsAggregation.Bucket bucket : buckets) {
+                        //Instant bucketStart = Instant.ofEpochMilli(((Double) bucket.g).longValue());
+                        //Instant bucketEnd = Instant.ofEpochMilli(((Double) bucket.getTo()).longValue());
                         DateFacetResultItem entry = DateFacetResultItem.builder()
                             .name(bucket.getKeyAsString()) //                             interval.print(bucketStart, false),
-                            .begin(bucketStart)
-                            .end(bucketStart)
+                            //.begin(bucket.getKeyAsString())
+                            //.end(bucketStart)
                             .count(bucket.getDocCount())
                             .build();
                         dateFacetResultItems.add(entry);
