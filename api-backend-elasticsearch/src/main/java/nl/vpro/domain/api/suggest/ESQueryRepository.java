@@ -6,11 +6,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.AbstractESRepository;
@@ -65,7 +66,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         try {
             client().prepareIndex(getIndexName(), "query")
                 //.setOpType(DocWriteRequest.)
-                .setSource(Jackson2Mapper.getInstance().writeValueAsString(query))
+                .setSource(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON)
                 .setTTL(queryTtl) // ms
                 .execute()
                 .actionGet();

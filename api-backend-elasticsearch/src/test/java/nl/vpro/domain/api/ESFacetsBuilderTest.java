@@ -10,22 +10,22 @@ public class ESFacetsBuilderTest {
     public void testEscapeFacetName() throws Exception {
         assertThat(ESFacetsBuilder.escapeFacetName("Eerste componist")).isEqualTo("Eerste__componist");
     }
-
+/*
     @Test(expected = UnsupportedOperationException.class)
     public void year() {
         assertThat(IntervalUnit.YEAR.getShortEs());
-    }
+    }*/
  /*   @Test
     public void years() {
         assertThat(ESFacetsBuilder.ESInterval.parse("YEAR").number).isEqualTo(1);
         assertThat(ESFacetsBuilder.ESInterval.parse("2YEAR").unit).isEqualTo(ESFacetsBuilder.IntervalUnit.YEAR);
         assertThat(ESFacetsBuilder.ESInterval.parse("YEAR").getEsValue()).isEqualTo("year");
     }*/
-
+    /*
     @Test(expected = UnsupportedOperationException.class)
     public void month() {
         assertThat(IntervalUnit.MONTH.getShortEs());
-    }
+    }*/
 /*
     @Test
     public void months() {
