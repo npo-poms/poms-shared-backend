@@ -17,6 +17,7 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -168,15 +169,31 @@ public abstract class ESFacetsHandler {
                     for (MultiBucketsAggregation.Bucket bucket : buckets) {
                         if (bucket instanceof Range.Bucket) {
                             Range.Bucket rangeBucket = (Range.Bucket) bucket;
-                            //Instant bucketStart = Instant.ofEpochMilli(((Double) bucket.g).longValue());
-                            //Instant bucketEnd = Instant.ofEpochMilli(((Double) bucket.getTo()).longValue());
-                            DateFacetResultItem entry = DateFacetResultItem.builder()
-                                .name(bucket.getKeyAsString()) //                             interval.print(bucketStart, false),
+                            String value = bucket.getKeyAsString();
+                            String name = value;
+                            if (value.startsWith("PRESET:")) {
+                                DateRangePreset preset = DateRangePreset.valueOf(value.substring("PRESET:".length()));
+                                value = preset.getDisplayName();
+                                name = preset.name();
+                            }
+                            DateFacetResultItem entry = DateFacetResultItem
+                                .builder()
+                                .value(value)
+                                .name(name)
                                 .begin(Instant.ofEpochMilli(((Double) rangeBucket.getFrom()).longValue()))
                                 .end(Instant.ofEpochMilli(((Double) rangeBucket.getTo()).longValue()))
                                 .count(bucket.getDocCount())
                                 .build();
                             dateFacetResultItems.add(entry);
+                        } else if (bucket instanceof Histogram.Bucket) {
+                            DateFacetResultItem entry = DateFacetResultItem
+                                .builder()
+                                .value(bucket.getKeyAsString()) //
+                                .count(bucket.getDocCount())
+                                .build();
+                            dateFacetResultItems.add(entry);
+                        } else {
+                            throw new IllegalArgumentException();
                         }
                     }
                 }

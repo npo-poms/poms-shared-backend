@@ -75,7 +75,7 @@ public abstract class ESFacetsBuilder {
             if(facet.getRanges() != null) {
                 RangeAggregationBuilder aggregationBuilder = null;
                 for(nl.vpro.domain.api.RangeFacet<Instant> range : facet.getRanges()) {
-                    if (range instanceof DateRangeFacetItem) {
+                    if (range instanceof RangeFacetItem) {
                         if (aggregationBuilder == null) {
                             aggregationBuilder = AggregationBuilders
                                 .range(fieldName)
@@ -83,35 +83,31 @@ public abstract class ESFacetsBuilder {
                                 .keyed(false)
                             ;
                         }
-                        DateRangeFacetItem dateRange = (DateRangeFacetItem) range;
+                        RangeFacetItem<Instant> dateRange = (RangeFacetItem) range;
+                        String name;
+                        if (range instanceof DateRangePreset) {
+                            name = "PRESET:" + dateRange.getName();
+                        } else {
+                            name = dateRange.getName();
+                        }
                         aggregationBuilder.addRange(
-                            dateRange.getName(),
-                            dateRange.getBegin() != null ? dateRange.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
-                            dateRange.getEnd() != null ? dateRange.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
+                            name,
+                            dateRange.getBegin() != null ? dateRange.getBegin().toEpochMilli() : Double.MIN_VALUE,
+                            dateRange.getEnd() != null ? dateRange.getEnd().toEpochMilli() : Double.MAX_VALUE
                         );
                     } else if(range instanceof DateRangeInterval) {
                         DateRangeInterval dateRange = (DateRangeInterval) range;
 
+                        String name = fieldName + "." + dateRange.getInterval();
+
                         DateHistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
-                            .dateHistogram(fieldName + "." + dateRange.getInterval())
+                            .dateHistogram(name)
                             .dateHistogramInterval(from(dateRange.getInterval()))
                             .field(fieldName)
+                            .format("yyyy")
                             .keyed(false)
                             ;
                         searchBuilder.aggregation(histogramAggregationBuilder);
-                    } else if (range instanceof DateRangePreset) {
-                        DateRangePreset preset = (DateRangePreset) range;
-                        if (aggregationBuilder == null) {
-                            aggregationBuilder = AggregationBuilders
-                                .range(fieldName)
-                                .field(fieldName)
-                                .keyed(false);
-                        }
-                        aggregationBuilder.addRange(
-                            preset.getName(),
-                            preset.getBegin() != null ? preset.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
-                            preset.getEnd() != null ? preset.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
-                        );
                     } else {
                         throw new IllegalArgumentException();
                     }

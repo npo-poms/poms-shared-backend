@@ -383,7 +383,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)).build());
 
         DurationRangeInterval interval = new DurationRangeInterval("1 hour");
-        MediaForm form = form().durationFacet(interval).build();
+        MediaForm form = form()
+            .durationFacet(interval)
+            .build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
