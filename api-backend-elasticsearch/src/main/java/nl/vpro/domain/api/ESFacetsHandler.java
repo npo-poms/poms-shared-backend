@@ -18,6 +18,7 @@ import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
+import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import nl.vpro.domain.Displayable;
@@ -165,15 +166,18 @@ public abstract class ESFacetsHandler {
                     //RangeFacet<Instant> interval;
                     //List<RangeFacet<Instant>> ranges = dateRangeFacets.getRanges();
                     for (MultiBucketsAggregation.Bucket bucket : buckets) {
-                        //Instant bucketStart = Instant.ofEpochMilli(((Double) bucket.g).longValue());
-                        //Instant bucketEnd = Instant.ofEpochMilli(((Double) bucket.getTo()).longValue());
-                        DateFacetResultItem entry = DateFacetResultItem.builder()
-                            .name(bucket.getKeyAsString()) //                             interval.print(bucketStart, false),
-                            //
-                            //.end(bucketStart)
-                            .count(bucket.getDocCount())
-                            .build();
-                        dateFacetResultItems.add(entry);
+                        if (bucket instanceof Range.Bucket) {
+                            Range.Bucket rangeBucket = (Range.Bucket) bucket;
+                            //Instant bucketStart = Instant.ofEpochMilli(((Double) bucket.g).longValue());
+                            //Instant bucketEnd = Instant.ofEpochMilli(((Double) bucket.getTo()).longValue());
+                            DateFacetResultItem entry = DateFacetResultItem.builder()
+                                .name(bucket.getKeyAsString()) //                             interval.print(bucketStart, false),
+                                .begin(Instant.ofEpochMilli(((Double) rangeBucket.getFrom()).longValue()))
+                                .end(Instant.ofEpochMilli(((Double) rangeBucket.getTo()).longValue()))
+                                .count(bucket.getDocCount())
+                                .build();
+                            dateFacetResultItems.add(entry);
+                        }
                     }
                 }
             }

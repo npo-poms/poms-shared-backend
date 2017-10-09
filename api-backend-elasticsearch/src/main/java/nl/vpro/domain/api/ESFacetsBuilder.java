@@ -80,7 +80,8 @@ public abstract class ESFacetsBuilder {
                             aggregationBuilder = AggregationBuilders
                                 .range(fieldName)
                                 .field(fieldName)
-                                .keyed(true);
+                                .keyed(false)
+                            ;
                         }
                         DateRangeFacetItem dateRange = (DateRangeFacetItem) range;
                         aggregationBuilder.addRange(
@@ -104,7 +105,7 @@ public abstract class ESFacetsBuilder {
                             aggregationBuilder = AggregationBuilders
                                 .range(fieldName)
                                 .field(fieldName)
-                                .keyed(true);
+                                .keyed(false);
                         }
                         aggregationBuilder.addRange(
                             preset.getName(),
