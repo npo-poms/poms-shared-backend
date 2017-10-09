@@ -209,7 +209,7 @@
       "type": "keyword",
       "fields": {
         "lower": {
-          "type": "string",
+          "type": "text",
           "analyzer": "lowercase"
         }
       }
@@ -225,11 +225,11 @@
           "type": "keyword",
           "fields": {
             "lower": {
-              "type": "string",
+              "type": "text",
               "analyzer": "lowercase"
             },
             "text": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               }

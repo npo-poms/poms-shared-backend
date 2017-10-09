@@ -1,0 +1,12 @@
+{
+  "source": {
+      "remote": {
+          "host": "http://localhost:9209"
+      },
+      "index": "apimedia"
+
+  },
+    "dest": {
+        "index": "apimedia-1"
+    }
+}

@@ -6,31 +6,12 @@ fi
 
 if [ $# -lt 1 ];
 then
-    echo "Usage $0 npo_dev|npo_test|npo_prod|localhost|<es-url> [<index number>|<alias>]"
+    echo "Usage $0 <es-url> [<index number>|<alias>]"
     echo "index number:  Number of the new index to create (e.g. 2 in apimedia-2). If ommited the mappings are put over the old ones (only possible if they are compatible)"
     exit
 fi
 
-
-case "$1" in
-
-    npo_dev)
-        desthost=http://es-dev.poms.omroep.nl
-        ;;
-    npo_test)
-        desthost=http://es-test.poms.omroep.nl
-        ;;
-    npo_prod)
-        desthost=http://poms10aas:9200
-        ;;
-    localhost)
-        desthost="http://localhost:9200"
-        ;;
-    *)
-        echo "Unknown destination. Supposing that $1 is the URL."
-        desthost=$1
-        ;;
-esac
+desthost=$1
 
 basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
