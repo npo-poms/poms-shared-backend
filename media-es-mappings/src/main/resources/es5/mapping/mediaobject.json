@@ -1,8 +1,20 @@
 {
   "dynamic": "strict",
   "properties": {
+    "midRef": {
+      "type": "keyword"
+    },
+    "urnRef": {
+      "type": "keyword"
+    },
     "mergedTo": {
       "type": "keyword"
+    },
+    "poSequenceInformation": {
+      "type": "keyword"
+    },
+    "isOrdered": {
+      "type": "boolean"
     },
     "ageRating": {
       "type": "keyword"

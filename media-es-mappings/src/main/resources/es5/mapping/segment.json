@@ -1,10 +1,13 @@
 {
   "dynamic": "strict",
   "properties": {
-    "mergedTo": {
+    "midRef": {
       "type": "keyword"
     },
-    "midRef": {
+    "urnRef": {
+      "type": "keyword"
+    },
+    "mergedTo": {
       "type": "keyword"
     },
     "ageRating": {
@@ -50,7 +53,7 @@
       "type": "keyword"
     },
     "awards": {
-      "type": "string",
+      "type": "text",
       "norms": {
         "enabled": false
       }
@@ -61,15 +64,15 @@
           "type": "keyword"
         },
         "value": {
-          "type": "string",
-          "index": "no",
+          "type": "text",
+          "index": false,
           "fields": {
             "lower": {
-              "type": "string",
+              "type": "text",
               "analyzer": "lowercase"
             },
             "text": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               }
@@ -87,11 +90,11 @@
           "type": "keyword"
         },
         "value": {
-          "type": "string",
-          "index": "no",
+          "type": "text",
+          "index": false,
           "fields": {
             "text": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               }
@@ -107,21 +110,21 @@
     "credits": {
       "properties": {
         "familyName": {
-          "type": "string",
-          "index": "no",
+          "type": "text",
+          "index": false,
           "copy_to": "credits.fullName"
         },
         "givenName": {
-          "type": "string",
-          "index": "no",
+          "type": "text",
+          "index": false,
           "copy_to": "credits.fullName"
         },
         "fullName": {
-          "type": "string",
-          "index": "no",
+          "type": "text",
+          "index": false,
           "fields": {
             "text": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               }
@@ -163,10 +166,10 @@
           "type": "keyword"
         },
         "value": {
-          "type": "string",
+          "type": "text",
           "fields": {
             "stemmed": {
-              "type": "string",
+              "type": "text",
               "analyzer": "dutch_stemmed"
             }
           }
@@ -177,7 +180,7 @@
       "type": "long"
     },
     "email": {
-      "type": "string",
+      "type": "text",
       "analyzer": "lowercase"
     },
     "embeddable": {
@@ -187,7 +190,7 @@
       "type": "keyword",
       "fields": {
         "lower": {
-          "type": "string",
+          "type": "text",
           "analyzer": "lowercase"
         }
       }
@@ -203,11 +206,11 @@
           "type": "keyword",
           "fields": {
             "lower": {
-              "type": "string",
+              "type": "text",
               "analyzer": "lowercase"
             },
             "text": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               }
@@ -236,10 +239,10 @@
           "format": "epoch_millis"
         },
         "description": {
-          "type": "string",
+          "type": "text",
           "fields": {
             "stemmed": {
-              "type": "string",
+              "type": "text",
               "analyzer": "dutch_stemmed"
             }
           }
@@ -272,13 +275,13 @@
           "format": "epoch_millis"
         },
         "title": {
-          "type": "string",
+          "type": "text",
           "norms": {
             "enabled": false
           },
           "fields": {
             "stemmed": {
-              "type": "string",
+              "type": "text",
               "analyzer": "dutch_stemmed",
               "norms": {
                 "enabled": false
@@ -290,7 +293,7 @@
           "type": "keyword"
         },
         "credits": {
-          "type": "string",
+          "type": "text",
           "norms": {
             "enabled": false
           }
@@ -299,7 +302,7 @@
           "type": "keyword"
         },
         "sourceName": {
-          "type": "string"
+          "type": "text"
         },
         "license": {
           "type": "keyword"
@@ -327,11 +330,11 @@
           "type": "keyword"
         },
         "value": {
-          "type": "string",
-          "index": "no",
+          "type": "text",
+          "index": false,
           "fields": {
             "text": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               }
@@ -417,7 +420,7 @@
           "type": "keyword",
           "fields": {
             "extension": {
-              "type": "string",
+              "type": "text",
               "analyzer": "extension"
             }
           }
@@ -478,15 +481,15 @@
           "type": "keyword"
         },
         "value": {
-          "type": "string",
-          "index": "no",
+          "type": "text",
+          "index": false,
           "fields": {
             "lower": {
-              "type": "string",
+              "type": "text",
               "analyzer": "lowercase"
             },
             "text": {
-              "type": "string",
+              "type": "text",
               "analyzer": "lowercase"
             }
           }
@@ -524,8 +527,7 @@
       "format": "epoch_millis"
     },
     "regions": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "relations": {
       "type": "nested",
@@ -547,7 +549,7 @@
           "type": "keyword",
           "fields": {
             "lower": {
-              "type": "string",
+              "type": "text",
               "analyzer": "lowercase",
               "fielddata": true
 
@@ -630,7 +632,7 @@
               "type": "boolean"
             },
             "value": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               }
@@ -656,14 +658,14 @@
           "format": "epoch_millis"
         },
         "textSubtitles": {
-          "type": "string",
+          "type": "text",
           "norms": {
             "enabled": false
           }
         },
         "textPage": {
-          "type": "string",
-          "index": "no"
+          "type": "text",
+          "index": false
         },
         "type": {
           "type": "keyword"
@@ -680,17 +682,17 @@
               "type": "keyword"
             },
             "value": {
-              "type": "string",
+              "type": "text",
               "norms": {
                 "enabled": false
               },
               "fields": {
                 "full": {
-                  "type": "string",
-                  "index": "no"
+                  "type": "text",
+                  "index": false
                 },
                 "stemmed": {
-                  "type": "string",
+                  "type": "text",
                   "analyzer": "dutch_stemmed",
                   "norms": {
                     "enabled": false
@@ -707,33 +709,30 @@
       "format": "epoch_millis"
     },
     "source": {
-      "type": "string",
+      "type": "text",
       "norms": {
         "enabled": false
       }
     },
-    "start": {
-      "type": "long"
-    },
     "tags": {
-      "type": "string",
+      "type": "text",
       "index": "not_analyzed",
       "fields": {
         "text": {
-          "type": "string",
+          "type": "text",
           "norms": {
             "enabled": false
           }
         },
         "stemmed": {
-          "type": "string",
+          "type": "text",
           "analyzer": "dutch_stemmed",
           "norms": {
             "enabled": false
           }
         },
         "lower": {
-          "type": "string",
+          "type": "text",
           "analyzer": "lowercase",
           "fielddata": true
         }
@@ -747,25 +746,23 @@
       "include_in_parent": true,
       "properties": {
         "owner": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "value": {
-          "type": "string",
+          "type": "text",
           "norms": {
             "enabled": false
           },
           "fields": {
             "full": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "text",
+              "index": false
             },
             "stemmed": {
-              "type": "string",
+              "type": "text",
               "analyzer": "dutch_stemmed",
               "norms": {
                 "enabled": false
@@ -780,25 +777,23 @@
       "include_in_parent": true,
       "properties": {
         "owner": {
-          "type": "keyword",
-          "index": true
+          "type": "keyword"
         },
         "type": {
-          "type": "keyword",
-          "index": true
+          "type": "keyword"
         },
         "value": {
-          "type": "string",
+          "type": "text",
           "norms": {
             "enabled": false
           },
           "fields": {
             "full": {
-              "type": "string",
-              "index": "not_analyzed"
+              "type": "keyword",
+              "index": false
             },
             "stemmed": {
-              "type": "string",
+              "type": "text",
               "analyzer": "dutch_stemmed",
               "norms": {
                 "enabled": false
@@ -811,30 +806,23 @@
     "twitter": {
       "properties": {
         "type": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         },
         "value": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },
     "type": {
-      "type": "string",
-      "index": "not_analyzed"
-    },
-    "urn": {
       "type": "keyword"
     },
-    "urnRef": {
+    "urn": {
       "type": "keyword"
     },
     "websites": {
       "properties": {
         "value": {
-          "type": "string",
-          "index": "not_analyzed"
+          "type": "keyword"
         }
       }
     },

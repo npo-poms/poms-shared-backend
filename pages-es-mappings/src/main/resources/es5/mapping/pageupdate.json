@@ -32,16 +32,16 @@
       }
     },
     "title": {
-      "type": "string",
-      "index": "no"
+      "type": "text",
+      "index": false
     },
     "subtitle": {
-      "type": "string",
-      "index": "no"
+      "type": "text",
+      "index": false
     },
     "summary": {
-      "type": "string",
-      "index": "no"
+      "type": "text",
+      "index": false
     },
     "lastPublished": {
       "type": "date",
@@ -71,12 +71,12 @@
     "paragraphs": {
       "properties": {
         "title": {
-          "type": "string",
-          "index": "no"
+          "type": "text",
+          "index": false
         },
         "body": {
-          "type": "string",
-          "index": "no"
+          "type": "text",
+          "index": false
         }
       }
     },
@@ -92,12 +92,11 @@
           "type": "keyword"
         },
         "text": {
-          "type": "string",
-          "index": "no"
+          "type": "text",
+          "index": false
         },
         "type": {
-          "type": "keyword",
-          "index": "no"
+          "type": "keyword"
         }
       }
     },
@@ -107,8 +106,8 @@
           "type": "keyword"
         },
         "title": {
-          "type": "string",
-          "index": "no"
+          "type": "text",
+          "index": false
         }
       }
     },
