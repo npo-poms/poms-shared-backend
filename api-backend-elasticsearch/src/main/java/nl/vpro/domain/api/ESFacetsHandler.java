@@ -169,7 +169,7 @@ public abstract class ESFacetsHandler {
                         //Instant bucketEnd = Instant.ofEpochMilli(((Double) bucket.getTo()).longValue());
                         DateFacetResultItem entry = DateFacetResultItem.builder()
                             .name(bucket.getKeyAsString()) //                             interval.print(bucketStart, false),
-                            //.begin(bucket.getKeyAsString())
+                            //
                             //.end(bucketStart)
                             .count(bucket.getDocCount())
                             .build();

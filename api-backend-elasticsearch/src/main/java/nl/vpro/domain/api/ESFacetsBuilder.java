@@ -82,11 +82,11 @@ public abstract class ESFacetsBuilder {
                                 .field(fieldName)
                                 .keyed(true);
                         }
-                        DateRangeFacetItem durationRange = (DateRangeFacetItem) range;
+                        DateRangeFacetItem dateRange = (DateRangeFacetItem) range;
                         aggregationBuilder.addRange(
-                            durationRange.getName(),
-                            durationRange.getBegin() != null ? durationRange.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
-                            durationRange.getEnd() != null ? durationRange.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
+                            dateRange.getName(),
+                            dateRange.getBegin() != null ? dateRange.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
+                            dateRange.getEnd() != null ? dateRange.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
                         );
                     } else if(range instanceof DateRangeInterval) {
                         DateRangeInterval dateRange = (DateRangeInterval) range;
@@ -98,6 +98,21 @@ public abstract class ESFacetsBuilder {
                             .keyed(false)
                             ;
                         searchBuilder.aggregation(histogramAggregationBuilder);
+                    } else if (range instanceof DateRangePreset) {
+                        DateRangePreset preset = (DateRangePreset) range;
+                        if (aggregationBuilder == null) {
+                            aggregationBuilder = AggregationBuilders
+                                .range(fieldName)
+                                .field(fieldName)
+                                .keyed(true);
+                        }
+                        aggregationBuilder.addRange(
+                            preset.getName(),
+                            preset.getBegin() != null ? preset.getBegin().toEpochMilli() : Instant.MIN.toEpochMilli(),
+                            preset.getEnd() != null ? preset.getEnd().toEpochMilli() : Instant.MAX.toEpochMilli()
+                        );
+                    } else {
+                        throw new IllegalArgumentException();
                     }
                 }
                 if (aggregationBuilder != null) {
