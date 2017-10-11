@@ -58,3 +58,55 @@ echo Created $destindex.json
 
 curl -XPUT $desthost/$destindex -d@$destindex.json
 
+
+if [ "$previndex" != "" ] ; then
+
+   echo "moving alias $previndex $destindex"
+
+   publishalias="{
+    \"actions\": [
+        { \"remove\": {
+            \"alias\": \"apipages-publish\",
+            \"index\": \"$previndex\"
+        }},
+        { \"add\": {
+            \"alias\": \"apipages-publish\",
+            \"index\": \"$destindex\"
+        }}
+    ]
+}
+"
+   echo $publishalias
+
+   curl -XPOST $desthost/_aliases -d "$publishalias"
+
+   reindex="{
+  \"source\": {
+    \"index\": \"$previndex\"
+    },
+   \"dest\": {
+    \"index\": \"$destindex\"
+  }
+}"
+   echo
+   echo curl -XPOST $desthost/_reindex -d "'$reindex'"
+
+   alias="{
+    \"actions\": [
+        { \"remove\": {
+            \"alias\": \"apipages\",
+            \"index\": \"$previndex\"
+        }},
+        { \"add\": {
+            \"alias\": \"apipages\",
+            \"index\": \"$destindex\"
+        }}
+    ]
+}
+"
+
+   echo "Followed by"
+   echo curl -XPOST $desthost/_aliases -d "'$alias'"
+fi
+
+
