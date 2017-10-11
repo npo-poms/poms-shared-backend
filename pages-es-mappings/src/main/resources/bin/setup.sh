@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#set -x
+set -x
 
 case "$1" in
 
@@ -48,10 +48,10 @@ fi
 rm $destindex.json
 echo "putting settings"
 echo '{ "settings":' > $destindex.json
-cat $basedir/setting/apipages.json >> $destindex.json
+cat $basedir/es5/setting/apipages.json >> $destindex.json
 echo ',"mappings": {' >> $destindex.json
 echo '"page":'  >>  $destindex.json
-cat $basedir/mapping/page.json >> $destindex.json
+cat $basedir/es5/mapping/page.json >> $destindex.json
 echo -e '}\n}' >> $destindex.json
 
 echo Created $destindex.json

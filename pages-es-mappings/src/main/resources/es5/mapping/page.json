@@ -90,6 +90,9 @@
             "midRef": {
               "type": "keyword"
             },
+            "start": {
+              "type": "long"
+            },
             "urnRef": {
               "type": "keyword"
             },
@@ -1535,8 +1538,7 @@
                   }
                 },
                 "tags": {
-                  "type": "text",
-                  "index": "not_analyzed",
+                  "type": "keyword",
                   "fields": {
                     "text": {
                       "type": "text",
@@ -1662,8 +1664,7 @@
               }
             },
             "tags": {
-              "type": "text",
-              "index": "not_analyzed",
+              "type": "keyword",
               "fields": {
                 "text": {
                   "type": "text",
@@ -1788,7 +1789,7 @@
           "type": "keyword"
         },
         "terms": {
-          "type": "keyword"
+          "type": "keyword",
           "fields": {
             "lower": {
               "type": "text",
