@@ -743,6 +743,9 @@
         "midRef": {
           "type": "keyword"
         },
+        "start": {
+          "type": "long"
+        },
         "urnRef": {
           "type": "keyword"
         },
@@ -851,12 +854,12 @@
             "familyName": {
               "type": "text",
               "index": false,
-              "copy_to": "credits.fullName"
+              "copy_to": "segments.credits.fullName"
             },
             "givenName": {
               "type": "text",
               "index": false,
-              "copy_to": "credits.fullName"
+              "copy_to": "segments.credits.fullName"
             },
             "fullName": {
               "type": "text",

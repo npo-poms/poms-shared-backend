@@ -207,12 +207,12 @@
                 "familyName": {
                   "type": "text",
                   "index": false,
-                  "copy_to": "credits.fullName"
+                  "copy_to": "embeds.media.credits.fullName"
                 },
                 "givenName": {
                   "type": "text",
                   "index": false,
-                  "copy_to": "credits.fullName"
+                  "copy_to": "embeds.media.credits.fullName"
                 },
                 "fullName": {
                   "type": "text",
@@ -831,6 +831,9 @@
                 "urnRef": {
                   "type": "keyword"
                 },
+                "start": {
+                  "type": "long"
+                },
                 "mergedTo": {
                   "type": "keyword"
                 },
@@ -936,12 +939,12 @@
                     "familyName": {
                       "type": "text",
                       "index": false,
-                      "copy_to": "credits.fullName"
+                      "copy_to": "embeds.media.segments.credits.fullName"
                     },
                     "givenName": {
                       "type": "text",
                       "index": false,
-                      "copy_to": "credits.fullName"
+                      "copy_to": "embeds.media.segments.credits.fullName"
                     },
                     "fullName": {
                       "type": "text",
