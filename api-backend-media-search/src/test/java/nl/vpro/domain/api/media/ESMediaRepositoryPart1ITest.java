@@ -1230,15 +1230,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     // NPA-403
     public void testSortByLexicoForOwner() throws IOException, ExecutionException, InterruptedException {
         index(program()
-            .mainTitle("bbmis", OwnerType.MIS)
-            .mainTitle("cc", OwnerType.BROADCASTER)
+            .mainTitle("bbmis", OwnerType.MIS)      // so this is its mis lexico title
+            .mainTitle("cc", OwnerType.BROADCASTER) // so this is its broadcaster lexico title
             .mid("bb")
             .build());
         index(program()
             .mainTitle("ccmis", OwnerType.MIS)
             .mainTitle("bb", OwnerType.BROADCASTER)
-            .lexicoTitle("ccmislexico", OwnerType.NPO)
-            .lexicoTitle("bblexico", OwnerType.BROADCASTER)
+            .lexicoTitle("ccmislexico", OwnerType.NPO)      // so this is its mis lexico title
+            .lexicoTitle("bblexico", OwnerType.BROADCASTER) // so this is it's broadcaster lexico title
             .mid("aa")
             .build());
         {
@@ -1251,8 +1251,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
             assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");  // its mis lexicotitle is bbmis
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");  // its mis lexicotitle is ccmislexico
         }
         {
             MediaForm form = new MediaForm();
@@ -1264,8 +1264,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
             assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa");
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb");
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa"); // its lexico title is bblexico
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb"); // its lexico title is cc
         }
     }
 

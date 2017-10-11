@@ -74,9 +74,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     /**
      * Builds a media relationQuery for standalone or embedded media when the prefix argument is left blank.
      *
-     * @param searches
+     * @param searches The 'searches' part of a MediaForm
      * @param prefix   not null path to the media node in the documents to search, including the last dot, can be blank
-     * @return
      */
     public static QueryBuilder query(MediaSearch searches, @NotNull BoolQueryBuilder booleanQuery, @NotNull String prefix) {
         if(searches == null) {
