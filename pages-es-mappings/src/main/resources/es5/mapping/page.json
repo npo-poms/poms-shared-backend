@@ -2056,8 +2056,7 @@
           "type": "keyword"
         },
         "value": {
-          "type": "text",
-          "index": false,
+          "type": "keyword",
           "fields": {
             "lower": {
               "type": "text",
@@ -2117,14 +2116,11 @@
       "type": "keyword"
     },
     "title": {
-      "type": "text",
-      "norms": {
-        "enabled": false
-      },
+      "type": "keyword",
       "fields": {
         "full": {
           "type": "text",
-          "index": false
+          "index": true
         },
         "stemmed": {
           "type": "text",
