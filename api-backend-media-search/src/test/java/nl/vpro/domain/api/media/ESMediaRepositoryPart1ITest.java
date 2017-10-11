@@ -1311,10 +1311,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 TitleSearch.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
-                    .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD)
-                    ).build()
+                    .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD))
+                    .build()
             )
-            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .asc(MediaSortField.creationDate)
             .build();
 
 
@@ -1366,15 +1366,14 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .build());
 
         MediaForm form = form()
-            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .asc(MediaSortField.creationDate)
             .build();
         form.setFacets(new MediaFacets());
-        TitleSearch subSearch = new TitleSearch();
         form.getFacets().setTitles(new TitleFacetList());
 
         MediaSearchResult result = target.find(null, form, 0, null);
         assertThat(result.getSize()).isEqualTo(3);
-        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa subtitle is not a main title'?
+        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually, I think, it should have been 3, 'aaa subtitle' is not a main title
         log.info("{}", result);
     }
 
@@ -1413,7 +1412,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.getSize()).isEqualTo(3);
         assertThat(result.getFacets().getTitles()).hasSize(1);
         //assertThat(result.getFacets().getTitles().get(0).getName()).isEqualTo("A"); TODO
-        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2);
+        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2); // namely, abcde and aaaaa
         log.info("{}", result);
     }
 

@@ -52,10 +52,12 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             {
                 TitleFacetList titles = facets.getTitles();
-                if (titles.asMediaFacet()) {
-                    addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
+                if (titles != null) {
+                    if (titles.asMediaFacet()) {
+                        addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
+                    }
+                    addNestedTitlesAggregations(aggregationBuilder, "full", titles, prefix);
                 }
-                addNestedTitlesAggregations(aggregationBuilder, "full", titles, prefix);
 
             }
 

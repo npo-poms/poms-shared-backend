@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
@@ -107,7 +108,7 @@ public abstract class AbstractESRepositoryITest {
             try {
                 NodesInfoResponse response = client.admin().cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                indexName = ("test-" + index + "-" + LocalDateTime.now()).toLowerCase();
+                indexName = "test-" + index + "-" + DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss").format(LocalDateTime.now());
                 IndexHelper
                     .builder()
                     .log(log)
