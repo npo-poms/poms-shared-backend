@@ -4,10 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.ExecutionException;
 
 import javax.xml.bind.JAXB;
 
@@ -28,6 +27,8 @@ import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
+import nl.vpro.domain.media.support.TextualType;
+import nl.vpro.domain.media.support.Title;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
@@ -1076,6 +1077,40 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
             assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("heel gewoon");
         }
     }
+
+
+    @Test
+    public void testTitlesFacets() throws InterruptedException, ExecutionException, IOException {
+        index(program()
+            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mid("abcde")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
+            .build());
+        index(program()
+            .mainTitle("aaaaa")
+            .mid("aa")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
+            .build());
+        index(program()
+            .mainTitle("bbbbb")
+            .titles(new Title("aaa subtitle", OwnerType.BROADCASTER,  TextualType.SUB))
+            .mid("bb")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
+
+        MediaForm form = form()
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .build();
+        form.setFacets(new MediaFacets());
+        MediaFacet titleFacet = new MediaFacet();
+        form.getFacets().setTitles(titleFacet);
+
+        MediaSearchResult result = target.find(null, form, 0, null);
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa sbutitle is not a main title'?
+        log.info("{}", result);
+    }
+
 
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
