@@ -13,6 +13,7 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.AgeRating;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.search.TitleForm;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;

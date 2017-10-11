@@ -34,7 +34,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
     }
 
     public static MediaFacetsResult extractFacets(SearchResponse response, MediaFacets request, MediaLoader mediaRepository, @Nonnull String prefix) {
-        if(request == null || !request.isFaceted()) {
+        if (request == null || !request.isFaceted()) {
             return null;
 
         }
@@ -57,7 +57,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         {
             Aggregations aggregations = response.getAggregations();
-            if(aggregations != null) {
+            if (aggregations != null) {
                 Filter globalFilter = aggregations.get(ROOT_FILTER);
 
                 facetsResult.setGenres(getGenreAggregationResultItems(prefix, globalFilter));
@@ -105,15 +105,16 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         };
     }
 
+
     protected static List<MemberRefFacetResultItem> getMemberRefAggregationResultItems(String prefix, String nestedField, final MediaLoader mediaRepository, Filter root) {
-        if(root == null) {
+        if (root == null) {
             return null;
         }
 
         Aggregation nested = getNestedResult(prefix, nestedField, root);
 
         Terms midRefs = getFilteredTerms("midRef", nested);
-        if(midRefs == null) {
+        if (midRefs == null) {
             return null;
         }
 
@@ -132,25 +133,25 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
     }
 
     protected static List<MultipleFacetsResult> getRelationAggregationResultItems(RelationFacetList requestedRelations, Filter root) {
-        if(root == null || requestedRelations == null) {
+        if (root == null || requestedRelations == null) {
             return null;
         }
 
         List<MultipleFacetsResult> answer = new ArrayList<>();
 
-        for(RelationFacet facet : requestedRelations) {
+        for (RelationFacet facet : requestedRelations) {
             String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
             HasAggregations aggregations = root.getAggregations().get("filter_" + escapedFacetName);
-            if(aggregations != null) {
+            if (aggregations != null) {
                 Aggregation aggregation = aggregations.getAggregations().get("filter_" + escapedFacetName);
-                if(aggregation != null) {
+                if (aggregation != null) {
                     Aggregation subAggregation = ((HasAggregations) aggregation).getAggregations().get("relations");
                     if (subAggregation == null) {
                         subAggregation = ((HasAggregations) aggregation).getAggregations().get("embeds_media_relations");
                     }
                     final Terms relations = getFilteredTerms(escapedFacetName, subAggregation);
 
-                    if(relations != null) {
+                    if (relations != null) {
                         AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(relations) {
                             @Override
                             protected TermFacetResultItem adapt(Terms.Bucket bucket) {
@@ -169,4 +170,43 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         return answer;
     }
+
+    protected static List<MultipleFacetsResult> getTitleAggregationResultItems(TitleFacetList requestedTitles, Filter root) {
+        if (root == null || requestedTitles == null) {
+            return null;
+        }
+
+        List<MultipleFacetsResult> answer = new ArrayList<>();
+
+        for (TitleFacet facet : requestedTitles) {
+            String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
+            HasAggregations aggregations = root.getAggregations().get("filter_" + escapedFacetName);
+            if (aggregations != null) {
+                Aggregation aggregation = aggregations.getAggregations().get("filter_" + escapedFacetName);
+                if (aggregation != null) {
+                    Aggregation subAggregation = ((HasAggregations) aggregation).getAggregations().get("titles");
+                    if (subAggregation == null) {
+                        subAggregation = ((HasAggregations) aggregation).getAggregations().get("embeds_media_relations");
+                    }
+                    final Terms titles = getFilteredTerms(escapedFacetName, subAggregation);
+
+                    if (titles != null) {
+                        AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(titles) {
+                            @Override
+                            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+                                return new TermFacetResultItem(
+                                    bucket.getKeyAsString(),
+                                    bucket.getKeyAsString(),
+                                    bucket.getDocCount()
+                                );
+                            }
+                        };
+                        answer.add(new MultipleFacetsResult(facet.getName(), resultItems));
+                    }
+                }
+            }
+        }
+        return answer;
+    }
+
 }

@@ -183,6 +183,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     }
 
+
+
     @Test
     public void testFindTagWildcard() throws IOException, ExecutionException, InterruptedException {
         index(program().mainTitle("t1").tags("foobar", "xxxyyyy").build());
@@ -1270,10 +1272,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    @Ignore("Doesn't test a thing yet. TODO: we might introduce a search on title feature?")
     public void testFindByTitles() throws InterruptedException, ExecutionException, IOException {
         index(program()
-            .mainTitle("abcde", OwnerType.BROADCASTER)
+            .mainTitle("abcde", OwnerType.WHATS_ON)
             .mid("abcde")
             .build());
         index(program()
@@ -1285,14 +1286,34 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .mid("bb")
             .build());
 
-        MediaForm form = MediaForm.builder()
-            .fuzzyText("aaa")
-            .build();
-
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
-
+        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder().owner(OwnerType.BROADCASTER).type(TextualType.MAIN).value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD)).build()).build(), 0, null);
+        assertThat(result.getSize()).isEqualTo(1);
         log.info("{}", result);
     }
+
+    @Test
+    public void testFindByTitles2() throws InterruptedException, ExecutionException, IOException {
+        index(program()
+            .lexicoTitle("Buitenhof")
+            .mid("POW_345")
+            .build());
+        index(program()
+            .mainTitle("Reporter")
+            .mid("POW_123")
+            .build());
+        index(program()
+            .lexicoTitle("BZT Show")
+            .mid("POW_789")
+            .build());
+
+        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder().owner(OwnerType.BROADCASTER).type(TextualType.LEXICO).value(ExtendedTextMatcher.must("b*", ExtendedMatchType.WILDCARD)).build()).build(), 0, null);
+        assertThat(result.getSize()).isEqualTo(2);
+        log.info("{}", result);
+        System.out.println(result.toString());
+    }
+
+
+
 
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
