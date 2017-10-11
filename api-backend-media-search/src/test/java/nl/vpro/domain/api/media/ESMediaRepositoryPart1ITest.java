@@ -1374,7 +1374,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaSearchResult result = target.find(null, form, 0, null);
         assertThat(result.getSize()).isEqualTo(3);
-        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa sbutitle is not a main title'?
+        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa subtitle is not a main title'?
         log.info("{}", result);
     }
 
@@ -1405,12 +1405,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         TitleSearch subSearch = new TitleSearch();
         subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
         TitleFacet titleFacet = new TitleFacet();
+        titleFacet.setName("A");
         titleFacet.setSubSearch(subSearch);
         form.getFacets().setTitles(new TitleFacetList(Arrays.asList(titleFacet)));
 
         MediaSearchResult result = target.find(null, form, 0, null);
         assertThat(result.getSize()).isEqualTo(3);
-        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa sbutitle is not a main title'?
+        assertThat(result.getFacets().getTitles()).hasSize(1);
+        //assertThat(result.getFacets().getTitles().get(0).getName()).isEqualTo("A"); TODO
+        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2);
         log.info("{}", result);
     }
 

@@ -52,7 +52,11 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             {
                 TitleFacetList titles = facets.getTitles();
-                addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
+                if (titles.asMediaFacet()) {
+                    addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
+                }
+                addNestedTitlesAggregations(aggregationBuilder, "full", titles, prefix);
+
             }
 
             {
@@ -206,6 +210,42 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         }
     }
 
+    protected static void addNestedTitlesAggregations(FilterAggregationBuilder rootAggregation, String facetField, TitleFacetList facets, String pathPrefix) {
+        if (facets == null || facets.isEmpty()) {
+            return;
+        }
+
+        TitleSearch subSearch = facets.getSubSearch();
+        // TODO
+      /*  for (TitleFacet facet : facets) {
+
+            QueryBuilder filter = facet.hasSubSearch() ? ESMediaFilterBuilder.filter(facet.getSubSearch(), pathPrefix, "expandedTitles") : null;
+            if (subSearch != null) {
+                if (filter == null) {
+                    filter = ESMediaFilterBuilder.filter(subSearch, pathPrefix, "expandedTitles");
+                } else {
+                    ESMediaFilterBuilder.filter((BoolQueryBuilder) filter, subSearch, pathPrefix, "expandedTitles");
+                }
+            }
+            AggregationBuilder termsBuilder = getFilteredRelationTermsBuilder(
+                pathPrefix,
+                "expandedTitles",
+                facetField,
+                facet,
+                filter
+            );
+
+            NestedAggregationBuilder nestedBuilder = getNestedBuilder(
+                pathPrefix,
+                "expandedTitles",
+                null,
+                termsBuilder
+            );
+            String facetName = escapeFacetName(facet.getName());
+            AggregationBuilder builder = filterAggregation(pathPrefix, facetName, nestedBuilder, facet.getFilter(), facets.getFilter());
+            rootAggregation.subAggregation(builder);
+        }*/
+    }
 
     protected static AggregationBuilder getFilteredRelationTermsBuilder(
         String pathPrefix,
