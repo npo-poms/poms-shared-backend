@@ -139,7 +139,9 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         Integer max) {
         SearchRequest request = new SearchRequest(indexName);
         request.types(types);
-        request.source(searchBuilder(profile, form, mediaObject, extraFilter, offset, max));
+        request.source(
+            searchBuilder(profile, form, mediaObject, extraFilter, offset, max)
+        );
         return request;
     }
 

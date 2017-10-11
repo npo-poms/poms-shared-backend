@@ -1438,8 +1438,7 @@
           }
         },
         "tags": {
-          "type": "text",
-          "index": "not_analyzed",
+          "type": "keyword",
           "fields": {
             "text": {
               "type": "text",
@@ -1565,8 +1564,7 @@
       }
     },
     "tags": {
-      "type": "text",
-      "index": "not_analyzed",
+      "type": "keyword",
       "fields": {
         "text": {
           "type": "text",

@@ -6,16 +6,13 @@
   "dynamic": "strict",
   "properties": {
     "parent": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "lang": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "type": {
-      "type": "string",
-      "index": "not_analyzed"
+      "type": "keyword"
     },
     "sequence": {
       "type": "long"
@@ -30,7 +27,7 @@
       "type": "long"
     },
     "content": {
-      "type": "string"
+      "type": "text"
     }
   }
 

@@ -3,6 +3,7 @@ package nl.vpro.domain.api;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
@@ -19,9 +20,11 @@ import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHitField;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.rules.TestRule;
-import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.Statement;
 import org.springframework.test.context.ContextConfiguration;
@@ -51,15 +54,10 @@ public abstract class AbstractESRepositoryITest {
 
     protected static Client client;
     @Rule
-    public TestRule noElasticSearch = new TestRule() {
+    public TestRule noElasticSearch = (base, description) -> new Statement() {
         @Override
-        public Statement apply(Statement base, Description description)  {
-            return new Statement() {
-                @Override
-                public void evaluate() throws Throwable {
-                    base.evaluate();
-                }
-            };
+        public void evaluate() throws Throwable {
+            base.evaluate();
         }
     };
 
@@ -109,7 +107,7 @@ public abstract class AbstractESRepositoryITest {
             try {
                 NodesInfoResponse response = client.admin().cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                indexName = "test-" + index + "-" + System.currentTimeMillis();
+                indexName = ("test-" + index + "-" + LocalDateTime.now()).toLowerCase();
                 IndexHelper
                     .builder()
                     .log(log)
