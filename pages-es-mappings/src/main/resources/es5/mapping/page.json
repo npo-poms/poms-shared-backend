@@ -47,7 +47,7 @@
           "type": "keyword",
           "fields": {
             "tokens": {
-              "type": "keyword",
+              "type": "text",
               "norms": {
                 "enabled": false
               }
@@ -77,7 +77,7 @@
     "embeds": {
       "properties": {
         "title": {
-          "type": "keyword",
+          "type": "text",
           "norms": {
             "enabled": false
           }
@@ -1821,7 +1821,7 @@
           }
         },
         "title": {
-          "type": "keyword",
+          "type": "text",
           "norms": {
             "enabled": false
           },
@@ -1842,10 +1842,7 @@
           "type": "keyword"
         },
         "credits": {
-          "type": "keyword",
-          "norms": {
-            "enabled": false
-          }
+          "type": "keyword"
         },
         "source": {
           "type": "keyword"
@@ -1979,7 +1976,7 @@
           "type": "keyword"
         },
         "lower": {
-          "type": "keyword",
+          "type": "text",
           "analyzer": "lowercase"
         },
         "section": {
@@ -1988,7 +1985,7 @@
               "type": "keyword",
               "fields": {
                 "lower": {
-                  "type": "keyword",
+                  "type": "text",
                   "analyzer": "lowercase"
                 },
                 "text": {
