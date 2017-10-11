@@ -51,7 +51,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             searchBuilder.aggregation(aggregationBuilder);
 
             {
-                MediaFacet titles = facets.getTitles();
+                TitleFacetList titles = facets.getTitles();
                 addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
             }
 

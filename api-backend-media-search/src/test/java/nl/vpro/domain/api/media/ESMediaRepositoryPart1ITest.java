@@ -8,10 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 import javax.xml.bind.JAXB;
@@ -1346,9 +1343,76 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder().owner(OwnerType.BROADCASTER).type(TextualType.LEXICO).value(ExtendedTextMatcher.must("b*", ExtendedMatchType.WILDCARD)).build()).build(), 0, null);
         assertThat(result.getSize()).isEqualTo(2);
         log.info("{}", result);
-        System.out.println(result.toString());
     }
 
+
+    @Test
+    public void testTitlesFacetsBackwards() throws InterruptedException, ExecutionException, IOException {
+        index(program()
+            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mid("abcde")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
+            .build());
+        index(program()
+            .mainTitle("aaaaa")
+            .mid("aa")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
+            .build());
+        index(program()
+            .mainTitle("bbbbb")
+            .subTitle("aaa subtitle")
+            .mid("bb")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
+
+        MediaForm form = form()
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .build();
+        form.setFacets(new MediaFacets());
+        TitleSearch subSearch = new TitleSearch();
+        form.getFacets().setTitles(new TitleFacetList());
+
+        MediaSearchResult result = target.find(null, form, 0, null);
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa sbutitle is not a main title'?
+        log.info("{}", result);
+    }
+
+
+    @Test
+    public void testTitlesFacets() throws InterruptedException, ExecutionException, IOException {
+        index(program()
+            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mid("abcde")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
+            .build());
+        index(program()
+            .mainTitle("aaaaa")
+            .mid("aa")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
+            .build());
+        index(program()
+            .mainTitle("bbbbb")
+            .subTitle("aaa subtitle")
+            .mid("bb")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
+
+        MediaForm form = form()
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .build();
+        form.setFacets(new MediaFacets());
+        TitleSearch subSearch = new TitleSearch();
+        subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
+        TitleFacet titleFacet = new TitleFacet();
+        titleFacet.setSubSearch(subSearch);
+        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(titleFacet)));
+
+        MediaSearchResult result = target.find(null, form, 0, null);
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa sbutitle is not a main title'?
+        log.info("{}", result);
+    }
 
 
 

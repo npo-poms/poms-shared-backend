@@ -707,8 +707,7 @@
               },
               "fields": {
                 "full": {
-                  "type": "text",
-                  "index": false
+                  "type": "keyword"
                 },
                 "stemmed": {
                   "type": "text",
@@ -1287,149 +1286,6 @@
         "releaseYear": {
           "type": "long"
         },
-        "scheduleEvents": {
-          "properties": {
-            "avAttributes": {
-              "properties": {
-                "avFileFormat": {
-                  "type": "keyword"
-                },
-                "bitrate": {
-                  "type": "long"
-                },
-                "videoAttributes": {
-                  "properties": {
-                    "aspectRatio": {
-                      "type": "keyword"
-                    },
-                    "color": {
-                      "type": "keyword"
-                    },
-                    "videoCoding": {
-                      "type": "keyword"
-                    },
-                    "heigth": {
-                      "type": "long"
-                    },
-                    "width": {
-                      "type": "long"
-                    }
-                  }
-                }
-              }
-            },
-            "channel": {
-              "type": "keyword"
-            },
-            "duration": {
-              "type": "long"
-            },
-            "imi": {
-              "type": "keyword"
-            },
-            "memberOf": {
-              "type": "keyword"
-            },
-            "midRef": {
-              "type": "keyword"
-            },
-            "net": {
-              "type": "keyword"
-            },
-            "offset": {
-              "type": "long"
-            },
-            "poProgID": {
-              "type": "keyword"
-            },
-            "poSeriesID": {
-              "type": "keyword"
-            },
-            "primaryLifestyle": {
-              "properties": {
-                "value": {
-                  "type": "keyword"
-                }
-              }
-            },
-            "repeat": {
-              "properties": {
-                "isRerun": {
-                  "type": "boolean"
-                },
-                "value": {
-                  "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
-                }
-              }
-            },
-            "secondaryLifestyle": {
-              "properties": {
-                "value": {
-                  "type": "keyword"
-                }
-              }
-            },
-            "guideDay": {
-              "type": "date",
-              "format": "epoch_millis"
-            },
-            "start": {
-              "type": "long"
-            },
-            "eventStart": {
-              "type": "date",
-              "format": "epoch_millis"
-            },
-            "textSubtitles": {
-              "type": "text",
-              "norms": {
-                "enabled": false
-              }
-            },
-            "textPage": {
-              "type": "text",
-              "index": false
-            },
-            "type": {
-              "type": "keyword"
-            },
-            "urnRef": {
-              "type": "keyword"
-            },
-            "titles": {
-              "properties": {
-                "owner": {
-                  "type": "keyword"
-                },
-                "type": {
-                  "type": "keyword"
-                },
-                "value": {
-                  "type": "text",
-                  "norms": {
-                    "enabled": false
-                  },
-                  "fields": {
-                    "full": {
-                      "type": "text",
-                      "index": false
-                    },
-                    "stemmed": {
-                      "type": "text",
-                      "analyzer": "dutch_stemmed",
-                      "norms": {
-                        "enabled": false
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
         "sortDate": {
           "type": "date",
           "format": "epoch_millis"
@@ -1483,8 +1339,7 @@
               },
               "fields": {
                 "full": {
-                  "type": "text",
-                  "index": false
+                  "type": "keyword"
                 },
                 "stemmed": {
                   "type": "text",
@@ -1609,8 +1464,7 @@
           },
           "fields": {
             "full": {
-              "type": "text",
-              "index": false
+              "type": "keyword"
             },
             "stemmed": {
               "type": "text",
