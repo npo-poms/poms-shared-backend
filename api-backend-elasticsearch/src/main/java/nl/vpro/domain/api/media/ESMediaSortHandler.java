@@ -24,6 +24,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import nl.vpro.domain.api.ESFacetsHandler;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.support.OwnerType;
 
 /**
  * @author Roelof Jan Koekoek
@@ -87,7 +88,11 @@ public class ESMediaSortHandler extends ESFacetsHandler {
                         nested = QueryBuilders.termQuery(titlesField + ".type", titleSortOrder.getType().name());
                     }
                     if (titleSortOrder.getOwner() != null) {
-                        org.elasticsearch.index.query.TermQueryBuilder ownerFilter = QueryBuilders.termQuery(titlesField + ".owner", titleSortOrder.getOwner().name());
+                        if (! OwnerType.ENTRIES.contains(titleSortOrder.getOwner())) {
+                            throw new IllegalArgumentException("Cannot sort on type " + titleSortOrder.getOwner() + ". Can only sort on titles of type " + OwnerType.ENTRIES);
+                        }
+                        org.elasticsearch.index.query.TermQueryBuilder ownerFilter =
+                            QueryBuilders.termQuery(titlesField + ".owner", titleSortOrder.getOwner().name());
                         if (nested == null) {
                             nested = ownerFilter;
                         } else {

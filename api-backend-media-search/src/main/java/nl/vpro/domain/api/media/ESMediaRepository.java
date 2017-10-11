@@ -438,6 +438,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
+    @Deprecated
     public Iterator<MediaChange> changes(Long since, ProfileDefinition<MediaObject> current, ProfileDefinition<MediaObject> previous, Order order, Integer max, Long keepAlive) {
         throw new UnsupportedOperationException("Not supported");
     }

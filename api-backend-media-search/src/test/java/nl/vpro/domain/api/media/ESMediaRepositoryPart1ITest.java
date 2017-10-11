@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
@@ -1232,29 +1233,30 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     // NPA-403
     public void testSortByLexicoForOwner() throws IOException, ExecutionException, InterruptedException {
         index(program()
-            .mainTitle("bbmis", OwnerType.MIS)      // so this is its mis lexico title
+            .mainTitle("bbmis", OwnerType.MIS)      // so this is its npo lexico title
             .mainTitle("cc", OwnerType.BROADCASTER) // so this is its broadcaster lexico title
-            .mid("bb")
+            .mid("MID1")
             .build());
         index(program()
             .mainTitle("ccmis", OwnerType.MIS)
             .mainTitle("bb", OwnerType.BROADCASTER)
-            .lexicoTitle("ccmislexico", OwnerType.NPO)      // so this is its mis lexico title
+            .lexicoTitle("ccnpolexico", OwnerType.NPO)      // so this is its npo lexico title
+            .lexicoTitle("aa", OwnerType.MIS)      // so this is NOT its npo lexico title
             .lexicoTitle("bblexico", OwnerType.BROADCASTER) // so this is it's broadcaster lexico title
-            .mid("aa")
+            .mid("MID2")
             .build());
         {
             MediaForm form = new MediaForm();
             form.addSortField(TitleSortOrder.builder()
                 .textualType(TextualType.LEXICO)
-                .ownerType(OwnerType.MIS)
+                .ownerType(OwnerType.NPO)
                 .order(Order.ASC)
                 .build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
             assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("bb");  // its mis lexicotitle is bbmis
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");  // its mis lexicotitle is ccmislexico
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID1");  // its npo lexicotitle is bbmis
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("MID2");  // its npo lexicotitle is ccnpolexico
         }
         {
             MediaForm form = new MediaForm();
@@ -1266,28 +1268,63 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
             assertThat(result.getSize()).isEqualTo(2);
-            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("aa"); // its lexico title is bblexico
-            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("bb"); // its lexico title is cc
+            assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID2"); // its lexico title is bblexico
+            assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("MID1"); // its lexico title is cc
         }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSortByLexicoForOwnerIllegalOwner() throws IOException, ExecutionException, InterruptedException {
+
+        MediaForm form = new MediaForm();
+        form.addSortField(TitleSortOrder.builder()
+            .textualType(TextualType.LEXICO)
+            .ownerType(OwnerType.MIS)
+            .order(Order.ASC)
+            .build());
+
+        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+
+
     }
 
     @Test
     public void testFindByTitles() throws InterruptedException, ExecutionException, IOException {
         index(program()
-            .mainTitle("abcde", OwnerType.WHATS_ON)
+            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
             .build());
         index(program()
             .mainTitle("aaaaa")
             .mid("aa")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
             .build());
         index(program()
             .mainTitle("bbbbb")
+            .subTitle("aaa subtitle")
             .mid("bb")
+
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+
             .build());
 
-        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder().owner(OwnerType.BROADCASTER).type(TextualType.MAIN).value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD)).build()).build(), 0, null);
-        assertThat(result.getSize()).isEqualTo(1);
+        MediaForm form = form()
+            .titles(
+                TitleSearch.builder()
+                    .owner(OwnerType.BROADCASTER)
+                    .type(TextualType.MAIN)
+                    .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD)
+                    ).build()
+            )
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .build();
+
+
+        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        assertThat(result.getSize()).isEqualTo(2);
+        assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("abcde");
+        assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
         log.info("{}", result);
     }
 
