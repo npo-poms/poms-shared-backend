@@ -728,6 +728,9 @@
         "midRef": {
           "type": "keyword"
         },
+        "start": {
+          "type": "long"
+        },
         "urnRef": {
           "type": "keyword"
         },
