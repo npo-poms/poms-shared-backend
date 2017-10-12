@@ -78,6 +78,41 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         }
     }
 
+    public static QueryBuilder filter(TitleSearch searches, @Nonnull String axis) {
+        return filter(searches, "", axis);
+    }
+
+    public static QueryBuilder filter(TitleSearch titleSearch, @Nonnull String prefix, String axis) {
+        if(titleSearch == null) {
+            return QueryBuilders.matchAllQuery();
+        }
+
+        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
+        filter(booleanFilter, titleSearch, prefix, axis);
+        if (booleanFilter.hasClauses()) {
+            return booleanFilter;
+        } else {
+            return QueryBuilders.matchAllQuery();
+        }
+    }
+
+    public static void filter(BoolQueryBuilder booleanFilter, TitleSearch titleSearch, @Nonnull String prefix, String axis) {
+        titleSearch.getMatch();
+
+        if(titleSearch.getOwner() != null) {
+            QueryBuilder titleQuery = QueryBuilders.termQuery(prefix + "expandedTitles.owner", titleSearch.getOwner().name());
+            booleanFilter.must(titleQuery);
+        }
+        if(titleSearch.getType() != null) {
+            QueryBuilder typeQuery = QueryBuilders.termQuery(prefix + "expandedTitles.type", titleSearch.getType().name());
+            booleanFilter.must(typeQuery);
+        }
+        if(titleSearch.getValue() != null) {
+            ESQueryBuilder.SingleFieldApplier titleApplier = new ESQueryBuilder.SingleFieldApplier("expandedTitles.value");
+            titleApplier.applyField(booleanFilter, titleSearch.getValue());
+        }
+    }
+
 
     public static QueryBuilder filter(MediaSearch searches) {
         return filter(searches, "");

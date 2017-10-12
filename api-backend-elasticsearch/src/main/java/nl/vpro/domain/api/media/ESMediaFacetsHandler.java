@@ -43,7 +43,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         {
             Aggregations facets = response.getAggregations();
-
+            // TODO extract the new title facets
             facetsResult.setTitles(getFacetResultItems(prefix + "titles.value.full", facets));
             facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), facets, MediaType.class));
             facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), facets, AVType.class));

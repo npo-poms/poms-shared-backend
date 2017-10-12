@@ -1538,6 +1538,11 @@
                   "norms": {
                     "enabled": false
                   }
+                },
+                "lower": {
+                  "type": "text",
+                  "analyzer": "lowercase",
+                  "fielddata": true
                 }
               }
             }
@@ -1664,6 +1669,11 @@
               "norms": {
                 "enabled": false
               }
+            },
+            "lower": {
+              "type": "text",
+              "analyzer": "lowercase",
+              "fielddata": true
             }
           }
         }

@@ -1286,7 +1286,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testFindByTitles() throws InterruptedException, ExecutionException, IOException {
+    public void testFindByTitlesCaseSensitive() throws InterruptedException, ExecutionException, IOException {
         index(program()
             .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")
@@ -1301,9 +1301,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .mainTitle("bbbbb")
             .subTitle("aaa subtitle")
             .mid("bb")
-
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
-
+            .build());
+        index(program()
+            .mainTitle("AAAB")
+            .subTitle("AAA subtitle")
+            .mid("BB")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
             .build());
 
         MediaForm form = form()
@@ -1342,6 +1346,50 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder().owner(OwnerType.BROADCASTER).type(TextualType.LEXICO).value(ExtendedTextMatcher.must("b*", ExtendedMatchType.WILDCARD)).build()).build(), 0, null);
         assertThat(result.getSize()).isEqualTo(2);
+        log.info("{}", result);
+    }
+
+    @Test
+    public void testFindByTitlesCaseInSensitive() throws InterruptedException, ExecutionException, IOException {
+        index(program()
+            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mid("abcde")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
+            .build());
+        index(program()
+            .mainTitle("aaaaa")
+            .mid("aa")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
+            .build());
+        index(program()
+            .mainTitle("bbbbb")
+            .subTitle("aaa subtitle")
+            .mid("bb")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
+        index(program()
+            .mainTitle("AAAB")
+            .subTitle("AAA subtitle")
+            .mid("BB")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
+
+        MediaForm form = form()
+            .titles(
+                TitleSearch.builder()
+                    .owner(OwnerType.BROADCASTER)
+                    .type(TextualType.MAIN)
+                    .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD, false))
+                    .build()
+            )
+            .asc(MediaSortField.creationDate)
+            .build();
+
+
+        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("abcde");
+        assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("aa");
         log.info("{}", result);
     }
 
@@ -1396,6 +1444,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .mid("bb")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
             .build());
+        index(program()
+            .mainTitle("AAAB")
+            .subTitle("AAA subtitle")
+            .mid("BB")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
 
         MediaForm form = form()
             .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
@@ -1409,10 +1463,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         form.getFacets().setTitles(new TitleFacetList(Arrays.asList(titleFacet)));
 
         MediaSearchResult result = target.find(null, form, 0, null);
-        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getSize()).isEqualTo(4);
         assertThat(result.getFacets().getTitles()).hasSize(1);
-        //assertThat(result.getFacets().getTitles().get(0).getName()).isEqualTo("A"); TODO
-        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2); // namely, abcde and aaaaa
+        assertThat(result.getFacets().getTitles().get(0)).isEqualTo("A");
+        //assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2); // namely, abcde and aaaaa
         log.info("{}", result);
     }
 

@@ -27,6 +27,7 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
+import nl.vpro.domain.api.media.TitleSearch;
 
 /**
  * @author Michiel Meeuwissen
@@ -255,6 +256,7 @@ public abstract class ESQueryBuilder {
             QueryBuilder typeQuery = buildQuery(fieldName, matcher);
             apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
         }
+
     }
 
     public static class MultipleFieldsApplier implements FieldApplier {
@@ -317,6 +319,7 @@ public abstract class ESQueryBuilder {
         }
     }
 
+
     protected static void build(BoolQueryBuilder booleanQuery, DurationRangeMatcherList rangeMatchers, FieldApplier applier) {
         if (rangeMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
@@ -373,6 +376,8 @@ public abstract class ESQueryBuilder {
         return booleanQuery;
     }
 
+
+
     public static QueryBuilder buildQuery(String fieldName, DateRangeMatcher matcher) {
         RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(fieldName);
 
@@ -406,4 +411,6 @@ public abstract class ESQueryBuilder {
 
         return rangeQuery;
     }
+
+
 }

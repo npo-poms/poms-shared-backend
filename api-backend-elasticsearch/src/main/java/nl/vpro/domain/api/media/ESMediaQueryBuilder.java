@@ -16,15 +16,13 @@ import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.join.query.JoinQueryBuilders;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
 import nl.vpro.domain.api.subtitles.SubtitlesSearch;
+import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.media.domain.es.ApiCueIndex;
 
 //import org.elasticsearch.join.query.JoinQueryBuilders;
@@ -153,6 +151,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             if(titleSearches != null && ! titleSearches.isEmpty()) {
                 for (TitleSearch titleSearch : titleSearches) {
                     buildTitleQuery(booleanQuery, prefix, titleSearch);
+
                 }
             }
         }
@@ -189,24 +188,36 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
-    private static void buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch matcher) {
+    private static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch titleSearch) {
+
+        if (titleSearch == null) {
+            return boolQueryBuilder;
+        }
+
         BoolQueryBuilder titleSub = QueryBuilders.boolQuery();
-        if(matcher.getOwner() != null) {
-            QueryBuilder titleQuery = QueryBuilders.termQuery(prefix + "expandedTitles.owner", matcher.getOwner().name());
+        if(titleSearch.getOwner() != null) {
+            QueryBuilder titleQuery = QueryBuilders.termQuery(prefix + "expandedTitles.owner", titleSearch.getOwner().name());
             titleSub.must(titleQuery);
         }
-        if(matcher.getType() != null) {
-            QueryBuilder typeQuery = QueryBuilders.termQuery(prefix + "expandedTitles.type", matcher.getType().name());
+        if(titleSearch.getType() != null) {
+            QueryBuilder typeQuery = QueryBuilders.termQuery(prefix + "expandedTitles.type", titleSearch.getType().name());
             titleSub.must(typeQuery);
         }
-        if(matcher.getValue() != null) {
+        if(titleSearch.getValue() != null) {
             SingleFieldApplier titleApplier = new SingleFieldApplier("expandedTitles.value");
-            titleApplier.applyField(titleSub, matcher.getValue());
+            titleApplier.applyField(titleSub, titleSearch.getValue());
         }
-        if(titleSub.hasClauses()) {
-            apply(boolQueryBuilder, titleSub, matcher.getMatch());
-        }
+
+
+        NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + "expandedTitles", titleSub, ScoreMode.Max);
+
+        apply(boolQueryBuilder, nestedQuery, titleSearch.getMatch());
+
+        return boolQueryBuilder;
     }
+
+
+
 
 
     private static void buildScheduleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, ScheduleEventSearch matcher) {
