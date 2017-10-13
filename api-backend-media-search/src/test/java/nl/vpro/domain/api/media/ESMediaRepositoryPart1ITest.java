@@ -1419,6 +1419,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         form.setFacets(new MediaFacets());
         form.getFacets().setTitles(new TitleFacetList());
 
+        assertThat(form.getFacets().getTitles().asMediaFacet()).isTrue();
+
+
         MediaSearchResult result = target.find(null, form, 0, null);
         assertThat(result.getSize()).isEqualTo(3);
         assertThat(result.getFacets().getTitles()).hasSize(4); // Actually, I think, it should have been 3, 'aaa subtitle' is not a main title
@@ -1457,16 +1460,20 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         form.setFacets(new MediaFacets());
         TitleSearch subSearch = new TitleSearch();
         subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
+        subSearch.setType(TextualType.MAIN);
+
         TitleFacet titleFacet = new TitleFacet();
         titleFacet.setName("A");
         titleFacet.setSubSearch(subSearch);
         form.getFacets().setTitles(new TitleFacetList(Arrays.asList(titleFacet)));
 
+        assertThat(form.getFacets().getTitles().asMediaFacet()).isFalse();
+
         MediaSearchResult result = target.find(null, form, 0, null);
         assertThat(result.getSize()).isEqualTo(4);
         assertThat(result.getFacets().getTitles()).hasSize(1);
-        assertThat(result.getFacets().getTitles().get(0)).isEqualTo("A");
-        //assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2); // namely, abcde and aaaaa
+        assertThat(result.getFacets().getTitles().get(0).getValue()).isEqualTo("A");
+        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2); // namely, abcde and aaaaa
         log.info("{}", result);
     }
 

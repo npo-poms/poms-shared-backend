@@ -8,9 +8,14 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 
 import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.ESQueryBuilder.MultipleFieldsApplier;
+import nl.vpro.domain.api.ESQueryBuilder.SingleFieldApplier;
 
 /**
  * NOTE!: There is also a{@link ESMediaQueryBuilder} equivalent that more or less contains the same code for
@@ -18,6 +23,7 @@ import nl.vpro.domain.api.*;
  *
  * @author Roelof Jan Koekoek
  * @since 2.0
+ * @TODO This can be dropped in favour of {@link ESMediaQueryBuilder}
  */
 public class ESMediaFilterBuilder extends ESFilterBuilder {
 
@@ -32,11 +38,11 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
 
         BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
         if(searches.getMediaIds() != null && !searches.getMediaIds().isEmpty()) {
-            build(booleanFilter, searches.getMediaIds(), new SimpleFieldApplier(prefix + axis + ".midRef"));
+            build(booleanFilter, searches.getMediaIds(), new SingleFieldApplier(prefix + axis + ".midRef"));
         }
 
         if(searches.getTypes() != null && !searches.getTypes().isEmpty()) {
-            build(booleanFilter, searches.getTypes(), new SimpleFieldApplier(prefix + axis + ".type"));
+            build(booleanFilter, searches.getTypes(), new SingleFieldApplier(prefix + axis + ".type"));
         }
         return booleanFilter;
     }
@@ -62,19 +68,19 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     public static void filter(BoolQueryBuilder booleanFilter, RelationSearch relationSearch, @Nonnull String prefix, String axis) {
 
         if(relationSearch.getTypes() != null && !relationSearch.getTypes().isEmpty()) {
-            build(booleanFilter, relationSearch.getTypes(), new SimpleFieldApplier(prefix + axis + ".type"));
+            build(booleanFilter, relationSearch.getTypes(), new SingleFieldApplier(prefix + axis + ".type"));
         }
 
         if(relationSearch.getBroadcasters() != null && !relationSearch.getBroadcasters().isEmpty()) {
-            build(booleanFilter, relationSearch.getBroadcasters(), new SimpleFieldApplier(prefix + axis + ".broadcaster"));
+            build(booleanFilter, relationSearch.getBroadcasters(), new SingleFieldApplier(prefix + axis + ".broadcaster"));
         }
 
         if(relationSearch.getValues() != null && !relationSearch.getValues().isEmpty()) {
-            build(booleanFilter, relationSearch.getValues(), new SimpleFieldApplier(prefix + axis + ".value"));
+            build(booleanFilter, relationSearch.getValues(), new SingleFieldApplier(prefix + axis + ".value"));
         }
 
         if(relationSearch.getUriRefs() != null && !relationSearch.getUriRefs().isEmpty()) {
-            build(booleanFilter, relationSearch.getUriRefs(), new SimpleFieldApplier(prefix + axis + ".uriRef"));
+            build(booleanFilter, relationSearch.getUriRefs(), new SingleFieldApplier(prefix + axis + ".uriRef"));
         }
     }
 
@@ -88,7 +94,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         }
 
         BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
-        filter(booleanFilter, titleSearch, prefix, axis);
+        ESMediaQueryBuilder.buildTitleQuery(booleanFilter, prefix, titleSearch);
         if (booleanFilter.hasClauses()) {
             return booleanFilter;
         } else {
@@ -96,22 +102,6 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         }
     }
 
-    public static void filter(BoolQueryBuilder booleanFilter, TitleSearch titleSearch, @Nonnull String prefix, String axis) {
-        titleSearch.getMatch();
-
-        if(titleSearch.getOwner() != null) {
-            QueryBuilder titleQuery = QueryBuilders.termQuery(prefix + "expandedTitles.owner", titleSearch.getOwner().name());
-            booleanFilter.must(titleQuery);
-        }
-        if(titleSearch.getType() != null) {
-            QueryBuilder typeQuery = QueryBuilders.termQuery(prefix + "expandedTitles.type", titleSearch.getType().name());
-            booleanFilter.must(typeQuery);
-        }
-        if(titleSearch.getValue() != null) {
-            ESQueryBuilder.SingleFieldApplier titleApplier = new ESQueryBuilder.SingleFieldApplier("expandedTitles.value");
-            titleApplier.applyField(booleanFilter, titleSearch.getValue());
-        }
-    }
 
 
     public static QueryBuilder filter(MediaSearch searches) {
@@ -119,6 +109,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     }
 
     public static QueryBuilder filter(MediaSearch searches, @Nonnull String prefix) {
+
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
         }
@@ -142,7 +133,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             TextMatcherList mediaIds = searches.getMediaIds();
             if(mediaIds != null && !mediaIds.isEmpty()) {
-                build(booleanFilter, mediaIds, new SimpleFieldApplier(prefix + "mid"));
+                build(booleanFilter, mediaIds, new SingleFieldApplier(prefix + "mid"));
                 hasClause = true;
             }
         }
@@ -150,7 +141,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             TextMatcherList types = searches.getTypes();
             if(types != null && !types.isEmpty()) {
-                build(booleanFilter, types, new SimpleFieldApplier(prefix + "type"));
+                build(booleanFilter, types, new SingleFieldApplier(prefix + "type"));
                 hasClause = true;
             }
         }
@@ -158,14 +149,14 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             TextMatcherList avTypes = searches.getAvTypes();
             if(avTypes != null && !avTypes.isEmpty()) {
-                build(booleanFilter, avTypes, new SimpleFieldApplier(prefix + "avType"));
+                build(booleanFilter, avTypes, new SingleFieldApplier(prefix + "avType"));
                 hasClause = true;
             }
         }
         {
             TextMatcherList broadcasters = searches.getBroadcasters();
             if(broadcasters != null && !broadcasters.isEmpty()) {
-                build(booleanFilter, broadcasters, new SimpleFieldApplier(prefix + "broadcasters.id"));
+                build(booleanFilter, broadcasters, new SingleFieldApplier(prefix + "broadcasters.id"));
                 hasClause = true;
             }
         }
@@ -181,7 +172,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             ExtendedTextMatcherList tags = searches.getTags();
             if(tags != null && !tags.isEmpty()) {
-                build(booleanFilter, tags, new SimpleFieldApplier(prefix + "tags"));
+                build(booleanFilter, tags, new SingleFieldApplier(prefix + "tags"));
                 hasClause = true;
             }
         }
@@ -189,7 +180,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             TextMatcherList genres = searches.getGenres();
             if(genres != null && !genres.isEmpty()) {
-                build(booleanFilter, genres, new SimpleFieldApplier(prefix + "genres.id"));
+                build(booleanFilter, genres, new SingleFieldApplier(prefix + "genres.id"));
                 hasClause = true;
             }
         }
@@ -207,7 +198,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             TextMatcherList descendantOf = searches.getDescendantOf();
             if(descendantOf != null && !descendantOf.isEmpty()) {
-                build(booleanFilter, descendantOf, new MultipleFieldApplier(prefix + "descendantOf.midRef", prefix + "descendantOf.type"));
+                build(booleanFilter, descendantOf, new MultipleFieldsApplier(prefix + "descendantOf.midRef", prefix + "descendantOf.type"));
                 hasClause = true;
             }
         }
@@ -215,7 +206,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             TextMatcherList episodeOf = searches.getEpisodeOf();
             if(episodeOf != null && !episodeOf.isEmpty()) {
-                build(booleanFilter, episodeOf, new MultipleFieldApplier(prefix + "episodeOf.midRef", prefix + "episodeOf.type"));
+                build(booleanFilter, episodeOf, new MultipleFieldsApplier(prefix + "episodeOf.midRef", prefix + "episodeOf.type"));
                 hasClause = true;
             }
         }
@@ -223,7 +214,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         {
             TextMatcherList memberOf = searches.getMemberOf();
             if(memberOf != null && !memberOf.isEmpty()) {
-                build(booleanFilter, memberOf, new MultipleFieldApplier(prefix + "memberOf.midRef", prefix + "memberOf.type"));
+                build(booleanFilter, memberOf, new MultipleFieldsApplier(prefix + "memberOf.midRef", prefix + "memberOf.type"));
                 hasClause = true;
             }
         }
@@ -262,7 +253,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     static QueryBuilder buildTextFilter(SimpleTextMatcher textSearch, List<SearchFieldDefinition> searchFields) {
         BoolQueryBuilder answer = QueryBuilders.boolQuery();
         for(SearchFieldDefinition searchField : searchFields) {
-            QueryBuilder textFilter = buildFilter(searchField.getName(), textSearch);
+            QueryBuilder textFilter = ESQueryBuilder.buildQuery(searchField.getName(), textSearch);
             answer.should(textFilter);
         }
         return answer;
@@ -270,12 +261,12 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
 
 
     private static void buildLocationFilter(BoolQueryBuilder boolFilterBuilder, TextMatcherList locations) {
-        build(boolFilterBuilder, locations, new FieldApplier() {
+        build(boolFilterBuilder, locations, new ESQueryBuilder.FieldApplier() {
             @Override
-            public <S extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher) {
-                QueryBuilder extensionFilter = buildFilter("locations.programUrl.extension", matcher, true);
+            public <MT extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<MT> matcher) {
+                QueryBuilder extensionFilter = ESQueryBuilder.buildQuery("locations.programUrl.extension", matcher, true);
                 booleanQueryBuilder.should(extensionFilter);
-                QueryBuilder formatFilter = buildFilter("locations.avAttributes.avFileFormat", matcher, true);
+                QueryBuilder formatFilter = ESQueryBuilder.buildQuery("locations.avAttributes.avFileFormat", matcher, true);
                 booleanQueryBuilder.should(formatFilter);
             }
         });

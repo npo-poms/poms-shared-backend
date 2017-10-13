@@ -55,9 +55,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 if (titles != null) {
                     if (titles.asMediaFacet()) {
                         addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
-                    } else {
-                        addNestedTitlesAggregations(aggregationBuilder, "value.full", titles, prefix);
                     }
+                    addNestedTitlesAggregations(aggregationBuilder, "value.full", titles, prefix);
+
                 }
 
             }
@@ -219,31 +219,24 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
         TitleSearch titleSearch = facets.getSubSearch();
         for (TitleFacet facet : facets) {
-            QueryBuilder filter = facet.hasSubSearch() ? ESMediaFilterBuilder.filter(facet.getSubSearch(), pathPrefix, "expandedTitles") : null;
+
+
+            QueryBuilder filter = facet.hasSubSearch() ?
+                ESMediaFilterBuilder.filter(facet.getSubSearch(), pathPrefix, "expandedTitles") : null;
             if (titleSearch != null) {
                 if (filter == null) {
                     filter = ESMediaFilterBuilder.filter(titleSearch, pathPrefix, "expandedTitles");
                 } else {
-                    ESMediaFilterBuilder.filter((BoolQueryBuilder) filter, titleSearch, pathPrefix, "expandedTitles");
+                    ESMediaQueryBuilder.buildTitleQuery((BoolQueryBuilder) filter, "expandedTitles", titleSearch);
                 }
             }
-            AggregationBuilder termsBuilder = getFilteredTitleTermsBuilder(
-                pathPrefix,
-                "expandedTitles",
-                facetField,
-                facet,
-                filter
-            );
+            if (filter == null) {
+                throw new IllegalArgumentException();
+            }
 
-            NestedAggregationBuilder nestedBuilder = getNestedBuilder(
-                pathPrefix,
-                "expandedTitles",
-                null,
-                termsBuilder
-            );
-            String facetName = escapeFacetName(facet.getName());
-            AggregationBuilder builder = filterAggregation(pathPrefix, facetName, nestedBuilder, facet.getFilter(), facets.getFilter());
-            rootAggregation.subAggregation(builder);
+            FilterAggregationBuilder filterAggregationBuilder =
+                AggregationBuilders.filter(escapeFacetName(facet.getName()), filter);
+            rootAggregation.subAggregation(filterAggregationBuilder);
         }
     }
 

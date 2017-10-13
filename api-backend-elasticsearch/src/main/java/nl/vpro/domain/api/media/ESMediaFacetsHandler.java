@@ -17,10 +17,7 @@ import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
-import nl.vpro.domain.api.ESFacetsBuilder;
-import nl.vpro.domain.api.ESFacetsHandler;
-import nl.vpro.domain.api.MultipleFacetsResult;
-import nl.vpro.domain.api.TermFacetResultItem;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.media.*;
 
 /**
@@ -41,32 +38,30 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         MediaFacetsResult facetsResult = new MediaFacetsResult();
 
-        {
-            Aggregations facets = response.getAggregations();
-            // TODO extract the new title facets
-            facetsResult.setTitles(getFacetResultItems(prefix + "titles.value.full", facets));
-            facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), facets, MediaType.class));
-            facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), facets, AVType.class));
+        Aggregations aggregations = response.getAggregations();
+        if (aggregations != null) {
+            Filter globalFilter = aggregations.get(ROOT_FILTER);
+
+            facetsResult.setTitles(
+                getTitleAggregationResultItems(request.getTitles(), globalFilter)
+            );
+            facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), aggregations, MediaType.class));
+            facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), aggregations, AVType.class));
             facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response));
-            facetsResult.setBroadcasters(filterThreshold(getBroadcasterResultItems(prefix + "broadcasters.id", facets), request.getBroadcasters()));
-            facetsResult.setTags(getFacetResultItems(prefix + "tags", facets, request.getTags()));
+            facetsResult.setBroadcasters(filterThreshold(getBroadcasterResultItems(prefix + "broadcasters.id", aggregations), request.getBroadcasters()));
+            facetsResult.setTags(getFacetResultItems(prefix + "tags", aggregations, request.getTags()));
             facetsResult.setDurations(getDurationRangeFacetResultItems(request.getDurations(), prefix + "duration", response));
-            facetsResult.setAgeRatings(getFacetResultItemsForEnum(prefix + "ageRating", request.getAgeRatings(), facets, AgeRating.class, s -> AgeRating.xmlValueOf(s.toUpperCase()), AgeRating::getXmlValue));
-            facetsResult.setContentRatings(getFacetResultItemsForEnum(prefix + "contentRatings", request.getContentRatings(), facets, ContentRating.class));
-        }
+            facetsResult.setAgeRatings(getFacetResultItemsForEnum(prefix + "ageRating", request.getAgeRatings(), aggregations, AgeRating.class, s -> AgeRating.xmlValueOf(s.toUpperCase()), AgeRating::getXmlValue));
+            facetsResult.setContentRatings(getFacetResultItemsForEnum(prefix + "contentRatings", request.getContentRatings(), aggregations, ContentRating.class));
 
-        {
-            Aggregations aggregations = response.getAggregations();
-            if (aggregations != null) {
-                Filter globalFilter = aggregations.get(ROOT_FILTER);
 
-                facetsResult.setGenres(getGenreAggregationResultItems(prefix, globalFilter));
+            facetsResult.setGenres(getGenreAggregationResultItems(prefix, globalFilter));
 
-                facetsResult.setDescendantOf(getMemberRefAggregationResultItems(prefix, "descendantOf", mediaRepository, globalFilter));
-                facetsResult.setEpisodeOf(getMemberRefAggregationResultItems(prefix, "episodeOf", mediaRepository, globalFilter));
-                facetsResult.setMemberOf(getMemberRefAggregationResultItems(prefix, "memberOf", mediaRepository, globalFilter));
-                facetsResult.setRelations(getRelationAggregationResultItems(request.getRelations(), globalFilter));
-            }
+            facetsResult.setDescendantOf(getMemberRefAggregationResultItems(prefix, "descendantOf", mediaRepository, globalFilter));
+            facetsResult.setEpisodeOf(getMemberRefAggregationResultItems(prefix, "episodeOf", mediaRepository, globalFilter));
+            facetsResult.setMemberOf(getMemberRefAggregationResultItems(prefix, "memberOf", mediaRepository, globalFilter));
+            facetsResult.setRelations(getRelationAggregationResultItems(request.getRelations(), globalFilter));
+
         }
         return facetsResult;
     }
@@ -171,38 +166,25 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         return answer;
     }
 
-    protected static List<MultipleFacetsResult> getTitleAggregationResultItems(TitleFacetList requestedTitles, Filter root) {
+    protected static List<FacetResultItem> getTitleAggregationResultItems(TitleFacetList requestedTitles, Filter root) {
         if (root == null || requestedTitles == null) {
             return null;
         }
 
-        List<MultipleFacetsResult> answer = new ArrayList<>();
-
+        List<FacetResultItem> answer = new ArrayList<>();
         for (TitleFacet facet : requestedTitles) {
             String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
-            HasAggregations aggregations = root.getAggregations().get("filter_" + escapedFacetName);
-            if (aggregations != null) {
-                Aggregation aggregation = aggregations.getAggregations().get("filter_" + escapedFacetName);
-                if (aggregation != null) {
-                    Aggregation subAggregation = ((HasAggregations) aggregation).getAggregations().get("titles");
-                    if (subAggregation == null) {
-                        subAggregation = ((HasAggregations) aggregation).getAggregations().get("embeds_media_relations");
-                    }
-                    final Terms titles = getFilteredTerms(escapedFacetName, subAggregation);
 
-                    if (titles != null) {
-                        AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(titles) {
-                            @Override
-                            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
-                                return new TermFacetResultItem(
-                                    bucket.getKeyAsString(),
-                                    bucket.getKeyAsString(),
-                                    bucket.getDocCount()
-                                );
-                            }
-                        };
-                        answer.add(new MultipleFacetsResult(facet.getName(), resultItems));
-                    }
+            Aggregation aggregation = root.getAggregations().get(escapedFacetName);
+            if (aggregation != null) {
+                if (aggregation instanceof Filter) {
+                    Filter filter = (Filter) aggregation;
+                    FilterFacetResultItem item = FilterFacetResultItem.builder()
+                        .count(filter.getDocCount())
+                        .value(escapedFacetName)
+                        .build();
+
+                    answer.add(item);
                 }
             }
         }

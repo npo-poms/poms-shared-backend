@@ -27,7 +27,6 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
-import nl.vpro.domain.api.media.TitleSearch;
 
 /**
  * @author Michiel Meeuwissen
@@ -224,11 +223,15 @@ public abstract class ESQueryBuilder {
 
 
     public interface FieldApplier {
-        void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher matcher);
+        <T extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<T> matcher);
 
-        void applyField(BoolQueryBuilder booleanQueryBuilder, DateRangeMatcher matcher);
+        default void applyField(BoolQueryBuilder booleanQueryBuilder, DateRangeMatcher matcher) {
+            throw new UnsupportedOperationException();
+        }
 
-        void applyField(BoolQueryBuilder booleanQueryBuilder, DurationRangeMatcher matcher);
+        default void applyField(BoolQueryBuilder booleanQueryBuilder, DurationRangeMatcher matcher) {
+            throw new UnsupportedOperationException();
+        }
 
     }
 
@@ -343,8 +346,15 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    public static QueryBuilder buildQuery(String fieldName, AbstractTextMatcher matcher) {
+    public static <MT extends MatchType> QueryBuilder buildQuery(String fieldName, AbstractTextMatcher<MT> matcher) {
+        return buildQuery(fieldName, matcher, false);
+    }
+
+    public static <MT extends MatchType> QueryBuilder buildQuery(String fieldName, AbstractTextMatcher<MT> matcher, boolean makeLowerCase) {
         String value = matcher.getValue();
+        if (makeLowerCase) {
+            value = value.toLowerCase();
+        }
 
         ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
 

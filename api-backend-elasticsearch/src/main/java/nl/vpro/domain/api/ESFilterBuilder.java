@@ -21,18 +21,9 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  */
 public abstract class ESFilterBuilder {
 
+    @Deprecated
     protected static void apply(BoolQueryBuilder answer, QueryBuilder filter, Match match) {
-        switch (match) {
-            case SHOULD:
-                answer.should(filter);
-                break;
-            case MUST:
-                answer.must(filter);
-                break;
-            case NOT:
-                answer.mustNot(filter);
-                break;
-        }
+        ESQueryBuilder.apply(answer, filter, match);
     }
 
     public static <T> QueryBuilder filter(ProfileDefinition<T> definition) {
@@ -73,7 +64,7 @@ public abstract class ESFilterBuilder {
         }
 
         BoolQueryBuilder booleanFilter = boolQuery();
-        build(booleanFilter, searches.getIds(), new SimpleFieldApplier(prefix + axis + '.' + field));
+        build(booleanFilter, searches.getIds(), new ESQueryBuilder.SingleFieldApplier(prefix + axis + '.' + field));
         return booleanFilter;
     }
 
@@ -208,62 +199,15 @@ public abstract class ESFilterBuilder {
         return existsQuery(constraint.getESPath());
     }
 
-    protected interface FieldApplier {
-        <S extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher);
-    }
 
 
-    protected static class SimpleFieldApplier implements FieldApplier {
-        private final String fieldName;
-
-        public SimpleFieldApplier(String fieldName) {
-            this.fieldName = fieldName;
-        }
-
-        @Override
-        public <S extends MatchType> void applyField(BoolQueryBuilder boolFilterBuilder, AbstractTextMatcher<S> matcher) {
-            QueryBuilder filter = buildFilter(fieldName, matcher);
-            apply(boolFilterBuilder, filter, matcher.getMatch());
-        }
-    }
-
-    protected static class MultipleFieldApplier implements FieldApplier {
-        private final String[] fieldNames;
-
-        public MultipleFieldApplier(String... fieldNames) {
-            this.fieldNames = fieldNames;
-        }
-
-        @Override
-        public <S extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<S> matcher) {
-            BoolQueryBuilder bool = QueryBuilders.boolQuery();
-            for (String fieldName : fieldNames) {
-                QueryBuilder query = buildFilter(fieldName, matcher);
-                apply(bool, query, Match.SHOULD);
-            }
-            apply(booleanQueryBuilder, bool, matcher.getMatch());
-        }
-    }
-
-    protected static <S extends MatchType>  void build(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<? extends AbstractTextMatcher<S>, S> list, FieldApplier applier) {
+    protected static <S extends MatchType>  void build(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<? extends AbstractTextMatcher<S>, S> list, ESQueryBuilder.FieldApplier applier) {
         BoolQueryBuilder append = QueryBuilders.boolQuery();
         for (AbstractTextMatcher<S> matcher : list) {
             applier.applyField(append, matcher);
         }
-        apply(booleanQueryBuilder, append, list.getMatch());
+        ESQueryBuilder.apply(booleanQueryBuilder, append, list.getMatch());
     }
 
-    protected static <S extends MatchType> QueryBuilder buildFilter(String fieldName, AbstractTextMatcher<S> matcher) {
-        return buildFilter(fieldName, matcher, false);
-    }
-
-    protected static <S extends MatchType> QueryBuilder buildFilter(String fieldName, AbstractTextMatcher<S> matcher, boolean makeLowerCase) {
-        String value = matcher.getValue();
-        if (makeLowerCase) {
-            value = value.toLowerCase();
-        }
-        ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
-        return matchType.getFilterBuilder(fieldName, value, matcher.isCaseSensitive());
-    }
 
 }

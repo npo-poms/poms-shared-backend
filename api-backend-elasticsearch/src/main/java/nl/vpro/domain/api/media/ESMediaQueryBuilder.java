@@ -22,7 +22,6 @@ import org.elasticsearch.join.query.JoinQueryBuilders;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
 import nl.vpro.domain.api.subtitles.SubtitlesSearch;
-import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.media.domain.es.ApiCueIndex;
 
 //import org.elasticsearch.join.query.JoinQueryBuilders;
@@ -188,7 +187,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
-    private static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch titleSearch) {
+    static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch titleSearch) {
 
         if (titleSearch == null) {
             return boolQueryBuilder;
