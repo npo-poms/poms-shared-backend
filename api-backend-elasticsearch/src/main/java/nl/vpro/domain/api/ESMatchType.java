@@ -16,33 +16,17 @@ import static nl.vpro.domain.api.ESUtils.wildcard2regex;
 public enum ESMatchType {
     TEXT {
         @Override
-        public QueryBuilder getFilterBuilder(String fieldName, String value, boolean caseSensitive) {
-            return QueryBuilders.termQuery(esField(fieldName, caseSensitive), esValue(value, caseSensitive));
-        }
-
-        @Override
         public QueryBuilder getQueryBuilder(String fieldName, String value, boolean caseSensitive) {
             return QueryBuilders.termQuery(esField(fieldName, caseSensitive), esValue(value, caseSensitive));
         }
     },
     REGEX {
         @Override
-        public QueryBuilder getFilterBuilder(String fieldName, String value, boolean caseSensitive) {
-            return QueryBuilders.regexpQuery(esField(fieldName, caseSensitive), esValue(value, caseSensitive));
-        }
-
-        @Override
         public QueryBuilder getQueryBuilder(String fieldName, String value, boolean caseSensitive) {
             return QueryBuilders.regexpQuery(esField(fieldName, caseSensitive), esValue(value, caseSensitive));
         }
     },
     WILDCARD {
-        @Override
-        public QueryBuilder getFilterBuilder(String fieldName, String value, boolean caseSensitive) {
-            String regex = wildcard2regex(value);
-            return QueryBuilders.regexpQuery(esField(fieldName, caseSensitive), esValue(regex, caseSensitive));
-        }
-
         @Override
         public QueryBuilder getQueryBuilder(String fieldName, String value, boolean caseSensitive) {
             return QueryBuilders.wildcardQuery(esField(fieldName, caseSensitive), esValue(value, caseSensitive));
@@ -52,8 +36,6 @@ public enum ESMatchType {
 
     private static final String LOWERCASEFIELD = "lower";
 
-    public abstract QueryBuilder  getFilterBuilder(String fieldName, String value, boolean caseSensitive);
-
     public abstract QueryBuilder getQueryBuilder(String fieldName, String value, boolean caseSensitive);
 
     protected String esValue(String value, boolean caseSensitive) {
@@ -61,7 +43,7 @@ public enum ESMatchType {
     }
 
     public static String esField(String fieldName, boolean caseSensitive) {
-        return caseSensitive ? fieldName : fieldName + "." + LOWERCASEFIELD;
+        return caseSensitive ? fieldName + ".full" : fieldName + "." + LOWERCASEFIELD;
     }
 
 }

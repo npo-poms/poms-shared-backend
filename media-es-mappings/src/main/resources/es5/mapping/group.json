@@ -574,7 +574,7 @@
     "tags": {
       "type": "keyword",
       "fields": {
-        "text": {
+        "full": {
           "type": "text",
           "norms": {
             "enabled": false
@@ -645,7 +645,7 @@
           "fields": {
             "full": {
               "type": "keyword",
-              "index": false
+              "index": true
             },
             "stemmed": {
               "type": "text",
