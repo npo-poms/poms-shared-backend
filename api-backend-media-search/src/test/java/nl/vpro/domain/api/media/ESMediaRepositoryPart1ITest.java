@@ -1458,22 +1458,42 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
             .build();
         form.setFacets(new MediaFacets());
-        TitleSearch subSearch = new TitleSearch();
-        subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
-        subSearch.setType(TextualType.MAIN);
 
-        TitleFacet titleFacet = new TitleFacet();
-        titleFacet.setName("A");
-        titleFacet.setSubSearch(subSearch);
-        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(titleFacet)));
+
+        TitleFacet a;
+        TitleFacet A;
+
+        {
+            TitleSearch subSearch = new TitleSearch();
+            subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
+            subSearch.setType(TextualType.MAIN);
+
+            a  = new TitleFacet();
+            a.setName("a");
+            a.setSubSearch(subSearch);
+        }
+        {
+            TitleSearch subSearch = new TitleSearch();
+            subSearch.setValue(new ExtendedTextMatcher("A*", Match.MUST, ExtendedMatchType.WILDCARD, true));
+            subSearch.setType(TextualType.MAIN);
+
+            A = new TitleFacet();
+            A.setName("A");
+            A.setSubSearch(subSearch);
+        }
+
+
+        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(a, A)));
 
         assertThat(form.getFacets().getTitles().asMediaFacet()).isFalse();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
-        assertThat(result.getSize()).isEqualTo(4);
-        assertThat(result.getFacets().getTitles()).hasSize(1);
-        assertThat(result.getFacets().getTitles().get(0).getValue()).isEqualTo("A");
-        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2); // namely, abcde and aaaaa
+        MediaSearchResult result = target.find(null, form, 0, 0);
+        assertThat(result.getSize()).isEqualTo(0);
+        assertThat(result.getFacets().getTitles()).hasSize(2);
+        assertThat(result.getFacets().getTitles().get(0).getValue()).isEqualTo("a");
+        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(3); // namely, abcde and aaaaa
+        assertThat(result.getFacets().getTitles().get(1).getValue()).isEqualTo("A");
+        assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(1); // namely, abcde and aaaaa
         log.info("{}", result);
     }
 
