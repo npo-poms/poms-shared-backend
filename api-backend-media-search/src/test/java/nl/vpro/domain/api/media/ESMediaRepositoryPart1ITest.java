@@ -1490,9 +1490,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaSearchResult result = target.find(null, form, 0, 0);
         assertThat(result.getSize()).isEqualTo(0);
         assertThat(result.getFacets().getTitles()).hasSize(2);
-        assertThat(result.getFacets().getTitles().get(0).getValue()).isEqualTo("a");
+        assertThat(result.getFacets().getTitles().get(0).getId()).isEqualTo("a");
         assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(3); // namely, abcde and aaaaa
-        assertThat(result.getFacets().getTitles().get(1).getValue()).isEqualTo("A");
+        assertThat(result.getFacets().getTitles().get(1).getId()).isEqualTo("A");
         assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(1); // namely, abcde and aaaaa
         log.info("{}", result);
     }

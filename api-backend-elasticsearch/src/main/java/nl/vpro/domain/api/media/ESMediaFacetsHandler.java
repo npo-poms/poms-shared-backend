@@ -49,7 +49,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             facetsResult.setTitles(
                 getTitleAggregationResultItems(request.getTitles(), globalFilter)
             );
-            List<FacetResultItem> titles = facetsResult.getTitles();
+            List<TermFacetResultItem> titles = facetsResult.getTitles();
             Aggregation aggregation = aggregations.get("titles.value.full");
             if (aggregation != null) {
                 if (titles == null) {
@@ -185,12 +185,12 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         return answer;
     }
 
-    protected static List<FacetResultItem> getTitleAggregationResultItems(TitleFacetList requestedTitles, Filter root) {
+    protected static List<TermFacetResultItem> getTitleAggregationResultItems(TitleFacetList requestedTitles, Filter root) {
         if (root == null || requestedTitles == null) {
             return null;
         }
 
-        List<FacetResultItem> answer = new ArrayList<>();
+        List<TermFacetResultItem> answer = new ArrayList<>();
         for (TitleFacet facet : requestedTitles) {
             String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
 
@@ -198,9 +198,9 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             if (aggregation != null) {
                 if (aggregation instanceof Filter) {
                     Filter filter = (Filter) aggregation;
-                    FilterFacetResultItem item = FilterFacetResultItem.builder()
+                    TermFacetResultItem item = TermFacetResultItem.builder()
                         .count(filter.getDocCount())
-                        .value(escapedFacetName)
+                        .id(escapedFacetName)
                         .build();
 
                     answer.add(item);
