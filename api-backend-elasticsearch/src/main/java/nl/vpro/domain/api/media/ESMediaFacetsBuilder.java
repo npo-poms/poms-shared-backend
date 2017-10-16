@@ -279,8 +279,6 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         BoolQueryBuilder mainTitleFilter = QueryBuilders.boolQuery();
         mainTitleFilter.must(filterBuilder);
         mainTitleFilter.must(QueryBuilders.termQuery(fieldName + ".type", type.name()));
-
-
         addFacet(searchBuilder, mainTitleFilter, fieldName + ".value.full", facet, null);
     }
 

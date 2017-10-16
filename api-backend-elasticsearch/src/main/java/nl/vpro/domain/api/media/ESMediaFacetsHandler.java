@@ -4,6 +4,8 @@
  */
 package nl.vpro.domain.api.media;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import nl.vpro.domain.api.*;
@@ -24,6 +27,7 @@ import nl.vpro.domain.media.*;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
+@Slf4j
 public class ESMediaFacetsHandler extends ESFacetsHandler {
 
     public static MediaFacetsResult extractFacets(SearchResponse response, MediaFacets facets, MediaLoader mediaRepository) {
@@ -45,6 +49,21 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             facetsResult.setTitles(
                 getTitleAggregationResultItems(request.getTitles(), globalFilter)
             );
+            List<FacetResultItem> titles = facetsResult.getTitles();
+            Aggregation aggregation = aggregations.get("titles.value.full");
+            if (aggregation != null) {
+                if (titles == null) {
+                    titles = new ArrayList<>();
+                }
+                StringTerms terms = (StringTerms) aggregation;
+                for (StringTerms.Bucket bucket : terms.getBuckets()) {
+                    titles.add(new TermFacetResultItem(bucket.getKeyAsString(), bucket.getKeyAsString(), bucket.getDocCount()));
+                }
+
+            }
+
+
+            facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), aggregations, MediaType.class));
             facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), aggregations, MediaType.class));
             facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), aggregations, AVType.class));
             facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response));
@@ -185,6 +204,9 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                         .build();
 
                     answer.add(item);
+                } else {
+                    // backwards compatible
+                    log.info("" + aggregation);
                 }
             }
         }

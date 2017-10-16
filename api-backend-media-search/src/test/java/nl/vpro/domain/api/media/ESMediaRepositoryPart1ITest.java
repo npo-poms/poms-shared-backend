@@ -1422,8 +1422,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(form.getFacets().getTitles().asMediaFacet()).isTrue();
 
 
-        MediaSearchResult result = target.find(null, form, 0, null);
-        assertThat(result.getSize()).isEqualTo(3);
+        MediaSearchResult result = target.find(null, form, 0, 0);
+        assertThat(result.getSize()).isEqualTo(0);
         assertThat(result.getFacets().getTitles()).hasSize(4); // Actually, I think, it should have been 3, 'aaa subtitle' is not a main title
         log.info("{}", result);
     }
