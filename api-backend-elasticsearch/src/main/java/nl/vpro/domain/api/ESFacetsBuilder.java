@@ -264,7 +264,8 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static String esField(String field, ExtendedTextFacet<?> facet) {
-        return ESMatchType.esField(field, facet == null || facet.isCaseSensitive());
+        boolean caseSensitive = facet == null || facet.isCaseSensitive();
+        return caseSensitive ? field + ".full" : field + ".lower";
     }
 
 

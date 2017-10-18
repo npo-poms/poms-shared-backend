@@ -64,7 +64,7 @@ public abstract class ESFilterBuilder {
         }
 
         BoolQueryBuilder booleanFilter = boolQuery();
-        build(booleanFilter, searches.getIds(), new ESQueryBuilder.SingleFieldApplier(prefix + axis + '.' + field));
+        build(booleanFilter, searches.getIds(), new ESQueryBuilder.TextSingleFieldApplier(prefix + axis + '.' + field));
         return booleanFilter;
     }
 

@@ -296,17 +296,20 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithAvTypeFacet() throws Exception {
         index(program().withMid().withAVType().build());
 
-        MediaSearchResult result = target.find(null, form().avTypes(AVType.VIDEO).avTypeFacet().build(), 0, null);
+        MediaForm form = form().avTypes(AVType.VIDEO).avTypeFacet().build();
+        MediaSearchResult result = target.find(null, form, 0, null);
+
+        //MediaSearchResult result = target.find(null, form().avTypes(AVType.VIDEO).avTypeFacet().build(), 0, null);
 
         assertThat(result.getFacets().getAvTypes()).isNotEmpty();
-//        List<TermFacetResultItem> avTypes = result.getFacets().getAvTypes();
-//        for (TermFacetResultItem avType : avTypes) {
-//            if (avType.getId().equals(AVType.VIDEO.name())) {
-//                assertThat(avType.getCount()).isEqualTo(1L);
-//            } else {
-//                assertThat(avType.getCount()).isEqualTo(0);
-//            }
-//        }
+        List<TermFacetResultItem> avTypes = result.getFacets().getAvTypes();
+        for (TermFacetResultItem avType : avTypes) {
+            if (avType.getId().equals(AVType.VIDEO.name())) {
+                assertThat(avType.getCount()).isEqualTo(1);
+            } else {
+                assertThat(avType.getCount()).isEqualTo(0);
+            }
+        }
     }
 
     @Test
@@ -411,8 +414,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
         index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)).build());
 
-        MediaForm form = form().durationFacet(
-            DurationRangeFacetItem.builder()
+        MediaForm form = form()
+            .durationFacet(DurationRangeFacetItem.builder()
                 .name("less than 2 hours")
                 .end(Duration.ofHours(2))
                 .build(),
@@ -623,8 +626,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         index(program().withMid().relations(new Relation(label, null, "Blue Note")).build());
         index(program().withMid().relations(new Relation(label, null, "blue note")).build());
-        index(program().withMid()
-                .relations(new Relation(eoLabel, null, "Evangelisch"), new Relation(label, null, "Blue NOte")).build());
+        index(program().withMid().relations(new Relation(eoLabel, null, "Evangelisch"), new Relation(label, null, "Blue NOte")).build());
 
         RelationFacet relationFacet = new RelationFacet();
         relationFacet.setName("test");
@@ -1345,7 +1347,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .mid("POW_789")
             .build());
 
-        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder().owner(OwnerType.BROADCASTER).type(TextualType.LEXICO).value(ExtendedTextMatcher.must("b*", ExtendedMatchType.WILDCARD)).build()).build(), 0, null);
+        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder()
+            .owner(OwnerType.BROADCASTER)
+            .type(TextualType.LEXICO)
+            .value(ExtendedTextMatcher.must("b*", ExtendedMatchType.WILDCARD, false)).build())
+            .build(), 0, null);
         assertThat(result.getSize()).isEqualTo(2);
         log.info("{}", result);
     }

@@ -546,13 +546,16 @@
           "type": "keyword"
         },
         "value": {
-          "type": "keyword",
+          "type": "text",
           "fields": {
+            "full": {
+              "type": "keyword"
+
+            },
             "lower": {
               "type": "text",
               "analyzer": "lowercase",
               "fielddata": true
-
             }
           }
         }

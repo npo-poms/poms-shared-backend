@@ -61,9 +61,9 @@ public class ESSubtitlesQueryBuilder extends ESQueryBuilder {
             }
         }
 
-        build(booleanQuery, searches.getMediaIds(), new SingleFieldApplier(prefix + "parent"));
-        build(booleanQuery, searches.getTypes(), new SingleFieldApplier(prefix + "type"));
-        build(booleanQuery, searches.getLanguages(), new SingleFieldApplier(prefix + "language"));
+        build(booleanQuery, searches.getMediaIds(), new TextSingleFieldApplier(prefix + "parent"));
+        build(booleanQuery, searches.getTypes(), new TextSingleFieldApplier(prefix + "type"));
+        build(booleanQuery, searches.getLanguages(), new TextSingleFieldApplier(prefix + "language"));
 
 
         if(booleanQuery.hasClauses()) {

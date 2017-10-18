@@ -102,31 +102,31 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             }
         }
 
-        build(booleanQuery, searches.getMediaIds(), new MultipleFieldsApplier(prefix + "mid", prefix + "urn", prefix + "crids"));
-        build(booleanQuery, searches.getTypes(), new SingleFieldApplier(prefix + "type"));
-        build(booleanQuery, searches.getAvTypes(), new SingleFieldApplier(prefix + "avType"));
-        build(booleanQuery, searches.getSortDates(), new SingleFieldApplier(prefix + "sortDate"));
-        build(booleanQuery, searches.getPublishDates(), new SingleFieldApplier(prefix + "publishDate"));
-        build(booleanQuery, searches.getCreationDates(), new SingleFieldApplier(prefix + "creationDate"));
-        build(booleanQuery, searches.getLastModifiedDates(), new SingleFieldApplier(prefix + "lastModified"));
-        build(booleanQuery, searches.getBroadcasters(), new SingleFieldApplier(prefix + "broadcasters.id"));
-        build(booleanQuery, searches.getAgeRatings(), new SingleFieldApplier(prefix + "ageRating"));
-        build(booleanQuery, searches.getContentRatings(), new SingleFieldApplier(prefix + "contentRatings"));
+        build(booleanQuery, searches.getMediaIds(), new TextMultipleFieldsApplier(new String[] {prefix + "mid", prefix + "urn", prefix + "crids"}));
+        build(booleanQuery, searches.getTypes(), new TextSingleFieldApplier(prefix + "type"));
+        build(booleanQuery, searches.getAvTypes(), new TextSingleFieldApplier(prefix + "avType"));
+        build(booleanQuery, searches.getSortDates(), new DateSingleFieldApplier(prefix + "sortDate"));
+        build(booleanQuery, searches.getPublishDates(), new DateSingleFieldApplier(prefix + "publishDate"));
+        build(booleanQuery, searches.getCreationDates(), new DateSingleFieldApplier(prefix + "creationDate"));
+        build(booleanQuery, searches.getLastModifiedDates(), new DateSingleFieldApplier(prefix + "lastModified"));
+        build(booleanQuery, searches.getBroadcasters(), new TextSingleFieldApplier(prefix + "broadcasters.id"));
+        build(booleanQuery, searches.getAgeRatings(), new TextSingleFieldApplier(prefix + "ageRating"));
+        build(booleanQuery, searches.getContentRatings(), new TextSingleFieldApplier(prefix + "contentRatings"));
         {
             TextMatcherList locations = searches.getLocations();
             if(locations != null && !locations.isEmpty()) {
                 buildLocationQuery(booleanQuery, prefix, locations);
             }
         }
-        build(booleanQuery, searches.getTags(), new SingleFieldApplier(prefix + "tags"));
+        build(booleanQuery, searches.getTags(), new ExtendedTextSingleFieldApplier(prefix + "tags"));
 
-        nested(prefix + "genres", booleanQuery, searches.getGenres(), new SingleFieldApplier(prefix + "genres.id"));
+        nested(prefix + "genres", booleanQuery, searches.getGenres(), new TextSingleFieldApplier(prefix + "genres.id"));
 
-        build(booleanQuery, searches.getDurations(), new SingleFieldApplier(prefix + "duration"));
+        build(booleanQuery, searches.getDurations(), new DateSingleFieldApplier(prefix + "duration"));
 
-        nested(prefix + "descendantOf", booleanQuery, searches.getDescendantOf(), new MultipleFieldsApplier(prefix + "descendantOf.midRef", prefix + "descendantOf.type"));
-        nested(prefix + "episodeOf", booleanQuery, searches.getEpisodeOf(), new MultipleFieldsApplier(prefix + "episodeOf.midRef", prefix + "episodeOf.type"));
-        nested(prefix + "memberOf", booleanQuery, searches.getMemberOf(), new MultipleFieldsApplier(prefix + "memberOf.midRef", prefix + "memberOf.type"));
+        nested(prefix + "descendantOf", booleanQuery, searches.getDescendantOf(), new TextMultipleFieldsApplier(new String[] {prefix + "descendantOf.midRef", prefix + "descendantOf.type"}));
+        nested(prefix + "episodeOf", booleanQuery, searches.getEpisodeOf(), new TextMultipleFieldsApplier(new String[]{prefix + "episodeOf.midRef", prefix + "episodeOf.type"}));
+        nested(prefix + "memberOf", booleanQuery, searches.getMemberOf(), new TextMultipleFieldsApplier(new String[] {prefix + "memberOf.midRef", prefix + "memberOf.type"}));
 
         {
             if(searches.getRelations() != null) {
@@ -163,7 +163,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
     private static void buildLocationQuery(BoolQueryBuilder boolQueryBuilder, final String prefix, TextMatcherList locations) {
-        build(boolQueryBuilder, locations, new FieldApplier() {
+        build(boolQueryBuilder, locations, new FieldApplier<AbstractTextMatcher>() {
             @Override
             public void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher matcher) {
                 BoolQueryBuilder bool = QueryBuilders.boolQuery();
@@ -174,15 +174,6 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                 apply(booleanQueryBuilder, bool, matcher.getMatch());
             }
 
-            @Override
-            public void applyField(BoolQueryBuilder booleanQueryBuilder, DateRangeMatcher matcher) {
-                throw new UnsupportedOperationException("Range location queries are not available");
-            }
-
-            @Override
-            public void applyField(BoolQueryBuilder booleanQueryBuilder, DurationRangeMatcher matcher) {
-                throw new UnsupportedOperationException("Range location queries are not available");
-            }
         });
     }
 
@@ -203,7 +194,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             titleSub.must(typeQuery);
         }
         if(titleSearch.getValue() != null) {
-            SingleFieldApplier titleApplier = new SingleFieldApplier("expandedTitles.value");
+            ExtendedTextSingleFieldApplier titleApplier = new ExtendedTextSingleFieldApplier("expandedTitles.value");
             titleApplier.applyField(titleSub, titleSearch.getValue());
         }
 
