@@ -120,6 +120,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().mainTitle("foo").build());
         index(program().mainTitle("foa").build());
         index(program().mainTitle("bar").build());
+        index(program().mainTitle("Tegenlicht").build());
 
         {
             SearchResult<MediaObject> result = target.find(null, form().fuzzyText("foa").build(), 0, null);
@@ -132,6 +133,26 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             SearchResult<MediaObject> result = target.find(null, form().text("FOO").build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
+        }
+        {
+            SearchResult<MediaObject> result = target.find(null, form().fuzzyText("Regenlucht").build(), 0, null);
+            assertThat(result.getSize()).isEqualTo(1);
+        }
+    }
+
+
+    @Test
+    public void testResultOrderTextSearch() throws IOException, ExecutionException, InterruptedException {
+        index(program().mainTitle("Alleen op de Wereld").build());
+        index(program().mainTitle("De Wereld Draait Door").build());
+        index(program().mainTitle("De Ideale Wereld").build());
+
+        {
+            SearchResult<MediaObject> result = target.find(null, form().text("WERELD").build(), 0, null);
+            assertThat(result.getSize()).isEqualTo(3);
+            assertThat(result.getItems().get(2).equals("De Wereld Draait Door"));
+            assertThat(result.getItems().get(1).equals("De Ideale Wereld"));
+            assertThat(result.getItems().get(2).equals("Alleen op de wereld"));
         }
     }
 
@@ -384,7 +405,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithDurationFacetHistogram() throws Exception {
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
-        index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)).build());
+        index(program().withMid().duration(Duration.of(2, ChronoUnit.HOURS)).build());
 
         DurationRangeInterval interval = new DurationRangeInterval("1 hour");
         MediaForm form = form()
@@ -1370,7 +1391,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .build());
         index(program()
             .mainTitle("bbbbb")
-            .subTitle("aaa subtitle")
+            .subTitle("aaa subfuzzy")
             .mid("bb")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
             .build());
