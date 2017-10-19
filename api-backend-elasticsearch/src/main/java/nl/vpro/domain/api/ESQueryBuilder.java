@@ -404,7 +404,7 @@ public abstract class ESQueryBuilder {
 
         build(fieldWrapper, relationSearch.getTypes(), new TextSingleFieldApplier(prefix + "relations.type"));
         build(fieldWrapper, relationSearch.getBroadcasters(), new TextSingleFieldApplier(prefix + "relations.broadcaster"));
-        build(fieldWrapper, relationSearch.getValues(), new TextSingleFieldApplier(prefix + "relations.value"));
+        build(fieldWrapper, relationSearch.getValues(), new ExtendedTextSingleFieldApplier(prefix + "relations.value"));
         build(fieldWrapper, relationSearch.getUriRefs(), new TextSingleFieldApplier(prefix + "relations.uriRef"));
 
         NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + "relations", fieldWrapper, ScoreMode.Max);
