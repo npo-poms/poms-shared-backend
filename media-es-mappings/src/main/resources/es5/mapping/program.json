@@ -569,7 +569,6 @@
           "fields": {
             "full": {
               "type": "keyword"
-
             },
             "lower": {
               "type": "text",
@@ -1307,10 +1306,7 @@
           "type": "keyword",
           "fields": {
             "full": {
-              "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "type": "keyword"
             },
             "stemmed": {
               "type": "text",
@@ -1338,7 +1334,6 @@
             },
             "type": {
               "type": "keyword"
-
             },
             "value": {
               "type": "text",
@@ -1438,10 +1433,7 @@
       "type": "keyword",
       "fields": {
         "full": {
-          "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "type": "keyword"
         },
         "stemmed": {
           "type": "text",
