@@ -122,7 +122,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
         nested(prefix + "genres", booleanQuery, searches.getGenres(), new TextSingleFieldApplier(prefix + "genres.id"));
 
-        build(booleanQuery, searches.getDurations(), new DateSingleFieldApplier(prefix + "duration"));
+        build(booleanQuery, searches.getDurations(), new DurationSingleFieldApplier(prefix + "duration"));
 
         nested(prefix + "descendantOf", booleanQuery, searches.getDescendantOf(), new TextMultipleFieldsApplier(new String[] {prefix + "descendantOf.midRef", prefix + "descendantOf.type"}));
         nested(prefix + "episodeOf", booleanQuery, searches.getEpisodeOf(), new TextMultipleFieldsApplier(new String[]{prefix + "episodeOf.midRef", prefix + "episodeOf.type"}));
