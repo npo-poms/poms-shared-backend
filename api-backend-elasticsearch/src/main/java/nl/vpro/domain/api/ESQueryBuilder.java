@@ -77,7 +77,7 @@ public abstract class ESQueryBuilder {
                     fieldQuery.should(phraseQuery);
                     if (fuzziness != null) {
                         fieldQuery.should(
-                            fuzzy(fuzziness, phraseQuery)
+                            sloppy(fuzziness, phraseQuery)
                         );
                     }
                 }
@@ -93,12 +93,11 @@ public abstract class ESQueryBuilder {
                 fieldQuery.should(phraseQuery);
 
                 if (fuzziness != null) {
+                    fieldQuery.should(
+                        fuzzy(fuzziness, matchQuery));
 
-//                fieldQuery.should(
-//                    fuzzy(fuzziness, matchQuery));
-
-                fieldQuery.should(
-                    fuzzy(fuzziness, phraseQuery)
+                    fieldQuery.should(
+                        sloppy(fuzziness, phraseQuery)
                     );
                 }
             }
@@ -125,10 +124,17 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    static MatchPhraseQueryBuilder fuzzy(Fuzziness fuzziness, MatchPhraseQueryBuilder queryBuilder) {
+    //Doesn't do anything (yet)
+    static MatchPhraseQueryBuilder sloppy(Fuzziness fuzziness, MatchPhraseQueryBuilder queryBuilder) {
+        if (fuzziness == null) {
+            queryBuilder.slop(1);
+        }
+        return queryBuilder;
+    }
+
+    static MatchQueryBuilder fuzzy(Fuzziness fuzziness, MatchQueryBuilder queryBuilder) {
         if (fuzziness != null) {
-            //queryBuilder.fuziness(fuzziness);
-            queryBuilder.analyzer(fuzziness.asString());
+            queryBuilder.fuzziness(fuzziness);
         }
         return queryBuilder;
     }
@@ -228,7 +234,7 @@ public abstract class ESQueryBuilder {
     }
 
 
-    protected static abstract class AbstractSingleFieldApplier<M extends Matcher>  implements FieldApplier<M> {
+    protected static abstract class AbstractSingleFieldApplier<M extends Matcher> implements FieldApplier<M> {
         protected final String fieldName;
 
         public AbstractSingleFieldApplier(String fieldName) {
@@ -236,7 +242,7 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    public static class ExtendedTextSingleFieldApplier extends  AbstractSingleFieldApplier<ExtendedTextMatcher> {
+    public static class ExtendedTextSingleFieldApplier extends AbstractSingleFieldApplier<ExtendedTextMatcher> {
         public ExtendedTextSingleFieldApplier(String fieldName) {
             super(fieldName);
         }
@@ -244,7 +250,7 @@ public abstract class ESQueryBuilder {
         @Override
         public void applyField(BoolQueryBuilder booleanQueryBuilder, ExtendedTextMatcher matcher) {
 
-            QueryBuilder typeQuery = buildQuery(matcher.isCaseSensitive() ? fieldName +".full" : fieldName + ".lower", matcher);
+            QueryBuilder typeQuery = buildQuery(matcher.isCaseSensitive() ? fieldName + ".full" : fieldName + ".lower", matcher);
             apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
         }
 
@@ -262,7 +268,7 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    public static class DateSingleFieldApplier  extends  AbstractSingleFieldApplier<DateRangeMatcher> {
+    public static class DateSingleFieldApplier extends AbstractSingleFieldApplier<DateRangeMatcher> {
         public DateSingleFieldApplier(String fieldName) {
             super(fieldName);
         }
@@ -274,7 +280,8 @@ public abstract class ESQueryBuilder {
         }
 
     }
-    public static class DurationSingleFieldApplier  extends  AbstractSingleFieldApplier<DurationRangeMatcher> {
+
+    public static class DurationSingleFieldApplier extends AbstractSingleFieldApplier<DurationRangeMatcher> {
         public DurationSingleFieldApplier(String fieldName) {
             super(fieldName);
         }
@@ -287,7 +294,7 @@ public abstract class ESQueryBuilder {
 
     }
 
-    public static abstract class AbstractMultipleFieldsApplier <M extends Matcher> implements FieldApplier<M> {
+    public static abstract class AbstractMultipleFieldsApplier<M extends Matcher> implements FieldApplier<M> {
         protected final String[] fieldNames;
 
         protected AbstractMultipleFieldsApplier(String[] fieldNames) {
@@ -295,7 +302,7 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    public static class TextMultipleFieldsApplier<MT extends  MatchType> extends AbstractMultipleFieldsApplier <AbstractTextMatcher<MT>> {
+    public static class TextMultipleFieldsApplier<MT extends MatchType> extends AbstractMultipleFieldsApplier<AbstractTextMatcher<MT>> {
 
         public TextMultipleFieldsApplier(String[] fieldNames) {
             super(fieldNames);
@@ -312,6 +319,7 @@ public abstract class ESQueryBuilder {
 
         }
     }
+
     public static class DateMultipleFieldsApplier extends AbstractMultipleFieldsApplier<DateRangeMatcher> {
 
         public DateMultipleFieldsApplier(String[] fieldNames) {
@@ -413,7 +421,6 @@ public abstract class ESQueryBuilder {
 
         return booleanQuery;
     }
-
 
 
     public static QueryBuilder buildQuery(String fieldName, DateRangeMatcher matcher) {

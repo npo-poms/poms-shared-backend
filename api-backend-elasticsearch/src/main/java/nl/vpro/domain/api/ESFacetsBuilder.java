@@ -167,7 +167,7 @@ public abstract class ESFacetsBuilder {
                             .histogram(fieldName + "." + durationRange.getInterval())
                             .interval(durationRange.getInterval().getDuration().toMillis())
                             .field(fieldName)
-                            .format("bla")
+                            .format("interval" + durationRange.getIntervalString())
                             .keyed(false);
                         searchBuilder.aggregation(histogramAggregationBuilder);
                     }
