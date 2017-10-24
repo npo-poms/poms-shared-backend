@@ -60,22 +60,6 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         return gtaaService.submit(convertToPerson(newPerson), creator);
     }
 
-    /**
-     * Used for testing
-     * @return a JWT string
-     */
-
-    protected String encrypt(String issuer, String key, String user) {
-        String compactJws = Jwts.builder()
-            .setSubject("GTAAPerson")
-            .setHeaderParam("iss", issuer)
-            .setHeaderParam("usr", user)
-            .signWith(SignatureAlgorithm.HS512, key.getBytes())
-            .compact();
-        log.debug(compactJws);
-        return compactJws;
-    }
-
 
     private String getCreator(JwsHeader<?> header) {
         Assert.notNull(header.get("usr"), "Expecting a 'usr' value in the header " + header);
