@@ -33,11 +33,12 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
 
     @SuppressWarnings("rawtypes")
     private SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
+
         @Override
         public byte[] resolveSigningKeyBytes(JwsHeader header, Claims claims) {
             Assert.notNull(header.get("iss"), "Expecting an issuer under key 'iss' in the header " + header);
             return keysRepo.getKeyFor((String) header.get("iss"))
-                .orElseThrow(() -> new RuntimeException("Couldn't find key for issuer " + header.get("iss")))
+                .orElseThrow(() -> new SecurityException("Couldn't find key for issuer " + header.get("iss")))
                 .getBytes();
         }
     };
