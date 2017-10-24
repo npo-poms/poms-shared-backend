@@ -11,7 +11,7 @@
    <context:component-scan base-package="nl.vpro.domain.api.thesaurus" />
 
    <bean class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
-      <constructor-arg ref="gtaaKeys"></constructor-arg>
+      <constructor-arg ref="gtaaKeys" />
    </bean>
 
    <bean id="gtaaKeys" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
