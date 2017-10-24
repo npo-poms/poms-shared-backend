@@ -20,9 +20,8 @@
          <list>
             <value>classpath:/gtaa-keys.properties</value>
             <value>file:${user.home}/conf/gtaa-keys.properties</value>
-            <value>file:${user.home}/.media/gtaa-keys.properties</value>
          </list>
       </property>
    </bean>
-   
+
    </beans>
