@@ -1336,7 +1336,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form()
             .titles(
-                TitleSearch.builder()
+                TitleMatcher.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
                     .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD))
@@ -1368,7 +1368,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .mid("POW_789")
             .build());
 
-        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder()
+        SearchResult<MediaObject> result = target.find(null, form().titles(TitleMatcher.builder()
             .owner(OwnerType.BROADCASTER)
             .type(TextualType.LEXICO)
             .value(ExtendedTextMatcher.must("b*", ExtendedMatchType.WILDCARD, false)).build())
@@ -1404,7 +1404,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form()
             .titles(
-                TitleSearch.builder()
+                TitleMatcher.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
                     .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD, false))
@@ -1492,7 +1492,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         TitleFacet aCaseSensitive;
 
         {
-            TitleSearch subSearch = new TitleSearch();
+            TitleMatcher subSearch = new TitleMatcher();
             subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
             subSearch.setType(TextualType.MAIN);
 
@@ -1501,7 +1501,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             aCaseInsensitive.setSubSearch(subSearch);
         }
         {
-            TitleSearch subSearch = new TitleSearch();
+            TitleMatcher subSearch = new TitleMatcher();
             subSearch.setValue(new ExtendedTextMatcher("A*", Match.MUST, ExtendedMatchType.WILDCARD, true));
             subSearch.setType(TextualType.MAIN);
 
@@ -1516,6 +1516,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(form.getFacets().getTitles().asMediaFacet()).isFalse();
 
         MediaSearchResult result = target.find(null, form, 0, 0);
+        Jackson2Mapper.getPrettyInstance().writeValue(System.out, form);
         assertThat(result.getSize()).isEqualTo(0);
         assertThat(result.getFacets().getTitles()).hasSize(2);
         assertThat(result.getFacets().getTitles().get(0).getId()).isEqualTo("a");
@@ -1526,6 +1527,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
+    // TODO FAILS
     public void expandedTitles() throws IOException {
         MediaForm form = Jackson2Mapper.getInstance().readValue("{\n" +
             "    \"facets\": {\n" +

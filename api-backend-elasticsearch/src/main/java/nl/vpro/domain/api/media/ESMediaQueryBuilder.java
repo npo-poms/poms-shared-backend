@@ -146,9 +146,9 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
 
         {
-            List<TitleSearch> titleSearches = searches.getTitles();
+            List<TitleMatcher> titleSearches = searches.getTitles();
             if(titleSearches != null && ! titleSearches.isEmpty()) {
-                for (TitleSearch titleSearch : titleSearches) {
+                for (TitleMatcher titleSearch : titleSearches) {
                     buildTitleQuery(booleanQuery, prefix, titleSearch);
 
                 }
@@ -178,7 +178,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
-    static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch titleSearch) {
+    static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleMatcher titleSearch) {
 
         if (titleSearch == null) {
             return boolQueryBuilder;
@@ -195,7 +195,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
         if(titleSearch.getValue() != null) {
             ExtendedTextSingleFieldApplier titleApplier = new ExtendedTextSingleFieldApplier("expandedTitles.value");
-            titleApplier.applyField(titleSub, titleSearch.getValue());
+            titleApplier.applyField(titleSub, titleSearch.asExtendedTextMatcher());
         }
 
 

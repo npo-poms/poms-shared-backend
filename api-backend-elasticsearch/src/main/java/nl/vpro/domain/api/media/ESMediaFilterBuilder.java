@@ -84,11 +84,11 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         }
     }
 
-    public static QueryBuilder filter(TitleSearch searches, @Nonnull String axis) {
+    public static QueryBuilder filter(TitleMatcher searches, @Nonnull String axis) {
         return filter(searches, "", axis);
     }
 
-    public static QueryBuilder filter(TitleSearch titleSearch, @Nonnull String prefix, String axis) {
+    public static QueryBuilder filter(TitleMatcher titleSearch, @Nonnull String prefix, String axis) {
         if(titleSearch == null) {
             return QueryBuilders.matchAllQuery();
         }

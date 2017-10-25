@@ -218,7 +218,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             return;
         }
 
-        TitleSearch titleSearch = facets.getSubSearch();
+        TitleMatcher titleSearch = facets.getSubSearch();
         for (TitleFacet facet : facets) {
 
 
