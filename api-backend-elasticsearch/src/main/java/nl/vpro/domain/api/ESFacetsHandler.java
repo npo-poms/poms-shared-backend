@@ -51,7 +51,11 @@ public abstract class ESFacetsHandler {
     }
 
     protected static List<TermFacetResultItem> getFacetResultItems(String facetName, Aggregations facets, ExtendedTextFacet<?> extendedTextFacet) {
-        return getFacetResultItems(esField(facetName, extendedTextFacet), facets);
+        if (extendedTextFacet != null) {
+            return getFacetResultItems(esField(facetName, extendedTextFacet.isCaseSensitive()), facets);
+        } else {
+            return null;
+        }
 
     }
 

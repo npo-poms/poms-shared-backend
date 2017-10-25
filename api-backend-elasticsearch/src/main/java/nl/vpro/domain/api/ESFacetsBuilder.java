@@ -263,9 +263,12 @@ public abstract class ESFacetsBuilder {
         return (prefix + field).replace('.', '_');
     }
 
-    protected static String esField(String field, ExtendedTextFacet<?> facet) {
-        boolean caseSensitive = facet == null || facet.isCaseSensitive();
+    protected static String esField(String field, boolean caseSensitive) {
         return caseSensitive ? field + ".full" : field + ".lower";
+    }
+
+    protected static String esField(String field, ExtendedTextFacet<?> facet) {
+        return esField(field, facet == null || facet.isCaseSensitive());
     }
 
 

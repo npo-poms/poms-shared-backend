@@ -13,6 +13,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import nl.vpro.domain.api.*;
@@ -56,7 +57,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                     if (titles.asMediaFacet()) {
                         addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
                     }
-                    addNestedTitlesAggregations(aggregationBuilder, "value.full", titles, prefix);
+                    addNestedTitlesAggregations(aggregationBuilder, titles, prefix);
 
                 }
 
@@ -89,7 +90,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             {
                 ExtendedMediaFacet tags = facets.getTags();
-                addFacet(searchBuilder, addFacetFilter(tags, facetFilter, prefix), prefix + esField("tags", tags), tags, null);
+                addFacet(searchBuilder, addFacetFilter(tags, facetFilter, prefix), prefix + esField("tags", tags), tags,
+                        null);
+
             }
 
             {
@@ -212,7 +215,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         }
     }
 
-    protected static void addNestedTitlesAggregations(FilterAggregationBuilder rootAggregation, String facetField, TitleFacetList facets, String pathPrefix) {
+    protected static void addNestedTitlesAggregations(FilterAggregationBuilder rootAggregation, TitleFacetList facets, String pathPrefix) {
         if (facets == null || facets.isEmpty()) {
             return;
         }
@@ -247,7 +250,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         RelationFacet facet,
         QueryBuilder subSearch
     ) {
-        return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet), facet, facet.getName(), subSearch);
+        return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet.isCaseSensitive()), facet, facet.getName(), subSearch);
     }
 
     protected static AggregationBuilder getFilteredTitleTermsBuilder(
@@ -257,7 +260,15 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         TitleFacet facet,
         QueryBuilder subSearch
     ) {
-        return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet), facet, facet.getName(), subSearch);
+        TermsAggregationBuilder termsBuilder =
+            AggregationBuilders.terms(escapeFacetName(facet.getName()))
+                .field(esField(facetField, facet.isCaseSensitive()));
+        if (subSearch != null) {
+            return AggregationBuilders
+                .filter(FILTER_PREFIX + escapeFacetName(facet.getName()), subSearch)
+                .subAggregation(termsBuilder);
+        }
+        return termsBuilder;
     }
 
     private static AggregationBuilder filterAggregation(String pathPrefix, String facetName, AggregationBuilder aggregationBuilder, MediaSearch... mediaSearch) {
