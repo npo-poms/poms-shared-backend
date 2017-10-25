@@ -13,7 +13,6 @@ import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import nl.vpro.domain.api.*;
@@ -58,7 +57,6 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                         addTextualTypeFacet(searchBuilder, addFacetFilter(titles, facetFilter, prefix), prefix + "titles", TextualType.MAIN, titles);
                     }
                     addNestedTitlesAggregations(aggregationBuilder, titles, prefix);
-
                 }
 
             }
@@ -251,24 +249,6 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         QueryBuilder subSearch
     ) {
         return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet.isCaseSensitive()), facet, facet.getName(), subSearch);
-    }
-
-    protected static AggregationBuilder getFilteredTitleTermsBuilder(
-        String pathPrefix,
-        String nestedField,
-        String facetField,
-        TitleFacet facet,
-        QueryBuilder subSearch
-    ) {
-        TermsAggregationBuilder termsBuilder =
-            AggregationBuilders.terms(escapeFacetName(facet.getName()))
-                .field(esField(facetField, facet.isCaseSensitive()));
-        if (subSearch != null) {
-            return AggregationBuilders
-                .filter(FILTER_PREFIX + escapeFacetName(facet.getName()), subSearch)
-                .subAggregation(termsBuilder);
-        }
-        return termsBuilder;
     }
 
     private static AggregationBuilder filterAggregation(String pathPrefix, String facetName, AggregationBuilder aggregationBuilder, MediaSearch... mediaSearch) {

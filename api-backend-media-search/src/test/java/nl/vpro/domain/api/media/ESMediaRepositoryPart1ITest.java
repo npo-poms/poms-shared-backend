@@ -1488,30 +1488,30 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         form.setFacets(new MediaFacets());
 
 
-        TitleFacet a;
-        TitleFacet A;
+        TitleFacet aCaseInsensitive;
+        TitleFacet aCaseSensitive;
 
         {
             TitleSearch subSearch = new TitleSearch();
             subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
             subSearch.setType(TextualType.MAIN);
 
-            a  = new TitleFacet();
-            a.setName("a");
-            a.setSubSearch(subSearch);
+            aCaseInsensitive  = new TitleFacet();
+            aCaseInsensitive.setName("a");
+            aCaseInsensitive.setSubSearch(subSearch);
         }
         {
             TitleSearch subSearch = new TitleSearch();
             subSearch.setValue(new ExtendedTextMatcher("A*", Match.MUST, ExtendedMatchType.WILDCARD, true));
             subSearch.setType(TextualType.MAIN);
 
-            A = new TitleFacet();
-            A.setName("A");
-            A.setSubSearch(subSearch);
+            aCaseSensitive = new TitleFacet();
+            aCaseSensitive.setName("A");
+            aCaseSensitive.setSubSearch(subSearch);
         }
 
 
-        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(a, A)));
+        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(aCaseInsensitive, aCaseSensitive)));
 
         assertThat(form.getFacets().getTitles().asMediaFacet()).isFalse();
 
