@@ -1341,6 +1341,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                     .type(TextualType.MAIN)
                     .value("a*")
                     .matchType(ExtendedMatchType.WILDCARD)
+                    .caseSensitive(true)
                     .build()
             )
             .asc(MediaSortField.creationDate)
