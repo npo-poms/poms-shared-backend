@@ -1339,7 +1339,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 TitleMatcher.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
-                    .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD))
+                    .value("a*")
+                    .matchType(ExtendedMatchType.WILDCARD)
                     .build()
             )
             .asc(MediaSortField.creationDate)
@@ -1371,7 +1372,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         SearchResult<MediaObject> result = target.find(null, form().titles(TitleMatcher.builder()
             .owner(OwnerType.BROADCASTER)
             .type(TextualType.LEXICO)
-            .value(ExtendedTextMatcher.must("b*", ExtendedMatchType.WILDCARD, false)).build())
+            .value("b*")
+            .matchType(ExtendedMatchType.WILDCARD)
+            .caseSensitive(false)
+            .build())
             .build(), 0, null);
         assertThat(result.getSize()).isEqualTo(2);
         log.info("{}", result);
@@ -1407,7 +1411,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 TitleMatcher.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
-                    .value(ExtendedTextMatcher.must("a*", ExtendedMatchType.WILDCARD, false))
+                    .match(Match.MUST)
+                    .matchType(ExtendedMatchType.WILDCARD)
+                    .caseSensitive(false)
                     .build()
             )
             .asc(MediaSortField.creationDate)
@@ -1492,18 +1498,26 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         TitleFacet aCaseSensitive;
 
         {
-            TitleMatcher subSearch = new TitleMatcher();
-            subSearch.setValue(new ExtendedTextMatcher("a*", Match.MUST, ExtendedMatchType.WILDCARD, false));
-            subSearch.setType(TextualType.MAIN);
+            TitleMatcher subSearch = TitleMatcher.builder()
+                .value("a*")
+                .match(Match.MUST)
+                .matchType(ExtendedMatchType.WILDCARD)
+                .caseSensitive(false)
+                .type(TextualType.MAIN)
+                .build();
 
             aCaseInsensitive  = new TitleFacet();
             aCaseInsensitive.setName("a");
             aCaseInsensitive.setSubSearch(subSearch);
         }
         {
-            TitleMatcher subSearch = new TitleMatcher();
-            subSearch.setValue(new ExtendedTextMatcher("A*", Match.MUST, ExtendedMatchType.WILDCARD, true));
-            subSearch.setType(TextualType.MAIN);
+            TitleMatcher subSearch = TitleMatcher.builder()
+                .value("A*")
+                .match(Match.MUST)
+                .matchType(ExtendedMatchType.WILDCARD)
+                .caseSensitive(true)
+                .type(TextualType.MAIN)
+                .build();
 
             aCaseSensitive = new TitleFacet();
             aCaseSensitive.setName("A");
