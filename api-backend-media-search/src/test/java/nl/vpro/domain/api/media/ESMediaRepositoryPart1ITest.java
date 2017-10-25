@@ -1525,6 +1525,48 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         log.info("{}", result);
     }
 
+    @Test
+    public void expandedTitles() throws IOException {
+        MediaForm form = Jackson2Mapper.getInstance().readValue("{\n" +
+            "    \"facets\": {\n" +
+            "        \"titles\": [\n" +
+            "             {\n" +
+            "                 \"sort\" : \"COUNT_DESC\",\n" +
+            "                 \"max\" : 23\n" +
+            "             },\n" +
+            "            {\n" +
+            "                \"name\": \"a\",\n" +
+            "                \"subSearch\": {\n" +
+            "                    \"type\": \"MAIN\",\n" +
+            "                    \"value\": \"a*\",\n" +
+            "                    \"matchType\": \"WILDCARD\"\n" +
+            "                }\n" +
+            "            },\n" +
+            "            {\n" +
+            "                \"name\": \"b\",\n" +
+            "                \"subSearch\": {\n" +
+            "                    \"type\": \"MAIN\",\n" +
+            "                    \"value\": \"b*\",\n" +
+            "                    \"matchType\": \"WILDCARD\"\n" +
+            "                }\n" +
+            "            }\n" +
+            "        ]\n" +
+            "    },\n" +
+            "    \"searches\": {\n" +
+            "        \"titles\": [\n" +
+            "            {\n" +
+            "                \"match\": \"SHOULD\",\n" +
+            "                \"type\": \"MAIN\",\n" +
+            "                \"value\": \"a*\",\n" +
+            "                \"matchType\": \"WILDCARD\"\n" +
+            "            }\n" +
+            "        ]\n" +
+            "    }\n" +
+            "}\n", MediaForm.class);
+
+        MediaSearchResult result = target.find(null, form, 0, 0);
+
+    }
 
 
     private void redirect(String from, String to) {
