@@ -146,9 +146,9 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
 
         {
-            List<TitleMatcher> titleSearches = searches.getTitles();
+            List<TitleSearch> titleSearches = searches.getTitles();
             if(titleSearches != null && ! titleSearches.isEmpty()) {
-                for (TitleMatcher titleSearch : titleSearches) {
+                for (TitleSearch titleSearch : titleSearches) {
                     buildTitleQuery(booleanQuery, prefix, titleSearch);
 
                 }
@@ -178,7 +178,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
-    static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleMatcher titleSearch) {
+    static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch titleSearch) {
 
         if (titleSearch == null) {
             return boolQueryBuilder;

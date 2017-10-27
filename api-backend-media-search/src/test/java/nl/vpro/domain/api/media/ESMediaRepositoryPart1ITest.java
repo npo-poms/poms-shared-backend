@@ -1336,7 +1336,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form()
             .titles(
-                TitleMatcher.builder()
+                TitleSearch.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
                     .value("a*")
@@ -1370,7 +1370,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .mid("POW_789")
             .build());
 
-        SearchResult<MediaObject> result = target.find(null, form().titles(TitleMatcher.builder()
+        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder()
             .owner(OwnerType.BROADCASTER)
             .type(TextualType.LEXICO)
             .value("b*")
@@ -1409,7 +1409,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form()
             .titles(
-                TitleMatcher.builder()
+                TitleSearch.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
                     .match(Match.MUST)
@@ -1499,7 +1499,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         TitleFacet aCaseSensitive;
 
         {
-            TitleMatcher subSearch = TitleMatcher.builder()
+            TitleSearch subSearch = TitleSearch.builder()
                 .value("a*")
                 .match(Match.MUST)
                 .matchType(ExtendedMatchType.WILDCARD)
@@ -1512,7 +1512,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             aCaseInsensitive.setSubSearch(subSearch);
         }
         {
-            TitleMatcher subSearch = TitleMatcher.builder()
+            TitleSearch subSearch = TitleSearch.builder()
                 .value("A*")
                 .match(Match.MUST)
                 .matchType(ExtendedMatchType.WILDCARD)
