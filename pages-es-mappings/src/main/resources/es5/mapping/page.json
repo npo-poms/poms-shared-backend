@@ -207,12 +207,12 @@
                 "familyName": {
                   "type": "text",
                   "index": false,
-                  "copy_to": "embeds.media.credits.fullName"
+                  "copy_to": "credits.fullName"
                 },
                 "givenName": {
                   "type": "text",
                   "index": false,
-                  "copy_to": "embeds.media.credits.fullName"
+                  "copy_to": "credits.fullName"
                 },
                 "fullName": {
                   "type": "text",
@@ -666,8 +666,11 @@
                   "type": "keyword"
                 },
                 "value": {
-                  "type": "keyword",
+                  "type": "text",
                   "fields": {
+                    "full": {
+                      "type": "keyword"
+                    },
                     "lower": {
                       "type": "text",
                       "analyzer": "lowercase",
@@ -807,8 +810,7 @@
                       },
                       "fields": {
                         "full": {
-                          "type": "text",
-                          "index": false
+                          "type": "keyword"
                         },
                         "stemmed": {
                           "type": "text",
@@ -828,11 +830,11 @@
                 "midRef": {
                   "type": "keyword"
                 },
-                "urnRef": {
-                  "type": "keyword"
-                },
                 "start": {
                   "type": "long"
+                },
+                "urnRef": {
+                  "type": "keyword"
                 },
                 "mergedTo": {
                   "type": "keyword"
@@ -939,12 +941,12 @@
                     "familyName": {
                       "type": "text",
                       "index": false,
-                      "copy_to": "embeds.media.segments.credits.fullName"
+                      "copy_to": "segments.credits.fullName"
                     },
                     "givenName": {
                       "type": "text",
                       "index": false,
-                      "copy_to": "embeds.media.segments.credits.fullName"
+                      "copy_to": "segments.credits.fullName"
                     },
                     "fullName": {
                       "type": "text",
@@ -1373,8 +1375,11 @@
                       "type": "keyword"
                     },
                     "value": {
-                      "type": "keyword",
+                      "type": "text",
                       "fields": {
+                        "full": {
+                          "type": "keyword"
+                        },
                         "lower": {
                           "type": "text",
                           "analyzer": "lowercase",
@@ -1386,149 +1391,6 @@
                 },
                 "releaseYear": {
                   "type": "long"
-                },
-                "scheduleEvents": {
-                  "properties": {
-                    "avAttributes": {
-                      "properties": {
-                        "avFileFormat": {
-                          "type": "keyword"
-                        },
-                        "bitrate": {
-                          "type": "long"
-                        },
-                        "videoAttributes": {
-                          "properties": {
-                            "aspectRatio": {
-                              "type": "keyword"
-                            },
-                            "color": {
-                              "type": "keyword"
-                            },
-                            "videoCoding": {
-                              "type": "keyword"
-                            },
-                            "heigth": {
-                              "type": "long"
-                            },
-                            "width": {
-                              "type": "long"
-                            }
-                          }
-                        }
-                      }
-                    },
-                    "channel": {
-                      "type": "keyword"
-                    },
-                    "duration": {
-                      "type": "long"
-                    },
-                    "imi": {
-                      "type": "keyword"
-                    },
-                    "memberOf": {
-                      "type": "keyword"
-                    },
-                    "midRef": {
-                      "type": "keyword"
-                    },
-                    "net": {
-                      "type": "keyword"
-                    },
-                    "offset": {
-                      "type": "long"
-                    },
-                    "poProgID": {
-                      "type": "keyword"
-                    },
-                    "poSeriesID": {
-                      "type": "keyword"
-                    },
-                    "primaryLifestyle": {
-                      "properties": {
-                        "value": {
-                          "type": "keyword"
-                        }
-                      }
-                    },
-                    "repeat": {
-                      "properties": {
-                        "isRerun": {
-                          "type": "boolean"
-                        },
-                        "value": {
-                          "type": "text",
-                          "norms": {
-                            "enabled": false
-                          }
-                        }
-                      }
-                    },
-                    "secondaryLifestyle": {
-                      "properties": {
-                        "value": {
-                          "type": "keyword"
-                        }
-                      }
-                    },
-                    "guideDay": {
-                      "type": "date",
-                      "format": "epoch_millis"
-                    },
-                    "start": {
-                      "type": "long"
-                    },
-                    "eventStart": {
-                      "type": "date",
-                      "format": "epoch_millis"
-                    },
-                    "textSubtitles": {
-                      "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
-                    },
-                    "textPage": {
-                      "type": "text",
-                      "index": false
-                    },
-                    "type": {
-                      "type": "keyword"
-                    },
-                    "urnRef": {
-                      "type": "keyword"
-                    },
-                    "titles": {
-                      "properties": {
-                        "owner": {
-                          "type": "keyword"
-                        },
-                        "type": {
-                          "type": "keyword"
-                        },
-                        "value": {
-                          "type": "text",
-                          "norms": {
-                            "enabled": false
-                          },
-                          "fields": {
-                            "full": {
-                              "type": "text",
-                              "index": false
-                            },
-                            "stemmed": {
-                              "type": "text",
-                              "analyzer": "dutch_stemmed",
-                              "norms": {
-                                "enabled": false
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
                 },
                 "sortDate": {
                   "type": "date",
@@ -1543,11 +1405,8 @@
                 "tags": {
                   "type": "keyword",
                   "fields": {
-                    "text": {
-                      "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                    "full": {
+                      "type": "keyword"
                     },
                     "stemmed": {
                       "type": "text",
@@ -1583,8 +1442,7 @@
                       },
                       "fields": {
                         "full": {
-                          "type": "text",
-                          "index": false
+                          "type": "keyword"
                         },
                         "stemmed": {
                           "type": "text",
@@ -1615,7 +1473,7 @@
                       "fields": {
                         "full": {
                           "type": "keyword",
-                          "index": false
+                          "index": true
                         },
                         "stemmed": {
                           "type": "text",
@@ -1623,6 +1481,11 @@
                           "norms": {
                             "enabled": false
                           }
+                        },
+                        "lower": {
+                          "type": "text",
+                          "analyzer": "lowercase",
+                          "fielddata": true
                         }
                       }
                     }
@@ -1669,11 +1532,8 @@
             "tags": {
               "type": "keyword",
               "fields": {
-                "text": {
-                  "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                "full": {
+                  "type": "keyword"
                 },
                 "stemmed": {
                   "type": "text",
@@ -1709,8 +1569,7 @@
                   },
                   "fields": {
                     "full": {
-                      "type": "text",
-                      "index": false
+                      "type": "keyword"
                     },
                     "stemmed": {
                       "type": "text",
@@ -1741,7 +1600,7 @@
                   "fields": {
                     "full": {
                       "type": "keyword",
-                      "index": false
+                      "index": true
                     },
                     "stemmed": {
                       "type": "text",
@@ -1749,6 +1608,11 @@
                       "norms": {
                         "enabled": false
                       }
+                    },
+                    "lower": {
+                      "type": "text",
+                      "analyzer": "lowercase",
+                      "fielddata": true
                     }
                   }
                 }

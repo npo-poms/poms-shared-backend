@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.junit.FixMethodOrder;
@@ -47,6 +48,7 @@ import static org.mockito.Mockito.when;
  * @since 2.0
  */
 
+@SuppressWarnings("unchecked")
 @Slf4j
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
@@ -373,7 +375,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(result.getSize()).isEqualTo(2);
         for (int i = 1; i < result.getItems().size(); i++) {
-            assertThat(result.getItems().get(i).getResult().getSortDate()).isAfterOrEqualsTo(result.getItems().get(i - 1).getResult().getSortDate());
+            assertThat(result.getItems().get(i).getResult().getSortInstant()).isAfterOrEqualTo(result.getItems().get(i - 1).getResult().getSortInstant());
         }
     }
 
@@ -388,7 +390,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(result.getSize()).isEqualTo(5);
         for (int i = 1; i < result.getItems().size(); i++) {
-            assertThat(result.getItems().get(i).getResult().getLastPublished()).isAfter(result.getItems().get(i - 1).getResult().getLastPublished());
+            assertThat(result.getItems().get(i).getResult().getLastPublishedInstant()).isAfter(result.getItems().get(i - 1).getResult().getLastPublishedInstant());
         }
     }
 
@@ -400,7 +402,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(result.getSize()).isEqualTo(5);
         for (int i = 1; i < result.getItems().size(); i++) {
-            assertThat(result.getItems().get(i).getResult().getLastPublished()).isBefore(result.getItems().get(i - 1).getResult().getLastPublished());
+            assertThat(result.getItems().get(i).getResult().getLastPublishedInstant()).isBefore(result.getItems().get(i - 1).getResult().getLastPublishedInstant());
         }
     }
 
@@ -682,10 +684,14 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
-        AbstractESRepositoryITest.client.index(new IndexRequest(indexName, getTypeName(object), object.getMid()).source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object))).get();
+        AbstractESRepositoryITest.client
+            .index(
+                new IndexRequest(indexName, getTypeName(object), object.getMid())
+                    .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object), XContentType.JSON)
+            ).get();
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
-        indexed.sort((o1, o2) -> (int) (o1.getLastPublished().getTime() - o2.getLastPublished().getTime()));
+        indexed.sort((o1, o2) -> (int) (o1.getLastPublishedInstant().toEpochMilli() - o2.getLastPublishedInstant().toEpochMilli()));
         if (Workflow.REVOKES.contains(object.getWorkflow())) {
             deletedObjectCount++;
             if (object instanceof Program) {
