@@ -394,6 +394,9 @@
                 },
                 "numberOfChannels": {
                   "type": "long"
+                },
+                "language": {
+                  "type": "keyword"
                 }
               }
             },
@@ -1103,6 +1106,9 @@
                     },
                     "numberOfChannels": {
                       "type": "long"
+                    },
+                    "language": {
+                      "type": "keyword"
                     }
                   }
                 },

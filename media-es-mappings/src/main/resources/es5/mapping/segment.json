@@ -363,6 +363,9 @@
                 },
                 "numberOfChannels": {
                   "type": "long"
+                },
+                "language": {
+                  "type": "keyword"
                 }
               }
             },
