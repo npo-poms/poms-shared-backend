@@ -78,10 +78,6 @@ if [ "$previndex" != "" ] ; then
 
    curl -XPOST $desthost/_aliases -d "$publishalias"
 
-
-   #echo -e "\nConsider:\n stream2es es  --source $desthost/$previndex --target $desthost/$destindex"
-   #echo "(streams2es can be found at https://github.com/elasticsearch/stream2es)"
-
    reindex="{
   \"source\": {
     \"index\": \"$previndex\"
@@ -107,6 +103,6 @@ if [ "$previndex" != "" ] ; then
 }
 "
 
-   echo "Followed by"
+   echo ";"
    echo curl -XPOST $desthost/_aliases -d "'$alias'"
 fi

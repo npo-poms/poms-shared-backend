@@ -369,7 +369,7 @@
             "bitrate": {
               "type": "long"
             },
-            "bytesize": {
+            "byteSize": {
               "type": "long"
             },
             "videoAttributes": {
