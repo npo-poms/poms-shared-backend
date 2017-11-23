@@ -4,40 +4,9 @@
  */
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-
-import org.elasticsearch.action.ListenableActionFuture;
-import org.elasticsearch.action.mlt.MoreLikeThisRequestBuilder;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.BoolFilterBuilder;
-import org.elasticsearch.index.query.FilterBuilders;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
-import org.springframework.jmx.export.annotation.ManagedAttribute;
-import org.springframework.jmx.export.annotation.ManagedResource;
-
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
-
+import lombok.extern.slf4j.Slf4j;
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -49,6 +18,34 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.media.domain.es.MediaESType;
 import nl.vpro.util.*;
+import org.elasticsearch.action.ListenableActionFuture;
+import org.elasticsearch.action.mlt.MoreLikeThisRequestBuilder;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.BoolFilterBuilder;
+import org.elasticsearch.index.query.FilterBuilders;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedResource;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.IOException;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * @author Roelof Jan Koekoek
@@ -58,6 +55,14 @@ import nl.vpro.util.*;
 @Slf4j
 @ManagedResource(objectName = "nl.vpro.api:name=esMediaRepository")
 public class ESMediaRepository extends AbstractESMediaRepository implements MediaSearchRepository {
+
+    // Delay in milliseconds before we show changes to the user.
+    // This is to allow Elasticsearch to commit changes to the index so they show up in queries.
+    // Otherwise we might get holes in the results.
+    // See: https://www.elastic.co/guide/en/elasticsearch/guide/2.x/near-real-time.html for documentation about this.
+    // See: nl.vpro.domain.api.media.ESMediaRepositoryFlushDelayTest for a test case showing and testing the delay.
+    // See: NPA-429
+    public static final long COMMITDELAY = 10000;
 
     private final String[] relatedFields;
 
@@ -186,7 +191,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         MoreLikeThisRequestBuilder moreLikeThis = new MoreLikeThisRequestBuilder(
             client(),
-                indexName,
+            indexName,
             media.getClass().getSimpleName().toLowerCase(),
             media.getMid());
 
@@ -354,9 +359,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .addSort("publishDate", SortOrder.valueOf(order.name()))
                 .addSort("mid", SortOrder.ASC);
 
-        QueryBuilder restriction = QueryBuilders.matchAllQuery();
+        ;
+        // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
+        Instant changesUpto = Instant.now().minus(COMMITDELAY, ChronoUnit.MILLIS);
+        RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(Date.from(changesUpto));
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
-            restriction = QueryBuilders.rangeQuery("publishDate").from(Date.from(since));
+            if (since.isBefore(changesUpto)) {
+                restriction = restriction.from(Date.from(since));
+            } else {
+                log.debug("Since is after commited changes window, creating query with just changes from the current moment");
+                restriction = restriction.from(Date.from(changesUpto));
+            }
         }
         searchRequestBuilder.setQuery(QueryBuilders.filteredQuery(restriction, FilterBuilders.existsFilter("publishDate")));
 
@@ -384,7 +397,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (since != null && mid != null) {
             PeekingIterator<Change> peeking = Iterators.peekingIterator(iterator);
             iterator = peeking;
-            while(true) {
+            while (true) {
                 Change peek = peeking.peek();
                 if (peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
                     break;
@@ -401,7 +414,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             case INCLUDE:
                 break;
             case EXCLUDE:
-                iterator= FilteringIterator.<Change>builder()
+                iterator = FilteringIterator.<Change>builder()
                     .wrapped(iterator)
                     .filter((c) -> c == null || !c.isDeleted())
                     .build();
@@ -479,11 +492,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .setQuery(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
             .setSize(iterateBatchSize)
         ;
-        while(i.hasNext()) {
+        while (i.hasNext()) {
             MediaObject o = i.next();
             newRedirects.put(o.getMid(), o.getMergedToRef());
         }
-        if (! newRedirects.equals(redirects)) {
+        if (!newRedirects.equals(redirects)) {
             redirects = newRedirects;
             lastRedirectChange = Instant.now();
             log.info("Read {} redirects from ES", redirects.size());
