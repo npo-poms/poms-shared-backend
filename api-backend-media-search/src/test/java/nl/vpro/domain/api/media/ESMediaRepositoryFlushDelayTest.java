@@ -40,7 +40,6 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author r.jansen
- * @date 22/11/2017
  */
 @Slf4j
 public class ESMediaRepositoryFlushDelayTest extends AbstractMediaESRepositoryITest {
