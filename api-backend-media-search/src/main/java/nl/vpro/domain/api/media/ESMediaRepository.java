@@ -361,14 +361,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         ;
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
-        Instant changesUpto = Instant.now().minus(COMMITDELAY);
+        final Instant changesUpto = Instant.now().minus(COMMITDELAY);
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(Date.from(changesUpto));
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
             if (since.isBefore(changesUpto)) {
                 restriction = restriction.from(Date.from(since));
             } else {
-                log.debug("Since is after commited changes window, creating query with just changes from the current moment");
-                restriction = restriction.from(Date.from(changesUpto));
+                log.debug("Since is after commited changes window (before {}). Returing empty iterator.", changesUpto);
+                // This will result exactly nothing, so we return empty iterator immediately:
+                return Collections.emptyIterator();
             }
         }
         searchRequestBuilder.setQuery(QueryBuilders.boolQuery().must(restriction).filter(QueryBuilders.existsQuery("publishDate")));
