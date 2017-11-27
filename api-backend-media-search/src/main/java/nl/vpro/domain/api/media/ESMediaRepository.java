@@ -4,20 +4,22 @@
  */
 package nl.vpro.domain.api.media;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
 import lombok.extern.slf4j.Slf4j;
-import nl.vpro.api.Settings;
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.media.AgeRating;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.elasticsearch.ElasticSearchIterator;
-import nl.vpro.media.domain.es.MediaESType;
-import nl.vpro.util.*;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -29,19 +31,20 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.PeekingIterator;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import nl.vpro.api.Settings;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.profile.ProfileDefinition;
+import nl.vpro.domain.media.AgeRating;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.support.Workflow;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch.ElasticSearchIterator;
+import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.util.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -58,7 +61,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     // See: https://www.elastic.co/guide/en/elasticsearch/guide/2.x/near-real-time.html for documentation about this.
     // See: nl.vpro.domain.api.media.ESMediaRepositoryFlushDelayTest for a test case showing and testing the delay.
     // See: NPA-429
-    public static final long COMMITDELAY = 10000;
+    public static final Duration COMMITDELAY = Duration.ofSeconds(10);
 
     private final String[] relatedFields;
 
@@ -358,7 +361,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         ;
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
-        Instant changesUpto = Instant.now().minus(COMMITDELAY, ChronoUnit.MILLIS);
+        Instant changesUpto = Instant.now().minus(COMMITDELAY);
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(Date.from(changesUpto));
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
             if (since.isBefore(changesUpto)) {
