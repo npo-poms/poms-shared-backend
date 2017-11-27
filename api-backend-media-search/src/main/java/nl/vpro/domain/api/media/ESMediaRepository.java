@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -55,13 +54,6 @@ import nl.vpro.util.*;
 @ManagedResource(objectName = "nl.vpro.api:name=esMediaRepository")
 public class ESMediaRepository extends AbstractESMediaRepository implements MediaSearchRepository {
 
-    // Delay in milliseconds before we show changes to the user.
-    // This is to allow Elasticsearch to commit changes to the index so they show up in queries.
-    // Otherwise we might get holes in the results.
-    // See: https://www.elastic.co/guide/en/elasticsearch/guide/2.x/near-real-time.html for documentation about this.
-    // See: nl.vpro.domain.api.media.ESMediaRepositoryFlushDelayTest for a test case showing and testing the delay.
-    // See: NPA-429
-    public static final Duration COMMITDELAY = Duration.ofSeconds(10);
 
     private final String[] relatedFields;
 
@@ -361,7 +353,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         ;
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
-        final Instant changesUpto = Instant.now().minus(COMMITDELAY);
+        final Instant changesUpto = Instant.now().minus(getCommitDelay());
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(Date.from(changesUpto));
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
             if (since.isBefore(changesUpto)) {

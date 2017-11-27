@@ -92,8 +92,8 @@ public class ESMediaRepositoryFlushDelayTest extends AbstractMediaESRepositoryIT
         log.info("Delay to first result : {}ms", firstResultDelay);
         log.info("Delay to all results : {}ms", flushDelay);
         log.info("Total indexing time : {}ms", (indexerStopTime - indexerStartTime));
-        assertThat(Duration.ofMillis(flushDelay)).isLessThan(ESMediaRepository.COMMITDELAY);
-        assertThat(Duration.ofMillis(firstResultDelay)).isLessThan(ESMediaRepository.COMMITDELAY);
+        assertThat(Duration.ofMillis(flushDelay)).isLessThan(target.getCommitDelay());
+        assertThat(Duration.ofMillis(firstResultDelay)).isLessThan(target.getCommitDelay());
     }
 
     private Callable<Long> indexer() throws Exception {

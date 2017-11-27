@@ -1,8 +1,6 @@
 package nl.vpro.media.domain.es;
 
 import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**

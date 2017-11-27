@@ -1,5 +1,7 @@
 package nl.vpro.domain.api;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,8 +35,8 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
-
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.vpro.domain.api.media.Redirector;
@@ -57,11 +59,16 @@ public abstract class AbstractESRepository<T> {
     private final ESClientFactory factory;
 
     protected Integer facetLimit = 10;
+
     protected Duration timeOut = Duration.ofSeconds(15);
 
     protected String indexName = null;
 
     private final Set<String> loadTypes;
+
+    @Getter
+    @Setter
+    protected Duration commitDelay = Duration.ofSeconds(10);
 
 
     public AbstractESRepository(@NotNull ESClientFactory factory) {
@@ -126,9 +133,23 @@ public abstract class AbstractESRepository<T> {
         this.timeOut = TimeUtils.parseDuration(timeOut).orElse(this.timeOut);
     }
 
+    @ManagedAttribute
+    public String setCommitDelayAsString() {
+        return String.valueOf(commitDelay);
+    }
+
+    @ManagedAttribute
+    @Value("${elasticSearch.commitDelay}")
+    public void setCommitDelayAsString(String commitDelay) {
+        this.commitDelay = TimeUtils.parseDuration(commitDelay).orElse(this.commitDelay);
+    }
+
+
     protected final Client client() {
         return factory.client(getClass());
     }
+
+
 
     /**
      * Returns all types relevant, this e.g. als includes 'deleted' objects types

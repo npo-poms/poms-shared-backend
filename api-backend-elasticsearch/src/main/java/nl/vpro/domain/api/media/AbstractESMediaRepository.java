@@ -61,6 +61,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         super.setTimeOut(TimeUtils.parseDuration(timeout).orElse(Duration.ofSeconds(15)));
     }
 
+
     private final IndexHelper helper;
 
     protected boolean createIndices = false;
