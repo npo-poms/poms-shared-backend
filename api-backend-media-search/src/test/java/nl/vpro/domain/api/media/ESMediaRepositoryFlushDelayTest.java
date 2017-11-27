@@ -5,14 +5,16 @@
 package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.vpro.api.Settings;
-import nl.vpro.domain.api.AbstractESRepositoryITest;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.media.domain.es.ApiMediaIndex;
-import nl.vpro.media.domain.es.MediaESType;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
+
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -22,13 +24,14 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.*;
-import java.util.stream.Collectors;
+import nl.vpro.api.Settings;
+import nl.vpro.domain.api.AbstractESRepositoryITest;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.MediaTestDataBuilder;
+import nl.vpro.domain.media.support.Workflow;
+import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.domain.es.ApiMediaIndex;
+import nl.vpro.media.domain.es.MediaESType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -90,8 +93,8 @@ public class ESMediaRepositoryFlushDelayTest extends AbstractMediaESRepositoryIT
         log.info("Delay to first result : {}ms", firstResultDelay);
         log.info("Delay to all results : {}ms", flushDelay);
         log.info("Total indexing time : {}ms", (indexerStopTime - indexerStartTime));
-        assertThat(flushDelay).isLessThan(ESMediaRepository.COMMITDELAY);
-        assertThat(firstResultDelay).isLessThan(ESMediaRepository.COMMITDELAY);
+        assertThat(Duration.ofMillis(flushDelay)).isLessThan(ESMediaRepository.COMMITDELAY);
+        assertThat(Duration.ofMillis(firstResultDelay)).isLessThan(ESMediaRepository.COMMITDELAY);
     }
 
     private Callable<Long> indexer() throws Exception {
