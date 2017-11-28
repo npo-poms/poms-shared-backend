@@ -26,6 +26,8 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Slf4j
 public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
@@ -34,7 +36,9 @@ public class ESScheduleRepositoryTest extends AbstractESRepositoryTest {
 
     @Before
     public void setup() throws IOException, ExecutionException, InterruptedException {
-        repository = new ESScheduleRepository(clientFactory, null);
+        MediaRepository redirectRepository = mock(MediaRepository.class);
+        when(redirectRepository.redirects()).thenReturn(new RedirectList());
+        repository = new ESScheduleRepository(clientFactory, redirectRepository);
         repository.setIndexName(ApiMediaIndex.NAME);
         repository.createIndices().get();
     }
