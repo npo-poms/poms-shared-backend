@@ -288,6 +288,12 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         changes.forEachRemaining(list::add);
         assertThat(list).hasSize(indexedObjectCount - 17); // 17 objects created around EPOCH
         assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
+        Instant prev = Instant.MIN;
+
+        for (MediaChange c : list) {
+            assertThat(! c.getPublishDate().isBefore(prev));
+            prev = c.getPublishDate();
+        }
     }
 
     @Test
