@@ -7,7 +7,6 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.Executors;
@@ -354,17 +353,20 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         ;
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
         final Instant changesUpto = Instant.now().minus(getCommitDelay());
-        RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(Date.from(changesUpto));
+        RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(changesUpto.toEpochMilli());
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
             if (since.isBefore(changesUpto)) {
-                restriction = restriction.from(Date.from(since));
+                restriction = restriction.from(since.toEpochMilli());
             } else {
                 log.debug("Since is after commited changes window (before {}). Returing empty iterator.", changesUpto);
                 // This will result exactly nothing, so we return empty iterator immediately:
                 return Collections.emptyIterator();
             }
         }
-        searchRequestBuilder.setQuery(QueryBuilders.boolQuery().must(restriction).filter(QueryBuilders.existsQuery("publishDate")));
+        searchRequestBuilder.setQuery(QueryBuilders.boolQuery()
+            .must(restriction)
+            .filter(QueryBuilders.existsQuery("publishDate"))
+        );
 
         log.debug("Found {} changes", i.getTotalSize());
         ChangeIterator changes = new ChangeIterator(
