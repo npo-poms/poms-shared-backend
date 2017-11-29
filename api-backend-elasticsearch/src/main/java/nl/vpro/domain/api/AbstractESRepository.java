@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.action.ActionFuture;
@@ -79,7 +80,7 @@ public abstract class AbstractESRepository<T> {
         loadTypes = new HashSet<>(Arrays.asList(getLoadTypes()));
     }
 
-    //@PostConstruct
+    @PostConstruct
     public void logIntro() {
         log.info("ES Repository {} {}", this, factory);
         ThreadPools.backgroundExecutor.execute(() -> {
