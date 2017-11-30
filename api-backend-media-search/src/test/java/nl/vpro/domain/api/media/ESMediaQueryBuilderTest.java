@@ -865,7 +865,7 @@ public class ESMediaQueryBuilderTest {
             "          \"should\" : [\n" +
             "            {\n" +
             "              \"term\" : {\n" +
-            "                \"tags\" : {\n" +
+            "                \"tags.full\" : {\n" +
             "                  \"value\" : \"Kunst\",\n" +
             "                  \"boost\" : 1.0\n" +
             "                }\n" +
@@ -873,7 +873,7 @@ public class ESMediaQueryBuilderTest {
             "            },\n" +
             "            {\n" +
             "              \"term\" : {\n" +
-            "                \"tags\" : {\n" +
+            "                \"tags.full\" : {\n" +
             "                  \"value\" : \"Kunst & Cultuur\",\n" +
             "                  \"boost\" : 1.0\n" +
             "                }\n" +

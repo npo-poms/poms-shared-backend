@@ -15,7 +15,7 @@ public class GTAAKeysPropertiesRepositoryTest {
 
     @Test
     public void testGetKeyFor() {
-        assertEquals("***REMOVED***", repo.getKeyFor("issuer1").get());
+        assertEquals("***REMOVED***", repo.getKeyFor("npo-functional-tests").get());
     }
 
 }

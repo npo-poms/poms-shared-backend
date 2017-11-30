@@ -26,6 +26,7 @@
     <integ.cluster.name>api-test</integ.cluster.name>-->
     <pages.version>5.5-SNAPSHOT</pages.version>
     <vpro.shared.version>1.75-SNAPSHOT</vpro.shared.version>
+    <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
   </properties>
 
   <scm>
