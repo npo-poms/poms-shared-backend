@@ -267,7 +267,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             for (ScheduleEvent e : mo.getResult().getScheduleEvents()) {
                 if (form.test(e)) {
                     ApiScheduleEvent ae = new ApiScheduleEvent(e);
-                    ae.setMediaObject(e.getMediaObject());
+                    ae.setParent(e.getParent());
                     results.add(ae);
                     count++;
                 }
