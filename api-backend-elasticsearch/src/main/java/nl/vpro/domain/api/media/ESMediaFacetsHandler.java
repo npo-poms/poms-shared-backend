@@ -5,13 +5,11 @@
 package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-
+import nl.vpro.domain.api.ESFacetsBuilder;
+import nl.vpro.domain.api.ESFacetsHandler;
+import nl.vpro.domain.api.MultipleFacetsResult;
+import nl.vpro.domain.api.TermFacetResultItem;
+import nl.vpro.domain.media.*;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -20,8 +18,10 @@ import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.media.*;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Roelof Jan Koekoek
@@ -50,7 +50,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 getTitleAggregationResultItems(request.getTitles(), globalFilter)
             );
             List<TermFacetResultItem> titles = facetsResult.getTitles();
-            Aggregation aggregation = aggregations.get("titles.value.full");
+            Aggregation aggregation = aggregations.get(prefix + "titles.value.full");
             if (aggregation != null) {
                 if (titles == null) {
                     titles = new ArrayList<>();

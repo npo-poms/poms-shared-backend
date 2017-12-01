@@ -1725,6 +1725,9 @@
     "keywords": {
       "type": "keyword",
       "fields": {
+        "full": {
+          "type": "keyword"
+        },
         "text": {
           "type": "text",
           "norms": {
@@ -1965,6 +1968,9 @@
             "enabled": false
           }
         },
+        "full": {
+          "type": "keyword"
+        },
         "stemmed": {
           "type": "text",
           "analyzer": "dutch_stemmed",
@@ -1983,11 +1989,10 @@
       "type": "keyword"
     },
     "title": {
-      "type": "keyword",
+      "type": "text",       
       "fields": {
         "full": {
-          "type": "text",
-          "index": true
+          "type": "keyword"
         },
         "stemmed": {
           "type": "text",
