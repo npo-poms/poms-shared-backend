@@ -1928,6 +1928,9 @@
         "value": {
           "type": "keyword",
           "fields": {
+            "full": {
+              "type": "keyword"
+            },
             "lower": {
               "type": "text",
               "analyzer": "lowercase",
