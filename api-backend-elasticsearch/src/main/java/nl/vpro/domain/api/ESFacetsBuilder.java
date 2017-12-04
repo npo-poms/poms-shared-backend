@@ -4,10 +4,6 @@
  */
 package nl.vpro.domain.api;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.regex.Pattern;
-
 import org.apache.lucene.util.automaton.RegExp;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.script.Script;
@@ -23,6 +19,10 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.regex.Pattern;
 
 /**
  * @author Roelof Jan Koekoek
@@ -100,11 +100,13 @@ public abstract class ESFacetsBuilder {
 
                         String name = fieldName + "." + dateRange.getInterval();
 
+                        String format = dateRange.getInterval().getUnit().getFormat();
+
                         DateHistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
                             .dateHistogram(name)
                             .dateHistogramInterval(from(dateRange.getInterval()))
                             .field(fieldName)
-                            .format("yyyy")
+                            .format(format)
                             .keyed(false)
                             ;
                         searchBuilder.aggregation(histogramAggregationBuilder);
