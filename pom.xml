@@ -94,34 +94,9 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>nl.vpro.api</groupId>
-        <artifactId>api-domain</artifactId>
-        <version>${poms.shared.version}</version>
-      </dependency>
-      <dependency>
         <groupId>nl.vpro.media</groupId>
         <artifactId>media-es-mappings</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.media</groupId>
-        <artifactId>media-test</artifactId>
-        <version>${poms.shared.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.api</groupId>
-        <artifactId>api-spring</artifactId>
-        <version>${poms.shared.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.media</groupId>
-        <artifactId>media-domain</artifactId>
-        <version>${poms.shared.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.subtitles</groupId>
-        <artifactId>subtitles-domain</artifactId>
-        <version>${poms.shared.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
