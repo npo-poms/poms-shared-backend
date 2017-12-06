@@ -16,7 +16,7 @@
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
-    <poms.shared.version>5.6-SNAPSHOT</poms.shared.version>
+    <poms.shared.version>5.5.8-SNAPSHOT</poms.shared.version>
     <skipIntegTests>true</skipIntegTests>
     <vpro.shared.version>1.75-SNAPSHOT</vpro.shared.version>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
