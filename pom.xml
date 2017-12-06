@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>5.5.0</version>
+    <version>5.5.1</version>
   </parent>
 
   <groupId>nl.publiekeomroep</groupId>
@@ -18,12 +18,6 @@
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
     <poms.shared.version>5.6-SNAPSHOT</poms.shared.version>
     <skipIntegTests>true</skipIntegTests>
-    <!--<integ.deps>${project.basedir}/../target/integration-tests/binaries</integ.deps>
-    <integ.scratch>${project.basedir}/../target/integration-scratch</integ.scratch>
-    <integ.http.port>9211</integ.http.port>
-    <integ.java.port>9311</integ.java.port>
-    <integ.temp>${project.basedir}/../target/integration-tests/tmp</integ.temp>
-    <integ.cluster.name>api-test</integ.cluster.name>-->
     <vpro.shared.version>1.75-SNAPSHOT</vpro.shared.version>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
   </properties>
@@ -101,74 +95,6 @@
   </dependencyManagement>
   <build>
     <plugins>
-      <!-- we doen het niet, en installeren een ES op jenkins -->
-   <!-- &lt;!&ndash; http://david.pilato.fr/blog/2016/10/18/elasticsearch-real-integration-tests-updated-for-ga/ &ndash;&gt;
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.0.1</version>
-        <executions>
-          <execution>
-            <id>integ-setup-dependencies</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <skip>${skipIntegTests}</skip>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.elasticsearch.distribution.zip</groupId>
-                  <artifactId>elasticsearch</artifactId>
-                  <version>${elasticsearch.version}</version>
-                  <type>zip</type>
-                </artifactItem>
-              </artifactItems>
-              <useBaseVersion>true</useBaseVersion>
-              <outputDirectory>${integ.deps}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.8</version>
-        <executions>
-          &lt;!&ndash; start up external cluster &ndash;&gt;
-          <execution>
-            <id>integ-setup</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <skip>${skipIntegTests}</skip>
-              <target>
-
-                <ant antfile="${project.basedir}/../src/test/ant/integration-tests.xml"
-                     target="start-external-cluster"/>
-              </target>
-            </configuration>
-          </execution>
-          &lt;!&ndash; shut down external cluster &ndash;&gt;
-          <execution>
-            <id>integ-teardown</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <skip>${skipIntegTests}</skip>
-              <target>
-                <ant antfile="${project.basedir}/../src/test/ant/integration-tests.xml"
-                     target="stop-external-cluster"/>
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>-->
     </plugins>
   </build>
 </project>
