@@ -3,7 +3,14 @@ package nl.vpro.domain.api.thesaurus;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -50,17 +57,22 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     }
 
     /**
-     * @param jws is unpacked, key checked, converted to a gtaa-person and submitted
-     *            to the {@link GTAARepository}
+     * @param jws is unpacked, key checked, converted to a gtaa-person and will now be submitted
+     *            to the {@link GTAARepository}. Extra check on expiration date (jwt should not be issued > 12h ago)
      */
     @Override
     public GTAAPerson submitPerson(NewPerson newPerson, String jws) {
         JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
+        parser.setAllowedClockSkewSeconds(5);
         Jws<Claims> claims = parser.parseClaimsJws(StringUtils.trim(jws));
         String creator = getCreator(claims.getHeader());
+        Instant issuedAt = claims.getBody().getIssuedAt().toInstant();
+        Instant maxAllowed = ZonedDateTime.now().minus(12, ChronoUnit.HOURS).toInstant();
+        if (issuedAt.isBefore(maxAllowed)) {
+            throw new SecurityException("JWT token was issued more than the permitted 12 hours ago");
+        }
         return gtaaService.submit(convertToPerson(newPerson), creator);
     }
-
 
     private String getCreator(JwsHeader<?> header) {
         Assert.notNull(header.get("usr"), "Expecting a 'usr' value in the header " + header);
@@ -75,4 +87,6 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         return person;
 
     }
+
+
 }
