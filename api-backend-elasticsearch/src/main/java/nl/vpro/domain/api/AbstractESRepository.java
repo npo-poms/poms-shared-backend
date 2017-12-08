@@ -2,7 +2,6 @@ package nl.vpro.domain.api;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -50,7 +49,6 @@ import nl.vpro.util.TimeUtils;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-@ToString(of = {"indexName", "loadTypes"})
 public abstract class AbstractESRepository<T> {
 
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
@@ -83,7 +81,7 @@ public abstract class AbstractESRepository<T> {
 
     @PostConstruct
     public void logIntro() {
-        log.info("ES Repository {} {}", this, factory);
+        log.info("ES Repository {} with factory {}", this, factory);
         ThreadPools.backgroundExecutor.execute(() -> {
             try {
                 String indexName = getIndexName();
@@ -407,4 +405,11 @@ public abstract class AbstractESRepository<T> {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "{" +
+            "indexName='" + indexName + '\'' +
+            ", loadTypes=" + loadTypes +
+            '}';
+    }
 }
