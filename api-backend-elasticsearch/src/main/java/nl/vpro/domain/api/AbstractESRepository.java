@@ -50,7 +50,7 @@ import nl.vpro.util.TimeUtils;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-@ToString
+@ToString(of = {"indexName", "loadTypes"})
 public abstract class AbstractESRepository<T> {
 
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
@@ -62,6 +62,8 @@ public abstract class AbstractESRepository<T> {
 
     protected Duration timeOut = Duration.ofSeconds(15);
 
+    @Getter
+    @Setter
     protected String indexName = null;
 
     private final Set<String> loadTypes;
@@ -405,12 +407,4 @@ public abstract class AbstractESRepository<T> {
         throw new UnsupportedOperationException();
     }
 
-
-    public String getIndexName() {
-        return indexName;
-    }
-
-    public void setIndexName(String indexName) {
-        this.indexName = indexName;
-    }
 }
