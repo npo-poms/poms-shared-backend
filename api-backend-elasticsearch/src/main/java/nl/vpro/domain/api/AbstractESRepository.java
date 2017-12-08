@@ -3,7 +3,6 @@ package nl.vpro.domain.api;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -51,10 +50,10 @@ import nl.vpro.util.TimeUtils;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-@Slf4j
 @ToString
 public abstract class AbstractESRepository<T> {
 
+    protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     protected final Logger LOG_ERRORS = LoggerFactory.getLogger(getClass().getName() + ".ERRORS");
 
     private final ESClientFactory factory;
