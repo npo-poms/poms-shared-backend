@@ -56,8 +56,12 @@ public abstract class AbstractESRepository<T> {
 
     private final ESClientFactory factory;
 
+    @Getter
+    @Setter
     protected Integer facetLimit = 10;
 
+    @Getter
+    @Setter
     protected Duration timeOut = Duration.ofSeconds(15);
 
     @Getter
@@ -111,22 +115,6 @@ public abstract class AbstractESRepository<T> {
         });
     }
 
-    public Integer getFacetLimit() {
-        return facetLimit;
-    }
-
-    public void setFacetLimit(Integer facetLimit) {
-        this.facetLimit = facetLimit;
-    }
-
-    public Duration getTimeOut() {
-        return timeOut;
-    }
-
-    public void setTimeOut(Duration timeOut) {
-        this.timeOut = timeOut;
-    }
-
 
     @ManagedAttribute
     public String getTimeOutAsString() {
@@ -153,8 +141,6 @@ public abstract class AbstractESRepository<T> {
     protected final Client client() {
         return factory.client(getClass());
     }
-
-
 
     /**
      * Returns all types relevant, this e.g. als includes 'deleted' objects types
