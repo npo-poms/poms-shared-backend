@@ -85,19 +85,24 @@ public abstract class AbstractESRepository<T> {
         log.info("ES Repository {} {}", this, factory);
         ThreadPools.backgroundExecutor.execute(() -> {
             try {
-                SearchResponse response = client()
-                    .prepareSearch(getIndexName())
-                    .setTypes(getRelevantTypes())
-                    .addAggregation(AggregationBuilders.terms("types")
-                        .field("_type")
-                        .order(Terms.Order.term(true))
-                    )
-                    .setSize(0)
-                    .get();
+                String indexName = getIndexName();
+                if (indexName != null) {
+                    SearchResponse response = client()
+                        .prepareSearch(indexName)
+                        .setTypes(getRelevantTypes())
+                        .addAggregation(AggregationBuilders.terms("types")
+                            .field("_type")
+                            .order(Terms.Order.term(true))
+                        )
+                        .setSize(0)
+                        .get();
 
-                Terms a  = response.getAggregations().get("types");
-                String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
-                log.info("{}\n{} currently contains {} items ({})", factory, getIndexName(), response.getHits().getTotalHits(), result);
+                    Terms a = response.getAggregations().get("types");
+                    String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
+                    log.info("{}\n{} currently contains {} items ({})", factory, getIndexName(), response.getHits().getTotalHits(), result);
+                } else {
+                    log.error("No indexname in {}", this);
+                }
             } catch (IndexNotFoundException ime) {
                 log.info("{} does exist yet ({})",
                     getIndexName(), ime.getMessage());
