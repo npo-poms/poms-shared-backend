@@ -43,9 +43,9 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
 
         @Override
         public byte[] resolveSigningKeyBytes(JwsHeader header, Claims claims) {
-            Assert.notNull(header.get("iss"), "Expecting an issuer under key 'iss' in the header " + header);
-            return keysRepo.getKeyFor((String) header.get("iss"))
-                .orElseThrow(() -> new SecurityException("Couldn't find key for issuer " + header.get("iss")))
+            Assert.notNull(claims.get("iss"), "Expecting an issuer under key 'iss' in the header " + header);
+            return keysRepo.getKeyFor((String) claims.get("iss"))
+                .orElseThrow(() -> new SecurityException("Couldn't find key for issuer " + claims.get("iss")))
                 .getBytes();
         }
     };
@@ -65,18 +65,13 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
         parser.setAllowedClockSkewSeconds(5);
         Jws<Claims> claims = parser.parseClaimsJws(StringUtils.trim(jws));
-        String creator = getCreator(claims.getHeader());
+        String creator = claims.getBody().getIssuer();
         Instant issuedAt = claims.getBody().getIssuedAt().toInstant();
         Instant maxAllowed = ZonedDateTime.now().minus(12, ChronoUnit.HOURS).toInstant();
         if (issuedAt.isBefore(maxAllowed)) {
             throw new SecurityException("JWT token was issued more than the permitted 12 hours ago");
         }
         return gtaaService.submit(convertToPerson(newPerson), creator);
-    }
-
-    private String getCreator(JwsHeader<?> header) {
-        Assert.notNull(header.get("usr"), "Expecting a 'usr' value in the header " + header);
-        return header.get("iss") + ":" + header.get("usr");
     }
 
     private GTAAPerson convertToPerson(NewPerson newPerson) {
