@@ -102,7 +102,7 @@ public abstract class AbstractESRepository<T> {
 
                     Terms a = response.getAggregations().get("types");
                     String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
-                    log.info("{}\n{} currently contains {} items ({})", factory, getIndexName(), response.getHits().getTotalHits(), result);
+                    log.info("{} {} currently contains {} items ({})", factory, getIndexName(), response.getHits().getTotalHits(), result);
                 } else {
                     log.error("No indexname in {}", this);
                 }
