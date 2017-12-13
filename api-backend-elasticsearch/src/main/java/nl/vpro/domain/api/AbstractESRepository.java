@@ -1,25 +1,19 @@
 package nl.vpro.domain.api;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-
+import nl.vpro.domain.api.media.Redirector;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.util.ThreadPools;
+import nl.vpro.util.TimeUtils;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetItemResponse;
 import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.get.MultiGetResponse;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
@@ -36,13 +30,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
-import com.fasterxml.jackson.databind.JsonNode;
 
-import nl.vpro.domain.api.media.Redirector;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.util.ThreadPools;
-import nl.vpro.util.TimeUtils;
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 
 /**
@@ -248,6 +246,22 @@ public abstract class AbstractESRepository<T> {
             }
         } else {
             searchBuilder.size(max);
+        }
+    }
+
+    protected void handlePaging(long offset, Integer max, SearchRequestBuilder searchBuilder, QueryBuilder queryBuilder, String indexName) {
+        if (offset != 0) {
+            searchBuilder.setFrom((int)offset);
+        }
+        if (max == null) {
+            try {
+                max = (int) executeCount(queryBuilder, indexName);
+                searchBuilder.setSize(max);
+            } catch(ExecutionException | InterruptedException e) {
+                log.warn(e.getMessage());
+            }
+        } else {
+            searchBuilder.setSize(max);
         }
     }
 

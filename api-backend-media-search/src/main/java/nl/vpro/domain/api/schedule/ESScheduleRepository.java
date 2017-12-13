@@ -2,25 +2,6 @@ package nl.vpro.domain.api.schedule;
 
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.StringUtils;
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.inject.Inject;
-import org.elasticsearch.index.query.*;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.beans.factory.annotation.Value;
-
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -28,9 +9,32 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.DateRange;
 import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.MediaESType;
 import nl.vpro.util.TimeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.common.inject.Inject;
+import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @since 4.8
@@ -242,29 +246,17 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             total = null;
         }
 
-        SearchRequest request = new SearchRequest(getIndexName());
-        request.types(getScheduleEventTypes());
+        ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject);
+        SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
+        requestBuilder.setQuery(toExecute);
+        requestBuilder.setTypes(getScheduleEventTypes());
+        handlePaging(offset, max, requestBuilder, toExecute, getIndexName());
 
-        SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
-        searchBuilder.query(toExecute);
-
-        handlePaging(offset, max, searchBuilder, toExecute, getIndexName());
-
-        request.source(searchBuilder);
-
-        ActionFuture<SearchResponse> searchResponseFuture =
-            client().search(request);
-        SearchResponse response = searchResponseFuture.actionGet(
-                timeOut.toMillis(), TimeUnit.MILLISECONDS);
-
-        SearchHits hits = response.getHits();
-
-        List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         List<ApiScheduleEvent> results = new ArrayList<>();
 
-        for (SearchResultItem<? extends MediaObject> mo : adapted) {
+        searchIterator.forEachRemaining(mo -> {
             int count = 0;
-            for (ScheduleEvent e : mo.getResult().getScheduleEvents()) {
+            for (ScheduleEvent e : mo.getScheduleEvents()) {
                 if (form.test(e)) {
                     ApiScheduleEvent ae = new ApiScheduleEvent(e);
                     ae.setParent(e.getParent());
@@ -279,8 +271,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 // it doesn't really matter for now, we simply didn't add it to the result
                 log.debug("Mediaobject {} not added, since it did unexpectedly not apply to {}", mo, form);
             }
-
-        }
+        });
 
         switch (form.getPager().getOrder()) {
             case ASC:
@@ -292,6 +283,15 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         }
 
         return new ScheduleResult(new Result<>(results, offset, max, total));
+    }
+
+    protected MediaObject getMediaObject(SearchHit hit) {
+        try {
+            return getObject(hit, MediaObject.class);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
     }
 
     protected String[] getScheduleEventTypes() {
