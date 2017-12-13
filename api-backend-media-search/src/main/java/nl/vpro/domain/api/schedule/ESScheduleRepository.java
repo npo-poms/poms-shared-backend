@@ -12,6 +12,7 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.util.MaxOffsetIterator;
 import nl.vpro.util.TimeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.ActionFuture;
@@ -250,11 +251,10 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
         requestBuilder.setQuery(toExecute);
         requestBuilder.setTypes(getScheduleEventTypes());
-        handlePaging(offset, max, requestBuilder, toExecute, getIndexName());
 
         List<ApiScheduleEvent> results = new ArrayList<>();
 
-        searchIterator.forEachRemaining(mo -> {
+        new MaxOffsetIterator<>(searchIterator, max, offset, true).forEachRemaining(mo -> {
             int count = 0;
             for (ScheduleEvent e : mo.getScheduleEvents()) {
                 if (form.test(e)) {

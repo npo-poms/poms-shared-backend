@@ -1,19 +1,7 @@
 package nl.vpro.domain.api.schedule;
 
-import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.ExecutionException;
-
-import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.Before;
-import org.junit.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
+import lombok.extern.slf4j.Slf4j;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.*;
@@ -21,6 +9,16 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,6 +56,24 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
         ScheduleResult result = repository.listSchedules((Instant) null, null, Order.ASC, 0L, 10);
+        assertThat(result).hasSize(3);
+    }
+
+    @Test
+    public void listTestScrolled() throws Exception {
+        index(MediaBuilder.program().mid("DONNA_1")
+            .scheduleEvents(
+                event(Channel.BBC1, "2015-06-19T10:00:00"),
+                event(Channel.BBC1, "2015-06-18T10:00:00")
+            ).build());
+
+        index(MediaBuilder.program().mid("DONNA_2")
+            .scheduleEvents(
+                event(Channel.BBC2, "2015-06-19T10:00:00")
+            ).build());
+
+
+        ScheduleResult result = repository.listSchedules((Instant) null, null, Order.ASC, 0L, 100000);
         assertThat(result).hasSize(3);
     }
 
