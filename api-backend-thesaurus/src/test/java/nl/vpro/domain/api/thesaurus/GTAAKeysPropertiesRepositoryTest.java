@@ -1,5 +1,10 @@
 package nl.vpro.domain.api.thesaurus;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.NoSuchElementException;
+
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +19,18 @@ public class GTAAKeysPropertiesRepositoryTest {
     GTAAKeysPropertiesRepository repo;
 
     @Test
-    public void testGetKeyFor() {
+    public void testGetKeyFor1() throws IOException {
         assertEquals("***REMOVED***", repo.getKeyFor("npo-functional-tests").get());
+    }
+
+    @Test
+    public void testGetKeyFor2() throws IOException {
+        assertEquals("test", repo.getKeyFor("issuer").get());
+    }
+
+    @Test (expected = NoSuchElementException.class)
+    public void testGetKeyFor3() throws IOException {
+        assertEquals("test2", repo.getKeyFor("demo-user").get());
     }
 
 }

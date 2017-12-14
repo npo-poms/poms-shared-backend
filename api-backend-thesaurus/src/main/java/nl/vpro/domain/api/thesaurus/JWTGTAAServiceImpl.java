@@ -3,6 +3,7 @@ package nl.vpro.domain.api.thesaurus;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -44,9 +45,14 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         @Override
         public byte[] resolveSigningKeyBytes(JwsHeader header, Claims claims) {
             Assert.notNull(claims.get("iss"), "Expecting an issuer under key 'iss' in the header " + header);
-            return keysRepo.getKeyFor((String) claims.get("iss"))
-                .orElseThrow(() -> new SecurityException("Couldn't find key for issuer " + claims.get("iss")))
-                .getBytes();
+            try {
+                return keysRepo.getKeyFor((String) claims.get("iss"))
+                    .orElseThrow(() -> new SecurityException("Couldn't find key for issuer " + claims.get("iss")))
+                    .getBytes();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     };
 

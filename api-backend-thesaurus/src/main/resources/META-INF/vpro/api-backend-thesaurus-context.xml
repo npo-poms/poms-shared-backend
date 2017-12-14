@@ -10,18 +10,18 @@
 
    <context:component-scan base-package="nl.vpro.domain.api.thesaurus" />
 
-   <bean class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
-      <constructor-arg ref="gtaaKeys" />
-   </bean>
 
-   <bean id="gtaaKeys" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
-      <property name="ignoreResourceNotFound" value="true" />
+   <bean id="GTAAKeysPropertiesRepository" class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
       <property name="locations">
          <list>
             <value>classpath:/gtaa-keys.properties</value>
             <value>file:${user.home}/conf/gtaa-keys.properties</value>
+            <value>${NPOConfigurationBean.file.parent}/gtaa-keys.properties</value>
          </list>
       </property>
    </bean>
 
-   </beans>
+
+</beans>
+
+
