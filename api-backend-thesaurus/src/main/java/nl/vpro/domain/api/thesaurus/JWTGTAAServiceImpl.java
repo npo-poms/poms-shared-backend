@@ -44,7 +44,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
 
         @Override
         public byte[] resolveSigningKeyBytes(JwsHeader header, Claims claims) {
-            Assert.notNull(claims.get("iss"), "Expecting an issuer under key 'iss' in the header " + header);
+            Assert.notNull(claims.get("iss"), "no value for 'iss' available");
             try {
                 return keysRepo.getKeyFor((String) claims.get("iss"))
                     .orElseThrow(() -> new SecurityException("Couldn't find key for issuer " + claims.get("iss")))
@@ -86,7 +86,6 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
             person.setNotes(Arrays.asList(Label.forValue(newPerson.getNote())));
         }
         return person;
-
     }
 
 
