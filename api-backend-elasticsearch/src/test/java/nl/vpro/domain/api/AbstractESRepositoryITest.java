@@ -2,15 +2,20 @@ package nl.vpro.domain.api;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
+import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -38,6 +43,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.elasticsearch.TransportClientFactory;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -126,6 +132,36 @@ public abstract class AbstractESRepositoryITest {
         refresh();
         return indexName;
     }
+
+
+    public static Supplier<String> sourceSupplier(String name) {
+        return () -> {
+            try {
+                StringWriter writer = new StringWriter();
+                InputStream inputStream = ApiMediaIndex.class.getClassLoader().getResourceAsStream(name);
+                if (inputStream == null) {
+                    throw new IllegalStateException("Could not find " + name);
+                }
+                IOUtils.copy(inputStream, writer, "utf-8");
+                return writer.toString();
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        };
+    }
+
+
+    public static Map<String, Supplier<String>> mappingSupplier(String... name) {
+        Map<String, Supplier<String>> result  = new HashMap<>();
+        for (String n :name) {
+            String key = new File(n).getName();
+            int lastIndexOfDot = key.lastIndexOf(".");
+            key = key.substring(0, lastIndexOfDot);
+            result.put(key, sourceSupplier(n));
+        }
+        return result;
+    }
+
 
     protected static void clearIndex() {
         client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
