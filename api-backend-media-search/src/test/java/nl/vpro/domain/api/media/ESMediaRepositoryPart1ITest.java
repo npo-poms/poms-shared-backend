@@ -1412,6 +1412,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 TitleSearch.builder()
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
+                    .value("a*")
                     .match(Match.MUST)
                     .matchType(ExtendedMatchType.WILDCARD)
                     .caseSensitive(false)
