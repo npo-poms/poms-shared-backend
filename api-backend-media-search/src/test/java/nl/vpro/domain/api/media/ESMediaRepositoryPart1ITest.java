@@ -1542,7 +1542,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    // TODO FAILS
     public void expandedTitles() throws IOException {
         MediaForm form = Jackson2Mapper.getInstance().readValue("{\n" +
             "    \"facets\": {\n" +
@@ -1584,7 +1583,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaSearchResult result = target.find(null, form, 0, 0);
 
     }
-
 
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();

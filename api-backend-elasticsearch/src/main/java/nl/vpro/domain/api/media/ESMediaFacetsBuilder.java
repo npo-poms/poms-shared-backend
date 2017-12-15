@@ -226,7 +226,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 if (filter == null) {
                     filter = ESMediaFilterBuilder.filter(titleSearch, pathPrefix, "expandedTitles");
                 } else {
-                    ESMediaQueryBuilder.buildTitleQuery((BoolQueryBuilder) filter, "expandedTitles", titleSearch);
+                    ESMediaQueryBuilder.buildTitleQuery((BoolQueryBuilder) filter, "", titleSearch);
                 }
             }
             if (filter == null) {
