@@ -6,7 +6,15 @@
  <bean class="org.mockito.Mockito" factory-method="mock">
       <constructor-arg value="nl.vpro.domain.media.gtaa.GTAARepository" />
    </bean>
-   
-   <import resource="classpath:/META-INF/vpro/api-backend-thesaurus-context.xml"/>
+
+
+  <bean id="GTAAKeysPropertiesRepository" class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
+    <property name="locations">
+      <list>
+        <value>classpath:/gtaa-keys.properties</value>
+        <value>file:${user.home}/conf/gtaa-keys.properties</value>
+      </list>
+    </property>
+  </bean>
 
 </beans>

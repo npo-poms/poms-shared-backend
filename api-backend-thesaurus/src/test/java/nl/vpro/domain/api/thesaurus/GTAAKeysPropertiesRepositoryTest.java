@@ -1,6 +1,5 @@
 package nl.vpro.domain.api.thesaurus;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
@@ -24,6 +23,7 @@ public class GTAAKeysPropertiesRepositoryTest {
     }
 
     @Test
+    @Ignore
     public void testGetKeyFor2() throws IOException {
         assertEquals("test", repo.getKeyFor("issuer").get());
     }
