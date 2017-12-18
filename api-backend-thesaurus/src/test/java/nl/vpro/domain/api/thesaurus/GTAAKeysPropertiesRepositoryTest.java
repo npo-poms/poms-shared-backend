@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringRunner.class) //  implicitely uses GTAAKeysPropertiesRepositoryTest-context.xml ?
 public class GTAAKeysPropertiesRepositoryTest {
 
     @Autowired
