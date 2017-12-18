@@ -43,7 +43,6 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.elasticsearch.TransportClientFactory;
-import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -138,7 +137,7 @@ public abstract class AbstractESRepositoryITest {
         return () -> {
             try {
                 StringWriter writer = new StringWriter();
-                InputStream inputStream = ApiMediaIndex.class.getClassLoader().getResourceAsStream(name);
+                InputStream inputStream = AbstractESRepositoryITest.class.getClassLoader().getResourceAsStream(name);
                 if (inputStream == null) {
                     throw new IllegalStateException("Could not find " + name);
                 }
