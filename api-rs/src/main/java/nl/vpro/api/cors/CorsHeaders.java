@@ -1,7 +1,7 @@
 package nl.vpro.api.cors;
 
 /**
- * @author ricojansen
+ * @author rico jansen
  */
 public class CorsHeaders {
 
