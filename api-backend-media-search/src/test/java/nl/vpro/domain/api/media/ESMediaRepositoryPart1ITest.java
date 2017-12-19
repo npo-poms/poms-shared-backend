@@ -1356,33 +1356,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testFindByTitles2() throws InterruptedException, ExecutionException, IOException {
-        index(program()
-            .lexicoTitle("Buitenhof")
-            .mid("POW_345")
-            .build());
-        index(program()
-            .mainTitle("Reporter")
-            .mid("POW_123")
-            .build());
-        index(program()
-            .lexicoTitle("BZT Show")
-            .mid("POW_789")
-            .build());
-
-        SearchResult<MediaObject> result = target.find(null, form().titles(TitleSearch.builder()
-            .owner(OwnerType.BROADCASTER)
-            .type(TextualType.LEXICO)
-            .value("b*")
-            .matchType(ExtendedMatchType.WILDCARD)
-            .caseSensitive(false)
-            .build())
-            .build(), 0, null);
-        assertThat(result.getSize()).isEqualTo(2);
-        log.info("{}", result);
-    }
-
-    @Test
     public void testFindByTitlesCaseInSensitive() throws InterruptedException, ExecutionException, IOException {
         index(program()
             .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
@@ -1457,9 +1430,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(form.getFacets().getTitles().asMediaFacet()).isTrue();
 
-
         MediaSearchResult result = target.find(null, form, 0, 0);
-        assertThat(result.getSize()).isEqualTo(0);
+        assertThat(result.getTotal()).isEqualTo(3);
         assertThat(result.getFacets().getTitles()).hasSize(4); // Actually, I think, it should have been 3, 'aaa subtitle' is not a main title
         log.info("{}", result);
     }
@@ -1531,9 +1503,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(form.getFacets().getTitles().asMediaFacet()).isFalse();
 
-        MediaSearchResult result = target.find(null, form, 0, 0);
-        Jackson2Mapper.getPrettyInstance().writeValue(System.out, form);
-        assertThat(result.getSize()).isEqualTo(0);
+        MediaSearchResult result  = target.find(null, form, 0, 0);
+        //Jackson2Mapper.getPrettyInstance().writeValue(System.out, form);
+        assertThat(result.getTotal()).isEqualTo(4);
         assertThat(result.getFacets().getTitles()).hasSize(2);
         assertThat(result.getFacets().getTitles().get(0).getId()).isEqualTo("a");
         assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(3); // namely, abcde and aaaaa
@@ -1543,19 +1515,41 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void expandedTitles() throws IOException {
+    public void expandedTitles() throws IOException, ExecutionException, InterruptedException {
+        index(program()
+            .mainTitle("christmas", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mid("POW_123")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
+            .build());
+        index(program()
+            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mid("POW_234")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
+            .build());
+        index(program()
+            .mainTitle("aaaaa")
+            .mid("POW_345")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
+            .build());
+        index(program()
+            .mainTitle("bbbbb")
+            .mid("POW_456")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
+        index(program()
+            .mainTitle("BBBB")
+            .mid("POW_567")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .build());
+
         MediaForm form = Jackson2Mapper.getInstance().readValue("{\n" +
             "    \"facets\": {\n" +
             "        \"titles\": [\n" +
-            "             {\n" +
-            "                 \"sort\" : \"COUNT_DESC\",\n" +
-            "                 \"max\" : 23\n" +
-            "             },\n" +
             "            {\n" +
             "                \"name\": \"a\",\n" +
             "                \"subSearch\": {\n" +
             "                    \"type\": \"MAIN\",\n" +
-            "                    \"value\": \"a*\",\n" +
+            "                    \"value\": \"b*\",\n" +
             "                    \"matchType\": \"WILDCARD\"\n" +
             "                }\n" +
             "            },\n" +
@@ -1563,19 +1557,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             "                \"name\": \"b\",\n" +
             "                \"subSearch\": {\n" +
             "                    \"type\": \"MAIN\",\n" +
-            "                    \"value\": \"b*\",\n" +
+            "                    \"value\": \"a*\",\n" +
             "                    \"matchType\": \"WILDCARD\"\n" +
             "                }\n" +
-            "            }\n" +
-            "        ]\n" +
-            "    },\n" +
-            "    \"searches\": {\n" +
-            "        \"titles\": [\n" +
-            "            {\n" +
-            "                \"match\": \"SHOULD\",\n" +
-            "                \"type\": \"MAIN\",\n" +
-            "                \"value\": \"a*\",\n" +
-            "                \"matchType\": \"WILDCARD\"\n" +
             "            }\n" +
             "        ]\n" +
             "    }\n" +
@@ -1583,6 +1567,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaSearchResult result = target.find(null, form, 0, 0);
 
+        assertThat(result.getFacets().getTitles().get(0).getId()).isEqualTo("a");
+        assertThat(result.getFacets().getTitles().get(1).getId()).isEqualTo("b");
+        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2);
+        assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(2);
     }
 
     private void redirect(String from, String to) {
