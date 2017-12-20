@@ -1438,28 +1438,21 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
 
     @Test
-    public void testTitlesFacets() throws InterruptedException, ExecutionException, IOException {
+    public void testTitlesFacetsWithTextualType() throws InterruptedException, ExecutionException, IOException {
         index(program()
-            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
-            .mid("abcde")
+            .mainTitle("aaa")
+            .subTitle("xxx")// no broadcaster title, so it should fall back to this.
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
             .build());
         index(program()
-            .mainTitle("aaaaa")
-            .mid("aa")
+            .mainTitle("yyy")
+            .subTitle("bbb")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
             .build());
         index(program()
-            .mainTitle("bbbbb")
-            .subTitle("aaa subtitle")
-            .mid("bb")
-            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
-            .build());
-        index(program()
-            .mainTitle("AAAB")
-            .subTitle("AAA subtitle")
-            .mid("BB")
-            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
+            .mainTitle("yyy")
+            .subTitle("aaa")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
             .build());
 
         MediaForm form = form()
@@ -1468,50 +1461,127 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         form.setFacets(new MediaFacets());
 
 
-        TitleFacet aCaseInsensitive;
-        TitleFacet aCaseSensitive;
+        TitleFacet mainTitles;
+        TitleFacet subTiltes;
 
         {
-            TitleSearch subSearch = TitleSearch.builder()
+            TitleSearch subSearch1 = TitleSearch.builder()
                 .value("a*")
                 .match(Match.MUST)
                 .matchType(ExtendedMatchType.WILDCARD)
-                .caseSensitive(false)
                 .type(TextualType.MAIN)
                 .build();
 
-            aCaseInsensitive  = new TitleFacet();
-            aCaseInsensitive.setName("a");
-            aCaseInsensitive.setSubSearch(subSearch);
+            mainTitles  = new TitleFacet();
+            mainTitles.setName("mainTitleswithA");
+            mainTitles.setSubSearch(subSearch1);
         }
         {
-            TitleSearch subSearch = TitleSearch.builder()
-                .value("A*")
+            TitleSearch subSearch2 = TitleSearch.builder()
+                .value("b*")
                 .match(Match.MUST)
                 .matchType(ExtendedMatchType.WILDCARD)
-                .caseSensitive(true)
-                .type(TextualType.MAIN)
+                .type(TextualType.SUB)
                 .build();
 
-            aCaseSensitive = new TitleFacet();
-            aCaseSensitive.setName("A");
-            aCaseSensitive.setSubSearch(subSearch);
+            subTiltes = new TitleFacet();
+            subTiltes.setName("subtitlesWithB");
+            subTiltes.setSubSearch(subSearch2);
         }
 
-
-        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(aCaseInsensitive, aCaseSensitive)));
+        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(mainTitles, subTiltes)));
 
         assertThat(form.getFacets().getTitles().asMediaFacet()).isFalse();
 
         MediaSearchResult result  = target.find(null, form, 0, 0);
         //Jackson2Mapper.getPrettyInstance().writeValue(System.out, form);
-        assertThat(result.getTotal()).isEqualTo(4);
+        assertThat(result.getTotal()).isEqualTo(3);
         assertThat(result.getFacets().getTitles()).hasSize(2);
-        assertThat(result.getFacets().getTitles().get(0).getId()).isEqualTo("a");
-        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(3); // namely, abcde and aaaaa
-        assertThat(result.getFacets().getTitles().get(1).getId()).isEqualTo("A");
-        assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(1); // namely, AAAB
-        log.info("{}", result);
+        assertThat(result.getFacets().getTitles().get(0).getId()).isEqualTo("mainTitleswithA");
+        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(1); // namely, aaa
+        assertThat(result.getFacets().getTitles().get(1).getId()).isEqualTo("subtitlesWithB");
+        assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(1); // namely, bbb
+    }
+
+    @Test
+    public void testTitlesFacetsWithTextualTypeAndCaseSensitive() throws InterruptedException, ExecutionException, IOException {
+        index(program()
+            .mainTitle("AAA")
+            .subTitle("xxx")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
+            .build());
+        index(program()
+            .mainTitle("AAA")
+            .subTitle("yyy")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
+            .build());
+        index(program()
+            .mainTitle("bbb")
+            .subTitle("aaa")
+            .creationDate(LocalDateTime.of(2017, 10, 11, 10, 1))
+            .build());
+
+        MediaForm form = form()
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
+            .build();
+        form.setFacets(new MediaFacets());
+
+        TitleFacet aMainTitlesCaseSensitive;
+        TitleFacet aCaseInsensitive;
+        TitleFacet aSubTitlesCaseInsensitive;
+
+        {
+            TitleSearch subSearch1 = TitleSearch.builder()
+                .value("A*")
+                .match(Match.MUST)
+                .caseSensitive(true)
+                .matchType(ExtendedMatchType.WILDCARD)
+                .type(TextualType.MAIN)
+                .build();
+
+            aMainTitlesCaseSensitive = new TitleFacet();
+            aMainTitlesCaseSensitive.setName("mainTitleswithCapitalA");
+            aMainTitlesCaseSensitive.setSubSearch(subSearch1);
+        }
+        {
+            TitleSearch subSearch2 = TitleSearch.builder()
+                .value("A*")
+                .match(Match.MUST)
+                .caseSensitive(false)
+                .matchType(ExtendedMatchType.WILDCARD)
+                .build();
+
+            aCaseInsensitive = new TitleFacet();
+            aCaseInsensitive.setName("allTitlesWithA");
+            aCaseInsensitive.setSubSearch(subSearch2);
+        }
+
+        {
+            TitleSearch subSearch3 = TitleSearch.builder()
+                .value("A*")
+                .match(Match.MUST)
+                .type(TextualType.SUB)
+                .caseSensitive(false)
+                .matchType(ExtendedMatchType.WILDCARD)
+                .build();
+
+            aSubTitlesCaseInsensitive = new TitleFacet();
+            aSubTitlesCaseInsensitive.setName("allSubtitlesWithA");
+            aSubTitlesCaseInsensitive.setSubSearch(subSearch3);
+        }
+
+        form.getFacets().setTitles(new TitleFacetList(Arrays.asList(aMainTitlesCaseSensitive, aCaseInsensitive, aSubTitlesCaseInsensitive)));
+
+        MediaSearchResult result = target.find(null, form, 0, 0);
+
+        assertThat(result.getTotal()).isEqualTo(3);
+        assertThat(result.getFacets().getTitles()).hasSize(3);
+        assertThat(result.getFacets().getTitles().get(0).getId()).isEqualTo("mainTitleswithCapitalA");
+        assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2);
+        assertThat(result.getFacets().getTitles().get(1).getId()).isEqualTo("allTitlesWithA");
+        assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(3);
+        assertThat(result.getFacets().getTitles().get(2).getId()).isEqualTo("allSubtitlesWithA");
+        assertThat(result.getFacets().getTitles().get(2).getCount()).isEqualTo(1);
     }
 
     @Test
