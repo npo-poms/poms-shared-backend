@@ -63,6 +63,10 @@ public enum MediaESType {
         return toString(DELETED_MEDIAOBJECTS);
     }
 
+    public static boolean isDeleted(String type) {
+        return type.startsWith("deleted");
+    }
+
     public static String[] nonRefs() {
         return toString(
             Stream.concat(
