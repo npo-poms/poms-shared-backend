@@ -44,26 +44,53 @@ else
 fi
 
 
+targetfile=target/$destindex.json
+mkdir target
 
-rm $destindex.json
 echo "putting settings"
-echo '{ "settings":' > $destindex.json
-cat $basedir/setting/pageupdates.json >> $destindex.json
-echo ',"mappings": {' >> $destindex.json
+echo '{ "settings":' > $targetfile
+cat $basedir/es5/setting/pageupdates.json >> $targetfile
+echo ',"mappings": {' >> $targetfile
 
 declare -a arr=( "pageupdate" "deletedpageupdate" )
 for i in "${!arr[@]}"
 do
     mapping=${arr[$i]}
     if [ $i -gt 0 ]; then
-      echo "," >> $destindex.json
+      echo "," >> $targetfile
     fi
-    echo '"'$mapping'": ' >>  $destindex.json
-    cat $basedir/mapping/$mapping.json >> $destindex.json
+    echo '"'$mapping'": ' >>  $targetfile
+    cat $basedir/es5/mapping/$mapping.json >> $targetfile
 done
-echo -e '}\n}' >> $destindex.json
+echo -e '}\n}' >> $targetfile
 
-echo Created $destindex.json
+echo Created $targetfile
 
-curl -XPUT $desthost/$destindex -d@$destindex.json
+curl -XPUT $desthost/$destindex -d@$targetfile
 
+
+
+   echo "moving alias $previndex $destindex"
+
+   publishalias="{
+    \"actions\": [";
+
+
+  if [ "$previndex" != "" -a $(($2-1)) -gt 0 ] ; then
+   publishalias="$publishalias
+        { \"remove\": {
+            \"alias\": \"pageupdates-publish\",
+            \"index\": \"$previndex\"
+        }},";
+  fi
+   publishalias="$publishalias
+
+        { \"add\": {
+            \"alias\": \"pageupdates-publish\",
+            \"index\": \"$destindex\"
+        }}
+    ]
+}
+"
+echo $publishalias
+curl -XPOST $desthost/_aliases -d "$publishalias"
