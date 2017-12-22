@@ -1,12 +1,11 @@
 {
   "source": {
       "remote": {
-          "host": "http://ddu18laas:9200"
+          "host": "http://localhost:9210"
       },
-      "index": "apipages"
-
+      "index": "apimedia"
   },
     "dest": {
-        "index": "apipages-1"
+        "index": "apimedia-publish"
     }
 }
