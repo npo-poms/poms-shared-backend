@@ -42,6 +42,7 @@ public enum MediaESType {
 
     }
 
+
     public static String[] mediaObjects() {
         return toString(MEDIAOBJECTS);
     }
