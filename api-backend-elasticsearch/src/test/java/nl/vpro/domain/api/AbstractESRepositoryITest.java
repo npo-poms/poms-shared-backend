@@ -192,8 +192,12 @@ public abstract class AbstractESRepositoryITest {
     }
 
 
-    protected static void refresh() throws ExecutionException, InterruptedException {
-        client.admin().indices().refresh(new RefreshRequest(indexName)).get();
+    protected static void refresh() {
+        try {
+            client.admin().indices().refresh(new RefreshRequest(indexName)).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage(), e);
+        }
 
     }
 
