@@ -108,7 +108,7 @@ public abstract class AbstractESRepositoryITest {
         }
     }
 
-    protected static String createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings) throws InterruptedException, ExecutionException, IOException {
+    protected static String createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings)  {
         if (indexName == null) {
             try {
                 NodesInfoResponse response = client.admin().cluster().nodesInfo(new NodesInfoRequest()).get();
@@ -126,6 +126,8 @@ public abstract class AbstractESRepositoryITest {
             } catch (NoNodeAvailableException noNodeAvailableException) {
                 log.warn("No elastic search node could be found with {}", client);
                 log.info("Please start up local elasticsearch version");
+            } catch (InterruptedException | ExecutionException | IOException e) {
+                log.error(e.getMessage(), e);
             }
         }
         refresh();
