@@ -27,7 +27,6 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
-import nl.vpro.domain.api.suggest.Query;
 
 /**
  * @author Michiel Meeuwissen
@@ -381,6 +380,20 @@ public abstract class ESQueryBuilder {
             apply(booleanQueryBuilder, nested, textMatchers.getMatch());
         }
     }
+
+
+    protected static void build(BoolQueryBuilder booleanQuery, ExtendedTextMatcher textMatcher, FieldApplier applier) {
+        if (textMatcher!= null) {
+            applier.applyField(booleanQuery, textMatcher);
+        }
+    }
+
+    protected static void build(BoolQueryBuilder booleanQuery, SimpleTextMatcher textMatcher, FieldApplier applier) {
+        if (textMatcher != null) {
+            applier.applyField(booleanQuery, textMatcher);
+        }
+    }
+
 
     public static <MT extends MatchType> QueryBuilder buildQuery(String fieldName, AbstractTextMatcher<MT> matcher) {
         return buildQuery(fieldName, matcher, false);
