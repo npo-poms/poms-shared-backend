@@ -111,7 +111,8 @@ public abstract class AbstractESRepositoryITest {
     protected static String createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings)  {
         if (indexName == null) {
             try {
-                NodesInfoResponse response = client.admin().cluster().nodesInfo(new NodesInfoRequest()).get();
+                NodesInfoResponse response = client.admin()
+                    .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
                 indexName = "test-" + index + "-" + DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss").format(LocalDateTime.now());
                 IndexHelper
