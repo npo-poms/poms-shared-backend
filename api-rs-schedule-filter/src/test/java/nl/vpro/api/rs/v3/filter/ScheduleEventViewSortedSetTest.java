@@ -73,6 +73,6 @@ public class ScheduleEventViewSortedSetTest {
         FilteredSortedSet<ScheduleEvent> filteredEvents = FilteredSortedSet.wrap("scheduleEvents", events);
         assertThat(filteredEvents.size()).isEqualTo(4);
 
-        assertThat(filteredEvents.first().getMediaObject().getDescendantOf()).isNotEmpty();
+        assertThat(filteredEvents.first().getParent().getDescendantOf()).isNotEmpty();
     }
 }

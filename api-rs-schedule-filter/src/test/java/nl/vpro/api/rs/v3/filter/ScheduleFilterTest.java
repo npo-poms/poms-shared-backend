@@ -40,6 +40,7 @@ public class ScheduleFilterTest {
     @Autowired
     UserDetailsService userDetailsService;
 
+    @SuppressWarnings("unchecked")
     @Before
     public void init() {
         Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
