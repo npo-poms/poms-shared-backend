@@ -127,7 +127,7 @@ public abstract class AbstractESRepositoryITest {
             } catch (NoNodeAvailableException noNodeAvailableException) {
                 log.warn("No elastic search node could be found with {}", client);
                 log.info("Please start up local elasticsearch version");
-            } catch (InterruptedException | ExecutionException | IOException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 log.error(e.getMessage(), e);
             }
         }
