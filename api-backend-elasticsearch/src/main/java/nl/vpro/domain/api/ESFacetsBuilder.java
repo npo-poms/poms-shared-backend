@@ -34,7 +34,6 @@ public abstract class ESFacetsBuilder {
 
     //public static final org.elasticsearch.common.joda.time.DateTimeZone DATE_TIME_ZONE = org.elasticsearch.common.joda.time.DateTimeZone.forID(TIMEZONE);
 
-    protected static final String ROOT_FILTER = "rootFilter";
 
     protected static final String FILTER_PREFIX = "filter_";
 

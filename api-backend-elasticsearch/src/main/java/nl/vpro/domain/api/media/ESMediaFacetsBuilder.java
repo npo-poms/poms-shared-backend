@@ -24,6 +24,9 @@ import nl.vpro.domain.media.support.TextualType;
  */
 public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
+    protected static final String ROOT_FILTER = "mediaRootFilter";
+
+
     public static void facets(SearchSourceBuilder searchBuilder, MediaForm form, QueryBuilder profileFilter) {
         buildFacets(searchBuilder, form, profileFilter, "");
     }

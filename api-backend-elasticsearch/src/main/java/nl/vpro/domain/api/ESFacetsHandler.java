@@ -35,7 +35,6 @@ import static nl.vpro.domain.api.ESFacetsBuilder.esField;
 @Slf4j
 public abstract class ESFacetsHandler {
 
-    protected static final String ROOT_FILTER = "rootFilter";
 
     protected static final String FILTER_PREFIX = "filter_";
 

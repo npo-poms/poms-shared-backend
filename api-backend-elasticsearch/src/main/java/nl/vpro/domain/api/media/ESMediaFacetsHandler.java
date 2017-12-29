@@ -5,11 +5,13 @@
 package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.vpro.domain.api.ESFacetsBuilder;
-import nl.vpro.domain.api.ESFacetsHandler;
-import nl.vpro.domain.api.MultipleFacetsResult;
-import nl.vpro.domain.api.TermFacetResultItem;
-import nl.vpro.domain.media.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -18,10 +20,13 @@ import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import nl.vpro.domain.api.ESFacetsBuilder;
+import nl.vpro.domain.api.ESFacetsHandler;
+import nl.vpro.domain.api.MultipleFacetsResult;
+import nl.vpro.domain.api.TermFacetResultItem;
+import nl.vpro.domain.media.*;
+
+import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 
 /**
  * @author Roelof Jan Koekoek
