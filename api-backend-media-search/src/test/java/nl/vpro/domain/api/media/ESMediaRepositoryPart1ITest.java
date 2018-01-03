@@ -30,6 +30,7 @@ import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
@@ -1426,8 +1427,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .asc(MediaSortField.creationDate)
             .build();
         form.setFacets(new MediaFacets());
+        TitleFacetList list = new TitleFacetList();
+        list.setSort(FacetOrder.COUNT_ASC);
         form.getFacets().setTitles(new TitleFacetList());
 
+        JAXB.marshal(form, LoggerOutputStream.info(log));
         assertThat(form.getFacets().getTitles().asMediaFacet()).isTrue();
 
         MediaSearchResult result = target.find(null, form, 0, 0);
@@ -1435,6 +1439,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.getFacets().getTitles()).hasSize(4); // Actually, I think, it should have been 3, 'aaa subtitle' is not a main title
         log.info("{}", result);
     }
+
 
 
     @Test
