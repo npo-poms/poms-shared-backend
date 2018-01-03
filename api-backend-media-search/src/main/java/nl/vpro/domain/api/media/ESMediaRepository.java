@@ -183,7 +183,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         SearchSourceBuilder search = searchBuilder(profile, form, ageRatingFilter, 0L, 0x7ffffef);
         String type = media.getClass().getSimpleName().toLowerCase();
         MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(indexName, type, media.getMid());
-        MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(new MoreLikeThisQueryBuilder.Item[] {item});
+        MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
+            filterFields(media, relatedFields, "titles.value"),
+            new String[] {},
+            new MoreLikeThisQueryBuilder.Item[] {item});
 
         moreLikeThisQueryBuilder
             .maxQueryTerms(10)
@@ -191,9 +194,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .minWordLength(4) // longer terms are more unique and randomize the outcome at a cost
             .minTermFreq(1)  // on limited text high term frequency gives strange results f.e. everything with "actueel"
             .minDocFreq(10)
+
         ;
 
-        //.setField(filterFields(media, relatedFields, "titles.value"))
+
         ActionFuture<SearchResponse> future;
         try {
             SearchRequest request = client()
