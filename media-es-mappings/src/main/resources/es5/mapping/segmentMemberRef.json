@@ -2,6 +2,9 @@
   "_parent": {
     "type": "segment"
   },
+  "_routing": {
+    "required": true
+  },
   "dynamic": "strict",
   "properties": {
     "added": {

@@ -3,6 +3,9 @@
   "_parent": {
     "type": "group"
   },
+  "_routing": {
+    "required": true
+  },
   "dynamic": "strict",
   "properties": {
     "added": {
