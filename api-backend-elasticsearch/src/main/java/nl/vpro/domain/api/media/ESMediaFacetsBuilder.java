@@ -233,11 +233,10 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 }
             }
             if (filter == null) {
-                throw new IllegalArgumentException();
+                throw new RuntimeException("No filter found for " + facet);
             }
 
-            FilterAggregationBuilder filterAggregationBuilder =
-                AggregationBuilders.filter(escapeFacetName(facet.getName()), filter);
+            FilterAggregationBuilder filterAggregationBuilder = AggregationBuilders.filter(escapeFacetName(facet.getName()), filter);
             rootAggregation.subAggregation(filterAggregationBuilder);
         }
     }
