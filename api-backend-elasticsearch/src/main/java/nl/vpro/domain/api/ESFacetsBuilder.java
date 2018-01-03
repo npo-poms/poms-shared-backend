@@ -4,6 +4,10 @@
  */
 package nl.vpro.domain.api;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.regex.Pattern;
+
 import org.apache.lucene.util.automaton.RegExp;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.script.Script;
@@ -19,10 +23,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-
-import java.time.Duration;
-import java.time.Instant;
-import java.util.regex.Pattern;
 
 /**
  * @author Roelof Jan Koekoek
@@ -94,11 +94,9 @@ public abstract class ESFacetsBuilder {
                             dateRange.getBegin() != null ? dateRange.getBegin().toEpochMilli() : Double.MIN_VALUE,
                             dateRange.getEnd() != null ? dateRange.getEnd().toEpochMilli() : Double.MAX_VALUE
                         );
-                    } else if(range instanceof DateRangeInterval) {
+                    } else if (range instanceof DateRangeInterval) {
                         DateRangeInterval dateRange = (DateRangeInterval) range;
-
                         String name = fieldName + "." + dateRange.getInterval();
-
                         String format = dateRange.getInterval().getUnit().getFormat();
 
                         DateHistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
@@ -127,7 +125,7 @@ public abstract class ESFacetsBuilder {
             case MONTH:
                 return interval.amount == 1 ? DateHistogramInterval.MONTH : DateHistogramInterval.days(interval.amount * 30);
             case WEEK:
-                return DateHistogramInterval.weeks(interval.amount);
+                return interval.amount == 1 ? DateHistogramInterval.WEEK : DateHistogramInterval.days(interval.amount * 7);
             case DAY:
                 return DateHistogramInterval.days(interval.amount);
             case HOUR:
