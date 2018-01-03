@@ -18,13 +18,16 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
@@ -178,40 +181,40 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
 
         SearchSourceBuilder search = searchBuilder(profile, form, ageRatingFilter, 0L, 0x7ffffef);
+        String type = media.getClass().getSimpleName().toLowerCase();
+        MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(indexName, type, media.getMid());
+        MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(new MoreLikeThisQueryBuilder.Item[] {item});
 
-      /*  MoreLikeThisRequestBuilder moreLikeThis = new MoreLikeThisRequestBuilder(
-            client(),
-                indexName,
-            media.getClass().getSimpleName().toLowerCase(),
-            media.getMid());
-
-        moreLikeThis
-            .setSearchSource(search) // I doubt this source is honored...
-            .setSearchSize(max)
+        moreLikeThisQueryBuilder
             .maxQueryTerms(10)
-            .setField(filterFields(media, relatedFields, "titles.value"))
-            .setPercentTermsToMatch(0.1f)
-            .setMinWordLen(4) // longer terms are more unique and randomize the outcome at a cost
-            .setMinTermFreq(1)  // on limited text high term frequency gives strange results f.e. everything with "actueel"
-            .setMinDocFreq(10)
+            //.percentTermsToMatch(0.1f)
+            .minWordLength(4) // longer terms are more unique and randomize the outcome at a cost
+            .minTermFreq(1)  // on limited text high term frequency gives strange results f.e. everything with "actueel"
+            .minDocFreq(10)
         ;
 
-        ListenableActionFuture<SearchResponse> future;
+        //.setField(filterFields(media, relatedFields, "titles.value"))
+        ActionFuture<SearchResponse> future;
         try {
-            future = moreLikeThis.execute();
+            SearchRequest request = client()
+                .prepareSearch(indexName)
+                .setTypes(MediaESType.mediaObjects())
+                .setSize(max)
+                .setQuery(moreLikeThisQueryBuilder)
+                .request();
+            future = client().search(request);
         } catch (Exception e) {
-            LOG_ERRORS.warn("findRelated max {}, {}, {}", max, profile, search, moreLikeThis);
+            LOG_ERRORS.warn("findRelated max {}, {}, {}", max, profile, search, moreLikeThisQueryBuilder);
             throw e;
         }
-*/
-       /* SearchResponse response = future.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+        SearchResponse response = future.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
 
         SearchHits hits = response.getHits();
 
         List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         //MediaSearchResults.setSelectedFacets(hits.getFa, form); // TODO
-        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits());*/
-       return null;
+        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits());
+
     }
 
     protected MediaObject getMediaObject(SearchHit hit) {
