@@ -1,7 +1,18 @@
 package nl.vpro.domain.api.schedule;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutionException;
+
+import org.elasticsearch.common.xcontent.XContentType;
+import org.junit.Before;
+import org.junit.Test;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.*;
@@ -9,16 +20,6 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,7 +36,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     }
 
     @Before
-    public void setup() throws IOException, ExecutionException, InterruptedException {
+    public void setup() {
         repository = new ESScheduleRepository(clientFactory, null);
         repository.setIndexName(indexName);
         clearIndex();
@@ -166,7 +167,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
         ScheduleResult result = repository.listSchedulesForMediaType(MediaType.MOVIE, date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
 
-        assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(movie);
+        assertThat(result.getItems().stream().map(ApiScheduleEvent::getParent)).containsExactly(movie);
     }
 
 
@@ -190,7 +191,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         ScheduleResult result = repository.listSchedulesForAncestor("DESCENDANT1",
             date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
 
-        assertThat(result.getItems().stream().map(ApiScheduleEvent::getMediaObject)).containsExactly(broadcast);
+        assertThat(result.getItems().stream().map(ApiScheduleEvent::getParent)).containsExactly(broadcast);
     }
 
 
@@ -297,7 +298,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         index(g, "group");
     }
 
-    private void index(MediaObject o, String mediaType) throws JsonProcessingException, ExecutionException, InterruptedException {
+    private void index(MediaObject o, String mediaType) throws JsonProcessingException {
         client.prepareIndex()
                 .setIndex(indexName)
                 .setType(mediaType)
