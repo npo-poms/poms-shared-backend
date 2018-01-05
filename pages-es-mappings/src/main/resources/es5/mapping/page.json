@@ -1569,7 +1569,8 @@
                   },
                   "fields": {
                     "full": {
-                      "type": "keyword"
+                      "type": "keyword",
+                      "fielddata": true
                     },
                     "stemmed": {
                       "type": "text",
@@ -1992,7 +1993,7 @@
       "type": "keyword"
     },
     "title": {
-      "type": "text",       
+      "type": "text",
       "fields": {
         "full": {
           "type": "keyword"
