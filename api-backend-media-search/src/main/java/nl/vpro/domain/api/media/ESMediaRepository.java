@@ -304,10 +304,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         SearchRequestBuilder builder = iterator
             .prepareSearch(indexName)
             .setTypes(type)
-            .setQuery(QueryBuilders.parentId(type, media.getMid()))
+            .setQuery(QueryBuilders.parentId(type, media.getMid()).ignoreUnmapped(false))
             .addSort("index", SortOrder.valueOf(order.name()))
             .addSort("added", SortOrder.ASC)
             .addSort("childRef", SortOrder.ASC)
+            .setRouting(media.getMid())
             .setFrom((int) offsetForES);
 
         if (maxForES != null) {

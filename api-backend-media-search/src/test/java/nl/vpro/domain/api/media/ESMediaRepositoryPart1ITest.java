@@ -1684,8 +1684,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .build();
         byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
         client.index(new IndexRequest(indexName, type, ref.getId())
-                .source(bytes, XContentType.JSON)
-                .parent(object.getMidRef()))
+            .source(bytes, XContentType.JSON)
+            .routing(object.getMidRef())
+            .parent(object.getMidRef()))
             .actionGet();
         log.info("Indexed {} {}", type, ref.getId());
         refresh();
