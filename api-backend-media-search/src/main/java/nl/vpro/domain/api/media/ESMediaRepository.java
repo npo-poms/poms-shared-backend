@@ -319,13 +319,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (profile == null) {
             SearchResponse response = builder.get();
             SearchHit[] hits = response.getHits().getHits();
-            mids = Arrays.stream(hits).map(sh -> String.valueOf(sh.getSource().get("childRef"))).collect(Collectors.toList());
+            mids = Arrays.stream(hits)
+                .map(sh -> String.valueOf(sh.getSource().get("childRef")))
+                .collect(Collectors.toList());
             total = response.getHits().getTotalHits();
         } else {
             mids = new ArrayList<>();
             iterator.forEachRemaining(mids::add);
         }
-        return Pair.of(total, null, mids, null);
+        return Pair.of(total, mids);
     }
 
     private <T extends MediaObject> Long filterWithProfile(List<T> objects, ProfileDefinition<MediaObject> profile, long offset, Integer max) {
