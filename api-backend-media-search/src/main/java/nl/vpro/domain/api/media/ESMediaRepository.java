@@ -366,7 +366,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(changesUpto.toEpochMilli());
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
             if (since.isBefore(changesUpto)) {
-                restriction = restriction.from(since.toEpochMilli());
+                long epoch = since.toEpochMilli();
+                restriction = restriction.from(epoch).includeLower(true);
             } else {
                 log.debug("Since is after commited changes window (before {}). Returing empty iterator.", changesUpto);
                 // This will result exactly nothing, so we return empty iterator immediately:
@@ -404,8 +405,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             iterator = peeking;
             while(true) {
                 MediaChange peek = peeking.peek();
+
                 if (peek != null) {
                     if (peek.getPublishDate() == null || peek.getMid() == null || peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
+                        log.debug("Peek is ok");
                         break;
                     } else {
                         MediaChange skipped = peeking.next();
