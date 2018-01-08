@@ -16,8 +16,10 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+
+import static org.apache.http.HttpHeaders.CONTENT_TYPE;
+import static org.jboss.resteasy.spi.CorsHeaders.*;
+
 
 /**
  * @author rico
@@ -36,9 +38,9 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
 
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
-        String origin = request.getHeaderString(HttpHeaders.ORIGIN);
+        String origin = request.getHeaderString(ORIGIN);
         HttpServletResponse realResponse = ResteasyProviderFactory.getContextData(HttpServletResponse.class);
-        boolean alreadyHasCorsHeaders = realResponse.getHeader(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN) != null;
+        boolean alreadyHasCorsHeaders = realResponse.getHeader(ACCESS_CONTROL_ALLOW_ORIGIN) != null;
         if  (!alreadyHasCorsHeaders) {
             if (corsPolicy.isEnabled()) {
                 String method = request.getMethod();
@@ -46,16 +48,16 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
                     boolean allowed = corsPolicy.allowedOriginAndMethod(origin, method);
 
                     if (allowed) {
-                        response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                        response.getHeaders().add(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                         //ACCESS_CONTROL_ALLOW_ORIGIN_VALUE is ook beschikbaar
-                        response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
-                        response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
-                        response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
+                        response.getHeaders().add(ACCESS_CONTROL_ALLOW_METHODS, CorsHeaders.ACCESS_CONTROL_ALLOW_METHODS_VALUE);
+                        response.getHeaders().add(ACCESS_CONTROL_ALLOW_HEADERS, CorsHeaders.ACCESS_CONTROL_ALLOW_HEADERS_VALUE);
+                        response.getHeaders().add(ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
                     }
                 }
             } else {
                 if (StringUtils.isNotEmpty(origin)) {
-                    response.getHeaders().add(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                    response.getHeaders().add(ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                 }
             }
         }
@@ -70,12 +72,12 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
     public void filter(ContainerRequestContext request) throws IOException {
 
         if("POST".equals(request.getMethod())) {
-            List<String> contentTypes = request.getHeaders().get(HttpHeaders.CONTENT_TYPE);
+            List<String> contentTypes = request.getHeaders().get(CONTENT_TYPE);
             if(contentTypes == null) {
-                request.getHeaders().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-            } else if(contentTypes.isEmpty() || contentTypes.equals(Collections.singletonList(MediaType.ALL_VALUE)) || contentTypes.equals(Collections.singletonList(MediaType.TEXT_PLAIN_VALUE))) {
+                request.getHeaders().add(CONTENT_TYPE, "application/json");
+            } else if(contentTypes.isEmpty() || contentTypes.equals(Collections.singletonList("*/*")) || contentTypes.equals(Collections.singletonList("text/plain"))) {
                 contentTypes.clear();
-                contentTypes.add(MediaType.APPLICATION_JSON_VALUE);
+                contentTypes.add("application/json");
             }
         }
     }
