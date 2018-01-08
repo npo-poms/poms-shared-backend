@@ -12,9 +12,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import com.google.common.net.HttpHeaders;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -44,7 +42,7 @@ public class CorsInterceptorTest {
         ContainerRequestContext request = mock(ContainerRequestContext.class);
         ContainerResponseContext response = mock(ContainerResponseContext.class);
         when(request.getHeaderString(HttpHeaders.ORIGIN)).thenReturn("localhost");
-        when(request.getMethod()).thenReturn(HttpMethod.GET.name());
+        when(request.getMethod()).thenReturn("GET");
         when(response.getHeaders()).thenReturn(headers);
 
         CorsInterceptor inst = new CorsInterceptor(corsPolicy);
@@ -61,31 +59,31 @@ public class CorsInterceptorTest {
 
 
         ContainerRequestContext request = mock(ContainerRequestContext.class);
-        when(request.getMethod()).thenReturn(HttpMethod.POST.name());
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeaders()).thenReturn(headers);
 
         CorsInterceptor inst = new CorsInterceptor(corsPolicy);
 
         inst.filter(request);
 
-        assertThat(request.getHeaders().get(HttpHeaders.CONTENT_TYPE)).containsExactly(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(request.getHeaders().get(HttpHeaders.CONTENT_TYPE)).containsExactly("application/json");
     }
 
     @Test
     public void testIEHack2() throws Exception {
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
-        headers.put(HttpHeaders.CONTENT_TYPE, new ArrayList<>(Collections.singletonList(MediaType.TEXT_PLAIN_VALUE)));
+        headers.put(HttpHeaders.CONTENT_TYPE, new ArrayList<>(Collections.singletonList("text/plain")));
 
 
         ContainerRequestContext request = mock(ContainerRequestContext.class);
-        when(request.getMethod()).thenReturn(HttpMethod.POST.name());
+        when(request.getMethod()).thenReturn("POST");
         when(request.getHeaders()).thenReturn(headers);
 
         CorsInterceptor inst = new CorsInterceptor(corsPolicy);
 
         inst.filter(request);
 
-        assertThat(request.getHeaders().get(HttpHeaders.CONTENT_TYPE)).containsExactly(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(request.getHeaders().get(HttpHeaders.CONTENT_TYPE)).containsExactly("application/json");
     }
 }
