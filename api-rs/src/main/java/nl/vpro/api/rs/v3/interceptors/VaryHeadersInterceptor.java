@@ -8,7 +8,8 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.Provider;
 
-import org.springframework.http.HttpHeaders;
+import com.google.common.net.HttpHeaders;
+
 
 /**
  * @author Michiel Meeuwissen
