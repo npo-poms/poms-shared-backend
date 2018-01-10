@@ -183,10 +183,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
         try {
             SearchResponse response = searchResponseFuture
-
                 .actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS)
                 ;
-
             SearchHits hits = response.getHits();
 
             List<SearchResultItem<? extends S>> adapted = adapt(hits, clazz);
