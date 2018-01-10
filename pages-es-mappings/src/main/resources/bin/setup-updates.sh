@@ -94,3 +94,14 @@ curl -XPUT $desthost/$destindex -d@$targetfile
 "
 echo $publishalias
 curl -XPOST $desthost/_aliases -d "$publishalias"
+
+reindex="{
+  \"source\": {
+    \"index\": \"$previndex\"
+    },
+   \"dest\": {
+    \"index\": \"$destindex\"
+  }
+}"
+echo
+curl -XPOST $desthost/_reindex -d "'$reindex'"
