@@ -672,9 +672,8 @@
                       "type": "keyword"
                     },
                     "lower": {
-                      "type": "text",
-                      "analyzer": "lowercase",
-                      "fielddata": true
+                      "type": "keyword",
+                      "normalizer": "lowercase_normalizer"
                     }
                   }
                 }
@@ -1375,17 +1374,7 @@
                       "type": "keyword"
                     },
                     "value": {
-                      "type": "text",
-                      "fields": {
-                        "full": {
-                          "type": "keyword"
-                        },
-                        "lower": {
-                          "type": "text",
-                          "analyzer": "lowercase",
-                          "fielddata": true
-                        }
-                      }
+                      "type": "text"
                     }
                   }
                 },
@@ -1403,24 +1392,7 @@
                   }
                 },
                 "tags": {
-                  "type": "keyword",
-                  "fields": {
-                    "full": {
-                      "type": "keyword"
-                    },
-                    "stemmed": {
-                      "type": "text",
-                      "analyzer": "dutch_stemmed",
-                      "norms": {
-                        "enabled": false
-                      }
-                    },
-                    "lower": {
-                      "type": "text",
-                      "analyzer": "lowercase",
-                      "fielddata": true
-                    }
-                  }
+                  "type": "keyword"
                 },
                 "teletext": {
                   "type": "long"
@@ -1466,28 +1438,7 @@
                       "type": "keyword"
                     },
                     "value": {
-                      "type": "text",
-                      "norms": {
-                        "enabled": false
-                      },
-                      "fields": {
-                        "full": {
-                          "type": "keyword",
-                          "index": true
-                        },
-                        "stemmed": {
-                          "type": "text",
-                          "analyzer": "dutch_stemmed",
-                          "norms": {
-                            "enabled": false
-                          }
-                        },
-                        "lower": {
-                          "type": "text",
-                          "analyzer": "lowercase",
-                          "fielddata": true
-                        }
-                      }
+                      "type": "text"
                     }
                   }
                 },
@@ -1543,9 +1494,8 @@
                   }
                 },
                 "lower": {
-                  "type": "text",
-                  "analyzer": "lowercase",
-                  "fielddata": true
+                  "type": "keyword",
+                  "normalizer": "lowercase_normalizer"
                 }
               }
             },
@@ -1569,8 +1519,7 @@
                   },
                   "fields": {
                     "full": {
-                      "type": "text",
-                      "fielddata": true
+                      "type": "text"
                     },
                     "stemmed": {
                       "type": "text",
@@ -1611,9 +1560,8 @@
                       }
                     },
                     "lower": {
-                      "type": "text",
-                      "analyzer": "lowercase",
-                      "fielddata": true
+                      "type": "keyword",
+                      "normalizer": "lowercase_normalizer"
                     }
                   }
                 }
@@ -1736,9 +1684,8 @@
           }
         },
         "lower": {
-          "type": "text",
-          "analyzer": "lowercase",
-          "fielddata": true
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
         }
       }
     },
@@ -1933,9 +1880,8 @@
               "type": "keyword"
             },
             "lower": {
-              "type": "text",
-              "analyzer": "lowercase",
-              "fielddata": true
+              "type": "keyword",
+              "normalizer": "lowercase_normalizer"
             }
           }
         }
@@ -1983,9 +1929,8 @@
           }
         },
         "lower": {
-          "type": "text",
-          "analyzer": "lowercase",
-          "fielddata": true
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
         }
       }
     },

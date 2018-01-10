@@ -78,6 +78,15 @@
         "pattern": "\\.([\\w\\d]+)(?:($|\\?|#|\\s))",
         "group": 1
       }
+    },
+    "normalizer": {
+      "lowercase_normalizer": {
+        "type": "custom",
+        "char_filter": [],
+        "filter": [
+          "lowercase"
+        ]
+      }
     }
   }
 }

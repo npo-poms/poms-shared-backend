@@ -1,13 +1,20 @@
 package nl.vpro.domain.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
-import nl.vpro.domain.api.media.Redirector;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.util.ThreadPools;
-import nl.vpro.util.TimeUtils;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.get.MultiGetItemResponse;
@@ -29,17 +36,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
+import com.fasterxml.jackson.databind.JsonNode;
 
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.stream.Collectors;
+import nl.vpro.domain.api.media.Redirector;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.util.ThreadPools;
+import nl.vpro.util.TimeUtils;
 
 
 /**
@@ -62,7 +65,6 @@ public abstract class AbstractESRepository<T> {
     protected Duration timeOut = Duration.ofSeconds(15);
 
     @Getter
-    @Setter
     protected String indexName = null;
 
     private final Set<String> loadTypes;
@@ -80,36 +82,44 @@ public abstract class AbstractESRepository<T> {
         loadTypes = new HashSet<>(Arrays.asList(getLoadTypes()));
     }
 
-    @PostConstruct
-    public void logIntro() {
-        log.info("ES Repository {} with factory {}", this, factory);
-        ThreadPools.backgroundExecutor.execute(() -> {
-            try {
-                String indexName = getIndexName();
-                if (indexName != null) {
-                    SearchResponse response = client()
-                        .prepareSearch(indexName)
-                        .setTypes(getRelevantTypes())
-                        .addAggregation(AggregationBuilders.terms("types")
-                            .field("_type")
-                            .order(Terms.Order.term(true))
-                        )
-                        .setSize(0)
-                        .get();
+    public void setIndexName(String indexName) {
+        if (! Objects.equals(indexName, this.indexName)) {
+            this.indexName = indexName;
+            logIntro();
+        }
+    }
 
-                    Terms a = response.getAggregations().get("types");
-                    String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
-                    log.info("{} {} currently contains {} items ({})", factory, getIndexName(), response.getHits().getTotalHits(), result);
-                } else {
-                    log.error("No indexname in {}", this);
+    protected void logIntro() {
+        if (StringUtils.isNotBlank(getIndexName())) {
+            log.info("ES Repository {} with factory {}", this, factory);
+            ThreadPools.backgroundExecutor.execute(() -> {
+                try {
+                    String indexName = getIndexName();
+                    if (indexName != null) {
+                        SearchResponse response = client()
+                            .prepareSearch(indexName)
+                            .setTypes(getRelevantTypes())
+                            .addAggregation(AggregationBuilders.terms("types")
+                                .field("_type")
+                                .order(Terms.Order.term(true))
+                            )
+                            .setSize(0)
+                            .get();
+
+                        Terms a = response.getAggregations().get("types");
+                        String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
+                        log.info("{} {} currently contains {} items ({})", factory, getIndexName(), response.getHits().getTotalHits(), result);
+                    } else {
+                        log.error("No indexname in {}", this);
+                    }
+                } catch (IndexNotFoundException ime) {
+                    log.info("{} does exist yet ({})",
+                        getIndexName(), ime.getMessage());
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
                 }
-            } catch (IndexNotFoundException ime) {
-                log.info("{} does exist yet ({})",
-                    getIndexName(), ime.getMessage());
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        });
+            });
+        }
     }
 
 

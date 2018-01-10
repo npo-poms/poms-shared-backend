@@ -11,7 +11,7 @@
       <props>
         <prop key="elasticSearch.media.facetLimit">20</prop>
         <prop key="elasticSearch.media.timeout">PT100S</prop>
-        <prop key="elasticSearch.media.index">apimedia</prop>
+        <prop key="elasticSearch.media.index"></prop>
         <prop key="mediaService.loadRepository">ELASTICSEARCH</prop>
         <prop key="mediaService.listRepository">ELASTICSEARCH</prop>
         <prop key="mediaService.changesRepository">ELASTICSEARCH</prop>

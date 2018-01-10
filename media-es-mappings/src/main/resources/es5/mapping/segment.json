@@ -558,9 +558,8 @@
               "type": "keyword"
             },
             "lower": {
-              "type": "text",
-              "analyzer": "lowercase",
-              "fielddata": true
+              "type": "keyword",
+              "normalizer": "lowercase_normalizer"
             }
           }
         }
@@ -593,9 +592,8 @@
           }
         },
         "lower": {
-          "type": "text",
-          "analyzer": "lowercase",
-          "fielddata": true
+          "type": "keyword",
+          "normalizer": "lowercase_normalizer"
         }
       }
     },
@@ -622,9 +620,8 @@
               "type": "keyword"
             },
             "lower": {
-              "type": "text",
-              "analyzer": "lowercase",
-              "fielddata": true
+              "type": "keyword",
+              "normalizer": "lowercase_normalizer"
             },
             "stemmed": {
               "type": "text",
@@ -665,9 +662,8 @@
               }
             },
             "lower": {
-              "type": "text",
-              "analyzer": "lowercase",
-              "fielddata": true
+              "type": "keyword",
+              "normalizer": "lowercase_normalizer"
             }
           }
         }
