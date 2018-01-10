@@ -1358,7 +1358,10 @@
               "type": "keyword"
             },
             "value": {
-              "type": "text"
+              "type": "text",
+              "norms": {
+                "enabled": false
+              }
             }
           }
         },
