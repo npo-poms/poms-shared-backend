@@ -1298,7 +1298,6 @@
         },
         "tags": {
           "type": "keyword"
-          }
         },
         "teletext": {
           "type": "long"
