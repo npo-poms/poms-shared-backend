@@ -61,6 +61,7 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
         SortedSet<T> forSub = null;
         for (T object : wrapped) {
             TextualType type = object.getType();
+            //noinspection deprecation
             if (type == TextualType.EPISODE) {
                 type = TextualType.SUB;
             }
