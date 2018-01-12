@@ -19,7 +19,7 @@
     <poms.shared.version>5.5.9</poms.shared.version>
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
-    <vpro.shared.version>1.75.2-SNAPSHOT</vpro.shared.version>
+    <vpro.shared.version>1.75.2</vpro.shared.version>
   </properties>
 
   <scm>
