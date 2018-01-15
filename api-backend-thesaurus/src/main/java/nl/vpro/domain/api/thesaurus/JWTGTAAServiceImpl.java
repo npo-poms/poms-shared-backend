@@ -4,14 +4,9 @@ import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
-import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -24,6 +19,7 @@ import nl.vpro.domain.media.gtaa.GTAAPerson;
 import nl.vpro.domain.media.gtaa.GTAARepository;
 import nl.vpro.openarchives.oai.Label;
 import nl.vpro.rs.thesaurus.update.NewPerson;
+import nl.vpro.util.DateUtils;
 
 /**
  * Wraps the {@link GTAARepository} to accept signed JWT to ensure the sender is
@@ -72,8 +68,8 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         parser.setAllowedClockSkewSeconds(5);
         Jws<Claims> claims = parser.parseClaimsJws(StringUtils.trim(jws));
         String creator = claims.getBody().getIssuer();
-        Instant issuedAt = claims.getBody().getIssuedAt().toInstant();
-        Instant maxAllowed = ZonedDateTime.now().minus(12, ChronoUnit.HOURS).toInstant();
+        Instant issuedAt = DateUtils.toInstant(claims.getBody().getIssuedAt());
+        Instant maxAllowed = Instant.now().minus(12, ChronoUnit.HOURS);
         if (issuedAt.isBefore(maxAllowed)) {
             throw new SecurityException("JWT token was issued more than the permitted 12 hours ago");
         }
