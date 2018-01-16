@@ -48,9 +48,7 @@
     },
     "awards": {
       "type": "text",
-      "norms": {
-        "enabled": false
-      }
+      "norms": false
     },
     "broadcasters": {
       "properties": {
@@ -67,9 +65,7 @@
             },
             "text": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         }
@@ -89,9 +85,7 @@
           "fields": {
             "text": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         }
@@ -119,9 +113,7 @@
           "fields": {
             "text": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         },
@@ -230,9 +222,7 @@
             },
             "text": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         }
@@ -295,16 +285,12 @@
         },
         "title": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          },
+          "norms": false,
           "fields": {
             "stemmed": {
               "type": "text",
               "analyzer": "dutch_stemmed",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         },
@@ -313,9 +299,7 @@
         },
         "credits": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "source": {
           "type": "keyword"
@@ -354,9 +338,7 @@
           "fields": {
             "text": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         }
@@ -656,9 +638,7 @@
             },
             "value": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         },
@@ -682,9 +662,7 @@
         },
         "textSubtitles": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "textPage": {
           "type": "text",
@@ -706,9 +684,7 @@
             },
             "value": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              },
+              "norms": false,
               "fields": {
                 "full": {
                   "type": "keyword"
@@ -716,9 +692,7 @@
                 "stemmed": {
                   "type": "text",
                   "analyzer": "dutch_stemmed",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             }
@@ -784,9 +758,7 @@
         },
         "awards": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "broadcasters": {
           "properties": {
@@ -803,9 +775,7 @@
                 },
                 "text": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             }
@@ -825,9 +795,7 @@
               "fields": {
                 "text": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             }
@@ -855,9 +823,7 @@
               "fields": {
                 "text": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             },
@@ -941,9 +907,7 @@
                 },
                 "text": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             }
@@ -1006,16 +970,12 @@
             },
             "title": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              },
+              "norms": false,
               "fields": {
                 "stemmed": {
                   "type": "text",
                   "analyzer": "dutch_stemmed",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             },
@@ -1024,9 +984,7 @@
             },
             "credits": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             },
             "source": {
               "type": "keyword"
@@ -1065,9 +1023,7 @@
               "fields": {
                 "text": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             }
@@ -1292,9 +1248,7 @@
         },
         "source": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "tags": {
           "type": "keyword"
@@ -1314,9 +1268,7 @@
             },
             "value": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              },
+              "norms": false,
               "fields": {
                 "full": {
                   "type": "keyword"
@@ -1324,9 +1276,7 @@
                 "stemmed": {
                   "type": "text",
                   "analyzer": "dutch_stemmed",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 }
               }
             }
@@ -1344,9 +1294,7 @@
             },
             "value": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         },
@@ -1384,9 +1332,7 @@
     },
     "source": {
       "type": "text",
-      "norms": {
-        "enabled": false
-      }
+      "norms": false
     },
     "tags": {
       "type": "keyword",
@@ -1397,9 +1343,7 @@
         "stemmed": {
           "type": "text",
           "analyzer": "dutch_stemmed",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "lower": {
           "type": "keyword",
@@ -1422,9 +1366,7 @@
         },
         "value": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          },
+          "norms": false,
           "fields": {
             "full": {
               "type": "keyword"
@@ -1432,9 +1374,7 @@
             "stemmed": {
               "type": "text",
               "analyzer": "dutch_stemmed",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         }
@@ -1452,9 +1392,7 @@
         },
         "value": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          },
+          "norms": false,
           "fields": {
             "full": {
               "type": "keyword",
@@ -1463,9 +1401,7 @@
             "stemmed": {
               "type": "text",
               "analyzer": "dutch_stemmed",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             },
             "lower": {
               "type": "keyword",

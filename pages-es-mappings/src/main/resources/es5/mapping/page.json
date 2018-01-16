@@ -16,9 +16,7 @@
             },
             "text": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         }
@@ -48,24 +46,18 @@
           "fields": {
             "tokens": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         },
         "text": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          },
+          "norms": false,
           "fields": {
             "stemmed": {
               "type": "text",
               "analyzer": "dutch_stemmed",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         },
@@ -78,9 +70,7 @@
       "properties": {
         "title": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "description": {
           "type": "text"
@@ -149,9 +139,7 @@
             },
             "awards": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             },
             "broadcasters": {
               "properties": {
@@ -168,9 +156,7 @@
                     },
                     "text": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 }
@@ -190,9 +176,7 @@
                   "fields": {
                     "text": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 }
@@ -220,9 +204,7 @@
                   "fields": {
                     "text": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 },
@@ -331,9 +313,7 @@
                     },
                     "text": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 }
@@ -396,16 +376,12 @@
                 },
                 "title": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  },
+                  "norms": false,
                   "fields": {
                     "stemmed": {
                       "type": "text",
                       "analyzer": "dutch_stemmed",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 },
@@ -414,9 +390,7 @@
                 },
                 "credits": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 },
                 "source": {
                   "type": "keyword"
@@ -455,9 +429,7 @@
                   "fields": {
                     "text": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 }
@@ -754,9 +726,7 @@
                     },
                     "value": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 },
@@ -780,9 +750,7 @@
                 },
                 "textSubtitles": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 },
                 "textPage": {
                   "type": "text",
@@ -804,9 +772,7 @@
                     },
                     "value": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      },
+                      "norms": false,
                       "fields": {
                         "full": {
                           "type": "keyword"
@@ -814,9 +780,7 @@
                         "stemmed": {
                           "type": "text",
                           "analyzer": "dutch_stemmed",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     }
@@ -882,9 +846,7 @@
                 },
                 "awards": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 },
                 "broadcasters": {
                   "properties": {
@@ -901,9 +863,7 @@
                         },
                         "text": {
                           "type": "text",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     }
@@ -923,9 +883,7 @@
                       "fields": {
                         "text": {
                           "type": "text",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     }
@@ -953,9 +911,7 @@
                       "fields": {
                         "text": {
                           "type": "text",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     },
@@ -1039,9 +995,7 @@
                         },
                         "text": {
                           "type": "text",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     }
@@ -1104,16 +1058,12 @@
                     },
                     "title": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      },
+                      "norms": false,
                       "fields": {
                         "stemmed": {
                           "type": "text",
                           "analyzer": "dutch_stemmed",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     },
@@ -1122,9 +1072,7 @@
                     },
                     "credits": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     },
                     "source": {
                       "type": "keyword"
@@ -1163,9 +1111,7 @@
                       "fields": {
                         "text": {
                           "type": "text",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     }
@@ -1387,9 +1333,7 @@
                 },
                 "source": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 },
                 "tags": {
                   "type": "keyword"
@@ -1409,9 +1353,7 @@
                     },
                     "value": {
                       "type": "text",
-                      "norms": {
-                        "enabled": false
-                      },
+                      "norms": false,
                       "fields": {
                         "full": {
                           "type": "keyword"
@@ -1419,9 +1361,7 @@
                         "stemmed": {
                           "type": "text",
                           "analyzer": "dutch_stemmed",
-                          "norms": {
-                            "enabled": false
-                          }
+                          "norms": false
                         }
                       }
                     }
@@ -1476,9 +1416,7 @@
             },
             "source": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             },
             "tags": {
               "type": "keyword",
@@ -1489,9 +1427,7 @@
                 "stemmed": {
                   "type": "text",
                   "analyzer": "dutch_stemmed",
-                  "norms": {
-                    "enabled": false
-                  }
+                  "norms": false
                 },
                 "lower": {
                   "type": "keyword",
@@ -1514,9 +1450,7 @@
                 },
                 "value": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  },
+                  "norms": false,
                   "fields": {
                     "full": {
                       "type": "keyword"
@@ -1524,9 +1458,7 @@
                     "stemmed": {
                       "type": "text",
                       "analyzer": "dutch_stemmed",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     }
                   }
                 }
@@ -1544,9 +1476,7 @@
                 },
                 "value": {
                   "type": "text",
-                  "norms": {
-                    "enabled": false
-                  },
+                  "norms": false,
                   "fields": {
                     "full": {
                       "type": "keyword",
@@ -1555,9 +1485,7 @@
                     "stemmed": {
                       "type": "text",
                       "analyzer": "dutch_stemmed",
-                      "norms": {
-                        "enabled": false
-                      }
+                      "norms": false
                     },
                     "lower": {
                       "type": "keyword",
@@ -1613,9 +1541,7 @@
             },
             "text": {
               "type": "text",
-              "norms": {
-                "enabled": false
-              }
+              "norms": false
             }
           }
         },
@@ -1638,9 +1564,7 @@
         },
         "title": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          },
+          "norms": false,
           "fields": {
             "stemmed": {
               "type": "text",
@@ -1679,9 +1603,7 @@
         },
         "text": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "lower": {
           "type": "keyword",
@@ -1709,9 +1631,7 @@
         },
         "title": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          },
+          "norms": false,
           "fields": {
             "stemmed": {
               "type": "text",
@@ -1845,9 +1765,7 @@
       "properties": {
         "title": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "referrer": {
           "type": "keyword"
@@ -1914,9 +1832,7 @@
       "fields": {
         "text": {
           "type": "text",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "full": {
           "type": "keyword"
@@ -1924,9 +1840,7 @@
         "stemmed": {
           "type": "text",
           "analyzer": "dutch_stemmed",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         },
         "lower": {
           "type": "keyword",
@@ -1946,9 +1860,7 @@
         "stemmed": {
           "type": "text",
           "analyzer": "dutch_stemmed",
-          "norms": {
-            "enabled": false
-          }
+          "norms": false
         }
       }
     },
