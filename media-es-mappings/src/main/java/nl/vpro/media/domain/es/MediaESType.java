@@ -55,6 +55,10 @@ public enum MediaESType {
         return valueOf(clazz.getSimpleName().toLowerCase());
     }
 
+    public static MediaESType deletedValueOf(Class<?> clazz) {
+        return valueOf("deleted" + clazz.getSimpleName().toLowerCase());
+    }
+
 
     public static String[] memberRefs() {
         return toString(MEMBERREFS);
