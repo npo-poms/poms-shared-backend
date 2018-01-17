@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * @author r.jansen
  */
 @Slf4j
-public class ESMediaRepositoryFlushDelayTest extends AbstractMediaESRepositoryITest {
+public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryITest {
 
     private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags");
 
