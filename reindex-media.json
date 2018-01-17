@@ -1,7 +1,7 @@
 {
   "source": {
       "remote": {
-          "host": "http://localhost:9210"
+          "host": "http://poms10aas:9200"
       },
       "index": "apimedia"
   },
