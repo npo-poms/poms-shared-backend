@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * @author r.jansen
  */
 @Slf4j
-public class ESMediaRepositoryFlushDelayTest extends AbstractMediaESRepositoryITest {
+public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryITest {
 
     private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags");
 
@@ -96,7 +96,7 @@ public class ESMediaRepositoryFlushDelayTest extends AbstractMediaESRepositoryIT
         assertThat(Duration.ofMillis(firstResultDelay)).isLessThan(target.getCommitDelay());
     }
 
-    private Callable<Long> indexer() throws Exception {
+    private Callable<Long> indexer() {
         return () -> {
             log.info("Indexer start");
             indexerStartTime = System.currentTimeMillis();
@@ -117,7 +117,7 @@ public class ESMediaRepositoryFlushDelayTest extends AbstractMediaESRepositoryIT
         };
     }
 
-    private Callable<Long> querier() throws Exception {
+    private Callable<Long> querier() {
         return () -> {
             long count = 0;
             log.info("Querier start");
