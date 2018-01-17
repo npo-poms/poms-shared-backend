@@ -96,7 +96,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
         assertThat(Duration.ofMillis(firstResultDelay)).isLessThan(target.getCommitDelay());
     }
 
-    private Callable<Long> indexer() throws Exception {
+    private Callable<Long> indexer() {
         return () -> {
             log.info("Indexer start");
             indexerStartTime = System.currentTimeMillis();
@@ -117,7 +117,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
         };
     }
 
-    private Callable<Long> querier() throws Exception {
+    private Callable<Long> querier() {
         return () -> {
             long count = 0;
             log.info("Querier start");
