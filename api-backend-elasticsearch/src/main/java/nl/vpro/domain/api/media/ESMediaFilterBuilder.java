@@ -253,7 +253,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     static QueryBuilder buildTextFilter(SimpleTextMatcher textSearch, List<SearchFieldDefinition> searchFields) {
         BoolQueryBuilder answer = QueryBuilders.boolQuery();
         for(SearchFieldDefinition searchField : searchFields) {
-            QueryBuilder textFilter = ESQueryBuilder.buildQuery(searchField.getName(), textSearch);
+            QueryBuilder textFilter = ESQueryBuilder.buildQuery(searchField.getName(), textSearch, ESMatchType.FieldInfo.TEXT);
             answer.should(textFilter);
         }
         return answer;
@@ -269,9 +269,9 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
             }
 
             public <MT extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<MT> matcher) {
-                QueryBuilder extensionFilter = ESQueryBuilder.buildQuery("locations.programUrl.extension", matcher, true);
+                QueryBuilder extensionFilter = ESQueryBuilder.buildQuery("locations.programUrl.extension", matcher, ESMatchType.FieldInfo.TEXT);
                 booleanQueryBuilder.should(extensionFilter);
-                QueryBuilder formatFilter = ESQueryBuilder.buildQuery("locations.avAttributes.avFileFormat", matcher, true);
+                QueryBuilder formatFilter = ESQueryBuilder.buildQuery("locations.avAttributes.avFileFormat", matcher, ESMatchType.FieldInfo.TEXT);
                 booleanQueryBuilder.should(formatFilter);
             }
 

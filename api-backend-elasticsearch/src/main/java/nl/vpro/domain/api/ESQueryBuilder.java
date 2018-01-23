@@ -228,20 +228,20 @@ public abstract class ESQueryBuilder {
 
 
     public interface FieldApplier<M extends Matcher> {
-        <T extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, M matcher);
+        void applyField(BoolQueryBuilder booleanQueryBuilder, M matcher);
 
     }
 
 
-    protected static abstract class AbstractSingleFieldApplier<M extends Matcher> implements FieldApplier<M> {
+    protected static abstract class SingleFieldApplier<M extends Matcher> implements FieldApplier<M> {
         protected final String fieldName;
 
-        public AbstractSingleFieldApplier(String fieldName) {
+        public SingleFieldApplier(String fieldName) {
             this.fieldName = fieldName;
         }
     }
 
-    public static class ExtendedTextSingleFieldApplier extends AbstractSingleFieldApplier<ExtendedTextMatcher> {
+    public static class ExtendedTextSingleFieldApplier extends SingleFieldApplier<ExtendedTextMatcher> {
         public ExtendedTextSingleFieldApplier(String fieldName) {
             super(fieldName);
         }
@@ -249,25 +249,36 @@ public abstract class ESQueryBuilder {
         @Override
         public void applyField(BoolQueryBuilder booleanQueryBuilder, ExtendedTextMatcher matcher) {
 
-            QueryBuilder typeQuery = buildQuery(matcher.isCaseSensitive() ? fieldName + ".full" : fieldName + ".lower", matcher);
+            QueryBuilder typeQuery = buildQuery(matcher.isCaseSensitive() ? fieldName + ".full" : fieldName + ".lower", matcher, ESMatchType.FieldInfo.TEXT);
             apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
         }
 
     }
 
-    public static class TextSingleFieldApplier<MT extends MatchType> extends AbstractSingleFieldApplier<AbstractTextMatcher<MT>> {
+
+    public static class TextSingleFieldApplier<MT extends MatchType, TM extends AbstractTextMatcher<MT>> extends SingleFieldApplier<TM> {
+        final ESMatchType.FieldInfo fieldInfo;
+
         public TextSingleFieldApplier(String fieldName) {
             super(fieldName);
+            fieldInfo = ESMatchType.FieldInfo.TEXT;
+        }
+
+        public TextSingleFieldApplier(String fieldName, ESMatchType.FieldInfo fieldInfo) {
+            super(fieldName);
+            this.fieldInfo = fieldInfo;
         }
 
         @Override
-        public <T extends MatchType> void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher<MT> matcher) {
-            QueryBuilder typeQuery = buildQuery(fieldName, matcher);
+        public void applyField(BoolQueryBuilder booleanQueryBuilder, TM matcher) {
+            QueryBuilder typeQuery = buildQuery(fieldName, matcher, fieldInfo);
             apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
         }
     }
 
-    public static class DateSingleFieldApplier extends AbstractSingleFieldApplier<DateRangeMatcher> {
+
+
+    public static class DateSingleFieldApplier extends SingleFieldApplier<DateRangeMatcher> {
         public DateSingleFieldApplier(String fieldName) {
             super(fieldName);
         }
@@ -280,7 +291,7 @@ public abstract class ESQueryBuilder {
 
     }
 
-    public static class DurationSingleFieldApplier extends AbstractSingleFieldApplier<DurationRangeMatcher> {
+    public static class DurationSingleFieldApplier extends SingleFieldApplier<DurationRangeMatcher> {
         public DurationSingleFieldApplier(String fieldName) {
             super(fieldName);
         }
@@ -301,22 +312,23 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    public static class TextMultipleFieldsApplier<MT extends MatchType> extends AbstractMultipleFieldsApplier<AbstractTextMatcher<MT>> {
+    public static class TextMultipleFieldsApplier<MT extends MatchType, TM extends AbstractTextMatcher<MT>> extends AbstractMultipleFieldsApplier<TM> {
 
-        public TextMultipleFieldsApplier(String[] fieldNames) {
+        public TextMultipleFieldsApplier(String... fieldNames) {
             super(fieldNames);
         }
 
         @Override
-        public void applyField(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcher matcher) {
+        public void applyField(BoolQueryBuilder booleanQueryBuilder, TM matcher) {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
             for (String fieldName : fieldNames) {
-                QueryBuilder extensionQuery = buildQuery(fieldName, matcher);
+                QueryBuilder extensionQuery = buildQuery(fieldName, matcher, ESMatchType.FieldInfo.TEXT);
                 bool.should(extensionQuery);
             }
             apply(booleanQueryBuilder, bool, matcher.getMatch());
 
         }
+
     }
 
     public static class DateMultipleFieldsApplier extends AbstractMultipleFieldsApplier<DateRangeMatcher> {
@@ -336,17 +348,20 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    protected static <T extends MatchType> void build(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<? extends AbstractTextMatcher<T>, T> textMatchers, FieldApplier applier) {
+    protected static <MT extends MatchType, TM extends AbstractTextMatcher<MT>, TML extends AbstractTextMatcherList<TM, MT>>
+    void buildFromList(BoolQueryBuilder booleanQueryBuilder, TML textMatchers,
+                        FieldApplier<TM> applier) {
         if (textMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
-            for (AbstractTextMatcher matcher : textMatchers.asList()) {
+            for (TM matcher : textMatchers.asList()) {
                 applier.applyField(sub, matcher);
             }
             apply(booleanQueryBuilder, sub, textMatchers.getMatch());
         }
     }
 
-    protected static void build(BoolQueryBuilder booleanQuery, DateRangeMatcherList rangeMatchers, FieldApplier applier) {
+    protected static void buildFromList(BoolQueryBuilder booleanQuery, DateRangeMatcherList rangeMatchers,
+                                        FieldApplier<DateRangeMatcher> applier) {
         if (rangeMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
 
@@ -358,7 +373,8 @@ public abstract class ESQueryBuilder {
     }
 
 
-    protected static void build(BoolQueryBuilder booleanQuery, DurationRangeMatcherList rangeMatchers, FieldApplier applier) {
+    protected static void buildFromList(BoolQueryBuilder booleanQuery, DurationRangeMatcherList rangeMatchers,
+                                        FieldApplier<DurationRangeMatcher> applier) {
         if (rangeMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
 
@@ -369,7 +385,7 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    protected static void nested(String path, BoolQueryBuilder booleanQueryBuilder, TextMatcherList textMatchers, FieldApplier applier) {
+    protected static void nested(String path, BoolQueryBuilder booleanQueryBuilder, TextMatcherList textMatchers, FieldApplier<TextMatcher> applier) {
         if (textMatchers != null) {
             BoolQueryBuilder query = QueryBuilders.boolQuery();
             for (TextMatcher matcher : textMatchers) {
@@ -382,32 +398,24 @@ public abstract class ESQueryBuilder {
     }
 
 
-    protected static void build(BoolQueryBuilder booleanQuery, ExtendedTextMatcher textMatcher, FieldApplier applier) {
+    protected static void build(BoolQueryBuilder booleanQuery, ExtendedTextMatcher textMatcher, ExtendedTextSingleFieldApplier applier) {
         if (textMatcher!= null) {
             applier.applyField(booleanQuery, textMatcher);
         }
     }
 
-    protected static void build(BoolQueryBuilder booleanQuery, SimpleTextMatcher textMatcher, FieldApplier applier) {
+    protected static void build(BoolQueryBuilder booleanQuery, SimpleTextMatcher textMatcher, FieldApplier<SimpleTextMatcher> applier) {
         if (textMatcher != null) {
             applier.applyField(booleanQuery, textMatcher);
         }
     }
 
 
-    public static <MT extends MatchType> QueryBuilder buildQuery(String fieldName, AbstractTextMatcher<MT> matcher) {
-        return buildQuery(fieldName, matcher, false);
-    }
 
-    public static <MT extends MatchType> QueryBuilder buildQuery(String fieldName, AbstractTextMatcher<MT> matcher, boolean makeLowerCase) {
+    public static <MT extends MatchType> QueryBuilder buildQuery(String fieldName, AbstractTextMatcher<MT> matcher, ESMatchType.FieldInfo fieldInfo) {
         String value = matcher.getValue();
-        if (makeLowerCase) {
-            value = value.toLowerCase();
-        }
-
         ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
-
-        return matchType.getQueryBuilder(fieldName, value, matcher.isCaseSensitive());
+        return matchType.getQueryBuilder(fieldName, ESMatchType.esValue(value, matcher.isCaseSensitive()), fieldInfo);
     }
 
 
@@ -416,17 +424,19 @@ public abstract class ESQueryBuilder {
      *
      * @param prefix not null path to the media node in the documents to search, including the last dot, can be blank
      */
-    public static QueryBuilder relationQuery(AbstractRelationSearch relationSearch, @NotNull BoolQueryBuilder booleanQuery, @NotNull String prefix) {
+    public static QueryBuilder relationQuery(
+        AbstractRelationSearch relationSearch,
+        @NotNull BoolQueryBuilder booleanQuery, @NotNull String prefix) {
         if (relationSearch == null) {
             return booleanQuery;
         }
 
         BoolQueryBuilder fieldWrapper = QueryBuilders.boolQuery();
-
-        build(fieldWrapper, relationSearch.getTypes(), new TextSingleFieldApplier(prefix + "relations.type"));
-        build(fieldWrapper, relationSearch.getBroadcasters(), new TextSingleFieldApplier(prefix + "relations.broadcaster"));
-        build(fieldWrapper, relationSearch.getValues(), new ExtendedTextSingleFieldApplier(prefix + "relations.value"));
-        build(fieldWrapper, relationSearch.getUriRefs(), new TextSingleFieldApplier(prefix + "relations.uriRef"));
+        buildFromList(fieldWrapper, relationSearch.getTypes(), new TextSingleFieldApplier<>(prefix + "relations.type"));
+        buildFromList(fieldWrapper, relationSearch.getBroadcasters(), new TextSingleFieldApplier<>(prefix + "relations.broadcaster"));
+        ExtendedTextMatcherList values = relationSearch.getValues();
+        //build(fieldWrapper, relationSearch.getValues(), new ExtendedTextSingleFieldApplier(prefix + "relations.value"));
+        buildFromList(fieldWrapper, relationSearch.getUriRefs(), new TextSingleFieldApplier<>(prefix + "relations.uriRef"));
 
         NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + "relations", fieldWrapper, ScoreMode.Max);
 
@@ -434,6 +444,7 @@ public abstract class ESQueryBuilder {
 
         return booleanQuery;
     }
+
 
 
     public static QueryBuilder buildQuery(String fieldName, DateRangeMatcher matcher) {
@@ -469,6 +480,5 @@ public abstract class ESQueryBuilder {
 
         return rangeQuery;
     }
-
 
 }

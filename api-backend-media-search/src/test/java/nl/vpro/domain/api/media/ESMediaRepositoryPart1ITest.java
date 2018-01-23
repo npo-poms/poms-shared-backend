@@ -67,11 +67,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
 
     @Override
-    protected void firstRun() throws Exception {
+    protected void firstRun() {
         createIndexIfNecessary(ApiMediaIndex.NAME);
     }
     @Before
-    public  void setup() throws Exception {
+    public  void setup() {
         target.setIndexName(indexName);
         clearIndex();
     }
@@ -1296,7 +1296,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSortByLexicoForOwnerIllegalOwner() throws IOException, ExecutionException, InterruptedException {
+    public void testSortByLexicoForOwnerIllegalOwner() {
 
         MediaForm form = new MediaForm();
         form.addSortField(TitleSortOrder.builder()
@@ -1668,7 +1668,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         return object;
     }
 
-    private void indexMediaObject(MediaObject object) throws IOException, ExecutionException, InterruptedException {
+    private void indexMediaObject(MediaObject object) throws IOException {
         byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
         client.index(new IndexRequest(indexName, getTypeName(object), object.getMid())
             .source(bytes, XContentType.JSON))
@@ -1677,7 +1677,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     }
 
-    private void index(String type, MediaObject child, MemberRef object) throws IOException, ExecutionException, InterruptedException {
+    private void index(String type, MediaObject child, MemberRef object) throws IOException {
         StandaloneMemberRef ref = StandaloneMemberRef.builder()
             .childRef(child.getMid())
             .memberRef(object)
