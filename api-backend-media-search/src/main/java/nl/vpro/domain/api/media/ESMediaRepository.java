@@ -350,17 +350,25 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public Iterator<MediaChange> changes(Instant since, String mid, ProfileDefinition<MediaObject> currentProfile, ProfileDefinition<MediaObject> previousProfile, Order order, Integer max, Long keepAlive, Deletes deletes) {
+    public Iterator<MediaChange> changes(
+        Instant since,
+        String mid,
+        ProfileDefinition<MediaObject> currentProfile,
+        ProfileDefinition<MediaObject> previousProfile,
+        Order order,
+        Integer max,
+        Long keepAlive,
+        Deletes deletes) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
-        ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
+        final ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
         final SearchRequestBuilder searchRequestBuilder =
             i.prepareSearch(indexName)
                 .addSort("publishDate", SortOrder.valueOf(order.name()))
                 .addSort("mid", SortOrder.ASC);
 
-        ;
+
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
         final Instant changesUpto = Instant.now().minus(getCommitDelay());
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(changesUpto.toEpochMilli());

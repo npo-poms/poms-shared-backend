@@ -2,15 +2,18 @@ package nl.vpro.domain.api.schedule;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.StringReader;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.ExecutionException;
+
+import javax.xml.bind.JAXB;
 
 import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.Before;
 import org.junit.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.ApiScheduleEvent;
@@ -30,7 +33,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @Override
-    protected void firstRun() throws Exception {
+    protected void firstRun() {
         System.out.println("JAVAPORT " + System.getProperty("integ.java.port"));
         createIndexIfNecessary(ApiMediaIndex.NAME);
     }
@@ -265,6 +268,29 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     }
 
+    @Test
+    public void findScheduleWithGenre() throws JsonProcessingException {
+        Program broadcast1 = MediaBuilder.program().mid("p1")
+            .type(ProgramType.BROADCAST)
+            .genres("3.0.1.2", "3.0.1.2.3")
+            .scheduleEvents(
+                event(Channel.NDR3, "2018-01-23T11:00:00")
+            )
+            .build();
+        Program broadcast2 = MediaBuilder.program().mid("p2")
+            .type(ProgramType.BROADCAST)
+            .scheduleEvents(
+                event(Channel.NDR3, "2018-01-23T12:00:00")
+            )
+            .build();
+        index(broadcast1, broadcast2);
+
+        String example = "<api:scheduleForm xmlns:api=\"urn:vpro:api:2013\" xmlns:media=\"urn:vpro:media:2009\" xmlns:pages=\"urn:vpro:pages:2013\"><api:searches><api:genres match=\"MUST\"><api:matcher match=\"SHOULD\">3.0.1.2</api:matcher><api:matcher matchType=\"WILDCARD\" match=\"SHOULD\">3.0.1.2.*</api:matcher></api:genres><api:scheduleEvents><api:begin>2018-01-23T06:00:00+01:00</api:begin><api:end>2018-01-24T06:00:00+01:00</api:end><api:channel>NDR3</api:channel></api:scheduleEvents></api:searches></api:scheduleForm>";
+        ScheduleForm form = JAXB.unmarshal(new StringReader(example), ScheduleForm.class);
+        ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
+        assertThat(schedules).hasSize(1);
+    }
+
     private ScheduleEvent event(Channel c, String start) {
         return ScheduleEvent.builder()
             .channel(c)
@@ -286,15 +312,17 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         return LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(Schedule.ZONE_ID).toInstant();
     }
 
-    private void index(Program p) throws JsonProcessingException, ExecutionException, InterruptedException {
-        index(p, "program");
+    private void index(Program... ps) throws JsonProcessingException {
+        for (Program p : ps) {
+            index(p, "program");
+        }
     }
 
     private void index(Segment s) throws Exception {
         index(s, "segment");
     }
 
-    private void index(Group g) throws JsonProcessingException, ExecutionException, InterruptedException {
+    private void index(Group g) throws JsonProcessingException {
         index(g, "group");
     }
 
