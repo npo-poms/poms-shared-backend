@@ -483,6 +483,22 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
+    public void testFindWithGenreWildcardNothing() {
+        index(program().withMid().genres(new Genre("3.0.1.1.6")).build());
+        index(program().withMid().genres(new Genre("3.0.1.1.7")).build());
+        index(program().withMid().genres(new Genre("3.0.1.2.7")).build());
+
+
+        MediaForm form = form().genres(Match.MUST, new TextMatcher("4.0.1.*", Match.MUST, StandardMatchType.WILDCARD)).build();
+
+        MediaSearchResult result = target.find(null, form, 0, null);
+        assertThat(result.getSize()).isEqualTo(0);
+
+
+    }
+
+
+    @Test
     public void testFindWithGenreFacet() {
         index(program().withMid().withGenres().build());
 
