@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXB;
 
@@ -187,18 +188,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.must("fo.*", ExtendedMatchType.REGEX)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.must("fo.*", StandardMatchType.REGEX)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.must("FO.*", StandardMatchType.REGEX)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.must("FO.*", ExtendedMatchType.REGEX, false)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.must("FO.*", StandardMatchType.REGEX, false)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
@@ -213,18 +214,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.should("fo*bar", ExtendedMatchType.WILDCARD)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.should("fo*bar", StandardMatchType.WILDCARD)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.should("FO*BAR", StandardMatchType.WILDCARD)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.should("FO*BAR", ExtendedMatchType.WILDCARD, false)).build(), 0,
+                    form().tags(ExtendedTextMatcher.should("FO*BAR", StandardMatchType.WILDCARD, false)).build(), 0,
                     null);
             assertThat(result.getSize()).isEqualTo(1);
         }
@@ -1009,6 +1010,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertEquals(2L, (long) target.find(null, form().ageRating(_6, _12).build(), 0, null).getSize());
         assertEquals(1L, (long) target.find(null, form().ageRating(ALL).build(), 0, null).getSize());
         assertEquals(3L, (long) target.find(null, form().build(), 0, null).getSize());
+
+        assertEquals(2L, (long) target.find(null, form().ageRating(Pattern.compile("6|ALL")).build(), 0, null).getSize());
+
+
     }
 
     @Test
@@ -1341,7 +1346,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                     .owner(OwnerType.BROADCASTER)
                     .type(TextualType.MAIN)
                     .value("a*")
-                    .matchType(ExtendedMatchType.WILDCARD)
+                    .matchType(StandardMatchType.WILDCARD)
                     .caseSensitive(true)
                     .build()
             )
@@ -1388,7 +1393,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                     .type(TextualType.MAIN)
                     .value("a*")
                     .match(Match.MUST)
-                    .matchType(ExtendedMatchType.WILDCARD)
+                    .matchType(StandardMatchType.WILDCARD)
                     .caseSensitive(false)
                     .build()
             )
@@ -1473,7 +1478,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             TitleSearch subSearch1 = TitleSearch.builder()
                 .value("a*")
                 .match(Match.MUST)
-                .matchType(ExtendedMatchType.WILDCARD)
+                .matchType(StandardMatchType.WILDCARD)
                 .type(TextualType.MAIN)
                 .build();
 
@@ -1485,7 +1490,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             TitleSearch subSearch2 = TitleSearch.builder()
                 .value("b*")
                 .match(Match.MUST)
-                .matchType(ExtendedMatchType.WILDCARD)
+                .matchType(StandardMatchType.WILDCARD)
                 .type(TextualType.SUB)
                 .build();
 
@@ -1540,7 +1545,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .value("A*")
                 .match(Match.MUST)
                 .caseSensitive(true)
-                .matchType(ExtendedMatchType.WILDCARD)
+                .matchType(StandardMatchType.WILDCARD)
                 .type(TextualType.MAIN)
                 .build();
 
@@ -1553,7 +1558,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .value("A*")
                 .match(Match.MUST)
                 .caseSensitive(false)
-                .matchType(ExtendedMatchType.WILDCARD)
+                .matchType(StandardMatchType.WILDCARD)
                 .build();
 
             aCaseInsensitive = new TitleFacet();
@@ -1567,7 +1572,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .match(Match.MUST)
                 .type(TextualType.SUB)
                 .caseSensitive(false)
-                .matchType(ExtendedMatchType.WILDCARD)
+                .matchType(StandardMatchType.WILDCARD)
                 .build();
 
             aSubTitlesCaseInsensitive = new TitleFacet();

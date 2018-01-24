@@ -465,7 +465,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithTagsIgnoreCase() {
-        MediaForm form = form().tags(Match.SHOULD, new ExtendedTextMatcher("OnderKast", ExtendedMatchType.TEXT, false)).build();
+        MediaForm form = form().tags(Match.SHOULD, new ExtendedTextMatcher("OnderKast", StandardMatchType.TEXT, false)).build();
         SearchResult<MediaObject> result = target.find(null, form, 0, null);
 
         assertThat(result.getSize()).isEqualTo(2);
