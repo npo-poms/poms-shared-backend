@@ -75,6 +75,8 @@ public enum ESMatchType {
             return QueryBuilders.existsQuery(esField);
         } else if (builders.size() == 1) {
             return builders.get(0);
+        } else if (builders.isEmpty()) {
+            return QueryBuilders.termQuery(esField, "____IMPOSSIBLE_VALUES___");
         } else {
             BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             for (QueryBuilder qb : builders) {
