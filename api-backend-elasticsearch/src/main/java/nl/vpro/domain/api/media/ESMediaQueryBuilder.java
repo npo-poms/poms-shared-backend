@@ -22,6 +22,8 @@ import org.elasticsearch.join.query.JoinQueryBuilders;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
 import nl.vpro.domain.api.subtitles.SubtitlesSearch;
+import nl.vpro.domain.classification.ClassificationServiceLocator;
+import nl.vpro.domain.classification.Term;
 import nl.vpro.domain.media.AVType;
 import nl.vpro.domain.media.AgeRating;
 import nl.vpro.domain.media.ContentRating;
@@ -84,6 +86,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         if(searches == null) {
             return booleanQuery;
         }
+
 
         {
             SimpleTextMatcher textSearch = searches.getText();
@@ -166,8 +169,14 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
         buildFromList(booleanQuery, searches.getTags(), new ExtendedTextSingleFieldApplier(prefix + "tags"));
 
-        nested(prefix + "genres", booleanQuery, searches.getGenres(),
-            new TextSingleFieldApplier<>(prefix + "genres.id"));
+        List<String> terms = ClassificationServiceLocator.getInstance().values().stream().map(Term::getTermId).collect(Collectors.toList());
+        nested(
+            prefix + "genres", booleanQuery, searches.getGenres(),
+            new TextSingleFieldApplier<>(prefix + "genres.id",
+                ESMatchType.FieldInfo.builder()
+                    .possibleValues(terms)
+                    .build())
+        );
 
         buildFromList(booleanQuery, searches.getDurations(), new DurationSingleFieldApplier(prefix + "duration"));
 
