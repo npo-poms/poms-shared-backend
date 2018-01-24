@@ -412,7 +412,7 @@ public abstract class ESQueryBuilder {
 
 
 
-    public static <MT extends MatchType> QueryBuilder buildQuery(String fieldName, AbstractTextMatcher<MT> matcher, ESMatchType.FieldInfo fieldInfo) {
+    public static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> QueryBuilder buildQuery(String fieldName, TM  matcher, ESMatchType.FieldInfo fieldInfo) {
         String value = matcher.getValue();
         ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
         return matchType.getQueryBuilder(fieldName, ESMatchType.esValue(value, matcher.isCaseSensitive()), fieldInfo);
