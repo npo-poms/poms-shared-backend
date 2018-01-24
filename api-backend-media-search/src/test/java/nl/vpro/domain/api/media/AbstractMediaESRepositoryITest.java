@@ -2,9 +2,6 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
 import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
@@ -15,7 +12,7 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 @Slf4j
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
-    protected static String createIndexIfNecessary(String index) throws InterruptedException, ExecutionException, IOException {
+    protected static String createIndexIfNecessary(String index) {
         return createIndexIfNecessary(index, ApiMediaIndex::source, ApiMediaIndex.mappingsAsMap());
     }
 
