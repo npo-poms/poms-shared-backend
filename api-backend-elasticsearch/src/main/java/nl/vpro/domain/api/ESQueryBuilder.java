@@ -22,7 +22,6 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.collation.CollationAttributeFactory;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.util.IOUtils;
-import org.apache.lucene.util.Version;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
@@ -42,7 +41,6 @@ public abstract class ESQueryBuilder {
 
     private static final int PHRASE_SLOP = 4;
 
-    private static Version LUCENE_VERSION = Version.LUCENE_6_6_0;
     private static CharArraySet STOP_WORDS;
 
     static {

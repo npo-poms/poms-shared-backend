@@ -28,20 +28,23 @@ public enum MediaESType {
         return ApiMediaIndex.source(mapping());
     }
 
-    public static MediaESType[] MEDIAOBJECTS = {program, group, segment};
+    public static final MediaESType[] MEDIAOBJECTS = {program, group, segment};
 
-    public static MediaESType[] MEMBERREFS= {programMemberRef, groupMemberRef, segmentMemberRef};
+    public static final MediaESType[] MEMBERREFS= {programMemberRef, groupMemberRef, segmentMemberRef};
 
-    public static MediaESType[] REFS = {programMemberRef, groupMemberRef, segmentMemberRef, episodeRef};
+    public static final MediaESType[] REFS = {programMemberRef, groupMemberRef, segmentMemberRef, episodeRef};
 
-    public static MediaESType[] DELETED_MEDIAOBJECTS = {deletedprogram, deletedgroup, deletedsegment};
+    public static final MediaESType[] DELETED_MEDIAOBJECTS = {deletedprogram, deletedgroup, deletedsegment};
 
+    public static final MediaESType[] NON_REFS = Stream.concat(
+        Arrays.stream(MEDIAOBJECTS),
+        Arrays.stream(DELETED_MEDIAOBJECTS)).toArray(MediaESType[]::new);
 
     public static String[] toString(MediaESType... types) {
-        return Arrays.stream(types).map(Enum::name).toArray(String[]::new);
-
+        return Arrays.stream(types)
+            .map(Enum::name)
+            .toArray(String[]::new);
     }
-
 
     public static String[] mediaObjects() {
         return toString(MEDIAOBJECTS);
@@ -68,19 +71,15 @@ public enum MediaESType {
         return toString(DELETED_MEDIAOBJECTS);
     }
 
-    public static boolean isDeleted(String type) {
-        return type.startsWith("deleted");
-    }
-
     public static String[] nonRefs() {
-        return toString(
-            Stream.concat(
-                Arrays.stream(MEDIAOBJECTS),
-                Arrays.stream(DELETED_MEDIAOBJECTS)
-            ).toArray(MediaESType[]::new));
+        return toString(NON_REFS);
     }
     public static String[] refs() {
         return toString(REFS);
+    }
+
+    public static boolean isDeleted(String type) {
+        return type.startsWith("deleted");
     }
 
 
