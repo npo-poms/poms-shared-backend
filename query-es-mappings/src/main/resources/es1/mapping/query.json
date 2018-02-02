@@ -1,0 +1,35 @@
+{
+    "query" : {
+        "_id" : {
+            "path" : "id"
+        },
+        "_ttl": {
+            "enabled": true,
+            "default": "14d"
+        },
+        "dynamic" : "strict",
+        "properties" : {
+            "id" : {
+                "type" : "string",
+                "index" : "not_analyzed"
+            },
+            "text" : {
+                "type" : "string"
+            },
+            "profile" : {
+                "type" : "string",
+                "index" : "not_analyzed"
+            },
+            "sortDate" : {
+                "type" : "date",
+                "format" : "date_time"
+            },
+            "suggest" : {
+                "type" : "completion",
+                "index_analyzer" : "simple",
+                "search_analyzer" : "simple",
+                "payloads" : true
+            }
+        }
+    }
+}

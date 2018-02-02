@@ -35,6 +35,8 @@
 
     <module>media-es-mappings</module>
     <module>pages-es-mappings</module>
+    <module>query-es-mappings</module>
+
   </modules>
 
   <dependencies>
@@ -89,6 +91,16 @@
       <dependency>
         <groupId>nl.vpro.media</groupId>
         <artifactId>media-es-mappings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.pages</groupId>
+        <artifactId>pages-es-mappings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.publiekeomroep</groupId>
+        <artifactId>query-es-mappings</artifactId>
         <version>${project.version}</version>
       </dependency>
     </dependencies>

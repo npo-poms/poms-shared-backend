@@ -1,0 +1,28 @@
+{
+  "index": {
+    "mapper": {
+      "dynamic": false
+    },
+    "analysis": {
+      "analyzer": {
+        "default": {
+          "type": "dutch"
+        },
+        "dutch": {
+          "type": "custom",
+          "tokenizer": "icu_tokenizer",
+          "filter": [
+            "dutch",
+            "icu_folding"
+          ]
+        }
+      },
+      "filter": {
+        "dutch": {
+          "language": "Dutch",
+          "type": "snowball"
+        }
+      }
+    }
+  }
+}

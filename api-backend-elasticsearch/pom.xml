@@ -24,6 +24,10 @@
       <groupId>nl.vpro.media</groupId>
       <artifactId>media-es-mappings</artifactId>
     </dependency>
+    <dependency>
+      <groupId>nl.publiekeomroep</groupId>
+      <artifactId>query-es-mappings</artifactId>
+    </dependency>
     <!-- Override POMS parent with another Lucene version used by Elastic search -->
     <dependency>
       <groupId>org.apache.lucene</groupId>
