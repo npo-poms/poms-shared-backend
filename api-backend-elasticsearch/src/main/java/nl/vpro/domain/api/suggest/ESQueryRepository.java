@@ -68,6 +68,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
                 //.setOpType(DocWriteRequest.)
                 .setSource(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON)
                 .setTTL(queryTtl) // ms
+                .setId(query.getId())
                 .execute()
                 .actionGet();
         } catch (JsonProcessingException e) {
