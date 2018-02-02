@@ -1,9 +1,5 @@
 {
   "query": {
-    "_ttl": {
-      "enabled": true,
-      "default": "14d"
-    },
     "dynamic": "strict",
     "properties": {
       "id": {
@@ -20,10 +16,7 @@
         "format": "epoch_millis"
       },
       "suggest": {
-        "type": "completion",
-        "index_analyzer": "simple",
-        "search_analyzer": "simple",
-        "payloads": true
+        "type": "completion"
       }
     }
   }

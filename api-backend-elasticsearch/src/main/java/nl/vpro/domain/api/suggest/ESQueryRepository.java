@@ -1,17 +1,26 @@
 package nl.vpro.domain.api.suggest;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryAction;
 import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.AbstractESRepository;
@@ -20,6 +29,7 @@ import nl.vpro.domain.api.Suggestion;
 import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.util.ThreadPools;
 
 /**
  * @author Roelof Jan Koekoek
@@ -29,6 +39,12 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     private static final String[] RELEVANT_TYPES = new String[]{"query"};
     private static final Integer PROFILE_SEPARATOR_LENGTH = "||".length();
 
+    @Getter
+    private final Duration cleanInterval = Duration.ofHours(1);
+
+    @Getter
+    @Setter
+    private Duration ttl  = Duration.ofDays(14);
 
     @Override
     @Value("${elasticSearch.query.index}")
@@ -36,12 +52,22 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         super.setIndexName(indexName);
     }
 
-    @Value("${elasticSearch.query.ttl}")
-    private long queryTtl;
 
     @Autowired
     public ESQueryRepository(ESClientFactory client) {
         super(client);
+        ThreadPools.backgroundExecutor.scheduleWithFixedDelay(this::cleanSuggestions,
+            0, cleanInterval.toMillis(), TimeUnit.MILLISECONDS );
+    }
+
+    public void cleanSuggestions() {
+        BulkByScrollResponse response = DeleteByQueryAction.INSTANCE.newRequestBuilder(client())
+            .filter(QueryBuilders.rangeQuery("sortDate")
+                .lte(Instant.now().minus(ttl).toEpochMilli()))
+            .source(indexName)
+            .get();
+
+        log.info("Deleted {}", response.getDeleted());
     }
 
     @Override
@@ -67,7 +93,6 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
             client().prepareIndex(getIndexName(), "query")
                 //.setOpType(DocWriteRequest.)
                 .setSource(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON)
-                .setTTL(queryTtl) // ms
                 .setId(query.getId())
                 .execute()
                 .actionGet();
@@ -78,10 +103,10 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     @Override
     public SuggestResult suggest(String input, String profile, Integer max) {
-        CompletionSuggestionBuilder response = new CompletionSuggestionBuilder("completions");
-
         SearchResponse searchResponse = client().prepareSearch(getIndexName())
-            //.suggest(suggestBuilder(Query.queryId(input, profile), profile, max).build(asdfkl))
+            .suggest(
+                suggestBuilder(Query.queryId(input, profile), profile, max)
+            )
             .execute()
             .actionGet();
 
@@ -89,16 +114,18 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         return adapt(suggest, input, profile);
     }
 
-    private CompletionSuggestionBuilder suggestBuilder(String input, String profile, Integer max) {
+    private SuggestBuilder suggestBuilder(String input, String profile, Integer max) {
+        if (max == null) {
+            max = 10;
+        }
         int profilePrefixLength = profile != null ? profile.length() + PROFILE_SEPARATOR_LENGTH : 0;
-
-        // TODO
-        return new CompletionSuggestionBuilder("suggest")
-            .text(input)
-            //.field("suggest")
-            .size(max)
+        return new SuggestBuilder()
+            .addSuggestion("suggest",
+                new CompletionSuggestionBuilder("suggest")
+                    .text(input)
+                    .size(max))
             //.setFuzziness(Fuzziness.AUTO)
-            //.setFuzzyMinLength(profilePrefixLength + 3);
+            //setFuzzyMinLength(profilePrefixLength + 3);
         ;
     }
 
@@ -107,7 +134,10 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     }
 
     SuggestResult adapt(Suggest suggestions, final String input, final String profile) {
-
+        if (suggestions == null) {
+            log.debug("No suggestions given");
+            return SuggestResult.emptyResult();
+        }
         Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> esSuggestion = suggestions.getSuggestion("suggest");
         if (esSuggestion != null && esSuggestion.getEntries().size() > 0) {
             final List<? extends Suggest.Suggestion.Entry.Option> options = esSuggestion.getEntries().get(0).getOptions();
