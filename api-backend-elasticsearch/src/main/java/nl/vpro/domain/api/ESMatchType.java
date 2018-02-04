@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 
@@ -64,27 +63,22 @@ public enum ESMatchType {
     };
 
     protected QueryBuilder useCardinality(String esField, Predicate<String> value, List<String> possibleValues) {
-        List<QueryBuilder> builders = new ArrayList<>();
+        List<String> builders = new ArrayList<>();
         for (String possibleValue : possibleValues) {
             if (value.test(possibleValue)) {
-                builders.add(QueryBuilders.termQuery(esField, possibleValue));
+                builders.add(possibleValue);
             }
         }
         if (builders.size() == possibleValues.size()) {
             // every possible value matches, so this simply means that the value should exist
             return QueryBuilders.existsQuery(esField);
         } else if (builders.size() == 1) {
-            return builders.get(0);
+            return QueryBuilders.termQuery(esField, builders.get(0));
         } else if (builders.isEmpty()) {
             return QueryBuilders.termQuery(esField, "____IMPOSSIBLE_VALUES___" + value);
         } else {
-            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-            for (QueryBuilder qb : builders) {
-                boolQueryBuilder.should(qb);
-            }
-            return boolQueryBuilder;
+            return QueryBuilders.termsQuery(esField, builders);
         }
-
     }
 
     public abstract QueryBuilder getQueryBuilder(
