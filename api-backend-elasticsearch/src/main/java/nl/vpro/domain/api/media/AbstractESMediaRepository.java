@@ -6,17 +6,17 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.http.concurrent.BasicFuture;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.TransportSerializationException;
@@ -31,7 +31,6 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
-import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
 
 /**
@@ -42,6 +41,23 @@ import nl.vpro.util.TimeUtils;
 @ToString(callSuper = true)
 public abstract class AbstractESMediaRepository extends AbstractESRepository<MediaObject> implements MediaLoader {
 
+    private final IndexHelper helper;
+
+    protected AbstractESMediaRepository(ESClientFactory client) {
+        super(client);
+        this.helper = IndexHelper.builder()
+            .log(log)
+            .client(client)
+            .settings(ApiMediaIndex::source)
+            .mappings(ApiMediaIndex.mappingsAsMap())
+            .build();
+    }
+
+
+    @PostConstruct
+    public void init() {
+        helper.setIndexName(indexName);
+    }
 
     @Override
     @Value("${elasticSearch.media.index}")
@@ -62,45 +78,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
 
-    private final IndexHelper helper;
-
-    protected boolean createIndices = false;
-
-
-    protected AbstractESMediaRepository(ESClientFactory client) {
-        super(client);
-        this.helper = IndexHelper.builder()
-            .log(log)
-            .client(client)
-            .settings(ApiMediaIndex::source)
-            .mappings(ApiMediaIndex.mappingsAsMap())
-            .build();
-    }
-
-
-    @PostConstruct
-    public Future createIndices() {
-        helper.setIndexName(indexName);
-        if (isCreateIndices()) {
-            return ThreadPools.startUpExecutor.submit(helper::prepareIndex);
-        } else {
-            return new BasicFuture<>(null);
-        }
-    }
-
-    public boolean isCreateIndices() {
-        return createIndices;
-    }
-
-    public void setCreateIndices(boolean createIndices) {
-        this.createIndices = createIndices;
-    }
-
-    @Override
-    protected String[] getLoadTypes() {
-        return MediaESType.mediaObjects();
-    }
-
     @Override
     public MediaObject load(String mid) {
         mid = redirect(mid).orElse(mid);
@@ -113,59 +90,91 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
 
+    @Override
+    protected String[] getLoadTypes() {
+        return MediaESType.mediaObjects();
+    }
+
     protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         return loadAll(clazz, indexName, ids.toArray(new String[ids.size()]));
     }
 
 
-    final protected SearchRequest searchRequest(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, QueryBuilder extraFilter, long offset, Integer max) {
+    /**
+     * Defaulting version of {@link #searchRequest(String[], ProfileDefinition, AbstractMediaForm, MediaObject, BoolQueryBuilder, long, Integer)}
+     * Where the types is set to {@link #getLoadTypes()}
+     */
+    final protected SearchRequest searchRequest(
+        ProfileDefinition<MediaObject> profile,
+        AbstractMediaForm form,
+        long offset,
+        Integer max) {
+
         return searchRequest(
             getLoadTypes(),
             profile,
             form,
             null,
-            extraFilter,
+            QueryBuilders.boolQuery(),
             offset,
             max);
     }
 
-    protected SearchRequest searchRequest(
+    /**
+     * Builds a {@link SearchRequest}
+     *
+     * @param types   Which types to search (defaults to {@link #getLoadTypes()})
+     * @param profile The profile will be added as a filter on the resulting query
+     * @param form    Handles {@link AbstractMediaForm#getSearches()} and {@link MediaForm#getSortFields()}. Also, if applicate it
+     *                will handle {@link MediaForm#getFacets()}
+     */
+    final protected SearchRequest searchRequest(
         String[] types,
         ProfileDefinition<MediaObject> profile,
         AbstractMediaForm form,
         MediaObject mediaObject,
-        QueryBuilder extraFilter,
+        BoolQueryBuilder filter,
         long offset,
         Integer max) {
         SearchRequest request = new SearchRequest(indexName);
         request.types(types);
         request.source(
-            searchBuilder(profile, form, mediaObject, extraFilter, offset, max)
+            searchBuilder(profile, form, mediaObject, filter, offset, max)
         );
         return request;
     }
 
-    final protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, QueryBuilder extraFilter, long offset, Integer max) {
+    final protected SearchSourceBuilder searchBuilder(
+        ProfileDefinition<MediaObject> profile,
+        AbstractMediaForm form,
+        BoolQueryBuilder extraFilter,
+        long offset,
+        Integer max) {
         return searchBuilder(profile, form, null, extraFilter, offset, max);
     }
 
-    protected SearchSourceBuilder searchBuilder(ProfileDefinition<MediaObject> profile, AbstractMediaForm form, MediaObject mediaObject, QueryBuilder extraFilter, long offset, Integer max) {
+    final protected SearchSourceBuilder searchBuilder(
+        ProfileDefinition<MediaObject> profile,
+        AbstractMediaForm form,
+        MediaObject mediaObject,
+        BoolQueryBuilder filter,
+        long offset,
+        Integer max) {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+        ESMediaFilterBuilder.filter(profile, filter);
 
-        QueryBuilder profileFilter = ESMediaFilterBuilder.filter(profile, extraFilter);
-
-        searchBuilder.postFilter(profileFilter);
-
+        if (filter.hasClauses()) {
+            searchBuilder.postFilter(filter);
+        }
         QueryBuilder queryBuilder = ESMediaQueryBuilder.query(form != null ? form.getSearches() : null);
-
         QueryBuilder scoredBuilder = ESMediaScoreBuilder.score(queryBuilder, Instant.now());
 
         searchBuilder.query(scoredBuilder);
 
         if (form instanceof MediaForm) {
             ESMediaSortHandler.sort(searchBuilder, (MediaForm) form, mediaObject);
-            ESMediaFacetsBuilder.facets(searchBuilder, (MediaForm) form, profileFilter);
+            ESMediaFacetsBuilder.facets(searchBuilder, (MediaForm) form, filter);
         }
 
         buildHighlights(searchBuilder, form, ESMediaQueryBuilder.SEARCH_FIELDS);
@@ -176,7 +185,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
     protected <S extends MediaObject> GenericMediaSearchResult<S> executeQuery(
-        SearchRequest request, MediaFacets facets, long offset, Integer max, Class<S> clazz) {
+        SearchRequest request,
+        MediaFacets facets,
+        long offset,
+        Integer max,
+        Class<S> clazz) {
         ActionFuture<SearchResponse> searchResponseFuture = client()
             .search(request)
             ;
@@ -189,7 +202,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
             List<SearchResultItem<? extends S>> adapted = adapt(hits, clazz);
 
-            MediaFacetsResult facetsResult = ESMediaFacetsHandler.extractFacets(response, facets, this);
+            MediaFacetsResult facetsResult =
+                ESMediaFacetsHandler.extractFacets(response, facets, this);
             return new GenericMediaSearchResult<>(adapted, facetsResult, offset, max, hits.getTotalHits());
         } catch (TransportSerializationException e) {
             String detail = e.getDetailedMessage();
@@ -221,13 +235,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         redirectTextMatchers(search.getMemberOf());
     }
 
-    private void redirectMemberRefSearch(MemberRefSearch search) {
-        if (search == null) {
-            return;
-        }
-        redirectTextMatchers(search.getMediaIds());
-    }
-
 
     protected void redirectMemberRefFacet(MemberRefFacet facet) {
         if (facet == null) {
@@ -235,7 +242,13 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         }
         redirectMediaSearch(facet.getFilter());
         redirectMemberRefSearch(facet.getSubSearch());
+    }
 
+    private void redirectMemberRefSearch(MemberRefSearch search) {
+        if (search == null) {
+            return;
+        }
+        redirectTextMatchers(search.getMediaIds());
     }
 
 }
