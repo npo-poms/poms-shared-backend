@@ -698,6 +698,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                     .build())
                 .build())
             .ageRatingFacet(MediaFacet.builder()
+                .filter(MediaSearch.builder()
+                    .mediaIds(TextMatcherList.must(TextMatcher.must("MID-[04].*", StandardMatchType.REGEX)))
+                    .build()
+                )
                 .build()
             )
             .build();
@@ -706,10 +710,14 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         List<TermFacetResultItem> broadcasters = result.getFacets().getBroadcasters();
         assertThat(broadcasters).isNotNull();
+        long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
 
 
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
         assertThat(ageRatings).isNotNull();
+        long totalAgeRatingCount = ageRatings.stream().mapToLong(FacetResultItem::getCount).sum();
+
+        assertThat(totalBroadcasterCount).isNotEqualTo(totalAgeRatingCount);
 
         log.info("{}", result);
 
