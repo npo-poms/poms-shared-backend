@@ -187,6 +187,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .broadcasters("OMROEP" + (i % 3))
                 .memberOf(g, 1)
                 .avType(AVType.values()[i % AVType.values().length])
+                .ageRating(AgeRating.values()[i % AgeRating.values().length])
                 .predictions(Platform.INTERNETVOD)
                 .mid("MID-" + i)
                 .build());
@@ -685,6 +686,32 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("MID-1");
         assertThat(result.getItems().get(2).getResult().getMid()).isEqualTo("MID-4");
         assertThat(result.getItems().get(3).getResult().getMid()).isEqualTo("MID-5");
+
+    }
+
+    @Test
+    public void testWithMultipleFacetsAndFilter() {
+        MediaForm form = MediaFormBuilder.form()
+            .broadcasterFacet(MediaFacet.builder()
+                .filter(MediaSearch.builder()
+                    .mediaIds(TextMatcherList.must(TextMatcher.must("MID-[024].*", StandardMatchType.REGEX)))
+                    .build())
+                .build())
+            .ageRatingFacet(MediaFacet.builder()
+                .build()
+            )
+            .build();
+        MediaSearchResult result = target.find(null, form, 0L, 100);
+
+
+        List<TermFacetResultItem> broadcasters = result.getFacets().getBroadcasters();
+        assertThat(broadcasters).isNotNull();
+
+
+        List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
+        assertThat(ageRatings).isNotNull();
+
+        log.info("{}", result);
 
     }
 

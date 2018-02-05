@@ -123,7 +123,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     @Override
     public MediaSearchResult find(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max) {
         form = redirectForm(form);
-        SearchRequest request = searchRequest(profile, form, null, offset, max);
+        SearchRequest request = searchRequest(profile, form, offset, max);
         GenericMediaSearchResult<MediaObject> result = executeQuery(request, form != null ? form.getFacets() : null, offset, max, MediaObject.class);
         if (form != null && form.getFacets() != null) {
             result.setSelectedFacets(new MediaFacetsResult());
