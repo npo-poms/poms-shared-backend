@@ -1130,7 +1130,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().mainTitle("t5").ageRating(_6).build());
         index(program().mainTitle("t6").ageRating(ALL).build());
 
-        MediaSearchResult result = target.find(null, form().ageRating(ALL, _6, _12).ageRatingFacet(0).build(), 0, null);
+        MediaSearchResult result = target.find(null,
+            form()
+                .ageRating(ALL, _6, _12)
+                .ageRatingFacet(0)
+                .build(), 0, null
+        );
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
 
         assertEquals(5, ageRatings.size());

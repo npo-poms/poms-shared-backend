@@ -30,7 +30,9 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
+import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.FilteringIterator;
 
@@ -107,6 +109,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         createIndexIfNecessary(ApiMediaIndex.NAME);
 
+        BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
         target.mediaRepository = mock(MediaRepository.class);
         target.settings = new Settings();
         when(target.mediaRepository.redirect(anyString())).thenReturn(Optional.empty());

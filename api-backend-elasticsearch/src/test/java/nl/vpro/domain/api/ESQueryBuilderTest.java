@@ -35,4 +35,6 @@ public class ESQueryBuilderTest {
     public void testSplit5() {
         assertThat(ESQueryBuilder.split("  \"de vogels\"  in  \"de bomen\"")).containsExactly("\"de vogels\"", "in", "\"de bomen\"");
     }
+
+
 }

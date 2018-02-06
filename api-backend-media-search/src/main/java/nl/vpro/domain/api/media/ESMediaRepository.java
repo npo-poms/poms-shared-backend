@@ -121,10 +121,20 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
     @Override
-    public MediaSearchResult find(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max) {
+    public MediaSearchResult find(
+        ProfileDefinition<MediaObject> profile,
+        MediaForm form,
+        long offset,
+        Integer max) {
         form = redirectForm(form);
         SearchRequest request = searchRequest(profile, form, offset, max);
-        GenericMediaSearchResult<MediaObject> result = executeQuery(request, form != null ? form.getFacets() : null, offset, max, MediaObject.class);
+        GenericMediaSearchResult<MediaObject> result = executeQuery(
+            request,
+            form != null ? form.getFacets() : null,
+            offset,
+            max,
+            MediaObject.class
+        );
         if (form != null && form.getFacets() != null) {
             result.setSelectedFacets(new MediaFacetsResult());
         }
@@ -171,16 +181,20 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public MediaSearchResult findRelated(MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, Integer max) {
+    public MediaSearchResult findRelated(
+        MediaObject media,
+        ProfileDefinition<MediaObject> profile,
+        MediaForm form,
+        Integer max) {
         form = redirectForm(form);
         AgeRating ageRating = media.getAgeRating();
-        BoolQueryBuilder ageRatingFilter = null;
+        BoolQueryBuilder filter = QueryBuilders.boolQuery();
         if (ageRating != null) {
             String ratingString = ageRating == AgeRating.ALL ? ageRating.name() : ageRating.name().substring(1);
-            ageRatingFilter = QueryBuilders.boolQuery().must(QueryBuilders.termQuery("ageRating", ratingString));
+            filter.must(QueryBuilders.termQuery("ageRating", ratingString));
         }
 
-        SearchSourceBuilder search = searchBuilder(profile, form, ageRatingFilter, 0L, 0x7ffffef);
+        SearchSourceBuilder search = searchBuilder(profile, form, filter, 0L, 0x7ffffef);
         String type = media.getClass().getSimpleName().toLowerCase();
         MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(indexName, type, media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
@@ -267,7 +281,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .setQuery(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
             .setFrom((int) offset)
             .setSize(max)
-            .setPostFilter(ESMediaFilterBuilder.filter(profile, null))
+            .setPostFilter(ESMediaFilterBuilder.filter(profile))
             .request();
 
         GenericMediaSearchResult<MediaObject> objects =
@@ -489,7 +503,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         builder.setTypes(MediaESType.mediaObjects())
             .setSize(iterateBatchSize)
             .setQuery(ESMediaQueryBuilder.query(form != null ? form.getSearches() : null))
-            .setPostFilter(ESMediaFilterBuilder.filter(profile, null))
+            .setPostFilter(ESMediaFilterBuilder.filter(profile))
         ;
 
         Predicate<MediaObject> filter = Objects::nonNull;
@@ -540,9 +554,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return form;
     }
 
-    private <S extends MediaObject> GenericMediaSearchResult<S> findAssociatedMedia(String axis, MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, Class<S> clazz) {
+    private <S extends MediaObject> GenericMediaSearchResult<S> findAssociatedMedia(
+        String axis,
+        MediaObject media,
+        ProfileDefinition<MediaObject> profile,
+        MediaForm form,
+        long offset,
+        Integer max,
+        Class<S> clazz) {
         String ref = media.getMid();
-        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
+        BoolQueryBuilder booleanFilter =
+            QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
 
         SearchRequest request = searchRequest(getLoadTypes(), profile, form, media, booleanFilter, offset, max);
 

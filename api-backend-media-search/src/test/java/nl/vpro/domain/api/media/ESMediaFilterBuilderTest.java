@@ -8,10 +8,12 @@ import java.io.IOException;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
+import nl.vpro.domain.api.ESQueryBuilder;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.Filter;
 import nl.vpro.domain.media.MediaObject;
@@ -152,8 +154,10 @@ public class ESMediaFilterBuilderTest {
 
     @Test
     public void testFilterProfileWithExtraFilterOnNullProfile() throws Exception {
-        QueryBuilder builder = ESMediaFilterBuilder.filter((MediaSearch)null, QueryBuilders.termQuery("name", "value"));
-        assertThat(toString(builder)).isEqualTo(
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.termQuery("name", "value"));
+        ESMediaFilterBuilder.filter("", (MediaSearch)null, boolQueryBuilder);
+        assertThat(toString(ESQueryBuilder.simplifyQuery(boolQueryBuilder))).isEqualTo(
             "{\n" +
                 "  \"term\" : {\n" +
                 "    \"name\" : {\n" +
@@ -171,23 +175,26 @@ public class ESMediaFilterBuilderTest {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("Vpro")
         ));
-        QueryBuilder builder = ESMediaFilterBuilder.filter(definition, QueryBuilders.termQuery("name", "value"));
-        assertThat(toString(builder)).isEqualTo(
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder.must(QueryBuilders.termQuery("name", "value"));
+
+        ESMediaFilterBuilder.filter(definition, boolQueryBuilder);
+        assertThat(toString(boolQueryBuilder)).isEqualTo(
             "{\n" +
                 "  \"bool\" : {\n" +
                 "    \"must\" : [\n" +
                 "      {\n" +
                 "        \"term\" : {\n" +
-                "          \"broadcasters.id\" : {\n" +
-                "            \"value\" : \"Vpro\",\n" +
+                "          \"name\" : {\n" +
+                "            \"value\" : \"value\",\n" +
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
                 "        }\n" +
                 "      },\n" +
                 "      {\n" +
                 "        \"term\" : {\n" +
-                "          \"name\" : {\n" +
-                "            \"value\" : \"value\",\n" +
+                "          \"broadcasters.id\" : {\n" +
+                "            \"value\" : \"Vpro\",\n" +
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
                 "        }\n" +
@@ -206,11 +213,21 @@ public class ESMediaFilterBuilderTest {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             hasLocation("NONE")
         ));
-        QueryBuilder builder = ESMediaFilterBuilder.filter(definition, QueryBuilders.termQuery("name", "value"));
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        builder.must(QueryBuilders.termQuery("name", "value"));
+        ESMediaFilterBuilder.filter(definition, builder);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"bool\" : {\n" +
                 "    \"must\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"name\" : {\n" +
+                "            \"value\" : \"value\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
                 "      {\n" +
                 "        \"nested\" : {\n" +
                 "          \"query\" : {\n" +
@@ -240,14 +257,6 @@ public class ESMediaFilterBuilderTest {
                 "          \"ignore_unmapped\" : false,\n" +
                 "          \"score_mode\" : \"avg\",\n" +
                 "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"name\" : {\n" +
-                "            \"value\" : \"value\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +

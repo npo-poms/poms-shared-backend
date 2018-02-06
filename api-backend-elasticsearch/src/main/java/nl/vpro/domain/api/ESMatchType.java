@@ -120,6 +120,13 @@ public enum ESMatchType {
         public Optional<Integer> getCardinality() {
             return possibleValues == null || possibleValues.isEmpty() ? Optional.empty() : Optional.of(possibleValues.size());
         }
+    }
+
+    @Data
+    @lombok.Builder
+    public static class FieldInfoWrapper  {
+        private final String name;
+        private final FieldInfo fieldInfo;
 
     }
 

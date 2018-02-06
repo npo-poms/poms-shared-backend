@@ -20,14 +20,16 @@ import org.elasticsearch.index.query.*;
 import org.elasticsearch.join.query.JoinQueryBuilders;
 
 import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.ESMatchType.FieldInfo;
+import nl.vpro.domain.api.ESMatchType.FieldInfoWrapper;
 import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
 import nl.vpro.domain.api.subtitles.SubtitlesSearch;
 import nl.vpro.domain.classification.ClassificationServiceLocator;
-import nl.vpro.domain.classification.Term;
 import nl.vpro.domain.media.AVType;
 import nl.vpro.domain.media.AgeRating;
 import nl.vpro.domain.media.ContentRating;
 import nl.vpro.domain.media.MediaType;
+import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.ApiCueIndex;
 
 import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
@@ -68,23 +70,30 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
     public static final SearchFieldDefinition SUBTITLES = new SearchFieldDefinition("subtitles", 0.0f);
 
+    private static final FieldInfo MEDIA_TYPE = FieldInfo.enumValue(MediaType.class);
+
+
     public static QueryBuilder query(MediaSearch searches) {
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
         }
-
-        return query(searches, QueryBuilders.boolQuery(), "");
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        query("", searches, builder);
+        return simplifyQuery(builder);
     }
 
     /**
      * Builds a media relationQuery for standalone or embedded media when the prefix argument is left blank.
      *
-     * @param searches The 'searches' part of a MediaForm
      * @param prefix   not null path to the media node in the documents to search, including the last dot, can be blank
+     * @param searches The 'searches' part of a MediaForm
      */
-    public static QueryBuilder query(MediaSearch searches, @NotNull BoolQueryBuilder booleanQuery, @NotNull String prefix) {
+    public static void query(
+        @NotNull String prefix,
+        final MediaSearch searches,
+        @NotNull BoolQueryBuilder booleanQuery) {
         if(searches == null) {
-            return booleanQuery;
+            return;
         }
 
 
@@ -92,8 +101,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             SimpleTextMatcher textSearch = searches.getText();
             if(textSearch != null && StringUtils.isNotBlank(textSearch.getValue())) {
                 BoolQueryBuilder textQuery = buildTextQuery(
-                    textSearch,
-                    prefix,
+                    prefix, textSearch,
                     SEARCH_FIELDS
                 );
 
@@ -102,7 +110,11 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                     subtitlesSearch.setText(textSearch);
                     //subtitlesSearch.setLanguages(TextMatcherList.must(TextMatcher.must("nl")));
                     QueryBuilder subtitlesQuery = ESSubtitlesQueryBuilder.query(subtitlesSearch);
-                    textQuery.should(JoinQueryBuilders.hasChildQuery(ApiCueIndex.TYPE, subtitlesQuery, ScoreMode.Max)).boost(SUBTITLES.getBoost());
+                    textQuery
+                        .should(
+                            JoinQueryBuilders.hasChildQuery(ApiCueIndex.TYPE, subtitlesQuery, ScoreMode.Max)
+                        )
+                        .boost(SUBTITLES.getBoost());
                 } else {
                     log.debug("Searching in subtitles is disabled");
                 }
@@ -112,54 +124,68 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
 
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getMediaIds(),
-            new TextMultipleFieldsApplier<>(prefix + "mid", prefix + "urn", prefix + "crids")
+            new TextMultipleFieldsApplier<>("mid", "urn", "crids")
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getTypes(),
-            new TextSingleFieldApplier<>(prefix + "type", enumValue(MediaType.class))
+            new TextSingleFieldApplier<>("type", MEDIA_TYPE)
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getAvTypes(),
-            new TextSingleFieldApplier<>(prefix + "avType", enumValue(AVType.class))
+            new TextSingleFieldApplier<>("avType", enumValue(AVType.class))
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getSortDates(),
-            new DateSingleFieldApplier(prefix + "sortDate")
+            new DateSingleFieldApplier("sortDate")
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getPublishDates(),
-            new DateSingleFieldApplier(prefix + "publishDate")
+            new DateSingleFieldApplier("publishDate")
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getCreationDates(),
-            new DateSingleFieldApplier(prefix + "creationDate")
+            new DateSingleFieldApplier("creationDate")
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getLastModifiedDates(),
-            new DateSingleFieldApplier(prefix + "lastModified")
+            new DateSingleFieldApplier("lastModified")
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getBroadcasters(),
-            new TextSingleFieldApplier<>(prefix + "broadcasters.id")
+            new TextSingleFieldApplier<>("broadcasters.id",
+                FieldInfo.builder()
+                    .possibleValues(BroadcasterServiceLocator.getIds())
+                    .build()
+            )
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getAgeRatings(),
-            new TextSingleFieldApplier<>(prefix + "ageRating", enumValue(AgeRating.class))
+            new TextSingleFieldApplier<>("ageRating", enumValue(AgeRating.class))
         );
         buildFromList(
+            prefix,
             booleanQuery,
             searches.getContentRatings(),
-            new TextSingleFieldApplier<>(prefix + "contentRatings", enumValue(ContentRating.class))
+            new TextSingleFieldApplier<>("contentRatings", enumValue(ContentRating.class))
         );
         {
             TextMatcherList locations = searches.getLocations();
@@ -167,27 +193,79 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                 buildLocationQuery(booleanQuery, prefix, locations);
             }
         }
-        buildFromList(booleanQuery, searches.getTags(), new ExtendedTextSingleFieldApplier(prefix + "tags"));
-
-        List<String> terms = ClassificationServiceLocator.getInstance().values().stream().map(Term::getTermId).collect(Collectors.toList());
+        buildFromList(
+            prefix,
+            booleanQuery,
+            searches.getTags(),
+            new ExtendedTextSingleFieldApplier("tags")
+        );
         nested(
-            prefix + "genres", booleanQuery, searches.getGenres(),
-            new TextSingleFieldApplier<>(prefix + "genres.id",
-                ESMatchType.FieldInfo.builder()
-                    .possibleValues(terms)
-                    .build())
+            prefix,
+            "genres",
+            booleanQuery,
+            searches.getGenres(),
+            new TextSingleFieldApplier<>("genres.id",
+                FieldInfo.builder()
+                    .possibleValues(ClassificationServiceLocator.getTerms())
+                    .build()
+            )
         );
 
-        buildFromList(booleanQuery, searches.getDurations(), new DurationSingleFieldApplier(prefix + "duration"));
+        buildFromList(
+            prefix,
+            booleanQuery,
+            searches.getDurations(),
+            new DurationSingleFieldApplier("duration")
+        );
 
-        nested(prefix + "descendantOf", booleanQuery, searches.getDescendantOf(), new TextMultipleFieldsApplier<>(prefix + "descendantOf.midRef", prefix + "descendantOf.type"));
-        nested(prefix + "episodeOf", booleanQuery, searches.getEpisodeOf(), new TextMultipleFieldsApplier<>(prefix + "episodeOf.midRef", prefix + "episodeOf.type"));
-        nested(prefix + "memberOf", booleanQuery, searches.getMemberOf(), new TextMultipleFieldsApplier<>(prefix + "memberOf.midRef", prefix + "memberOf.type"));
+        nested(
+            prefix,
+            "descendantOf",
+            booleanQuery,
+            searches.getDescendantOf(),
+            new TextMultipleFieldsApplier<>(
+                FieldInfoWrapper.builder()
+                    .name("descendantOf.midRef")
+                    .fieldInfo(FieldInfo.TEXT)
+                    .build(),
+                FieldInfoWrapper.builder()
+                    .name("descendantOf.type")
+                    .fieldInfo(MEDIA_TYPE)
+                    .build()
+            )
+        );
+        nested(
+            prefix, "episodeOf",
+            booleanQuery,
+            searches.getEpisodeOf(),
+            new TextMultipleFieldsApplier<>(
+                FieldInfoWrapper.builder()
+                    .name("episodeOf.midRef")
+                    .fieldInfo(FieldInfo.TEXT)
+                    .build(),
+                FieldInfoWrapper.builder()
+                    .name("episodeOf.type")
+                    .fieldInfo(MEDIA_TYPE)
+                    .build()
+            )
+        );
+        nested(prefix, "memberOf", booleanQuery, searches.getMemberOf(),
+            new TextMultipleFieldsApplier<>(
+                FieldInfoWrapper.builder()
+                    .name("memberOf.midRef")
+                    .fieldInfo(FieldInfo.TEXT)
+                    .build(),
+                FieldInfoWrapper.builder()
+                    .name("memberOf.type")
+                    .fieldInfo(MEDIA_TYPE)
+                    .build()
+            )
+        );
 
         {
             if(searches.getRelations() != null) {
                 for(RelationSearch relationSearch : searches.getRelations()) {
-                    relationQuery(relationSearch, booleanQuery, prefix);
+                    relationQuery(prefix, relationSearch, booleanQuery);
                 }
             }
         }
@@ -196,7 +274,11 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             List<ScheduleEventSearch> scheduleEventSearches = searches.getScheduleEvents();
             if(scheduleEventSearches != null && ! scheduleEventSearches.isEmpty()) {
                 for (ScheduleEventSearch scheduleEventSearch : scheduleEventSearches) {
-                    buildScheduleQuery(booleanQuery, prefix, scheduleEventSearch);
+                    buildScheduleQuery(
+                        prefix,
+                        booleanQuery,
+                        scheduleEventSearch
+                    );
                 }
             }
         }
@@ -205,33 +287,27 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             List<TitleSearch> titleSearches = searches.getTitles();
             if(titleSearches != null && ! titleSearches.isEmpty()) {
                 for (TitleSearch titleSearch : titleSearches) {
-                    buildTitleQuery(booleanQuery, prefix, titleSearch);
+                    buildTitleQuery(prefix, booleanQuery, titleSearch);
 
                 }
             }
         }
-
-        if(booleanQuery.hasClauses()) {
-            return booleanQuery;
-        }
-
-        return QueryBuilders.matchAllQuery();
     }
 
     private static void buildLocationQuery(BoolQueryBuilder boolQueryBuilder, final String prefix, TextMatcherList locations) {
 
-        buildFromList(boolQueryBuilder, locations, (booleanQueryBuilder, matcher) -> {
+        buildFromList(prefix, boolQueryBuilder, locations, (pref, booleanQueryBuilder, matcher) -> {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
-            QueryBuilder extensionQuery = buildQuery(prefix + "locations.programUrl", matcher, ESMatchType.FieldInfo.TEXT);
+            QueryBuilder extensionQuery = buildQuery(prefix, "locations.programUrl", matcher, FieldInfo.TEXT);
             bool.should(extensionQuery);
-            QueryBuilder formatQuery = buildQuery(prefix + "locations.programUrl.extension", matcher.toLowerCase(), ESMatchType.FieldInfo.TEXT);
+            QueryBuilder formatQuery = buildQuery(prefix, "locations.programUrl.extension", matcher.toLowerCase(), FieldInfo.TEXT);
             bool.should(formatQuery);
             apply(booleanQueryBuilder, bool, matcher.getMatch());
         });
     }
 
 
-    static BoolQueryBuilder buildTitleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, TitleSearch titleSearch) {
+    static BoolQueryBuilder buildTitleQuery(String prefix, BoolQueryBuilder boolQueryBuilder, TitleSearch titleSearch) {
 
         if (titleSearch == null) {
             return boolQueryBuilder;
@@ -243,12 +319,13 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             titleSub.must(titleQuery);
         }
         if(titleSearch.getType() != null) {
-            QueryBuilder typeQuery = QueryBuilders.termQuery(prefix + "expandedTitles.type", titleSearch.getType().name());
+            QueryBuilder typeQuery =
+                QueryBuilders.termQuery(prefix + "expandedTitles.type", titleSearch.getType().name());
             titleSub.must(typeQuery);
         }
         if(titleSearch.getValue() != null) {
             ExtendedTextSingleFieldApplier titleApplier = new ExtendedTextSingleFieldApplier("expandedTitles.value");
-            titleApplier.applyField(titleSub, titleSearch.asExtendedTextMatcher());
+            titleApplier.applyField(prefix, titleSub, titleSearch.asExtendedTextMatcher());
         }
 
 
@@ -263,7 +340,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
 
 
-    private static void buildScheduleQuery(BoolQueryBuilder boolQueryBuilder, String prefix, ScheduleEventSearch matcher) {
+    private static void buildScheduleQuery(String prefix, BoolQueryBuilder boolQueryBuilder, ScheduleEventSearch matcher) {
         BoolQueryBuilder scheduleSub = QueryBuilders.boolQuery();
         if(matcher.getChannel() != null) {
             QueryBuilder channelQuery = QueryBuilders.termQuery(prefix + "scheduleEvents.channel", matcher.getChannel().name());

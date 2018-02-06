@@ -4,7 +4,6 @@ import javax.annotation.Nonnull;
 
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 
@@ -13,6 +12,7 @@ import nl.vpro.domain.constraint.*;
 import nl.vpro.domain.constraint.media.HasLocationConstraint;
 import nl.vpro.domain.constraint.media.HasPredictionConstraint;
 
+import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
@@ -27,45 +27,41 @@ public abstract class ESFilterBuilder {
     }
 
     public static <T> QueryBuilder filter(ProfileDefinition<T> definition) {
-        if (isEmpty(definition)) {
-            return matchAllQuery();
-        }
-
-        return handleConstraint(definition.getFilter().getConstraint());
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        filter(definition, boolQueryBuilder);
+        return simplifyQuery(boolQueryBuilder);
     }
 
-    public static <T> QueryBuilder filter(ProfileDefinition<T> definition, QueryBuilder  filter) {
-        if (filter == null || filter instanceof MatchAllQueryBuilder) {
-            return filter(definition);
-        }
-
-        if (isEmpty(definition)) {
-            return filter;
-        }
-
-        // unwrap
-        if (filter instanceof BoolQueryBuilder) {
-            return ((BoolQueryBuilder) filter).must(filter(definition));
-        } else {
-            BoolQueryBuilder result = QueryBuilders.boolQuery();
-            result.must(filter(definition));
-            result.must(filter);
-            return result;
+    public static <T> void filter(ProfileDefinition<T> definition, BoolQueryBuilder filter) {
+        if (!isEmpty(definition)) {
+            filter.filter(
+                handleConstraint(definition.getFilter().getConstraint())
+            );
         }
     }
+
 
     public static QueryBuilder filter(TermSearch searches, @Nonnull String axis, String field) {
         return filter(searches, "", axis, field);
     }
 
     public static QueryBuilder filter(TermSearch searches, @Nonnull String prefix, String axis, String field) {
-        if(searches == null || searches.getIds() == null || searches.getIds().isEmpty()) {
+        if (searches == null || searches.getIds() == null || searches.getIds().isEmpty()) {
             return matchAllQuery();
         }
 
         BoolQueryBuilder booleanFilter = boolQuery();
-        build(booleanFilter, searches.getIds(), new ESQueryBuilder.TextSingleFieldApplier(prefix + axis + '.' + field));
+        build(prefix, booleanFilter, searches.getIds(), new ESQueryBuilder.TextSingleFieldApplier<>(axis + '.' + field));
         return booleanFilter;
+    }
+
+    protected static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> void
+    build(String prefix, BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<TM, MT> list, ESQueryBuilder.FieldApplier<TM> applier) {
+        BoolQueryBuilder append = QueryBuilders.boolQuery();
+        for (TM matcher : list) {
+            applier.applyField(prefix, append, matcher);
+        }
+        ESQueryBuilder.apply(booleanQueryBuilder, append, list.getMatch());
     }
 
     static <T> boolean isEmpty(ProfileDefinition<T> definition) {
@@ -104,7 +100,7 @@ public abstract class ESFilterBuilder {
             return doTextConstraint((TextConstraint<T>) constraint);
         } else if (constraint instanceof ExistsConstraint) {
             return doExistsConstraint((ExistsConstraint<T>) constraint);
-        } else if (constraint instanceof  DateConstraint) {
+        } else if (constraint instanceof DateConstraint) {
             return doDateConstraint((DateConstraint<T>) constraint);
         }
 
@@ -121,7 +117,7 @@ public abstract class ESFilterBuilder {
     }
 
     static private <T> QueryBuilder doOr(AbstractOr<T> or) {
-        BoolQueryBuilder  booleanFilter = boolQuery();
+        BoolQueryBuilder booleanFilter = boolQuery();
         for (Constraint<T> constraint : or.getConstraints()) {
             QueryBuilder filter = handleConstraint(constraint);
             booleanFilter.should(filter);
@@ -135,7 +131,6 @@ public abstract class ESFilterBuilder {
         booleanFilter.mustNot(filter);
         return booleanFilter;
     }
-
 
     static protected <T> QueryBuilder doTextConstraint(WildTextConstraint<T> constraint) {
         boolean exactMatch = constraint.isExact();
@@ -181,7 +176,7 @@ public abstract class ESFilterBuilder {
     }
 
     static protected <T> QueryBuilder doDateConstraint(DateConstraint<T> constraint) {
-        switch(constraint.getOperator()) {
+        switch (constraint.getOperator()) {
             case LT:
                 return rangeQuery(constraint.getESPath()).lt(constraint.getDateAsDate().getTime());
             case LTE:
@@ -197,16 +192,6 @@ public abstract class ESFilterBuilder {
 
     static private <T> QueryBuilder doExistsConstraint(ExistsConstraint<T> constraint) {
         return existsQuery(constraint.getESPath());
-    }
-
-
-
-    protected static <S extends MatchType>  void build(BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<? extends AbstractTextMatcher<S>, S> list, ESQueryBuilder.FieldApplier applier) {
-        BoolQueryBuilder append = QueryBuilders.boolQuery();
-        for (AbstractTextMatcher<S> matcher : list) {
-            applier.applyField(append, matcher);
-        }
-        ESQueryBuilder.apply(booleanQueryBuilder, append, list.getMatch());
     }
 
 

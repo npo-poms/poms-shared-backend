@@ -41,4 +41,5 @@
     <constructor-arg ref="clientFactory" />
     <constructor-arg value="titles,descriptions"/>
   </bean>
+  <bean class="nl.vpro.media.broadcaster.BroadcasterServiceLocator" />
 </beans>

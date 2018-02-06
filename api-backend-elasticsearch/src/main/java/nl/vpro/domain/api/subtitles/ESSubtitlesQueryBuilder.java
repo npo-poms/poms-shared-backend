@@ -53,24 +53,18 @@ public class ESSubtitlesQueryBuilder extends ESQueryBuilder {
             SimpleTextMatcher textSearch = searches.getText();
             if(textSearch != null && StringUtils.isNotBlank(textSearch.getValue())) {
                 QueryBuilder textQuery = buildTextQuery(
-                    textSearch,
-                    prefix,
+                    prefix, textSearch,
                     SEARCH_FIELDS
                 );
                 apply(booleanQuery, textQuery, textSearch.getMatch());
             }
         }
 
-        buildFromList(booleanQuery, searches.getMediaIds(), new TextSingleFieldApplier(prefix + "parent"));
-        buildFromList(booleanQuery, searches.getTypes(), new TextSingleFieldApplier(prefix + "type"));
-        buildFromList(booleanQuery, searches.getLanguages(), new TextSingleFieldApplier(prefix + "language"));
+        buildFromList(prefix, booleanQuery, searches.getMediaIds(), new TextSingleFieldApplier<>("parent"));
+        buildFromList(prefix, booleanQuery, searches.getTypes(), new TextSingleFieldApplier<>("type"));
+        buildFromList(prefix, booleanQuery, searches.getLanguages(), new TextSingleFieldApplier<>("language"));
 
-
-        if(booleanQuery.hasClauses()) {
-            return booleanQuery;
-        }
-
-        return QueryBuilders.matchAllQuery();
+        return simplifyQuery(booleanQuery);
     }
 
 

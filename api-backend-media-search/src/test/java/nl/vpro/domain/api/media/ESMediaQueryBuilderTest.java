@@ -1032,4 +1032,13 @@ public class ESMediaQueryBuilderTest {
             "  }\n" +
             "}");
     }
+
+    @Test
+    public void withEverything() {
+        MediaForm form = MediaForm.builder().withEverything().build();
+
+        QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
+        System.out.print(builder.toString());
+
+    }
 }

@@ -2,18 +2,18 @@ package nl.vpro.domain.api.schedule;
 
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.media.*;
-import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.media.*;
-import nl.vpro.domain.media.search.DateRange;
-import nl.vpro.domain.media.search.SchedulePager;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.elasticsearch.ElasticSearchIterator;
-import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.media.domain.es.MediaESType;
-import nl.vpro.util.MaxOffsetIterator;
-import nl.vpro.util.TimeUtils;
+
+import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
@@ -26,16 +26,20 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.media.*;
+import nl.vpro.domain.api.profile.ProfileDefinition;
+import nl.vpro.domain.media.*;
+import nl.vpro.domain.media.search.DateRange;
+import nl.vpro.domain.media.search.SchedulePager;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch.ElasticSearchIterator;
+import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.util.MaxOffsetIterator;
+import nl.vpro.util.TimeUtils;
+
+import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
 
 /**
  * @since 4.8
@@ -67,12 +71,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Value("${elasticSearch.schedule.timeout}")
     public void setTimeout(String timeout) {
         super.setTimeOut(TimeUtils.parseDuration(timeout).orElse(Duration.ofSeconds(15)));
-    }
-
-
-
-    public ESScheduleRepository() {
-        this(null, null);
     }
 
     @Inject
@@ -159,11 +157,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         return execute(form, offset, max);
     }
 
-
-    public long count() {
-        return client().prepareSearch(indexName).setSource(new SearchSourceBuilder().size(0)).get().getHits().getTotalHits();
-    }
-
     private MediaObject findByCrid(String crid) throws IOException {
         TermQueryBuilder query = QueryBuilders.termQuery("crids", crid);
         SearchRequest request = new SearchRequest(indexName);
@@ -233,11 +226,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 query.must(QueryBuilders.termQuery("scheduleEvents.guideDay", form.getGuideDay().atStartOfDay(ScheduleService.ZONE_ID).toEpochSecond() * 1000));
             }
 
-            if (!query.hasClauses()) {
-                toExecute = QueryBuilders.matchAllQuery();
-            } else {
-                toExecute = query;
-            }
+            toExecute = simplifyQuery(query);
         }
         Long total;
         try {
@@ -306,7 +295,11 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
 
     @Override
-    public ScheduleSearchResult findSchedules(ProfileDefinition<MediaObject> profile, ScheduleForm form, long offset, Integer max) {
+    public ScheduleSearchResult findSchedules(
+        ProfileDefinition<MediaObject> profile,
+        ScheduleForm form,
+        long offset,
+        Integer max) {
         form = redirectForm(form);
         Schedule schedule;
         List<ScheduleEventSearch> scheduleEventSearches = form.getSearches() == null ? null : form.getSearches().getScheduleEvents();

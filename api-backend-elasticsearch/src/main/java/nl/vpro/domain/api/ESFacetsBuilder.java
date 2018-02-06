@@ -39,10 +39,8 @@ public abstract class ESFacetsBuilder {
 
     protected static void addFacet(
         SearchSourceBuilder searchBuilder,
-        QueryBuilder filterBuilder,
         String fieldName,
-        TextFacet<?> facet,
-        String fieldPrefix) {
+        TextFacet<?> facet) {
         if(facet != null) {
             Terms.Order order = ESFacets.getComparatorType(facet);
 
@@ -69,7 +67,7 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, QueryBuilder filterBuilder, String fieldName, DateRangeFacets<?> facet, String fieldPrefix) {
+    protected static void addFacet(SearchSourceBuilder searchBuilder, String fieldName, DateRangeFacets<?> facet) {
         if(facet != null) {
             if(facet.getRanges() != null) {
                 RangeAggregationBuilder aggregationBuilder = null;
@@ -139,10 +137,8 @@ public abstract class ESFacetsBuilder {
 
     protected static void addFacet(
         SearchSourceBuilder searchBuilder,
-        QueryBuilder filterBuilder,
         String fieldName,
-        DurationRangeFacets<?> facet,
-        String fieldPrefix) {
+        DurationRangeFacets<?> facet) {
         if (facet != null) {
             if (facet.getRanges() != null) {
                 RangeAggregationBuilder aggregationBuilder = null;
