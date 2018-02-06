@@ -264,6 +264,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testList() {
         MediaResult results = target.list(Order.ASC, 0L, 1000);
         assertThat(results).hasSize(indexedObjectCount);
+        log.info("All mids: {}", results.stream().map(MediaObject::getMid).collect(Collectors.toList()));
     }
 
     @Test
@@ -690,21 +691,32 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testWithMultipleFacetsAndFilter() {
+    public void testWithMultipleFacetsAndFilters() {
+
+        // for reference: These are all mids:
+        // [MID-0, MID-1, MID-2, MID-3, MID-4, MID-5, MID-6, MID-7, MID-8, MID-9, MID_DRENTHE, MID_G_0, MID_G_1, MID_G_2, MID_G_3, MID_G_4, MID_G_5, MID_G_6, MID_G_7, MID_G_8, MID_G_9, MID_HIGH_SCORE, MID_SCORING_ON_DESCRIPTION, MID_WITH_LOCATION, MID_WITH_RELATIONS, POMS_S_12345, VPROWON_12346, VPROWON_12349, VPROWON_12351, VPROWON_12353, sub_group, sub_program_1, sub_program_2]
         MediaForm form = MediaFormBuilder.form()
+            /*
+            According to the documentation:
+            By default,the count of a facet result is over the entire search result (i.e.not limited by the 'max' property).
+            It is possible to limit the facet results global or per individual facet(from release version REL - 3.3).To
+            limit the facet result a filter property must be added globally or on an individual facet.
+           */
             .broadcasterFacet(MediaFacet.builder()
+                // So, in this case we limit to only a few mids, so the total number in the facet results must be equal to that
                 .filter(MediaSearch.builder()
                     .mediaIds(
                         TextMatcherList.must(
-                            TextMatcher.must("MID-[024].*", StandardMatchType.REGEX))
+                            TextMatcher.must("MID-[024]", StandardMatchType.REGEX)) // only 3 objects match
                     )
                     .build())
                 .build())
             .ageRatingFacet(MediaFacet.builder()
+                // And this case is limited even further
                 .filter(MediaSearch.builder()
                     .mediaIds(
                         TextMatcherList.must(
-                            TextMatcher.must("MID-[04].*", StandardMatchType.REGEX))
+                            TextMatcher.must("MID-[04]", StandardMatchType.REGEX)) // only 2 objects match
                     )
                     .build()
                 )
@@ -729,6 +741,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         List<TermFacetResultItem> broadcasters = result.getFacets().getBroadcasters();
         assertThat(broadcasters).isNotNull();
         long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
+        assertThat(totalBroadcasterCount).isEqualTo(3);
 
         // TODO check these results
         assertThat(broadcasters.get(0).getId()).isEqualTo("AVRO");
@@ -741,7 +754,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(broadcasters.get(3).getCount()).isEqualTo(6);
         assertThat(broadcasters.get(4).getId()).isEqualTo("OMROEP2");
         assertThat(broadcasters.get(4).getCount()).isEqualTo(6);
-
         assertThat(broadcasters.get(5).getId()).isEqualTo("TVDRENTHE");
         assertThat(broadcasters.get(5).getCount()).isEqualTo(1);
 
@@ -749,6 +761,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
         assertThat(ageRatings).isNotNull();
         long totalAgeRatingCount = ageRatings.stream().mapToLong(FacetResultItem::getCount).sum();
+        assertThat(totalBroadcasterCount).isEqualTo(2);
 
 
         assertThat(totalBroadcasterCount).isNotEqualTo(totalAgeRatingCount);
