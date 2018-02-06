@@ -27,8 +27,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     protected static final String ROOT_FILTER = "mediaRootFilter";
 
 
-    public static void facets(SearchSourceBuilder searchBuilder, MediaForm form, BoolQueryBuilder profileFilter) {
-        buildFacets("", searchBuilder, form, profileFilter);
+    public static void facets(SearchSourceBuilder searchBuilder, MediaForm form) {
+        buildFacets("", searchBuilder, form);
     }
 
     /**
@@ -37,11 +37,11 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     public static void buildFacets(
         @Nonnull String prefix,
         SearchSourceBuilder searchBuilder,
-        MediaForm form,
-        BoolQueryBuilder facetFilter) {
+        MediaForm form) {
         if (form != null && form.isFaceted()) {
 
             MediaFacets facets = form.getFacets();
+            BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
 
             // Under default ES behaviour profile filtering does not influence facet results
             if (facets.getFilter() != null) {

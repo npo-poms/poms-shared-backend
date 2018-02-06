@@ -127,8 +127,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         Integer max) {
         form = redirectForm(form);
-        SearchRequest request = searchRequest(profile, form, offset, max);
-        GenericMediaSearchResult<MediaObject> result = executeQuery(
+
+        SearchRequest request = searchRequest(
+            profile, form, offset, max
+        );
+
+        GenericMediaSearchResult<MediaObject> result = executeSearchRequest(
             request,
             form != null ? form.getFacets() : null,
             offset,
@@ -254,7 +258,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .setSize(max)
             .request();
 
-        GenericMediaSearchResult<MediaObject> result = executeQuery(request, null, offset, max, MediaObject.class);
+        GenericMediaSearchResult<MediaObject> result = executeSearchRequest(request, null, offset, max, MediaObject.class);
         return new MediaSearchResult(result).asResult();
     }
 
@@ -285,7 +289,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .request();
 
         GenericMediaSearchResult<MediaObject> objects =
-            executeQuery(request, null, offset, max, MediaObject.class);
+            executeSearchRequest(request, null, offset, max, MediaObject.class);
 
         return new MediaSearchResult(objects).asResult();
 
@@ -568,7 +572,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         SearchRequest request = searchRequest(getLoadTypes(), profile, form, media, booleanFilter, offset, max);
 
-        return executeQuery(request, form != null ? form.getFacets() : null, offset, max, clazz);
+        return executeSearchRequest(request, form != null ? form.getFacets() : null, offset, max, clazz);
     }
 
     private boolean hasProfileUpdate(ProfileDefinition<MediaObject> current, ProfileDefinition<MediaObject> previous) {

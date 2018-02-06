@@ -148,12 +148,22 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     final protected SearchSourceBuilder searchBuilder(
         ProfileDefinition<MediaObject> profile,
         AbstractMediaForm form,
-        BoolQueryBuilder extraFilter,
+        BoolQueryBuilder filter,
         long offset,
         Integer max) {
-        return searchBuilder(profile, form, null, extraFilter, offset, max);
+        return searchBuilder(profile, form, null, filter, offset, max);
     }
 
+    /**
+     *
+     * @param profile
+     * @param form
+     * @param mediaObject
+     * @param filter
+     * @param offset
+     * @param max
+     * @return
+     */
     final protected SearchSourceBuilder searchBuilder(
         ProfileDefinition<MediaObject> profile,
         AbstractMediaForm form,
@@ -162,19 +172,21 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         long offset,
         Integer max) {
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
-        ESMediaFilterBuilder.filter(profile, filter);
 
+        // Handle profile filtering
+        ESMediaFilterBuilder.filter(profile, filter);
         if (filter.hasClauses()) {
             searchBuilder.postFilter(filter);
         }
         QueryBuilder queryBuilder = ESMediaQueryBuilder.query(form != null ? form.getSearches() : null);
-        QueryBuilder scoredBuilder = ESMediaScoreBuilder.score(queryBuilder, Instant.now());
-
-        searchBuilder.query(scoredBuilder);
+        searchBuilder.query(
+            ESMediaScoreBuilder.score(queryBuilder, Instant.now())
+        );
 
         if (form instanceof MediaForm) {
+            ESMediaFacetsBuilder.facets(searchBuilder, (MediaForm) form);
+
             ESMediaSortHandler.sort(searchBuilder, (MediaForm) form, mediaObject);
-            ESMediaFacetsBuilder.facets(searchBuilder, (MediaForm) form, filter);
         }
 
         buildHighlights(searchBuilder, form, ESMediaQueryBuilder.SEARCH_FIELDS);
@@ -184,7 +196,12 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         return searchBuilder;
     }
 
-    protected <S extends MediaObject> GenericMediaSearchResult<S> executeQuery(
+    /**
+     *
+     * @param request The ElasticSearch {@link SearchRequest} to execute and adapt to a API search result.
+     * @param facets The requested facets. Will not be used to change the search request, but only to properly extract the facet results
+     */
+    protected <S extends MediaObject> GenericMediaSearchResult<S> executeSearchRequest(
         SearchRequest request,
         MediaFacets facets,
         long offset,

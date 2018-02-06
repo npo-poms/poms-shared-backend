@@ -87,11 +87,6 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
 
 
 
-    public static QueryBuilder filter(MediaSearch searches) {
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        ESMediaQueryBuilder.query("", searches, boolQueryBuilder);
-        return simplifyQuery(boolQueryBuilder);
-    }
 
     public static void filter(String prefix, MediaSearch searches, BoolQueryBuilder filter) {
         ESMediaQueryBuilder.query(prefix, searches, filter);
