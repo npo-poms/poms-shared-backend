@@ -694,12 +694,18 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         MediaForm form = MediaFormBuilder.form()
             .broadcasterFacet(MediaFacet.builder()
                 .filter(MediaSearch.builder()
-                    .mediaIds(TextMatcherList.must(TextMatcher.must("MID-[024].*", StandardMatchType.REGEX)))
+                    .mediaIds(
+                        TextMatcherList.must(
+                            TextMatcher.must("MID-[024].*", StandardMatchType.REGEX))
+                    )
                     .build())
                 .build())
             .ageRatingFacet(MediaFacet.builder()
                 .filter(MediaSearch.builder()
-                    .mediaIds(TextMatcherList.must(TextMatcher.must("MID-[04].*", StandardMatchType.REGEX)))
+                    .mediaIds(
+                        TextMatcherList.must(
+                            TextMatcher.must("MID-[04].*", StandardMatchType.REGEX))
+                    )
                     .build()
                 )
                 .build()
