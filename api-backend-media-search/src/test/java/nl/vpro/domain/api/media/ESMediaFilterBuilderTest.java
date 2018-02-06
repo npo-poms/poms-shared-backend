@@ -30,7 +30,7 @@ public class ESMediaFilterBuilderTest {
 
     @Test
     public void testFilterProfileOnNullArgument() throws Exception {
-        QueryBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
+        QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo("{\n" +
             "  \"match_all\" : {\n" +
             "    \"boost\" : 1.0\n" +
@@ -142,7 +142,7 @@ public class ESMediaFilterBuilderTest {
 
     @Test
     public void testFilterProfileWithExtraFilterOnNullArguments() throws Exception {
-        QueryBuilder builder = ESMediaFilterBuilder.filter(new MediaSearch());
+        QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"match_all\" : {\n" +
