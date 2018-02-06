@@ -712,12 +712,41 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(broadcasters).isNotNull();
         long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
 
+        // TODO check these results
+        assertThat(broadcasters.get(0).getId()).isEqualTo("AVRO");
+        assertThat(broadcasters.get(0).getCount()).isEqualTo(32);
+        assertThat(broadcasters.get(1).getId()).isEqualTo("BNN");
+        assertThat(broadcasters.get(1).getCount()).isEqualTo(32);
+        assertThat(broadcasters.get(2).getId()).isEqualTo("OMROEP0");
+        assertThat(broadcasters.get(2).getCount()).isEqualTo(8);
+        assertThat(broadcasters.get(3).getId()).isEqualTo("OMROEP1");
+        assertThat(broadcasters.get(3).getCount()).isEqualTo(6);
+        assertThat(broadcasters.get(4).getId()).isEqualTo("OMROEP2");
+        assertThat(broadcasters.get(4).getCount()).isEqualTo(6);
+
+        assertThat(broadcasters.get(5).getId()).isEqualTo("TVDRENTHE");
+        assertThat(broadcasters.get(5).getCount()).isEqualTo(1);
+
 
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
         assertThat(ageRatings).isNotNull();
         long totalAgeRatingCount = ageRatings.stream().mapToLong(FacetResultItem::getCount).sum();
 
+
         assertThat(totalBroadcasterCount).isNotEqualTo(totalAgeRatingCount);
+
+        // TODO check these results
+        assertThat(ageRatings.get(0).getId()).isEqualTo("6");
+        assertThat(ageRatings.get(0).getCount()).isEqualTo(2);
+        assertThat(ageRatings.get(1).getId()).isEqualTo("9");
+        assertThat(ageRatings.get(1).getCount()).isEqualTo(2);
+        assertThat(ageRatings.get(2).getId()).isEqualTo("12");
+        assertThat(ageRatings.get(2).getCount()).isEqualTo(2);
+        assertThat(ageRatings.get(3).getId()).isEqualTo("16");
+        assertThat(ageRatings.get(3).getCount()).isEqualTo(2);
+        assertThat(ageRatings.get(4).getId()).isEqualTo("ALL");
+        assertThat(ageRatings.get(4).getCount()).isEqualTo(2);
+
 
         log.info("{}", result);
 
