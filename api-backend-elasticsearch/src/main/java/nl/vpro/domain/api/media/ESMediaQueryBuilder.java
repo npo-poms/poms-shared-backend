@@ -73,6 +73,10 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     private static final FieldInfo MEDIA_TYPE = FieldInfo.enumValue(MediaType.class);
 
 
+    /**
+     * Builds  an Elastic Search {@link QueryBuilder} from a {@link MediaSearch}
+     * @param searches or <code>null</code> (resulting in a matchAllQuery)
+     */
     public static QueryBuilder query(MediaSearch searches) {
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
@@ -95,8 +99,6 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         if(searches == null) {
             return;
         }
-
-
         {
             SimpleTextMatcher textSearch = searches.getText();
             if(textSearch != null && StringUtils.isNotBlank(textSearch.getValue())) {
