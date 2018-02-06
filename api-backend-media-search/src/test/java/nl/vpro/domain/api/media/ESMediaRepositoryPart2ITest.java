@@ -710,6 +710,18 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 )
                 .build()
             )
+            .facetFilter(MediaSearch.builder()
+                .sortDates(DateRangeMatcherList
+                    .builder()
+                    .value(
+                        DateRangeMatcher.builder()
+                            .localBegin(LocalDateTime.of(2010, 1, 1, 12, 0))
+                        .build()
+                    )
+                    .build()
+                )
+                .build()
+            )
             .build();
         MediaSearchResult result = target.find(null, form, 0L, 100);
 
