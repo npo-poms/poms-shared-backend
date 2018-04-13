@@ -47,11 +47,20 @@ public class ESMediaFilterBuilderTest {
         QueryBuilder builder = ESMediaFilterBuilder.filter(definition);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
-                "  \"term\" : {\n" +
-                "    \"broadcasters.id\" : {\n" +
-                "      \"value\" : \"vpro\",\n" +
-                "      \"boost\" : 1.0\n" +
-                "    }\n" +
+                "  \"bool\" : {\n" +
+                "    \"filter\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"broadcasters.id\" : {\n" +
+                "            \"value\" : \"vpro\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"disable_coord\" : false,\n" +
+                "    \"adjust_pure_negative\" : true,\n" +
+                "    \"boost\" : 1.0\n" +
                 "  }\n" +
                 "}"
         );
@@ -76,24 +85,56 @@ public class ESMediaFilterBuilderTest {
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
                 "  \"bool\" : {\n" +
-                "    \"must\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"broadcasters.id\" : {\n" +
-                "            \"value\" : \"VpRo\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      },\n" +
+                "    \"filter\" : [\n" +
                 "      {\n" +
                 "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
+                "          \"must\" : [\n" +
                 "            {\n" +
                 "              \"term\" : {\n" +
-                "                \"descendantOf.midRef\" : {\n" +
-                "                  \"value\" : \"POMS_S_aa12345\",\n" +
+                "                \"broadcasters.id\" : {\n" +
+                "                  \"value\" : \"VpRo\",\n" +
                 "                  \"boost\" : 1.0\n" +
                 "                }\n" +
+                "              }\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"bool\" : {\n" +
+                "                \"should\" : [\n" +
+                "                  {\n" +
+                "                    \"term\" : {\n" +
+                "                      \"descendantOf.midRef\" : {\n" +
+                "                        \"value\" : \"POMS_S_aa12345\",\n" +
+                "                        \"boost\" : 1.0\n" +
+                "                      }\n" +
+                "                    }\n" +
+                "                  },\n" +
+                "                  {\n" +
+                "                    \"exists\" : {\n" +
+                "                      \"field\" : \"images.urn\",\n" +
+                "                      \"boost\" : 1.0\n" +
+                "                    }\n" +
+                "                  }\n" +
+                "                ],\n" +
+                "                \"disable_coord\" : false,\n" +
+                "                \"adjust_pure_negative\" : true,\n" +
+                "                \"boost\" : 1.0\n" +
+                "              }\n" +
+                "            },\n" +
+                "            {\n" +
+                "              \"bool\" : {\n" +
+                "                \"must_not\" : [\n" +
+                "                  {\n" +
+                "                    \"term\" : {\n" +
+                "                      \"type\" : {\n" +
+                "                        \"value\" : \"VISUALRADIO\",\n" +
+                "                        \"boost\" : 1.0\n" +
+                "                      }\n" +
+                "                    }\n" +
+                "                  }\n" +
+                "                ],\n" +
+                "                \"disable_coord\" : false,\n" +
+                "                \"adjust_pure_negative\" : true,\n" +
+                "                \"boost\" : 1.0\n" +
                 "              }\n" +
                 "            },\n" +
                 "            {\n" +
@@ -105,29 +146,6 @@ public class ESMediaFilterBuilderTest {
                 "          ],\n" +
                 "          \"disable_coord\" : false,\n" +
                 "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"must_not\" : [\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"type\" : {\n" +
-                "                  \"value\" : \"VISUALRADIO\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"exists\" : {\n" +
-                "          \"field\" : \"images.urn\",\n" +
                 "          \"boost\" : 1.0\n" +
                 "        }\n" +
                 "      }\n" +
@@ -159,11 +177,30 @@ public class ESMediaFilterBuilderTest {
         ESMediaFilterBuilder.filter("", (MediaSearch)null, boolQueryBuilder);
         assertThat(toString(ESQueryBuilder.simplifyQuery(boolQueryBuilder))).isEqualTo(
             "{\n" +
-                "  \"term\" : {\n" +
-                "    \"name\" : {\n" +
-                "      \"value\" : \"value\",\n" +
-                "      \"boost\" : 1.0\n" +
-                "    }\n" +
+                "  \"bool\" : {\n" +
+                "    \"must\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"name\" : {\n" +
+                "            \"value\" : \"value\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"filter\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"broadcasters.id\" : {\n" +
+                "            \"value\" : \"Vpro\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"disable_coord\" : false,\n" +
+                "    \"adjust_pure_negative\" : true,\n" +
+                "    \"boost\" : 1.0\n" +
                 "  }\n" +
                 "}"
         );
@@ -190,7 +227,9 @@ public class ESMediaFilterBuilderTest {
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
                 "        }\n" +
-                "      },\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"filter\" : [\n" +
                 "      {\n" +
                 "        \"term\" : {\n" +
                 "          \"broadcasters.id\" : {\n" +
@@ -227,7 +266,9 @@ public class ESMediaFilterBuilderTest {
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
                 "        }\n" +
-                "      },\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"filter\" : [\n" +
                 "      {\n" +
                 "        \"nested\" : {\n" +
                 "          \"query\" : {\n" +
