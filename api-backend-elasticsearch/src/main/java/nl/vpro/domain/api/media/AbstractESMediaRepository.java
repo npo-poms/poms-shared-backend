@@ -155,14 +155,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
     /**
+     * TODO javadoc
      *
-     * @param profile
-     * @param form
-     * @param mediaObject
-     * @param filter
-     * @param offset
-     * @param max
-     * @return
      */
     final protected SearchSourceBuilder searchBuilder(
         ProfileDefinition<MediaObject> profile,

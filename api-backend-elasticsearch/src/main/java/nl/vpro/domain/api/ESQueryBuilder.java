@@ -9,6 +9,7 @@ import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
@@ -214,7 +215,8 @@ public abstract class ESQueryBuilder {
         return QUOTES.contains(charAtStart) && charAtStart == value.charAt(value.length() - 1);
     }
 
-    public static void apply(BoolQueryBuilder answer, QueryBuilder subQuery, Match match) {
+    public static void apply(@Nonnull BoolQueryBuilder answer, @Nonnull QueryBuilder subQuery, @Nonnull Match match) {
+
         switch (match) {
             case SHOULD:
                 answer.should(subQuery);
@@ -362,8 +364,11 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    protected static void buildFromList(String prefix, BoolQueryBuilder booleanQuery, DateRangeMatcherList rangeMatchers,
-                                        FieldApplier<DateRangeMatcher> applier) {
+    protected static void buildFromList(
+        String prefix,
+        BoolQueryBuilder booleanQuery,
+        DateRangeMatcherList rangeMatchers,
+        FieldApplier<DateRangeMatcher> applier) {
         if (rangeMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
 

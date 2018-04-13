@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ESMediaQueryBuilderTest {
 
     @Test
-    public void testQueryTextWithoutAForm() throws Exception {
+    public void testQueryTextWithoutAForm() {
         QueryBuilder builder = ESMediaQueryBuilder.query(new MediaSearch());
 
         assertThat(builder.toString()).isEqualTo(
@@ -30,7 +30,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryTextWithoutProfile() throws Exception {
+    public void testQueryTextWithoutProfile() {
         MediaForm form = MediaFormBuilder.form().text("Text to search for").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -665,7 +665,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForExcludeMediaIds() throws Exception {
+    public void testQueryForExcludeMediaIds() {
         MediaForm form = MediaFormBuilder.form().mediaIds(Match.NOT, "POMS_12345", "POMS_12346").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -758,7 +758,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForBroadcasters() throws Exception {
+    public void testQueryForBroadcasters() {
         MediaForm form = MediaFormBuilder.form().broadcasters("VPRO", "BNN").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -801,7 +801,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForLocationsOnVaryingCase() throws Exception {
+    public void testQueryForLocationsOnVaryingCase() {
         MediaForm form = MediaFormBuilder.form().locations("mP3").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -853,7 +853,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForTags() throws Exception {
+    public void testQueryForTags() {
         MediaForm form = MediaFormBuilder.form().tags("Kunst", "Kunst & Cultuur").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -894,7 +894,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForIds() throws Exception {
+    public void testQueryForIds() {
         MediaForm form = MediaFormBuilder.form().mediaIds("MID1", "MID2").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -985,7 +985,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForGenres() throws Exception {
+    public void testQueryForGenres() {
         MediaForm form = MediaFormBuilder.form().genres("3.0.1.1", "3.0.1.2").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
