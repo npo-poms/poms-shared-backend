@@ -711,8 +711,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    @Ignore
-    // TODO FAILS FAILS
     public void testFindWithRelationFacetWithSearch() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
