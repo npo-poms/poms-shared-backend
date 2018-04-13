@@ -178,8 +178,8 @@
   </build>
 
   <scm>
-    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</connection>
-    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</developerConnection>
-    <url>https://subversion.vpro.nl/viewvc/nl/vpro/api/branches/REL-5.2-SNAPSHOT/api-backend-elasticsearch</url>
+    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.6-SNAPSHOT/api-backend-elasticsearch</connection>
+    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/vpro/api/branches/REL-5.6-SNAPSHOT/api-backend-elasticsearch</developerConnection>
+    <url>https://subversion.vpro.nl/viewvc/nl/vpro/api/branches/REL-5.6-SNAPSHOT/api-backend-elasticsearch</url>
   </scm>
 </project>
