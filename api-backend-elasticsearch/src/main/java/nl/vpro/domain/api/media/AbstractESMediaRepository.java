@@ -175,7 +175,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
         // Handle profile filtering
         ESMediaFilterBuilder.filter(profile, filter);
-        if (filter.hasClauses()) {
+        if (filter != null && filter.hasClauses()) {
             searchBuilder.postFilter(filter);
         }
         QueryBuilder queryBuilder = ESMediaQueryBuilder.query(form != null ? form.getSearches() : null);
