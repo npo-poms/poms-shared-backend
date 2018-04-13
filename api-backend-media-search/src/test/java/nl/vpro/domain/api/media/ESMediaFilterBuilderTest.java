@@ -177,30 +177,11 @@ public class ESMediaFilterBuilderTest {
         ESMediaFilterBuilder.filter("", (MediaSearch)null, boolQueryBuilder);
         assertThat(toString(ESQueryBuilder.simplifyQuery(boolQueryBuilder))).isEqualTo(
             "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"must\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"name\" : {\n" +
-                "            \"value\" : \"value\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"filter\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"broadcasters.id\" : {\n" +
-                "            \"value\" : \"Vpro\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
+                "  \"term\" : {\n" +
+                "    \"name\" : {\n" +
+                "      \"value\" : \"value\",\n" +
+                "      \"boost\" : 1.0\n" +
+                "    }\n" +
                 "  }\n" +
                 "}"
         );

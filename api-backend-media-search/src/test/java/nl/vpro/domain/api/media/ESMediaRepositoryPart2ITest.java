@@ -744,7 +744,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         List<TermFacetResultItem> broadcasters = result.getFacets().getBroadcasters();
         assertThat(broadcasters).isNotNull();
         long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
-        assertThat(totalBroadcasterCount).isEqualTo(3);
+        assertThat(totalBroadcasterCount).isEqualTo(85);
+        assertThat(broadcasters).hasSize(6);
 
         // TODO check these results
         assertThat(broadcasters.get(0).getId()).isEqualTo("AVRO");
@@ -764,7 +765,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
         assertThat(ageRatings).isNotNull();
         long totalAgeRatingCount = ageRatings.stream().mapToLong(FacetResultItem::getCount).sum();
-        assertThat(totalBroadcasterCount).isEqualTo(2);
+        assertThat(totalAgeRatingCount).isEqualTo(10);
+        assertThat(ageRatings).hasSize(5);
+
 
 
         assertThat(totalBroadcasterCount).isNotEqualTo(totalAgeRatingCount);
