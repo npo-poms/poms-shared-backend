@@ -8,18 +8,15 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 
 import org.assertj.core.api.AbstractCharSequenceAssert;
-
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.junit.Before;
 import org.springframework.mock.web.MockHttpServletResponse;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.resteasy.DateParamConverterProvider;
-import nl.vpro.resteasy.InstantParamConverter;
 import nl.vpro.resteasy.JacksonContextResolver;
 import nl.vpro.resteasy.LocaleParamConverterProvider;
 
@@ -69,7 +66,11 @@ public abstract class AbstractRestServiceImplTest<T> {
 
 
     protected void assert200(MockHttpResponse response) {
-        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
+        try {
+            assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
+        } catch (UnsupportedEncodingException use) {
+            throw new RuntimeException(use);
+        }
     }
 
     protected void assert200(MockHttpServletResponse response) throws UnsupportedEncodingException {
@@ -77,12 +78,20 @@ public abstract class AbstractRestServiceImplTest<T> {
     }
 
     protected void assert400(MockHttpResponse response) {
-        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 400, response.getStatus());
+        try {
+            assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 400, response.getStatus());
+        } catch (UnsupportedEncodingException use) {
+            throw new RuntimeException(use);
+        }
     }
 
     protected AbstractCharSequenceAssert<?, String> assert404(MockHttpResponse response) {
-        String result = response.getContentAsString();
-        assertEquals(response.getErrorMessage() + " " + result, 404, response.getStatus());
-        return assertThat(result);
+        try {
+            String result = response.getContentAsString();
+            assertEquals(response.getErrorMessage() + " " + result, 404, response.getStatus());
+            return assertThat(result);
+        } catch (UnsupportedEncodingException use) {
+            throw new RuntimeException(use);
+        }
     }
 }
