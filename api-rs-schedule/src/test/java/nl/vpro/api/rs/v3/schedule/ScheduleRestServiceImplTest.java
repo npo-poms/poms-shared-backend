@@ -3,6 +3,7 @@ package nl.vpro.api.rs.v3.schedule;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.Duration;
@@ -273,7 +274,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
 
     @Test
-    public void NPA_359() throws URISyntaxException {
+    public void NPA_359() throws URISyntaxException, UnsupportedEncodingException {
 
         Program program = MediaTestDataBuilder.program().withDescendantOf().withScheduleEvents().build();
         ApiScheduleEvent event = new ApiScheduleEvent(program.getScheduleEvents().first(), program);
