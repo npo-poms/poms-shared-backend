@@ -46,7 +46,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
                     .orElseThrow(() -> new SecurityException("Couldn't find key for issuer " + claims.get("iss")))
                     .getBytes();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
             return null;
         }
