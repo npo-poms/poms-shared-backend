@@ -43,7 +43,7 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
             log.warn("Topspin repository is disabled");
             return new Recommendations();
         } else {
-            String url = topspinUrl + mid + ".json";
+            String url = topspinUrl + mid;
             WebTarget target = getTopSpinClient().target(url).queryParam("max", topspinMaxResults);
             Response response = target.request().get();
             if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
