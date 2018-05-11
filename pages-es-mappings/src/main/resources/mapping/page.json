@@ -1,104 +1,84 @@
 {
-  "dynamic": "strict",
-  "properties": {
-    "broadcasters": {
-      "properties": {
-        "id": {
-          "type": "string",
-          "index": "not_analyzed"
-        },
-        "value": {
-          "type": "string",
-          "index": "not_analyzed",
-          "fields": {
-            "lower": {
-              "type": "string",
-              "analyzer": "lowercase"
-            },
-            "text": {
-              "type": "string",
-              "norms": {
-                "enabled": false
-              }
-            }
-          }
-        }
-      }
+  "page": {
+    "dynamic": "strict",
+    "_id": {
+      "path": "url"
     },
-    "creationDate": {
-      "type": "date",
-      "format": "epoch_millis"
-    },
-    "publishStart": {
-      "type": "date",
-      "format": "epoch_millis"
-    },
-    "lastPublished": {
-      "type": "date",
-      "format": "epoch_millis"
-    },
-    "crids": {
-      "type": "string",
-      "index": "not_analyzed"
-    },
-    "links": {
-      "type": "nested",
-      "include_in_parent": true,
-      "properties": {
-        "pageRef": {
-          "type": "string",
-          "index": "not_analyzed",
-          "fields": {
-            "tokens": {
-              "type": "string",
-              "norms": {
-                "enabled": false
-              }
-            }
-          }
-        },
-        "text": {
-          "type": "string",
-          "norms": {
-            "enabled": false
+    "properties": {
+      "alternativeUrls": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "broadcasters": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "index": "not_analyzed"
           },
-          "fields": {
-            "stemmed": {
-              "type": "string",
-              "analyzer": "dutch_stemmed",
-              "norms": {
-                "enabled": false
+          "value": {
+            "type": "string",
+            "index": "not_analyzed",
+            "fields": {
+              "lower": {
+                "type": "string",
+                "analyzer": "lowercase"
+              },
+              "text": {
+                "type": "string",
+                "norms": {
+                  "enabled": false
+                }
               }
             }
           }
-        },
-        "type": {
-          "type": "string",
-          "index": "not_analyzed"
         }
-      }
-    },
-    "embeds": {
-      "properties": {
-        "title": {
-          "type": "string",
-          "norms": {
-            "enabled": false
-          }
-        },
-        "description": {
-          "type": "string",
+      },
+      "creationDate": {
+        "type": "date",
+        "format": "date_time"
+      },
+      "crids": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
+      "embeds": {
+        "properties": {
+          "description": {
+            "type": "string"
+          },
           "media": {
             "properties": {
-              "poSequenceInformation": {
-                "type": "string",
-                "index": "not_analyzed"
-              },
+               "availableSubtitles" : {
+			    "properties" : {
+			    	"language": {
+			    	    "type": "string",
+			    	    "index" : "not_analyzed"
+			    	},
+			    	"type": {
+			    	    "type": "string",
+			    	    "index" : "not_analyzed"
+			    	}
+			    }
+			},
+               "expandedTitles": {
+                  "type": "nested",
+                  "include_in_parent": true,
+                  "properties": {
+                    "owner": {
+                      "type": "string",
+                      "index" : "not_analyzed"
+
+                    },
+                    "type": {
+                      "type": "string",
+                      "index" : "not_analyzed"
+                    },
+                    "value": {
+                      "type": "string"
+                    }
+                  }
+                },
               "ageRating": {
-                "type": "string",
-                "index": "not_analyzed"
-              },
-              "mergedTo": {
                 "type": "string",
                 "index": "not_analyzed"
               },
@@ -128,12 +108,12 @@
                         "type": "string",
                         "index": "not_analyzed"
                       },
+                      "heigth": {
+                        "type": "long"
+                      },
                       "videoCoding": {
                         "type": "string",
                         "index": "not_analyzed"
-                      },
-                      "heigth": {
-                        "type": "long"
                       },
                       "width": {
                         "type": "long"
@@ -202,19 +182,16 @@
               },
               "creationDate": {
                 "type": "date",
-                "format": "epoch_millis"
+                "format": "date_time"
               },
               "credits": {
                 "properties": {
                   "familyName": {
                     "type": "string",
                     "index": "not_analyzed",
-                    "copy_to": "embeds.media.credits.fullName"
-                  },
-                  "givenName": {
-                    "type": "string",
-                    "index": "not_analyzed",
-                    "copy_to": "embeds.media.credits.fullName"
+                    "copy_to": [
+                      "embeds.media.credits.fullName"
+                    ]
                   },
                   "fullName": {
                     "type": "string",
@@ -228,11 +205,18 @@
                       }
                     }
                   },
-                  "role": {
+                  "givenName": {
+                    "type": "string",
+                    "index": "not_analyzed",
+                    "copy_to": [
+                      "embeds.media.credits.fullName"
+                    ]
+                  },
+                  "gtaaUri": {
                     "type": "string",
                     "index": "not_analyzed"
                   },
-                  "gtaaUri": {
+                  "role": {
                     "type": "string",
                     "index": "not_analyzed"
                   }
@@ -282,7 +266,8 @@
                 }
               },
               "duration": {
-                "type": "long"
+                "type": "date",
+                "format": "basic_time"
               },
               "email": {
                 "type": "string",
@@ -297,7 +282,7 @@
                 "properties": {
                   "added": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "highlighted": {
                     "type": "boolean"
@@ -333,6 +318,10 @@
                 "type": "nested",
                 "include_in_parent": true,
                 "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                  },
                   "id": {
                     "type": "string",
                     "index": "not_analyzed"
@@ -352,10 +341,6 @@
                         }
                       }
                     }
-                  },
-                  "displayName": {
-                    "type": "string",
-                    "index": "not_analyzed"
                   }
                 }
               },
@@ -366,7 +351,17 @@
                 "properties": {
                   "creationDate": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
+                  },
+                  "credits": {
+                    "type": "string",
+                    "norms": {
+                      "enabled": false
+                    }
+                  },
+                  "date": {
+                    "type": "string",
+                    "index": "not_analyzed"
                   },
                   "description": {
                     "type": "string",
@@ -389,10 +384,15 @@
                   },
                   "lastModified": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
+                  },
+                  "license": {
+                    "type": "string",
+                    "index": "not_analyzed"
                   },
                   "offset": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "basic_time"
                   },
                   "owner": {
                     "type": "string",
@@ -400,11 +400,18 @@
                   },
                   "publishStart": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "publishStop": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
+                  },
+                  "source": {
+                    "type": "string",
+                    "index": "not_analyzed"
+                  },
+                  "sourceName": {
+                    "type": "string"
                   },
                   "title": {
                     "type": "string",
@@ -414,35 +421,14 @@
                     "fields": {
                       "stemmed": {
                         "type": "string",
-                        "analyzer": "dutch_stemmed",
                         "norms": {
                           "enabled": false
-                        }
+                        },
+                        "analyzer": "dutch_stemmed"
                       }
                     }
                   },
                   "type": {
-                    "type": "string",
-                    "index": "not_analyzed"
-                  },
-                  "credits": {
-                    "type": "string",
-                    "norms": {
-                      "enabled": false
-                    }
-                  },
-                  "source": {
-                    "type": "string",
-                    "index": "not_analyzed"
-                  },
-                  "sourceName": {
-                    "type": "string"
-                  },
-                  "license": {
-                    "type": "string",
-                    "index": "not_analyzed"
-                  },
-                  "date": {
                     "type": "string",
                     "index": "not_analyzed"
                   },
@@ -484,7 +470,7 @@
               },
               "lastModified": {
                 "type": "date",
-                "format": "epoch_millis"
+                "format": "date_time"
               },
               "locations": {
                 "properties": {
@@ -518,12 +504,12 @@
                             "type": "string",
                             "index": "not_analyzed"
                           },
+                          "heigth": {
+                            "type": "long"
+                          },
                           "videoCoding": {
                             "type": "string",
                             "index": "not_analyzed"
-                          },
-                          "heigth": {
-                            "type": "long"
                           },
                           "width": {
                             "type": "long"
@@ -534,10 +520,11 @@
                   },
                   "creationDate": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "duration": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "basic_time"
                   },
                   "guciRef": {
                     "type": "string",
@@ -545,10 +532,11 @@
                   },
                   "lastModified": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "offset": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "basic_time"
                   },
                   "owner": {
                     "type": "string",
@@ -570,11 +558,11 @@
                   },
                   "publishStart": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "publishStop": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "type": {
                     "type": "string",
@@ -596,7 +584,7 @@
                 "properties": {
                   "added": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "highlighted": {
                     "type": "boolean"
@@ -618,7 +606,15 @@
                   }
                 }
               },
+              "mergedTo": {
+                "type": "string",
+                "index": "not_analyzed"
+              },
               "mid": {
+                "type": "string",
+                "index": "not_analyzed"
+              },
+              "midRef": {
                 "type": "string",
                 "index": "not_analyzed"
               },
@@ -635,6 +631,10 @@
                 "index": "not_analyzed"
               },
               "poProgType": {
+                "type": "string",
+                "index": "not_analyzed"
+              },
+              "poSequenceInformation": {
                 "type": "string",
                 "index": "not_analyzed"
               },
@@ -666,35 +666,35 @@
               },
               "predictions": {
                 "properties": {
-                  "state": {
+                  "platform": {
                     "type": "string",
                     "index": "not_analyzed"
                   },
                   "publishStart": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "publishStop": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
-                  "platform": {
+                  "state": {
                     "type": "string",
                     "index": "not_analyzed"
                   }
                 }
               },
+              "publishDate": {
+                "type": "date",
+                "format": "date_time"
+              },
               "publishStart": {
                 "type": "date",
-                "format": "epoch_millis"
+                "format": "date_time"
               },
               "publishStop": {
                 "type": "date",
-                "format": "epoch_millis"
-              },
-              "publishDate": {
-                "type": "date",
-                "format": "epoch_millis"
+                "format": "date_time"
               },
               "regions": {
                 "type": "string",
@@ -756,12 +756,12 @@
                             "type": "string",
                             "index": "not_analyzed"
                           },
+                          "heigth": {
+                            "type": "long"
+                          },
                           "videoCoding": {
                             "type": "string",
                             "index": "not_analyzed"
-                          },
-                          "heigth": {
-                            "type": "long"
                           },
                           "width": {
                             "type": "long"
@@ -775,7 +775,12 @@
                     "index": "not_analyzed"
                   },
                   "duration": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "basic_time"
+                  },
+                  "guideDay": {
+                    "type": "date",
+                    "format": "date"
                   },
                   "imi": {
                     "type": "string",
@@ -794,7 +799,8 @@
                     "index": "not_analyzed"
                   },
                   "offset": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "basic_time"
                   },
                   "poProgID": {
                     "type": "string",
@@ -833,12 +839,13 @@
                       }
                     }
                   },
-                  "guideDay": {
-                    "type": "date",
-                    "format": "date"
-                  },
                   "start": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "date_time"
+                  },
+                  "eventStart": {
+                    "type": "date",
+                    "format": "date_time"
                   },
                   "textPage": {
                     "type": "string",
@@ -892,12 +899,12 @@
                             "type": "string",
                             "index": "not_analyzed"
                           },
+                          "heigth": {
+                            "type": "long"
+                          },
                           "videoCoding": {
                             "type": "string",
                             "index": "not_analyzed"
-                          },
-                          "heigth": {
-                            "type": "long"
                           },
                           "width": {
                             "type": "long"
@@ -966,19 +973,16 @@
                   },
                   "creationDate": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "credits": {
                     "properties": {
                       "familyName": {
                         "type": "string",
                         "index": "not_analyzed",
-                        "copy_to": "embeds.media.segments.credits.fullName"
-                      },
-                      "givenName": {
-                        "type": "string",
-                        "index": "not_analyzed",
-                        "copy_to": "embeds.media.segments.credits.fullName"
+                        "copy_to": [
+                          "embeds.media.segments.credits.fullName"
+                        ]
                       },
                       "fullName": {
                         "type": "string",
@@ -992,11 +996,18 @@
                           }
                         }
                       },
-                      "role": {
+                      "givenName": {
+                        "type": "string",
+                        "index": "not_analyzed",
+                        "copy_to": [
+                          "embeds.media.segments.credits.fullName"
+                        ]
+                      },
+                      "gtaaUri": {
                         "type": "string",
                         "index": "not_analyzed"
                       },
-                      "gtaaUri": {
+                      "role": {
                         "type": "string",
                         "index": "not_analyzed"
                       }
@@ -1046,7 +1057,8 @@
                     }
                   },
                   "duration": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "basic_time"
                   },
                   "email": {
                     "type": "string",
@@ -1069,6 +1081,10 @@
                     "type": "nested",
                     "include_in_parent": true,
                     "properties": {
+                      "displayName": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                      },
                       "id": {
                         "type": "string",
                         "index": "not_analyzed"
@@ -1088,10 +1104,6 @@
                             }
                           }
                         }
-                      },
-                      "displayName": {
-                        "type": "string",
-                        "index": "not_analyzed"
                       }
                     }
                   },
@@ -1102,7 +1114,17 @@
                     "properties": {
                       "creationDate": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
+                      },
+                      "credits": {
+                        "type": "string",
+                        "norms": {
+                          "enabled": false
+                        }
+                      },
+                      "date": {
+                        "type": "string",
+                        "index": "not_analyzed"
                       },
                       "description": {
                         "type": "string",
@@ -1125,7 +1147,11 @@
                       },
                       "lastModified": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
+                      },
+                      "license": {
+                        "type": "string",
+                        "index": "not_analyzed"
                       },
                       "owner": {
                         "type": "string",
@@ -1133,11 +1159,18 @@
                       },
                       "publishStart": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
                       "publishStop": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
+                      },
+                      "source": {
+                        "type": "string",
+                        "index": "not_analyzed"
+                      },
+                      "sourceName": {
+                        "type": "string"
                       },
                       "title": {
                         "type": "string",
@@ -1147,35 +1180,14 @@
                         "fields": {
                           "stemmed": {
                             "type": "string",
-                            "analyzer": "dutch_stemmed",
                             "norms": {
                               "enabled": false
-                            }
+                            },
+                            "analyzer": "dutch_stemmed"
                           }
                         }
                       },
                       "type": {
-                        "type": "string",
-                        "index": "not_analyzed"
-                      },
-                      "credits": {
-                        "type": "string",
-                        "norms": {
-                          "enabled": false
-                        }
-                      },
-                      "source": {
-                        "type": "string",
-                        "index": "not_analyzed"
-                      },
-                      "sourceName": {
-                        "type": "string"
-                      },
-                      "license": {
-                        "type": "string",
-                        "index": "not_analyzed"
-                      },
-                      "date": {
                         "type": "string",
                         "index": "not_analyzed"
                       },
@@ -1214,7 +1226,7 @@
                   },
                   "lastModified": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "locations": {
                     "properties": {
@@ -1248,12 +1260,12 @@
                                 "type": "string",
                                 "index": "not_analyzed"
                               },
+                              "heigth": {
+                                "type": "long"
+                              },
                               "videoCoding": {
                                 "type": "string",
                                 "index": "not_analyzed"
-                              },
-                              "heigth": {
-                                "type": "long"
                               },
                               "width": {
                                 "type": "long"
@@ -1264,11 +1276,11 @@
                       },
                       "creationDate": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
                       "duration": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "basic_time"
                       },
                       "guciRef": {
                         "type": "string",
@@ -1276,10 +1288,11 @@
                       },
                       "lastModified": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
                       "offset": {
-                        "type": "long"
+                        "type": "date",
+                        "format": "basic_time"
                       },
                       "owner": {
                         "type": "string",
@@ -1301,11 +1314,11 @@
                       },
                       "publishStart": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
                       "publishStop": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
                       "type": {
                         "type": "string",
@@ -1327,7 +1340,7 @@
                     "properties": {
                       "added": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
                       "highlighted": {
                         "type": "boolean"
@@ -1353,11 +1366,11 @@
                     "type": "string",
                     "index": "not_analyzed"
                   },
-                  "objectType": {
+                  "midRef": {
                     "type": "string",
                     "index": "not_analyzed"
                   },
-                  "midRef": {
+                  "objectType": {
                     "type": "string",
                     "index": "not_analyzed"
                   },
@@ -1385,35 +1398,35 @@
                   },
                   "predictions": {
                     "properties": {
-                      "state": {
+                      "platform": {
                         "type": "string",
                         "index": "not_analyzed"
                       },
                       "publishStart": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
                       "publishStop": {
                         "type": "date",
-                        "format": "epoch_millis"
+                        "format": "date_time"
                       },
-                      "platform": {
+                      "state": {
                         "type": "string",
                         "index": "not_analyzed"
                       }
                     }
                   },
+                  "publishDate": {
+                    "type": "date",
+                    "format": "date_time"
+                  },
                   "publishStart": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "publishStop": {
                     "type": "date",
-                    "format": "epoch_millis"
-                  },
-                  "publishDate": {
-                    "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "regions": {
                     "type": "string",
@@ -1475,12 +1488,12 @@
                                 "type": "string",
                                 "index": "not_analyzed"
                               },
+                              "heigth": {
+                                "type": "long"
+                              },
                               "videoCoding": {
                                 "type": "string",
                                 "index": "not_analyzed"
-                              },
-                              "heigth": {
-                                "type": "long"
                               },
                               "width": {
                                 "type": "long"
@@ -1494,7 +1507,8 @@
                         "index": "not_analyzed"
                       },
                       "duration": {
-                        "type": "long"
+                        "type": "date",
+                        "format": "basic_time"
                       },
                       "imi": {
                         "type": "string",
@@ -1517,7 +1531,8 @@
                         }
                       },
                       "offset": {
-                        "type": "long"
+                        "type": "date",
+                        "format": "basic_time"
                       },
                       "poProgID": {
                         "type": "string",
@@ -1541,7 +1556,8 @@
                         }
                       },
                       "start": {
-                        "type": "long"
+                        "type": "date",
+                        "format": "date_time"
                       },
                       "textPage": {
                         "type": "string",
@@ -1565,7 +1581,7 @@
                   },
                   "sortDate": {
                     "type": "date",
-                    "format": "epoch_millis"
+                    "format": "date_time"
                   },
                   "source": {
                     "type": "string",
@@ -1574,28 +1590,29 @@
                     }
                   },
                   "start": {
-                    "type": "long"
+                    "type": "date",
+                    "format": "date_time"
                   },
                   "tags": {
                     "type": "string",
                     "index": "not_analyzed",
                     "fields": {
+                      "stemmed": {
+                        "type": "string",
+                        "norms": {
+                          "enabled": false
+                        },
+                        "analyzer": "dutch_stemmed"
+                      },
+                      "lower": {
+                        "type": "string",
+                        "analyzer": "lowercase"
+                      },
                       "text": {
                         "type": "string",
                         "norms": {
                           "enabled": false
                         }
-                      },
-                      "stemmed": {
-                        "type": "string",
-                        "analyzer": "dutch_stemmed",
-                        "norms": {
-                          "enabled": false
-                        }
-                      },
-                      "lower": {
-                        "type": "string",
-                        "analyzer": "lowercase"
                       }
                     }
                   },
@@ -1624,10 +1641,10 @@
                           },
                           "stemmed": {
                             "type": "string",
-                            "analyzer": "dutch_stemmed",
                             "norms": {
                               "enabled": false
-                            }
+                            },
+                            "analyzer": "dutch_stemmed"
                           }
                         }
                       }
@@ -1673,7 +1690,7 @@
               },
               "sortDate": {
                 "type": "date",
-                "format": "epoch_millis"
+                "format": "date_time"
               },
               "source": {
                 "type": "string",
@@ -1682,28 +1699,29 @@
                 }
               },
               "start": {
-                "type": "long"
+                "type": "date",
+                "format": "date_time"
               },
               "tags": {
                 "type": "string",
                 "index": "not_analyzed",
                 "fields": {
+                  "stemmed": {
+                    "type": "string",
+                    "norms": {
+                      "enabled": false
+                    },
+                    "analyzer": "dutch_stemmed"
+                  },
+                  "lower": {
+                    "type": "string",
+                    "analyzer": "lowercase"
+                  },
                   "text": {
                     "type": "string",
                     "norms": {
                       "enabled": false
                     }
-                  },
-                  "stemmed": {
-                    "type": "string",
-                    "analyzer": "dutch_stemmed",
-                    "norms": {
-                      "enabled": false
-                    }
-                  },
-                  "lower": {
-                    "type": "string",
-                    "analyzer": "lowercase"
                   }
                 }
               },
@@ -1732,10 +1750,10 @@
                       },
                       "stemmed": {
                         "type": "string",
-                        "analyzer": "dutch_stemmed",
                         "norms": {
                           "enabled": false
-                        }
+                        },
+                        "analyzer": "dutch_stemmed"
                       }
                     }
                   }
@@ -1765,10 +1783,6 @@
                 "type": "string",
                 "index": "not_analyzed"
               },
-              "midRef": {
-                "type": "string",
-                "index": "not_analyzed"
-              },
               "websites": {
                 "properties": {
                   "value": {
@@ -1782,6 +1796,12 @@
                 "index": "not_analyzed"
               }
             }
+          },
+          "title": {
+            "type": "string",
+            "norms": {
+              "enabled": false
+            }
           }
         }
       },
@@ -1789,6 +1809,10 @@
         "type": "nested",
         "include_in_parent": true,
         "properties": {
+          "displayName": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
           "id": {
             "type": "string",
             "index": "not_analyzed"
@@ -1808,15 +1832,17 @@
                 }
               }
             }
-          },
-          "displayName": {
-            "type": "string",
-            "index": "not_analyzed"
           }
         }
       },
       "images": {
         "properties": {
+          "credits": {
+            "type": "string",
+            "norms": {
+              "enabled": false
+            }
+          },
           "description": {
             "type": "string",
             "fields": {
@@ -1826,6 +1852,17 @@
               }
             }
           },
+          "license": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "source": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
+          "sourceName": {
+            "type": "string"
+          },
           "title": {
             "type": "string",
             "norms": {
@@ -1834,10 +1871,10 @@
             "fields": {
               "stemmed": {
                 "type": "string",
-                "analyzer": "dutch_stemmed",
                 "norms": {
                   "enabled": false
-                }
+                },
+                "analyzer": "dutch_stemmed"
               }
             }
           },
@@ -1848,23 +1885,6 @@
           "url": {
             "type": "string",
             "index": "not_analyzed"
-          },
-          "credits": {
-            "type": "string",
-            "norms": {
-              "enabled": false
-            }
-          },
-          "source": {
-            "type": "string",
-            "index": "not_analyzed"
-          },
-          "sourceName": {
-            "type": "string"
-          },
-          "license": {
-            "type": "string",
-            "index": "not_analyzed"
           }
         }
       },
@@ -1872,21 +1892,62 @@
         "type": "string",
         "index": "not_analyzed",
         "fields": {
+          "lower": {
+            "type": "string",
+            "analyzer": "lowercase"
+          },
           "text": {
             "type": "string",
             "norms": {
               "enabled": false
             }
-          },
-          "lower": {
-            "type": "string",
-            "analyzer": "lowercase"
           }
         }
       },
       "lastModified": {
         "type": "date",
-        "format": "epoch_millis"
+        "format": "date_time"
+      },
+      "lastPublished": {
+        "type": "date",
+        "format": "date_time"
+      },
+      "links": {
+        "type": "nested",
+        "include_in_parent": true,
+        "properties": {
+          "pageRef": {
+            "type": "string",
+            "index": "not_analyzed",
+            "fields": {
+              "tokens": {
+                "type": "string",
+                "norms": {
+                  "enabled": false
+                }
+              }
+            }
+          },
+          "text": {
+            "type": "string",
+            "norms": {
+              "enabled": false
+            },
+            "fields": {
+              "stemmed": {
+                "type": "string",
+                "norms": {
+                  "enabled": false
+                },
+                "analyzer": "dutch_stemmed"
+              }
+            }
+          },
+          "type": {
+            "type": "string",
+            "index": "not_analyzed"
+          }
+        }
       },
       "objectType": {
         "type": "string",
@@ -1900,21 +1961,6 @@
               "stemmed": {
                 "type": "string",
                 "analyzer": "dutch_stemmed"
-              }
-            }
-          },
-          "title": {
-            "type": "string",
-            "norms": {
-              "enabled": false
-            },
-            "fields": {
-              "stemmed": {
-                "type": "string",
-                "analyzer": "dutch_stemmed",
-                "norms": {
-                  "enabled": false
-                }
               }
             }
           },
@@ -1937,10 +1983,10 @@
                 "fields": {
                   "stemmed": {
                     "type": "string",
-                    "analyzer": "dutch_stemmed",
                     "norms": {
                       "enabled": false
-                    }
+                    },
+                    "analyzer": "dutch_stemmed"
                   }
                 }
               },
@@ -1953,6 +1999,21 @@
                 "index": "not_analyzed"
               }
             }
+          },
+          "title": {
+            "type": "string",
+            "norms": {
+              "enabled": false
+            },
+            "fields": {
+              "stemmed": {
+                "type": "string",
+                "norms": {
+                  "enabled": false
+                },
+                "analyzer": "dutch_stemmed"
+              }
+            }
           }
         }
       },
@@ -1961,12 +2022,9 @@
           "familyName": {
             "type": "string",
             "index": "not_analyzed",
-            "copy_to": "persons.fullName"
-          },
-          "givenName": {
-            "type": "string",
-            "index": "not_analyzed",
-            "copy_to": "persons.fullName"
+            "copy_to": [
+              "persons.fullName"
+            ]
           },
           "fullName": {
             "type": "string",
@@ -1980,6 +2038,13 @@
               }
             }
           },
+          "givenName": {
+            "type": "string",
+            "index": "not_analyzed",
+            "copy_to": [
+              "persons.fullName"
+            ]
+          },
           "role": {
             "type": "string",
             "index": "not_analyzed"
@@ -1988,20 +2053,20 @@
       },
       "portal": {
         "properties": {
-          "name": {
+          "id": {
             "type": "string",
             "index": "not_analyzed"
           },
-          "lower": {
-            "type": "string",
-            "analyzer": "lowercase"
-          },
-          "text": {
-            "type": "string",
-            "analyzer": "lowercase"
-          },
           "section": {
             "properties": {
+              "id": {
+                "type": "string",
+                "index": "not_analyzed"
+              },
+              "path": {
+                "type": "string",
+                "index": "not_analyzed"
+              },
               "value": {
                 "type": "string",
                 "index": "not_analyzed",
@@ -2015,14 +2080,6 @@
                     "analyzer": "lowercase"
                   }
                 }
-              },
-              "path": {
-                "type": "string",
-                "index": "not_analyzed"
-              },
-              "id": {
-                "type": "string",
-                "index": "not_analyzed"
               }
             }
           },
@@ -2038,11 +2095,29 @@
               }
             }
           },
-          "id": {
+          "value": {
             "type": "string",
-            "index": "not_analyzed"
+            "index": "no",
+            "fields": {
+              "name": {
+                "type": "string",
+                "index": "not_analyzed"
+              },
+              "lower": {
+                "type": "string",
+                "analyzer": "lowercase"
+              },
+              "text": {
+                "type": "string",
+                "analyzer": "lowercase"
+              }
+            }
           }
         }
+      },
+      "publishStart": {
+        "type": "date",
+        "format": "date_time"
       },
       "refCount": {
         "type": "long"
@@ -2051,15 +2126,15 @@
         "type": "nested",
         "include_in_parent": true,
         "properties": {
+          "referrer": {
+            "type": "string",
+            "index": "not_analyzed"
+          },
           "title": {
             "type": "string",
             "norms": {
               "enabled": false
             }
-          },
-          "referrer": {
-            "type": "string",
-            "index": "not_analyzed"
           },
           "type": {
             "type": "string",
@@ -2101,7 +2176,11 @@
       },
       "sortDate": {
         "type": "date",
-        "format": "epoch_millis"
+        "format": "date_time"
+      },
+      "statRefs": {
+        "type": "string",
+        "index": "not_analyzed"
       },
       "subTitle": {
         "type": "string",
@@ -2125,28 +2204,24 @@
         "type": "string",
         "index": "not_analyzed",
         "fields": {
+          "stemmed": {
+            "type": "string",
+            "norms": {
+              "enabled": false
+            },
+            "analyzer": "dutch_stemmed"
+          },
+          "lower": {
+            "type": "string",
+            "analyzer": "lowercase"
+          },
           "text": {
             "type": "string",
             "norms": {
               "enabled": false
             }
-          },
-          "stemmed": {
-            "type": "string",
-            "analyzer": "dutch_stemmed",
-            "norms": {
-              "enabled": false
-            }
-          },
-          "lower": {
-            "type": "string",
-            "analyzer": "lowercase"
           }
         }
-      },
-      "statRefs": {
-        "type": "string",
-        "index": "not_analyzed"
       },
       "title": {
         "type": "string",
@@ -2160,16 +2235,12 @@
           },
           "stemmed": {
             "type": "string",
-            "analyzer": "dutch_stemmed",
             "norms": {
               "enabled": false
-            }
+            },
+            "analyzer": "dutch_stemmed"
           }
         }
-      },
-      "alternativeUrls": {
-        "type": "string",
-        "index": "not_analyzed"
       },
       "type": {
         "type": "string",
@@ -2182,3 +2253,4 @@
     }
   }
 }
+
