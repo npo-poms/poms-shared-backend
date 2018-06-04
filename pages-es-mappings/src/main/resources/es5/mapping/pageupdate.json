@@ -80,10 +80,14 @@
         },
         "image": {
           "properties": {
-            "imageLocation": {
+            "image": {
               "properties": {
-                "url": {
-                  "type": "keyword"
+                "imageLocation": {
+                  "properties": {
+                    "url": {
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
