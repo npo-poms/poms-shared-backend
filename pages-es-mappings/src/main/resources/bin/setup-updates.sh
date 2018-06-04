@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#set -x
+set -x
 
 case "$1" in
 
@@ -37,39 +37,47 @@ fi
 
 if [ "$2" == "" ] ; then
     echo "No index number found, trying to put mappings over existing ones (supposing they are compatible)"
-    destindex=pageupdates
+    destindex=pageupdates-publish
 else
     previndex=pageupdates-$(($2-1))
     destindex=pageupdates-$2
 fi
 
 
-targetfile=target/$destindex.json
-mkdir target
-
-echo "putting settings"
-echo '{ "settings":' > $targetfile
-cat $basedir/es5/setting/pageupdates.json >> $targetfile
-echo ',"mappings": {' >> $targetfile
 
 declare -a arr=( "pageupdate" "deletedpageupdate" )
-for i in "${!arr[@]}"
-do
-    mapping=${arr[$i]}
-    if [ $i -gt 0 ]; then
-      echo "," >> $targetfile
-    fi
-    echo '"'$mapping'": ' >>  $targetfile
-    cat $basedir/es5/mapping/$mapping.json >> $targetfile
-done
-echo -e '}\n}' >> $targetfile
-
-echo Created $targetfile
-
-curl -XPUT $desthost/$destindex -d@$targetfile
 
 
+if [ "$previndex" != "" ]; then
+    targetfile=target/$destindex.json
+    mkdir -p target
+    echo "putting settings"
+    echo '{ "settings":' > $targetfile
+    cat $basedir/es5/setting/pageupdates.json >> $targetfile
+    echo ',"mappings": {' >> $targetfile
+    for i in "${!arr[@]}"
+    do
+        mapping=${arr[$i]}
+        if [ $i -gt 0 ]; then
+            echo "," >> $targetfile
+        fi
+        echo '"'$mapping'": ' >>  $targetfile
+        cat $basedir/es5/mapping/$mapping.json >> $targetfile
+    done
+    echo -e '}\n}' >> $targetfile
+    echo Created $targetfile
+    curl -XPUT $desthost/$destindex -d@$targetfile
 
+else
+    for i in "${!arr[@]}"
+    do
+        mapping=${arr[$i]}
+        curl -XPUT $desthost/$destindex/$mapping/_mapping -d@$basedir/es5/mapping/$mapping.json
+    done
+fi
+
+
+if [ "$previndex" != "" ]; then
    echo "moving alias $previndex $destindex"
 
    publishalias="{
@@ -105,3 +113,4 @@ reindex="{
 }"
 echo
 curl -XPOST $desthost/_reindex -d "'$reindex'"
+fi

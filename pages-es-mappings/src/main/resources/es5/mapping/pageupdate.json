@@ -86,33 +86,33 @@
                   "type": "keyword"
                 }
               }
+            },
+            "type": {
+              "type": "keyword"
+            },
+            "title": {
+              "type": "text",
+              "index": false
+            },
+            "description": {
+              "type": "text",
+              "index": false
+            },
+            "source": {
+              "type": "text",
+              "index": false
+            },
+            "sourcename": {
+              "type": "text",
+              "index": false
+            },
+            "credits": {
+              "type": "text",
+              "index": false
+            },
+            "license": {
+              "type": "keyword"
             }
-          },
-          "type": {
-            "type": "keyword"
-          },
-          "title": {
-            "type": "text",
-            "index": false
-          },
-          "description": {
-            "type": "text",
-            "index": false
-          },
-          "source": {
-            "type": "text",
-            "index": false
-          },
-          "sourcename": {
-            "type": "text",
-            "index": false
-          },
-          "credits": {
-            "type": "text",
-            "index": false
-          },
-          "license": {
-            "type": "keyword"
           }
         }
       }
