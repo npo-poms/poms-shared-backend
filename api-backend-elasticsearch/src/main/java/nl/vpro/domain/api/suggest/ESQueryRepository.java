@@ -130,6 +130,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     }
 
     private Comparator<Suggestion> getLexicalDistanceComparator(final String input) {
+        //        org.apache.commons.text.similarity.LevenshteinDistance
         return Comparator.comparingInt(o -> StringUtils.getLevenshteinDistance(input, o.getText()));
     }
 
