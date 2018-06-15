@@ -1,6 +1,5 @@
 package nl.vpro.api.cors;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,7 +36,7 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
     }
 
     @Override
-    public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
+    public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         String origin = request.getHeaderString(ORIGIN);
         HttpServletResponse realResponse = ResteasyProviderFactory.getContextData(HttpServletResponse.class);
         boolean alreadyHasCorsHeaders = realResponse.getHeader(ACCESS_CONTROL_ALLOW_ORIGIN) != null;
@@ -69,7 +68,7 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
      * (so this is related to cors)
      */
     @Override
-    public void filter(ContainerRequestContext request) throws IOException {
+    public void filter(ContainerRequestContext request) {
 
         if("POST".equals(request.getMethod())) {
             List<String> contentTypes = request.getHeaders().get(CONTENT_TYPE);
