@@ -34,6 +34,7 @@ import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
+import static nl.vpro.domain.api.TextMatcher.must;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.ContentRating.*;
@@ -151,9 +152,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             SearchResult<MediaObject> result = target.find(null, form().text("WERELD").build(), 0, null);
             assertThat(result.getSize()).isEqualTo(3);
-            assertThat(result.getItems().get(2).equals("De Wereld Draait Door"));
-            assertThat(result.getItems().get(1).equals("De Ideale Wereld"));
-            assertThat(result.getItems().get(2).equals("Alleen op de wereld"));
+            assertThat(result.getItems().get(2)).isEqualTo("De Wereld Draait Door");
+            assertThat(result.getItems().get(1)).isEqualTo("De Ideale Wereld");
+            assertThat(result.getItems().get(2)).isEqualTo("Alleen op de wereld");
         }
     }
 
@@ -676,37 +677,119 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
 
-        index(program().withMid().relations(new Relation(label, null, "Blue Note")).build());
-        index(program().withMid().relations(new Relation(label, null, "blue note")).build());
-        index(program().withMid().relations(new Relation(eoLabel, null, "Evangelisch"), new Relation(label, null, "Blue NOte")).build());
 
-        RelationFacet relationFacet = new RelationFacet();
-        relationFacet.setName("test");
-        relationFacet.setCaseSensitive(false);
+        // 3 object
+        // 3 have a vpro:label
+        // 1 has eo:label
+        // 3 have vpro:label blue note
+        index(program().withMid().relations(
+            Relation.ofText(label,"Blue Note")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(label, "blue note")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(eoLabel, "Evangelisch"),
+            Relation.ofText(label, "Blue NOte")
+        ).build());
 
-        MediaForm form = form().relationsFacet(relationFacet)
-                .relationText(label, ExtendedTextMatcher.must("blue note", false)).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        {
+            RelationFacet relationFacet = new RelationFacet();
+            relationFacet.setName("test");
+            relationFacet.setCaseSensitive(false);
 
-        final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
+            MediaForm form = form()
+                .relationsFacet(relationFacet)
+                .relationText(label, ExtendedTextMatcher.must("blue note", false))
+                .build();
 
-        assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0).getFacets()).hasSize(2);
-        assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-        assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
-        assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
+            MediaSearchResult result = target.find(null, form, 0, null);
 
-        assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("evangelisch");
-        assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
-        assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
+            final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
-        assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
-        assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
-        assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
-        assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-        assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(relations).isNotEmpty();
+            assertThat(relations.get(0).getName()).isEqualTo("test");
+            assertThat(relations.get(0).getFacets()).hasSize(2);
+            assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+            assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
+
+            assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("evangelisch");
+            assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
+            assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
+
+            assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
+        }
+
+    }
+    @Test
+    public void testFindWithRelationFacetWithSubSearchAndSearchCaseInsensitive() {
+        RelationDefinition label = new RelationDefinition("label", "VPRO");
+        RelationDefinition eoLabel = new RelationDefinition("label", "EO");
+
+
+        // 4 object
+        // 4 have a vpro:label
+        // 2 has eo:label
+        // 3 have vpro:label blue note
+        // 1 has vpro:label red note
+        index(program().withMid().relations(
+            Relation.ofText(label,"Blue Note")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(label, "blue note")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(eoLabel, "Evangelisch"),
+            Relation.ofText(label, "Blue NOte")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(eoLabel, "bla bla"),
+            Relation.ofText(label, "red note")
+        ).build());
+
+        {
+            RelationFacet relationFacet = new RelationFacet();
+            relationFacet.setName("test");
+            relationFacet.setCaseSensitive(false);
+            relationFacet.setSubSearch(
+                RelationSearch.builder()
+                    .broadcasters(TextMatcherList.should(must("VPRO")))
+                    .types(TextMatcherList.should(must("label")))
+                    .build()
+            );
+
+            MediaForm form = form()
+                .relationsFacet(relationFacet)
+                .relationText(label, ExtendedTextMatcher.must("blue note", false))
+                .build();
+
+            MediaSearchResult result = target.find(null, form, 0, null);
+
+            final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
+
+            assertThat(relations).hasSize(1);
+            assertThat(relations.get(0).getName()).isEqualTo("test");
+            assertThat(relations.get(0).getFacets()).hasSize(2);
+            assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+            assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
+
+            assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("red note");
+            assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
+            assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
+
+            assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
+        }
 
     }
 
@@ -1689,6 +1772,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(2);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
         redirects.put(from, to);

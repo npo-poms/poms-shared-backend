@@ -5,6 +5,7 @@
 package nl.vpro.domain.api.media;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -36,8 +37,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
      */
     public static void buildFacets(
         @Nonnull String prefix,
-        SearchSourceBuilder searchBuilder,
-        MediaForm form) {
+        @Nonnull SearchSourceBuilder searchBuilder,
+        @Nullable MediaForm form) {
         if (form != null && form.isFaceted()) {
 
             MediaFacets facets = form.getFacets();
@@ -70,7 +71,6 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             {
                 MediaFacet types = facets.getTypes();
                 addFacet(searchBuilder, prefix + "type", types, facetRootFilter);
-
             }
 
             {
@@ -143,11 +143,11 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     }
 
     protected static void addNestedAggregation(
-        String nestedField,
-        FilterAggregationBuilder rootAggregation,
-        String facetField,
-        MediaSearchableTermFacet facet,
-        String pathPrefix) {
+        @Nonnull String nestedField,
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nonnull String facetField,
+        @Nullable MediaSearchableTermFacet facet,
+        @Nonnull String pathPrefix) {
         if (facet == null) {
             return;
         }
@@ -172,11 +172,11 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     }
 
     protected static void addNestedAggregation(
-        String nestedField,
-        FilterAggregationBuilder rootAggregation,
-        String facetField,
-        MemberRefFacet facet,
-        String pathPrefix) {
+        @Nonnull String nestedField,
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nonnull String facetField,
+        @Nullable MemberRefFacet facet,
+        @Nonnull String pathPrefix) {
         if (facet == null) {
             return;
         }
@@ -201,10 +201,10 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     }
 
     protected static void addNestedRelationAggregations(
-        FilterAggregationBuilder rootAggregation,
-        String facetField,
-        RelationFacetList facets,
-        String pathPrefix) {
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nonnull String facetField,
+        @Nullable RelationFacetList facets,
+        @Nonnull String pathPrefix) {
         if (facets == null || facets.isEmpty()) {
             return;
         }
@@ -246,9 +246,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     }
 
     protected static void addNestedTitlesAggregations(
-        FilterAggregationBuilder rootAggregation,
-        TitleFacetList facets,
-        String pathPrefix) {
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nullable TitleFacetList facets,
+        @Nonnull String pathPrefix) {
         if (facets == null || facets.isEmpty()) {
             return;
         }
@@ -275,23 +275,20 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     }
 
     protected static AggregationBuilder getFilteredRelationTermsBuilder(
-        String pathPrefix,
-        String nestedField,
-        String facetField,
-        RelationFacet facet,
-        QueryBuilder subSearch
+        @Nonnull String pathPrefix,
+        @Nonnull String nestedField,
+        @Nonnull String facetField,
+        @Nonnull RelationFacet facet,
+        @Nonnull QueryBuilder subSearch
     ) {
         return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet.isCaseSensitive()), facet, facet.getName(), subSearch);
     }
 
     private static AggregationBuilder filterAggregation(
-        String pathPrefix,
-        String facetName,
-        AggregationBuilder aggregationBuilder,
-        MediaSearch... mediaSearch) {
-        if (mediaSearch == null) {
-            return aggregationBuilder;
-        }
+        @Nonnull String pathPrefix,
+        @Nonnull String facetName,
+        @Nonnull AggregationBuilder aggregationBuilder,
+        @Nonnull MediaSearch... mediaSearch) {
 
         for (MediaSearch search : mediaSearch) {
             BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
@@ -320,31 +317,4 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     }
 
 
-
-
-    /**
-     * Returns the filter to wich given facet must be added.
-     *
-     * @param rootAggregationBuilder  If the facet itself does not have a filter, it must be added to the root filter.
-     * @return The filter associated with the facet.
-     */
-    private static FilterAggregationBuilder addFacetFilter(
-        String prefix,
-        String facetName,
-        TextFacet<MediaSearch> facet,
-        FilterAggregationBuilder rootAggregationBuilder) {
-        if (facet != null) {
-            MediaSearch filter = facet.getFilter();
-            if (filter != null) {
-                BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
-                ESMediaQueryBuilder.query(prefix, filter, facetFilter);
-                FilterAggregationBuilder filterAggregationBuilder =
-                    AggregationBuilders.filter(facetName, facetFilter);
-
-                rootAggregationBuilder.subAggregation(filterAggregationBuilder);
-                return filterAggregationBuilder;
-            }
-        }
-        return rootAggregationBuilder;
-    }
 }
