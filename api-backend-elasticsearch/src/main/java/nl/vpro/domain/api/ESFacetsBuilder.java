@@ -8,6 +8,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.apache.lucene.util.automaton.RegExp;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -38,11 +41,14 @@ public abstract class ESFacetsBuilder {
 
     protected static final String FILTER_PREFIX = "filter_";
 
+    public static final String FACET_POSTFIX = "_facet";
+
+
     protected static void addFacet(
-        SearchSourceBuilder searchBuilder,
-        String fieldName,
-        TextFacet<?> facet,
-        BoolQueryBuilder filter) {
+        @Nonnull SearchSourceBuilder searchBuilder,
+        @Nonnull  String fieldName,
+        @Nullable  TextFacet<?> facet,
+        @Nullable BoolQueryBuilder filter) {
         if(facet != null) {
             Terms.Order order = ESFacets.getComparatorType(facet);
 
@@ -67,7 +73,7 @@ public abstract class ESFacetsBuilder {
 
             if (filter != null) {
                 FilterAggregationBuilder filterAggregationBuilder =
-                    AggregationBuilders.filter(fieldName + "_facet", filter);
+                    AggregationBuilders.filter(fieldName + FACET_POSTFIX, filter);
                 filterAggregationBuilder.subAggregation(aggregationBuilder);
                 searchBuilder.aggregation(filterAggregationBuilder);
             } else {

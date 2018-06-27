@@ -59,8 +59,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 TitleFacetList titles = facets.getTitles();
                 if (titles != null) {
                     if (titles.asMediaFacet()) {
-                        FilterAggregationBuilder filterAggregationBuilder =
-                            addFacetFilter(prefix, "titles", titles, rootAggregation);
+                        addFacet(searchBuilder, prefix +  "titles", titles, facetRootFilter);
                         //addTextualTypeFacet(searchBuilder, filterAggregationBuilder, prefix + "titles", TextualType.MAIN, titles);
                     }
                     addNestedTitlesAggregations(rootAggregation, titles, prefix);
@@ -296,7 +295,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
         for (MediaSearch search : mediaSearch) {
             BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
-            ESMediaFilterBuilder.filter(pathPrefix, search, facetFilter);
+            ESMediaQueryBuilder.query(pathPrefix, search, facetFilter);
             aggregationBuilder = AggregationBuilders
                 .filter("filter_" + facetName, facetFilter)
                 .subAggregation(aggregationBuilder);
@@ -306,15 +305,18 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     }
 
     private static void addTextualTypeFacet(
-        SearchSourceBuilder searchBuilder,
-        QueryBuilder filterBuilder,
-        String fieldName,
-        TextualType type,
+        @Nonnull  SearchSourceBuilder searchBuilder,
+        @Nonnull  QueryBuilder filterBuilder,
+        @Nonnull  String fieldName,
+        @Nonnull  TextualType type,
         TextFacet facet) {
-        BoolQueryBuilder mainTitleFilter = QueryBuilders.boolQuery();
-        mainTitleFilter.must(filterBuilder);
-        mainTitleFilter.must(QueryBuilders.termQuery(fieldName + ".type", type.name()));
-        addFacet(searchBuilder, fieldName + ".value.full", facet, mainTitleFilter);
+
+
+        BoolQueryBuilder textualFilter = QueryBuilders.boolQuery();
+        textualFilter.must(filterBuilder);
+        textualFilter.must(QueryBuilders.termQuery(fieldName + ".type", type.name()));
+
+        addFacet(searchBuilder, fieldName + ".value.full", facet, textualFilter);
     }
 
 
@@ -323,8 +325,6 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     /**
      * Returns the filter to wich given facet must be added.
      *
-     * @param prefix
-     * @param facet
      * @param rootAggregationBuilder  If the facet itself does not have a filter, it must be added to the root filter.
      * @return The filter associated with the facet.
      */

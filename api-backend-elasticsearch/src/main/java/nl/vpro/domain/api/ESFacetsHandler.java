@@ -17,6 +17,7 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
@@ -26,6 +27,7 @@ import nl.vpro.domain.Displayable;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
 
+import static nl.vpro.domain.api.ESFacetsBuilder.FACET_POSTFIX;
 import static nl.vpro.domain.api.ESFacetsBuilder.esField;
 
 /**
@@ -38,35 +40,47 @@ public abstract class ESFacetsHandler {
 
     protected static final String FILTER_PREFIX = "filter_";
 
-    protected static List<TermFacetResultItem> getFacetResultItems(String facetName, Aggregations facets) {
+
+    protected static <A extends Aggregation> A getAggregation(String fieldName, Aggregations facets) {
+        String facetName = fieldName + FACET_POSTFIX;
+        InternalFilter facet = facets.get(facetName);
+        if(facet == null) {
+            return null;
+        }
+        return facet.getAggregations().get(fieldName);
+    }
+
+
+    protected static List<TermFacetResultItem> getFacetResultItems(String fieldName, Aggregations facets) {
         if(facets != null) {
-            Aggregation facet = facets.get(facetName);
-            if(facet == null) {
-                return null;
+
+            MultiBucketsAggregation a = getAggregation(fieldName, facets);
+            if (a != null) {
+                return defaultTextFacetResult(a);
             }
-            return defaultTextFacetResult((MultiBucketsAggregation) facet);
         }
         return null;
     }
 
-    protected static List<TermFacetResultItem> getFacetResultItems(String facetName, Aggregations facets, ExtendedTextFacet<?> extendedTextFacet) {
+
+    protected static List<TermFacetResultItem> getFacetResultItems(String fieldName, Aggregations facets, ExtendedTextFacet<?> extendedTextFacet) {
         if (extendedTextFacet != null) {
-            return getFacetResultItems(esField(facetName, extendedTextFacet.isCaseSensitive()), facets);
+            return getFacetResultItems(esField(fieldName, extendedTextFacet.isCaseSensitive()), facets);
         } else {
             return null;
         }
 
     }
 
-    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String facetName, TextFacet<?> requestFacet, Aggregations facets, Class<T> enumClass, Function<String, T> valueOf, Function<T, String> xmlId) {
+    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String fieldName, TextFacet<?> requestFacet, Aggregations facets, Class<T> enumClass, Function<String, T> valueOf, Function<T, String> xmlId) {
         if(facets != null) {
-            Aggregation facet = facets.getAsMap().get(facetName);
+            MultiBucketsAggregation facet = getAggregation(fieldName, facets);
             if(facet == null) {
                 return null;
             }
             Integer threshold = requestFacet.getThreshold();
             Set<T> notFound = new HashSet<T>(Arrays.asList(enumClass.getEnumConstants()));
-            List<TermFacetResultItem> result =  new ArrayList<>(enumTextFacetResult((MultiBucketsAggregation) facet, valueOf, xmlId));
+            List<TermFacetResultItem> result =  new ArrayList<>(enumTextFacetResult(facet, valueOf, xmlId));
             for (TermFacetResultItem i : result) {
                 notFound.remove(valueOf.apply(i.getId()));
             }
@@ -80,23 +94,16 @@ public abstract class ESFacetsHandler {
         return null;
     }
 
-    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String facetName, TextFacet<?> requestedFacet, Aggregations facets, final Class<T> enumClass) {
-        return getFacetResultItemsForEnum(facetName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name);
+    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String fieldName, TextFacet<?> requestedFacet, Aggregations facets, final Class<T> enumClass) {
+        return getFacetResultItemsForEnum(fieldName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name);
     }
 
-    protected static List<TermFacetResultItem> getBroadcasterResultItems(String facetName, Aggregations facets) {
-        if(facets == null) {
+    protected static List<TermFacetResultItem> getBroadcasterResultItems(String fieldName, Aggregations facets) {
+        Terms aggregation = getAggregation(fieldName, facets);
+        if(aggregation == null) {
             return null;
         }
-
-        final Aggregation facet = facets.get(facetName);
-        if(facet == null) {
-            return null;
-        }
-
-
-
-        return new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>((Terms) facet) {
+        return new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(aggregation) {
             @Override
             protected TermFacetResultItem adapt(Terms.Bucket bucket) {
                 String id = bucket.getKeyAsString();

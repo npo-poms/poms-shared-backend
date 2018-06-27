@@ -69,7 +69,6 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
 
             facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), aggregations, MediaType.class));
-            facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), aggregations, MediaType.class));
             facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), aggregations, AVType.class));
             facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response));
             facetsResult.setBroadcasters(
