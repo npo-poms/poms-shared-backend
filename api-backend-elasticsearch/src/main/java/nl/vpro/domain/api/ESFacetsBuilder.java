@@ -221,23 +221,24 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static AggregationBuilder getFilteredTermsBuilder(
-        String pathPrefix,
-        String nestedField,
-        String facetField,
-        TextFacet<?> facet,
-        QueryBuilder subSearch
+        @Nonnull String pathPrefix,
+        @Nonnull String nestedField,
+        @Nonnull String facetField,
+        @Nonnull TextFacet<?> facet,
+        @Nullable QueryBuilder subSearch
     ) {
-        return getFilteredTermsBuilder(pathPrefix, nestedField, facetField, facet, facetField, subSearch);
+        return getFilteredTermsBuilder(
+            pathPrefix, nestedField, facetField, facet, facetField, subSearch);
     }
 
 
     protected static AggregationBuilder getFilteredTermsBuilder(
-        String pathPrefix,
-        String nestedField,
-        String facetField,
-        TextFacet<?> facet,
-        String facetName,
-        QueryBuilder subSearch) {
+        @Nonnull  String pathPrefix,
+        @Nonnull  String nestedField,
+        @Nonnull  String facetField,
+        @Nonnull  TextFacet<?> facet,
+        @Nonnull String facetName,
+        @Nullable QueryBuilder subSearch) {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
