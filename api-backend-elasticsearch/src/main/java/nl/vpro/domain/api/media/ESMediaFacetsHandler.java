@@ -72,7 +72,9 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), aggregations, MediaType.class));
             facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), aggregations, AVType.class));
             facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response));
-            facetsResult.setBroadcasters(filterThreshold(getBroadcasterResultItems(prefix + "broadcasters.id", aggregations), request.getBroadcasters()));
+            facetsResult.setBroadcasters(
+                filterThreshold(
+                    getBroadcasterResultItems(prefix + "broadcasters.id", aggregations), request.getBroadcasters()));
             facetsResult.setTags(getFacetResultItems(prefix + "tags", aggregations, request.getTags()));
             facetsResult.setDurations(getDurationRangeFacetResultItems(request.getDurations(), prefix + "duration", response));
             facetsResult.setAgeRatings(getFacetResultItemsForEnum(prefix + "ageRating", request.getAgeRatings(), aggregations, AgeRating.class, s -> AgeRating.xmlValueOf(s.toUpperCase()), AgeRating::getXmlValue));

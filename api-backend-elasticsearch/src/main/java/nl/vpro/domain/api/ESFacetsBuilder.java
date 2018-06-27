@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.util.regex.Pattern;
 
 import org.apache.lucene.util.automaton.RegExp;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -40,7 +41,8 @@ public abstract class ESFacetsBuilder {
     protected static void addFacet(
         SearchSourceBuilder searchBuilder,
         String fieldName,
-        TextFacet<?> facet) {
+        TextFacet<?> facet,
+        BoolQueryBuilder filter) {
         if(facet != null) {
             Terms.Order order = ESFacets.getComparatorType(facet);
 
@@ -63,7 +65,14 @@ public abstract class ESFacetsBuilder {
                 aggregationBuilder.script(new Script(script));
             }
 
-            searchBuilder.aggregation(aggregationBuilder);
+            if (filter != null) {
+                FilterAggregationBuilder filterAggregationBuilder =
+                    AggregationBuilders.filter(fieldName + "_facet", filter);
+                filterAggregationBuilder.subAggregation(aggregationBuilder);
+                searchBuilder.aggregation(filterAggregationBuilder);
+            } else {
+                searchBuilder.aggregation(aggregationBuilder);
+            }
         }
     }
 

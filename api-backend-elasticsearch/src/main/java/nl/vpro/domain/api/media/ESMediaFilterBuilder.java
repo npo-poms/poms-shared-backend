@@ -86,7 +86,13 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     }
 
 
-
+    /**
+     *
+     * @param prefix
+     * @param searches
+     * @param filter
+     */
+    @Deprecated
 
     public static void filter(String prefix, MediaSearch searches, BoolQueryBuilder filter) {
         ESMediaQueryBuilder.query(prefix, searches, filter);

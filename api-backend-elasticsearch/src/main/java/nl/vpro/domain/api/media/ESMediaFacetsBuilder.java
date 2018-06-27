@@ -41,43 +41,42 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         if (form != null && form.isFaceted()) {
 
             MediaFacets facets = form.getFacets();
-            BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
+            BoolQueryBuilder facetRootFilter = QueryBuilders.boolQuery();
 
             // Under default ES behaviour profile filtering does not influence facet results
             if (facets.getFilter() != null) {
                 MediaSearch search = facets.getFilter();
-                ESMediaFilterBuilder.filter(prefix, search, facetFilter);
+                ESMediaQueryBuilder.query(prefix, search, facetRootFilter);
             }
 
             // Append all aggregations to this filtered aggregation builder
-            FilterAggregationBuilder aggregationBuilder = AggregationBuilders
-                .filter(ROOT_FILTER, facetFilter);
+            FilterAggregationBuilder rootAggregation = AggregationBuilders
+                .filter(ROOT_FILTER, facetRootFilter);
 
-            searchBuilder.aggregation(aggregationBuilder);
+            searchBuilder.aggregation(rootAggregation);
 
             {
                 TitleFacetList titles = facets.getTitles();
                 if (titles != null) {
                     if (titles.asMediaFacet()) {
-                        addFacetFilter(prefix, titles, facetFilter);
-                        addTextualTypeFacet(searchBuilder, facetFilter, prefix + "titles", TextualType.MAIN, titles);
+                        FilterAggregationBuilder filterAggregationBuilder =
+                            addFacetFilter(prefix, "titles", titles, rootAggregation);
+                        //addTextualTypeFacet(searchBuilder, filterAggregationBuilder, prefix + "titles", TextualType.MAIN, titles);
                     }
-                    addNestedTitlesAggregations(aggregationBuilder, titles, prefix);
+                    addNestedTitlesAggregations(rootAggregation, titles, prefix);
                 }
 
             }
 
             {
                 MediaFacet types = facets.getTypes();
-                addFacetFilter(prefix, types, facetFilter);
-                addFacet(searchBuilder, prefix + "type", types);
+                addFacet(searchBuilder, prefix + "type", types, facetRootFilter);
 
             }
 
             {
                 MediaFacet avTypes = facets.getAvTypes();
-                addFacetFilter(prefix, avTypes, facetFilter);
-                addFacet(searchBuilder, prefix + "avType", avTypes);
+                addFacet(searchBuilder, prefix + "avType", avTypes, facetRootFilter);
 
             }
 
@@ -88,20 +87,20 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             {
                 MediaFacet broadcasters = facets.getBroadcasters();
-                addFacetFilter(prefix, broadcasters, facetFilter);
-                addFacet(searchBuilder, prefix + "broadcasters.id", broadcasters);
+                //addFacetFilter(prefix, broadcasters, facetRootFilter);
+                addFacet(searchBuilder, prefix + "broadcasters.id", broadcasters, facetRootFilter);
 
             }
 
             {
                 MediaSearchableTermFacet genres = facets.getGenres();
-                addNestedAggregation("genres", aggregationBuilder, "id", genres, prefix);
+                addNestedAggregation("genres", rootAggregation, "id", genres, prefix);
             }
 
             {
                 ExtendedMediaFacet tags = facets.getTags();
-                addFacetFilter(prefix, tags, facetFilter);
-                addFacet(searchBuilder, prefix + esField("tags", tags), tags);
+                //addFacetFilter(prefix, tags, facetRootFilter);
+                addFacet(searchBuilder, prefix + esField("tags", tags), tags, facetRootFilter);
             }
 
             {
@@ -111,34 +110,34 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             {
                 MemberRefFacet descendantOf = facets.getDescendantOf();
-                addNestedAggregation("descendantOf", aggregationBuilder, "midRef", descendantOf, prefix);
+                addNestedAggregation("descendantOf", rootAggregation, "midRef", descendantOf, prefix);
             }
 
             {
                 MemberRefFacet episodeOf = facets.getEpisodeOf();
-                addNestedAggregation("episodeOf", aggregationBuilder, "midRef", episodeOf, prefix);
+                addNestedAggregation("episodeOf", rootAggregation, "midRef", episodeOf, prefix);
             }
 
             {
                 MemberRefFacet memberOf = facets.getMemberOf();
-                addNestedAggregation("memberOf", aggregationBuilder, "midRef", memberOf, prefix);
+                addNestedAggregation("memberOf", rootAggregation, "midRef", memberOf, prefix);
             }
 
             {
                 RelationFacetList relations = facets.getRelations();
-                addNestedRelationAggregations(aggregationBuilder, "value", relations, prefix);
+                addNestedRelationAggregations(rootAggregation, "value", relations, prefix);
             }
 
             {
                 MediaFacet ageRatings = facets.getAgeRatings();
-                addFacetFilter(prefix, ageRatings, facetFilter);
-                addFacet(searchBuilder, prefix + "ageRating", ageRatings);
+                //addFacetFilter(prefix, ageRatings, facetRootFilter);
+                addFacet(searchBuilder, prefix + "ageRating", ageRatings, facetRootFilter);
             }
 
             {
                 MediaFacet contentRatings = facets.getContentRatings();
-                addFacetFilter(prefix, contentRatings, facetFilter);
-                addFacet(searchBuilder, prefix + "contentRatings", contentRatings);
+                //addFacetFilter(prefix, contentRatings, facetRootFilter);
+                addFacet(searchBuilder, prefix + "contentRatings", contentRatings, facetRootFilter);
 
             }
         }
@@ -270,7 +269,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 throw new RuntimeException("No filter found for " + facet);
             }
 
-            FilterAggregationBuilder filterAggregationBuilder = AggregationBuilders.filter(escapeFacetName(facet.getName()), filter);
+            FilterAggregationBuilder filterAggregationBuilder =
+                AggregationBuilders.filter(escapeFacetName(facet.getName()), filter);
             rootAggregation.subAggregation(filterAggregationBuilder);
         }
     }
@@ -314,18 +314,37 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         BoolQueryBuilder mainTitleFilter = QueryBuilders.boolQuery();
         mainTitleFilter.must(filterBuilder);
         mainTitleFilter.must(QueryBuilders.termQuery(fieldName + ".type", type.name()));
-        addFacet(searchBuilder, fieldName + ".value.full", facet);
+        addFacet(searchBuilder, fieldName + ".value.full", facet, mainTitleFilter);
     }
 
-    private static void addFacetFilter(
+
+
+
+    /**
+     * Returns the filter to wich given facet must be added.
+     *
+     * @param prefix
+     * @param facet
+     * @param rootAggregationBuilder  If the facet itself does not have a filter, it must be added to the root filter.
+     * @return The filter associated with the facet.
+     */
+    private static FilterAggregationBuilder addFacetFilter(
         String prefix,
+        String facetName,
         TextFacet<MediaSearch> facet,
-        BoolQueryBuilder filterBuilder) {
+        FilterAggregationBuilder rootAggregationBuilder) {
         if (facet != null) {
             MediaSearch filter = facet.getFilter();
             if (filter != null) {
-                ESMediaFilterBuilder.filter(prefix, filter, filterBuilder);
+                BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
+                ESMediaQueryBuilder.query(prefix, filter, facetFilter);
+                FilterAggregationBuilder filterAggregationBuilder =
+                    AggregationBuilders.filter(facetName, facetFilter);
+
+                rootAggregationBuilder.subAggregation(filterAggregationBuilder);
+                return filterAggregationBuilder;
             }
         }
+        return rootAggregationBuilder;
     }
 }

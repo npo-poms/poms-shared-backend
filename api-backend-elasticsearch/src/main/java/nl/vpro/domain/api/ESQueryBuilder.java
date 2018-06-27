@@ -217,6 +217,9 @@ public abstract class ESQueryBuilder {
 
     public static void apply(@Nonnull BoolQueryBuilder answer, @Nonnull QueryBuilder subQuery, @Nonnull Match match) {
 
+        if (match == null) {
+            match = Match.MUST;
+        }
         switch (match) {
             case SHOULD:
                 answer.should(subQuery);

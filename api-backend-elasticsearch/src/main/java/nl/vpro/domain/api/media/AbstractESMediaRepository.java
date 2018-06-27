@@ -103,7 +103,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     /**
      * Defaulting version of {@link #searchRequest(String[], ProfileDefinition, AbstractMediaForm, MediaObject, BoolQueryBuilder, long, Integer)}
-     * Where the types is set to {@link #getLoadTypes()}
+     * Where the types is set to {@link #getLoadTypes()} and mediaObject is <code>null</code>
      */
     final protected SearchRequest searchRequest(
         ProfileDefinition<MediaObject> profile,
