@@ -28,6 +28,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.FACET_POSTFIX;
+import static nl.vpro.domain.api.ESFacetsBuilder.FILTER_PREFIX;
 import static nl.vpro.domain.api.ESFacetsBuilder.esField;
 
 /**
@@ -36,9 +37,6 @@ import static nl.vpro.domain.api.ESFacetsBuilder.esField;
  */
 @Slf4j
 public abstract class ESFacetsHandler {
-
-
-    protected static final String FILTER_PREFIX = "filter_";
 
 
     protected static <A extends Aggregation> A getAggregation(String fieldName, Aggregations facets) {

@@ -29,6 +29,7 @@ import nl.vpro.domain.api.TermFacetResultItem;
 import nl.vpro.domain.media.*;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.FACET_POSTFIX;
+import static nl.vpro.domain.api.ESFacetsBuilder.FILTER_PREFIX;
 import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 
 /**
@@ -162,38 +163,33 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         };
     }
 
-    protected static List<MultipleFacetsResult> getRelationAggregationResultItems(RelationFacetList requestedRelations, Filter root) {
-        if (root == null || requestedRelations == null) {
+    protected static List<MultipleFacetsResult> getRelationAggregationResultItems(
+        @Nullable RelationFacetList requestedRelations,
+        @Nonnull Filter root) {
+        if (requestedRelations == null) {
             return null;
         }
 
         List<MultipleFacetsResult> answer = new ArrayList<>();
 
         for (RelationFacet facet : requestedRelations) {
+            log.debug("Handling facet {}", facet);
             String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
-            HasAggregations aggregations = root.getAggregations().get("filter_" + escapedFacetName);
+            HasAggregations aggregations = root.getAggregations().get(FILTER_PREFIX + escapedFacetName);
             if (aggregations != null) {
-                Aggregation aggregation = aggregations.getAggregations().get("filter_" + escapedFacetName);
-                if (aggregation != null) {
-                    Aggregation subAggregation = ((HasAggregations) aggregation).getAggregations().get("relations");
-                    if (subAggregation == null) {
-                        subAggregation = ((HasAggregations) aggregation).getAggregations().get("embeds_media_relations");
-                    }
-                    final Terms relations = getFilteredTerms(escapedFacetName, subAggregation);
-
-                    if (relations != null) {
-                        AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(relations) {
-                            @Override
-                            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
-                                return new TermFacetResultItem(
-                                    bucket.getKeyAsString(),
-                                    bucket.getKeyAsString(),
-                                    bucket.getDocCount()
-                                );
-                            }
-                        };
-                        answer.add(new MultipleFacetsResult(facet.getName(), resultItems));
-                    }
+                Terms relations = aggregations.getAggregations().get(escapedFacetName);
+                if (relations != null) {
+                    AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(relations) {
+                        @Override
+                        protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+                            return new TermFacetResultItem(
+                                bucket.getKeyAsString(),
+                                bucket.getKeyAsString(),
+                                bucket.getDocCount()
+                            );
+                        }
+                    };
+                    answer.add(new MultipleFacetsResult(facet.getName(), resultItems));
                 }
             }
         }

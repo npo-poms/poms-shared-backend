@@ -39,7 +39,7 @@ public abstract class ESFacetsBuilder {
     //public static final org.elasticsearch.common.joda.time.DateTimeZone DATE_TIME_ZONE = org.elasticsearch.common.joda.time.DateTimeZone.forID(TIMEZONE);
 
 
-    protected static final String FILTER_PREFIX = "filter_";
+    public static final String FILTER_PREFIX = "filter_";
 
     public static final String FACET_POSTFIX = "_facet";
 

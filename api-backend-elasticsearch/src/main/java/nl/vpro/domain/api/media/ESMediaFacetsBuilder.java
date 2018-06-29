@@ -226,17 +226,11 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 facetFilter
             );
 
-            NestedAggregationBuilder nestedBuilder = getNestedBuilder(
-                pathPrefix,
-                "relations",
-                null,
-                termsBuilder
-            );
             String facetName = escapeFacetName(facet.getName());
             AggregationBuilder builder = filterAggregation(
                 pathPrefix,
                 facetName,
-                nestedBuilder,
+                termsBuilder,
                 facet.getFilter(),
                 facets.getFilter()
             );
@@ -293,7 +287,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
             ESMediaQueryBuilder.query(pathPrefix, search, facetFilter);
             aggregationBuilder = AggregationBuilders
-                .filter("filter_" + facetName, facetFilter)
+                .filter(FILTER_PREFIX + facetName, facetFilter)
                 .subAggregation(aggregationBuilder);
         }
 
