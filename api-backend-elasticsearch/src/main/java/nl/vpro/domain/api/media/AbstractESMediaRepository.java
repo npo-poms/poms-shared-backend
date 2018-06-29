@@ -145,7 +145,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     final protected SearchRequest searchRequest(
         @Nonnull String[] types,
         @Nullable ProfileDefinition<MediaObject> profile,
-        @Nonnull AbstractMediaForm form,
+        @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
         @Nonnull BoolQueryBuilder filter,
         long offset,

@@ -12,16 +12,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.join.query.JoinQueryBuilders;
 
-import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.ESMatchType.FieldInfo;
 import nl.vpro.domain.api.ESMatchType.FieldInfoWrapper;
+import nl.vpro.domain.api.ESQueryBuilder;
+import nl.vpro.domain.api.SearchFieldDefinition;
+import nl.vpro.domain.api.SimpleTextMatcher;
+import nl.vpro.domain.api.TextMatcherList;
 import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
 import nl.vpro.domain.api.subtitles.SubtitlesSearch;
 import nl.vpro.domain.classification.ClassificationServiceLocator;
@@ -93,12 +97,13 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * @param searches The 'searches' part of a MediaForm
      */
     public static void query(
-        @NotNull String prefix,
-        final MediaSearch searches,
-        @NotNull BoolQueryBuilder booleanQuery) {
-        if(searches == null) {
+        @Nonnull String prefix,
+        @Nullable final MediaSearch searches,
+        @Nonnull BoolQueryBuilder booleanQuery) {
+        if (searches == null) {
             return;
         }
+
         {
             SimpleTextMatcher textSearch = searches.getText();
             if(textSearch != null && StringUtils.isNotBlank(textSearch.getValue())) {

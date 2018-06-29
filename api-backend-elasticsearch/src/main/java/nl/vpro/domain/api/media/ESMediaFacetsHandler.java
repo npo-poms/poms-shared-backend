@@ -18,6 +18,7 @@ import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
+import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
@@ -27,6 +28,7 @@ import nl.vpro.domain.api.MultipleFacetsResult;
 import nl.vpro.domain.api.TermFacetResultItem;
 import nl.vpro.domain.media.*;
 
+import static nl.vpro.domain.api.ESFacetsBuilder.FACET_POSTFIX;
 import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 
 /**
@@ -62,12 +64,12 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 getTitleAggregationResultItems(request.getTitles(), globalFilter)
             );
             List<TermFacetResultItem> titles = facetsResult.getTitles();
-            Aggregation aggregation = aggregations.get(prefix + "titles.value.full");
+            InternalFilter aggregation = aggregations.get(prefix + "titles.value.full" + FACET_POSTFIX);
             if (aggregation != null) {
                 if (titles == null) {
                     titles = new ArrayList<>();
                 }
-                StringTerms terms = (StringTerms) aggregation;
+                StringTerms terms = aggregation.getAggregations().get("titles.value.full");
                 for (StringTerms.Bucket bucket : terms.getBuckets()) {
                     titles.add(new TermFacetResultItem(bucket.getKeyAsString(), bucket.getKeyAsString(), bucket.getDocCount()));
                 }

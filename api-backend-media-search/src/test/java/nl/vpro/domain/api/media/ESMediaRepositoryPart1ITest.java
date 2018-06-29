@@ -1562,6 +1562,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testTitlesFacetsBackwards() {
+        target.setScore(false);
         index(program()
             .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")

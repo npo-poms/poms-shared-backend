@@ -17,7 +17,6 @@ import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuil
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import nl.vpro.domain.api.*;
-import nl.vpro.domain.media.support.TextualType;
 
 /**
  * @author Roelof Jan Koekoek
@@ -60,8 +59,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 TitleFacetList titles = facets.getTitles();
                 if (titles != null) {
                     if (titles.asMediaFacet()) {
-                        addFacet(searchBuilder, prefix +  "titles", titles, facetRootFilter);
-                        //addTextualTypeFacet(searchBuilder, filterAggregationBuilder, prefix + "titles", TextualType.MAIN, titles);
+                        addFacet(searchBuilder, prefix +  "titles.value.full", titles, facetRootFilter);
                     }
                     addNestedTitlesAggregations(rootAggregation, titles, prefix);
                 }
@@ -301,21 +299,5 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
         return aggregationBuilder;
     }
-
-    private static void addTextualTypeFacet(
-        @Nonnull  SearchSourceBuilder searchBuilder,
-        @Nonnull  QueryBuilder filterBuilder,
-        @Nonnull  String fieldName,
-        @Nonnull  TextualType type,
-        TextFacet facet) {
-
-
-        BoolQueryBuilder textualFilter = QueryBuilders.boolQuery();
-        textualFilter.must(filterBuilder);
-        textualFilter.must(QueryBuilders.termQuery(fieldName + ".type", type.name()));
-
-        addFacet(searchBuilder, fieldName + ".value.full", facet, textualFilter);
-    }
-
 
 }
