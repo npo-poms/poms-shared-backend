@@ -153,7 +153,7 @@ public abstract class ESFacetsHandler {
             // This seems to happen if a media facet is embedded in a page search....
             filter = root.getAggregations().get(FILTER_PREFIX + nestedField);
         }
-        if(filter == null || !(filter instanceof HasAggregations)) {
+        if(!(filter instanceof HasAggregations)) {
             return null;
         }
 

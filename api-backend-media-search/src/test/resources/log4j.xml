@@ -6,6 +6,9 @@
       <param name="ConversionPattern" value="%p %c %M.%L %m%n"/>
     </layout>
   </appender>
+  <logger name="nl.vpro.domain.api.media.ESMediaRepository">
+    <level value="DEBUG" />
+  </logger>
 
   <root>
     <level value="INFO"/>

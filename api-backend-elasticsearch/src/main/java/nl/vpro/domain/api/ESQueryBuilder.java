@@ -439,11 +439,8 @@ public abstract class ESQueryBuilder {
      */
     public static void relationQuery(
         @NotNull String prefix,
-        AbstractRelationSearch relationSearch,
+        @NotNull AbstractRelationSearch relationSearch,
         @NotNull BoolQueryBuilder booleanQuery) {
-        if (relationSearch == null) {
-            return;
-        }
 
         BoolQueryBuilder fieldWrapper = QueryBuilders.boolQuery();
         buildFromList(prefix, fieldWrapper, relationSearch.getTypes(),

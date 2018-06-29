@@ -1,7 +1,8 @@
 package nl.vpro.domain.api.media;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 
 import org.elasticsearch.action.ActionFuture;
@@ -20,9 +23,12 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.TransportSerializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import nl.vpro.domain.api.AbstractESRepository;
+import nl.vpro.domain.api.ESFilterBuilder;
 import nl.vpro.domain.api.GenericMediaSearchResult;
 import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -37,11 +43,17 @@ import nl.vpro.util.TimeUtils;
  * @author Michiel Meeuwissen
  * @since 3.7
  */
-@Slf4j
+
 @ToString(callSuper = true)
 public abstract class AbstractESMediaRepository extends AbstractESRepository<MediaObject> implements MediaLoader {
 
+    private final Logger log = LoggerFactory.getLogger(getClass());
+
     private final IndexHelper helper;
+
+    @Getter
+    @Setter
+    private boolean score = true;
 
     protected AbstractESMediaRepository(ESClientFactory client) {
         super(client);
@@ -159,23 +171,26 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      *
      */
     final protected SearchSourceBuilder searchBuilder(
-        ProfileDefinition<MediaObject> profile,
+        @Nullable ProfileDefinition<MediaObject> profile,
         AbstractMediaForm form,
         MediaObject mediaObject,
-        BoolQueryBuilder filter,
+        @Nonnull BoolQueryBuilder filter,
         long offset,
-        Integer max) {
+        @Nullable Integer max) {
+
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
 
         // Handle profile filtering
-        ESMediaFilterBuilder.filter(profile, filter);
-        if (filter != null && filter.hasClauses()) {
+        ESFilterBuilder.filter(profile, filter);
+        if (filter.hasClauses()) {
             searchBuilder.postFilter(filter);
         }
         QueryBuilder queryBuilder = ESMediaQueryBuilder.query(form != null ? form.getSearches() : null);
-        searchBuilder.query(
-            ESMediaScoreBuilder.score(queryBuilder, Instant.now())
-        );
+        if (score) {
+            searchBuilder.query(
+                ESMediaScoreBuilder.score(queryBuilder, Instant.now())
+            );
+        }
 
         if (form instanceof MediaForm) {
             ESMediaFacetsBuilder.facets(searchBuilder, (MediaForm) form);
@@ -186,6 +201,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         buildHighlights(searchBuilder, form, ESMediaQueryBuilder.SEARCH_FIELDS);
 
         handlePaging(offset, max, searchBuilder, queryBuilder, indexName);
+
+        log.debug("ES query: {}", searchBuilder);
 
         return searchBuilder;
     }

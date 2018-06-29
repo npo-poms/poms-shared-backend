@@ -1,6 +1,7 @@
 package nl.vpro.domain.api;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -21,10 +22,6 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
  */
 public abstract class ESFilterBuilder {
 
-    @Deprecated
-    protected static void apply(BoolQueryBuilder answer, QueryBuilder filter, Match match) {
-        ESQueryBuilder.apply(answer, filter, match);
-    }
 
     public static <T> QueryBuilder filter(ProfileDefinition<T> definition) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
@@ -32,7 +29,9 @@ public abstract class ESFilterBuilder {
         return simplifyQuery(boolQueryBuilder);
     }
 
-    public static <T> void filter(ProfileDefinition<T> definition, BoolQueryBuilder filter) {
+    public static <T> void filter(
+        @Nullable ProfileDefinition<T> definition,
+        @Nonnull BoolQueryBuilder filter) {
         if (!isEmpty(definition)) {
             filter.filter(
                 handleConstraint(definition.getFilter().getConstraint())
@@ -64,7 +63,8 @@ public abstract class ESFilterBuilder {
         ESQueryBuilder.apply(booleanQueryBuilder, append, list.getMatch());
     }
 
-    static <T> boolean isEmpty(ProfileDefinition<T> definition) {
+    static <T> boolean isEmpty(
+        @Nullable ProfileDefinition<T> definition) {
         return definition == null || !definition.hasConstraint();
     }
 

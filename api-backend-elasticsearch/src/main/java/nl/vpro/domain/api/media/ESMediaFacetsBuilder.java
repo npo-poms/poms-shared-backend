@@ -209,15 +209,16 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             return;
         }
 
-        RelationSearch relationSearch = facets.getSubSearch();
+        // for all relation search
+        RelationSearch allRelationsFacetsSubSearch = facets.getSubSearch();
+
         for (RelationFacet facet : facets) {
             BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
             if (facet.hasSubSearch()) {
-                ESMediaFilterBuilder.filter(pathPrefix, "relations", facet.getSubSearch(), facetFilter);
+                ESQueryBuilder.relationQuery(pathPrefix, facet.getSubSearch(), facetFilter);
             }
-            if (relationSearch != null) {
-                ESMediaQueryBuilder.relationQuery(pathPrefix + "relations", relationSearch,  facetFilter);
-
+            if (allRelationsFacetsSubSearch != null) {
+                ESQueryBuilder.relationQuery(pathPrefix, allRelationsFacetsSubSearch,  facetFilter);
             }
             AggregationBuilder termsBuilder = getFilteredRelationTermsBuilder(
                 pathPrefix,

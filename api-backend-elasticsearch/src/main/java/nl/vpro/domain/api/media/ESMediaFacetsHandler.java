@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -35,11 +36,17 @@ import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 @Slf4j
 public class ESMediaFacetsHandler extends ESFacetsHandler {
 
-    public static MediaFacetsResult extractFacets(SearchResponse response, MediaFacets facets, MediaLoader mediaRepository) {
+    public static MediaFacetsResult extractFacets(
+        SearchResponse response, MediaFacets facets, MediaLoader mediaRepository) {
         return extractFacets(response, facets, mediaRepository, "");
     }
 
-    public static MediaFacetsResult extractFacets(SearchResponse response, MediaFacets request, MediaLoader mediaRepository, @Nonnull String prefix) {
+    @Nullable
+    public static MediaFacetsResult extractFacets(
+        @Nonnull SearchResponse response,
+        @Nullable MediaFacets request,
+        @Nonnull MediaLoader mediaRepository,
+        @Nonnull String prefix) {
         if (request == null || !request.isFaceted()) {
             return null;
 
@@ -126,7 +133,8 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
     }
 
 
-    protected static List<MemberRefFacetResultItem> getMemberRefAggregationResultItems(String prefix, String nestedField, final MediaLoader mediaRepository, Filter root) {
+    protected static List<MemberRefFacetResultItem> getMemberRefAggregationResultItems(
+        String prefix, String nestedField, final MediaLoader mediaRepository, Filter root) {
         if (root == null) {
             return null;
         }
@@ -191,7 +199,9 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         return answer;
     }
 
-    protected static List<TermFacetResultItem> getTitleAggregationResultItems(TitleFacetList requestedTitles, Filter root) {
+    protected static List<TermFacetResultItem> getTitleAggregationResultItems(
+        TitleFacetList requestedTitles,
+        Filter root) {
         if (root == null || requestedTitles == null) {
             return null;
         }

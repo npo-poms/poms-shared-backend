@@ -53,24 +53,6 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
         return booleanFilter;
     }
 
-    public static void filter(
-        @Nonnull String axis,
-        RelationSearch searches,
-        BoolQueryBuilder boolQueryBuilder) {
-        filter("", axis, searches, boolQueryBuilder);
-    }
-
-    public static void filter(
-        @Nonnull String prefix,
-        String axis,
-        RelationSearch relationSearch,
-        BoolQueryBuilder boolQueryBuilder) {
-        if(relationSearch == null) {
-            return;
-        }
-        ESMediaQueryBuilder.relationQuery(prefix + axis, relationSearch, boolQueryBuilder);
-    }
-
     public static QueryBuilder filter(@Nonnull String axis, TitleSearch searches) {
         return filter("", axis, searches);
     }

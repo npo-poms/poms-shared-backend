@@ -12,6 +12,9 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -35,7 +38,9 @@ public class ESMediaSortHandler extends ESFacetsHandler {
 
     interface SortHandler extends BiFunction<MediaSortOrder, MediaObject, FieldSortBuilder> {
         @Override
-        default FieldSortBuilder apply(MediaSortOrder order, MediaObject mediaObject) {
+        default FieldSortBuilder apply(
+            @Nonnull MediaSortOrder order,
+            @Nullable MediaObject mediaObject) {
             return new FieldSortBuilder(order.getField().name())
                 .order(order(order.getOrder()));
         }
@@ -58,7 +63,9 @@ public class ESMediaSortHandler extends ESFacetsHandler {
 
 
         @Override
-        public FieldSortBuilder apply(MediaSortOrder sortOrder, MediaObject mediaObject) {
+        public FieldSortBuilder apply(
+            @Nonnull MediaSortOrder sortOrder,
+            @Nullable MediaObject mediaObject) {
             FieldSortBuilder sortBuilder = new FieldSortBuilder(field)
                 .setNestedPath(nestedField)
                 .order(order(sortOrder.getOrder()));
@@ -76,7 +83,9 @@ public class ESMediaSortHandler extends ESFacetsHandler {
         static final String field = titlesField  + ".value.full";
 
         @Override
-        public FieldSortBuilder apply(MediaSortOrder sortOrder, MediaObject mediaObject) {
+        public FieldSortBuilder apply(
+            @Nonnull MediaSortOrder sortOrder,
+            @Nullable MediaObject mediaObject) {
             FieldSortBuilder sortBuilder = new FieldSortBuilder(field)
                 .setNestedPath(titlesField)
                 .order(order(sortOrder.getOrder()));
