@@ -34,7 +34,6 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Override
     protected void firstRun() {
-        System.out.println("JAVAPORT " + System.getProperty("integ.java.port"));
         createIndexIfNecessary(ApiMediaIndex.NAME);
     }
 

@@ -59,6 +59,11 @@ public abstract class AbstractESRepositoryITest {
     protected static String indexName = null;
 
     protected static Client client;
+
+    static {
+        log.info("JAVAPORT " + System.getProperty("integ.java.port"));
+
+    }
     @Rule
     public TestRule noElasticSearch = (base, description) -> new Statement() {
         @Override
