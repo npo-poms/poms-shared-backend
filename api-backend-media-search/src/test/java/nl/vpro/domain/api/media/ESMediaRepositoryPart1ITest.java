@@ -539,17 +539,22 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithGenreFacetWhenFiltered() {
         index(program().withMid().genres(new Genre("3.0.1.1.6")).build());
+        index(program().withMid().genres(new Genre("3.0.1.1.6"), new Genre("3.0.1.1.5")).build());
         index(program().withMid().genres(new Genre("3.0.1.1.7")).build());
 
         MediaForm form = form().genreFacet().build();
 
+        // This is actually a bit of an degenerated example. why would you filter the facet on exactly one other genre?
+        // But anyhow this means: aggregate genre buckets on all documents wich at least have 3.0.1.1.6
         final MediaSearch search = new MediaSearch();
         search.setGenres(new TextMatcherList(new TextMatcher("3.0.1.1.6")));
         form.getFacets().getGenres().setFilter(search);
 
         MediaSearchResult result = target.find(null, form, 0, null);
-        assertThat(result.getFacets().getGenres()).hasSize(1);
+        assertThat(result.getFacets().getGenres()).hasSize(2);
         assertThat(result.getFacets().getGenres().get(0).getValue()).isEqualTo("Jeugd - Amusement");
+        assertThat(result.getFacets().getGenres().get(0).getCount()).isEqualTo(2);
+        assertThat(result.getFacets().getGenres().get(1).getId()).isEqualTo("3.0.1.1.5");
     }
 
     @Test
@@ -562,8 +567,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().genreFacet().build();
 
+        // This is a subsearch, so this means that we are only interested in the count for the given genres.
         final TermSearch search = new TermSearch();
         search.setIds(new TextMatcherList(new TextMatcher("3.0.1.1.6")));
+        // Since this matched only one, we will get only one facet result!
         form.getFacets().getGenres().setSubSearch(search);
 
         MediaSearchResult result = target.find(null, form, 0, null);
@@ -689,7 +696,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         RelationFacet relationFacet = new RelationFacet();
         relationFacet.setName("test");
         relationFacet.setCaseSensitive(false);
-        MediaForm form = form().relationsFacet(relationFacet).build();
+        // relation facet with no subsearch, this does not really make much sense of course, but we support it anyways.
+
+        MediaForm form = form()
+            .relationsFacet(relationFacet)
+            .build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 

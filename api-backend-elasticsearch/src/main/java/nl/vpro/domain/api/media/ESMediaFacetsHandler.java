@@ -70,7 +70,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 if (titles == null) {
                     titles = new ArrayList<>();
                 }
-                StringTerms terms = aggregation.getAggregations().get("titles.value.full");
+                StringTerms terms = aggregation.getAggregations().get(prefix + "titles.value.full");
                 for (StringTerms.Bucket bucket : terms.getBuckets()) {
                     titles.add(new TermFacetResultItem(bucket.getKeyAsString(), bucket.getKeyAsString(), bucket.getDocCount()));
                 }
