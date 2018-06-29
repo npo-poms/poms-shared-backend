@@ -152,9 +152,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             SearchResult<MediaObject> result = target.find(null, form().text("WERELD").build(), 0, null);
             assertThat(result.getSize()).isEqualTo(3);
-            assertThat(result.getItems().get(2)).isEqualTo("De Wereld Draait Door");
-            assertThat(result.getItems().get(1)).isEqualTo("De Ideale Wereld");
-            assertThat(result.getItems().get(2)).isEqualTo("Alleen op de wereld");
+            float score0 = result.getItems().get(0).getScore(); // TODO: Fails.
+            float score1 = result.getItems().get(1).getScore();
+            float score2 = result.getItems().get(2).getScore();
+            assertThat(score0).isGreaterThan(score1);
+            assertThat(score1).isGreaterThan(score2);
+            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("De Ideale Wereld");
+            assertThat(result.getItems().get(1).getResult().getMainTitle()).isEqualTo("Alleen op de Wereld");
+            assertThat(result.getItems().get(2).getResult().getMainTitle()).isEqualTo("De Wereld Draait Door");
+
         }
     }
 
