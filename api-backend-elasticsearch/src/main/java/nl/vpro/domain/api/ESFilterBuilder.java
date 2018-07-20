@@ -90,7 +90,7 @@ public abstract class ESFilterBuilder {
         } else if (constraint instanceof HasPredictionConstraint) {
             HasPredictionConstraint hasPrediction = (HasPredictionConstraint) constraint;
             if (hasPrediction.getPlatform() != null) {
-                return QueryBuilders.termQuery(hasPrediction.getESPath(), hasPrediction.getPlatform());
+                return QueryBuilders.termQuery(hasPrediction.getESPath(), hasPrediction.getPlatform().name());
             } else {
                 return doExistsConstraint(hasPrediction);
             }
