@@ -11,6 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
 import javax.xml.bind.JAXB;
 
 import org.elasticsearch.action.index.IndexRequest;
@@ -665,6 +666,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
+    @Ignore("work in progress")
     public void testFindWithRelationFacet() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
@@ -685,6 +687,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
+    @Ignore("work in progress")
+
     public void testFindWithRelationFacetCaseInsensitive() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
@@ -714,6 +718,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
+    @Ignore("work in progress")
+
     public void testFindWithRelationFacetAndSearchCaseInsensitive() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
@@ -769,6 +775,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     }
     @Test
+    @Ignore("work in progress")
     public void testFindWithRelationFacetWithSubSearchAndSearchCaseInsensitive() {
         target.setScore(false);
         RelationDefinition label = new RelationDefinition("label", "VPRO");
@@ -836,6 +843,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
+    @Ignore("work in progress")
+
     public void testFindWithRelationFacetWithSearch() {
         target.setScore(false);
         RelationDefinition label = new RelationDefinition("label", "VPRO");
@@ -862,6 +871,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
+    @Ignore("work in progress")
+
     public void testFindWithRelationFacetWithFilter() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
