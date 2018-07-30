@@ -4,6 +4,8 @@
  */
 package nl.vpro.domain.api.media;
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -22,6 +24,7 @@ import nl.vpro.domain.api.*;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
+@Slf4j
 public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
     protected static final String ROOT_FILTER = "mediaRootFilter";
@@ -165,6 +168,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             terms
         );
         AggregationBuilder builder = filterAggregation(pathPrefix, nestedField, nestedBuilder, facet.getFilter());
+        log.debug("Added aggregation {}", builder);
         rootAggregation.subAggregation(builder);
 
     }
@@ -234,6 +238,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 facet.getFilter(),
                 facets.getFilter()
             );
+            log.debug("Added aggregation {}", builder);
             rootAggregation.subAggregation(builder);
         }
     }

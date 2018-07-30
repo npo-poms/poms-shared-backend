@@ -672,15 +672,16 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().relations(new Relation(eoLabel, null, "Evangelisch")).build());
 
         RelationFacet relationFacet = new RelationFacet();
-        relationFacet.setName("test");
+        relationFacet.setName("my_relationsfacets");
         MediaForm form = form().relationsFacet(relationFacet).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+
+        MediaSearchResult result = target.find(null, form, 0, 0);
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
         assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
+        assertThat(relations.get(0).getName()).isEqualTo("my_relationsfacets");
         assertThat(relations.get(0)).hasSize(2);
     }
 

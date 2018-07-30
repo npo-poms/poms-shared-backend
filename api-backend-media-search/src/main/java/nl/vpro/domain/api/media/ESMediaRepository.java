@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -122,10 +123,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public MediaSearchResult find(
-        ProfileDefinition<MediaObject> profile,
-        MediaForm form,
+        @Nullable final ProfileDefinition<MediaObject> profile,
+        @Nullable MediaForm form,
         long offset,
-        Integer max) {
+        @Nullable Integer max) {
+
         form = redirectForm(form);
 
         SearchRequest request = searchRequest(

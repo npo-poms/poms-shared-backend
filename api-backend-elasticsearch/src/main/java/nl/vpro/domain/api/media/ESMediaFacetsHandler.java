@@ -175,9 +175,16 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         for (RelationFacet facet : requestedRelations) {
             log.debug("Handling facet {}", facet);
             String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
-            HasAggregations aggregations = root.getAggregations().get(FILTER_PREFIX + escapedFacetName);
+            String filterName = FILTER_PREFIX + escapedFacetName;
+            HasAggregations aggregations = root.getAggregations().get(filterName);
             if (aggregations != null) {
-                Terms relations = aggregations.getAggregations().get(escapedFacetName);
+                HasAggregations filtered = aggregations.getAggregations().get(filterName);
+
+                HasAggregations filtered2 = filtered.getAggregations().get(filterName);
+
+                Terms relations = filtered2.getAggregations().get(escapedFacetName);
+
+
                 if (relations != null) {
                     AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(relations) {
                         @Override
