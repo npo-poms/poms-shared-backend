@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>5.7.2</version>
+    <version>5.8.0</version>
   </parent>
 
   <groupId>nl.publiekeomroep</groupId>
@@ -16,7 +16,7 @@
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
-    <poms.shared.version>5.7.9</poms.shared.version>
+    <poms.shared.version>5.8.1</poms.shared.version>
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
   </properties>
