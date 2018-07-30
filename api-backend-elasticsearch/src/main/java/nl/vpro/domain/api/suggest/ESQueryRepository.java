@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -130,8 +130,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     }
 
     private Comparator<Suggestion> getLexicalDistanceComparator(final String input) {
-        //        org.apache.commons.text.similarity.LevenshteinDistance
-        return Comparator.comparingInt(o -> StringUtils.getLevenshteinDistance(input, o.getText()));
+        return Comparator.comparingInt(o ->  LevenshteinDistance.getDefaultInstance().apply(input, o.getText()));
     }
 
     SuggestResult adapt(Suggest suggestions, final String input, final String profile) {
