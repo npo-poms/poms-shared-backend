@@ -772,7 +772,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithRelationFacetWithSubSearchAndSearchCaseInsensitive() {
         target.setScore(false);
-        RelationDefinition label = new RelationDefinition("label", "VPRO");
+        RelationDefinition vproLabel = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
 
 
@@ -782,18 +782,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         // 3 have vpro:label blue note
         // 1 has vpro:label red note
         index(program().withMid().relations(
-            Relation.ofText(label,"Blue Note")
+            Relation.ofText(vproLabel,"Blue Note")
         ).build());
         index(program().withMid().relations(
-            Relation.ofText(label, "blue note")
+            Relation.ofText(vproLabel, "blue note")
         ).build());
         index(program().withMid().relations(
             Relation.ofText(eoLabel, "Evangelisch"),
-            Relation.ofText(label, "Blue NOte")
+            Relation.ofText(vproLabel, "Blue NOte")
         ).build());
         index(program().withMid().relations(
             Relation.ofText(eoLabel, "bla bla"),
-            Relation.ofText(label, "red note")
+            Relation.ofText(vproLabel, "red note")
         ).build());
 
         {
@@ -802,14 +802,14 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             relationFacet.setCaseSensitive(false);
             relationFacet.setSubSearch(
                 RelationSearch.builder()
-                    .broadcasters(TextMatcherList.should(must("VPRO")))
-                    .types(TextMatcherList.should(must("label")))
+                    .broadcasters(TextMatcherList.should(must(vproLabel.getBroadcaster())))
+                    .types(TextMatcherList.should(must(vproLabel.getType())))
                     .build()
             );
 
             MediaForm form = form()
                 .relationsFacet(relationFacet)
-                .relationText(label, ExtendedTextMatcher.must("blue note", false))
+                .relationText(vproLabel, ExtendedTextMatcher.must("blue note", false))
                 .build();
 
             MediaSearchResult result = target.find(null, form, 0, null);
@@ -1613,6 +1613,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testTitlesFacetsWithTextualType() {
+        target.setScore(false);
         index(program()
             .mainTitle("aaa")
             .subTitle("xxx")// no broadcaster title, so it should fall back to this.

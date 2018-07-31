@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -270,14 +271,18 @@ public abstract class ESFacetsHandler {
 
     protected static abstract class AggregationResultItemList<A extends MultiBucketsAggregation, B extends MultiBucketsAggregation.Bucket, T extends FacetResultItem> extends AbstractList<T> {
 
-        private List<B> buckets = new ArrayList<>();
+        private final List<B> buckets = new ArrayList<>();
 
         private final List<T> backing;
 
-        public AggregationResultItemList(A terms) {
-            buckets.addAll((Collection<? extends B>)terms.getBuckets());
+        public AggregationResultItemList(A terms, Predicate<B> predicate) {
+            ((Collection<? extends B>)terms.getBuckets()).stream().filter(predicate).forEach(buckets::add);
             this.backing = new ArrayList<>(Collections.nCopies(buckets.size(), (T)null));
         }
+        public AggregationResultItemList(A terms) {
+            this(terms, (b) -> true);
+        }
+
 
         @Override
         public T get(int index) {

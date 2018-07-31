@@ -179,23 +179,25 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             HasAggregations aggregations = root.getAggregations().get(filterName);
             if (aggregations != null) {
                 HasAggregations filtered = aggregations.getAggregations().get(filterName);
-
                 HasAggregations filtered2 = filtered.getAggregations().get(filterName);
-
                 Terms relations = filtered2.getAggregations().get(escapedFacetName);
 
-
                 if (relations != null) {
-                    AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(relations) {
-                        @Override
-                        protected TermFacetResultItem adapt(Terms.Bucket bucket) {
-                            return new TermFacetResultItem(
-                                bucket.getKeyAsString(),
-                                bucket.getKeyAsString(),
-                                bucket.getDocCount()
-                            );
-                        }
-                    };
+
+                    AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems =
+                        new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(relations, (b) -> {
+                            //Relation relation = new Relation()
+                            return true;
+                        }) {
+                            @Override
+                            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+                                return new TermFacetResultItem(
+                                    bucket.getKeyAsString(),
+                                    bucket.getKeyAsString(),
+                                    bucket.getDocCount()
+                                );
+                            }
+                        };
                     answer.add(new MultipleFacetsResult(facet.getName(), resultItems));
                 }
             }
