@@ -711,6 +711,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                     .mediaIds(
                         TextMatcherList.must(
                             TextMatcher.must("MID-[024]", StandardMatchType.REGEX)) // only 3 objects match
+                        // namely
+                        // MID-0, BNN, AVRO, OMROEP0
+                        // MID-2, BNN, AVRO,OMROEP2
+                        // MID-4, BNN, AVRO,OMROEP1
                     )
                     .build())
                 .build())
@@ -720,6 +724,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                     .mediaIds(
                         TextMatcherList.must(
                             TextMatcher.must("MID-[04]", StandardMatchType.REGEX)) // only 2 objects match
+                        // namely
+                        // MID-0, _6
+                        // MID-4, ALL
                     )
                     .build()
                 )
@@ -744,46 +751,36 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         List<TermFacetResultItem> broadcasters = result.getFacets().getBroadcasters();
         assertThat(broadcasters).isNotNull();
         long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
-        assertThat(totalBroadcasterCount).isEqualTo(85);
-        assertThat(broadcasters).hasSize(6);
+        // 3 with BNN + 3 with AVRO + 1 with OMROEP0, 1 with OMROEP2, 0 with OMROEP1, total 9.
+        assertThat(totalBroadcasterCount).isEqualTo(9);
+        assertThat(broadcasters).hasSize(5);
 
-        // TODO check these results
         assertThat(broadcasters.get(0).getId()).isEqualTo("AVRO");
-        assertThat(broadcasters.get(0).getCount()).isEqualTo(32);
+        assertThat(broadcasters.get(0).getCount()).isEqualTo(3);
         assertThat(broadcasters.get(1).getId()).isEqualTo("BNN");
-        assertThat(broadcasters.get(1).getCount()).isEqualTo(32);
+        assertThat(broadcasters.get(1).getCount()).isEqualTo(3);
         assertThat(broadcasters.get(2).getId()).isEqualTo("OMROEP0");
-        assertThat(broadcasters.get(2).getCount()).isEqualTo(8);
+        assertThat(broadcasters.get(2).getCount()).isEqualTo(1);
         assertThat(broadcasters.get(3).getId()).isEqualTo("OMROEP1");
-        assertThat(broadcasters.get(3).getCount()).isEqualTo(6);
+        assertThat(broadcasters.get(3).getCount()).isEqualTo(1);
         assertThat(broadcasters.get(4).getId()).isEqualTo("OMROEP2");
-        assertThat(broadcasters.get(4).getCount()).isEqualTo(6);
-        assertThat(broadcasters.get(5).getId()).isEqualTo("TVDRENTHE");
-        assertThat(broadcasters.get(5).getCount()).isEqualTo(1);
+        assertThat(broadcasters.get(4).getCount()).isEqualTo(1);
+
 
 
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
         assertThat(ageRatings).isNotNull();
         long totalAgeRatingCount = ageRatings.stream().mapToLong(FacetResultItem::getCount).sum();
-        assertThat(totalAgeRatingCount).isEqualTo(10);
-        assertThat(ageRatings).hasSize(5);
-
+        assertThat(totalAgeRatingCount).isEqualTo(2);
+        assertThat(ageRatings).hasSize(2);
 
 
         assertThat(totalBroadcasterCount).isNotEqualTo(totalAgeRatingCount);
 
-        // TODO check these results
         assertThat(ageRatings.get(0).getId()).isEqualTo("6");
-        assertThat(ageRatings.get(0).getCount()).isEqualTo(2);
-        assertThat(ageRatings.get(1).getId()).isEqualTo("9");
-        assertThat(ageRatings.get(1).getCount()).isEqualTo(2);
-        assertThat(ageRatings.get(2).getId()).isEqualTo("12");
-        assertThat(ageRatings.get(2).getCount()).isEqualTo(2);
-        assertThat(ageRatings.get(3).getId()).isEqualTo("16");
-        assertThat(ageRatings.get(3).getCount()).isEqualTo(2);
-        assertThat(ageRatings.get(4).getId()).isEqualTo("ALL");
-        assertThat(ageRatings.get(4).getCount()).isEqualTo(2);
-
+        assertThat(ageRatings.get(0).getCount()).isEqualTo(1);
+        assertThat(ageRatings.get(1).getId()).isEqualTo("ALL");
+        assertThat(ageRatings.get(1).getCount()).isEqualTo(1);
 
         log.info("{}", result);
 
