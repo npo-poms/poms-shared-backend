@@ -34,6 +34,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
+import static nl.vpro.domain.api.TextMatcher.must;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.ContentRating.*;
@@ -1109,6 +1110,70 @@ public class ESMediaRepositoryPart1ITest extends AbstractESRepositoryTest {
         assertThat(result.getSize()).isEqualTo(3);
         assertThat(result.getFacets().getTitles()).hasSize(4); // Actually it should have been 3, 'aaa sbutitle is not a main title'?
         log.info("{}", result);
+    }
+
+    @Test
+    public void testFindWithRelationFacetWithSubSearchAndSearchCaseInsensitive() throws IOException {
+        RelationDefinition vproLabel = new RelationDefinition("label", "VPRO");
+        RelationDefinition eoLabel = new RelationDefinition("label", "EO");
+
+
+        // 4 object
+        // 4 have a vpro:label
+        // 2 has eo:label
+        // 3 have vpro:label blue note
+        // 1 has vpro:label red note
+        index(program().withMid().relations(
+            Relation.ofText(vproLabel,"Blue Note")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(vproLabel, "blue note")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(eoLabel, "Evangelisch"),
+            Relation.ofText(vproLabel, "Blue NOte")
+        ).build());
+        index(program().withMid().relations(
+            Relation.ofText(eoLabel, "bla bla"),
+            Relation.ofText(vproLabel, "red note")
+        ).build());
+
+        {
+            RelationFacet relationFacet = new RelationFacet();
+            relationFacet.setName("test");
+            relationFacet.setCaseSensitive(false);
+            RelationSearch search = new RelationSearch();
+            search.setBroadcasters(TextMatcherList.should(must(vproLabel.getBroadcaster())));
+            search.setTypes(TextMatcherList.should(must(vproLabel.getType())));
+            relationFacet.setSubSearch(search);
+
+            MediaForm form = form()
+                .relationsFacet(relationFacet)
+                .relationText(vproLabel, ExtendedTextMatcher.must("blue note", false))
+                .build();
+
+            MediaSearchResult result = target.find(null, form, 0, null);
+
+            final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
+
+            assertThat(relations).hasSize(1);
+            assertThat(relations.get(0).getName()).isEqualTo("test");
+            assertThat(relations.get(0).getFacets()).hasSize(2);
+            assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+            assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
+
+            assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("red note");
+            assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
+            assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
+
+            assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
+        }
+
     }
 
 
