@@ -18,7 +18,6 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.nested.Nested;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
@@ -28,9 +27,7 @@ import nl.vpro.domain.Displayable;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
 
-import static nl.vpro.domain.api.ESFacetsBuilder.FACET_POSTFIX;
-import static nl.vpro.domain.api.ESFacetsBuilder.FILTER_PREFIX;
-import static nl.vpro.domain.api.ESFacetsBuilder.esField;
+import static nl.vpro.domain.api.ESFacetsBuilder.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -40,13 +37,15 @@ import static nl.vpro.domain.api.ESFacetsBuilder.esField;
 public abstract class ESFacetsHandler {
 
 
+
+
     protected static <A extends Aggregation> A getAggregation(String fieldName, Aggregations facets) {
-        String facetName = fieldName + FACET_POSTFIX;
-        InternalFilter facet = facets.get(facetName);
+        String facetName = getAggregationName(fieldName);
+        A facet = facets.get(facetName);
         if(facet == null) {
             return null;
         }
-        return facet.getAggregations().get(fieldName);
+        return facet;
     }
 
 
@@ -128,7 +127,7 @@ public abstract class ESFacetsHandler {
             return terms;
         }
 
-        Filter filter = subAggregations.getAggregations().get(FILTER_PREFIX + facetName);
+        Filter filter = subAggregations.getAggregations().get(getFilterName(facetName));
         if(filter == null) {
             return null;
         }
@@ -141,16 +140,24 @@ public abstract class ESFacetsHandler {
             return null;
         }
 
-        String aggregationName = escapePath(prefix, nestedField);
-        Nested nested = root.getAggregations().get(aggregationName);
+        String filterName = getFilterName(nestedField);
+        HasAggregations filter = root.getAggregations().get(filterName);
+
+        if (filter != null) {
+
+        }
+
+
+        String aggregationName = getNestedName(prefix, nestedField);
+        Nested nested = null; //aggregation.getAggregations().get(aggregationName);
         if(nested != null) {
             return nested;
         }
 
-        Aggregation filter = root.getAggregations().get(FILTER_PREFIX + aggregationName);
-        if (filter == null) {
+        Aggregation agg  = root.getAggregations().get(getAggregationName(aggregationName));
+        if (agg == null) {
             // This seems to happen if a media facet is embedded in a page search....
-            filter = root.getAggregations().get(FILTER_PREFIX + nestedField);
+            agg = root.getAggregations().get(getFilterName(nestedField));
         }
         if(!(filter instanceof HasAggregations)) {
             return null;

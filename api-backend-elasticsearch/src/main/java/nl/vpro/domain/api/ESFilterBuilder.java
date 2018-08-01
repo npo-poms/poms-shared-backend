@@ -40,28 +40,6 @@ public abstract class ESFilterBuilder {
     }
 
 
-    public static QueryBuilder filter(TermSearch searches, @Nonnull String axis, String field) {
-        return filter(searches, "", axis, field);
-    }
-
-    public static QueryBuilder filter(TermSearch searches, @Nonnull String prefix, String axis, String field) {
-        if (searches == null || searches.getIds() == null || searches.getIds().isEmpty()) {
-            return matchAllQuery();
-        }
-
-        BoolQueryBuilder booleanFilter = boolQuery();
-        build(prefix, booleanFilter, searches.getIds(), new ESQueryBuilder.TextSingleFieldApplier<>(axis + '.' + field));
-        return booleanFilter;
-    }
-
-    protected static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> void
-    build(String prefix, BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<TM, MT> list, ESQueryBuilder.FieldApplier<TM> applier) {
-        BoolQueryBuilder append = QueryBuilders.boolQuery();
-        for (TM matcher : list) {
-            applier.applyField(prefix, append, matcher);
-        }
-        ESQueryBuilder.apply(booleanQueryBuilder, append, list.getMatch());
-    }
 
     static <T> boolean isEmpty(
         @Nullable ProfileDefinition<T> definition) {

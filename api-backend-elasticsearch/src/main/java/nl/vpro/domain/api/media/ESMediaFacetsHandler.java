@@ -28,8 +28,8 @@ import nl.vpro.domain.api.MultipleFacetsResult;
 import nl.vpro.domain.api.TermFacetResultItem;
 import nl.vpro.domain.media.*;
 
-import static nl.vpro.domain.api.ESFacetsBuilder.FACET_POSTFIX;
-import static nl.vpro.domain.api.ESFacetsBuilder.FILTER_PREFIX;
+import static nl.vpro.domain.api.ESFacetsBuilder.getAggregationName;
+import static nl.vpro.domain.api.ESFacetsBuilder.getFilterName;
 import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 
 /**
@@ -65,7 +65,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 getTitleAggregationResultItems(request.getTitles(), globalFilter)
             );
             List<TermFacetResultItem> titles = facetsResult.getTitles();
-            InternalFilter aggregation = aggregations.get(prefix + "titles.value.full" + FACET_POSTFIX);
+            InternalFilter aggregation = aggregations.get(prefix + getAggregationName("titles.value.full"));
             if (aggregation != null) {
                 if (titles == null) {
                     titles = new ArrayList<>();
@@ -175,7 +175,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         for (RelationFacet facet : requestedRelations) {
             log.debug("Handling facet {}", facet);
             String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
-            String filterName = FILTER_PREFIX + escapedFacetName;
+            String filterName = getFilterName(facet.getName());
             HasAggregations aggregations = root.getAggregations().get(filterName);
             if (aggregations != null) {
                 HasAggregations filtered = aggregations.getAggregations().get(filterName);

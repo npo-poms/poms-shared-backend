@@ -8,7 +8,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
  */
 public class ESFacets {
 
-    static Terms.Order getComparatorType(TextFacet<?> facet) {
+    static Terms.Order getComparatorType(LimitableFacet<?> facet) {
         if (facet.getSort() == null) {
             return Terms.Order.count(false);
         }
@@ -25,7 +25,7 @@ public class ESFacets {
         }
     }
 
-    static Terms.Order getTermsOrder(TextFacet<?> facet) {
+    static Terms.Order getTermsOrder(LimitableFacet<?> facet) {
         if (facet.getSort() == null) {
             return Terms.Order.count(false);
         }

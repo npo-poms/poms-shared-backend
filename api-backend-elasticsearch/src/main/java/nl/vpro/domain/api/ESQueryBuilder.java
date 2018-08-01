@@ -1,5 +1,6 @@
 package nl.vpro.domain.api;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -28,6 +29,9 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
+
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * @author Michiel Meeuwissen
@@ -519,8 +523,7 @@ public abstract class ESQueryBuilder {
         return rangeQuery;
     }
 
-    public static QueryBuilder simplifyQuery(
-        @Nonnull BoolQueryBuilder booleanQuery) {
+    public static QueryBuilder simplifyQuery(@Nonnull BoolQueryBuilder booleanQuery) {
         if (booleanQuery.hasClauses()) {
             if ((booleanQuery.must().size() + booleanQuery.should().size() == 1 && booleanQuery.filter().isEmpty())) {
                 if (booleanQuery.must().size() == 1) {
@@ -533,5 +536,38 @@ public abstract class ESQueryBuilder {
         } else {
             return QueryBuilders.matchAllQuery();
         }
+    }
+
+
+
+
+    protected static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> void
+    build(String prefix, BoolQueryBuilder booleanQueryBuilder, AbstractTextMatcherList<TM, MT> list, ESQueryBuilder.FieldApplier<TM> applier) {
+        BoolQueryBuilder append = QueryBuilders.boolQuery();
+        for (TM matcher : list) {
+            applier.applyField(prefix, append, matcher);
+        }
+        ESQueryBuilder.apply(booleanQueryBuilder, append, list.getMatch());
+    }
+
+    public static QueryBuilder filter(
+        @Nullable TermSearch searches,
+        @Nonnull String axis,
+        @NonNull String field) {
+        return filter(searches, "", axis, field);
+    }
+
+    public static QueryBuilder filter(
+        @Nullable TermSearch searches,
+        @Nonnull String prefix,
+        @Nonnull String axis,
+        @NonNull String field) {
+        if (searches == null || searches.getIds() == null || searches.getIds().isEmpty()) {
+            return matchAllQuery();
+        }
+
+        BoolQueryBuilder booleanFilter = boolQuery();
+        build(prefix, booleanFilter, searches.getIds(), new ESQueryBuilder.TextSingleFieldApplier<>(axis + '.' + field));
+        return booleanFilter;
     }
 }

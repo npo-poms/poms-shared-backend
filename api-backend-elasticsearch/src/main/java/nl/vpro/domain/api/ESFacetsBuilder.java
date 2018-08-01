@@ -34,9 +34,11 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 public abstract class ESFacetsBuilder {
 
 
-    public static final String FILTER_PREFIX = "filter_";
+    public static final String FILTER_POSTFIX = "_filter";
 
     public static final String FACET_POSTFIX = "_facet";
+
+    public static final String NESTED_POSTFIX = "_nested";
 
 
     /**
@@ -44,13 +46,13 @@ public abstract class ESFacetsBuilder {
      */
     protected static TermsAggregationBuilder createAggregationBuilder(
         @Nonnull  String fieldName,
-        @Nullable TextFacet<?> facet) {
+        @Nullable LimitableFacet<?> facet) {
         if(facet != null) {
             Terms.Order order = ESFacets.getComparatorType(facet);
 
 
             TermsAggregationBuilder aggregationBuilder = AggregationBuilders
-                .terms(fieldName)
+                .terms(getAggregationName(fieldName))
                 .field(fieldName)
                 .order(order)
                 .size(facet.getMax())
@@ -195,13 +197,15 @@ public abstract class ESFacetsBuilder {
         @Nonnull String nestedField,
         @Nullable QueryBuilder subSearch,
         @Nonnull AggregationBuilder... subAggregations) {
+
+
         NestedAggregationBuilder nestedBuilder = AggregationBuilders
-            .nested(escapePath(pathPrefix, nestedField), pathPrefix + nestedField)
+            .nested(getNestedName(pathPrefix, nestedField), pathPrefix + nestedField)
             ;
 
         if(subSearch != null) {
             FilterAggregationBuilder filteredAggregation = AggregationBuilders
-                .filter(FILTER_PREFIX, subSearch);
+                .filter(getFilterName(nestedField + "_subsearch"), subSearch);
 
             addSubAggregations(filteredAggregation, subAggregations);
 
@@ -220,31 +224,33 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected static AggregationBuilder getFilteredTermsBuilder(
-        @Nonnull String pathPrefix,
-        @Nonnull String nestedField,
-        @Nonnull String facetField,
-        @Nonnull TextFacet<?> facet,
-        @Nullable QueryBuilder subSearch
-    ) {
-        return getFilteredTermsBuilder(
-            pathPrefix, nestedField, facetField, facet, facetField, subSearch);
-    }
 
-
-    protected static AggregationBuilder getFilteredTermsBuilder(
+    protected static TermsAggregationBuilder getFilteredTermsBuilder(
         @Nonnull  String pathPrefix,
         @Nonnull  String nestedField,
         @Nonnull  String facetField,
-        @Nonnull  TextFacet<?> facet,
-        @Nonnull String facetName,
-        @Nullable QueryBuilder subSearch) {
+        @Nonnull  LimitableFacet<?> facet) {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
+        return getFilteredTermsBuilder(facet, fullFieldPath);
+    }
+
+
+     protected static TermsAggregationBuilder getFilteredTermsBuilder(
+        @Nonnull  NameableLimitableFacet<?, ?> facet) {
+        return getFilteredTermsBuilder(facet, facet.getName());
+    }
+
+    private static TermsAggregationBuilder getFilteredTermsBuilder(
+        @Nonnull  LimitableFacet<?> facet,
+        @Nonnull  String aggregation) {
+
+
         TermsAggregationBuilder termsBuilder =
-            AggregationBuilders.terms(escapeFacetName(facetName))
-                .field(fullFieldPath)
+            AggregationBuilders.terms(
+                getAggregationName(aggregation))
+                .field(aggregation)
                 .size(facet.getMax())
                 .order(ESFacets.getTermsOrder(facet));
         if (facet.getThreshold() != null) {
@@ -257,14 +263,24 @@ public abstract class ESFacetsBuilder {
             termsBuilder.includeExclude(new IncludeExclude(new RegExp(pattern.pattern(), pattern.flags()), null));
         }
 
-        if(subSearch != null) {
-            return AggregationBuilders
-                .filter(FILTER_PREFIX + escapeFacetName(facetName), subSearch)
-                .subAggregation(termsBuilder);
-        }
 
         return termsBuilder;
     }
+
+
+
+    public static String getAggregationName(String fieldName) {
+        return escapeFacetName(fieldName) + FACET_POSTFIX;
+    }
+
+    public static String getFilterName(String fieldName) {
+        return escapeFacetName(fieldName) + FILTER_POSTFIX;
+    }
+
+    public static String getNestedName(String path, String fieldName) {
+        return escapeFacetName(path + fieldName) + NESTED_POSTFIX;
+    }
+
 
     /**
      * When using a prefix e.g., "embeds.media." as a facet or aggregation name in an search result, dots are not
@@ -278,7 +294,9 @@ public abstract class ESFacetsBuilder {
         return caseSensitive ? field + ".full" : field + ".lower";
     }
 
-    protected static String esField(@Nonnull String field, @Nullable ExtendedTextFacet<?> facet) {
+    protected static String esField(
+        @Nonnull String field,
+        @Nullable ExtendedTextFacet<?> facet) {
         return esField(field, facet == null || facet.isCaseSensitive());
     }
 

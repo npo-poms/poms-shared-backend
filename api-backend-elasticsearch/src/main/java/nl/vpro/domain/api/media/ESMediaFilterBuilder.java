@@ -4,16 +4,9 @@
  */
 package nl.vpro.domain.api.media;
 
-import javax.annotation.Nonnull;
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 
 import nl.vpro.domain.api.ESFilterBuilder;
-import nl.vpro.domain.api.ESQueryBuilder.TextSingleFieldApplier;
-
-import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
 
 /**
  * NOTE!: There is also a{@link ESMediaQueryBuilder} equivalent that more or less contains the same code for
@@ -25,48 +18,6 @@ import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
  *
  */
 public class ESMediaFilterBuilder extends ESFilterBuilder {
-
-    public static QueryBuilder filter(MemberRefSearch searches, @Nonnull String axis) {
-        return filter("", axis, searches);
-    }
-
-    /**
-     *
-     * @param axis Non empty string
-     */
-    public static QueryBuilder filter(
-        @Nonnull String prefix,
-        @Nonnull String axis,
-        MemberRefSearch searches) {
-        if(searches == null) {
-            return QueryBuilders.matchAllQuery();
-        }
-
-        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
-        if(searches.getMediaIds() != null && !searches.getMediaIds().isEmpty()) {
-            build(prefix, booleanFilter, searches.getMediaIds(), new TextSingleFieldApplier<>(axis + ".midRef"));
-        }
-
-        if(searches.getTypes() != null && !searches.getTypes().isEmpty()) {
-            build(prefix, booleanFilter, searches.getTypes(), new TextSingleFieldApplier<>(axis + ".type"));
-        }
-        return booleanFilter;
-    }
-
-    public static QueryBuilder filter(@Nonnull String axis, TitleSearch searches) {
-        return filter("", axis, searches);
-    }
-
-    public static QueryBuilder filter(@Nonnull String prefix, String axis, TitleSearch titleSearch) {
-        if(titleSearch == null) {
-            return QueryBuilders.matchAllQuery();
-        }
-
-        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
-        ESMediaQueryBuilder.buildTitleQuery(prefix, booleanFilter, titleSearch);
-        return simplifyQuery(booleanFilter);
-    }
-
 
     /**
      *

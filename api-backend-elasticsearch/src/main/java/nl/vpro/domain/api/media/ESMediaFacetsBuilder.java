@@ -101,7 +101,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             {
                 ExtendedMediaFacet tags = facets.getTags();
                 //addFacetFilter(prefix, tags, facetRootFilter);
-                //addFacet(searchBuilder, prefix + esField("tags", tags), tags, facetRootFilter);
+                addFacet(searchBuilder, prefix + esField("tags", tags), tags);
             }
 
             {
@@ -158,9 +158,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             pathPrefix,
             nestedField,
             facetField,
-            facet,
-            facet.hasSubSearch() ? ESFilterBuilder.filter(facet.getSubSearch(), pathPrefix, nestedField, facetField) : null
-        );
+            facet);
+
+        //facet.hasSubSearch() ? ESFilterBuilder.filter(facet.getSubSearch(), pathPrefix, nestedField, facetField) : null
 
         NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
@@ -188,9 +188,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             pathPrefix,
             nestedField,
             facetField,
-            facet,
-            facet.hasSubSearch() ? ESMediaFilterBuilder.filter(pathPrefix, nestedField, facet.getSubSearch()) : null
-        );
+            facet);
+        //
+        //facet.hasSubSearch() ? ESMediaFilterBuilder.filter(pathPrefix, nestedField, facet.getSubSearch()) : null
 
         NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
@@ -255,10 +255,10 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         TitleSearch titleSearch = facets.getSubSearch();
         for (TitleFacet facet : facets) {
             QueryBuilder filter = facet.hasSubSearch() ?
-                ESMediaFilterBuilder.filter(pathPrefix, "expandedTitles", facet.getSubSearch()) : null;
+                ESMediaQueryBuilder.filter(pathPrefix, "expandedTitles", facet.getSubSearch()) : null;
             if (titleSearch != null) {
                 if (filter == null) {
-                    filter = ESMediaFilterBuilder.filter(pathPrefix, "expandedTitles", titleSearch);
+                    filter = ESMediaQueryBuilder.filter(pathPrefix, "expandedTitles", titleSearch);
                 } else {
                     ESMediaQueryBuilder.buildTitleQuery("", (BoolQueryBuilder) filter, titleSearch);
                 }
@@ -280,7 +280,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         @Nonnull RelationFacet facet,
         @Nonnull QueryBuilder subSearch
     ) {
-        return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet.isCaseSensitive()), facet, facet.getName(), subSearch);
+        return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet.isCaseSensitive()), facet);
     }
 
     private static AggregationBuilder filterAggregation(
@@ -293,7 +293,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
             ESMediaQueryBuilder.query(pathPrefix, search, facetFilter);
             aggregationBuilder = AggregationBuilders
-                .filter(FILTER_PREFIX + facetName, facetFilter)
+                .filter(getFilterName(facetName), facetFilter)
                 .subAggregation(aggregationBuilder);
         }
 
@@ -304,7 +304,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     protected static void addFacet(
         @Nonnull  SearchSourceBuilder searchBuilder,
         @Nonnull  String fieldName,
-        @Nullable MediaFacet facet) {
+        @Nullable TextFacet<MediaSearch> facet) {
 
         TermsAggregationBuilder aggregationBuilder = ESFacetsBuilder.createAggregationBuilder(fieldName, facet);
         if(aggregationBuilder != null) {

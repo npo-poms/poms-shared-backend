@@ -301,6 +301,53 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
     }
 
+
+
+    /**
+     *
+     * @param axis Non empty string
+     */
+    public static QueryBuilder filter(
+        @Nonnull String prefix,
+        @Nonnull String axis,
+        MemberRefSearch searches) {
+        if(searches == null) {
+            return QueryBuilders.matchAllQuery();
+        }
+
+        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
+        if(searches.getMediaIds() != null && !searches.getMediaIds().isEmpty()) {
+            build(prefix, booleanFilter, searches.getMediaIds(), new TextSingleFieldApplier<>(axis + ".midRef"));
+        }
+
+        if(searches.getTypes() != null && !searches.getTypes().isEmpty()) {
+            build(prefix, booleanFilter, searches.getTypes(), new TextSingleFieldApplier<>(axis + ".type"));
+        }
+        return booleanFilter;
+    }
+
+
+    public static QueryBuilder filter(MemberRefSearch searches, @Nonnull String axis) {
+        return filter("", axis, searches);
+    }
+
+    public static QueryBuilder filter(@Nonnull String axis, TitleSearch searches) {
+        return filter("", axis, searches);
+    }
+
+    public static QueryBuilder filter(@Nonnull String prefix, String axis, TitleSearch titleSearch) {
+        if(titleSearch == null) {
+            return QueryBuilders.matchAllQuery();
+        }
+
+        BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
+        ESMediaQueryBuilder.buildTitleQuery(prefix, booleanFilter, titleSearch);
+        return simplifyQuery(booleanFilter);
+    }
+
+
+
+
     private static void buildLocationQuery(BoolQueryBuilder boolQueryBuilder, final String prefix, TextMatcherList locations) {
 
         buildFromList(prefix, boolQueryBuilder, locations, (pref, booleanQueryBuilder, matcher) -> {

@@ -296,14 +296,29 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         Instant prev = Instant.MIN;
 
         for (MediaChange c : list) {
-            assertThat(! c.getPublishDate().isBefore(prev));
+            assertThat(c.getPublishDate().isBefore(prev)).isFalse();
             prev = c.getPublishDate();
+        }
+    }
+
+     @Test
+    public void testMediaChangesSinceWithMax() {
+        Instant prev = NOW.minus(1, ChronoUnit.SECONDS);
+        Iterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, 5, null, null);
+        List<MediaChange> list = new ArrayList<>();
+        changes.forEachRemaining(list::add);
+        assertThat(list).hasSize(5);
+
+        for (MediaChange c : list) {
+            assertThat(c.getPublishDate().isBefore(prev)).isFalse();
+            prev = c.getPublishDate();
+            log.info("{}", c);
         }
     }
 
     @Test
     public void testMediaChangesWithMax() {
-        Iterator<MediaChange> changes = target.changes(Instant.EPOCH, null, null, null, Order.DESC, 10, null, null);
+        Iterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, null, Order.DESC, 10, null, null);
         List<MediaChange> list = new ArrayList<>();
         changes.forEachRemaining(list::add);
         assertThat(list).hasSize(10);
