@@ -36,6 +36,9 @@ public abstract class ESFacetsBuilder {
 
     public static final String FILTER_POSTFIX = "_filter";
 
+    public static final String SUBSEARCH_POSTFIX = "_subsearch";
+
+
     public static final String FACET_POSTFIX = "_facet";
 
     public static final String NESTED_POSTFIX = "_nested";
@@ -233,24 +236,11 @@ public abstract class ESFacetsBuilder {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
-        return getFilteredTermsBuilder(facet, fullFieldPath);
-    }
-
-
-     protected static TermsAggregationBuilder getFilteredTermsBuilder(
-        @Nonnull  NameableLimitableFacet<?, ?> facet) {
-        return getFilteredTermsBuilder(facet, facet.getName());
-    }
-
-    private static TermsAggregationBuilder getFilteredTermsBuilder(
-        @Nonnull  LimitableFacet<?> facet,
-        @Nonnull  String aggregation) {
-
 
         TermsAggregationBuilder termsBuilder =
             AggregationBuilders.terms(
-                getAggregationName(aggregation))
-                .field(aggregation)
+                getAggregationName(nestedField, facetField))
+                .field(fullFieldPath)
                 .size(facet.getMax())
                 .order(ESFacets.getTermsOrder(facet));
         if (facet.getThreshold() != null) {
@@ -269,16 +259,35 @@ public abstract class ESFacetsBuilder {
 
 
 
+
     public static String getAggregationName(String fieldName) {
         return escapeFacetName(fieldName) + FACET_POSTFIX;
+    }
+
+     public static String getAggregationName(String path, String fieldName) {
+        return getAggregationName(path + "_" + fieldName);
     }
 
     public static String getFilterName(String fieldName) {
         return escapeFacetName(fieldName) + FILTER_POSTFIX;
     }
 
+
+    public static String getFilterName(String path, String fieldName) {
+        return getFilterName(path + "_" + fieldName);
+    }
+
+    public static String getSubSearchName(String fieldName) {
+        return escapeFacetName(fieldName) + SUBSEARCH_POSTFIX;
+    }
+
+
+    public static String getSubSearchName(String path, String fieldName) {
+        return getSubSearchName(path + "_" + fieldName);
+    }
+
     public static String getNestedName(String path, String fieldName) {
-        return escapeFacetName(path + fieldName) + NESTED_POSTFIX;
+        return escapeFacetName(path + "_" + fieldName) + NESTED_POSTFIX;
     }
 
 

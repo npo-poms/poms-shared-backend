@@ -443,7 +443,11 @@ public abstract class ESQueryBuilder {
         }
     }
 
-    protected static void build(@Nonnull String prefix, @Nonnull BoolQueryBuilder booleanQuery, @Nullable SimpleTextMatcher textMatcher, @Nonnull FieldApplier<SimpleTextMatcher> applier) {
+    protected static void build(
+        @Nonnull String prefix,
+        @Nonnull BoolQueryBuilder booleanQuery,
+        @Nullable SimpleTextMatcher textMatcher,
+        @Nonnull FieldApplier<SimpleTextMatcher> applier) {
         if (textMatcher != null) {
             applier.applyField(prefix, booleanQuery, textMatcher);
         }
@@ -568,6 +572,6 @@ public abstract class ESQueryBuilder {
 
         BoolQueryBuilder booleanFilter = boolQuery();
         build(prefix, booleanFilter, searches.getIds(), new ESQueryBuilder.TextSingleFieldApplier<>(axis + '.' + field));
-        return booleanFilter;
+        return simplifyQuery(booleanFilter);
     }
 }

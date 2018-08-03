@@ -12,6 +12,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
@@ -19,7 +22,6 @@ import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
-import org.elasticsearch.search.aggregations.bucket.nested.Nested;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
@@ -135,35 +137,35 @@ public abstract class ESFacetsHandler {
         return filter.getAggregations().get(facetName);
     }
 
-    protected static Aggregation getNestedResult(String prefix, String nestedField, Filter root) {
+    protected static <T extends Aggregation> T getNestedResult(
+        @Nonnull String prefix,
+        @Nonnull String nestedField,
+        @Nullable  Filter root) {
         if(root == null) {
             return null;
         }
 
-        String filterName = getFilterName(nestedField);
-        HasAggregations filter = root.getAggregations().get(filterName);
+        HasAggregations parent = root;
+        HasAggregations filter = parent.getAggregations().get(getFilterName(prefix, nestedField));
 
         if (filter != null) {
-
+            parent = filter;
         }
 
+        parent =  parent.getAggregations().get(getNestedName(prefix, nestedField));
 
-        String aggregationName = getNestedName(prefix, nestedField);
-        Nested nested = null; //aggregation.getAggregations().get(aggregationName);
-        if(nested != null) {
-            return nested;
-        }
-
-        Aggregation agg  = root.getAggregations().get(getAggregationName(aggregationName));
-        if (agg == null) {
-            // This seems to happen if a media facet is embedded in a page search....
-            agg = root.getAggregations().get(getFilterName(nestedField));
-        }
-        if(!(filter instanceof HasAggregations)) {
+        if (parent == null) {
             return null;
         }
 
-        return ((HasAggregations)filter).getAggregations().get(aggregationName);
+        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(prefix, nestedField));
+        if (subSearch != null) {
+            parent = subSearch;
+        }
+
+
+        T agg  = parent.getAggregations().get(getAggregationName(prefix, nestedField));
+        return agg;
     }
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(DateRangeFacets<?> dateRangeFacets, String facetName, SearchResponse response) {
