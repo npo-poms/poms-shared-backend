@@ -31,7 +31,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     protected static final String ROOT_FILTER = "mediaRootFilter";
 
 
-    public static void facets(SearchSourceBuilder searchBuilder, MediaForm form) {
+    public static void facets(
+        @Nonnull SearchSourceBuilder searchBuilder,
+        @Nullable MediaForm form) {
         buildFacets("", searchBuilder, form);
     }
 
@@ -63,23 +65,16 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 TitleFacetList titles = facets.getTitles();
                 if (titles != null) {
                     if (titles.asMediaFacet()) {
-                        addFacet(searchBuilder, prefix +  "titles.value.full", titles);
+                        addFacet(searchBuilder, getAggregationName(prefix , "titles.value.full"), titles);
                     }
                     addNestedTitlesAggregations(rootAggregation, titles, prefix);
                 }
 
             }
 
-            {
-                MediaFacet types = facets.getTypes();
-                addFacet(searchBuilder, prefix + "type", types);
-            }
+            addFacet(searchBuilder, prefix + "type", facets.getTypes());
 
-            {
-                MediaFacet avTypes = facets.getAvTypes();
-                addFacet(searchBuilder, prefix + "avType", avTypes);
-
-            }
+            addFacet(searchBuilder, prefix + "avType", facets.getAvTypes());
 
             {
                 DateRangeFacets sortDates = facets.getSortDates();
@@ -165,7 +160,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
             nestedField,
-            null,
+            facetField,
             terms
         );
         AggregationBuilder builder = filterAggregation(pathPrefix, nestedField, nestedBuilder, facet.getFilter());
@@ -195,7 +190,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
             nestedField,
-            null,
+            facetField,
             terms
         );
         AggregationBuilder builder = filterAggregation(pathPrefix, nestedField, nestedBuilder, facet.getFilter());
@@ -231,7 +226,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 facetFilter
             );
 
-            String facetName = escapeFacetName(facet.getName());
+            String facetName = escape(facet.getName());
             AggregationBuilder builder = filterAggregation(
                 pathPrefix,
                 facetName,
@@ -268,7 +263,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             }
 
             FilterAggregationBuilder filterAggregationBuilder =
-                AggregationBuilders.filter(escapeFacetName(facet.getName()), filter);
+                AggregationBuilders.filter(escape(facet.getName()), filter);
             rootAggregation.subAggregation(filterAggregationBuilder);
         }
     }
@@ -293,7 +288,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
             ESMediaQueryBuilder.query(pathPrefix, search, facetFilter);
             aggregationBuilder = AggregationBuilders
-                .filter(getFilterName(facetName), facetFilter)
+                .filter(getFilterName(pathPrefix, facetName), facetFilter)
                 .subAggregation(aggregationBuilder);
         }
 

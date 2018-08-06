@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.util.automaton.RegExp;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.script.Script;
@@ -189,26 +190,21 @@ public abstract class ESFacetsBuilder {
     }
 
 
-    private static String VALID_FACET_CHARS = "a-zA-Z0-9_-";
-    private static Pattern INVALID = Pattern.compile("[^" + VALID_FACET_CHARS + "]+");
-    public static String escapeFacetName(String facetName) {
-        return INVALID.matcher(facetName).replaceAll("__");
-    }
-
     protected static NestedAggregationBuilder getNestedBuilder(
         @Nonnull String pathPrefix,
         @Nonnull String nestedField,
+        @Nonnull String facetField,
         @Nullable QueryBuilder subSearch,
         @Nonnull AggregationBuilder... subAggregations) {
 
 
         NestedAggregationBuilder nestedBuilder = AggregationBuilders
-            .nested(getNestedName(pathPrefix, nestedField), pathPrefix + nestedField)
+            .nested(getNestedName(pathPrefix, nestedField, facetField), pathPrefix + nestedField)
             ;
 
         if(subSearch != null) {
             FilterAggregationBuilder filteredAggregation = AggregationBuilders
-                .filter(getFilterName(nestedField + "_subsearch"), subSearch);
+                .filter(getSubSearchName(pathPrefix, getNestedFieldName(nestedField, facetField)), subSearch);
 
             addSubAggregations(filteredAggregation, subAggregations);
 
@@ -236,10 +232,10 @@ public abstract class ESFacetsBuilder {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
+        String aggregationName = getAggregationName(pathPrefix, nestedField + "." + facetField);
 
         TermsAggregationBuilder termsBuilder =
-            AggregationBuilders.terms(
-                getAggregationName(nestedField, facetField))
+            AggregationBuilders.terms(aggregationName)
                 .field(fullFieldPath)
                 .size(facet.getMax())
                 .order(ESFacets.getTermsOrder(facet));
@@ -258,46 +254,55 @@ public abstract class ESFacetsBuilder {
     }
 
 
+    private static String VALID_FACET_CHARS = "a-zA-Z0-9_-";
+    private static Pattern INVALID = Pattern.compile("[^" + VALID_FACET_CHARS + "]+");
+    public static String escape(String facetName) {
+        return INVALID.matcher(facetName).replaceAll("/");
+    }
+
+    public static String escape(String prefix, String name) {
+        if (StringUtils.isEmpty(prefix)) {
+            return escape(name);
+        } else {
+            return escape(prefix + "_" + name);
+        }
+    }
+
 
 
     public static String getAggregationName(String fieldName) {
-        return escapeFacetName(fieldName) + FACET_POSTFIX;
+        return getAggregationName("", fieldName);
     }
 
-     public static String getAggregationName(String path, String fieldName) {
-        return getAggregationName(path + "_" + fieldName);
+     public static String getAggregationName(String prefix, String fieldName) {
+        return escape(prefix, fieldName) + FACET_POSTFIX;
     }
 
     public static String getFilterName(String fieldName) {
-        return escapeFacetName(fieldName) + FILTER_POSTFIX;
+        return getFilterName("", fieldName);
     }
 
 
-    public static String getFilterName(String path, String fieldName) {
-        return getFilterName(path + "_" + fieldName);
+    public static String getFilterName(String prefix, String fieldName) {
+        return escape(prefix, fieldName) + FILTER_POSTFIX;
     }
 
     public static String getSubSearchName(String fieldName) {
-        return escapeFacetName(fieldName) + SUBSEARCH_POSTFIX;
+        return getSubSearchName("", fieldName);
     }
 
 
-    public static String getSubSearchName(String path, String fieldName) {
-        return getSubSearchName(path + "_" + fieldName);
+    public static String getSubSearchName(String prefix, String fieldName) {
+        return escape(prefix, fieldName) + SUBSEARCH_POSTFIX;
     }
 
-    public static String getNestedName(String path, String fieldName) {
-        return escapeFacetName(path + "_" + fieldName) + NESTED_POSTFIX;
+    public static String getNestedName(String prefix, String nestedField, String fieldName) {
+        return escape(prefix, getNestedFieldName(nestedField, fieldName)) + NESTED_POSTFIX;
+    }
+    public static String getNestedFieldName(String nestField, String fieldName) {
+        return nestField + "." + fieldName;
     }
 
-
-    /**
-     * When using a prefix e.g., "embeds.media." as a facet or aggregation name in an search result, dots are not
-     * allowed.
-     */
-    protected static String escapePath(@Nonnull String prefix, @Nonnull String field) {
-        return (prefix + field).replace('.', '_');
-    }
 
     protected static String esField(@Nonnull String field, boolean caseSensitive) {
         return caseSensitive ? field + ".full" : field + ".lower";

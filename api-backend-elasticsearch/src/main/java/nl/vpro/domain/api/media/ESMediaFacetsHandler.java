@@ -4,6 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.elasticsearch.search.aggregations.bucket.filter.InternalFilter;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
@@ -65,7 +65,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 getTitleAggregationResultItems(request.getTitles(), globalFilter)
             );
             List<TermFacetResultItem> titles = facetsResult.getTitles();
-            InternalFilter aggregation = aggregations.get(prefix + getAggregationName("titles.value.full"));
+            HasAggregations aggregation = aggregations.get(getAggregationName(prefix, "titles.value.full"));
             if (aggregation != null) {
                 if (titles == null) {
                     titles = new ArrayList<>();
@@ -101,7 +101,9 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         return facetsResult;
     }
 
-    private static List<TermFacetResultItem> filterThreshold(List<TermFacetResultItem> list, MediaFacet facet) {
+    private static List<TermFacetResultItem> filterThreshold(
+        @NonNull List<TermFacetResultItem> list,
+        @Nullable MediaFacet facet) {
         if (facet == null || facet.getThreshold() == null) {
             return list;
         }
@@ -109,18 +111,18 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
     }
 
-    protected static List<GenreFacetResultItem> getGenreAggregationResultItems(String prefix, Filter root) {
+    protected static List<GenreFacetResultItem> getGenreAggregationResultItems(
+        @Nonnull String prefix,
+        @Nullable Filter root) {
         if (root == null) {
             return null;
         }
 
-        Aggregation nested = getNestedResult(prefix, "genres", root);
+        Terms ids = getNestedResult(prefix, "genres", "id", root);
 
-        Terms ids = getFilteredTerms("id", nested);
         if (ids == null) {
             return null;
         }
-
         return new AggregationResultItemList<Terms, Terms.Bucket, GenreFacetResultItem>(ids) {
             @Override
             protected GenreFacetResultItem adapt(Terms.Bucket bucket) {
@@ -137,14 +139,19 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
 
     protected static List<MemberRefFacetResultItem> getMemberRefAggregationResultItems(
-        String prefix, String nestedField, final MediaLoader mediaRepository, Filter root) {
+        @Nonnull  final String prefix,
+        @Nonnull  final String nestedField,
+        @NonNull  final MediaLoader mediaRepository,
+        @Nullable final Filter root) {
         if (root == null) {
             return null;
         }
 
-        Aggregation nested = getNestedResult(prefix, nestedField, root);
+        String nestedFacet = "midRef";
 
-        Terms midRefs = getFilteredTerms("midRef", nested);
+        Aggregation nested = getNestedResult(prefix, nestedField, nestedFacet, root);
+
+        Terms midRefs = getFilteredTerms(nestedFacet, nested);
         if (midRefs == null) {
             return null;
         }
@@ -174,7 +181,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         for (RelationFacet facet : requestedRelations) {
             log.debug("Handling facet {}", facet);
-            String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
+            String escapedFacetName = ESFacetsBuilder.escape(facet.getName());
             String filterName = getFilterName(facet.getName());
             HasAggregations aggregations = root.getAggregations().get(filterName);
             if (aggregations != null) {
@@ -207,15 +214,15 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
     }
 
     protected static List<TermFacetResultItem> getTitleAggregationResultItems(
-        TitleFacetList requestedTitles,
-        Filter root) {
+        @Nullable TitleFacetList requestedTitles,
+        @Nullable Filter root) {
         if (root == null || requestedTitles == null) {
             return null;
         }
 
         List<TermFacetResultItem> answer = new ArrayList<>();
         for (TitleFacet facet : requestedTitles) {
-            String escapedFacetName = ESFacetsBuilder.escapeFacetName(facet.getName());
+            String escapedFacetName = ESFacetsBuilder.escape(facet.getName());
 
             Aggregation aggregation = root.getAggregations().get(escapedFacetName);
             if (aggregation != null) {

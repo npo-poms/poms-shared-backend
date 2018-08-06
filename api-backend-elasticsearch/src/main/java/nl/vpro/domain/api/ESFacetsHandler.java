@@ -41,7 +41,9 @@ public abstract class ESFacetsHandler {
 
 
 
-    protected static <A extends Aggregation> A getAggregation(String fieldName, Aggregations facets) {
+    protected static <A extends Aggregation> A getAggregation(
+        @Nonnull String fieldName,
+        @Nonnull Aggregations facets) {
         String facetName = getAggregationName(fieldName);
         A facet = facets.get(facetName);
         if(facet == null) {
@@ -51,7 +53,9 @@ public abstract class ESFacetsHandler {
     }
 
 
-    protected static List<TermFacetResultItem> getFacetResultItems(String fieldName, Aggregations facets) {
+    protected static List<TermFacetResultItem> getFacetResultItems(
+        @Nonnull String fieldName,
+        @Nullable Aggregations facets) {
         if(facets != null) {
 
             MultiBucketsAggregation a = getAggregation(fieldName, facets);
@@ -63,7 +67,10 @@ public abstract class ESFacetsHandler {
     }
 
 
-    protected static List<TermFacetResultItem> getFacetResultItems(String fieldName, Aggregations facets, ExtendedTextFacet<?> extendedTextFacet) {
+    protected static List<TermFacetResultItem> getFacetResultItems(
+        @Nonnull String fieldName,
+        Aggregations facets,
+        @Nullable ExtendedTextFacet<?> extendedTextFacet) {
         if (extendedTextFacet != null) {
             return getFacetResultItems(esField(fieldName, extendedTextFacet.isCaseSensitive()), facets);
         } else {
@@ -72,7 +79,8 @@ public abstract class ESFacetsHandler {
 
     }
 
-    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String fieldName, TextFacet<?> requestFacet, Aggregations facets, Class<T> enumClass, Function<String, T> valueOf, Function<T, String> xmlId) {
+    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
+        @Nonnull String fieldName, TextFacet<?> requestFacet, Aggregations facets, Class<T> enumClass, Function<String, T> valueOf, Function<T, String> xmlId) {
         if(facets != null) {
             MultiBucketsAggregation facet = getAggregation(fieldName, facets);
             if(facet == null) {
@@ -94,11 +102,17 @@ public abstract class ESFacetsHandler {
         return null;
     }
 
-    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(String fieldName, TextFacet<?> requestedFacet, Aggregations facets, final Class<T> enumClass) {
+    protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
+        @Nonnull String fieldName,
+        @Nonnull TextFacet<?> requestedFacet,
+        @Nonnull Aggregations facets,
+        @Nonnull final Class<T> enumClass) {
         return getFacetResultItemsForEnum(fieldName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name);
     }
 
-    protected static List<TermFacetResultItem> getBroadcasterResultItems(String fieldName, Aggregations facets) {
+    protected static List<TermFacetResultItem> getBroadcasterResultItems(
+        @Nonnull String fieldName,
+        @Nonnull Aggregations facets) {
         Terms aggregation = getAggregation(fieldName, facets);
         if(aggregation == null) {
             return null;
@@ -113,7 +127,7 @@ public abstract class ESFacetsHandler {
         };
     }
 
-    protected static Terms getFilteredTerms(String facetName, Aggregation root) {
+    protected static Terms getFilteredTerms(@Nonnull String facetName, Aggregation root) {
         if(root == null) {
             return null;
         }
@@ -138,37 +152,50 @@ public abstract class ESFacetsHandler {
     }
 
     protected static <T extends Aggregation> T getNestedResult(
-        @Nonnull String prefix,
-        @Nonnull String nestedField,
-        @Nullable  Filter root) {
+         @Nonnull  String nestedField,
+        @Nonnull  String facetField,
+        @Nullable  HasAggregations root) {
+        return getNestedResult("", nestedField, facetField, root);
+    }
+
+
+    protected static <T extends Aggregation> T getNestedResult(
+        @Nonnull String pathPrefix,
+        @Nonnull  String nestedField,
+        @Nonnull  String facetField,
+        @Nullable  HasAggregations root) {
         if(root == null) {
             return null;
         }
 
         HasAggregations parent = root;
-        HasAggregations filter = parent.getAggregations().get(getFilterName(prefix, nestedField));
+        String filterName = getFilterName(pathPrefix, nestedField);
+        HasAggregations filter = parent.getAggregations().get(filterName);
 
         if (filter != null) {
             parent = filter;
         }
 
-        parent =  parent.getAggregations().get(getNestedName(prefix, nestedField));
+        parent =  parent.getAggregations().get(getNestedName(pathPrefix, nestedField, facetField));
 
         if (parent == null) {
             return null;
         }
 
-        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(prefix, nestedField));
+        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(pathPrefix, getNestedFieldName(nestedField, facetField)));
         if (subSearch != null) {
             parent = subSearch;
         }
 
 
-        T agg  = parent.getAggregations().get(getAggregationName(prefix, nestedField));
+        T agg  = parent.getAggregations().get(getAggregationName(pathPrefix, getNestedFieldName(nestedField, facetField)));
         return agg;
     }
 
-    protected static List<DateFacetResultItem> getDateRangeFacetResultItems(DateRangeFacets<?> dateRangeFacets, String facetName, SearchResponse response) {
+    protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
+        DateRangeFacets<?> dateRangeFacets,
+        @Nonnull String facetName,
+        @Nonnull SearchResponse response) {
         Aggregations facets = response.getAggregations();
         Aggregations aggregations = response.getAggregations();
 
