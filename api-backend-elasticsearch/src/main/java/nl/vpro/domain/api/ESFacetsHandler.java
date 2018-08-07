@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,7 +73,7 @@ public abstract class ESFacetsHandler {
         Aggregations facets,
         @Nullable ExtendedTextFacet<?> extendedTextFacet) {
         if (extendedTextFacet != null) {
-            return getFacetResultItems(esField(fieldName, extendedTextFacet.isCaseSensitive()), facets);
+            return getFacetResultItems(esExtendedTextField(fieldName, extendedTextFacet.isCaseSensitive()), facets);
         } else {
             return null;
         }
@@ -80,8 +81,13 @@ public abstract class ESFacetsHandler {
     }
 
     protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
-        @Nonnull String fieldName, TextFacet<?> requestFacet, Aggregations facets, Class<T> enumClass, Function<String, T> valueOf, Function<T, String> xmlId) {
-        if(facets != null) {
+        @Nonnull String fieldName,
+        @Nullable TextFacet<?> requestFacet,
+        @Nullable Aggregations facets,
+        @Nonnull Class<T> enumClass,
+        @Nonnull Function<String, T> valueOf,
+        @Nonnull Function<T, String> xmlId) {
+        if(facets != null && requestFacet != null) {
             MultiBucketsAggregation facet = getAggregation(fieldName, facets);
             if(facet == null) {
                 return null;
@@ -104,7 +110,7 @@ public abstract class ESFacetsHandler {
 
     protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
         @Nonnull String fieldName,
-        @Nonnull TextFacet<?> requestedFacet,
+        @Nullable TextFacet<?> requestedFacet,
         @Nonnull Aggregations facets,
         @Nonnull final Class<T> enumClass) {
         return getFacetResultItemsForEnum(fieldName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name);
@@ -112,7 +118,10 @@ public abstract class ESFacetsHandler {
 
     protected static List<TermFacetResultItem> getBroadcasterResultItems(
         @Nonnull String fieldName,
-        @Nonnull Aggregations facets) {
+        @Nullable Aggregations facets) {
+        if (facets == null) {
+            return null;
+        }
         Terms aggregation = getAggregation(fieldName, facets);
         if(aggregation == null) {
             return null;
@@ -482,4 +491,17 @@ public abstract class ESFacetsHandler {
         }
     }*/
 
+
+  public static <T extends AbstractSearch> List<TermFacetResultItem> filterThreshold(
+        @Nullable List<TermFacetResultItem> list,
+        @Nullable LimitableFacet<T> facet) {
+        if (list == null) {
+            return null;
+        }
+        if (facet == null || facet.getThreshold() == null) {
+            return list;
+        }
+        return list.stream().filter(item -> item.getCount() >= facet.getThreshold()).collect(Collectors.toList());
+
+    }
 }

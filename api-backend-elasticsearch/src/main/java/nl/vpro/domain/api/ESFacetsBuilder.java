@@ -34,16 +34,13 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
  */
 public abstract class ESFacetsBuilder {
 
-
     public static final String FILTER_POSTFIX = "_filter";
 
     public static final String SUBSEARCH_POSTFIX = "_subsearch";
 
-
     public static final String FACET_POSTFIX = "_facet";
 
     public static final String NESTED_POSTFIX = "_nested";
-
 
     /**
      * Abstract because type of facet parameter is unknown.
@@ -82,7 +79,10 @@ public abstract class ESFacetsBuilder {
 
     }
 
-    protected static void addFacet(SearchSourceBuilder searchBuilder, String fieldName, DateRangeFacets<?> facet) {
+    protected static void addFacet(
+        @Nonnull SearchSourceBuilder searchBuilder,
+        @Nonnull String fieldName,
+        @Nullable DateRangeFacets<?> facet) {
         if(facet != null) {
             if(facet.getRanges() != null) {
                 RangeAggregationBuilder aggregationBuilder = null;
@@ -131,7 +131,8 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected static DateHistogramInterval from(DateRangeInterval.Interval interval) {
+    protected static DateHistogramInterval from(
+        @Nonnull DateRangeInterval.Interval interval) {
         switch(interval.getUnit()) {
             case YEAR:
                 return interval.amount == 1 ? DateHistogramInterval.YEAR : DateHistogramInterval.days(interval.amount * 365);
@@ -254,13 +255,13 @@ public abstract class ESFacetsBuilder {
     }
 
 
-    private static String VALID_FACET_CHARS = "a-zA-Z0-9_-";
-    private static Pattern INVALID = Pattern.compile("[^" + VALID_FACET_CHARS + "]+");
-    public static String escape(String facetName) {
+    private static final String VALID_FACET_CHARS = "a-zA-Z0-9_-";
+    private static final Pattern INVALID = Pattern.compile("[^" + VALID_FACET_CHARS + "]+");
+    public static String escape(@Nonnull String facetName) {
         return INVALID.matcher(facetName).replaceAll("/");
     }
 
-    public static String escape(String prefix, String name) {
+    public static String escape(@Nullable String prefix, @Nonnull String name) {
         if (StringUtils.isEmpty(prefix)) {
             return escape(name);
         } else {
@@ -268,50 +269,62 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-
-
-    public static String getAggregationName(String fieldName) {
+    public static String getAggregationName(
+        @Nonnull String fieldName) {
         return getAggregationName("", fieldName);
     }
 
-     public static String getAggregationName(String prefix, String fieldName) {
+     public static String getAggregationName(
+         String prefix,
+         @Nonnull String fieldName) {
         return escape(prefix, fieldName) + FACET_POSTFIX;
     }
 
-    public static String getFilterName(String fieldName) {
+    public static String getFilterName(
+        @Nonnull String fieldName) {
         return getFilterName("", fieldName);
     }
 
 
-    public static String getFilterName(String prefix, String fieldName) {
+    public static String getFilterName(
+        String prefix,
+        @Nonnull String fieldName) {
         return escape(prefix, fieldName) + FILTER_POSTFIX;
     }
 
-    public static String getSubSearchName(String fieldName) {
+    public static String getSubSearchName(
+        @Nonnull String fieldName) {
         return getSubSearchName("", fieldName);
     }
 
 
-    public static String getSubSearchName(String prefix, String fieldName) {
+    public static String getSubSearchName(
+        String prefix,
+        @Nonnull String fieldName) {
         return escape(prefix, fieldName) + SUBSEARCH_POSTFIX;
     }
 
-    public static String getNestedName(String prefix, String nestedField, String fieldName) {
+    public static String getNestedName(
+        @Nullable String prefix,
+        @Nonnull String nestedField,
+        @Nonnull String fieldName) {
         return escape(prefix, getNestedFieldName(nestedField, fieldName)) + NESTED_POSTFIX;
     }
-    public static String getNestedFieldName(String nestField, String fieldName) {
+    public static String getNestedFieldName(
+        @Nonnull String nestField,
+        @Nonnull String fieldName) {
         return nestField + "." + fieldName;
     }
 
 
-    protected static String esField(@Nonnull String field, boolean caseSensitive) {
+    protected static String esExtendedTextField(@Nonnull String field, boolean caseSensitive) {
         return caseSensitive ? field + ".full" : field + ".lower";
     }
 
-    protected static String esField(
+    protected static String esExtendedTextField(
         @Nonnull String field,
         @Nullable ExtendedTextFacet<?> facet) {
-        return esField(field, facet == null || facet.isCaseSensitive());
+        return esExtendedTextField(field, facet == null || facet.isCaseSensitive());
     }
 
 

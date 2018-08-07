@@ -15,11 +15,12 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.ESFacetsBuilder;
+import nl.vpro.domain.api.ESQueryBuilder;
+import nl.vpro.domain.api.TextFacet;
 
 /**
  * @author Roelof Jan Koekoek
@@ -76,133 +77,100 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             addFacet(searchBuilder, prefix + "avType", facets.getAvTypes());
 
-            {
-                DateRangeFacets sortDates = facets.getSortDates();
-                addFacet(searchBuilder, prefix + "sortDate", sortDates);
-            }
+            addFacet(searchBuilder, prefix + "sortDate", facets.getSortDates());
 
-            {
-                MediaFacet broadcasters = facets.getBroadcasters();
-                //addFacetFilter(prefix, broadcasters, facetRootFilter);
-                addFacet(searchBuilder, prefix + "broadcasters.id", broadcasters);
+            addFacet(searchBuilder, prefix + "broadcasters.id", facets.getBroadcasters());
 
-            }
-
-            {
-                MediaSearchableTermFacet genres = facets.getGenres();
-                addNestedAggregation("genres", rootAggregation, "id", genres, prefix);
-            }
+            addNestedAggregation(prefix, "genres", "id", rootAggregation, facets.getGenres());
 
             {
                 ExtendedMediaFacet tags = facets.getTags();
                 //addFacetFilter(prefix, tags, facetRootFilter);
-                addFacet(searchBuilder, prefix + esField("tags", tags), tags);
+                addFacet(searchBuilder, prefix + esExtendedTextField("tags", tags), tags);
             }
+            addFacet(searchBuilder, prefix + "duration", facets.getDurations());
 
-            {
-                DurationRangeFacets durations = facets.getDurations();
-                addFacet(searchBuilder, prefix + "duration", durations);
-            }
+            addNestedAggregation(prefix, "descendantOf", "midRef", rootAggregation, facets.getDescendantOf());
 
-            {
-                MemberRefFacet descendantOf = facets.getDescendantOf();
-                addNestedAggregation("descendantOf", rootAggregation, "midRef", descendantOf, prefix);
-            }
 
-            {
-                MemberRefFacet episodeOf = facets.getEpisodeOf();
-                addNestedAggregation("episodeOf", rootAggregation, "midRef", episodeOf, prefix);
-            }
+            addNestedAggregation(prefix, "episodeOf", "midRef", rootAggregation, facets.getEpisodeOf());
 
-            {
-                MemberRefFacet memberOf = facets.getMemberOf();
-                addNestedAggregation("memberOf", rootAggregation, "midRef", memberOf, prefix);
-            }
+            addNestedAggregation(prefix, "memberOf", "midRef", rootAggregation, facets.getMemberOf());
 
-            {
-                RelationFacetList relations = facets.getRelations();
-                addNestedRelationAggregations(rootAggregation, "value", relations, prefix);
-            }
+            addNestedRelationAggregations(prefix, "value", rootAggregation, facets.getRelations());
 
-            {
-                MediaFacet ageRatings = facets.getAgeRatings();
-                //addFacetFilter(prefix, ageRatings, facetRootFilter);
-                addFacet(searchBuilder, prefix + "ageRating", ageRatings);
-            }
+            addFacet(searchBuilder, prefix + "ageRating", facets.getAgeRatings());
 
-            {
-                MediaFacet contentRatings = facets.getContentRatings();
-                //addFacetFilter(prefix, contentRatings, facetRootFilter);
-                addFacet(searchBuilder, prefix + "contentRatings", contentRatings);
 
-            }
+            addFacet(searchBuilder, prefix + "contentRatings",  facets.getContentRatings());
+
         }
     }
 
     protected static void addNestedAggregation(
-        @Nonnull String nestedField,
-        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nonnull String pathPrefix,
+        @Nonnull String nestedObject,
         @Nonnull String facetField,
-        @Nullable MediaSearchableTermFacet facet,
-        @Nonnull String pathPrefix) {
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nullable MediaSearchableTermFacet facet) {
         if (facet == null) {
             return;
         }
 
         AggregationBuilder terms = getFilteredTermsBuilder(
             pathPrefix,
-            nestedField,
+            nestedObject,
             facetField,
             facet);
 
         //facet.hasSubSearch() ? ESFilterBuilder.filter(facet.getSubSearch(), pathPrefix, nestedField, facetField) : null
 
-        NestedAggregationBuilder nestedBuilder = getNestedBuilder(
+       /* NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
-            nestedField,
+            nestedObject,
             facetField,
             terms
         );
-        AggregationBuilder builder = filterAggregation(pathPrefix, nestedField, nestedBuilder, facet.getFilter());
+        AggregationBuilder builder = filterAggregation(pathPrefix, nestedObject, nestedBuilder, facet.getFilter());
         log.debug("Added aggregation {}", builder);
-        rootAggregation.subAggregation(builder);
+        rootAggregation.subAggregation(builder);*/
 
     }
 
     protected static void addNestedAggregation(
-        @Nonnull String nestedField,
-        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nonnull String pathPrefix,
+        @Nonnull String nestedObject,
         @Nonnull String facetField,
-        @Nullable MemberRefFacet facet,
-        @Nonnull String pathPrefix) {
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nullable MemberRefFacet facet) {
         if (facet == null) {
             return;
         }
 
         AggregationBuilder terms = getFilteredTermsBuilder(
             pathPrefix,
-            nestedField,
+            nestedObject,
             facetField,
             facet);
         //
         //facet.hasSubSearch() ? ESMediaFilterBuilder.filter(pathPrefix, nestedField, facet.getSubSearch()) : null
-
+/*
         NestedAggregationBuilder nestedBuilder = getNestedBuilder(
             pathPrefix,
-            nestedField,
+            nestedObject,
             facetField,
             terms
         );
-        AggregationBuilder builder = filterAggregation(pathPrefix, nestedField, nestedBuilder, facet.getFilter());
-        rootAggregation.subAggregation(builder);
+        AggregationBuilder builder = filterAggregation(pathPrefix, nestedObject, nestedBuilder, facet.getFilter());
+        rootAggregation.subAggregation(builder);*/
 
     }
 
     protected static void addNestedRelationAggregations(
-        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nonnull String pathPrefix,
         @Nonnull String facetField,
-        @Nullable RelationFacetList facets,
-        @Nonnull String pathPrefix) {
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nullable RelationFacetList facets) {
         if (facets == null || facets.isEmpty()) {
             return;
         }
@@ -275,7 +243,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         @Nonnull RelationFacet facet,
         @Nonnull QueryBuilder subSearch
     ) {
-        return getFilteredTermsBuilder(pathPrefix, nestedField, esField(facetField, facet.isCaseSensitive()), facet);
+        return getFilteredTermsBuilder(pathPrefix, nestedField, esExtendedTextField(facetField, facet.isCaseSensitive()), facet);
     }
 
     private static AggregationBuilder filterAggregation(

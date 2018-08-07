@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -101,15 +100,6 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         return facetsResult;
     }
 
-    private static List<TermFacetResultItem> filterThreshold(
-        @NonNull List<TermFacetResultItem> list,
-        @Nullable MediaFacet facet) {
-        if (facet == null || facet.getThreshold() == null) {
-            return list;
-        }
-        return list.stream().filter(item -> item.getCount() >= facet.getThreshold()).collect(Collectors.toList());
-
-    }
 
     protected static List<GenreFacetResultItem> getGenreAggregationResultItems(
         @Nonnull String prefix,
