@@ -522,6 +522,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithGenreFacet() {
+        target.setScore(false);
+
         index(program().withMid().withGenres().build());
 
         MediaForm form = form().genreFacet().build();
@@ -622,6 +624,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithMemberOfFacetWithAdditionalFields() {
+        target.setScore(false);
+
         final Group group = index(group().withMid().mainTitle("Group title").build());
         final Program program = index(program().withMid().memberOf(group, 1).build());
 

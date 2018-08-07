@@ -6,6 +6,7 @@ package nl.vpro.domain.api;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -14,7 +15,9 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.util.automaton.RegExp;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -29,7 +32,6 @@ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilde
 import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
-import nl.vpro.domain.api.page.PageSearch;
 import nl.vpro.util.TriFunction;
 
 /**
@@ -46,19 +48,20 @@ public abstract class ESFacetsBuilder {
 
     public static final String NESTED_POSTFIX = "_nested";
 
-    /**
-     * Abstract because type of facet parameter is unknown.
-     */
-    protected static TermsAggregationBuilder createAggregationBuilder(
+    protected static <T extends AbstractSearch> TermsAggregationBuilder addFacet(
+        @Nonnull String prefix,
+        @Nonnull  SearchSourceBuilder searchBuilder,
         @Nonnull  String fieldName,
-        @Nullable LimitableFacet<?> facet) {
+        @Nullable LimitableFacet<T> facet,
+        @Nonnull BiConsumer<BoolQueryBuilder, T> buildFilter
+        ) {
         if(facet != null) {
             Terms.Order order = ESFacets.getComparatorType(facet);
 
 
             TermsAggregationBuilder aggregationBuilder = AggregationBuilders
-                .terms(getAggregationName(fieldName))
-                .field(fieldName)
+                .terms(getAggregationName(prefix, fieldName))
+                .field(prefix + fieldName)
                 .order(order)
                 .size(facet.getMax())
 
@@ -76,6 +79,21 @@ public abstract class ESFacetsBuilder {
             if (script != null) {
                 aggregationBuilder.script(new Script(script));
             }
+
+            T facetFilter = facet.getFilter();
+            if (facetFilter != null) {
+                BoolQueryBuilder query = QueryBuilders.boolQuery();
+                buildFilter.accept(query, facetFilter);
+
+                FilterAggregationBuilder filterAggregationBuilder =
+                    AggregationBuilders.filter(getFilterName(prefix, fieldName), query);
+                filterAggregationBuilder.subAggregation(aggregationBuilder);
+                searchBuilder.aggregation(filterAggregationBuilder);
+            } else {
+                searchBuilder.aggregation(aggregationBuilder);
+            }
+
+
             return aggregationBuilder;
         } else {
             return null;
@@ -155,7 +173,7 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected static void addFacet(
+    protected static void addDurationFacet(
         @Nonnull SearchSourceBuilder searchBuilder,
         @Nonnull String fieldName,
         @Nullable DurationRangeFacets<?> facet) {
@@ -194,12 +212,13 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected <T extends PageSearch, S extends TermSearch> void  addNestedAggregation(
+    protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
+        @Nonnull String prefix,
         @Nonnull  String nestedObject,
         @Nonnull  String facetField,
         @Nonnull  FilterAggregationBuilder rootAggregation,
-        @Nullable SearchableLimitableFacet<T, S> facet,
-        @Nonnull Function<T, QueryBuilder> filterCreator,
+        @Nullable SearchableLimitableFacet<F, S> facet,
+        @Nonnull Function<F, QueryBuilder> filterCreator,
         @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
         if (facet == null) {
             return;
@@ -210,14 +229,14 @@ public abstract class ESFacetsBuilder {
 
         if (facet.hasFilter()) {
             QueryBuilder query = filterCreator.apply(facet.getFilter());
-            FilterAggregationBuilder filter = AggregationBuilders.filter(getFilterName(nestedObject, facetField), query);
+            FilterAggregationBuilder filter = AggregationBuilders.filter(getFilterName(prefix, nestedObject + "/" +  facetField), query);
             rootAggregation.subAggregation(filter);
             parent = filter;
         }
 
 
         NestedAggregationBuilder nestedBuilder = AggregationBuilders
-            .nested(getNestedName("", nestedObject, facetField), nestedObject);
+            .nested(getNestedName(prefix, nestedObject, facetField), nestedObject);
 
 
         parent.subAggregation(nestedBuilder);
@@ -226,8 +245,8 @@ public abstract class ESFacetsBuilder {
 
         // If the facet has a subsearch we need to wrap this aggregation in another one, which a filter.
         if (facet.hasSubSearch()) {
-            QueryBuilder query = ESPageQueryBuilder.filter(facet.getSubSearch(), nestedObject, facetField);
-            FilterAggregationBuilder subsearch = AggregationBuilders.filter(getSubSearchName(nestedObject, facetField), query);
+            QueryBuilder query = subSearchCreator.apply(facet.getSubSearch(), nestedObject, facetField);
+            FilterAggregationBuilder subsearch = AggregationBuilders.filter(getSubSearchName(prefix, nestedObject + "/"  + facetField), query);
             parent.subAggregation(subsearch);
             parent = subsearch;
         }
@@ -235,14 +254,13 @@ public abstract class ESFacetsBuilder {
 
         // Creates the actual aggregation
         TermsAggregationBuilder terms = getFilteredTermsBuilder(
-            "",
+            prefix,
             nestedObject,
             facetField,
             facet);
         parent.subAggregation(terms);
 
     }
-    stat
 
 
 
@@ -289,7 +307,7 @@ public abstract class ESFacetsBuilder {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
-        String aggregationName = getAggregationName(pathPrefix, nestedField + "." + facetField);
+        String aggregationName = getAggregationName(pathPrefix, nestedField, facetField);
 
         TermsAggregationBuilder termsBuilder =
             AggregationBuilders.terms(aggregationName)
@@ -321,7 +339,7 @@ public abstract class ESFacetsBuilder {
         if (StringUtils.isEmpty(prefix)) {
             return escape(name);
         } else {
-            return escape(prefix + "_" + name);
+            return escape(prefix + name);
         }
     }
 
@@ -336,6 +354,13 @@ public abstract class ESFacetsBuilder {
         return escape(prefix, fieldName) + FACET_POSTFIX;
     }
 
+
+    public static String getAggregationName(
+         String prefix,
+         @Nonnull String nestedObject,
+         @Nonnull String fieldName) {
+        return escape(prefix, getNestedFieldName(nestedObject, fieldName)) + FACET_POSTFIX;
+    }
     public static String getFilterName(
         @Nonnull String fieldName) {
         return getFilterName("", fieldName);

@@ -174,7 +174,7 @@ public class ESMediaFilterBuilderTest {
     public void testFilterProfileWithExtraFilterOnNullProfile() throws Exception {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.termQuery("name", "value"));
-        ESMediaQueryBuilder.query("", null, boolQueryBuilder);
+        ESMediaQueryBuilder.buildMediaQuery("", boolQueryBuilder,null);
         assertThat(toString(ESQueryBuilder.simplifyQuery(boolQueryBuilder))).isEqualTo(
             "{\n" +
                 "  \"term\" : {\n" +

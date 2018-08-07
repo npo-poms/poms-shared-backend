@@ -508,7 +508,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         ESMediaSortHandler.sort(form, null, builder::addSort);
         builder.setTypes(MediaESType.mediaObjects())
             .setSize(iterateBatchSize)
-            .setQuery(ESMediaQueryBuilder.query(form != null ? form.getSearches() : null))
+            .setQuery(ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null))
             .setPostFilter(ESMediaFilterBuilder.filter(profile))
         ;
 

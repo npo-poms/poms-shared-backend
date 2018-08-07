@@ -81,25 +81,28 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * Builds  an Elastic Search {@link QueryBuilder} from a {@link MediaSearch}
      * @param searches or <code>null</code> (resulting in a matchAllQuery)
      */
-    public static QueryBuilder query(MediaSearch searches) {
+    public static QueryBuilder query(String prefix, MediaSearch searches) {
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
         }
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        query("", searches, builder);
+        buildMediaQuery(prefix, builder, searches);
         return simplifyQuery(builder);
+    }
+    public static QueryBuilder query(MediaSearch searches) {
+        return query("", searches);
     }
 
     /**
      * Builds a media relationQuery for standalone or embedded media when the prefix argument is left blank.
-     *
-     * @param prefix   not null path to the media node in the documents to search, including the last dot, can be blank
+     *  @param prefix   not null path to the media node in the documents to search, including the last dot, can be blank
      * @param searches The 'searches' part of a MediaForm
      */
-    public static void query(
+    public static void buildMediaQuery(
         @Nonnull String prefix,
-        @Nullable final MediaSearch searches,
-        @Nonnull BoolQueryBuilder booleanQuery) {
+        @Nonnull BoolQueryBuilder booleanQuery,
+        @Nullable final MediaSearch searches) {
+
         if (searches == null) {
             return;
         }

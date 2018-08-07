@@ -77,16 +77,16 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             }
 
 
-            facetsResult.setTypes(getFacetResultItemsForEnum(prefix + "type", request.getTypes(), aggregations, MediaType.class));
-            facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix + "avType", request.getAvTypes(), aggregations, AVType.class));
+            facetsResult.setTypes(getFacetResultItemsForEnum(prefix, "type", request.getTypes(), aggregations, MediaType.class));
+            facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix, "avType", request.getAvTypes(), aggregations, AVType.class));
             facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response));
             facetsResult.setBroadcasters(
                 filterThreshold(
-                    getBroadcasterResultItems(prefix + "broadcasters.id", aggregations), request.getBroadcasters()));
-            facetsResult.setTags(getFacetResultItems(prefix + "tags", aggregations, request.getTags()));
+                    getBroadcasterResultItems(prefix, "broadcasters.id", aggregations), request.getBroadcasters()));
+            facetsResult.setTags(getFacetResultItems(prefix, "tags", aggregations, request.getTags()));
             facetsResult.setDurations(getDurationRangeFacetResultItems(request.getDurations(), prefix + "duration", response));
-            facetsResult.setAgeRatings(getFacetResultItemsForEnum(prefix + "ageRating", request.getAgeRatings(), aggregations, AgeRating.class, s -> AgeRating.xmlValueOf(s.toUpperCase()), AgeRating::getXmlValue));
-            facetsResult.setContentRatings(getFacetResultItemsForEnum(prefix + "contentRatings", request.getContentRatings(), aggregations, ContentRating.class));
+            facetsResult.setAgeRatings(getFacetResultItemsForEnum(prefix, "ageRating", request.getAgeRatings(), aggregations, AgeRating.class, s -> AgeRating.xmlValueOf(s.toUpperCase()), AgeRating::getXmlValue));
+            facetsResult.setContentRatings(getFacetResultItemsForEnum(prefix, "contentRatings", request.getContentRatings(), aggregations, ContentRating.class));
 
 
             facetsResult.setGenres(getGenreAggregationResultItems(prefix, globalFilter));
@@ -130,7 +130,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
     protected static List<MemberRefFacetResultItem> getMemberRefAggregationResultItems(
         @Nonnull  final String prefix,
-        @Nonnull  final String nestedField,
+        @Nonnull  final String nestedObject,
         @NonNull  final MediaLoader mediaRepository,
         @Nullable final Filter root) {
         if (root == null) {
@@ -139,9 +139,8 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         String nestedFacet = "midRef";
 
-        Aggregation nested = getNestedResult(prefix, nestedField, nestedFacet, root);
+        Terms midRefs = getNestedResult(prefix, nestedObject, nestedFacet, root);
 
-        Terms midRefs = getFilteredTerms(nestedFacet, nested);
         if (midRefs == null) {
             return null;
         }

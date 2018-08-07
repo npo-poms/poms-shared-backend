@@ -19,7 +19,7 @@ public class ESMediaQueryBuilderTest {
 
     @Test
     public void testQueryTextWithoutAForm() {
-        QueryBuilder builder = ESMediaQueryBuilder.query(new MediaSearch());
+        QueryBuilder builder = ESMediaQueryBuilder.query("", new MediaSearch());
 
         assertThat(builder.toString()).isEqualTo(
             "{\n" +
@@ -33,7 +33,7 @@ public class ESMediaQueryBuilderTest {
     public void testQueryTextWithoutProfile() {
         MediaForm form = MediaFormBuilder.form().text("Text to search for").build();
 
-        QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
+        QueryBuilder builder = ESMediaQueryBuilder.query("", form.getSearches());
 
         assertThat(builder.toString()).isEqualTo(
             "{\n" +

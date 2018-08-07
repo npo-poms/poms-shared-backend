@@ -554,14 +554,14 @@ public abstract class ESQueryBuilder {
         ESQueryBuilder.apply(booleanQueryBuilder, append, list.getMatch());
     }
 
-    public static QueryBuilder filter(
+    public static QueryBuilder search(
         @Nullable TermSearch searches,
         @Nonnull String axis,
         @NonNull String field) {
-        return filter(searches, "", axis, field);
+        return search(searches, "", axis, field);
     }
 
-    public static QueryBuilder filter(
+    public static QueryBuilder search(
         @Nullable TermSearch searches,
         @Nonnull String prefix,
         @Nonnull String axis,
