@@ -6,6 +6,7 @@ package nl.vpro.domain.api;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
@@ -27,6 +28,9 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import nl.vpro.domain.api.page.PageSearch;
+import nl.vpro.util.TriFunction;
 
 /**
  * @author Roelof Jan Koekoek
@@ -79,7 +83,7 @@ public abstract class ESFacetsBuilder {
 
     }
 
-    protected static void addFacet(
+    protected static void addDateRangeFacet(
         @Nonnull SearchSourceBuilder searchBuilder,
         @Nonnull String fieldName,
         @Nullable DateRangeFacets<?> facet) {
@@ -189,6 +193,58 @@ public abstract class ESFacetsBuilder {
             }
         }
     }
+
+    protected <T extends PageSearch, S extends TermSearch> void  addNestedAggregation(
+        @Nonnull  String nestedObject,
+        @Nonnull  String facetField,
+        @Nonnull  FilterAggregationBuilder rootAggregation,
+        @Nullable SearchableLimitableFacet<T, S> facet,
+        @Nonnull Function<T, QueryBuilder> filterCreator,
+        @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
+        if (facet == null) {
+            return;
+        }
+
+        AggregationBuilder parent = rootAggregation;
+
+
+        if (facet.hasFilter()) {
+            QueryBuilder query = filterCreator.apply(facet.getFilter());
+            FilterAggregationBuilder filter = AggregationBuilders.filter(getFilterName(nestedObject, facetField), query);
+            rootAggregation.subAggregation(filter);
+            parent = filter;
+        }
+
+
+        NestedAggregationBuilder nestedBuilder = AggregationBuilders
+            .nested(getNestedName("", nestedObject, facetField), nestedObject);
+
+
+        parent.subAggregation(nestedBuilder);
+        parent = nestedBuilder;
+
+
+        // If the facet has a subsearch we need to wrap this aggregation in another one, which a filter.
+        if (facet.hasSubSearch()) {
+            QueryBuilder query = ESPageQueryBuilder.filter(facet.getSubSearch(), nestedObject, facetField);
+            FilterAggregationBuilder subsearch = AggregationBuilders.filter(getSubSearchName(nestedObject, facetField), query);
+            parent.subAggregation(subsearch);
+            parent = subsearch;
+        }
+
+
+        // Creates the actual aggregation
+        TermsAggregationBuilder terms = getFilteredTermsBuilder(
+            "",
+            nestedObject,
+            facetField,
+            facet);
+        parent.subAggregation(terms);
+
+    }
+    stat
+
+
 
 
     protected static NestedAggregationBuilder getNestedBuilder(

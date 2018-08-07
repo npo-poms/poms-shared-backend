@@ -77,7 +77,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             addFacet(searchBuilder, prefix + "avType", facets.getAvTypes());
 
-            addFacet(searchBuilder, prefix + "sortDate", facets.getSortDates());
+            addDateRangeFacet(searchBuilder, prefix + "sortDate", facets.getSortDates());
 
             addFacet(searchBuilder, prefix + "broadcasters.id", facets.getBroadcasters());
 
