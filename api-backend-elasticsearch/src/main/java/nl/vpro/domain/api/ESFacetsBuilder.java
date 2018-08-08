@@ -216,9 +216,9 @@ public abstract class ESFacetsBuilder {
 
     protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
         @Nonnull String prefix,
-        @Nonnull  String nestedObject,
-        @Nonnull  String facetField,
-        @Nonnull  FilterAggregationBuilder rootAggregation,
+        @Nonnull String nestedObject,
+        @Nonnull String facetField,
+        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nullable SearchableLimitableFacet<F, S> facet,
         @Nonnull Function<F, QueryBuilder> filterCreator,
         @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
@@ -248,7 +248,7 @@ public abstract class ESFacetsBuilder {
         // If the facet has a subsearch we need to wrap this aggregation in another one, which a filter.
         if (facet.hasSubSearch()) {
             QueryBuilder query = subSearchCreator.apply(facet.getSubSearch(), nestedObject, facetField);
-            FilterAggregationBuilder subsearch = AggregationBuilders.filter(getSubSearchName(prefix, nestedObject + "/"  + facetField), query);
+            FilterAggregationBuilder subsearch = AggregationBuilders.filter(getSubSearchName(prefix, nestedObject, facetField), query);
             parent.subAggregation(subsearch);
             parent = subsearch;
         }
@@ -309,7 +309,9 @@ public abstract class ESFacetsBuilder {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
-        String aggregationName = getAggregationName(pathPrefix, nestedField, facetField);
+        String aggregationName = facet instanceof Nameable ?
+            ((Nameable) facet).getName() :
+            getAggregationName(pathPrefix, nestedField, facetField);
 
         TermsAggregationBuilder termsBuilder =
             AggregationBuilders.terms(aggregationName)
@@ -389,9 +391,16 @@ public abstract class ESFacetsBuilder {
 
 
     public static String getSubSearchName(
-        String prefix,
+        @Nonnull String prefix,
         @Nonnull String fieldName) {
         return escape(prefix, fieldName) + SUBSEARCH_POSTFIX;
+    }
+
+    public static String getSubSearchName(
+        @Nonnull String prefix,
+        @Nonnull String nestedObject,
+        @Nonnull String fieldName) {
+        return escape(prefix, getNestedFieldName(nestedObject, fieldName)) + SUBSEARCH_POSTFIX;
     }
 
     public static String getNestedName(
@@ -411,7 +420,7 @@ public abstract class ESFacetsBuilder {
         return caseSensitive ? field + ".full" : field + ".lower";
     }
 
-    protected static String esExtendedTextField(
+    public static String esExtendedTextField(
         @Nonnull String field,
         @Nullable ExtendedTextFacet<?> facet) {
         return esExtendedTextField(field, facet == null || facet.isCaseSensitive());

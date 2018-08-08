@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -181,7 +182,8 @@ public abstract class ESFacetsHandler {
         @Nonnull String pathPrefix,
         @Nonnull  String nestedField,
         @Nonnull  String facetField,
-        @Nullable  HasAggregations root) {
+        @Nullable  HasAggregations root,
+        @Nonnull Supplier<String> aggregationName) {
         if(root == null) {
             return null;
         }
@@ -194,7 +196,8 @@ public abstract class ESFacetsHandler {
             parent = filter;
         }
 
-        parent =  parent.getAggregations().get(getNestedName(pathPrefix, nestedField, facetField));
+        String nestedName = getNestedName(pathPrefix, nestedField, facetField);
+        parent =  parent.getAggregations().get(nestedName);
 
         if (parent == null) {
             return null;
@@ -205,9 +208,16 @@ public abstract class ESFacetsHandler {
             parent = subSearch;
         }
 
+        return parent.getAggregations().get(aggregationName.get());
+    }
 
-        T agg  = parent.getAggregations().get(getAggregationName(pathPrefix, nestedField, facetField));
-        return agg;
+    protected static <T extends Aggregation> T getNestedResult(
+        @Nonnull String pathPrefix,
+        @Nonnull  String nestedField,
+        @Nonnull  String facetField,
+        @Nullable  HasAggregations root) {
+
+        return getNestedResult(pathPrefix, nestedField, facetField, root, () -> getAggregationName(pathPrefix, nestedField, facetField));
     }
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
