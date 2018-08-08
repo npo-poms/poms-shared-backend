@@ -90,12 +90,11 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             addNestedAggregationMemberRefSearch(prefix, "descendantOf", "midRef", rootAggregation, facets.getDescendantOf());
 
-
             addNestedAggregationMemberRefSearch(prefix, "episodeOf", "midRef", rootAggregation, facets.getEpisodeOf());
 
             addNestedAggregationMemberRefSearch(prefix, "memberOf", "midRef", rootAggregation, facets.getMemberOf());
 
-            addNestedRelationAggregationsRelationSearch(prefix, "value", rootAggregation, facets.getRelations());
+            addNestedRelationAggregations(prefix, "value", rootAggregation, facets.getRelations());
 
             addMediaFacet(prefix, rootAggregation, "ageRating", facets.getAgeRatings());
 
@@ -141,7 +140,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
     }
 
-    protected static void addNestedRelationAggregationsRelationSearch(
+    protected static void addNestedRelationAggregations(
         @Nonnull String pathPrefix,
         @Nonnull String facetField,
         @Nonnull FilterAggregationBuilder rootAggregation,
@@ -154,6 +153,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         RelationSearch allRelationsFacetsSubSearch = facets.getSubSearch();
 
         for (RelationFacet facet : facets) {
+            addMediaNestedRelationAggregation(pathPrefix,"relations", esExtendedTextField("value", facet), rootAggregation, allRelationsFacetsSubSearch, facet);
+
             BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
             if (facet.hasSubSearch()) {
                 ESQueryBuilder.relationQuery(pathPrefix, facet.getSubSearch(), facetFilter);
@@ -181,6 +182,26 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             rootAggregation.subAggregation(builder);
         }
     }
+     protected static void addMediaNestedRelationAggregation(
+         @Nonnull String prefix,
+         @Nonnull  String nestedObject,
+         @Nonnull  String facetField,
+         @Nonnull  FilterAggregationBuilder rootAggregation,
+         @Nullable RelationSearch allRelationSearch,
+         @Nullable NameableSearchableLimitableFacet<MediaSearch, RelationSearch> facet) {
+
+        // TODO use allRelationsSearch
+
+        addNestedAggregation(
+            prefix,
+            nestedObject,
+            facetField,
+            rootAggregation,
+            facet,
+            (s) -> ESMediaFilterBuilder.filter(prefix, s),
+            (relationSearch, no, ff) -> ESMediaFilterBuilder.filterRelations(prefix, relationSearch)
+        );
+     }
 
     protected static void addNestedTitlesAggregations(
         @Nonnull FilterAggregationBuilder rootAggregation,

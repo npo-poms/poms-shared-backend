@@ -27,9 +27,6 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
 
     /**
      *
-     * @param prefix
-     * @param searches
-     * @param filter
      */
     @Deprecated
 
@@ -50,9 +47,17 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     }
 
 
+      public static QueryBuilder filterRelations(
+          @Nonnull String prefix,
+          @Nullable RelationSearch relationSearch) {
+          if (relationSearch == null) {
+              return QueryBuilders.matchAllQuery();
+          }
 
-
-
+          BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
+          ESQueryBuilder.relationQuery("", relationSearch, booleanFilter);
+          return ESQueryBuilder.simplifyQuery(booleanFilter);
+      }
 
 
 }

@@ -16,7 +16,6 @@ import javax.annotation.Nullable;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -28,7 +27,6 @@ import nl.vpro.domain.api.TermFacetResultItem;
 import nl.vpro.domain.media.*;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.getAggregationName;
-import static nl.vpro.domain.api.ESFacetsBuilder.getFilterName;
 import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 
 /**
@@ -93,7 +91,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             facetsResult.setDescendantOf(getMemberRefAggregationResultItems(prefix, "descendantOf", mediaRepository, rootFilter));
             facetsResult.setEpisodeOf(getMemberRefAggregationResultItems(prefix, "episodeOf", mediaRepository, rootFilter));
             facetsResult.setMemberOf(getMemberRefAggregationResultItems(prefix, "memberOf", mediaRepository, rootFilter));
-            facetsResult.setRelations(getRelationAggregationResultItems(request.getRelations(), rootFilter));
+            facetsResult.setRelations(getMediaRelationAggregationResultItems(prefix, request.getRelations(), rootFilter));
 
         }
         return facetsResult;
@@ -158,7 +156,8 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         };
     }
 
-    protected static List<MultipleFacetsResult> getRelationAggregationResultItems(
+    protected static List<MultipleFacetsResult> getMediaRelationAggregationResultItems(
+        @Nonnull String prefix,
         @Nullable RelationFacetList requestedRelations,
         @Nonnull Filter root) {
         if (requestedRelations == null) {
@@ -168,37 +167,31 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         List<MultipleFacetsResult> answer = new ArrayList<>();
 
         for (RelationFacet facet : requestedRelations) {
-            log.debug("Handling facet {}", facet);
-            String escapedFacetName = ESFacetsBuilder.escape(facet.getName());
-            String filterName = getFilterName(facet.getName());
-            HasAggregations aggregations = root.getAggregations().get(filterName);
-            if (aggregations != null) {
-                HasAggregations filtered = aggregations.getAggregations().get(filterName);
-                HasAggregations filtered2 = filtered.getAggregations().get(filterName);
-                Terms relations = filtered2.getAggregations().get(escapedFacetName);
 
-                if (relations != null) {
+            Terms terms = ESFacetsHandler.getNestedResult(prefix,
+                "relations",
+                ESFacetsBuilder.esExtendedTextField("value", facet),
+                root,
+                facet::getName);
 
-                    AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems =
-                        new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(relations, (b) -> {
-                            //Relation relation = new Relation()
-                            return true;
-                        }) {
-                            @Override
-                            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
-                                return new TermFacetResultItem(
-                                    bucket.getKeyAsString(),
-                                    bucket.getKeyAsString(),
-                                    bucket.getDocCount()
-                                );
-                            }
-                        };
-                    answer.add(new MultipleFacetsResult(facet.getName(), resultItems));
-                }
+            if (terms != null) {
+                AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(terms) {
+                    @Override
+                    protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+                        return new TermFacetResultItem(
+                            bucket.getKeyAsString(),
+                            bucket.getKeyAsString(),
+                            bucket.getDocCount()
+                        );
+                    }
+                };
+                answer.add(new MultipleFacetsResult(facet.getName(), resultItems));
             }
         }
 
         return answer;
+
+
     }
 
     protected static List<TermFacetResultItem> getTitleAggregationResultItems(
