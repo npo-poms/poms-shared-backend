@@ -22,10 +22,7 @@ import org.junit.runners.MethodSorters;
 import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.constraint.media.AVFileExtensionConstraint;
-import nl.vpro.domain.constraint.media.BroadcasterConstraint;
-import nl.vpro.domain.constraint.media.Filter;
-import nl.vpro.domain.constraint.media.HasPredictionConstraint;
+import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
@@ -709,7 +706,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testWithMultipleFacetsAndFilters() {
+    public void testWithMultipleFacetsAndFiltersAndProfile() {
+        target.setScore(false);
 
         // for reference: These are all mids:
         // [MID-0, MID-1, MID-2, MID-3, MID-4, MID-5, MID-6, MID-7, MID-8, MID-9, MID_DRENTHE, MID_G_0, MID_G_1, MID_G_2, MID_G_3, MID_G_4, MID_G_5, MID_G_6, MID_G_7, MID_G_8, MID_G_9, MID_HIGH_SCORE, MID_SCORING_ON_DESCRIPTION, MID_WITH_LOCATION, MID_WITH_RELATIONS, POMS_S_12345, VPROWON_12346, VPROWON_12349, VPROWON_12351, VPROWON_12353, sub_group, sub_program_1, sub_program_2]
@@ -760,7 +758,12 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .build()
             )
             .build();
-        MediaSearchResult result = target.find(null, form, 0L, 100);
+
+        ProfileDefinition<MediaObject> ageRatingProfile = new ProfileDefinition<>(
+            new Filter(new Not(new AgeRatingConstraint(AgeRating._16)))
+        );
+
+        MediaSearchResult result = target.find(ageRatingProfile, form, 0L, 100);
 
 
         List<TermFacetResultItem> broadcasters = result.getFacets().getBroadcasters();
