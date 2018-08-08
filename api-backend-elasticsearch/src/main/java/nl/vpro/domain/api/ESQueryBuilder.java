@@ -476,11 +476,14 @@ public abstract class ESQueryBuilder {
         @NotNull BoolQueryBuilder booleanQuery) {
 
         BoolQueryBuilder fieldWrapper = QueryBuilders.boolQuery();
+
         buildFromList(prefix, fieldWrapper, relationSearch.getTypes(),
             new TextSingleFieldApplier<>("relations.type"));
-        buildFromList(prefix, fieldWrapper, relationSearch.getBroadcasters(), RELATIONS_APPLIER);
-        ExtendedTextMatcherList values = relationSearch.getValues();
-        //build(fieldWrapper, relationSearch.getValues(), new ExtendedTextSingleFieldApplier(prefix + "relations.value"));
+
+        buildFromList(prefix, fieldWrapper,
+            relationSearch.getBroadcasters(), RELATIONS_APPLIER);
+
+        buildFromList(prefix, fieldWrapper, relationSearch.getValues(), new ExtendedTextSingleFieldApplier(prefix + "relations.value"));
         buildFromList(prefix, fieldWrapper, relationSearch.getUriRefs(), new TextSingleFieldApplier<>("relations.uriRef"));
 
         NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + "relations", fieldWrapper, ScoreMode.Max);

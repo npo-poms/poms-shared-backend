@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -241,7 +242,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     }
 
-    protected MediaObject getMediaObject(SearchHit hit) {
+    protected MediaObject getMediaObject(
+        SearchHit hit) {
         try {
             return getObject(hit, MediaObject.class);
         } catch (IOException e) {
@@ -251,7 +253,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public MediaResult list(Order order, long offset, Integer max) {
+    public MediaResult list(
+        @Nonnull Order order,
+        long offset,
+        @Nullable  Integer max) {
         SearchRequest request = client()
             .prepareSearch(indexName)
             .setTypes(MediaESType.mediaObjects())
@@ -265,7 +270,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public MediaResult listMembers(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+    public MediaResult listMembers(
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nonnull Order order,
+        long offset,
+        @Nonnull Integer max) {
 
         Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.memberRef(media.getClass()).name(), media, profile, order, offset, max);
         List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
@@ -279,7 +289,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public MediaResult listDescendants(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+    public MediaResult listDescendants(
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nonnull Order order,
+        long offset,
+        @Nonnull Integer max) {
         SearchRequest request = client()
             .prepareSearch(indexName)
             .setTypes(MediaESType.mediaObjects())
@@ -299,7 +314,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
     @Override
-    public ProgramResult listEpisodes(MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+    public ProgramResult listEpisodes(
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nonnull Order order,
+        long offset,
+        @Nullable Integer max) {
 
         Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.episodeRef.name(), media, profile, order, offset, max);
         List<Program> objects = loadAll(Program.class, queryResult.getSecond());
@@ -312,7 +332,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return new ProgramResult(objects, offset, max, total);
     }
 
-    private Pair<Long, List<String>> listMembersOrEpisodes(String type, MediaObject media, ProfileDefinition<MediaObject> profile, Order order, long offset, Integer max) {
+    private Pair<Long, List<String>> listMembersOrEpisodes(
+        @Nonnull String type,
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nonnull Order order,
+        long offset,
+        @Nullable Integer max) {
         long offsetForES = offset;
         Integer maxForES = max;
         if (profile != null) {

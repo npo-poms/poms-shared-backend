@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -48,7 +50,8 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     @Override
     @Value("${elasticSearch.query.index}")
-    public void setIndexName(String indexName) {
+    public void setIndexName(
+        @Nonnull String indexName) {
         super.setIndexName(indexName);
     }
 

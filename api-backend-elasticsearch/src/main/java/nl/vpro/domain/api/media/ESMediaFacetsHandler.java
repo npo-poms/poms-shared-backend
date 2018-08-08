@@ -36,13 +36,15 @@ import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 @Slf4j
 public class ESMediaFacetsHandler extends ESFacetsHandler {
 
-    public static MediaFacetsResult extractFacets(
-        SearchResponse response, MediaFacets facets, MediaLoader mediaRepository) {
-        return extractFacets("", response, facets, mediaRepository);
+    public static MediaFacetsResult extractMediaFacets(
+        @Nonnull SearchResponse response,
+        @Nullable MediaFacets facets,
+        @Nonnull MediaLoader mediaRepository) {
+        return extractMediaFacets("", response, facets, mediaRepository);
     }
 
     @Nullable
-    public static MediaFacetsResult extractFacets(
+    public static MediaFacetsResult extractMediaFacets(
         @Nonnull String prefix,
         @Nonnull SearchResponse response,
         @Nullable MediaFacets request,

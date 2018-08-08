@@ -30,16 +30,16 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     protected static final String ROOT_FILTER = "mediaRootFilter";
 
 
-    public static void facets(
+    public static void mediaFacets(
         @Nonnull SearchSourceBuilder searchBuilder,
         @Nullable MediaForm form) {
-        buildFacets("", searchBuilder, form);
+        buildMediaFacets("", searchBuilder, form);
     }
 
     /**
-     * @param prefix empty string of path to this field including the last dot e.g., "embeds.media."
+     * @param prefix empty string or path to this field including the last dot e.g., "embeds.media."
      */
-    public static void buildFacets(
+    public static void buildMediaFacets(
         @Nonnull String prefix,
         @Nonnull SearchSourceBuilder searchBuilder,
         @Nullable MediaForm form) {
@@ -51,7 +51,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             // Under default ES behaviour profile filtering does not influence facet results
             if (facets.getFilter() != null) {
                 MediaSearch search = facets.getFilter();
-                //ESMediaQueryBuilder.query(prefix, search, facetRootFilter);
+                QueryBuilder query = ESMediaQueryBuilder.query(prefix, search);
+                // TODO?
             }
 
             // Append all aggregations to this filtered aggregation builder
@@ -249,10 +250,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         @Nonnull MediaSearch... mediaSearch) {
 
         for (MediaSearch search : mediaSearch) {
-            BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
-            //ESMediaQueryBuilder.query(pathPrefix, search, facetFilter);
+            QueryBuilder query = ESMediaQueryBuilder.query(pathPrefix, search);
             aggregationBuilder = AggregationBuilders
-                .filter(getFilterName(pathPrefix, facetName), facetFilter)
+                .filter(getFilterName(pathPrefix, facetName), query)
                 .subAggregation(aggregationBuilder);
         }
 

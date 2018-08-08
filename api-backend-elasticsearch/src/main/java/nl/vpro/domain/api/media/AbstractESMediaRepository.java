@@ -74,7 +74,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     @Override
     @Value("${elasticSearch.media.index}")
-    public void setIndexName(String indexName) {
+    public void setIndexName(@Nonnull String indexName) {
         super.setIndexName(indexName);
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
-        return loadAll(clazz, indexName, ids.toArray(new String[ids.size()]));
+        return loadAll(clazz, indexName, ids.toArray(new String[0]));
     }
 
 
@@ -197,7 +197,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         }
 
         if (form instanceof MediaForm) {
-            ESMediaFacetsBuilder.facets(searchBuilder, (MediaForm) form);
+            ESMediaFacetsBuilder.mediaFacets(searchBuilder, (MediaForm) form);
 
             ESMediaSortHandler.sort(searchBuilder, (MediaForm) form, mediaObject);
         }
@@ -217,11 +217,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      * @param facets The requested facets. Will not be used to change the search request, but only to properly extract the facet results
      */
     protected <S extends MediaObject> GenericMediaSearchResult<S> executeSearchRequest(
-        SearchRequest request,
-        MediaFacets facets,
+        @Nonnull SearchRequest request,
+        @Nullable MediaFacets facets,
         long offset,
-        Integer max,
-        Class<S> clazz) {
+        @Nullable Integer max,
+        @Nonnull Class<S> clazz) {
         ActionFuture<SearchResponse> searchResponseFuture = client()
             .search(request)
             ;
@@ -235,7 +235,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             List<SearchResultItem<? extends S>> adapted = adapt(hits, clazz);
 
             MediaFacetsResult facetsResult =
-                ESMediaFacetsHandler.extractFacets(response, facets, this);
+                ESMediaFacetsHandler.extractMediaFacets(response, facets, this);
             return new GenericMediaSearchResult<>(adapted, facetsResult, offset, max, hits.getTotalHits());
         } catch (TransportSerializationException e) {
             String detail = e.getDetailedMessage();
