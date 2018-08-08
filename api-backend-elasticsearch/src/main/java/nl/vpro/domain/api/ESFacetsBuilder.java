@@ -370,9 +370,16 @@ public abstract class ESFacetsBuilder {
 
 
     public static String getFilterName(
-        String prefix,
+        @Nonnull String prefix,
         @Nonnull String fieldName) {
         return escape(prefix, fieldName) + FILTER_POSTFIX;
+    }
+
+       public static String getFilterName(
+        @Nonnull String prefix,
+        @Nonnull String nestedObject,
+        @Nonnull String fieldName) {
+        return escape(prefix, getNestedFieldName(nestedObject, fieldName)) + FILTER_POSTFIX;
     }
 
     public static String getSubSearchName(

@@ -184,7 +184,7 @@ public abstract class ESFacetsHandler {
         }
 
         HasAggregations parent = root;
-        String filterName = getFilterName(pathPrefix, nestedField);
+        String filterName = getFilterName(pathPrefix, nestedField, facetField);
         HasAggregations filter = parent.getAggregations().get(filterName);
 
         if (filter != null) {
