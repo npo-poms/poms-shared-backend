@@ -8,7 +8,7 @@ public class ESFacetsBuilderTest {
 
     @Test
     public void testEscapeFacetName() throws Exception {
-        assertThat(ESFacetsBuilder.escape("Eerste componist")).isEqualTo("Eerste__componist");
+        assertThat(ESFacetsBuilder.escape("Eerste componist")).isEqualTo("Eerste/componist");
     }
 /*
     @Test(expected = UnsupportedOperationException.class)
