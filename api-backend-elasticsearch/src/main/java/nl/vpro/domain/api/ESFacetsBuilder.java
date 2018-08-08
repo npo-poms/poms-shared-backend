@@ -231,7 +231,7 @@ public abstract class ESFacetsBuilder {
 
         if (facet.hasFilter()) {
             QueryBuilder query = filterCreator.apply(facet.getFilter());
-            FilterAggregationBuilder filter = AggregationBuilders.filter(getFilterName(prefix, nestedObject + "/" +  facetField), query);
+            FilterAggregationBuilder filter = AggregationBuilders.filter(getFilterName(prefix, nestedObject, facetField), query);
             rootAggregation.subAggregation(filter);
             parent = filter;
         }

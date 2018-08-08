@@ -540,6 +540,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithGenreFacetWhenFiltered() {
+        target.setScore(false);
+
         index(program().withMid().genres(new Genre("3.0.1.1.6")).build());
         index(program().withMid().genres(new Genre("3.0.1.1.6"), new Genre("3.0.1.1.5")).build());
         index(program().withMid().genres(new Genre("3.0.1.1.7")).build());

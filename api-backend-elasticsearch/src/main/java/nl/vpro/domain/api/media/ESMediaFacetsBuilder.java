@@ -116,7 +116,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             facetField,
             rootAggregation,
             facet,
-            mediaSearch -> ESMediaFilterBuilder.filter(pathPrefix, facet.getFilter()),
+            mediaSearch -> ESMediaFilterBuilder.filter(pathPrefix, mediaSearch),
             ESMediaQueryBuilder::search
         );
 
