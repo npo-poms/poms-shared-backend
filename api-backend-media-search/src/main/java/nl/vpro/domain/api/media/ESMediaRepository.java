@@ -93,7 +93,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     @ManagedAttribute
-    public MediaObject load(String mid) {
+    public MediaObject load(@Nonnull String mid) {
         mid = redirect(mid).orElse(mid);
         return load(mid, MediaObject.class);
     }
@@ -110,15 +110,16 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public List<MediaObject> loadAll(List<String> ids) {
+    public List<MediaObject> loadAll(@Nonnull List<String> ids) {
         return loadAll(MediaObject.class, ids);
     }
 
 
     @Override
-    protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
+    protected <S extends MediaObject> List<S> loadAll(@Nonnull Class<S> clazz,
+                                                      @Nonnull List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
-        return loadAll(clazz, indexName, ids.toArray(new String[ids.size()]));
+        return loadAll(clazz, indexName, ids.toArray(new String[0]));
     }
 
 
@@ -152,12 +153,22 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public MediaSearchResult findMembers(MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max) {
+    public MediaSearchResult findMembers(
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nullable MediaForm form,
+        long offset,
+        @Nullable Integer max) {
         return findAssociated("memberOf", media, profile, form, offset, max);
     }
 
     @Override
-    public ProgramSearchResult findEpisodes(MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max) {
+    public ProgramSearchResult findEpisodes(
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nullable MediaForm form,
+        long offset,
+        @Nullable Integer max) {
         form = redirectForm(form);
         GenericMediaSearchResult<Program> result = findAssociatedMedia("episodeOf", media, profile, form, offset, max, Program.class);
         if (form != null && form.getFacets() != null) {
@@ -171,11 +182,22 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
     @Override
-    public MediaSearchResult findDescendants(MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max) {
+    public MediaSearchResult findDescendants(
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nullable MediaForm form,
+        long offset,
+        @Nullable Integer max) {
         return findAssociated("descendantOf", media, profile, form, offset, max);
     }
 
-    private MediaSearchResult findAssociated(String type, MediaObject media, ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max) {
+    private MediaSearchResult findAssociated(
+        @Nonnull String type,
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nullable MediaForm form,
+        long offset,
+        @Nullable Integer max) {
         form = redirectForm(form);
         GenericMediaSearchResult<MediaObject> result = findAssociatedMedia(type, media, profile, form, offset, max, MediaObject.class);
         if (form != null && form.getFacets() != null) {
@@ -189,10 +211,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public MediaSearchResult findRelated(
-        MediaObject media,
-        ProfileDefinition<MediaObject> profile,
-        MediaForm form,
-        Integer max) {
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nullable MediaForm form,
+        @Nullable Integer max) {
         form = redirectForm(form);
         AgeRating ageRating = media.getAgeRating();
         BoolQueryBuilder filter = QueryBuilders.boolQuery();
@@ -243,7 +265,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     protected MediaObject getMediaObject(
-        SearchHit hit) {
+        @Nonnull SearchHit hit) {
         try {
             return getObject(hit, MediaObject.class);
         } catch (IOException e) {
@@ -376,7 +398,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return Pair.of(total, mids);
     }
 
-    private <T extends MediaObject> Long filterWithProfile(List<T> objects, ProfileDefinition<MediaObject> profile, long offset, Integer max) {
+    private <T extends MediaObject> Long filterWithProfile(
+        @Nonnull List<T> objects,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        long offset,
+        @Nullable Integer max) {
         if (profile != null) {
             objects.removeIf((p) -> !profile.test(p));
             long result = objects.size();
@@ -501,7 +527,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return new MaxOffsetIterator<>(iterator, max, 0L, true);
     }
 
-    private MediaChange of(SearchHit hit) {
+    private MediaChange of(
+        @Nonnull SearchHit hit) {
         try {
             MediaObject media = getObject(hit, MediaObject.class);
             if (media == null) {
@@ -587,13 +614,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     private <S extends MediaObject> GenericMediaSearchResult<S> findAssociatedMedia(
-        String axis,
-        MediaObject media,
-        ProfileDefinition<MediaObject> profile,
-        MediaForm form,
+        @Nonnull String axis,
+        @Nonnull MediaObject media,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nullable MediaForm form,
         long offset,
-        Integer max,
-        Class<S> clazz) {
+        @Nullable Integer max,
+        @Nonnull Class<S> clazz) {
         String ref = media.getMid();
         BoolQueryBuilder booleanFilter =
             QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
@@ -603,7 +630,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return executeSearchRequest(request, form != null ? form.getFacets() : null, offset, max, clazz);
     }
 
-    private boolean hasProfileUpdate(ProfileDefinition<MediaObject> current, ProfileDefinition<MediaObject> previous) {
+    private boolean hasProfileUpdate(
+        @Nullable ProfileDefinition<MediaObject> current,
+        @Nullable ProfileDefinition<MediaObject> previous) {
         return !(current == null ? previous == null : current.equals(previous));
     }
 
