@@ -14,6 +14,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -96,6 +97,13 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     static int deletedObjectCount = 0;
     static int deletedProgramCount = 0;
     static int deletedGroupCount = 0;
+
+
+
+    @Before
+    public void init() {
+        target.setScore(true);
+    }
 
 
     /**
@@ -619,6 +627,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testWithRelations() {
+
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
         MediaSearchResult result = target.find(null, MediaFormBuilder.form().relationText(director, "Stanley Kubrick").build(), 0, null);

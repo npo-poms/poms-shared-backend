@@ -192,6 +192,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             searchBuilder.query(
                 ESMediaScoreBuilder.score(queryBuilder, Instant.now())
             );
+        } else {
+            searchBuilder.query(queryBuilder);
         }
 
         if (form instanceof MediaForm) {

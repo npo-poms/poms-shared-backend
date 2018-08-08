@@ -99,8 +99,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * @param searches The 'searches' part of a MediaForm
      */
     public static void buildMediaQuery(
-        @Nonnull String prefix,
-        @Nonnull BoolQueryBuilder booleanQuery,
+        @Nonnull final String prefix,
+        @Nonnull final BoolQueryBuilder booleanQuery,
         @Nullable final MediaSearch searches) {
 
         if (searches == null) {
@@ -272,11 +272,9 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             )
         );
 
-        {
-            if(searches.getRelations() != null) {
-                for(RelationSearch relationSearch : searches.getRelations()) {
-                    relationQuery(prefix, relationSearch, booleanQuery);
-                }
+        if(searches.getRelations() != null) {
+            for(RelationSearch relationSearch : searches.getRelations()) {
+                relationQuery(prefix, relationSearch, booleanQuery);
             }
         }
 
