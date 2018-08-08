@@ -102,6 +102,7 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static void addDateRangeFacet(
+        @Nonnull String prefix,
         @Nonnull SearchSourceBuilder searchBuilder,
         @Nonnull String fieldName,
         @Nullable DateRangeFacets<?> facet) {
@@ -112,8 +113,8 @@ public abstract class ESFacetsBuilder {
                     if (range instanceof RangeFacetItem) {
                         if (aggregationBuilder == null) {
                             aggregationBuilder = AggregationBuilders
-                                .range(fieldName)
-                                .field(fieldName)
+                                .range(prefix + fieldName)
+                                .field(prefix + fieldName)
                                 .keyed(false)
                             ;
                         }
@@ -137,7 +138,7 @@ public abstract class ESFacetsBuilder {
                         DateHistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
                             .dateHistogram(name)
                             .dateHistogramInterval(from(dateRange.getInterval()))
-                            .field(fieldName)
+                            .field(prefix + fieldName)
                             .format(format)
                             .keyed(false)
                             ;
@@ -174,6 +175,7 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static void addDurationFacet(
+        @Nonnull String prefix,
         @Nonnull SearchSourceBuilder searchBuilder,
         @Nonnull String fieldName,
         @Nullable DurationRangeFacets<?> facet) {
@@ -184,8 +186,8 @@ public abstract class ESFacetsBuilder {
                     if (range instanceof  DurationRangeFacetItem) {
                         if (aggregationBuilder == null){
                             aggregationBuilder = AggregationBuilders
-                                .range(fieldName)
-                                .field(fieldName)
+                                .range(prefix + fieldName)
+                                .field(prefix + fieldName)
                                 .keyed(true);
                         }
                         DurationRangeFacetItem durationRange = (DurationRangeFacetItem) range;
@@ -197,9 +199,9 @@ public abstract class ESFacetsBuilder {
                     } else if (range instanceof DurationRangeInterval) {
                         DurationRangeInterval durationRange = (DurationRangeInterval) range;
                         HistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
-                            .histogram(fieldName + "." + durationRange.getInterval())
+                            .histogram(prefix + fieldName + "." + durationRange.getInterval())
                             .interval(durationRange.getInterval().getDuration().toMillis())
-                            .field(fieldName)
+                            .field(prefix + fieldName)
                             .format("interval" + durationRange.getIntervalString())
                             .keyed(false);
                         searchBuilder.aggregation(histogramAggregationBuilder);
@@ -236,7 +238,7 @@ public abstract class ESFacetsBuilder {
 
 
         NestedAggregationBuilder nestedBuilder = AggregationBuilders
-            .nested(getNestedName(prefix, nestedObject, facetField), nestedObject);
+            .nested(getNestedName(prefix, nestedObject, facetField), prefix + nestedObject);
 
 
         parent.subAggregation(nestedBuilder);

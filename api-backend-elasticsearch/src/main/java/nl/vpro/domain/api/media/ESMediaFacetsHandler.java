@@ -40,15 +40,15 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
     public static MediaFacetsResult extractFacets(
         SearchResponse response, MediaFacets facets, MediaLoader mediaRepository) {
-        return extractFacets(response, facets, mediaRepository, "");
+        return extractFacets("", response, facets, mediaRepository);
     }
 
     @Nullable
     public static MediaFacetsResult extractFacets(
+        @Nonnull String prefix,
         @Nonnull SearchResponse response,
         @Nullable MediaFacets request,
-        @Nonnull MediaLoader mediaRepository,
-        @Nonnull String prefix) {
+        @Nonnull MediaLoader mediaRepository) {
         if (request == null || !request.isFaceted()) {
             return null;
 
@@ -64,12 +64,11 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 getTitleAggregationResultItems(request.getTitles(), globalFilter)
             );
             List<TermFacetResultItem> titles = facetsResult.getTitles();
-            HasAggregations aggregation = aggregations.get(getAggregationName(prefix, "titles.value.full"));
-            if (aggregation != null) {
+            StringTerms terms = aggregations.get(getAggregationName(prefix, "titles.value.full"));
+            if (terms != null) {
                 if (titles == null) {
                     titles = new ArrayList<>();
                 }
-                StringTerms terms = aggregation.getAggregations().get(prefix + "titles.value.full");
                 for (StringTerms.Bucket bucket : terms.getBuckets()) {
                     titles.add(new TermFacetResultItem(bucket.getKeyAsString(), bucket.getKeyAsString(), bucket.getDocCount()));
                 }
