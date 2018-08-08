@@ -64,27 +64,27 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                 TitleFacetList titles = facets.getTitles();
                 if (titles != null) {
                     if (titles.asMediaFacet()) {
-                        addMediaFacet(prefix, searchBuilder, "titles.value.full", titles);
+                        addMediaFacet(prefix, rootAggregation, "titles.value.full", titles);
                     }
                     addNestedTitlesAggregations(rootAggregation, titles, prefix);
                 }
 
             }
 
-            addMediaFacet(prefix, searchBuilder, "type", facets.getTypes());
+            addMediaFacet(prefix, rootAggregation, "type", facets.getTypes());
 
-            addMediaFacet(prefix, searchBuilder, "avType", facets.getAvTypes());
+            addMediaFacet(prefix, rootAggregation, "avType", facets.getAvTypes());
 
             addDateRangeFacet(prefix, searchBuilder, "sortDate", facets.getSortDates());
 
-            addMediaFacet(prefix, searchBuilder, "broadcasters.id", facets.getBroadcasters());
+            addMediaFacet(prefix, rootAggregation, "broadcasters.id", facets.getBroadcasters());
 
             addMediaNestedAggregation(prefix, "genres", "id", rootAggregation, facets.getGenres());
 
             {
                 ExtendedMediaFacet tags = facets.getTags();
                 //addFacetFilter(prefix, tags, facetRootFilter);
-                addMediaFacet(prefix, searchBuilder, esExtendedTextField("tags", tags), tags);
+                addMediaFacet(prefix, rootAggregation, esExtendedTextField("tags", tags), tags);
             }
             addDurationFacet(prefix, searchBuilder, "duration", facets.getDurations());
 
@@ -97,9 +97,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             addNestedRelationAggregationsRelationSearch(prefix, "value", rootAggregation, facets.getRelations());
 
-            addMediaFacet(prefix, searchBuilder, "ageRating", facets.getAgeRatings());
+            addMediaFacet(prefix, rootAggregation, "ageRating", facets.getAgeRatings());
 
-            addMediaFacet(prefix, searchBuilder, "contentRatings",  facets.getContentRatings());
+            addMediaFacet(prefix, rootAggregation, "contentRatings",  facets.getContentRatings());
 
         }
     }
@@ -241,12 +241,12 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
     protected static void addMediaFacet(
         @NotNull String prefix,
-        @Nonnull SearchSourceBuilder searchBuilder,
+        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nonnull String fieldName,
         @Nullable LimitableFacet<MediaSearch> facet) {
         ESFacetsBuilder.addFacet(
             prefix,
-            searchBuilder,
+            rootAggregation,
             fieldName,
             facet,
             (boolQueryBuilder, mediaSearch) -> ESMediaQueryBuilder.buildMediaQuery(prefix, boolQueryBuilder, mediaSearch));

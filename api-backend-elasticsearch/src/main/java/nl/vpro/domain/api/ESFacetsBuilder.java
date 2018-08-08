@@ -50,7 +50,7 @@ public abstract class ESFacetsBuilder {
 
     protected static <T extends AbstractSearch> TermsAggregationBuilder addFacet(
         @Nonnull String prefix,
-        @Nonnull  SearchSourceBuilder searchBuilder,
+        @Nonnull  FilterAggregationBuilder rootAggregation,
         @Nonnull  String fieldName,
         @Nullable LimitableFacet<T> facet,
         @Nonnull BiConsumer<BoolQueryBuilder, T> buildFilter
@@ -88,9 +88,9 @@ public abstract class ESFacetsBuilder {
                 FilterAggregationBuilder filterAggregationBuilder =
                     AggregationBuilders.filter(getFilterName(prefix, fieldName), query);
                 filterAggregationBuilder.subAggregation(aggregationBuilder);
-                searchBuilder.aggregation(filterAggregationBuilder);
+                rootAggregation.subAggregation(filterAggregationBuilder);
             } else {
-                searchBuilder.aggregation(aggregationBuilder);
+                rootAggregation.subAggregation(aggregationBuilder);
             }
 
 
