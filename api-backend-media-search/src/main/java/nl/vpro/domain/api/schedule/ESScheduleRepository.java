@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nonnull;
@@ -230,13 +229,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
             toExecute = simplifyQuery(query);
         }
-        Long total;
-        try {
-            total = executeCount(toExecute, getIndexName());
-        } catch(InterruptedException | ExecutionException e) {
-            log.error(e.getMessage(), e);
-            total = null;
-        }
+        final Long total = executeCount(toExecute, getIndexName());
 
         ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject);
         SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
