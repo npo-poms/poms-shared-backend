@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
@@ -214,7 +215,7 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-    protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
+     protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
         @Nonnull String prefix,
         @Nonnull String nestedObject,
         @Nonnull String facetField,
@@ -222,23 +223,45 @@ public abstract class ESFacetsBuilder {
         @Nullable SearchableLimitableFacet<F, S> facet,
         @Nonnull Function<F, QueryBuilder> filterCreator,
         @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
+        addNestedAggregation(
+            prefix,
+            nestedObject,
+            facetField,
+            rootAggregation,
+            facet,
+            filterCreator,
+            subSearchCreator,
+            () -> getName(facet, nestedObject, facetField)
+        );
+     }
+
+    protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
+        @Nonnull String prefix,
+        @Nonnull String nestedObject,
+        @Nonnull String facetField,
+        @Nonnull FilterAggregationBuilder rootAggregation,
+        @Nullable SearchableLimitableFacet<F, S> facet,
+        @Nonnull Function<F, QueryBuilder> filterCreator,
+        @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator,
+        @Nonnull Supplier<String> nameSupplier) {
         if (facet == null) {
             return;
         }
 
         AggregationBuilder parent = rootAggregation;
 
+        String name = nameSupplier.get();
 
         if (facet.hasFilter()) {
             QueryBuilder query = filterCreator.apply(facet.getFilter());
-            FilterAggregationBuilder filter = AggregationBuilders.filter(getFilterName(prefix, nestedObject, facetField), query);
+            FilterAggregationBuilder filter = AggregationBuilders.filter(getFilterName(prefix, name), query);
             rootAggregation.subAggregation(filter);
             parent = filter;
         }
 
 
         NestedAggregationBuilder nestedBuilder = AggregationBuilders
-            .nested(getNestedName(prefix, nestedObject, facetField), prefix + nestedObject);
+            .nested(getNestedName(prefix, name), prefix + nestedObject);
 
 
         parent.subAggregation(nestedBuilder);
@@ -248,7 +271,7 @@ public abstract class ESFacetsBuilder {
         // If the facet has a subsearch we need to wrap this aggregation in another one, which a filter.
         if (facet.hasSubSearch()) {
             QueryBuilder query = subSearchCreator.apply(facet.getSubSearch(), nestedObject, facetField);
-            FilterAggregationBuilder subsearch = AggregationBuilders.filter(getSubSearchName(prefix, nestedObject, facetField), query);
+            FilterAggregationBuilder subsearch = AggregationBuilders.filter(getSubSearchName(prefix, name), query);
             parent.subAggregation(subsearch);
             parent = subsearch;
         }
@@ -259,59 +282,24 @@ public abstract class ESFacetsBuilder {
             prefix,
             nestedObject,
             facetField,
-            facet);
+            facet,
+            nameSupplier);
         parent.subAggregation(terms);
 
     }
 
 
 
-
-    protected static NestedAggregationBuilder getNestedBuilder(
-        @Nonnull String pathPrefix,
-        @Nonnull String nestedField,
-        @Nonnull String facetField,
-        @Nullable QueryBuilder subSearch,
-        @Nonnull AggregationBuilder... subAggregations) {
-
-
-        NestedAggregationBuilder nestedBuilder = AggregationBuilders
-            .nested(getNestedName(pathPrefix, nestedField, facetField), pathPrefix + nestedField)
-            ;
-
-        if(subSearch != null) {
-            FilterAggregationBuilder filteredAggregation = AggregationBuilders
-                .filter(getSubSearchName(pathPrefix, getNestedFieldName(nestedField, facetField)), subSearch);
-
-            addSubAggregations(filteredAggregation, subAggregations);
-
-            nestedBuilder.subAggregation(filteredAggregation);
-        } else {
-            addSubAggregations(nestedBuilder, subAggregations);
-        }
-        return nestedBuilder;
-    }
-
-    private static void addSubAggregations(
-        @Nonnull AggregationBuilder rootAggregation,
-        @Nonnull AggregationBuilder... subAggregations) {
-        for(AggregationBuilder subAggregation : subAggregations) {
-            rootAggregation.subAggregation(subAggregation);
-        }
-    }
-
-
     protected static TermsAggregationBuilder getFilteredTermsBuilder(
         @Nonnull  String pathPrefix,
         @Nonnull  String nestedField,
         @Nonnull  String facetField,
-        @Nonnull  LimitableFacet<?> facet) {
+        @Nonnull  LimitableFacet<?> facet,
+        @Nonnull Supplier<String> nameSupplier) {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
-        String aggregationName = facet instanceof Nameable ?
-            ((Nameable) facet).getName() :
-            getAggregationName(pathPrefix, nestedField, facetField);
+        String aggregationName = getAggregationName(pathPrefix, nameSupplier.get());
 
         TermsAggregationBuilder termsBuilder =
             AggregationBuilders.terms(aggregationName)
@@ -348,71 +336,57 @@ public abstract class ESFacetsBuilder {
     }
 
     public static String getAggregationName(
-        @Nonnull String fieldName) {
-        return getAggregationName("", fieldName);
+        @Nonnull String name) {
+        return getAggregationName("", name);
     }
 
      public static String getAggregationName(
          String prefix,
-         @Nonnull String fieldName) {
-        return escape(prefix, fieldName) + FACET_POSTFIX;
+         @Nonnull String name) {
+        return escape(prefix, name) + FACET_POSTFIX;
     }
 
 
-    public static String getAggregationName(
-         String prefix,
-         @Nonnull String nestedObject,
-         @Nonnull String fieldName) {
-        return escape(prefix, getNestedFieldName(nestedObject, fieldName)) + FACET_POSTFIX;
-    }
     public static String getFilterName(
-        @Nonnull String fieldName) {
-        return getFilterName("", fieldName);
+        @Nonnull String name) {
+        return getFilterName("", name);
     }
 
 
     public static String getFilterName(
         @Nonnull String prefix,
-        @Nonnull String fieldName) {
-        return escape(prefix, fieldName) + FILTER_POSTFIX;
+        @Nonnull String name) {
+        return escape(prefix, name) + FILTER_POSTFIX;
     }
 
-       public static String getFilterName(
-        @Nonnull String prefix,
-        @Nonnull String nestedObject,
-        @Nonnull String fieldName) {
-        return escape(prefix, getNestedFieldName(nestedObject, fieldName)) + FILTER_POSTFIX;
-    }
 
     public static String getSubSearchName(
-        @Nonnull String fieldName) {
-        return getSubSearchName("", fieldName);
+        @Nonnull String name) {
+        return getSubSearchName("", name);
     }
 
 
     public static String getSubSearchName(
         @Nonnull String prefix,
-        @Nonnull String fieldName) {
-        return escape(prefix, fieldName) + SUBSEARCH_POSTFIX;
+        @Nonnull String name) {
+        return escape(prefix, name) + SUBSEARCH_POSTFIX;
     }
 
-    public static String getSubSearchName(
-        @Nonnull String prefix,
-        @Nonnull String nestedObject,
-        @Nonnull String fieldName) {
-        return escape(prefix, getNestedFieldName(nestedObject, fieldName)) + SUBSEARCH_POSTFIX;
-    }
 
     public static String getNestedName(
         @Nullable String prefix,
-        @Nonnull String nestedField,
-        @Nonnull String fieldName) {
-        return escape(prefix, getNestedFieldName(nestedField, fieldName)) + NESTED_POSTFIX;
+        @Nonnull String name) {
+        return escape(prefix, name) + NESTED_POSTFIX;
     }
+
     public static String getNestedFieldName(
         @Nonnull String nestField,
         @Nonnull String fieldName) {
         return nestField + "." + fieldName;
+    }
+
+    public static String getName(Facet facet, String nestedObject, String facetField) {
+        return facet instanceof Nameable ? ((Nameable) facet).getName() : getNestedFieldName(nestedObject, facetField);
     }
 
 

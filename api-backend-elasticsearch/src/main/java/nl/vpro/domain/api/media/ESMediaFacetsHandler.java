@@ -27,6 +27,7 @@ import nl.vpro.domain.api.TermFacetResultItem;
 import nl.vpro.domain.media.*;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.getAggregationName;
+import static nl.vpro.domain.api.ESFacetsBuilder.getNestedFieldName;
 import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 
 /**
@@ -107,7 +108,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             return null;
         }
 
-        Terms ids = getNestedResult(prefix, "genres", "id", root);
+        Terms ids = getNestedResult(prefix, root, () -> getNestedFieldName("genres", "id"));
 
         if (ids == null) {
             return null;
@@ -138,7 +139,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         String nestedFacet = "midRef";
 
-        Terms midRefs = getNestedResult(prefix, nestedObject, nestedFacet, root);
+        Terms midRefs = getNestedResult(prefix, root,  () -> getNestedFieldName(nestedObject, "midRef"));
 
         if (midRefs == null) {
             return null;
@@ -171,8 +172,6 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
         for (RelationFacet facet : requestedRelations) {
 
             Terms terms = ESFacetsHandler.getNestedResult(prefix,
-                "relations",
-                ESFacetsBuilder.esExtendedTextField("value", facet),
                 root,
                 facet::getName);
 

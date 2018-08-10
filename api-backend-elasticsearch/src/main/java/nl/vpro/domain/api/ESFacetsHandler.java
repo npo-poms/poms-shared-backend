@@ -170,55 +170,39 @@ public abstract class ESFacetsHandler {
         return filter.getAggregations().get(facetName);
     }
 
-    protected static <T extends Aggregation> T getNestedResult(
-         @Nonnull  String nestedField,
-        @Nonnull  String facetField,
-        @Nullable  HasAggregations root) {
-        return getNestedResult("", nestedField, facetField, root);
-    }
-
 
     protected static <T extends Aggregation> T getNestedResult(
         @Nonnull String pathPrefix,
-        @Nonnull  String nestedField,
-        @Nonnull  String facetField,
         @Nullable  HasAggregations root,
         @Nonnull Supplier<String> aggregationName) {
         if(root == null) {
             return null;
         }
 
+        String name = aggregationName.get();
         HasAggregations parent = root;
-        String filterName = getFilterName(pathPrefix, nestedField, facetField);
+        String filterName = getFilterName(pathPrefix, name);
         HasAggregations filter = parent.getAggregations().get(filterName);
 
         if (filter != null) {
             parent = filter;
         }
 
-        String nestedName = getNestedName(pathPrefix, nestedField, facetField);
+        String nestedName = getNestedName(pathPrefix, name);
         parent =  parent.getAggregations().get(nestedName);
 
         if (parent == null) {
             return null;
         }
 
-        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(pathPrefix, getNestedFieldName(nestedField, facetField)));
+        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(pathPrefix, name));
         if (subSearch != null) {
             parent = subSearch;
         }
 
-        return parent.getAggregations().get(aggregationName.get());
+        return parent.getAggregations().get(getAggregationName(pathPrefix, name));
     }
 
-    protected static <T extends Aggregation> T getNestedResult(
-        @Nonnull String pathPrefix,
-        @Nonnull  String nestedField,
-        @Nonnull  String facetField,
-        @Nullable  HasAggregations root) {
-
-        return getNestedResult(pathPrefix, nestedField, facetField, root, () -> getAggregationName(pathPrefix, nestedField, facetField));
-    }
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
         DateRangeFacets<?> dateRangeFacets,

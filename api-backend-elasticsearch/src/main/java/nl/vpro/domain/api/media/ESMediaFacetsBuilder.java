@@ -200,7 +200,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             rootAggregation,
             facet,
             (s) -> ESMediaFilterBuilder.filter(prefix, s),
-            (relationSearch, no, ff) -> ESMediaFilterBuilder.filterRelations(prefix, relationSearch)
+            (relationSearch, no, ff) -> ESMediaFilterBuilder.filterRelations(prefix, relationSearch),
+            facet::getName
         );
      }
 
@@ -240,7 +241,12 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         @Nonnull RelationFacet facet,
         @Nonnull QueryBuilder subSearch
     ) {
-        return getFilteredTermsBuilder(pathPrefix, nestedField, esExtendedTextField(facetField, facet.isCaseSensitive()), facet);
+        return getFilteredTermsBuilder(
+            pathPrefix, nestedField, esExtendedTextField(facetField, facet.isCaseSensitive()),
+            facet,
+            facet::getName
+
+        );
     }
 
     private static AggregationBuilder filterAggregation(
