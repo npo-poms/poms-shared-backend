@@ -95,7 +95,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             addNestedAggregationMemberRefSearch(prefix, "memberOf", "midRef", rootAggregation, facets.getMemberOf());
 
-            addNestedRelationAggregations(prefix, "value", rootAggregation, facets.getRelations());
+            addMediaNestedRelationAggregations(prefix, rootAggregation, facets.getRelations());
 
             addMediaFacet(prefix, rootAggregation, "ageRating", facets.getAgeRatings());
 
@@ -141,48 +141,22 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
     }
 
-    protected static void addNestedRelationAggregations(
-        @Nonnull String pathPrefix,
-        @Nonnull String facetField,
+
+    protected static void addMediaNestedRelationAggregations(
+        @Nonnull String prefix,
         @Nonnull FilterAggregationBuilder rootAggregation,
         @Nullable RelationFacetList facets) {
         if (facets == null || facets.isEmpty()) {
             return;
         }
 
-        // for all relation search
-        RelationSearch allRelationsFacetsSubSearch = facets.getSubSearch();
-
+        RelationSearch subSearch = facets.getSubSearch();
         for (RelationFacet facet : facets) {
-            addMediaNestedRelationAggregation(pathPrefix,"relations", esExtendedTextField("value", facet), rootAggregation, allRelationsFacetsSubSearch, facet);
-
-            BoolQueryBuilder facetFilter = QueryBuilders.boolQuery();
-            if (facet.hasSubSearch()) {
-                ESQueryBuilder.relationQuery(pathPrefix, facet.getSubSearch(), facetFilter);
-            }
-            if (allRelationsFacetsSubSearch != null) {
-                ESQueryBuilder.relationQuery(pathPrefix, allRelationsFacetsSubSearch,  facetFilter);
-            }
-            AggregationBuilder termsBuilder = getFilteredRelationTermsBuilder(
-                pathPrefix,
-                "relations",
-                facetField,
-                facet,
-                facetFilter
-            );
-
-            String facetName = escape(facet.getName());
-            AggregationBuilder builder = filterAggregation(
-                pathPrefix,
-                facetName,
-                termsBuilder,
-                facet.getFilter(),
-                facets.getFilter()
-            );
-            log.debug("Added aggregation {}", builder);
-            rootAggregation.subAggregation(builder);
-        }
+            addMediaNestedRelationAggregation(prefix, "relations", esExtendedTextField("value", facet), rootAggregation, subSearch, facet);
+      }
     }
+
+
      protected static void addMediaNestedRelationAggregation(
          @Nonnull String prefix,
          @Nonnull  String nestedObject,

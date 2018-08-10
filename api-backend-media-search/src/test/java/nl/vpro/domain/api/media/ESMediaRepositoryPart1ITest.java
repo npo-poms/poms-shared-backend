@@ -672,6 +672,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithRelationFacet() {
+        target.setScore(false);
+
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
         index(program().withMid().relations(new Relation(label, null, "Blue Note")).build());
