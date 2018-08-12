@@ -849,7 +849,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         target.setScore(false);
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
-        index(program().withMid().relations(new Relation(label, null, "Blue Note")).build());
+        index(program().withMid()
+            .relations(
+                new Relation(label, null, "Blue Note"),
+                new Relation(eoLabel, null, "Genesis")
+            ).build());
         index(program().withMid().relations(new Relation(eoLabel, null, "Evangelisch")).build());
 
         RelationFacet relationFacet = RelationFacet.builder()
@@ -869,6 +873,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(relations).hasSize(1);
         assertThat(relations.get(0).getName()).isEqualTo("test");
         assertThat(relations.get(0)).hasSize(1);
+        assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("Blue Note");
+        assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(1);
+
     }
 
     @Test
