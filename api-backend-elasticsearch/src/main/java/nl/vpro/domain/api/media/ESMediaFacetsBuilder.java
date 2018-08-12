@@ -152,7 +152,14 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
         RelationSearch subSearch = facets.getSubSearch();
         for (RelationFacet facet : facets) {
-            addMediaNestedRelationAggregation(prefix, "relations", esExtendedTextField("value", facet), rootAggregation, subSearch, facet);
+            addMediaNestedRelationAggregation(
+                prefix,
+                "relations",
+                esExtendedTextField("value", facet),
+                rootAggregation,
+                subSearch,
+                facet
+            );
       }
     }
 

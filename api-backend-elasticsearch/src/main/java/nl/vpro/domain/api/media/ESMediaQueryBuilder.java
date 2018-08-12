@@ -275,6 +275,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         if(searches.getRelations() != null) {
             for(RelationSearch relationSearch : searches.getRelations()) {
                 relationQuery(prefix, relationSearch, booleanQuery);
+
             }
         }
 

@@ -470,25 +470,39 @@ public abstract class ESQueryBuilder {
      *
      * @param prefix not null path to the media node in the documents to search, including the last dot, can be blank
      */
-    public static void relationQuery(
+    public static void relationNestedQuery(
         @NotNull String prefix,
         @NotNull AbstractRelationSearch relationSearch,
         @NotNull BoolQueryBuilder booleanQuery) {
 
         BoolQueryBuilder fieldWrapper = QueryBuilders.boolQuery();
-
-        buildFromList(prefix, fieldWrapper, relationSearch.getTypes(),
-            new TextSingleFieldApplier<>("relations.type"));
-
-        buildFromList(prefix, fieldWrapper,
-            relationSearch.getBroadcasters(), RELATIONS_APPLIER);
-
-        buildFromList(prefix, fieldWrapper, relationSearch.getValues(), new ExtendedTextSingleFieldApplier(prefix + "relations.value"));
-        buildFromList(prefix, fieldWrapper, relationSearch.getUriRefs(), new TextSingleFieldApplier<>("relations.uriRef"));
+        relationQuery(prefix, relationSearch, fieldWrapper);
 
         NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + "relations", fieldWrapper, ScoreMode.Max);
 
         apply(booleanQuery, nestedQuery, relationSearch.getMatch());
+    }
+
+     /**
+     * Builds a relation relationQuery for standalone or embedded media media when the prefix argument is left blank.
+     *
+     * @param prefix not null path to the media node in the documents to search, including the last dot, can be blank
+     */
+    public static void relationQuery(
+        @NotNull String prefix,
+        @NotNull AbstractRelationSearch relationSearch,
+        @NonNull BoolQueryBuilder boolQueryBuilder) {
+
+
+
+        buildFromList(prefix, boolQueryBuilder, relationSearch.getTypes(),
+            new TextSingleFieldApplier<>("relations.type"));
+
+        buildFromList(prefix, boolQueryBuilder,
+            relationSearch.getBroadcasters(), RELATIONS_APPLIER);
+
+        buildFromList(prefix, boolQueryBuilder, relationSearch.getValues(), new ExtendedTextSingleFieldApplier(prefix + "relations.value"));
+        buildFromList(prefix, boolQueryBuilder, relationSearch.getUriRefs(), new TextSingleFieldApplier<>("relations.uriRef"));
     }
 
 

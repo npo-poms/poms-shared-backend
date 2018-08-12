@@ -47,7 +47,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     }
 
 
-      public static QueryBuilder filterRelations(
+      public static QueryBuilder filterRelationsNested(
           @Nonnull String prefix,
           @Nullable RelationSearch relationSearch) {
           if (relationSearch == null) {
@@ -55,8 +55,20 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
           }
 
           BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
-          ESQueryBuilder.relationQuery("", relationSearch, booleanFilter);
+          ESQueryBuilder.relationNestedQuery(prefix, relationSearch, booleanFilter);
           return ESQueryBuilder.simplifyQuery(booleanFilter);
+      }
+
+       public static QueryBuilder filterRelations(
+          @Nonnull String prefix,
+          @Nullable RelationSearch relationSearch) {
+          if (relationSearch == null) {
+              return QueryBuilders.matchAllQuery();
+          }
+
+          BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+          ESQueryBuilder.relationQuery(prefix, relationSearch, boolQueryBuilder);
+          return ESQueryBuilder.simplifyQuery(boolQueryBuilder);
       }
 
 

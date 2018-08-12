@@ -859,6 +859,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         RelationSearch search = new RelationSearch();
         search.setBroadcasters(TextMatcherList.must(TextMatcher.must("VPRO")));
         relationFacet.setSubSearch(search);
+
         MediaForm form = form().relationsFacet(relationFacet).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
