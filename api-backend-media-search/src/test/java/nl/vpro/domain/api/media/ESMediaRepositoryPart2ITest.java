@@ -775,7 +775,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         MediaSearchResult result = target.find(ageRatingProfile, form, 0L, 100);
 
 
-        List<TermFacetResultItem> broadcasters = result.getFacets().getBroadcasters();
+        List<TermFacetResultItem> broadcasters = result
+            .getFacets()
+            .getBroadcasters();
         assertThat(broadcasters).isNotNull();
         long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
         // 3 with BNN + 3 with AVRO + 1 with OMROEP0, 1 with OMROEP2, 0 with OMROEP1, total 9.

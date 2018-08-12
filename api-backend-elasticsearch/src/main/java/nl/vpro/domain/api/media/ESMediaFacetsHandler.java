@@ -73,28 +73,72 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 for (StringTerms.Bucket bucket : terms.getBuckets()) {
                     titles.add(new TermFacetResultItem(bucket.getKeyAsString(), bucket.getKeyAsString(), bucket.getDocCount()));
                 }
-
             }
 
 
-            facetsResult.setTypes(getFacetResultItemsForEnum(prefix, "type", request.getTypes(), rootFilter, MediaType.class));
-            facetsResult.setAvTypes(getFacetResultItemsForEnum(prefix, "avType", request.getAvTypes(), rootFilter, AVType.class));
-            facetsResult.setSortDates(getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response));
+            facetsResult.setTypes(
+                getFacetResultItemsForEnum(prefix, "type", request.getTypes(), rootFilter, MediaType.class)
+            );
+
+            facetsResult.setAvTypes(
+                getFacetResultItemsForEnum(prefix, "avType", request.getAvTypes(), rootFilter, AVType.class)
+            );
+
+            facetsResult.setSortDates(
+                getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response)
+            );
+
             facetsResult.setBroadcasters(
                 filterThreshold(
-                    getBroadcasterResultItems(prefix, "broadcasters.id", rootFilter), request.getBroadcasters()));
-            facetsResult.setTags(getFacetResultItems(prefix, "tags", rootFilter, request.getTags()));
-            facetsResult.setDurations(getDurationRangeFacetResultItems(request.getDurations(), prefix + "duration", response));
-            facetsResult.setAgeRatings(getFacetResultItemsForEnum(prefix, "ageRating", request.getAgeRatings(), rootFilter, AgeRating.class, s -> AgeRating.xmlValueOf(s.toUpperCase()), AgeRating::getXmlValue));
-            facetsResult.setContentRatings(getFacetResultItemsForEnum(prefix, "contentRatings", request.getContentRatings(), rootFilter, ContentRating.class));
+                    getBroadcasterResultItems(prefix, rootFilter),
+                    request.getBroadcasters()
+                )
+            );
 
+            facetsResult.setTags(
+                getFacetResultItems(prefix, "tags", rootFilter, request.getTags())
+            );
 
-            facetsResult.setGenres(getGenreAggregationResultItems(prefix, rootFilter));
+            facetsResult.setDurations(
+                getDurationRangeFacetResultItems(request.getDurations(), prefix + "duration", response)
+            );
 
-            facetsResult.setDescendantOf(getMemberRefAggregationResultItems(prefix, "descendantOf", mediaRepository, rootFilter));
-            facetsResult.setEpisodeOf(getMemberRefAggregationResultItems(prefix, "episodeOf", mediaRepository, rootFilter));
-            facetsResult.setMemberOf(getMemberRefAggregationResultItems(prefix, "memberOf", mediaRepository, rootFilter));
-            facetsResult.setRelations(getMediaRelationAggregationResultItems(prefix, request.getRelations(), rootFilter));
+            facetsResult.setAgeRatings(
+                getFacetResultItemsForEnum(
+                    prefix, "ageRating",
+                    request.getAgeRatings(),
+                    rootFilter,
+                    AgeRating.class,
+                    s -> AgeRating.xmlValueOf(s.toUpperCase()),
+                    AgeRating::getXmlValue)
+            );
+            facetsResult.setContentRatings(
+                getFacetResultItemsForEnum(prefix, "contentRatings",
+                    request.getContentRatings(),
+                    rootFilter,
+                    ContentRating.class
+                )
+            );
+
+            facetsResult.setGenres(
+                getGenreAggregationResultItems(prefix, rootFilter)
+            );
+
+            facetsResult.setDescendantOf(
+                getMemberRefAggregationResultItems(prefix, "descendantOf", mediaRepository, rootFilter)
+            );
+
+            facetsResult.setEpisodeOf(
+                getMemberRefAggregationResultItems(prefix, "episodeOf", mediaRepository, rootFilter)
+            );
+
+            facetsResult.setMemberOf(
+                getMemberRefAggregationResultItems(prefix, "memberOf", mediaRepository, rootFilter)
+            );
+
+            facetsResult.setRelations(
+                getMediaRelationAggregationResultItems(prefix, request.getRelations(), rootFilter)
+            );
 
         }
         return facetsResult;

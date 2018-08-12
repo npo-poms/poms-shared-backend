@@ -41,14 +41,26 @@ import static nl.vpro.domain.api.ESFacetsBuilder.*;
 public abstract class ESFacetsHandler {
 
 
-
-
     protected static <A extends Aggregation> A getAggregation(
         @Nonnull String prefix,
-        @Nonnull String fieldName,
-        @Nonnull Aggregations facets) {
-        String facetName = getAggregationName(prefix, fieldName);
-        A facet = facets.get(facetName);
+        @Nonnull String name,
+        @Nullable HasAggregations facets) {
+        if (facets == null) {
+            return null;
+        }
+        HasAggregations root = facets;
+        String filterName = getFilterName(prefix, name);
+        HasAggregations filter = root.getAggregations().get(filterName);
+        if (filter != null) {
+            root = filter;
+        }
+        String subSearchName = getSubSearchName(prefix, name);
+        HasAggregations subSearch = root.getAggregations().get(subSearchName);
+        if (subSearch != null) {
+            root = subSearch;
+        }
+        String facetName = getAggregationName(prefix, name);
+        A facet = root.getAggregations().get(facetName);
         if(facet == null) {
             return null;
         }
@@ -59,7 +71,7 @@ public abstract class ESFacetsHandler {
     protected static List<TermFacetResultItem> getFacetResultItems(
         @Nonnull String prefix,
         @Nonnull String fieldName,
-        @Nullable Aggregations facets) {
+        @Nullable HasAggregations facets) {
         if(facets != null) {
 
             MultiBucketsAggregation a = getAggregation(prefix, fieldName, facets);
@@ -77,8 +89,11 @@ public abstract class ESFacetsHandler {
         HasAggregations rootFilter,
         @Nullable ExtendedTextFacet<?> extendedTextFacet) {
         if (extendedTextFacet != null) {
-            Aggregations facets = rootFilter == null ? null : rootFilter.getAggregations();
-            return getFacetResultItems(prefix, esExtendedTextField(fieldName, extendedTextFacet.isCaseSensitive()), facets);
+            return getFacetResultItems(
+                prefix,
+                esExtendedTextField(fieldName, extendedTextFacet.isCaseSensitive()),
+                rootFilter
+            );
         } else {
             return null;
         }
@@ -93,10 +108,9 @@ public abstract class ESFacetsHandler {
         @Nonnull Class<T> enumClass,
         @Nonnull Function<String, T> valueOf,
         @Nonnull Function<T, String> xmlId) {
-        Aggregations facets = rootFilter == null ? null : rootFilter.getAggregations();
-        if(facets != null && requestFacet != null) {
+        if(requestFacet != null) {
 
-            MultiBucketsAggregation facet = getAggregation(prefix, fieldName, facets);
+            MultiBucketsAggregation facet = getAggregation(prefix, fieldName, rootFilter);
             if(facet == null) {
                 return null;
             }
@@ -122,17 +136,18 @@ public abstract class ESFacetsHandler {
         @Nullable TextFacet<?> requestedFacet,
         @Nonnull HasAggregations facets,
         @Nonnull final Class<T> enumClass) {
-        return getFacetResultItemsForEnum(prefix, fieldName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name);
+        return getFacetResultItemsForEnum(
+            prefix, fieldName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name
+        );
     }
 
     protected static List<TermFacetResultItem> getBroadcasterResultItems(
         @Nonnull String prefix,
-        @Nonnull String fieldName,
         @Nullable HasAggregations facets) {
         if (facets == null) {
             return null;
         }
-        Terms aggregation = getAggregation(prefix, fieldName, facets.getAggregations());
+        Terms aggregation = getAggregation(prefix, "broadcasters.id", facets);
         if(aggregation == null) {
             return null;
         }
@@ -146,7 +161,9 @@ public abstract class ESFacetsHandler {
         };
     }
 
-    protected static Terms getFilteredTerms(@Nonnull String facetName, Aggregation root) {
+    protected static Terms getFilteredTerms(
+        @Nonnull String facetName,
+        Aggregation root) {
         if(root == null) {
             return null;
         }
