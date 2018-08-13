@@ -29,6 +29,7 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.TextualType;
 import nl.vpro.domain.user.Broadcaster;
+import nl.vpro.domain.user.Portal;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
@@ -441,7 +442,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaSearchResult result = target.find(null, form, 0, null);
 
         for (SearchResultItem<? extends MediaObject> mo : result) {
-            System.out.println(mo.getResult().getDuration());
+            log.info("{} {}", mo.getResult().getMid(), mo.getResult().getDuration());
         }
 
         assertThat(result.getFacets().getDurations()).isNotEmpty();
@@ -449,10 +450,36 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(result.getFacets().getDurations().get(0).getCount()).isEqualTo(2);
         assertThat(result.getFacets().getDurations().get(1).getCount()).isEqualTo(1);
-
-
-
     }
+
+    @Test
+    public void testFindWithDurationFacetHistogramAndProfile() {
+        index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)).build());
+        index(program().withMid().portalRestrictions(PortalRestriction.builder().portal(Portal.builder().id("eo").build()).build()).duration(Duration.of(1, ChronoUnit.HOURS)).build());
+        index(program().withMid().duration(Duration.of(2, ChronoUnit.HOURS)).build());
+
+        DurationRangeInterval interval = new DurationRangeInterval("1 hour");
+        MediaForm form = form()
+            .durationFacet(interval)
+            .build();
+
+
+        ProfileDefinition<MediaObject> notExclusive = new ProfileDefinition<>(
+            new Filter(new Not(new HasPortalRestrictionConstraint()))
+        );
+        MediaSearchResult result = target.find(notExclusive, form, 0, null);
+
+        for (SearchResultItem<? extends MediaObject> mo : result) {
+            log.info("{} {}", mo.getResult().getMid(), mo.getResult().getDuration());
+        }
+
+        assertThat(result.getFacets().getDurations()).isNotEmpty();
+        assertThat(result.getFacets().getDurations()).hasSize(2);
+
+        assertThat(result.getFacets().getDurations().get(0).getCount()).isEqualTo(1);
+        assertThat(result.getFacets().getDurations().get(1).getCount()).isEqualTo(1);
+    }
+
 
 
     @Test
