@@ -38,7 +38,8 @@ public enum MediaESType {
 
     public static final MediaESType[] NON_REFS = Stream.concat(
         Arrays.stream(MEDIAOBJECTS),
-        Arrays.stream(DELETED_MEDIAOBJECTS)).toArray(MediaESType[]::new);
+        Arrays.stream(DELETED_MEDIAOBJECTS)
+    ).toArray(MediaESType[]::new);
 
     public static String[] toString(MediaESType... types) {
         return Arrays.stream(types)
