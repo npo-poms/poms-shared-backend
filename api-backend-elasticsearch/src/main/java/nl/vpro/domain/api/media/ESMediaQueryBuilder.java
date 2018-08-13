@@ -82,7 +82,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * @param searches or <code>null</code> (resulting in a matchAllQuery)
      */
     public static QueryBuilder query(
-        @Nonnull String prefix, MediaSearch searches) {
+        @Nonnull String prefix,
+        MediaSearch searches) {
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
         }

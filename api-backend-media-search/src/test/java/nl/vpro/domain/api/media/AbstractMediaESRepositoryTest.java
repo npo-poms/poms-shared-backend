@@ -3,6 +3,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
 import nl.vpro.elasticsearch.ESClientFactory;
@@ -30,9 +31,10 @@ public class AbstractMediaESRepositoryTest {
     @Test
     public void searchRequest() {
 
-        SearchRequest sr = repository.searchRequest(
+        SearchRequest sr = repository.mediaSearchRequest(
             null,
             MediaForm.builder().withEverything().build(),
+            QueryBuilders.boolQuery(),
             0, 0);
         log.info(sr.toString());
 

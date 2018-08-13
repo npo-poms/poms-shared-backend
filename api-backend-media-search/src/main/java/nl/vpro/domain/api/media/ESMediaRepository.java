@@ -132,8 +132,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         form = redirectForm(form);
 
-        SearchRequest request = searchRequest(
-            profile, form, offset, max
+        BoolQueryBuilder rootFilter = QueryBuilders.boolQuery();
+
+
+        SearchRequest request = mediaSearchRequest(
+            profile,
+            form,
+            rootFilter,
+            offset,
+            max
         );
 
         GenericMediaSearchResult<MediaObject> result = executeSearchRequest(
@@ -223,7 +230,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             filter.must(QueryBuilders.termQuery("ageRating", ratingString));
         }
 
-        SearchSourceBuilder search = searchBuilder(profile, form, filter, 0L, 0x7ffffef);
+        SearchSourceBuilder search = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
         String type = media.getClass().getSimpleName().toLowerCase();
         MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(indexName, type, media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
@@ -625,7 +632,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         BoolQueryBuilder booleanFilter =
             QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
 
-        SearchRequest request = searchRequest(getLoadTypes(), profile, form, media, booleanFilter, offset, max);
+        SearchRequest request = mediaSearchRequest(getLoadTypes(), profile, form, media, booleanFilter, offset, max);
 
         return executeSearchRequest(request, form != null ? form.getFacets() : null, offset, max, clazz);
     }

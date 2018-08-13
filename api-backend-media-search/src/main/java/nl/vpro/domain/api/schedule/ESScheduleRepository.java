@@ -332,7 +332,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
         // Make sure we query enough as to get a 'full' schedule
         int maxresult = Math.max(max, MAXRESULT);
-        SearchRequest request = searchRequest(getScheduleEventTypes(), profile, form, null, QueryBuilders.boolQuery(), 0L, maxresult);
+        SearchRequest request = mediaSearchRequest(getScheduleEventTypes(), profile, form, null, QueryBuilders.boolQuery(), 0L, maxresult);
         GenericMediaSearchResult<MediaObject> result = executeSearchRequest(request, null, 0, maxresult, MediaObject.class);
 
 

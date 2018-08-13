@@ -20,7 +20,6 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.TransportSerializationException;
@@ -115,21 +114,22 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
 
     /**
-     * Defaulting version of {@link #searchRequest(String[], ProfileDefinition, AbstractMediaForm, MediaObject, BoolQueryBuilder, long, Integer)}
+     * Defaulting version of {@link #mediaSearchRequest(String[], ProfileDefinition, AbstractMediaForm, MediaObject, BoolQueryBuilder, long, Integer)}
      * Where the types is set to {@link #getLoadTypes()} and mediaObject is <code>null</code>
      */
-    final protected SearchRequest searchRequest(
+    final protected SearchRequest mediaSearchRequest(
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
+        @Nonnull BoolQueryBuilder boolQueryBuilder,
         long offset,
         @Nullable Integer max) {
 
-        return searchRequest(
+        return mediaSearchRequest(
             getLoadTypes(),
             profile,
             form,
             null,
-            QueryBuilders.boolQuery(),
+            boolQueryBuilder,
             offset,
             max);
     }
@@ -142,7 +142,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      * @param form    Handles {@link AbstractMediaForm#getSearches()} and {@link MediaForm#getSortFields()}. Also, if applicate it
      *                will handle {@link MediaForm#getFacets()}
      */
-    final protected SearchRequest searchRequest(
+    final protected SearchRequest mediaSearchRequest(
         @Nonnull String[] types,
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
@@ -154,25 +154,25 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         request.types(types);
 
         request.source(
-            searchBuilder(profile, form, mediaObject, filter, offset, max)
+            mediaSearchBuilder(profile, form, mediaObject, filter, offset, max)
         );
         return request;
     }
 
-    final protected SearchSourceBuilder searchBuilder(
+    final protected SearchSourceBuilder mediaSearchBuilder(
         @Null ProfileDefinition<MediaObject> profile,
         @Nonnull AbstractMediaForm form,
         @Nullable BoolQueryBuilder filter,
         long offset,
         Integer max) {
-        return searchBuilder(profile, form, null, filter, offset, max);
+        return mediaSearchBuilder(profile, form, null, filter, offset, max);
     }
 
     /**
      * TODO javadoc
      *
      */
-    final protected SearchSourceBuilder searchBuilder(
+    final protected SearchSourceBuilder mediaSearchBuilder(
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
