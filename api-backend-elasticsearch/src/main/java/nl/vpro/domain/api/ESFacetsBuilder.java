@@ -31,7 +31,6 @@ import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilde
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import nl.vpro.util.TriFunction;
 
@@ -177,7 +176,7 @@ public abstract class ESFacetsBuilder {
 
     protected static void addDurationFacet(
         @Nonnull String prefix,
-        @Nonnull SearchSourceBuilder searchBuilder,
+        @Nonnull  FilterAggregationBuilder rootAggregation,
         @Nonnull String fieldName,
         @Nullable DurationRangeFacets<?> facet) {
         if (facet != null) {
@@ -205,29 +204,28 @@ public abstract class ESFacetsBuilder {
                             .field(prefix + fieldName)
                             .format("interval" + durationRange.getIntervalString())
                             .keyed(false);
-                        searchBuilder.aggregation(histogramAggregationBuilder);
+                        rootAggregation.subAggregation(histogramAggregationBuilder);
                     }
                 }
                 if (aggregationBuilder != null) {
-                    searchBuilder.aggregation(aggregationBuilder);
+                    rootAggregation.subAggregation(aggregationBuilder);
                 }
             }
         }
     }
 
      protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
-        @Nonnull String prefix,
-        @Nonnull String nestedObject,
-        @Nonnull String facetField,
-        @Nonnull FilterAggregationBuilder rootAggregation,
-        @Nullable SearchableLimitableFacet<F, S> facet,
-        @Nonnull Function<F, QueryBuilder> filterCreator,
-        @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
+         @Nonnull String prefix,
+         @Nonnull FilterAggregationBuilder rootAggregation,
+         @Nonnull String nestedObject,
+         @Nonnull String facetField,
+         @Nullable SearchableLimitableFacet<F, S> facet,
+         @Nonnull Function<F, QueryBuilder> filterCreator,
+         @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
         addNestedAggregation(
             prefix,
-            nestedObject,
+            rootAggregation, nestedObject,
             facetField,
-            rootAggregation,
             facet,
             filterCreator,
             subSearchCreator,
@@ -237,9 +235,9 @@ public abstract class ESFacetsBuilder {
 
     protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
         @Nonnull String prefix,
+        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nonnull String nestedObject,
         @Nonnull String facetField,
-        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nullable SearchableLimitableFacet<F, S> facet,
         @Nonnull Function<F, QueryBuilder> filterCreator,
         @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator,

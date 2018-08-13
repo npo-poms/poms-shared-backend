@@ -67,7 +67,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
                     if (titles.asMediaFacet()) {
                         addMediaFacet(prefix, rootAggregation, "titles.value.full", titles);
                     }
-                    addNestedTitlesAggregations(rootAggregation, titles, prefix);
+                    addNestedTitlesAggregations(prefix, rootAggregation, titles);
                 }
 
             }
@@ -80,20 +80,20 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             addMediaFacet(prefix, rootAggregation, "broadcasters.id", facets.getBroadcasters());
 
-            addMediaNestedAggregation(prefix, "genres", "id", rootAggregation, facets.getGenres());
+            addMediaNestedAggregation(prefix, rootAggregation, "genres", "id", facets.getGenres());
 
             {
                 ExtendedMediaFacet tags = facets.getTags();
                 //addFacetFilter(prefix, tags, facetRootFilter);
                 addMediaFacet(prefix, rootAggregation, esExtendedTextField("tags", tags), tags);
             }
-            addDurationFacet(prefix, searchBuilder, "duration", facets.getDurations());
+            addDurationFacet(prefix, rootAggregation, "duration", facets.getDurations());
 
-            addNestedAggregationMemberRefSearch(prefix, "descendantOf", "midRef", rootAggregation, facets.getDescendantOf());
+            addNestedAggregationMemberRefSearch(prefix, rootAggregation, "descendantOf", "midRef", facets.getDescendantOf());
 
-            addNestedAggregationMemberRefSearch(prefix, "episodeOf", "midRef", rootAggregation, facets.getEpisodeOf());
+            addNestedAggregationMemberRefSearch(prefix, rootAggregation, "episodeOf", "midRef", facets.getEpisodeOf());
 
-            addNestedAggregationMemberRefSearch(prefix, "memberOf", "midRef", rootAggregation, facets.getMemberOf());
+            addNestedAggregationMemberRefSearch(prefix, rootAggregation, "memberOf", "midRef", facets.getMemberOf());
 
             addMediaNestedRelationAggregations(prefix, rootAggregation, facets.getRelations());
 
@@ -106,15 +106,14 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
     protected static <S> void addMediaNestedAggregation(
         @Nonnull String pathPrefix,
+        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nonnull String nestedObject,
         @Nonnull String facetField,
-        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nullable SearchableLimitableFacet<MediaSearch, TermSearch> facet) {
         addNestedAggregation(
             pathPrefix,
-            nestedObject,
+            rootAggregation, nestedObject,
             facetField,
-            rootAggregation,
             facet,
             mediaSearch -> ESMediaFilterBuilder.filter(pathPrefix, mediaSearch),
             ESMediaQueryBuilder::search
@@ -124,15 +123,14 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
     protected static void addNestedAggregationMemberRefSearch(
         @Nonnull String pathPrefix,
+        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nonnull String nestedObject,
         @Nonnull String facetField,
-        @Nonnull FilterAggregationBuilder rootAggregation,
-        @Nullable  SearchableLimitableFacet<MediaSearch, MemberRefSearch>  facet) {
+        @Nullable SearchableLimitableFacet<MediaSearch, MemberRefSearch> facet) {
         addNestedAggregation(
             pathPrefix,
-            nestedObject,
+            rootAggregation, nestedObject,
             facetField,
-            rootAggregation,
             facet,
             mediaSearch -> ESMediaFilterBuilder.filter(pathPrefix, mediaSearch),
             (memberRefSearch, nestedObject1, facetField1) -> ESMediaQueryBuilder.filter(memberRefSearch, nestedObject1)
@@ -154,9 +152,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         for (RelationFacet facet : facets) {
             addMediaNestedRelationAggregation(
                 prefix,
-                "relations",
+                rootAggregation, "relations",
                 esExtendedTextField("value", facet),
-                rootAggregation,
                 subSearch,
                 facet
             );
@@ -166,9 +163,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
      protected static void addMediaNestedRelationAggregation(
          @Nonnull String prefix,
-         @Nonnull  String nestedObject,
-         @Nonnull  String facetField,
-         @Nonnull  FilterAggregationBuilder rootAggregation,
+         @Nonnull FilterAggregationBuilder rootAggregation,
+         @Nonnull String nestedObject,
+         @Nonnull String facetField,
          @Nullable RelationSearch allRelationSearch,
          @Nullable NameableSearchableLimitableFacet<MediaSearch, RelationSearch> facet) {
 
@@ -176,9 +173,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
         addNestedAggregation(
             prefix,
+            rootAggregation,
             nestedObject,
             facetField,
-            rootAggregation,
             facet,
             (s) -> ESMediaFilterBuilder.filter(prefix, s),
             (relationSearch, no, ff) -> ESMediaFilterBuilder.filterRelations(prefix, relationSearch),
@@ -187,9 +184,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
      }
 
     protected static void addNestedTitlesAggregations(
+        @Nonnull String prefix,
         @Nonnull FilterAggregationBuilder rootAggregation,
-        @Nullable TitleFacetList facets,
-        @Nonnull String pathPrefix) {
+        @Nullable TitleFacetList facets) {
         if (facets == null || facets.isEmpty()) {
             return;
         }
@@ -197,10 +194,10 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         TitleSearch titleSearch = facets.getSubSearch();
         for (TitleFacet facet : facets) {
             QueryBuilder filter = facet.hasSubSearch() ?
-                ESMediaQueryBuilder.filter(pathPrefix, "expandedTitles", facet.getSubSearch()) : null;
+                ESMediaQueryBuilder.filter(prefix, "expandedTitles", facet.getSubSearch()) : null;
             if (titleSearch != null) {
                 if (filter == null) {
-                    filter = ESMediaQueryBuilder.filter(pathPrefix, "expandedTitles", titleSearch);
+                    filter = ESMediaQueryBuilder.filter(prefix, "expandedTitles", titleSearch);
                 } else {
                     ESMediaQueryBuilder.buildTitleQuery("", (BoolQueryBuilder) filter, titleSearch);
                 }

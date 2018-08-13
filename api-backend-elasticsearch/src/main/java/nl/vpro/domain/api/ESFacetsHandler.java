@@ -16,9 +16,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
@@ -41,10 +39,10 @@ public abstract class ESFacetsHandler {
 
     protected static <A extends Aggregation> A getAggregation(
         @Nonnull String prefix,
-        @Nonnull String name,
-        @Nullable HasAggregations root) {
+        @Nullable HasAggregations root,
+        @Nonnull String name) {
 
-        return getAggregation(prefix, name, root,
+        return getAggregation(prefix, root, name,
             getParentAggregationNames(prefix, name)
         );
     }
@@ -52,19 +50,19 @@ public abstract class ESFacetsHandler {
 
     protected static <A extends Aggregation> A getNestedAggregation(
         @Nonnull String prefix,
-        @Nonnull String name,
-        @Nullable HasAggregations root) {
+        @Nullable HasAggregations root,
+        @Nonnull String name) {
 
-        return getAggregation(prefix, name, root,
+        return getAggregation(prefix, root, name,
             getNestedParentAggregationNames(prefix, name)
         );
     }
     protected static <A extends Aggregation> A getAggregation(
         @Nonnull String prefix,
-        @Nonnull String name,
         @Nullable HasAggregations root,
+        @Nonnull String name,
         @Nonnull String... names
-        ) {
+    ) {
         if (root == null) {
             return null;
         }
@@ -108,11 +106,11 @@ public abstract class ESFacetsHandler {
 
     protected static List<TermFacetResultItem> getFacetResultItems(
         @Nonnull String prefix,
-        @Nonnull String fieldName,
-        @Nullable HasAggregations facets) {
+        @Nullable HasAggregations facets,
+        @Nonnull String fieldName) {
         if(facets != null) {
 
-            MultiBucketsAggregation a = getAggregation(prefix, fieldName, facets);
+            MultiBucketsAggregation a = getAggregation(prefix, facets, fieldName);
             if (a != null) {
                 return defaultTextFacetResult(a);
             }
@@ -123,14 +121,13 @@ public abstract class ESFacetsHandler {
 
     protected static List<TermFacetResultItem> getFacetResultItems(
         @Nonnull String prefix,
-        @Nonnull String fieldName,
         HasAggregations rootFilter,
+        @Nonnull String fieldName,
         @Nullable ExtendedTextFacet<?> extendedTextFacet) {
         if (extendedTextFacet != null) {
             return getFacetResultItems(
                 prefix,
-                esExtendedTextField(fieldName, extendedTextFacet.isCaseSensitive()),
-                rootFilter
+                rootFilter, esExtendedTextField(fieldName, extendedTextFacet.isCaseSensitive())
             );
         } else {
             return null;
@@ -140,15 +137,15 @@ public abstract class ESFacetsHandler {
 
     protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
         @Nonnull String prefix,
+        @Nullable HasAggregations rootFilter,
         @Nonnull String fieldName,
         @Nullable TextFacet<?> requestFacet,
-        @Nullable HasAggregations rootFilter,
         @Nonnull Class<T> enumClass,
         @Nonnull Function<String, T> valueOf,
         @Nonnull Function<T, String> xmlId) {
         if(requestFacet != null) {
 
-            MultiBucketsAggregation facet = getAggregation(prefix, fieldName, rootFilter);
+            MultiBucketsAggregation facet = getAggregation(prefix, rootFilter, fieldName);
             if(facet == null) {
                 return null;
             }
@@ -170,12 +167,12 @@ public abstract class ESFacetsHandler {
 
     protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
         @Nonnull String prefix,
+        @Nonnull HasAggregations facets,
         @Nonnull String fieldName,
         @Nullable TextFacet<?> requestedFacet,
-        @Nonnull HasAggregations facets,
         @Nonnull final Class<T> enumClass) {
         return getFacetResultItemsForEnum(
-            prefix, fieldName, requestedFacet, facets, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name
+            prefix, facets, fieldName, requestedFacet, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name
         );
     }
 
@@ -185,7 +182,7 @@ public abstract class ESFacetsHandler {
         if (facets == null) {
             return null;
         }
-        Terms aggregation = getAggregation(prefix, "broadcasters.id", facets);
+        Terms aggregation = getAggregation(prefix, facets, "broadcasters.id");
         if(aggregation == null) {
             return null;
         }
@@ -203,9 +200,9 @@ public abstract class ESFacetsHandler {
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
         @Nonnull String prefix,
+        @Nonnull HasAggregations root,
         @Nonnull DateRangeFacets<?> dateRangeFacets,
-        @Nonnull String facetName,
-        @Nonnull HasAggregations root) {
+        @Nonnull String facetName) {
 
 
         HasAggregations aggregations = getAggregations(root, getParentAggregationNames(prefix, facetName));
@@ -261,10 +258,12 @@ public abstract class ESFacetsHandler {
     }
 
     protected static List<DurationFacetResultItem> getDurationRangeFacetResultItems(
-        DurationRangeFacets<?> durationRangeFacets, String
-        facetName,
-        SearchResponse response) {
-        Aggregations aggregations = response.getAggregations();
+        @Nonnull String prefix,
+        @Nonnull HasAggregations root,
+        DurationRangeFacets<?> durationRangeFacets,
+        @Nonnull String facetName) {
+
+        HasAggregations aggregations = getAggregations(root, getParentAggregationNames(prefix, facetName));
 
         if (aggregations == null) {
             return null;
@@ -272,7 +271,7 @@ public abstract class ESFacetsHandler {
 
         List<DurationFacetResultItem> facetResultItems = new ArrayList<>();
 
-        for (Aggregation aggregation : aggregations) {
+        for (Aggregation aggregation : aggregations.getAggregations()) {
             if (aggregation.getName().startsWith(facetName)) {
                 MultiBucketsAggregation range = (MultiBucketsAggregation) aggregation;
                 for (MultiBucketsAggregation.Bucket bucket : range.getBuckets()) {
