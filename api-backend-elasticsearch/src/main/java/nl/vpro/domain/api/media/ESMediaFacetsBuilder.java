@@ -52,7 +52,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             if (facets.getFilter() != null) {
                 MediaSearch search = facets.getFilter();
                 QueryBuilder query = ESMediaQueryBuilder.query(prefix, search);
-                // TODO?
+
             }
 
             // Append all aggregations to this filtered aggregation builder

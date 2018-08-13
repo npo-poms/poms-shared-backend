@@ -81,7 +81,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * Builds  an Elastic Search {@link QueryBuilder} from a {@link MediaSearch}
      * @param searches or <code>null</code> (resulting in a matchAllQuery)
      */
-    public static QueryBuilder query(String prefix, MediaSearch searches) {
+    public static QueryBuilder query(
+        @Nonnull String prefix, MediaSearch searches) {
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
         }
@@ -350,7 +351,10 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
 
 
-    private static void buildLocationQuery(BoolQueryBuilder boolQueryBuilder, final String prefix, TextMatcherList locations) {
+    private static void buildLocationQuery(
+        @Nonnull BoolQueryBuilder boolQueryBuilder,
+        @Nonnull final String prefix,
+        TextMatcherList locations) {
 
         buildFromList(prefix, boolQueryBuilder, locations, (pref, booleanQueryBuilder, matcher) -> {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
