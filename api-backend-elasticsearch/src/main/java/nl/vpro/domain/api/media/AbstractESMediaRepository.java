@@ -197,7 +197,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         }
 
         if (form instanceof MediaForm) {
-            ESMediaFacetsBuilder.mediaFacets(searchBuilder, (MediaForm) form);
+            ESMediaFacetsBuilder.buildMediaFacets("", searchBuilder, (MediaForm) form, filter);
 
             ESMediaSortHandler.sort(searchBuilder, (MediaForm) form, mediaObject);
         }

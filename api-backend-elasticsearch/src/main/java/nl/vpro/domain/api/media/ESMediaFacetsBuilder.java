@@ -12,7 +12,6 @@ import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
@@ -30,11 +29,6 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     protected static final String ROOT_FILTER = "mediaRootFilter";
 
 
-    public static void mediaFacets(
-        @Nonnull SearchSourceBuilder searchBuilder,
-        @Nullable MediaForm form) {
-        buildMediaFacets("", searchBuilder, form);
-    }
 
     /**
      * @param prefix empty string or path to this field including the last dot e.g., "embeds.media."
@@ -42,11 +36,11 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
     public static void buildMediaFacets(
         @Nonnull String prefix,
         @Nonnull SearchSourceBuilder searchBuilder,
-        @Nullable MediaForm form) {
+        @Nullable MediaForm form,
+        @Nonnull BoolQueryBuilder facetFilter) {
         if (form != null && form.isFaceted()) {
 
             MediaFacets facets = form.getFacets();
-            BoolQueryBuilder facetRootFilter = QueryBuilders.boolQuery();
 
             // Under default ES behaviour profile filtering does not influence facet results
             if (facets.getFilter() != null) {
@@ -57,7 +51,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             // Append all aggregations to this filtered aggregation builder
             FilterAggregationBuilder rootAggregation = AggregationBuilders
-                .filter(ROOT_FILTER, facetRootFilter);
+                .filter(ROOT_FILTER, facetFilter);
 
             searchBuilder.aggregation(rootAggregation);
 
