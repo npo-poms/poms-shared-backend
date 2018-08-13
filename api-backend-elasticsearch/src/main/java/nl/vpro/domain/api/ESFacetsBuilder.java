@@ -104,7 +104,7 @@ public abstract class ESFacetsBuilder {
 
     protected static void addDateRangeFacet(
         @Nonnull String prefix,
-        @Nonnull SearchSourceBuilder searchBuilder,
+        @Nonnull FilterAggregationBuilder rootAggregation,
         @Nonnull String fieldName,
         @Nullable DateRangeFacets<?> facet) {
         if(facet != null) {
@@ -143,13 +143,13 @@ public abstract class ESFacetsBuilder {
                             .format(format)
                             .keyed(false)
                             ;
-                        searchBuilder.aggregation(histogramAggregationBuilder);
+                        rootAggregation.subAggregation(histogramAggregationBuilder);
                     } else {
                         throw new IllegalArgumentException();
                     }
                 }
                 if (aggregationBuilder != null) {
-                    searchBuilder.aggregation(aggregationBuilder);
+                    rootAggregation.subAggregation(aggregationBuilder);
                 }
             }
         }

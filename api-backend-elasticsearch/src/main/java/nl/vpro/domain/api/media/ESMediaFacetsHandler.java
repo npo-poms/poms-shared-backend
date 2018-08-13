@@ -85,7 +85,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             );
 
             facetsResult.setSortDates(
-                getDateRangeFacetResultItems(request.getSortDates(), prefix + "sortDate", response)
+                getDateRangeFacetResultItems(prefix, request.getSortDates(), prefix + "sortDate", rootFilter)
             );
 
             facetsResult.setBroadcasters(

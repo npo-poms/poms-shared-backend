@@ -45,8 +45,7 @@ public abstract class ESFacetsHandler {
         @Nullable HasAggregations root) {
 
         return getAggregation(prefix, name, root,
-            getFilterName(prefix, name),
-            getSubSearchName(prefix, name)
+            getParentAggregationNames(prefix, name)
         );
     }
 
@@ -57,14 +56,36 @@ public abstract class ESFacetsHandler {
         @Nullable HasAggregations root) {
 
         return getAggregation(prefix, name, root,
-            getFilterName(prefix, name),
-            getNestedName(prefix, name),
-            getSubSearchName(prefix, name)
+            getNestedParentAggregationNames(prefix, name)
         );
     }
     protected static <A extends Aggregation> A getAggregation(
         @Nonnull String prefix,
         @Nonnull String name,
+        @Nullable HasAggregations root,
+        @Nonnull String... names
+        ) {
+        if (root == null) {
+            return null;
+        }
+        HasAggregations parent = getAggregations(root,names);
+        String facetName = getAggregationName(prefix, name);
+        A facet = parent.getAggregations().get(facetName);
+        if(facet == null) {
+            return null;
+        }
+        return facet;
+    }
+
+    protected static String [] getParentAggregationNames(String prefix, String name) {
+        return new String[] {getFilterName(prefix, name), getSubSearchName(prefix, name)};
+    }
+
+    protected static String [] getNestedParentAggregationNames(String prefix, String name) {
+        return new String[] {getFilterName(prefix, name), getNestedName(prefix, name), getSubSearchName(prefix, name)};
+    }
+
+     protected static HasAggregations getAggregations(
         @Nullable HasAggregations root,
         @Nonnull String... names
         ) {
@@ -78,12 +99,8 @@ public abstract class ESFacetsHandler {
                 parent = filter;
             }
         }
-        String facetName = getAggregationName(prefix, name);
-        A facet = parent.getAggregations().get(facetName);
-        if(facet == null) {
-            return null;
-        }
-        return facet;
+        return parent;
+
     }
 
 
@@ -185,53 +202,53 @@ public abstract class ESFacetsHandler {
 
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
+        @Nonnull String prefix,
         @Nonnull DateRangeFacets<?> dateRangeFacets,
         @Nonnull String facetName,
-        @Nonnull SearchResponse response) {
-        Aggregations facets = response.getAggregations();
-        Aggregations aggregations = response.getAggregations();
+        @Nonnull HasAggregations root) {
 
-        if(facets == null && aggregations == null) {
+
+        HasAggregations aggregations = getAggregations(root, getParentAggregationNames(prefix, facetName));
+
+        if(aggregations == null) {
             return null;
         }
         List<DateFacetResultItem> dateFacetResultItems = new ArrayList<>();
-        if(aggregations != null) {
-            for (Aggregation aggregation : aggregations) {
-                if (aggregation.getName().startsWith(facetName)) {
-                    MultiBucketsAggregation multiBucketsAggregation = (MultiBucketsAggregation) aggregation;
-                    List<? extends MultiBucketsAggregation.Bucket> buckets = multiBucketsAggregation.getBuckets();
+        for (Aggregation aggregation : aggregations.getAggregations()) {
+            if (aggregation.getName().startsWith(facetName)) {
+                MultiBucketsAggregation multiBucketsAggregation = (MultiBucketsAggregation) aggregation;
+                List<? extends MultiBucketsAggregation.Bucket> buckets = multiBucketsAggregation.getBuckets();
 
-                    //RangeFacet<Instant> interval;
-                    //List<RangeFacet<Instant>> ranges = dateRangeFacets.getRanges();
-                    for (MultiBucketsAggregation.Bucket bucket : buckets) {
-                        if (bucket instanceof Range.Bucket) {
-                            Range.Bucket rangeBucket = (Range.Bucket) bucket;
-                            String value = bucket.getKeyAsString();
-                            String name = value;
-                            if (value.startsWith("PRESET:")) {
-                                DateRangePreset preset = DateRangePreset.valueOf(value.substring("PRESET:".length()));
-                                value = preset.getDisplayName();
-                                name = preset.name();
-                            }
-                            DateFacetResultItem entry = DateFacetResultItem
-                                .builder()
-                                .value(value)
-                                .name(name)
-                                .begin(Instant.ofEpochMilli(((Double) rangeBucket.getFrom()).longValue()))
-                                .end(Instant.ofEpochMilli(((Double) rangeBucket.getTo()).longValue()))
-                                .count(bucket.getDocCount())
-                                .build();
-                            dateFacetResultItems.add(entry);
-                        } else if (bucket instanceof Histogram.Bucket) {
-                            DateFacetResultItem entry = DateFacetResultItem
-                                .builder()
-                                .value(bucket.getKeyAsString()) //
-                                .count(bucket.getDocCount())
-                                .build();
-                            dateFacetResultItems.add(entry);
-                        } else {
-                            throw new IllegalArgumentException();
+                //RangeFacet<Instant> interval;
+                //List<RangeFacet<Instant>> ranges = dateRangeFacets.getRanges();
+                for (MultiBucketsAggregation.Bucket bucket : buckets) {
+                    if (bucket instanceof Range.Bucket) {
+                        Range.Bucket rangeBucket = (Range.Bucket) bucket;
+                        String value = bucket.getKeyAsString();
+                        String name = value;
+                        if (value.startsWith("PRESET:")) {
+                            DateRangePreset preset = DateRangePreset.valueOf(value.substring("PRESET:".length()));
+                            value = preset.getDisplayName();
+                            name = preset.name();
                         }
+                        DateFacetResultItem entry = DateFacetResultItem
+                            .builder()
+                            .value(value)
+                            .name(name)
+                            .begin(Instant.ofEpochMilli(((Double) rangeBucket.getFrom()).longValue()))
+                            .end(Instant.ofEpochMilli(((Double) rangeBucket.getTo()).longValue()))
+                            .count(bucket.getDocCount())
+                            .build();
+                        dateFacetResultItems.add(entry);
+                    } else if (bucket instanceof Histogram.Bucket) {
+                        DateFacetResultItem entry = DateFacetResultItem
+                            .builder()
+                            .value(bucket.getKeyAsString()) //
+                            .count(bucket.getDocCount())
+                            .build();
+                        dateFacetResultItems.add(entry);
+                    } else {
+                        throw new IllegalArgumentException();
                     }
                 }
             }
@@ -274,7 +291,9 @@ public abstract class ESFacetsHandler {
         return facetResultItems;
     }
 
-    private static int indexOf(DateFacetResultItem item, List<nl.vpro.domain.api.RangeFacet<Instant>> ranges) {
+    private static int indexOf(
+        @Nonnull DateFacetResultItem item,
+        @Nonnull List<nl.vpro.domain.api.RangeFacet<Instant>> ranges) {
         int i = 0;
         for (nl.vpro.domain.api.RangeFacet<Instant> range : ranges) {
             if (range.matches(item.getBegin(), item.getEnd())) {
@@ -285,7 +304,9 @@ public abstract class ESFacetsHandler {
         return i;
     }
 
-    private static int indexOf(DurationFacetResultItem item, List<nl.vpro.domain.api.RangeFacet<Duration>> ranges) {
+    private static int indexOf(
+        @Nonnull DurationFacetResultItem item,
+        @Nonnull List<nl.vpro.domain.api.RangeFacet<Duration>> ranges) {
         int i = 0;
         for (nl.vpro.domain.api.RangeFacet<Duration> range : ranges) {
             if (range.matches(item.getBegin(), item.getEnd())) {
@@ -349,7 +370,8 @@ public abstract class ESFacetsHandler {
     protected static <T extends Enum<T>> List<TermFacetResultItem> enumTextFacetResult(final MultiBucketsAggregation facet, Function<String, T> valueOf, Function<T, String> idValue) {
         return new AggregationResultItemList<MultiBucketsAggregation, Terms.Bucket, TermFacetResultItem>(facet) {
             @Override
-            protected TermFacetResultItem adapt(Terms.Bucket bucket) {
+            protected TermFacetResultItem adapt(
+                @Nonnull Terms.Bucket bucket) {
                 String value = bucket.getKeyAsString();
                 String name;
 
@@ -365,14 +387,17 @@ public abstract class ESFacetsHandler {
             }
         };
     }
-    protected static <T extends Enum<T>> String enumValueToString(T enumValue) {
+    protected static <T extends Enum<T>> String enumValueToString(
+        @Nonnull T enumValue) {
         if (enumValue instanceof Displayable) {
             return ((Displayable) enumValue).getDisplayName();
         } else {
             return enumValue.toString();
         }
     }
-    protected static <T extends Enum<T>> TermFacetResultItem emptyItem(T enumValue, Function<T, String> xmlId) {
+    protected static <T extends Enum<T>> TermFacetResultItem emptyItem(
+        @Nonnull T enumValue,
+        @Nonnull Function<T, String> xmlId) {
         String name = ESFacetsHandler.enumValueToString(enumValue);
         return new TermFacetResultItem(name, xmlId.apply(enumValue), 0);
 
@@ -442,13 +467,6 @@ public abstract class ESFacetsHandler {
     }
 
 
-    /**
-     * When using a prefix e.g., "embeds.media." as a facet or aggregation name in an search result, dots are not
-     * allowed.
-     */
-    protected static String escapePath(String prefix, String field) {
-        return (prefix + field).replace('.', '_');
-    }
 /*
     static class ESInterval extends DateRangeInterval.Interval {
 
