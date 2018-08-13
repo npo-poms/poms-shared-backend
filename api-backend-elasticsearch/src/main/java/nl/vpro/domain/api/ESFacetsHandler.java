@@ -21,7 +21,6 @@ import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -44,26 +43,11 @@ public abstract class ESFacetsHandler {
         @Nonnull String prefix,
         @Nonnull String name,
         @Nullable HasAggregations root) {
-        if (root == null) {
-            return null;
-        }
-        HasAggregations parent = root;
-        String filterName = getFilterName(prefix, name);
-        HasAggregations filter = parent.getAggregations().get(filterName);
-        if (filter != null) {
-            parent = filter;
-        }
-        String subSearchName = getSubSearchName(prefix, name);
-        HasAggregations subSearch = parent.getAggregations().get(subSearchName);
-        if (subSearch != null) {
-            parent = subSearch;
-        }
-        String facetName = getAggregationName(prefix, name);
-        A facet = parent.getAggregations().get(facetName);
-        if(facet == null) {
-            return null;
-        }
-        return facet;
+
+        return getAggregation(prefix, name, root,
+            getFilterName(prefix, name),
+            getSubSearchName(prefix, name)
+        );
     }
 
 
@@ -71,26 +55,28 @@ public abstract class ESFacetsHandler {
         @Nonnull String prefix,
         @Nonnull String name,
         @Nullable HasAggregations root) {
-        if(root == null) {
+
+        return getAggregation(prefix, name, root,
+            getFilterName(prefix, name),
+            getNestedName(prefix, name),
+            getSubSearchName(prefix, name)
+        );
+    }
+    protected static <A extends Aggregation> A getAggregation(
+        @Nonnull String prefix,
+        @Nonnull String name,
+        @Nullable HasAggregations root,
+        @Nonnull String... names
+        ) {
+        if (root == null) {
             return null;
         }
         HasAggregations parent = root;
-        String filterName = getFilterName(prefix, name);
-        HasAggregations filter = parent.getAggregations().get(filterName);
-        if (filter != null) {
-            parent = filter;
-        }
-
-        String nestedName = getNestedName(prefix, name);
-        parent =  parent.getAggregations().get(nestedName);
-
-        if (parent == null) {
-            return null;
-        }
-
-        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(prefix, name));
-        if (subSearch != null) {
-            parent = subSearch;
+        for (String n : names) {
+            HasAggregations filter = parent.getAggregations().get(n);
+            if (filter != null) {
+                parent = filter;
+            }
         }
         String facetName = getAggregationName(prefix, name);
         A facet = parent.getAggregations().get(facetName);
@@ -196,35 +182,10 @@ public abstract class ESFacetsHandler {
         };
     }
 
-    protected static Terms getFilteredTerms(
-        @Nonnull String facetName,
-        Aggregation root) {
-        if(root == null) {
-            return null;
-        }
-
-        if(!(root instanceof HasAggregations)) {
-            return null;
-        }
-
-        HasAggregations subAggregations = (HasAggregations)root;
-
-        Terms terms = subAggregations.getAggregations().get(facetName);
-        if(terms != null) {
-            return terms;
-        }
-
-        Filter filter = subAggregations.getAggregations().get(getFilterName(facetName));
-        if(filter == null) {
-            return null;
-        }
-
-        return filter.getAggregations().get(facetName);
-    }
 
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
-        DateRangeFacets<?> dateRangeFacets,
+        @Nonnull DateRangeFacets<?> dateRangeFacets,
         @Nonnull String facetName,
         @Nonnull SearchResponse response) {
         Aggregations facets = response.getAggregations();
