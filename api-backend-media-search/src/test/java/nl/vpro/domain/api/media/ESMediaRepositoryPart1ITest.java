@@ -828,6 +828,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         ).build());
         index(program().withMid().relations(
             Relation.ofText(eoLabel, "bla bla"),
+            Relation.ofText(vproLabel, "blUe NOte"),
             Relation.ofText(vproLabel, "red note")
         ).build());
 
@@ -837,8 +838,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             relationFacet.setCaseSensitive(false);
             relationFacet.setSubSearch(
                 RelationSearch.builder()
-                    .broadcasters(TextMatcherList.should(must(vproLabel.getBroadcaster())))
-                    .types(TextMatcherList.should(must(vproLabel.getType())))
+                    .broadcasters(TextMatcherList.must(must(vproLabel.getBroadcaster())))
+                    .types(TextMatcherList.must(must(vproLabel.getType())))
                     .build()
             );
 
@@ -855,7 +856,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             assertThat(relations.get(0).getName()).isEqualTo("test");
             assertThat(relations.get(0).getFacets()).hasSize(2);
             assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-            assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(4);
             assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
 
             assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("red note");
@@ -866,7 +867,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
             assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
             assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(4);
         }
 
     }
@@ -1874,6 +1875,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             String memberRefType = MediaESType.memberRef(ref.getOwner().getClass()).name();
             index(memberRefType, object, ref);
         }
+
         if (object instanceof Program) {
             for (MemberRef ref : ((Program) object).getEpisodeOf()) {
                 index(MediaESType.episodeRef.name(), object, ref);
