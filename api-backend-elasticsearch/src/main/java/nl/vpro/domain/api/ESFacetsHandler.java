@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -44,28 +43,64 @@ public abstract class ESFacetsHandler {
     protected static <A extends Aggregation> A getAggregation(
         @Nonnull String prefix,
         @Nonnull String name,
-        @Nullable HasAggregations facets) {
-        if (facets == null) {
+        @Nullable HasAggregations root) {
+        if (root == null) {
             return null;
         }
-        HasAggregations root = facets;
+        HasAggregations parent = root;
         String filterName = getFilterName(prefix, name);
-        HasAggregations filter = root.getAggregations().get(filterName);
+        HasAggregations filter = parent.getAggregations().get(filterName);
         if (filter != null) {
-            root = filter;
+            parent = filter;
         }
         String subSearchName = getSubSearchName(prefix, name);
-        HasAggregations subSearch = root.getAggregations().get(subSearchName);
+        HasAggregations subSearch = parent.getAggregations().get(subSearchName);
         if (subSearch != null) {
-            root = subSearch;
+            parent = subSearch;
         }
         String facetName = getAggregationName(prefix, name);
-        A facet = root.getAggregations().get(facetName);
+        A facet = parent.getAggregations().get(facetName);
         if(facet == null) {
             return null;
         }
         return facet;
     }
+
+
+    protected static <A extends Aggregation> A getNestedAggregation(
+        @Nonnull String prefix,
+        @Nonnull String name,
+        @Nullable HasAggregations root) {
+        if(root == null) {
+            return null;
+        }
+        HasAggregations parent = root;
+        String filterName = getFilterName(prefix, name);
+        HasAggregations filter = parent.getAggregations().get(filterName);
+        if (filter != null) {
+            parent = filter;
+        }
+
+        String nestedName = getNestedName(prefix, name);
+        parent =  parent.getAggregations().get(nestedName);
+
+        if (parent == null) {
+            return null;
+        }
+
+        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(prefix, name));
+        if (subSearch != null) {
+            parent = subSearch;
+        }
+        String facetName = getAggregationName(prefix, name);
+        A facet = parent.getAggregations().get(facetName);
+        if(facet == null) {
+            return null;
+        }
+        return facet;
+    }
+
+
 
 
     protected static List<TermFacetResultItem> getFacetResultItems(
@@ -185,39 +220,6 @@ public abstract class ESFacetsHandler {
         }
 
         return filter.getAggregations().get(facetName);
-    }
-
-
-    protected static <T extends Aggregation> T getNestedResult(
-        @Nonnull String pathPrefix,
-        @Nullable  HasAggregations root,
-        @Nonnull Supplier<String> aggregationName) {
-        if(root == null) {
-            return null;
-        }
-
-        String name = aggregationName.get();
-        HasAggregations parent = root;
-        String filterName = getFilterName(pathPrefix, name);
-        HasAggregations filter = parent.getAggregations().get(filterName);
-
-        if (filter != null) {
-            parent = filter;
-        }
-
-        String nestedName = getNestedName(pathPrefix, name);
-        parent =  parent.getAggregations().get(nestedName);
-
-        if (parent == null) {
-            return null;
-        }
-
-        HasAggregations subSearch = parent.getAggregations().get(getSubSearchName(pathPrefix, name));
-        if (subSearch != null) {
-            parent = subSearch;
-        }
-
-        return parent.getAggregations().get(getAggregationName(pathPrefix, name));
     }
 
 

@@ -152,7 +152,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
             return null;
         }
 
-        Terms ids = getNestedResult(prefix, root, () -> getNestedFieldName("genres", "id"));
+        Terms ids = getNestedAggregation(prefix, getNestedFieldName("genres", "id"), root);
 
         if (ids == null) {
             return null;
@@ -183,7 +183,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         String nestedFacet = "midRef";
 
-        Terms midRefs = getNestedResult(prefix, root,  () -> getNestedFieldName(nestedObject, "midRef"));
+        Terms midRefs = getNestedAggregation(prefix, getNestedFieldName(nestedObject, nestedFacet), root);
 
         if (midRefs == null) {
             return null;
@@ -215,9 +215,9 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
         for (RelationFacet facet : requestedRelations) {
 
-            Terms terms = ESFacetsHandler.getNestedResult(prefix,
-                root,
-                facet::getName);
+            Terms terms = ESFacetsHandler.getNestedAggregation(prefix,
+                facet.getName(), root
+            );
 
             if (terms != null) {
                 AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem> resultItems = new AggregationResultItemList<Terms, Terms.Bucket, TermFacetResultItem>(terms) {
