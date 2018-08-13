@@ -42,6 +42,8 @@ public abstract class ESFacetsBuilder {
 
     public static final String FILTER_POSTFIX = "_filter";
 
+    public static final String NESTEDFILTER_POSTFIX = "_nestedfilter";
+
     public static final String SUBSEARCH_POSTFIX = "_subsearch";
 
     public static final String FACET_POSTFIX = "_facet";
@@ -221,6 +223,7 @@ public abstract class ESFacetsBuilder {
          @Nonnull String facetField,
          @Nullable SearchableLimitableFacet<F, S> facet,
          @Nonnull Function<F, QueryBuilder> filterCreator,
+         @Nonnull Supplier<QueryBuilder> nestedFilterCreator,
          @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
         addNestedAggregation(
             prefix,
@@ -228,6 +231,7 @@ public abstract class ESFacetsBuilder {
             facetField,
             facet,
             filterCreator,
+            nestedFilterCreator,
             subSearchCreator,
             () -> getName(facet, nestedObject, facetField)
         );
@@ -240,6 +244,7 @@ public abstract class ESFacetsBuilder {
         @Nonnull String facetField,
         @Nullable SearchableLimitableFacet<F, S> facet,
         @Nonnull Function<F, QueryBuilder> filterCreator,
+        @Nonnull Supplier<QueryBuilder> nestedFilterCreator,
         @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator,
         @Nonnull Supplier<String> nameSupplier) {
         if (facet == null) {
@@ -264,6 +269,13 @@ public abstract class ESFacetsBuilder {
 
         parent.subAggregation(nestedBuilder);
         parent = nestedBuilder;
+
+        QueryBuilder nestedFilter = nestedFilterCreator.get();
+        if (nestedFilter != null) {
+            FilterAggregationBuilder filter = AggregationBuilders.filter(getNestedFilterName(prefix, name), nestedFilter);
+            parent.subAggregation(filter);
+            parent = filter;
+        }
 
 
         // If the facet has a subsearch we need to wrap this aggregation in another one, which a filter.
@@ -356,6 +368,13 @@ public abstract class ESFacetsBuilder {
         @Nonnull String name) {
         return escape(prefix, name) + FILTER_POSTFIX;
     }
+
+    public static String getNestedFilterName(
+        @Nonnull String prefix,
+        @Nonnull String name) {
+        return escape(prefix, name) + NESTEDFILTER_POSTFIX;
+    }
+
 
 
     public static String getSubSearchName(

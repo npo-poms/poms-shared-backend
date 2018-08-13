@@ -110,6 +110,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             facetField,
             facet,
             mediaSearch -> ESMediaFilterBuilder.filter(pathPrefix, mediaSearch),
+            () -> null,
             ESMediaQueryBuilder::search
         );
 
@@ -127,6 +128,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             facetField,
             facet,
             mediaSearch -> ESMediaFilterBuilder.filter(pathPrefix, mediaSearch),
+            () -> null,
             (memberRefSearch, nestedObject1, facetField1) -> ESMediaQueryBuilder.filter(memberRefSearch, nestedObject1)
 
         );
@@ -172,6 +174,7 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
             facetField,
             facet,
             (s) -> ESMediaFilterBuilder.filter(prefix, s),
+            () -> ESMediaFilterBuilder.filterRelationsNested(prefix, allRelationSearch),
             (relationSearch, no, ff) -> ESMediaFilterBuilder.filterRelations(prefix, relationSearch),
             facet::getName
         );

@@ -80,7 +80,7 @@ public abstract class ESFacetsHandler {
     }
 
     protected static String [] getNestedParentAggregationNames(String prefix, String name) {
-        return new String[] {getFilterName(prefix, name), getNestedName(prefix, name), getSubSearchName(prefix, name)};
+        return new String[] {getFilterName(prefix, name), getNestedName(prefix, name), getNestedFilterName(prefix, name), getSubSearchName(prefix, name)};
     }
 
      protected static HasAggregations getAggregations(
