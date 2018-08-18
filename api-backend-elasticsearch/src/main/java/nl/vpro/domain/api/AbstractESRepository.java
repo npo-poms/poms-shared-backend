@@ -56,7 +56,7 @@ public abstract class AbstractESRepository<T> {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     protected final Logger LOG_ERRORS = LoggerFactory.getLogger(getClass().getName() + ".ERRORS");
 
-    private final ESClientFactory factory;
+    protected final ESClientFactory factory;
 
     @Getter
     @Setter
