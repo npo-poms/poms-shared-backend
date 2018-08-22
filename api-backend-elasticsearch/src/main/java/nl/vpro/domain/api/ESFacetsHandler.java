@@ -201,9 +201,12 @@ public abstract class ESFacetsHandler {
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
         @Nonnull String prefix,
         @Nonnull HasAggregations root,
-        @Nonnull DateRangeFacets<?> dateRangeFacets,
+        @Nullable DateRangeFacets<?> dateRangeFacets,
         @Nonnull String facetName) {
 
+        if (dateRangeFacets == null) {
+            return null;
+        }
 
         HasAggregations aggregations = getAggregations(root, getParentAggregationNames(prefix, facetName));
 
