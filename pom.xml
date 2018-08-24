@@ -8,7 +8,7 @@
 
   <groupId>nl.publiekeomroep</groupId>
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>5.8-SNAPSHOT</version>
+  <version>5.9-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
 
@@ -22,9 +22,9 @@
   </properties>
 
   <scm>
-    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/branches/REL-5.8-SNAPSHOT</connection>
-    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/branches/REL-5.8-SNAPSHOT</developerConnection>
-    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared-backend/branches/REL-5.8-SNAPSHOT</url>
+    <connection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/trunk</connection>
+    <developerConnection>scm:svn:https://subversion.vpro.nl/repo/nl/publiekeomroep/poms-shared-backend/trunk</developerConnection>
+    <url>https://subversion.vpro.nl/viewvc/nl/publiekomroep/poms-shared-backend/trunk</url>
   </scm>
 
   <modules>
