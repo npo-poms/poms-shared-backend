@@ -253,7 +253,7 @@
                         "index" : "not_analyzed"
                     }
                 }
-            },            
+            },
             "hasSubtitles" : {
                 "type" : "boolean"
             },
@@ -726,6 +726,10 @@
                     "start" : {
                         "type" : "date",
                         "format" : "date_time"
+                    },
+                    "eventStart": {
+                        "type": "date",
+                        "format": "date_time"
                     },
                     "textSubtitles" : {
                         "type" : "string",

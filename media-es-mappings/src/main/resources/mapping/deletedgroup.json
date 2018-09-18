@@ -712,6 +712,10 @@
                         "type" : "date",
                         "format" : "date_time"
                     },
+                    "eventStart": {
+                        "type": "date",
+                        "format": "date_time"
+                    },
                     "textSubtitles" : {
                         "type" : "string",
                         "norms": {
