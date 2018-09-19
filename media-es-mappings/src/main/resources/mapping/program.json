@@ -376,6 +376,9 @@
                     }
                 }
             },
+            "isDubbed": {
+                "type": "boolean"
+            },
             "languages" : {
                 "properties" : {
                     "code" : {
@@ -1080,6 +1083,9 @@
                             }
                         }
                     },
+                    "isDubbed": {
+                        "type": "boolean"
+                    },
                     "languages" : {
                         "properties" : {
                             "code" : {
@@ -1387,6 +1393,27 @@
                             }
                         }
                     },
+                    "expandedTitles": {
+                        "properties": {
+                            "owner": {
+                                "type": "string",
+                                "index" : "not_analyzed"
+
+                            },
+                            "type": {
+                                "type": "string",
+                                "index" : "not_analyzed"
+
+                            },
+                            "value": {
+                                "type": "string",
+                                "analyzer" : "dutch_stemmed",
+                                "norms": {
+                                    "enabled": false
+                                }
+                            }
+                        }
+                    },
                     "twitter" : {
                         "properties" : {
                             "type" : {
@@ -1492,6 +1519,27 @@
                                     "enabled": false
                                 }
                             }
+                        }
+                    }
+                }
+            },
+            "expandedTitles": {
+                "properties": {
+                    "owner": {
+                        "type": "string",
+                        "index" : "not_analyzed"
+
+                    },
+                    "type": {
+                        "type": "string",
+                        "index" : "not_analyzed"
+
+                    },
+                    "value": {
+                        "type": "string",
+                        "analyzer" : "dutch_stemmed",
+                        "norms": {
+                            "enabled": false
                         }
                     }
                 }
