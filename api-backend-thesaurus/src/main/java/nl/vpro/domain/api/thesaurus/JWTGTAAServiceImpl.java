@@ -10,15 +10,11 @@ import java.util.Arrays;
 
 import javax.inject.Inject;
 
+import nl.vpro.domain.media.gtaa.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import nl.vpro.domain.media.Person;
-import nl.vpro.domain.media.gtaa.GTAAPerson;
-import nl.vpro.domain.media.gtaa.GTAARepository;
-import nl.vpro.openarchives.oai.Label;
-import nl.vpro.rs.thesaurus.update.NewPerson;
 import nl.vpro.util.DateUtils;
 
 /**
@@ -63,7 +59,25 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
      *            to the {@link GTAARepository}. Extra check on expiration date (jwt should not be issued > 12h ago)
      */
     @Override
-    public GTAAPerson submitPerson(NewPerson newPerson, String jws) {
+    public GTAAPerson submitPerson(GTAANewPerson newPerson, String jws) {
+        try {
+            String creator = authenticate(jws);
+            return gtaaService.submit(new GTAAPerson(newPerson), creator);
+        } catch (SecurityException se) {
+            throw se;
+        }
+    }
+
+    public ThesaurusObject submitThesaurusObject(GTAANewThesaurusObject gtaaNewThesaurusObject, String jws) {
+        try {
+            String creator = authenticate(jws);
+            return gtaaService.submit(ThesaurusObjects.toThesaurusObject(gtaaNewThesaurusObject), creator);
+        } catch (SecurityException se) {
+            throw se;
+        }
+    }
+
+    private String authenticate(String jws) throws SecurityException{
         JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
         parser.setAllowedClockSkewSeconds(5);
         Jws<Claims> claims = parser.parseClaimsJws(StringUtils.trim(jws));
@@ -76,16 +90,11 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         if (issuedAt.isBefore(maxAllowed)) {
             throw new SecurityException("JWT token was issued more than the permitted 12 hours ago");
         }
-        return gtaaService.submit(convertToPerson(newPerson), creator);
+
+        return creator;
     }
 
-    private GTAAPerson convertToPerson(NewPerson newPerson) {
-        GTAAPerson person = new GTAAPerson(Person.builder().givenName(newPerson.getGivenName()).familyName(newPerson.getFamilyName()).build());
-        if(StringUtils.isNotBlank(newPerson.getNote())) {
-            person.setNotes(Arrays.asList(Label.forValue(newPerson.getNote())));
-        }
-        return person;
-    }
+
 
 
 }

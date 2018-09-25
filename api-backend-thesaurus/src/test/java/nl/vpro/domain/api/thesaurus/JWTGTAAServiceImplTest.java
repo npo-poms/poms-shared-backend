@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import nl.vpro.domain.media.gtaa.GTAANewPerson;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +23,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import nl.vpro.domain.media.gtaa.GTAAPerson;
 import nl.vpro.domain.media.gtaa.GTAARepository;
-import nl.vpro.rs.thesaurus.update.NewPerson;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,7 +54,7 @@ public class JWTGTAAServiceImplTest {
     @Test
     public void testSubmitPersonWithValidToken() throws IOException {
         when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of("SECRET"));
-        NewPerson newPerson = new NewPerson("piet", "hein", "opmerking");
+        GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
         String jws = encrypt1("demo-app", "SECRET", "user y");
         jwtService.submitPerson(newPerson, jws);
 
@@ -64,14 +64,14 @@ public class JWTGTAAServiceImplTest {
     @Test (expected = SecurityException.class)
     public void testSubmitPersonWithExpiredToken() throws IOException {
         when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of("SECRET"));
-        NewPerson newPerson = new NewPerson("piet", "hein", "opmerking");
+        GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
         String jws = encrypt2("demo-app", "SECRET", "user y");
         jwtService.submitPerson(newPerson, jws);
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void testAddPersonWithoutIssuer() throws IOException {
-        NewPerson newPerson = new NewPerson("piet", "hein", "opmerking");
+        GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
         String jws = encrypt2(null, "SECRET", "user y");
         jwtService.submitPerson(newPerson, jws);
     }
