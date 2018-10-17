@@ -61,8 +61,8 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     @Override
     public GTAAPerson submitPerson(GTAANewPerson newPerson, String jws) {
         try {
-            String creator = authenticate(jws);
-            return gtaaService.submit(new GTAAPerson(newPerson), creator);
+            String issuer = authenticate(jws);
+            return gtaaService.submit(new GTAAPerson(newPerson), issuer);
         } catch (SecurityException se) {
             throw se;
         }
@@ -70,8 +70,8 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
 
     public ThesaurusObject submitThesaurusObject(GTAANewThesaurusObject gtaaNewThesaurusObject, String jws) {
         try {
-            String creator = authenticate(jws);
-            return gtaaService.submit(ThesaurusObjects.toThesaurusObject(gtaaNewThesaurusObject), creator);
+            String issuer = authenticate(jws);
+            return gtaaService.submit(ThesaurusObjects.toThesaurusObject(gtaaNewThesaurusObject), issuer);
         } catch (SecurityException se) {
             throw se;
         }
@@ -80,8 +80,9 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     private String authenticate(String jws) throws SecurityException{
         JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
         parser.setAllowedClockSkewSeconds(5);
-        Jws<Claims> claims = parser.parseClaimsJws(StringUtils.trim(jws));
-        String creator = claims.getBody().getIssuer();
+
+        Jws<Claims> claims = parser.parseClaimsJws(jws);
+        String issuer = claims.getBody().getIssuer();
         Instant issuedAt = DateUtils.toInstant(claims.getBody().getIssuedAt());
         Instant maxAllowed = Instant.now().minus(12, ChronoUnit.HOURS);
         if (issuedAt == null) {
@@ -91,7 +92,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
             throw new SecurityException("JWT token was issued more than the permitted 12 hours ago");
         }
 
-        return creator;
+        return issuer;
     }
 
 
