@@ -1120,8 +1120,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         Group group = index(season().mid("MID_0").build());
         index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf(group, 2).build());
         index(broadcast().mid("MID_2").episodeOf(group, 1).build());
-        index(broadcast().mid("MID_3").episodeOf(MemberRef.builder().owner(group).number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
-        index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().owner(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
+        index(broadcast().mid("MID_3").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
+        index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
         index(broadcast().mid("MID_5").episodeOf(group, 4).build());
 
         ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);

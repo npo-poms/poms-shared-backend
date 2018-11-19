@@ -159,13 +159,14 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     public void listSchedulesForBroadcasterWithMax() throws Exception {
 
         Instant now = Instant.now();
+        Instant first = Instant.parse("2018-11-19T10:00:00Z");
         for (int i = 0 ; i < 40; i++) {
             index(MediaBuilder.program().mid("MID_" + i)
                 .broadcasters(i % 2 == 0 ? "VPRO" : "EO")
                 .creationDate(now.plusMillis(i))
                 .scheduleEvents(
-                    ScheduleEvent.builder().channel(Channel.BBC1).start(Instant.parse("2018-11-19T10:00:00Z").plus(Duration.ofHours(i))).duration(Duration.ofMinutes(20)).build(),
-                    ScheduleEvent.builder().channel(Channel.BBC2).start(Instant.parse("2018-11-19T10:00:00Z").plus(Duration.ofHours(i + 1)).plusSeconds(60 * 30)).rerun(true).duration(Duration.ofMinutes(20)).build()
+                    ScheduleEvent.builder().channel(Channel.BBC1).start(first.plus(Duration.ofHours(i))).duration(Duration.ofMinutes(20)).build(),
+                    ScheduleEvent.builder().channel(Channel.BBC2).start(first.plus(Duration.ofHours(i + 1)).plusSeconds(60 * 30)).rerun(true).duration(Duration.ofMinutes(20)).build()
                 ).build());
         }
         {

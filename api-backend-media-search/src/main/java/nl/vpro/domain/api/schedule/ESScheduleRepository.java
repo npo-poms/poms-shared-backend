@@ -277,6 +277,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 log.debug("Mediaobject {} not added, since it did unexpectedly not apply to {}", mo, form);
             }
         }
+        log.debug("Found {} different media objects" , mediaObjectCount);
 
         switch (form.getPager().getOrder()) {
             case ASC:
