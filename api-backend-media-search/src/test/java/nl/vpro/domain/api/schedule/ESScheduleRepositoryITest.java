@@ -159,24 +159,53 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     public void listSchedulesForBroadcasterWithMax() throws Exception {
 
         Instant now = Instant.now();
-        Instant first = Instant.parse("2018-11-19T10:00:00Z");
+        Instant first = LocalDateTime.parse("2018-11-19T10:00:00").atZone(Schedule.ZONE_ID).toInstant();
         for (int i = 0 ; i < 40; i++) {
-            index(MediaBuilder.program().mid("MID_" + i)
-                .broadcasters(i % 2 == 0 ? "VPRO" : "EO")
+            ScheduleEvent e1 =   ScheduleEvent.builder().channel(Channel.BBC1).start(first.plus(Duration.ofHours(i))).duration(Duration.ofMinutes(20)).build();
+            ScheduleEvent e2 =  ScheduleEvent.builder().channel(Channel.BBC2).start(first.plus(Duration.ofHours(i + 1))).rerun(true).duration(Duration.ofMinutes(20)).build();
+            Program p = MediaBuilder.program().mid("MID_" + i)
+                .broadcasters(i % 3 != 0 ? "VPRO" : "EO")
                 .creationDate(now.plusMillis(i))
-                .scheduleEvents(
-                    ScheduleEvent.builder().channel(Channel.BBC1).start(first.plus(Duration.ofHours(i))).duration(Duration.ofMinutes(20)).build(),
-                    ScheduleEvent.builder().channel(Channel.BBC2).start(first.plus(Duration.ofHours(i + 1)).plusSeconds(60 * 30)).rerun(true).duration(Duration.ofMinutes(20)).build()
-                ).build());
+                .scheduleEvents(e1, e2)
+                .build();
+            index(p);
+            if (p.getBroadcasters().contains(new Broadcaster("VPRO"))) {
+                log.info("{}", e1);
+                log.info("{}", e2);
+
+            }
+
         }
         {
             ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2018-11-19T09:00:00"), date("2018-11-19T18:01:00"), Order.ASC, 0L, 200);
-            assertThat(result).hasSize(17);
+            assertThat(result).hasSize(11);
+            assertThat(result.getItems().get(0).getStartInstant()).isEqualTo(first.plus(Duration.ofHours(1)));
+            assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC1);
+
+            assertThat(result.getItems().get(1).getStartInstant()).isEqualTo(first.plus(Duration.ofHours(2)));
+            assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC1);
+
+            assertThat(result.getItems().get(2).getStartInstant()).isEqualTo(first.plus(Duration.ofHours(2)));
+            assertThat(result.getItems().get(2).getChannel()).isEqualTo(Channel.BBC2);
+
+
         }
         {
 
-            ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2018-11-19T09:00:00"), date("2018-11-19T18:01:00"), Order.ASC, 0L, 15);
-            assertThat(result).hasSize(15);
+            ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2018-11-19T09:00:00"), date("2018-11-19T18:01:00"), Order.ASC, 0L, 5);
+            assertThat(result).hasSize(5);
+
+            // TODO FAILS. See  API-249
+            // This can only be correctly solved with parent/child queries or so (or very expensive queries)
+            assertThat(result.getItems().get(0).getStartInstant()).isEqualTo(first.plus(Duration.ofHours(1)));
+            assertThat(result.getItems().get(0).getChannel()).isEqualTo(Channel.BBC1);
+
+            assertThat(result.getItems().get(1).getStartInstant()).isEqualTo(first.plus(Duration.ofHours(2)));
+            assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC1);
+
+            assertThat(result.getItems().get(2).getStartInstant()).isEqualTo(first.plus(Duration.ofHours(2)));
+            assertThat(result.getItems().get(2).getChannel()).isEqualTo(Channel.BBC2);
+
         }
     }
 
