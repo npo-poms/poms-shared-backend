@@ -25,6 +25,7 @@ import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
 
 import nl.vpro.domain.api.*;
@@ -37,7 +38,6 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.MediaESType;
-import nl.vpro.util.MaxOffsetIterator;
 import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
@@ -107,7 +107,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     public ScheduleResult listSchedules(Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
-        return execute(form, offset, max);
+        return execute(form);
     }
 
     @Override
@@ -115,7 +115,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
         form.setChannels(Collections.singletonList(channel));
-        return execute(form, offset, max);
+        return execute(form);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), guideDay);
         form.setChannels(Collections.singletonList(channel));
-        return execute(form, offset, max);
+        return execute(form);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
         form.setNet(net.getId());
-        return execute(form, offset, max);
+        return execute(form);
     }
 
     @Override
@@ -139,7 +139,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
         form.setBroadcaster(broadcaster);
-        return execute(form, offset, max);
+        return execute(form);
     }
 
     @Override
@@ -147,7 +147,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
         form.setMediaType(mediaType);
-        return execute(form, offset, max);
+        return execute(form);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         ExtendedScheduleForm form = new ExtendedScheduleForm(
             new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
         form.setDescendantOf(Collections.singletonList(mediaId));
-        return execute(form, offset, max);
+        return execute(form);
     }
 
     private MediaObject findByCrid(String crid) throws IOException {
@@ -177,7 +177,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         return Jackson2Mapper.getInstance().readValue(hits.getHits()[0].getSourceAsString(), MediaObject.class);
     }
 
-    private ScheduleResult execute(ExtendedScheduleForm form, long offset, Integer max) {
+    private ScheduleResult execute(ExtendedScheduleForm form) {
         QueryBuilder toExecute;
         {
             BoolQueryBuilder query = QueryBuilders.boolQuery();
@@ -229,33 +229,54 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
             toExecute = simplifyQuery(query);
         }
-        final Long total = executeCount(toExecute, getIndexName());
 
         ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject);
         SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
         requestBuilder.setQuery(toExecute);
+        requestBuilder.addSort("creationDate", SortOrder.DESC);
         requestBuilder.setTypes(getScheduleEventTypes());
 
         List<ApiScheduleEvent> results = new ArrayList<>();
 
-        new MaxOffsetIterator<>(searchIterator, max, offset, true).forEachRemaining(mo -> {
-            int count = 0;
+        long skipped = 0;
+
+        long count = 0;
+        long mediaObjectCount = 0;
+
+        long offset = form.getPager().getOffset();
+        int max = form.getPager().getMax();
+
+        OUTER:
+        while (searchIterator.hasNext()) {
+            MediaObject mo = searchIterator.next();
+            int eventCountForMediaObject = 0;
+            mediaObjectCount++;
             for (ScheduleEvent e : mo.getScheduleEvents()) {
                 if (form.test(e)) {
-                    ApiScheduleEvent ae = new ApiScheduleEvent(e);
-                    ae.setParent(e.getParent());
-                    results.add(ae);
-                    count++;
+                    if (skipped < offset) {
+                        skipped++;
+                    } else {
+                        ApiScheduleEvent ae = new ApiScheduleEvent(e);
+                        ae.setParent(e.getParent());
+                        results.add(ae);
+                        eventCountForMediaObject++;
+                        count++;
+                    }
+                    if (count == max) {
+                        break OUTER;
+                    }
+                } else {
+                    log.debug("{} not in {}", e, form);
                 }
             }
-            if (count == 0) {
+            if (eventCountForMediaObject == 0) {
                 // this may happen if it broadcaster on the correct channel, and on the correct time
                 // _but not together_
                 // 1 schedule event has the correct channel, the other one the correct scheduleEvent.start
                 // it doesn't really matter for now, we simply didn't add it to the result
                 log.debug("Mediaobject {} not added, since it did unexpectedly not apply to {}", mo, form);
             }
-        });
+        }
 
         switch (form.getPager().getOrder()) {
             case ASC:
@@ -266,7 +287,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 break;
         }
 
-        return new ScheduleResult(new Result<>(results, offset, max, total));
+        return new ScheduleResult(new Result<>(results, offset, max, null));
     }
 
     protected MediaObject getMediaObject(SearchHit hit) {

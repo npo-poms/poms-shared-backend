@@ -13,7 +13,6 @@ import javax.xml.bind.JAXB;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.Before;
 import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.ApiScheduleEvent;
@@ -151,6 +150,35 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
             assertThat(result.getItems().get(1).getChannel()).isEqualTo(Channel.BBC1);
         }
     }
+
+
+    /**
+     * This reproduces API-249
+     */
+    @Test
+    public void listSchedulesForBroadcasterWithMax() throws Exception {
+
+        Instant now = Instant.now();
+        for (int i = 0 ; i < 40; i++) {
+            index(MediaBuilder.program().mid("MID_" + i)
+                .broadcasters(i % 2 == 0 ? "VPRO" : "EO")
+                .creationDate(now.plusMillis(i))
+                .scheduleEvents(
+                    ScheduleEvent.builder().channel(Channel.BBC1).start(Instant.parse("2018-11-19T10:00:00Z").plus(Duration.ofHours(i))).duration(Duration.ofMinutes(20)).build(),
+                    ScheduleEvent.builder().channel(Channel.BBC2).start(Instant.parse("2018-11-19T10:00:00Z").plus(Duration.ofHours(i + 1)).plusSeconds(60 * 30)).rerun(true).duration(Duration.ofMinutes(20)).build()
+                ).build());
+        }
+        {
+            ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2018-11-19T09:00:00"), date("2018-11-19T18:01:00"), Order.ASC, 0L, 200);
+            assertThat(result).hasSize(17);
+        }
+        {
+
+            ScheduleResult result = repository.listSchedulesForBroadcaster("VPRO", date("2018-11-19T09:00:00"), date("2018-11-19T18:01:00"), Order.ASC, 0L, 15);
+            assertThat(result).hasSize(15);
+        }
+    }
+
 
     @Test
     public void listSchedulesForMediaType() throws Exception {
