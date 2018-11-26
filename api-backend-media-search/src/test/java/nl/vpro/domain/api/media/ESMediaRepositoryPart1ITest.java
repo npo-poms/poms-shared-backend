@@ -1872,7 +1872,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private <T extends MediaObject> T index(T object)  {
         indexMediaObject(object);
         for (MemberRef ref : object.getMemberOf()) {
-            String memberRefType = MediaESType.memberRef(ref.getOwner().getClass()).name();
+            String memberRefType = MediaESType.memberRef(ref.getGroup().getClass()).name();
             index(memberRefType, object, ref);
         }
 
