@@ -6,15 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 
 import javax.inject.Inject;
 
-import nl.vpro.domain.media.gtaa.*;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import nl.vpro.domain.media.gtaa.*;
 import nl.vpro.util.DateUtils;
 
 /**
@@ -68,6 +66,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         }
     }
 
+    @Override
     public ThesaurusObject submitThesaurusObject(GTAANewThesaurusObject gtaaNewThesaurusObject, String jws) {
         try {
             String issuer = authenticate(jws);
