@@ -1865,6 +1865,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         form.setSearches(MediaSearch.builder()
             .title(TitleSearch.builder()
                 .value("b*")
+                .type(TextualType.MAIN)
                 .matchType(StandardMatchType.WILDCARD)
                 .build())
             .build());

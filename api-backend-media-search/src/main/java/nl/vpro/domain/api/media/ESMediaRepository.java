@@ -374,7 +374,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             offsetForES = 0;
             maxForES = null;
         }
-        ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSource().get("childRef"));
+        ElasticSearchIterator<String> iterator
+            = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSource().get("childRef"));
 
         SearchRequestBuilder builder = iterator
             .prepareSearch(indexName)
