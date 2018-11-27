@@ -1860,6 +1860,24 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.getFacets().getTitles().get(1).getId()).isEqualTo("b");
         assertThat(result.getFacets().getTitles().get(0).getCount()).isEqualTo(2);
         assertThat(result.getFacets().getTitles().get(1).getCount()).isEqualTo(2);
+
+
+        form.setSearches(MediaSearch.builder()
+            .title(TitleSearch.builder()
+                .value("b*")
+                .matchType(StandardMatchType.WILDCARD)
+                .build())
+            .build());
+
+        MediaSearchResult resultWithSearch = target.find(null, form, 0, 0);
+        assertThat(resultWithSearch.getFacets().getTitles().get(0).getId()).isEqualTo("a");
+        assertThat(resultWithSearch.getFacets().getTitles().get(0).getCount()).isEqualTo(2);
+        assertThat(resultWithSearch.getFacets().getTitles().get(0).isSelected()).isTrue();
+
+        assertThat(resultWithSearch.getFacets().getTitles().get(1).getId()).isEqualTo("b");
+        assertThat(resultWithSearch.getFacets().getTitles().get(1).getCount()).isEqualTo(0);
+        assertThat(resultWithSearch.getFacets().getTitles()).hasSize(2);
+        assertThat(resultWithSearch.getSelectedFacets().getTitles()).hasSize(1);
     }
 
     @SuppressWarnings("SameParameterValue")
