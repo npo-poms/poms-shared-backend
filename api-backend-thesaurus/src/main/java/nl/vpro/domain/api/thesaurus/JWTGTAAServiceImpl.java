@@ -82,6 +82,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
 
         Jws<Claims> claims = parser.parseClaimsJws(jws);
         String issuer = claims.getBody().getIssuer();
+
         Instant issuedAt = DateUtils.toInstant(claims.getBody().getIssuedAt());
         Instant maxAllowed = Instant.now().minus(12, ChronoUnit.HOURS);
         if (issuedAt == null) {
@@ -90,7 +91,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         if (issuedAt.isBefore(maxAllowed)) {
             throw new SecurityException("JWT token was issued more than the permitted 12 hours ago");
         }
-
+        log.debug("JWS authenticated {} for subject {}", issuer, claims.getBody().getSubject());
         return issuer;
     }
 
