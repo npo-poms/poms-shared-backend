@@ -491,7 +491,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (since != null && mid != null) {
             PeekingIterator<MediaChange> peeking = Iterators.peekingIterator(iterator);
             iterator = peeking;
-            while(true) {
+            while(peeking.hasNext()) {
                 MediaChange peek = peeking.peek();
 
                 if (peek != null) {
