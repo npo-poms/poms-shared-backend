@@ -73,7 +73,7 @@ public class PageServiceImpl implements PageService {
     @Override
     @PreAuthorize(Roles.API_USER)
     public List<Page> loadForIds(IdList ids) {
-        String[] idArray = ids.toArray(new String[ids.size()]);
+        String[] idArray = ids.toArray(new String[0]);
         CompletableFuture<Page[]> urlPages     = pageSearchRepository.loadByUrlsAsync(idArray);
         CompletableFuture<Page[]> cridPages    = pageSearchRepository.loadByCridsAsync(idArray);
         CompletableFuture<Page[]> statRefPages = pageSearchRepository.loadByStatRefsAsync(idArray);
@@ -96,7 +96,6 @@ public class PageServiceImpl implements PageService {
                 Page statRefPage = statRefPages.get()[i];
                 if (statRefPage != null) {
                     result.set(i, statRefPage);
-                    continue;
                 }
 
             }
