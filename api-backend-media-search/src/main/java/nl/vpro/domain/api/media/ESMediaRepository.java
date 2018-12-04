@@ -495,7 +495,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 MediaChange peek = peeking.peek();
 
                 if (peek != null) {
-                    if (peek.getPublishDate() == null || peek.getMid() == null || peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
+                    if (peek.isTail() || peek.getPublishDate() == null || peek.getMid() == null || peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
                         log.debug("Peek is ok");
                         break;
                     } else {
