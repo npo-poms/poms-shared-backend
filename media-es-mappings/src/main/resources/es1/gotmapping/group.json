@@ -539,6 +539,10 @@
         }
       }
     },
+    "mergedTo": {
+      "type": "string",
+      "index": "not_analyzed"
+    },
     "mid": {
       "type": "string",
       "index": "not_analyzed"

@@ -52,6 +52,18 @@
       "type": "string",
       "index": "not_analyzed"
     },
+    "availableSubtitles": {
+      "properties": {
+        "language": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    },
     "awards": {
       "type": "string",
       "norms": {
@@ -299,6 +311,10 @@
           "type": "date",
           "format": "date_time"
         },
+        "license": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
         "offset": {
           "type": "date",
           "format": "basic_time"
@@ -318,6 +334,9 @@
         "source": {
           "type": "string",
           "index": "not_analyzed"
+        },
+        "sourceName": {
+          "type": "string"
         },
         "title": {
           "type": "string",
