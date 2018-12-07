@@ -1,9 +1,4 @@
 {
-    "program" : {
-        "_id" : {
-            "path" : "mid"
-        },
-        "dynamic" : "strict",
         "properties" : {
             "ageRating" : {
                 "type" : "string",
@@ -1582,4 +1577,3 @@
             }
         }
     }
-}

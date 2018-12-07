@@ -14,33 +14,42 @@ fi
 desthost=$1
 
 basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
-
+needssettings=false
 if [ "$2" == "" ] ; then
     echo "No index number found, trying to put mappings over existing ones (supposing they are compatible)"
     destindex=apimedia
 else
     if [[ $2 =~ ^[0-9]+$ ]] ; then
-        previndex=apimedia-$(($2-1))
+        if (( $2 > 0 )) ; then
+            previndex=apimedia-$(($2-1))
+        fi
         destindex=apimedia-$2
+        needssettings=true
     else
         echo "No index number found, trying to put mappings over existing ones (supposing they are compatible)"
         destindex=$2
     fi
+    echo "$previndex -> $destindex"
 
 fi
 
 echo "Echo putting $basedir to $desthost/$destindex"
 
 rm $destindex.json
-if [ "$previndex" != "" ]; then
+echo '{' > $destindex.json
+if [ $needssettings ]; then
     echo "putting settings"
-    echo '{ "settings":' > $destindex.json
+    echo '"settings":' >> $destindex.json
     cat $basedir/es5/setting/apimedia.json >> $destindex.json
+    echo "," >> $destindex.json
+else
+    echo "previndex $previndex . No settings necessary"
 fi
 
-echo ',"mappings": {' >> $destindex.json
+echo '"mappings": {' >> $destindex.json
 
 declare -a arr=( "group" "program" "segment" "deletedprogram" "deletedgroup" "deletedsegment" "cue" "programMemberRef" "groupMemberRef" "segmentMemberRef" "episodeRef" )
+#declare -a arr=( "group" )
 
 for i in "${!arr[@]}"
 do
@@ -55,7 +64,7 @@ echo -e '}\n}' >> $destindex.json
 
 echo Created $destindex.json
 
-curl -XPUT $desthost/$destindex -d@$destindex.json
+curl -XPUT -H'content-type: application/json' $desthost/$destindex -d@$destindex.json
 
 if [ "$previndex" != "" ] ; then
 

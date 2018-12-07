@@ -17,6 +17,7 @@
         <configuration>
           <descriptors>
             <descriptor>assembly/package.xml</descriptor>
+            <descriptor>assembly/package-es1.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
