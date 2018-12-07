@@ -17,7 +17,7 @@ basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )"  && pwd )"
 destindex=apimedia-1
 
 
-curl -XPUT -H'content-type: application/json' $desthost/$destindex -d$basedir/setting/apimedia.json
+curl -XPUT -H'content-type: application/json' $desthost/$destindex -d@$basedir/setting/apimedia.json
 
 
 alias="{
@@ -31,5 +31,5 @@ alias="{
 }
 "
 
-curl -XPOST $desthost/_aliases -d "'$alias'"
+curl -XPOST $desthost/_aliases -d "$alias"
 
