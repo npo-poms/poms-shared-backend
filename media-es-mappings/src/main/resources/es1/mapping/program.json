@@ -747,6 +747,37 @@
           "type" : "date",
           "format" : "date_time"
         },
+        "titles": {
+          "properties": {
+            "owner": {
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "type": {
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "value": {
+              "fields": {
+                "full": {
+                  "index": "not_analyzed",
+                  "type": "string"
+                },
+                "stemmed": {
+                  "analyzer": "dutch_stemmed",
+                  "norms": {
+                    "enabled": false
+                  },
+                  "type": "string"
+                }
+              },
+              "norms": {
+                "enabled": false
+              },
+              "type": "string"
+            }
+          }
+        },
         "eventStart" : {
           "type" : "date",
           "format" : "date_time"
