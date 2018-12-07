@@ -19,7 +19,10 @@ destindex=apimedia
 
 declare -a arr=( "group" "program" "segment" "deletedprogram" "deletedgroup" "deletedsegment" "cue" "programMemberRef" "groupMemberRef" "segmentMemberRef" "episodeRef" )
 
+
+
 mkdir gotmapping
+echo $desthost/$destindex > gotmapping/desthost/
 for i in "${!arr[@]}"
 do
    curl $desthost/$destindex/_mapping/${arr[i]} | jq ".[].mappings.${arr[i]}" > $basedir/gotmapping/${arr[i]}.json

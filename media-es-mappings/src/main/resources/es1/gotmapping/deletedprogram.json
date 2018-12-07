@@ -788,6 +788,37 @@
             "enabled": false
           }
         },
+        "titles": {
+          "properties": {
+            "owner": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "value": {
+              "type": "string",
+              "norms": {
+                "enabled": false
+              },
+              "fields": {
+                "full": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "stemmed": {
+                  "type": "string",
+                  "norms": {
+                    "enabled": false
+                  },
+                  "analyzer": "dutch_stemmed"
+                }
+              }
+            }
+          }
+        },
         "type": {
           "type": "string",
           "index": "not_analyzed"
@@ -1391,16 +1422,16 @@
           "type": "string",
           "index": "not_analyzed",
           "fields": {
+            "lower": {
+              "type": "string",
+              "analyzer": "lowercase"
+            },
             "stemmed": {
               "type": "string",
               "norms": {
                 "enabled": false
               },
               "analyzer": "dutch_stemmed"
-            },
-            "lower": {
-              "type": "string",
-              "analyzer": "lowercase"
             },
             "text": {
               "type": "string",
@@ -1497,16 +1528,16 @@
       "type": "string",
       "index": "not_analyzed",
       "fields": {
+        "lower": {
+          "type": "string",
+          "analyzer": "lowercase"
+        },
         "stemmed": {
           "type": "string",
           "norms": {
             "enabled": false
           },
           "analyzer": "dutch_stemmed"
-        },
-        "lower": {
-          "type": "string",
-          "analyzer": "lowercase"
         },
         "text": {
           "type": "string",
