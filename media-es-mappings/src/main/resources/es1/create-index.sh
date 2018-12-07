@@ -6,11 +6,12 @@ fi
 
 if [ $# -lt 1 ];
 then
-    echo "Usage $0 <es-url>"
-    exit
+   desthost=http://localhost:9200
+else
+   desthost=$1
 fi
 
-desthost=$1
+
 
 basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )"  && pwd )"
 destindex=apimedia-1
