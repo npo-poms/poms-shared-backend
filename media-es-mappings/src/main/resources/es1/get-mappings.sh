@@ -22,10 +22,10 @@ declare -a arr=( "group" "program" "segment" "deletedprogram" "deletedgroup" "de
 
 
 mkdir gotmapping
-echo $desthost/$destindex > gotmapping/desthost/
+echo $desthost/$destindex > gotmapping/desthost
 for i in "${!arr[@]}"
 do
-   curl $desthost/$destindex/_mapping/${arr[i]} | jq ".[].mappings.${arr[i]}" > $basedir/gotmapping/${arr[i]}.json
+   curl $desthost/$destindex/_mapping/${arr[i]} | jq -S ".[].mappings.${arr[i]}" > $basedir/gotmapping/${arr[i]}.json
  done
 
 

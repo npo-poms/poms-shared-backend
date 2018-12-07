@@ -1,19 +1,19 @@
 {
-  "dynamic": "strict",
   "_parent": {
     "type": "program"
   },
   "_routing": {
     "required": true
   },
+  "dynamic": "strict",
   "properties": {
     "added": {
-      "type": "date",
-      "format": "date_time"
+      "format": "date_time",
+      "type": "date"
     },
     "childRef": {
-      "type": "string",
-      "index": "not_analyzed"
+      "index": "not_analyzed",
+      "type": "string"
     },
     "highlighted": {
       "type": "boolean"
@@ -22,16 +22,16 @@
       "type": "long"
     },
     "midRef": {
-      "type": "string",
-      "index": "not_analyzed"
+      "index": "not_analyzed",
+      "type": "string"
     },
     "type": {
-      "type": "string",
-      "index": "not_analyzed"
+      "index": "not_analyzed",
+      "type": "string"
     },
     "urnRef": {
-      "type": "string",
-      "index": "not_analyzed"
+      "index": "not_analyzed",
+      "type": "string"
     }
   }
 }
