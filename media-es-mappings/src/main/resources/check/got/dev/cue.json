@@ -1,0 +1,38 @@
+{
+  "_parent": {
+    "type": "program"
+  },
+  "_routing": {
+    "required": true
+  },
+  "dynamic": "strict",
+  "properties": {
+    "content": {
+      "type": "string"
+    },
+    "end": {
+      "type": "long"
+    },
+    "lang": {
+      "index": "not_analyzed",
+      "type": "string"
+    },
+    "offset": {
+      "type": "long"
+    },
+    "parent": {
+      "index": "not_analyzed",
+      "type": "string"
+    },
+    "sequence": {
+      "type": "long"
+    },
+    "start": {
+      "type": "long"
+    },
+    "type": {
+      "index": "not_analyzed",
+      "type": "string"
+    }
+  }
+}
