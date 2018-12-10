@@ -1,0 +1,37 @@
+{
+  "_parent": {
+    "type": "group"
+  },
+  "_routing": {
+    "required": true
+  },
+  "dynamic": "strict",
+  "properties": {
+    "added": {
+      "format": "date_time",
+      "type": "date"
+    },
+    "childRef": {
+      "index": "not_analyzed",
+      "type": "string"
+    },
+    "highlighted": {
+      "type": "boolean"
+    },
+    "index": {
+      "type": "long"
+    },
+    "midRef": {
+      "index": "not_analyzed",
+      "type": "string"
+    },
+    "type": {
+      "index": "not_analyzed",
+      "type": "string"
+    },
+    "urnRef": {
+      "index": "not_analyzed",
+      "type": "string"
+    }
+  }
+}
