@@ -252,6 +252,25 @@
       "index": "not_analyzed",
       "type": "string"
     },
+    "expandedTitles": {
+      "properties": {
+        "owner": {
+          "index": "not_analyzed",
+          "type": "string"
+        },
+        "type": {
+          "index": "not_analyzed",
+          "type": "string"
+        },
+        "value": {
+          "analyzer": "dutch_stemmed",
+          "norms": {
+            "enabled": false
+          },
+          "type": "string"
+        }
+      }
+    },
     "genres": {
       "include_in_parent": true,
       "properties": {
@@ -378,6 +397,9 @@
           "type": "string"
         }
       }
+    },
+    "isDubbed": {
+      "type": "boolean"
     },
     "languages": {
       "properties": {
@@ -687,6 +709,10 @@
           "format": "basic_time",
           "type": "date"
         },
+        "eventStart": {
+          "format": "date_time",
+          "type": "date"
+        },
         "guideDay": {
           "format": "date",
           "type": "date"
@@ -994,6 +1020,25 @@
           "index": "not_analyzed",
           "type": "string"
         },
+        "expandedTitles": {
+          "properties": {
+            "owner": {
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "type": {
+              "index": "not_analyzed",
+              "type": "string"
+            },
+            "value": {
+              "analyzer": "dutch_stemmed",
+              "norms": {
+                "enabled": false
+              },
+              "type": "string"
+            }
+          }
+        },
         "genres": {
           "include_in_parent": true,
           "properties": {
@@ -1116,6 +1161,9 @@
               "type": "string"
             }
           }
+        },
+        "isDubbed": {
+          "type": "boolean"
         },
         "languages": {
           "properties": {
