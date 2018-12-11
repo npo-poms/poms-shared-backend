@@ -1,24 +1,20 @@
 package nl.vpro.api.cors;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import lombok.extern.slf4j.Slf4j;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author rico jansen
  */
+@Slf4j
 public class CorsPolicyImpl implements CorsPolicy {
-    private static final Logger LOG = LoggerFactory.getLogger(CorsPolicyImpl.class);
     private final String policyFile;
     private final boolean enabled;
 
@@ -56,23 +52,22 @@ public class CorsPolicyImpl implements CorsPolicy {
     }
 
     private Properties getPolicyProperties() {
-        InputStream in = null;
         Properties properties = new Properties();
-        String filename = policyFile;
-        try {
-            if (filename.startsWith("classpath:")) {
-                in = CorsPolicyImpl.class.getResourceAsStream(StringUtils.substringAfter(filename, "classpath:"));
-            } else {
-                File file = new File(policyFile);
-                in = new FileInputStream(file);
-            }
+        try (InputStream in = getStream(policyFile)) {
             properties.load(in);
         } catch (IOException ioe) {
-            LOG.warn(ioe.getMessage());
-        } finally {
-            IOUtils.closeQuietly(in);
+            log.warn(ioe.getMessage());
         }
         return properties;
+    }
+
+    private InputStream getStream(String filename) throws FileNotFoundException {
+        if (filename.startsWith("classpath:")) {
+            return CorsPolicyImpl.class.getResourceAsStream(StringUtils.substringAfter(filename, "classpath:"));
+        } else {
+            File file = new File(policyFile);
+            return new FileInputStream(file);
+        }
     }
 
     @Override
