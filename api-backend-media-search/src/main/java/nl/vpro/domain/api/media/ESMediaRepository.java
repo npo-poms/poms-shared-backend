@@ -61,8 +61,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private final String[] relatedFields;
 
-    @Inject
-    Settings settings;
+    @Inject Settings settings;
 
     @Inject
     @Named("couchDBMediaRepository")

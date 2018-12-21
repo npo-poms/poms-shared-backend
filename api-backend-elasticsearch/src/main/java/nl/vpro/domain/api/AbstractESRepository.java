@@ -76,7 +76,8 @@ public abstract class AbstractESRepository<T> {
     protected Duration commitDelay = Duration.ofSeconds(10);
 
 
-    public AbstractESRepository(@NotNull ESClientFactory factory) {
+    protected AbstractESRepository(
+        @NotNull ESClientFactory factory) {
         this.factory = factory;
         if (this.factory == null) {
             throw new IllegalArgumentException("The ES client factory cannot be null");
