@@ -109,7 +109,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        max = handleTooManyResults(max, maxResults);
+        max = handleTooManyResults(offset, max, maxResults);
         Order order = parseOrder(sort);
         if (guideDay != null) {
             if (start != null || stop != null) {
@@ -141,7 +141,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        max = handleTooManyResults(max, maxResults);
+        max = handleTooManyResults(offset, max, maxResults);
 
 
         ScheduleSearchResult result = scheduleService.find(form, profile, offset, max);
@@ -170,7 +170,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
             @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        max = handleTooManyResults(max, maxResults);
+        max = handleTooManyResults(offset, max, maxResults);
 
         Order order = parseOrder(sort);
 
@@ -266,7 +266,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
             @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        max = handleTooManyResults(max, maxResults);
+        max = handleTooManyResults(offset, max, maxResults);
         Order order = parseOrder(sort);
         if (guideDay != null) {
             if (start != null || stop != null) {
@@ -361,7 +361,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        max = handleTooManyResults(max, maxResults);
+        max = handleTooManyResults(offset, max, maxResults);
         Order order = parseOrder(sort);
         Channel chan = getChannel(channel);
         if (guideDay != null) {
@@ -461,7 +461,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
-        max = handleTooManyResults(max, maxResults);
+        max = handleTooManyResults(offset, max, maxResults);
         Order order = parseOrder(sort);
         if (guideDay != null) {
             if (start != null || stop != null) {
