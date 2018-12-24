@@ -30,15 +30,18 @@ public class Exceptions {
         return new BadRequestException(MessageFormatter.arrayFormat(message, args).getMessage());
     }
 
-    public static Integer handleTooManyResults(Integer max) {
-        return handleTooManyResults(max, Constants.MAX_RESULTS);
+    public static Integer handleTooManyResults(long  offset, Integer max) {
+        return handleTooManyResults(offset, max, Constants.MAX_RESULTS);
     }
-    public static Integer handleTooManyResults(Integer max, Integer maxResults) {
+    public static Integer handleTooManyResults(long offset, Integer max, Integer maxResults) {
         if (max == null){
-            return maxResults;
+            max = maxResults;
         }
-        if (maxResults != null && max > maxResults) {
+        if (max > maxResults) {
             throw badRequest("Requesting more than {} results is not allowed. Use a pager!", maxResults);
+        }
+        if (offset + max > 10000) { // See ES max_result_window setting. This is the default, we may want to find out what the _actual_ configured value is
+            throw badRequest("Offset + max may not be more than 10000. Use a query or the iterate call.");
         }
         return max;
 
