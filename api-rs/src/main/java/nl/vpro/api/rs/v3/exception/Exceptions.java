@@ -30,7 +30,7 @@ public class Exceptions {
         return new BadRequestException(MessageFormatter.arrayFormat(message, args).getMessage());
     }
 
-    public static Integer handleTooManyResults(long  offset, Integer max) {
+    public static Integer handleTooManyResultsWithDefault(long  offset, Integer max) {
         return handleTooManyResults(offset, max, Constants.MAX_RESULTS);
     }
     public static Integer handleTooManyResults(long offset, Integer max, Integer maxResults) {
