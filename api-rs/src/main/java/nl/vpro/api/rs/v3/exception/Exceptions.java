@@ -7,10 +7,10 @@ package nl.vpro.api.rs.v3.exception;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
 
-import org.slf4j.helpers.MessageFormatter;
-
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.constraint.PredicateTestResult;
+
+import static org.slf4j.helpers.MessageFormatter.arrayFormat;
 
 /**
  * @author Roelof Jan Koekoek
@@ -19,7 +19,7 @@ import nl.vpro.domain.constraint.PredicateTestResult;
 public class Exceptions {
 
     public static NotFoundException notFound(String message, Object... args) {
-        return new NotFoundException(MessageFormatter.arrayFormat(message, args).getMessage());
+        return new NotFoundException(arrayFormat(message, args).getMessage());
     }
 
     public static NotFoundException notFound(PredicateTestResult<?> testResult) {
@@ -27,7 +27,7 @@ public class Exceptions {
     }
 
     public static BadRequestException badRequest(String message, Object... args) {
-        return new BadRequestException(MessageFormatter.arrayFormat(message, args).getMessage());
+        return new BadRequestException(arrayFormat(message, args).getMessage());
     }
 
     public static Integer handleTooManyResultsWithDefault(long  offset, Integer max) {
