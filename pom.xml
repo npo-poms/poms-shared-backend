@@ -8,7 +8,7 @@
 
   <groupId>nl.publiekeomroep</groupId>
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>5.9.2-SNAPSHOT</version>
+  <version>5.9-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
 
@@ -16,7 +16,7 @@
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
-    <poms.shared.version>5.9.2-SNAPSHOT</poms.shared.version>
+    <poms.shared.version>5.9.2</poms.shared.version>
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
   </properties>
