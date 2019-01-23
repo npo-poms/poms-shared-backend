@@ -1116,8 +1116,7 @@
             "workflow" : {
               "type" : "string",
               "index" : "not_analyzed"
-            },
-
+            }
           }
         },
         "isDubbed" : {
