@@ -422,6 +422,9 @@
             "bitrate" : {
               "type" : "long"
             },
+             "byteSize" : {
+               "type" : "long"
+             },
             "videoAttributes" : {
               "properties" : {
                 "aspectRatio" : {
@@ -1059,6 +1062,10 @@
               "type" : "date",
               "format" : "date_time"
             },
+            "publishStop" : {
+              "type" : "date",
+              "format" : "date_time"
+            },
             "title" : {
               "type" : "string",
               "norms" : {
@@ -1109,7 +1116,8 @@
             "workflow" : {
               "type" : "string",
               "index" : "not_analyzed"
-            }
+            },
+
           }
         },
         "isDubbed" : {
