@@ -448,6 +448,9 @@
               "isOrdered": {
                 "type": "boolean"
               },
+              "isDubbed": {
+                "type": "boolean"
+              },
               "languages": {
                 "properties": {
                   "code": {
