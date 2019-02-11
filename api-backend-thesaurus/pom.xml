@@ -12,7 +12,7 @@
        <artifactId>lombok</artifactId>
      </dependency>
      <dependency>
-       <groupId>nl.publiekeomroep</groupId>
+       <groupId>nl.vpro.poms</groupId>
        <artifactId>media-openskos</artifactId>
      </dependency>
      <dependency>
@@ -24,7 +24,7 @@
        <artifactId>media-domain</artifactId>
      </dependency>
      <dependency>
-       <groupId>nl.publiekeomroep</groupId>
+       <groupId>nl.vpro.poms</groupId>
        <artifactId>poms-shared-domain</artifactId>
      </dependency>
      <dependency>
