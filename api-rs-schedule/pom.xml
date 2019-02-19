@@ -22,7 +22,6 @@
     <dependency>
       <groupId>nl.vpro.shared</groupId>
       <artifactId>vpro-shared-swagger</artifactId>
-      <classifier>classes</classifier>
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
