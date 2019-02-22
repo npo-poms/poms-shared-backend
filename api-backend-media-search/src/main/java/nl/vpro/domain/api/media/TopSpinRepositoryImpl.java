@@ -43,14 +43,14 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
     }
 
     @Override
-    public Recommendations getForMid(String mid, String partyId) {
+    public Recommendations getForMid(String mid, String partyId, String clazz) {
         if (StringUtils.isBlank(topspinUrl)) {
             log.warn("Topspin repository is disabled");
             return new Recommendations();
         } else {
             Map<String, Object> replacements = new HashMap<>();
             replacements.put("mediaId", mid);
-            replacements.put("class", clazz);
+            replacements.put("class", clazz == null ? this.clazz : clazz);
 
             WebTarget target = getTopSpinClient().target(topspinUrl).resolveTemplates(replacements)
                 .queryParam("max", topspinMaxResults)
