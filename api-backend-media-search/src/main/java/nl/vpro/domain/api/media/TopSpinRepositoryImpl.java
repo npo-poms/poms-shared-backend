@@ -2,6 +2,9 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -28,6 +31,8 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
     @Value("${topspin.recommendations.maxResults}")
     protected String topspinMaxResults;
 
+    protected String clazz = "related-series";
+
     @PostConstruct
     public void init() {
         if (StringUtils.isBlank(topspinUrl)) {
@@ -38,16 +43,22 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
     }
 
     @Override
-    public Recommendations getForMid(String mid) {
+    public Recommendations getForMid(String mid, String partyId) {
         if (StringUtils.isBlank(topspinUrl)) {
             log.warn("Topspin repository is disabled");
             return new Recommendations();
         } else {
-            String url = topspinUrl + mid;
-            WebTarget target = getTopSpinClient().target(url).queryParam("max", topspinMaxResults);
+            Map<String, Object> replacements = new HashMap<>();
+            replacements.put("mediaId", mid);
+            replacements.put("class", clazz);
+
+            WebTarget target = getTopSpinClient().target(topspinUrl).resolveTemplates(replacements)
+                .queryParam("max", topspinMaxResults)
+                .queryParam("partyId", partyId)
+                ;
             Response response = target.request().get();
             if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-                log.warn("Could not get top spin recommendations for on url {} (status {})", url, response.getStatus());
+                log.warn("Could not get top spin recommendations for on url {} (status {})", topspinUrl, response.getStatus());
                 return new Recommendations();
             }
             return response.readEntity(Recommendations.class);
