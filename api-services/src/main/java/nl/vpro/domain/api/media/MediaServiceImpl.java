@@ -219,8 +219,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(Roles.API_USER)
-    public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max) {
-        Recommendations recommendations = topSpinRepository.getForMid(media.getMid(), null);
+    public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max, String partyId, String clazz) {
+        Recommendations recommendations = topSpinRepository.getForMid(media.getMid(), partyId, clazz);
         List<MediaObject> mediaObjects = loadAll(recommendations.getRecommendations().stream().map(Recommendation::getMidRef).collect(Collectors.toList()));
         Predicate<MediaObject> filter = (mo) -> true;
         if (profile != null) {
