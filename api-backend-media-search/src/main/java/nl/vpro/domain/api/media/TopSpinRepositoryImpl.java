@@ -11,6 +11,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -34,21 +35,22 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
 
     @PostConstruct
     public void init() {
-        log.info("Connecting with {} for related results (max results: {})", topspinUrl, topspinMaxResults);
+        if (StringUtils.isBlank(topspinUrl)) {
+            log.debug("{} is disabled", this);
+        } else {
+            log.info("Connecting with {} for related results (max results: {})", topspinUrl, topspinMaxResults);
+        }
     }
 
     @Override
-    public Recommendations getForMid(String mid, String partyId) {
-        String url = topspinUrl + mid + ".json";
-        WebTarget target = getTopSpinClient().target(url).queryParam("max", topspinMaxResults);
-        Response response = target.request().get();
-        if(response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-            log.warn("Could not get top spin recommendations for on url {} (status {})", url, response.getStatus());
+    public Recommendations getForMid(String mid, String partyId, String clazz) {
+        if (StringUtils.isBlank(topspinUrl)) {
+            log.warn("Topspin repository is disabled");
             return new Recommendations();
         } else {
             Map<String, Object> replacements = new HashMap<>();
             replacements.put("mediaId", mid);
-            replacements.put("class", clazz);
+            replacements.put("class", clazz == null ? this.clazz : clazz);
 
             WebTarget target = getTopSpinClient().target(topspinUrl).resolveTemplates(replacements)
                 .queryParam("max", topspinMaxResults)
@@ -61,7 +63,6 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
             }
             return response.readEntity(Recommendations.class);
         }
-        return response.readEntity(Recommendations.class);
     }
 
     protected Client getTopSpinClient() {
