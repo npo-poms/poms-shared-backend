@@ -7,5 +7,5 @@ import nl.vpro.domain.api.topspin.Recommendations;
  * @since 4.8
  */
 public interface TopSpinRepository {
-    Recommendations getForMid(String mid);
+    Recommendations getForMid(String mid, String partyId);
 }

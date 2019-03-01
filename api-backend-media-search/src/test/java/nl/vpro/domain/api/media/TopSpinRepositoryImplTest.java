@@ -30,7 +30,7 @@ public class TopSpinRepositoryImplTest {
         wireMockRule.stubFor(get(urlEqualTo("/notexist.json")).willReturn(notFound()));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
         repo.topspinUrl = "http://localhost:9999/";
-        Recommendations forMid = repo.getForMid("notexist");
+        Recommendations forMid = repo.getForMid("notexist", null);
         assertNotNull(forMid);
         assertTrue(forMid.getRecommendations().isEmpty());
     }
@@ -41,7 +41,7 @@ public class TopSpinRepositoryImplTest {
         wireMockRule.stubFor(get(urlEqualTo("/exists.json")).willReturn(okJson(json)));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
         repo.topspinUrl = "http://localhost:9999/";
-        Recommendations forMid = repo.getForMid("exists");
+        Recommendations forMid = repo.getForMid("exists", null);
         assertEquals(87, forMid.getRecommendations().size());
     }
 
