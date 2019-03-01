@@ -23,7 +23,7 @@ public class TopSpinRepositoryImplTest {
     public void testNoExists() {
         wireMockRule.stubFor(get(urlEqualTo("/notexist")).willReturn(notFound()));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
-        repo.topspinUrl = "http://localhost:9999/";
+        repo.topspinUrl = "http://localhost:9999/{mediaId}";
         Recommendations forMid = repo.getForMid("notexist", null, null);
         assertNotNull(forMid);
         assertTrue(forMid.getRecommendations().isEmpty());
@@ -34,7 +34,7 @@ public class TopSpinRepositoryImplTest {
         String json = IOUtils.toString(getClass().getResourceAsStream("/topspin-response.json"), StandardCharsets.UTF_8);
         wireMockRule.stubFor(get(urlEqualTo("/exists")).willReturn(okJson(json)));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
-        repo.topspinUrl = "http://localhost:9999/";
+        repo.topspinUrl = "http://localhost:9999/{mediaId}";
         Recommendations forMid = repo.getForMid("exists", null, null);
         assertEquals(87, forMid.getRecommendations().size());
     }
