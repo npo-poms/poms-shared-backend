@@ -859,6 +859,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(4);
             assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
 
+
+            // In 5.4 this fails, it gives 'evangelisch'.
+            // which is incorrect, since the relation search limit on vproLabels.
             assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("red note");
             assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
             assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
