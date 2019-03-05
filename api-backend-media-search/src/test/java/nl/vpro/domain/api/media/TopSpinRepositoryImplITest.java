@@ -15,7 +15,7 @@ public class TopSpinRepositoryImplITest {
     public void testNew() {
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
         repo.topspinUrl = "https://hub.npo-data.nl/api/v4/media/{mediaId}/recommendations/{class}";
-        Recommendations forMid = repo.getForMid("POW_03846555", null, "related-broadcasts");
+        Recommendations forMid = repo.getForMid("RBX_BV_13063322", null, "related-broadcasts");
         assertNotNull(forMid);
         log.info("{}", forMid.getRecommendations());
     }
