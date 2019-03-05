@@ -81,7 +81,7 @@ public class TopspinTest {
 
         // When
 
-        when(topSpinRepository.getForMid(startingMid)).thenReturn(recommendations);
+        when(topSpinRepository.getForMid(startingMid, null, null)).thenReturn(recommendations);
         doReturn(objects).when(mediaRepository).loadAll(anyList());
         when(mediaRepository.loadAll(anyList())).thenReturn(objects);
         when(profileService.getProfile("noteoprofile")).thenReturn(profile);
@@ -89,27 +89,27 @@ public class TopspinTest {
 
     @Test
     public void topspinNoFilter() {
-        MediaSearchResult result = target.findRelatedInTopspin(program, null, null, 3);
+        MediaSearchResult result = target.findRelatedInTopspin(program, null, null, 3, null, null);
         assertThat(result).hasSize(3);
     }
 
     @Test
     public void topspinProfileFilter() {
-        MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", null, 3);
+        MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", null, 3, null, null);
         assertThat(result).hasSize(2);
     }
 
     @Test
     public void topspinFormFilter() {
         MediaForm form = MediaFormBuilder.form().avTypes(AVType.VIDEO).build();
-        MediaSearchResult result = target.findRelatedInTopspin(program, null, form, 3);
+        MediaSearchResult result = target.findRelatedInTopspin(program, null, form, 3, null, null);
         assertThat(result).hasSize(2);
     }
 
     @Test
     public void topspinProfileAndFormFilter() {
         MediaForm form = MediaFormBuilder.form().avTypes(AVType.VIDEO).build();
-        MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", form, 3);
+        MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", form, 3, null, null);
         assertThat(result).hasSize(1);
     }
 }

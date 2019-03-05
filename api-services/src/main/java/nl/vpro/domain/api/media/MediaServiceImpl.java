@@ -7,9 +7,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -19,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-
 import com.google.common.collect.Iterators;
 
 import nl.vpro.api.Settings;
@@ -221,7 +218,11 @@ public class MediaServiceImpl implements MediaService {
     @PreAuthorize(Roles.API_USER)
     public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max, String partyId, String clazz) {
         Recommendations recommendations = topSpinRepository.getForMid(media.getMid(), partyId, clazz);
-        List<MediaObject> mediaObjects = loadAll(recommendations.getRecommendations().stream().map(Recommendation::getMidRef).collect(Collectors.toList()));
+
+        List<MediaObject> mediaObjects = loadAll(
+            recommendations.getRecommendations().stream()
+                .map(Recommendation::getMidRef)
+                .collect(Collectors.toList()));
         Predicate<MediaObject> filter = (mo) -> true;
         if (profile != null) {
             filter = getProfile(profile);
@@ -229,7 +230,18 @@ public class MediaServiceImpl implements MediaService {
         if (form != null) {
             filter = filter.and(form);
         }
-        List<SearchResultItem<? extends MediaObject>> filtered = mediaObjects.stream().filter(filter).limit(max).map(SearchResultItem::new).collect(Collectors.toList());
+        List<SearchResultItem<? extends MediaObject>> filtered = mediaObjects.stream()
+            .filter(filter)
+            .limit(max)
+            .map(SearchResultItem::new)
+            .collect(Collectors.toList());
+        for (SearchResultItem<? extends MediaObject> f : filtered) {
+            for (Recommendation r : recommendations) {
+                if (r.getMidRef().equals(f.getResult().getMid())) {
+                    f.setScore(r.getScore());
+                }
+            }
+        }
         return new MediaSearchResult(filtered, 0L, max, filtered.size());
     }
 
