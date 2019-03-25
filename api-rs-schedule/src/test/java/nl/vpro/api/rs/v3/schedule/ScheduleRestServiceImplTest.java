@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.xml.sax.SAXException;
 
-import nl.vpro.api.rs.v3.AbstractRestServiceImplTest;
+import nl.vpro.api.rs.AbstractRestServiceImplTest;
 import nl.vpro.api.rs.validation.ScheduleFormValidatingReader;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
