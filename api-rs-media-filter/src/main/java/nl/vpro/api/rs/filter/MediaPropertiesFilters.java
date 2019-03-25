@@ -106,18 +106,18 @@ public class MediaPropertiesFilters {
                                     if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
                                         log.debug("Instrumenting Set {}", fieldName);
                                         if ("titles".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
                                         } else if ("descriptions".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + f.getFieldName() + "\", $proceed($$));");
                                         } else {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                         }
                                     } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
                                         log.debug("Instrumenting List {}", fieldName);
-                                        f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                        f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                     } else {
                                         log.debug("Instrumenting {}", fieldName);
-                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.v3.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
+                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
                                     }
                                 }
                             } catch (RuntimeException | NotFoundException | CannotCompileException wtf) {
