@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 
 import com.newrelic.api.agent.Trace;
 
-import nl.vpro.api.rs.v3.exception.Exceptions;
+import nl.vpro.api.rs.exception.Exceptions;
 import nl.vpro.api.rs.v3.filter.ApiMediaFilter;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Constants;
@@ -42,7 +42,7 @@ import nl.vpro.domain.media.Net;
 import nl.vpro.domain.media.ScheduleEvent;
 import nl.vpro.swagger.SwaggerApplication;
 
-import static nl.vpro.api.rs.v3.exception.Exceptions.handleTooManyResults;
+import static nl.vpro.api.rs.exception.Exceptions.handleTooManyResults;
 import static nl.vpro.domain.api.Constants.*;
 
 
