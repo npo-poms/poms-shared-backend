@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 3.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:/nl/vpro/api/rs/v3/filter/scheduleEventViewSortedSetTest-context.xml")
+@ContextConfiguration(locations = "classpath:/nl/vpro/api/rs/filter/scheduleEventViewSortedSetTest-context.xml")
 public class ScheduleEventViewSortedSetTest {
     @Test
     public void testFilteredSetApiClient() {
