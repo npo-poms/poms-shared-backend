@@ -29,7 +29,7 @@ import org.springframework.stereotype.Service;
 import com.newrelic.api.agent.Trace;
 
 import nl.vpro.api.rs.exception.Exceptions;
-import nl.vpro.api.rs.v3.filter.ApiMediaFilter;
+import nl.vpro.api.rs.filter.ApiMediaFilter;
 import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Constants;
 import nl.vpro.domain.api.Order;
