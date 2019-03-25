@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3.filter;
+package nl.vpro.api.rs.filter;
 
 import java.util.Arrays;
 import java.util.Collections;

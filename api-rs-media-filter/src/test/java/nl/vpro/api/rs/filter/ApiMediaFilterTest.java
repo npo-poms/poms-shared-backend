@@ -2,7 +2,7 @@
  * Copyright (C) 2014 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.api.rs.v3.filter;
+package nl.vpro.api.rs.filter;
 
 import java.io.StringReader;
 import java.io.StringWriter;
