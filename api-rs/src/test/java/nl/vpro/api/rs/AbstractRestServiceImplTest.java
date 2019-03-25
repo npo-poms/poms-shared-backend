@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3;
+package nl.vpro.api.rs;
 
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
