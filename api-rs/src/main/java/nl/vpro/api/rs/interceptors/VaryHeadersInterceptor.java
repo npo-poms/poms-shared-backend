@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3.interceptors;
+package nl.vpro.api.rs.interceptors;
 
 import java.io.IOException;
 

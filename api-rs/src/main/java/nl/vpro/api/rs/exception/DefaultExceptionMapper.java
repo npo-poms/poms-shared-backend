@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3.exception;
+package nl.vpro.api.rs.exception;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,7 +8,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.jboss.resteasy.spi.Failure;
 
-import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
+import nl.vpro.api.rs.interceptors.StoreRequestInThreadLocal;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 

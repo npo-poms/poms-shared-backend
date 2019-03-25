@@ -2,7 +2,7 @@
  * Copyright (C) 2014 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.api.rs.v3.exception;
+package nl.vpro.api.rs.exception;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlElement;
 import org.jboss.resteasy.api.validation.ResteasyConstraintViolation;
 import org.jboss.resteasy.api.validation.ResteasyViolationException;
 
-import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
+import nl.vpro.api.rs.interceptors.StoreRequestInThreadLocal;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 

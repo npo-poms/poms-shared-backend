@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3.validation;
+package nl.vpro.api.rs.validation;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

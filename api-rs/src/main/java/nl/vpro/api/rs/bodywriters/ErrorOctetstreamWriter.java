@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3.bodywriters;
+package nl.vpro.api.rs.bodywriters;
 
 import java.io.IOException;
 import java.io.OutputStream;

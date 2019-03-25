@@ -2,7 +2,7 @@
  * Copyright (C) 2014 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.api.rs.v3.exception;
+package nl.vpro.api.rs.exception;
 
 
 import javax.ws.rs.BadRequestException;
@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
 
-import nl.vpro.api.rs.v3.interceptors.StoreRequestInThreadLocal;
+import nl.vpro.api.rs.interceptors.StoreRequestInThreadLocal;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 

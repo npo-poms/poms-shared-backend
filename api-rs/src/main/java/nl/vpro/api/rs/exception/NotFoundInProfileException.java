@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3.exception;
+package nl.vpro.api.rs.exception;
 
 import javax.ws.rs.NotFoundException;
 

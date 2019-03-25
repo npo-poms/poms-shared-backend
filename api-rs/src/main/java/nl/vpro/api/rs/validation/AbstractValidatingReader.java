@@ -1,4 +1,4 @@
-package nl.vpro.api.rs.v3.validation;
+package nl.vpro.api.rs.validation;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +19,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.xml.sax.SAXException;
 
@@ -49,7 +48,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     public AbstractValidatingReader(Class<T> classToRead, String namespace) {
         this(classToRead, namespace, null);
     }
-    
+
     public AbstractValidatingReader(Class<T> classToRead, String namespace, ApiMappings mappings) {
         this.classToRead = classToRead;
         this.namespace = namespace;

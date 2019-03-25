@@ -2,7 +2,7 @@
  * Copyright (C) 2014 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.api.rs.v3.exception;
+package nl.vpro.api.rs.exception;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
