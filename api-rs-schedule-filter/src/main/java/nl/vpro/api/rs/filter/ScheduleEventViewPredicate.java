@@ -2,14 +2,13 @@
  * Copyright (C) 2014 All rights reserved
  * VPRO The Netherlands
  */
-package nl.vpro.api.rs.v3.filter;
+package nl.vpro.api.rs.filter;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Date;
-import java.util.SortedSet;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;

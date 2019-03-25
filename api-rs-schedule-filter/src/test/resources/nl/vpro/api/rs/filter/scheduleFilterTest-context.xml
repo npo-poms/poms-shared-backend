@@ -7,7 +7,7 @@
                http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
   <!-- Instrument classes before they get loaded by the application. (Reloading classes is not possible) -->
-  <bean id="instrumentMediaFilters" class="nl.vpro.api.rs.v3.filter.MediaPropertiesFilters"/>
+  <bean id="instrumentMediaFilters" class="nl.vpro.api.rs.filter.MediaPropertiesFilters"/>
 
   <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider user-service-ref="userService"/>
