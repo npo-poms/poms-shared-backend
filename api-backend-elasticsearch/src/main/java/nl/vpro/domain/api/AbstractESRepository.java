@@ -239,9 +239,17 @@ public abstract class AbstractESRepository<T> {
             //List<T> answer = new ArrayList<>(responses.getResponses().length); // ES v > 0.20
             Map<String, S> answerMap = new HashMap<>(responses.getResponses().length);
             for(MultiGetItemResponse response : responses) {
-                if(response.getResponse().isExists()) {
-                    S item = Jackson2Mapper.INSTANCE.readValue(response.getResponse().getSourceAsString(), clazz);
-                    answerMap.put(response.getId(), item);
+                if(response.isFailed()) {
+                    if (response.getFailure() != null) {
+                        log.error("{}", response.getFailure().getMessage(), response.getFailure().getFailure());
+                    } else {
+                        log.error("{}", response);
+                    }
+                } else {
+                    if (response.getResponse().isExists()) {
+                        S item = Jackson2Mapper.INSTANCE.readValue(response.getResponse().getSourceAsString(), clazz);
+                        answerMap.put(response.getId(), item);
+                    }
                 }
             }
             List<S> answer = new ArrayList<>(ids.length);
