@@ -2,6 +2,7 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.vpro.domain.api.topspin.Recommendations;
@@ -22,6 +23,7 @@ public class TopSpinRepositoryImplITest {
 
 
     @Test
+    @Ignore
     public void testOld() {
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
         repo.topspinUrl = "https://api.npo.nl/api/v3/recommendations/related/{mediaId}";
