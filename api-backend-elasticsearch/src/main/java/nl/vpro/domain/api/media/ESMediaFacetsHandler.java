@@ -24,6 +24,8 @@ import nl.vpro.domain.api.MultipleFacetsResult;
 import nl.vpro.domain.api.TermFacetResultItem;
 import nl.vpro.domain.media.*;
 
+import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 2.0
