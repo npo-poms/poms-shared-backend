@@ -4,20 +4,22 @@
  */
 package nl.vpro.domain.api.media;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
 import lombok.extern.slf4j.Slf4j;
-import nl.vpro.api.Settings;
-import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.media.AgeRating;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.elasticsearch.ElasticSearchIterator;
-import nl.vpro.media.domain.es.MediaESType;
-import nl.vpro.util.*;
+
+import java.io.IOException;
+import java.sql.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.mlt.MoreLikeThisRequestBuilder;
 import org.elasticsearch.action.search.SearchRequest;
@@ -33,19 +35,20 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.PeekingIterator;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.IOException;
-import java.sql.Date;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import nl.vpro.api.Settings;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.profile.ProfileDefinition;
+import nl.vpro.domain.media.AgeRating;
+import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.support.Workflow;
+import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch.ElasticSearchIterator;
+import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.util.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -399,7 +402,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             iterator = peeking;
             while (true) {
                 Change peek = peeking.peek();
-                if (peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
+                if (peek.getPublishDate() == null || peek.getMid() == null || peek.getPublishDate().isAfter(since) || peek.getMid().compareTo(mid) > 0) {
                     break;
                 } else {
                     Change skipped = peeking.next();
