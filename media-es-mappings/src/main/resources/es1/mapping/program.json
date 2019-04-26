@@ -279,6 +279,10 @@
           "type" : "date",
           "format" : "date_time"
         },
+        "crids" : {
+          "type" : "string",
+          "index" : "not_analyzed"
+        },
         "description" : {
           "type" : "string",
           "fields" : {
@@ -1026,6 +1030,10 @@
             "creationDate" : {
               "type" : "date",
               "format" : "date_time"
+            },
+            "crids" : {
+              "type" : "string",
+              "index" : "not_analyzed"
             },
             "description" : {
               "type" : "string",

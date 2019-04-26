@@ -247,6 +247,9 @@
           "type": "date",
           "format": "epoch_millis"
         },
+        "crids": {
+          "type": "keyword"
+        },
         "description": {
           "type": "text",
           "fields": {
@@ -931,6 +934,9 @@
             "creationDate": {
               "type": "date",
               "format": "epoch_millis"
+            },
+            "crids": {
+              "type": "keyword"
             },
             "description": {
               "type": "text",
