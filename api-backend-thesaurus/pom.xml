@@ -17,7 +17,7 @@
      </dependency>
      <dependency>
        <groupId>io.jsonwebtoken</groupId>
-       <artifactId>jjwt</artifactId>
+       <artifactId>jjwt-impl</artifactId>
      </dependency>
      <dependency>
        <groupId>nl.vpro.media</groupId>

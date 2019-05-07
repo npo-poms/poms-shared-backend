@@ -67,19 +67,20 @@
       <artifactId>lombok</artifactId>
     </dependency>
     <dependency>
-      <groupId>nl.vpro.api</groupId>
-      <artifactId>api-spring</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-spring</artifactId>
     </dependency>
     <dependency>
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock-standalone</artifactId>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
 
