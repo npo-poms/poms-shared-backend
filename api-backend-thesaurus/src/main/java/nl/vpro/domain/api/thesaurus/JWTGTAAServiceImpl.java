@@ -60,7 +60,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     public GTAAPerson submitPerson(GTAANewPerson newPerson, String jws) {
         try {
             String issuer = authenticate(jws);
-            return gtaaService.submit(new GTAAPerson(newPerson), issuer);
+            return gtaaService.submit(newPerson, issuer);
         } catch (SecurityException se) {
             throw se;
         }
@@ -70,7 +70,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     public ThesaurusObject submitThesaurusObject(GTAANewThesaurusObject gtaaNewThesaurusObject, String jws) {
         try {
             String issuer = authenticate(jws);
-            return gtaaService.submit(ThesaurusObjects.toThesaurusObject(gtaaNewThesaurusObject), issuer);
+            return gtaaService.submit(gtaaNewThesaurusObject, issuer);
         } catch (SecurityException se) {
             throw se;
         }

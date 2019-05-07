@@ -56,24 +56,33 @@ public class JWTGTAAServiceImplTest {
     @Test
     public void testSubmitPersonWithValidToken() throws IOException {
         when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of(SECRET_KEY));
-        GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
+        GTAANewPerson newPerson = GTAANewPerson
+            .builder()
+            .givenName("piet")
+            .familyName("hein")
+            .note("opmerking")
+            .build();
         String jws = encrypt1("demo-app", SECRET_KEY, "user y");
         jwtService.submitPerson(newPerson, jws);
 
-        verify(gtaa).submit(any(GTAAPerson.class), eq("demo-app"));
+        verify(gtaa).submit(any(GTAANewPerson.class), eq("demo-app"));
     }
 
     @Test (expected = SecurityException.class)
     public void testSubmitPersonWithExpiredToken() throws IOException {
         when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of(SECRET_KEY));
-        GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
+        GTAANewPerson newPerson = GTAANewPerson.builder()
+        .givenName("piet")
+            .familyName("hein")
+            .note("opmerking")
+            .build();
         String jws = encrypt2("demo-app", SECRET_KEY, "user y");
         jwtService.submitPerson(newPerson, jws);
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void testAddPersonWithoutIssuer() {
-        GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
+        GTAANewPerson newPerson = GTAANewPerson.builder().givenName("piet").familyName("hein").note("opmerking").build();
         String jws = encrypt2(null, SECRET_KEY, "user y");
         jwtService.submitPerson(newPerson, jws);
     }
