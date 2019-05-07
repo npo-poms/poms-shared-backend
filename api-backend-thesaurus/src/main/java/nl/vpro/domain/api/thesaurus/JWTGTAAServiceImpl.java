@@ -5,8 +5,8 @@ import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -30,7 +30,9 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
 
     private final GTAAKeysRepository keysRepo;
 
-    @SuppressWarnings("rawtypes")
+    private Duration maxAge = Duration.ofHours(12);
+
+
     private SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
 
         @Override
@@ -69,6 +71,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         return gtaaService.submit(gtaaNewThesaurusObject, issuer);
     }
 
+
     private String authenticate(String jws) throws SecurityException{
         JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
         parser.setAllowedClockSkewSeconds(5);
@@ -77,12 +80,12 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
         String issuer = claims.getBody().getIssuer();
 
         Instant issuedAt = DateUtils.toInstant(claims.getBody().getIssuedAt());
-        Instant maxAllowed = Instant.now().minus(12, ChronoUnit.HOURS);
+        Instant maxAllowed = Instant.now().minus(maxAge);
         if (issuedAt == null) {
             throw new SecurityException("JWT token didn't have an issued at time");
         }
         if (issuedAt.isBefore(maxAllowed)) {
-            throw new SecurityException("JWT token was issued more than the permitted 12 hours ago");
+            throw new SecurityException("JWT token was issued more than the permitted " + maxAge + " ago");
         }
         log.debug("JWS authenticated {} for subject {}", issuer, claims.getBody().getSubject());
         return issuer;
