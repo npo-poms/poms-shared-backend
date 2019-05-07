@@ -63,7 +63,7 @@ public class JWTGTAAServiceImplTest {
             .note("opmerking")
             .build();
         String jws = encrypt1("demo-app", SECRET_KEY, "user y");
-        jwtService.submitPerson(newPerson, jws);
+        jwtService.submit(newPerson, jws);
 
         verify(gtaa).submit(any(GTAANewPerson.class), eq("demo-app"));
     }
@@ -77,14 +77,14 @@ public class JWTGTAAServiceImplTest {
             .note("opmerking")
             .build();
         String jws = encrypt2("demo-app", SECRET_KEY, "user y");
-        jwtService.submitPerson(newPerson, jws);
+        jwtService.submit(newPerson, jws);
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void testAddPersonWithoutIssuer() {
         GTAANewPerson newPerson = GTAANewPerson.builder().givenName("piet").familyName("hein").note("opmerking").build();
         String jws = encrypt2(null, SECRET_KEY, "user y");
-        jwtService.submitPerson(newPerson, jws);
+        jwtService.submit(newPerson, jws);
     }
 
     /**

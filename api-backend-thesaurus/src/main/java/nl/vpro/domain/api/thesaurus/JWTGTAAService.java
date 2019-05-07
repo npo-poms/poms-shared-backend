@@ -1,15 +1,12 @@
 package nl.vpro.domain.api.thesaurus;
 
-import nl.vpro.domain.media.gtaa.GTAANewPerson;
-import nl.vpro.domain.media.gtaa.GTAANewThesaurusObject;
-import nl.vpro.domain.media.gtaa.GTAAPerson;
-import nl.vpro.domain.media.gtaa.ThesaurusObject;
+import nl.vpro.domain.media.gtaa.*;
 
 public interface JWTGTAAService {
 
-    GTAAPerson submitPerson(GTAANewPerson newPerson, String jwt);
+    GTAAPerson submit(GTAANewPerson newPerson, String jwt);
 
-    ThesaurusObject submitThesaurusObject(GTAANewThesaurusObject gtaaNewThesaurusObject, String jwt);
+    <T extends ThesaurusObject, S extends NewThesaurusObject<T>>  T submit(S gtaaNewThesaurusObject, String jwt);
 
 
 }

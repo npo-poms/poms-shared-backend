@@ -57,7 +57,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
      *            to the {@link GTAARepository}. Extra check on expiration date (jwt should not be issued > 12h ago)
      */
     @Override
-    public GTAAPerson submitPerson(GTAANewPerson newPerson, String jws) {
+    public GTAAPerson submit(GTAANewPerson newPerson, String jws) {
         try {
             String issuer = authenticate(jws);
             return gtaaService.submit(newPerson, issuer);
@@ -67,7 +67,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     }
 
     @Override
-    public ThesaurusObject submitThesaurusObject(GTAANewThesaurusObject gtaaNewThesaurusObject, String jws) {
+    public  <T extends ThesaurusObject, S extends NewThesaurusObject<T>>  T submit(S gtaaNewThesaurusObject, String jws) {
         try {
             String issuer = authenticate(jws);
             return gtaaService.submit(gtaaNewThesaurusObject, issuer);
