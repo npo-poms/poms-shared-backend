@@ -1,26 +1,26 @@
 package nl.vpro.domain.api.thesaurus;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import nl.vpro.domain.media.gtaa.GTAANewPerson;
-import org.junit.Assert;
+import javax.crypto.SecretKey;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import nl.vpro.domain.media.gtaa.GTAANewPerson;
 import nl.vpro.domain.media.gtaa.GTAAPerson;
 import nl.vpro.domain.media.gtaa.GTAARepository;
 
@@ -39,6 +39,8 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public class JWTGTAAServiceImplTest {
 
+    private static String SECRET_KEY = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz";
+
     @Mock
     GTAARepository gtaa;
 
@@ -53,9 +55,9 @@ public class JWTGTAAServiceImplTest {
 
     @Test
     public void testSubmitPersonWithValidToken() throws IOException {
-        when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of("SECRET"));
+        when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of(SECRET_KEY));
         GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
-        String jws = encrypt1("demo-app", "SECRET", "user y");
+        String jws = encrypt1("demo-app", SECRET_KEY, "user y");
         jwtService.submitPerson(newPerson, jws);
 
         verify(gtaa).submit(any(GTAAPerson.class), eq("demo-app"));
@@ -63,16 +65,16 @@ public class JWTGTAAServiceImplTest {
 
     @Test (expected = SecurityException.class)
     public void testSubmitPersonWithExpiredToken() throws IOException {
-        when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of("SECRET"));
+        when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of(SECRET_KEY));
         GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
-        String jws = encrypt2("demo-app", "SECRET", "user y");
+        String jws = encrypt2("demo-app", SECRET_KEY, "user y");
         jwtService.submitPerson(newPerson, jws);
     }
 
     @Test (expected = IllegalArgumentException.class)
-    public void testAddPersonWithoutIssuer() throws IOException {
+    public void testAddPersonWithoutIssuer() {
         GTAANewPerson newPerson = new GTAANewPerson("piet", "hein", "opmerking");
-        String jws = encrypt2(null, "SECRET", "user y");
+        String jws = encrypt2(null, SECRET_KEY, "user y");
         jwtService.submitPerson(newPerson, jws);
     }
 
@@ -86,11 +88,11 @@ public class JWTGTAAServiceImplTest {
         Map<String, Object> claims = new HashMap<String, Object>();
         claims.put("iss", issuer);
         claims.put("usr", user);
-
+        SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes());
         String compactJws = Jwts.builder()
             .setSubject("GTAAPerson")
             .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS512, key.getBytes())
+            .signWith(secretKey)
             .setIssuedAt(Date.from(Instant.now().minus(10, ChronoUnit.HOURS)))
             .compact();
         log.debug(compactJws);
@@ -102,10 +104,12 @@ public class JWTGTAAServiceImplTest {
         claims.put("iss", issuer);
         claims.put("usr", user);
 
+        SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes());
+
         String compactJws = Jwts.builder()
             .setSubject("GTAAPerson")
             .setClaims(claims)
-            .signWith(SignatureAlgorithm.HS512, key.getBytes())
+            .signWith(secretKey)
             .setIssuedAt(Date.from(Instant.now().minus(13, ChronoUnit.HOURS)))
             .compact();
         log.debug(compactJws);
