@@ -13,6 +13,7 @@ import javax.xml.bind.JAXB;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.Before;
 import org.junit.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.ApiScheduleEvent;
@@ -154,6 +155,8 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     /**
      * This reproduces API-249
+     *
+     * TODO: Fails!
      */
     @Test
     public void listSchedulesForBroadcasterWithMax() throws Exception {
