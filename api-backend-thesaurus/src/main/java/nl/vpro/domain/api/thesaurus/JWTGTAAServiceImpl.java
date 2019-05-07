@@ -1,16 +1,17 @@
 package nl.vpro.domain.api.thesaurus;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.Assert;
 
 import nl.vpro.domain.media.gtaa.*;
 import nl.vpro.util.DateUtils;
@@ -33,7 +34,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     private SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
 
         @Override
-        public byte[] resolveSigningKeyBytes(JwsHeader header, Claims claims) {
+        public byte[] resolveSigningKeyBytes(@Nonnull JwsHeader header, @Nonnull Claims claims) {
             Assert.notNull(claims.get("iss"), "no value for 'iss' available");
             try {
                 return keysRepo.getKeyFor((String) claims.get("iss"))
@@ -58,22 +59,14 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
      */
     @Override
     public GTAAPerson submit(GTAANewPerson newPerson, String jws) {
-        try {
-            String issuer = authenticate(jws);
-            return gtaaService.submit(newPerson, issuer);
-        } catch (SecurityException se) {
-            throw se;
-        }
+        String issuer = authenticate(jws);
+        return gtaaService.submit(newPerson, issuer);
     }
 
     @Override
     public  <T extends ThesaurusObject, S extends NewThesaurusObject<T>>  T submit(S gtaaNewThesaurusObject, String jws) {
-        try {
-            String issuer = authenticate(jws);
-            return gtaaService.submit(gtaaNewThesaurusObject, issuer);
-        } catch (SecurityException se) {
-            throw se;
-        }
+        String issuer = authenticate(jws);
+        return gtaaService.submit(gtaaNewThesaurusObject, issuer);
     }
 
     private String authenticate(String jws) throws SecurityException{
