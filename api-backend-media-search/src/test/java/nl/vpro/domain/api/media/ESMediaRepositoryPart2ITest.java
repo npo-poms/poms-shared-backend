@@ -333,14 +333,14 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testIterate() {
         target.iterateBatchSize = 10;
         Iterator<MediaObject> results = target.iterate(null, null, 0L, 1000, FilteringIterator.noKeepAlive());
-        assertThat(results).hasSize(indexedObjectCount);
+        assertThat(results).toIterable().hasSize(indexedObjectCount);
     }
 
     @Test
     public void testIterateWithOffset() {
         target.iterateBatchSize = 10;
         Iterator<MediaObject> results = target.iterate(null, null, 10L, 1000, FilteringIterator.noKeepAlive());
-        assertThat(results).hasSize(indexedObjectCount - 10);
+        assertThat(results).toIterable().hasSize(indexedObjectCount - 10);
     }
 
 
