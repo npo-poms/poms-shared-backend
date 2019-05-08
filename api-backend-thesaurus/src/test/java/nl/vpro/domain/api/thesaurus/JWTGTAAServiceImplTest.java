@@ -47,10 +47,10 @@ public class JWTGTAAServiceImplTest {
     @Mock
     GTAAKeysRepository keysRepo;
 
-    JWTGTAAServiceImpl jwtService;
+    GTAAServiceImpl jwtService;
     @Before
     public void init() {
-        jwtService = new JWTGTAAServiceImpl(gtaa, keysRepo);
+        jwtService = new GTAAServiceImpl(gtaa, keysRepo);
     }
 
     @Test

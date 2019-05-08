@@ -24,7 +24,7 @@ import nl.vpro.util.DateUtils;
  */
 @Service
 @Slf4j
-public class JWTGTAAServiceImpl implements JWTGTAAService {
+public class GTAAServiceImpl implements GTAAService {
 
     private final GTAARepository gtaaService;
 
@@ -50,7 +50,7 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     };
 
     @Inject
-    public JWTGTAAServiceImpl(GTAARepository gtaaService, GTAAKeysRepository keysRepo) {
+    public GTAAServiceImpl(GTAARepository gtaaService, GTAAKeysRepository keysRepo) {
         this.gtaaService = gtaaService;
         this.keysRepo = keysRepo;
     }
@@ -66,9 +66,9 @@ public class JWTGTAAServiceImpl implements JWTGTAAService {
     }
 
     @Override
-    public  <T extends ThesaurusObject, S extends NewThesaurusObject<T>>  T submit(S gtaaNewThesaurusObject, String jws) {
+    public  <T extends ThesaurusObject, S extends NewThesaurusObject<T>>  T submit(S newObject, String jws) {
         String issuer = authenticate(jws);
-        return gtaaService.submit(gtaaNewThesaurusObject, issuer);
+        return gtaaService.submit(newObject, issuer);
     }
 
 
