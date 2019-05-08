@@ -14,6 +14,7 @@ fi
 desthost=$1
 
 basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+echo $basedir
 needssettings=false
 if [ "$2" == "" ] ; then
     echo "No index number found, trying to put mappings over existing ones (supposing they are compatible)"
@@ -40,7 +41,7 @@ echo '{' > $destindex.json
 if [ $needssettings ]; then
     echo "putting settings"
     echo '"settings":' >> $destindex.json
-    cat $basedir/es5/setting/apimedia.json >> $destindex.json
+    cat $basedir/setting/apimedia.json >> $destindex.json
     echo "," >> $destindex.json
 else
     echo "previndex $previndex . No settings necessary"
@@ -58,7 +59,7 @@ do
       echo "," >> $destindex.json
     fi
     echo '"'$mapping'": ' >>  $destindex.json
-    cat $basedir/es5/mapping/$mapping.json >> $destindex.json
+    cat $basedir/mapping/$mapping.json >> $destindex.json
 done
 echo -e '}\n}' >> $destindex.json
 
