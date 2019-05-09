@@ -1,4 +1,7 @@
-/.idea
-/poms-shared-backend-parent.iml
-/.settings
-/target
+.idea
+*.iml
+.settings
+target
+
+/api-backend-media-search/data
+
