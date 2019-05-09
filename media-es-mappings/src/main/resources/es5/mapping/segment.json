@@ -20,8 +20,14 @@
       "properties": {
         "audioAttributes": {
           "properties": {
+            "audioCoding": {
+              "type": "keyword"
+            },
             "numberOfChannels": {
               "type": "long"
+            },
+            "language": {
+              "type": "keyword"
             }
           }
         },
@@ -29,6 +35,9 @@
           "type": "keyword"
         },
         "bitrate": {
+          "type": "long"
+        },
+        "byteSize": {
           "type": "long"
         },
         "videoAttributes": {
@@ -209,6 +218,26 @@
               "norms": false
             }
           }
+        }
+      }
+    },
+    "intentions": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type" : "keyword"
+        }
+      }
+    },
+    "targetGroups": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type" : "keyword"
         }
       }
     },

@@ -36,13 +36,15 @@ import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.data.Index.atIndex;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * These are integration tests where the index is build in the @BeforeClass. Test which don't need that are placed in {@link ESMediaRepositoryPart1ITest}
+ * These are integration tests where the index is build in the @BeforeClass.
+ * Test which don't need that are placed in {@link ESMediaRepositoryPart1ITest}
  *
  * @author Michiel Meeuwissen
  * @since 2.0
@@ -105,9 +107,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         target.setScore(true);
     }
 
-
     /**
      * Builds a test database
+     * This method is also tests that ES is able to index all the mediaObject
+     * with all their attributes
      */
     @Override
     protected void firstRun() throws InterruptedException, ExecutionException, IOException {
@@ -361,7 +364,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testFind() {
+    public void     testFind() {
         SearchResult<MediaObject> result = target.find(null, null, 2L, 5);
 
 

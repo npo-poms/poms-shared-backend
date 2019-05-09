@@ -41,6 +41,7 @@ import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.ContentRating.*;
 import static nl.vpro.domain.media.MediaTestDataBuilder.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -1221,6 +1222,24 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     }
 
+    /**
+     * We create an index with all the MediaObject and all their properties
+     * to test that our mapping is complete.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void ableToIndexAllMediaObject(){
+
+        assertThatCode(() -> {
+            Group group = index(MediaTestDataBuilder.group().withEverything().published().build());
+            Segment segment = index(MediaTestDataBuilder.segment().withEverything().build());
+            Program program = index(MediaTestDataBuilder.program().withEverything().withSegmentsWithEveryting().build());
+
+        }).doesNotThrowAnyException();
+
+    }
+
     @Test
     public void testGenreFilter() {
         index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")).build());
@@ -1937,5 +1956,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         log.info("Indexed {} {}", type, ref.getId());
         refresh();
     }
+
 
 }
