@@ -21,6 +21,10 @@
       "sequence": {
         "type": "long"
       },
+      "identifier": {
+        "type": "string",
+        "index": "not_analyzed"
+      },
       "start": {
         "type": "long"
       },

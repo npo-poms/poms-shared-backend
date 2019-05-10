@@ -21,6 +21,9 @@
     "sequence": {
       "type": "long"
     },
+    "identifier": {
+      "type": "keyword"
+    },
     "start": {
       "type": "long"
     },
