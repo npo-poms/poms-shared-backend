@@ -36,36 +36,41 @@ fi
 
 echo "Echo putting $basedir to $desthost/$destindex"
 
+declare -a arr=( "group" "program" "segment" "deletedprogram" "deletedgroup" "deletedsegment" "cue" "programMemberRef" "groupMemberRef" "segmentMemberRef" "episodeRef" )
 rm $destindex.json
 echo '{' > $destindex.json
-if [ $needssettings ]; then
+if [ "$needssettings" = true ]; then
     echo "putting settings"
     echo '"settings":' >> $destindex.json
     cat $basedir/setting/apimedia.json >> $destindex.json
     echo "," >> $destindex.json
+
+    echo '"mappings": {' >> $destindex.json
+
+
+    for i in "${!arr[@]}"
+    do
+        mapping=${arr[$i]}
+        if [ $i -gt 0 ]; then
+            echo "," >> $destindex.json
+        fi
+        echo '"'$mapping'": ' >>  $destindex.json
+        cat $basedir/mapping/$mapping.json >> $destindex.json
+    done
+    echo -e '}\n}' >> $destindex.json
+
+    echo Created $destindex.json
+    curl -XPUT -H'content-type: application/json' $desthost/$destindex -d@$destindex.json
 else
     echo "previndex $previndex . No settings necessary"
+    for i in "${!arr[@]}"
+    do
+        mapping=${arr[$i]}
+        echo curl -XPUT -H'content-type: application/json' $desthost/$destindex/$mapping/_mapping -d@$basedir/mapping/$mapping.json
+        curl -XPUT -H'content-type: application/json' $desthost/$destindex/$mapping/_mapping -d@$basedir/mapping/$mapping.json
+    done
 fi
 
-echo '"mappings": {' >> $destindex.json
-
-declare -a arr=( "group" "program" "segment" "deletedprogram" "deletedgroup" "deletedsegment" "cue" "programMemberRef" "groupMemberRef" "segmentMemberRef" "episodeRef" )
-#declare -a arr=( "group" )
-
-for i in "${!arr[@]}"
-do
-    mapping=${arr[$i]}
-    if [ $i -gt 0 ]; then
-      echo "," >> $destindex.json
-    fi
-    echo '"'$mapping'": ' >>  $destindex.json
-    cat $basedir/mapping/$mapping.json >> $destindex.json
-done
-echo -e '}\n}' >> $destindex.json
-
-echo Created $destindex.json
-
-curl -XPUT -H'content-type: application/json' $desthost/$destindex -d@$destindex.json
 
 if [ "$previndex" != "" ] ; then
 
