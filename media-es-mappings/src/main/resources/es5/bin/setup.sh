@@ -8,6 +8,9 @@ if [ $# -lt 1 ];
 then
     echo "Usage $0 <es-url> [<index number>|<alias>]"
     echo "index number:  Number of the new index to create (e.g. 2 in apimedia-2). If ommited the mappings are put over the old ones (only possible if they are compatible)"
+    echo "Each index has 2 aliases: apimedia (read) apimedia-publish (write)."
+    echo "This script will create a new index and point the publisher to it."
+    echo "You will have to manually move the apimedia after you copied the index"
     exit
 fi
 
@@ -77,47 +80,56 @@ if [ "$previndex" != "" ] ; then
    echo "moving alias $previndex $destindex"
 
    publishalias="{
-    \"actions\": [
-        { \"remove\": {
-            \"alias\": \"apimedia-publish\",
-            \"index\": \"$previndex\"
-        }},
-        { \"add\": {
-            \"alias\": \"apimedia-publish\",
-            \"index\": \"$destindex\"
-        }}
-    ]
-}
-"
+        \"actions\": [
+            { \"remove\": {
+                \"alias\": \"apimedia-publish\",
+                \"index\": \"$previndex\"
+            }},
+            { \"add\": {
+                \"alias\": \"apimedia-publish\",
+                \"index\": \"$destindex\"
+            }}
+        ]
+      }"
    echo $publishalias
-
-   curl -XPOST $desthost/_aliases -d "$publishalias"
-
-   reindex="{
-  \"source\": {
-    \"index\": \"$previndex\"
-    },
-   \"dest\": {
-    \"index\": \"$destindex\"
-  }
-}"
    echo
-   echo curl -XPOST $desthost/_reindex -d "'$reindex'"
+   curl -XPOST $desthost/_aliases -d "$publishalias"
+   echo
 
+# Copy index
+  echo
+  echo "WARNING: You should execute this command to copy old to new index"
+  echo "Execute this command:"
+  reindex="{
+    \"source\": {
+      \"index\": \"$previndex\"
+      },
+     \"dest\": {
+      \"index\": \"$destindex\"
+      }
+     }"
+
+  echo curl -XPOST $desthost/_reindex -d "'$reindex'"
+#End copy index
+
+#Start move apimedia (read) alias
+  echo
+  echo "WARNING: See command before! Once the index is copied you can move the alias."
+  echo "Execute this command:"
    alias="{
     \"actions\": [
-        { \"remove\": {
-            \"alias\": \"apimedia\",
-            \"index\": \"$previndex\"
-        }},
-        { \"add\": {
-            \"alias\": \"apimedia\",
-            \"index\": \"$destindex\"
-        }}
-    ]
-}
-"
-
-   echo ";"
+            { \"remove\": {
+                \"alias\": \"apimedia\",
+                \"index\": \"$previndex\"
+            }},
+            { \"add\": {
+                \"alias\": \"apimedia\",
+                \"index\": \"$destindex\"
+            }}
+        ]
+    }"
    echo curl -XPOST $desthost/_aliases -d "'$alias'"
+
+#End move apimedia
+
 fi

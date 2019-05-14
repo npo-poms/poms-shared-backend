@@ -24,7 +24,23 @@ eg.
 `./push-es-media-mapping.sh localhost:9200 old_plus_1`
 
 ## Update the configuration
-
+The ES mapping can be changed in the files under:
 `./*-es-mapping/src/main/resources/es*/mapping/*.json`
 
 you can test your changes by editing the UnitTest in `ESMediaRepositoryPart1ITest`
+
+## Deploy
+Once you push jenkins will build your changes.
+Ensure you publish the [npo-publish](https://subversion.vpro.nl/reponl/publiekeomroep/npo-publish/trunk) (writer) and [npo api](https://subversion.vpro.nl/repo/nl/vpro/api/trunk) (reader)
+
+You will have to manually update the ES index with the new mapping configuration.
+
+### How to update index
+The script will create a new index already mapped for writing (apimedia alias)
+Follow the instruction in the output to manually copy the old index into the new one
+and flag the new index for reading.
+
+Connect to elastic search and find out what's the highest index.
+Then run the command to generate a new index with an incremented version number:
+`./push-es-media-mapping.sh localhost:9200 old_plus_1`
+
