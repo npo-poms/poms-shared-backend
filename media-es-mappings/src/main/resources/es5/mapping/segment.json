@@ -227,7 +227,7 @@
           "type": "keyword"
         },
         "values": {
-          "type" : "keyword"
+          "type": "keyword"
         }
       }
     },
@@ -237,7 +237,7 @@
           "type": "keyword"
         },
         "values": {
-          "type" : "keyword"
+          "type": "keyword"
         }
       }
     },

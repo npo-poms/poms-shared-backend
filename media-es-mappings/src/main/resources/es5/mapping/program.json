@@ -1270,15 +1270,15 @@
             }
           }
         },
+        "publishDate": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
         "publishStart": {
           "type": "date",
           "format": "epoch_millis"
         },
         "publishStop": {
-          "type": "date",
-          "format": "epoch_millis"
-        },
-        "publishDate": {
           "type": "date",
           "format": "epoch_millis"
         },
