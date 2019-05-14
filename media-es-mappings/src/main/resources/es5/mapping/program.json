@@ -243,7 +243,7 @@
           "type": "keyword"
         },
         "values": {
-          "type" : "keyword"
+          "type": "keyword"
         }
       }
     },
@@ -253,7 +253,7 @@
           "type": "keyword"
         },
         "values": {
-          "type" : "keyword"
+          "type": "keyword"
         }
       }
     },
@@ -963,7 +963,7 @@
               "type": "keyword"
             },
             "values": {
-              "type" : "keyword"
+              "type": "keyword"
             }
           }
         },
@@ -973,7 +973,7 @@
               "type": "keyword"
             },
             "values": {
-              "type" : "keyword"
+              "type": "keyword"
             }
           }
         },
@@ -1437,6 +1437,10 @@
           "fields": {
             "full": {
               "type": "keyword"
+            },
+            "lower": {
+              "type": "keyword",
+              "normalizer": "lowercase_normalizer"
             },
             "stemmed": {
               "type": "text",
