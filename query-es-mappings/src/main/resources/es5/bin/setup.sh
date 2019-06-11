@@ -38,11 +38,11 @@ destindex=apiqueries-$2
 echo "Echo putting settings to $desthost/$destindex. Reading fromr $basedir"
 
 
-curl -XPUT $desthost/$destindex -d @$basedir/es5/setting/apiqueries.json
+curl -XPUT $desthost/$destindex -d @$basedir/setting/apiqueries.json
 
 echo "Echo putting mappings to $desthost/$destindex"
 
-curl -XPUT $desthost/$destindex/query/_mapping -d @$basedir/es5/mapping/query.json
+curl -XPUT $desthost/$destindex/query/_mapping -d @$basedir/mapping/query.json
 
 echo " "
 
