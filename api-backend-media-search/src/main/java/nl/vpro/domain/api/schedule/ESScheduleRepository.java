@@ -32,7 +32,7 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
-import nl.vpro.domain.media.search.DateRange;
+import nl.vpro.domain.media.search.InstantRange;
 import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
@@ -106,14 +106,14 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleResult listSchedules(Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
+            new SchedulePager(offset, max, null, order.direction()), new InstantRange(start, stop));
         return execute(form);
     }
 
     @Override
     public ScheduleResult listSchedules(Channel channel, Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
+            new SchedulePager(offset, max, null, order.direction()), new InstantRange(start, stop));
         form.setChannels(Collections.singletonList(channel));
         return execute(form);
     }
@@ -129,7 +129,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleResult listSchedules(Net net, Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
+            new SchedulePager(offset, max, null, order.direction()), new InstantRange(start, stop));
         form.setNet(net.getId());
         return execute(form);
     }
@@ -137,7 +137,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleResult listSchedulesForBroadcaster(String broadcaster, Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
+            new SchedulePager(offset, max, null, order.direction()), new InstantRange(start, stop));
         form.setBroadcaster(broadcaster);
         return execute(form);
     }
@@ -145,7 +145,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleResult listSchedulesForMediaType(MediaType mediaType, Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
+            new SchedulePager(offset, max, null, order.direction()), new InstantRange(start, stop));
         form.setMediaType(mediaType);
         return execute(form);
     }
@@ -153,7 +153,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleResult listSchedulesForAncestor(String mediaId, Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), new DateRange(start, stop));
+            new SchedulePager(offset, max, null, order.direction()), new InstantRange(start, stop));
         form.setDescendantOf(Collections.singletonList(mediaId));
         return execute(form);
     }
@@ -224,7 +224,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
             }
             if (form.getGuideDay() != null) {
-                query.must(QueryBuilders.termQuery("scheduleEvents.guideDay", form.getGuideDay().atStartOfDay(ScheduleService.ZONE_ID).toEpochSecond() * 1000));
+                query.must(QueryBuilders.termQuery("scheduleEvents.guideDay", form.getGuideDay().atStartOfDay(Schedule.ZONE_ID).toEpochSecond() * 1000));
             }
 
             toExecute = simplifyQuery(query);
