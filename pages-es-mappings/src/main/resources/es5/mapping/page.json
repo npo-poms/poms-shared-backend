@@ -626,12 +626,10 @@
               "include_in_parent": true,
               "properties": {
                 "broadcaster": {
-                  "type": "keyword",
-                  "copy_to": "full_name"
+                  "type": "keyword"
                 },
                 "type": {
-                  "type": "keyword",
-                  "copy_to": "full_name"
+                  "type": "keyword"
                 },
                 "type_id": {
                   "type" : "keyword"
