@@ -25,7 +25,6 @@ import org.jboss.resteasy.annotations.cache.NoCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import com.newrelic.api.agent.Trace;
 
 import nl.vpro.api.rs.exception.Exceptions;
@@ -94,8 +93,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
         httpMethod = HttpMethod.GET,
-        value = "List scheduled media",
-        position = 0
+        value = "List scheduled media"
     )
     @GET
     @Trace(dispatcher = true)
@@ -128,8 +126,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
             httpMethod = HttpMethod.POST,
-            value = "Find scheduled media",
-            position = 1
+            value = "Find scheduled media"
     )
     @POST
     @Trace(dispatcher = true)
@@ -153,8 +150,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     @Override
     @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "List scheduled media for an ancestor",
-            position = 2
+            value = "List scheduled media for an ancestor"
     )
     @Path("/ancestor/{ancestor}")
     @GET
@@ -191,8 +187,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     @Override
     @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "Current item for an ancestor",
-            position = 3
+            value = "Current item for an ancestor"
     )
     @Path("/ancestor/{ancestor}/now")
     @GET
@@ -222,8 +217,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     @Override
     @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "Next item for an ancestor",
-            position = 4
+            value = "Next item for an ancestor"
     )
     @Path("/ancestor/{ancestor}/next")
     @GET
@@ -249,8 +243,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     @Override
     @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "List scheduled media for a broadcaster",
-            position = 5
+            value = "List scheduled media for a broadcaster"
     )
     @Path("/broadcaster/{broadcaster}")
     @GET
@@ -285,8 +278,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
             httpMethod = HttpMethod.GET,
-            value = "Current item for broadcaster",
-            position = 6
+            value = "Current item for broadcaster"
     )
     @Path("/broadcaster/{broadcaster}/now")
     @Trace(dispatcher = true)
@@ -317,8 +309,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
             httpMethod = HttpMethod.GET,
-            value = "Next item for broadcaster",
-            position = 7
+            value = "Next item for broadcaster"
     )
     @Path("/broadcaster/{broadcaster}/next")
     @GET
@@ -344,8 +335,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     @Override
     @ApiOperation(httpMethod = HttpMethod.GET,
-        value = "List scheduled media for a channel",
-        position = 8
+        value = "List scheduled media for a channel"
     )
     @Path("/channel/{channel}")
     @GET
@@ -382,8 +372,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
         httpMethod = HttpMethod.GET,
-        value = "Current item on channel",
-        position = 9
+        value = "Current item on channel"
     )
     @Path("/channel/{channel}/now")
     @Trace(dispatcher = true)
@@ -415,8 +404,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
             httpMethod = HttpMethod.GET,
-            value = "Next item on channel",
-            position = 10
+            value = "Next item on channel"
     )
     @Path("/channel/{channel}/next")
     @GET
@@ -444,8 +432,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
         httpMethod = HttpMethod.GET,
-        value = "List scheduled media for a net",
-        position = 11
+        value = "List scheduled media for a net"
     )
     @Path("/net/{net}")
     @GET
@@ -480,8 +467,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
         httpMethod = HttpMethod.GET,
-        value = "Current item on net",
-        position = 12
+        value = "Current item on net"
     )
     @Path("/net/{net}/now")
     @GET
@@ -512,8 +498,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
         httpMethod = HttpMethod.GET,
-        value = "Next item on net",
-        position = 13
+        value = "Next item on net"
     )
     @Path("/net/{net}/next")
     @GET
