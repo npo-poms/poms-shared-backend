@@ -195,9 +195,12 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @NoCache
     public ApiScheduleEvent nowForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @QueryParam(NOW) Instant now
     ) {
-        Instant now = Instant.now();
+        if (now == null) {
+            now = Instant.now();
+        }
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForAncestor(mediaId, null, now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -225,9 +228,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Trace(dispatcher = true)
     public ApiScheduleEvent nextForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @QueryParam(NOW) Instant now
+
     ) {
-        Instant now = Instant.now();
+        if (now == null) {
+            now = Instant.now();
+        }
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForAncestor(mediaId, now, null, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -278,7 +285,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Override
     @ApiOperation(
             httpMethod = HttpMethod.GET,
-            value = "Current item for broadcaster"
+            value = "Current item for broadcaster. I.e. the item that started most recently, and is still running."
     )
     @Path("/broadcaster/{broadcaster}/now")
     @Trace(dispatcher = true)
@@ -286,10 +293,15 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @NoCache
     public ApiScheduleEvent nowForBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @ApiParam()  @QueryParam("mustberunning") @DefaultValue("true") boolean mustBeRunning,
+            @QueryParam(NOW) Instant now
+
     ) {
-        Instant now = Instant.now();
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, null, now, Order.DESC, 0L, 1).getItems();
+        if (now == null) {
+            now = Instant.now();
+        }
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, null, now, Order.DESC, 0L, 100).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No current event for broadcaster " + broadcaster);
@@ -297,7 +309,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
         ApiScheduleEvent scheduleEvent = scheduleEvents.get(0);
 
-        if (!isActiveEvent(scheduleEvent, now)) {
+        if (mustBeRunning && !isActiveEvent(scheduleEvent, now)) {
             throw Exceptions.notFound("No current event for broadcaster " + broadcaster);
         }
 
@@ -317,9 +329,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @NoCache
     public ApiScheduleEvent nextForBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @QueryParam(NOW) Instant now
+
     ) {
-        final Instant now = Instant.now();
+        if (now == null) {
+            now = Instant.now();
+        }
         final List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, now, null, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -380,9 +396,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @NoCache
     public ApiScheduleEvent nowForChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @QueryParam(NOW) Instant now
+
     ) {
-        Instant now = Instant.now();
+        if (now == null) {
+            now = Instant.now();
+        }
         Channel chan = getChannel(channel);
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, null, now, Order.DESC, 0L, 1).getItems();
 
@@ -412,9 +432,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @NoCache
     public ApiScheduleEvent nextForChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @QueryParam(NOW) Instant now
+
     ) {
-        Instant now = Instant.now();
+        if (now == null) {
+            now = Instant.now();
+        }
         Channel chan = getChannel(channel);
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, now, null, Order.ASC, 0L, 1).getItems();
 
@@ -475,9 +499,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @NoCache
     public ApiScheduleEvent nowForNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @QueryParam(NOW) Instant now
+
     ) {
-        Instant now = Instant.now();
+        if (now == null) {
+            now = Instant.now();
+        }
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), null, now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
@@ -506,9 +534,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @NoCache
     public ApiScheduleEvent nextForNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties
+        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @QueryParam(NOW) Instant now
+
     ) {
-        Instant now = Instant.now();
+        if (now == null) {
+            now = Instant.now();
+        }
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), now, null, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
