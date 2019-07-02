@@ -189,11 +189,11 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 query.must(channelQuery);
             }
             if (form.getBroadcaster() != null) {
-                query.should(QueryBuilders.termQuery("broadcasters.id", form.getBroadcaster()));
+                query.must(QueryBuilders.termQuery("broadcasters.id", form.getBroadcaster()));
 
             }
             if (form.getNet() != null) {
-                query.should(QueryBuilders.termQuery("scheduleEvents.net", form.getNet()));
+                query.must(QueryBuilders.termQuery("scheduleEvents.net", form.getNet()));
 
             }
             if (form.getMediaType() != null) {
@@ -204,6 +204,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                     query.must(QueryBuilders.termQuery("descendantOf.midRef", descendantOf));
                 }
             }
+
             if (form.hasStart() || form.hasStop()) {
                 RangeQueryBuilder rangeQueryBuilder = QueryBuilders.rangeQuery("scheduleEvents.start");
                 if (form.hasStart()) {
@@ -233,12 +234,13 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject);
         SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
         requestBuilder.setQuery(toExecute);
-        requestBuilder.addSort("creationDate", SortOrder.DESC);
+        requestBuilder.addSort("sortDate", SortOrder.DESC);
         requestBuilder.setTypes(getScheduleEventTypes());
 
         List<ApiScheduleEvent> results = new ArrayList<>();
 
         long skipped = 0;
+
 
         long count = 0;
         long mediaObjectCount = 0;
