@@ -189,11 +189,11 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 query.must(channelQuery);
             }
             if (form.getBroadcaster() != null) {
-                query.should(QueryBuilders.termQuery("broadcasters.id", form.getBroadcaster()));
+                query.must(QueryBuilders.termQuery("broadcasters.id", form.getBroadcaster()));
 
             }
             if (form.getNet() != null) {
-                query.should(QueryBuilders.termQuery("scheduleEvents.net", form.getNet()));
+                query.must(QueryBuilders.termQuery("scheduleEvents.net", form.getNet()));
 
             }
             if (form.getMediaType() != null) {
