@@ -1,8 +1,4 @@
-.idea
-*.iml
-.settings
-target
-
-/api-backend-media-search/data
-
-apimedia*.json
+/.idea
+/poms-shared-backend-parent.iml
+/.settings
+/target
