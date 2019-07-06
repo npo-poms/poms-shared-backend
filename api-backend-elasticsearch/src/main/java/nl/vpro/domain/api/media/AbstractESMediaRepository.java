@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.Null;
 
 import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -241,6 +242,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             String detail = e.getDetailedMessage();
             log.warn(e.getMessage() + ":" + detail);
             throw e;
+        } catch (SearchPhaseExecutionException ee) {
+            throw ee;
         }
     }
 
