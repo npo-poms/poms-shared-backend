@@ -38,7 +38,7 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) {
         String origin = request.getHeaderString(ORIGIN);
-        HttpServletResponse realResponse = ResteasyProviderFactory.getContextData(HttpServletResponse.class);
+        HttpServletResponse realResponse = ResteasyProviderFactory.getInstance().getContextData(HttpServletResponse.class);
         boolean alreadyHasCorsHeaders = realResponse.getHeader(ACCESS_CONTROL_ALLOW_ORIGIN) != null;
         if  (!alreadyHasCorsHeaders) {
             if (corsPolicy.isEnabled()) {
