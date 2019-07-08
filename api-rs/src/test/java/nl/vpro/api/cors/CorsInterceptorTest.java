@@ -9,7 +9,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.jboss.resteasy.core.ResteasyContext;
 import org.junit.Before;
 import org.junit.Test;
 import com.google.common.net.HttpHeaders;
@@ -38,7 +38,7 @@ public class CorsInterceptorTest {
         when(corsPolicy.isEnabled()).thenReturn(Boolean.FALSE);
         when(corsPolicy.allowedOriginAndMethod(anyString(), anyString())).thenReturn(Boolean.TRUE);
 
-        ResteasyProviderFactory.pushContext(HttpServletResponse.class, mock(HttpServletResponse.class));
+        ResteasyContext.pushContext(HttpServletResponse.class, mock(HttpServletResponse.class));
         ContainerRequestContext request = mock(ContainerRequestContext.class);
         ContainerResponseContext response = mock(ContainerResponseContext.class);
         when(request.getHeaderString(HttpHeaders.ORIGIN)).thenReturn("localhost");
