@@ -12,7 +12,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.springframework.beans.factory.annotation.Value;
 
 import nl.vpro.domain.api.topspin.Recommendations;
@@ -66,7 +66,7 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
     }
 
     protected Client getTopSpinClient() {
-        return new ResteasyClientBuilder().build();
+        return new ResteasyClientBuilderImpl().build();
     }
 
     @Override
