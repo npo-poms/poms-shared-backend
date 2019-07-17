@@ -10,8 +10,6 @@ import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +23,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.collation.CollationAttributeFactory;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.util.IOUtils;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
@@ -32,6 +31,8 @@ import nl.vpro.domain.api.media.DurationRangeMatcher;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+
+;
 
 /**
  * @author Michiel Meeuwissen
