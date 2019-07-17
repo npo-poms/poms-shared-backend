@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
@@ -86,7 +86,7 @@ public abstract class AbstractESRepository<T> {
     }
 
     public void setIndexName(
-        @Nonnull String indexName) {
+        @NonNull String indexName) {
         if (! Objects.equals(indexName, this.indexName)) {
             this.indexName = indexName;
             logIntro();
@@ -165,8 +165,8 @@ public abstract class AbstractESRepository<T> {
 
 
     protected T load(
-        @Nonnull String id,
-        @Nonnull Class<T> clazz) {
+        @NonNull String id,
+        @NonNull Class<T> clazz) {
         try {
             MultiGetRequest getRequest =
                 new MultiGetRequest();
@@ -189,8 +189,8 @@ public abstract class AbstractESRepository<T> {
     }
 
     private T transformResponse(
-        @Nonnull GetResponse response,
-        @Nonnull Class<T> clazz) {
+        @NonNull GetResponse response,
+        @NonNull Class<T> clazz) {
         if (!response.isExists()) {
             return null;
         }
@@ -202,9 +202,9 @@ public abstract class AbstractESRepository<T> {
     }
 
     protected CompletableFuture<T> loadAsync(
-        @Nonnull String id,
-        @Nonnull Class<T> clazz,
-        @Nonnull String indexName) {
+        @NonNull String id,
+        @NonNull Class<T> clazz,
+        @NonNull String indexName) {
         CompletableFuture<GetResponse> reponseFuture = ESUtils.fromListenableActionFuture(client().prepareGet(indexName, "_all", id).execute());
         return reponseFuture.thenApply(r -> transformResponse(r, clazz));
     }
@@ -214,9 +214,9 @@ public abstract class AbstractESRepository<T> {
      * Returns a list with ${ids.length} entries. Nulls if not found.
      */
     protected <S extends T> List<S> loadAll(
-        @Nonnull Class<S> clazz,
-        @Nonnull String indexName,
-        @Nonnull String... ids) {
+        @NonNull Class<S> clazz,
+        @NonNull String indexName,
+        @NonNull String... ids) {
         try {
             if (ids.length == 0) {
                 return new ArrayList<S>();
@@ -267,9 +267,9 @@ public abstract class AbstractESRepository<T> {
     protected void handlePaging(
         long offset,
         @Nullable Integer max,
-        @Nonnull SearchSourceBuilder searchBuilder,
-        @Nonnull QueryBuilder queryBuilder,
-        @Nonnull String indexName) {
+        @NonNull SearchSourceBuilder searchBuilder,
+        @NonNull QueryBuilder queryBuilder,
+        @NonNull String indexName) {
         if (offset != 0) {
             searchBuilder.from((int) offset);
         }
@@ -282,8 +282,8 @@ public abstract class AbstractESRepository<T> {
     }
 
     protected <S extends T> List<SearchResultItem<? extends S>> adapt(
-        @Nonnull final SearchHits hits,
-        @Nonnull final Class<S> clazz) {
+        @NonNull final SearchHits hits,
+        @NonNull final Class<S> clazz) {
         final SearchHit[] array = hits.getHits();
         return new AbstractList<SearchResultItem<? extends S>>() {
             @Override
@@ -305,13 +305,13 @@ public abstract class AbstractESRepository<T> {
     }
 
     protected long executeCount(
-        @Nonnull QueryBuilder builder,
-        @Nonnull String indexName) {
+        @NonNull QueryBuilder builder,
+        @NonNull String indexName) {
         return client().prepareSearch(indexName).setSource(new SearchSourceBuilder().size(0).query(builder)).get().getHits().getTotalHits();
 
     }
 
-    protected void buildHighlights(@Nonnull SearchSourceBuilder searchBuilder, @Nullable Form form, List<SearchFieldDefinition> searchFields) {
+    protected void buildHighlights(@NonNull SearchSourceBuilder searchBuilder, @Nullable Form form, List<SearchFieldDefinition> searchFields) {
         if (form != null && form.isHighlight()) {
             HighlightBuilder highlightBuilder = new HighlightBuilder();
             highlightBuilder.tagsSchema("styled");
@@ -326,16 +326,16 @@ public abstract class AbstractESRepository<T> {
     }
 
 
-    protected final <S extends T> S getObject(@Nonnull SearchHit hit, @Nonnull Class<S> clazz) throws IOException {
+    protected final <S extends T> S getObject(@NonNull SearchHit hit, @NonNull Class<S> clazz) throws IOException {
         return Jackson2Mapper.getLenientInstance().readerFor(clazz).readValue(hit.getSourceAsString());
     }
 
 
 
     protected static <S> String[] filterFields(
-        @Nonnull S mo,
-        @Nonnull String[] fields,
-        @Nonnull String fallBack) {
+        @NonNull S mo,
+        @NonNull String[] fields,
+        @NonNull String fallBack) {
         List<String> result = new ArrayList<>();
         JsonNode root = Jackson2Mapper.getInstance().valueToTree(mo);
         for (String path : fields) {
@@ -350,21 +350,21 @@ public abstract class AbstractESRepository<T> {
     }
 
     static <S> boolean hasEsPath(
-        @Nonnull S o,
-        @Nonnull String path) {
+        @NonNull S o,
+        @NonNull String path) {
         JsonNode root = Jackson2Mapper.getInstance().valueToTree(o);
         return hasEsPath(root, path);
     }
 
     static boolean hasEsPath(
-        @Nonnull JsonNode o,
-        @Nonnull String path) {
+        @NonNull JsonNode o,
+        @NonNull String path) {
         return _hasEsPath(o, path.split("\\."));
     }
 
     static private boolean _hasEsPath(
-        @Nonnull JsonNode object,
-        @Nonnull String... path) {
+        @NonNull JsonNode object,
+        @NonNull String... path) {
         String f = path[0];
         if (object.isArray()) {
             for (JsonNode o : object) {
@@ -388,8 +388,8 @@ public abstract class AbstractESRepository<T> {
     }
 
     private <S extends T> SearchResultItem<S> getSearchResultItem(
-        @Nonnull SearchHit hit,
-        @Nonnull Class<S> clazz) throws IOException {
+        @NonNull SearchHit hit,
+        @NonNull Class<S> clazz) throws IOException {
         S object = getObject(hit, clazz);
         SearchResultItem<S> item = new SearchResultItem<>(object);
         item.setScore(hit.getScore());

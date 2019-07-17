@@ -11,8 +11,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.util.automaton.RegExp;
@@ -51,11 +51,11 @@ public abstract class ESFacetsBuilder {
     public static final String NESTED_POSTFIX = "_nested";
 
     protected static <T extends AbstractSearch> TermsAggregationBuilder addFacet(
-        @Nonnull String prefix,
-        @Nonnull  FilterAggregationBuilder rootAggregation,
-        @Nonnull  String fieldName,
+        @NonNull String prefix,
+        @NonNull  FilterAggregationBuilder rootAggregation,
+        @NonNull  String fieldName,
         @Nullable LimitableFacet<T> facet,
-        @Nonnull BiConsumer<BoolQueryBuilder, T> buildFilter
+        @NonNull BiConsumer<BoolQueryBuilder, T> buildFilter
         ) {
         if(facet != null) {
             Terms.Order order = ESFacets.getComparatorType(facet);
@@ -104,9 +104,9 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static void addDateRangeFacet(
-        @Nonnull String prefix,
-        @Nonnull FilterAggregationBuilder rootAggregation,
-        @Nonnull String fieldName,
+        @NonNull String prefix,
+        @NonNull FilterAggregationBuilder rootAggregation,
+        @NonNull String fieldName,
         @Nullable DateRangeFacets<?> facet) {
         if(facet != null) {
             if(facet.getRanges() != null) {
@@ -157,7 +157,7 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static DateHistogramInterval from(
-        @Nonnull DateRangeInterval.Interval interval) {
+        @NonNull DateRangeInterval.Interval interval) {
         switch(interval.getUnit()) {
             case YEAR:
                 return interval.amount == 1 ? DateHistogramInterval.YEAR : DateHistogramInterval.days(interval.amount * 365);
@@ -177,9 +177,9 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static void addDurationFacet(
-        @Nonnull String prefix,
-        @Nonnull  FilterAggregationBuilder rootAggregation,
-        @Nonnull String fieldName,
+        @NonNull String prefix,
+        @NonNull  FilterAggregationBuilder rootAggregation,
+        @NonNull String fieldName,
         @Nullable DurationRangeFacets<?> facet) {
         if (facet != null) {
             if (facet.getRanges() != null) {
@@ -217,14 +217,14 @@ public abstract class ESFacetsBuilder {
     }
 
      protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
-         @Nonnull String prefix,
-         @Nonnull FilterAggregationBuilder rootAggregation,
-         @Nonnull String nestedObject,
-         @Nonnull String facetField,
+         @NonNull String prefix,
+         @NonNull FilterAggregationBuilder rootAggregation,
+         @NonNull String nestedObject,
+         @NonNull String facetField,
          @Nullable SearchableLimitableFacet<F, S> facet,
-         @Nonnull Function<F, QueryBuilder> filterCreator,
-         @Nonnull Supplier<QueryBuilder> nestedFilterCreator,
-         @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
+         @NonNull Function<F, QueryBuilder> filterCreator,
+         @NonNull Supplier<QueryBuilder> nestedFilterCreator,
+         @NonNull TriFunction<S, String, String, QueryBuilder> subSearchCreator) {
         addNestedAggregation(
             prefix,
             rootAggregation, nestedObject,
@@ -238,15 +238,15 @@ public abstract class ESFacetsBuilder {
      }
 
     protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
-        @Nonnull String prefix,
-        @Nonnull FilterAggregationBuilder rootAggregation,
-        @Nonnull String nestedObject,
-        @Nonnull String facetField,
+        @NonNull String prefix,
+        @NonNull FilterAggregationBuilder rootAggregation,
+        @NonNull String nestedObject,
+        @NonNull String facetField,
         @Nullable SearchableLimitableFacet<F, S> facet,
-        @Nonnull Function<F, QueryBuilder> filterCreator,
-        @Nonnull Supplier<QueryBuilder> nestedFilterCreator,
-        @Nonnull TriFunction<S, String, String, QueryBuilder> subSearchCreator,
-        @Nonnull Supplier<String> nameSupplier) {
+        @NonNull Function<F, QueryBuilder> filterCreator,
+        @NonNull Supplier<QueryBuilder> nestedFilterCreator,
+        @NonNull TriFunction<S, String, String, QueryBuilder> subSearchCreator,
+        @NonNull Supplier<String> nameSupplier) {
         if (facet == null) {
             return;
         }
@@ -301,11 +301,11 @@ public abstract class ESFacetsBuilder {
 
 
     protected static TermsAggregationBuilder getFilteredTermsBuilder(
-        @Nonnull  String pathPrefix,
-        @Nonnull  String nestedField,
-        @Nonnull  String facetField,
-        @Nonnull  LimitableFacet<?> facet,
-        @Nonnull Supplier<String> nameSupplier) {
+        @NonNull  String pathPrefix,
+        @NonNull  String nestedField,
+        @NonNull  String facetField,
+        @NonNull  LimitableFacet<?> facet,
+        @NonNull Supplier<String> nameSupplier) {
 
         String fullFieldPath = pathPrefix + nestedField + '.' + facetField;
 
@@ -333,11 +333,11 @@ public abstract class ESFacetsBuilder {
 
     private static final String VALID_FACET_CHARS = "a-zA-Z0-9_-";
     private static final Pattern INVALID = Pattern.compile("[^" + VALID_FACET_CHARS + "]+");
-    public static String escape(@Nonnull String facetName) {
+    public static String escape(@NonNull String facetName) {
         return INVALID.matcher(facetName).replaceAll("/");
     }
 
-    public static String escape(@Nullable String prefix, @Nonnull String name) {
+    public static String escape(@Nullable String prefix, @NonNull String name) {
         if (StringUtils.isEmpty(prefix)) {
             return escape(name);
         } else {
@@ -346,59 +346,59 @@ public abstract class ESFacetsBuilder {
     }
 
     public static String getAggregationName(
-        @Nonnull String name) {
+        @NonNull String name) {
         return getAggregationName("", name);
     }
 
      public static String getAggregationName(
          String prefix,
-         @Nonnull String name) {
+         @NonNull String name) {
         return escape(prefix, name) + FACET_POSTFIX;
     }
 
 
     public static String getFilterName(
-        @Nonnull String name) {
+        @NonNull String name) {
         return getFilterName("", name);
     }
 
 
     public static String getFilterName(
-        @Nonnull String prefix,
-        @Nonnull String name) {
+        @NonNull String prefix,
+        @NonNull String name) {
         return escape(prefix, name) + FILTER_POSTFIX;
     }
 
     public static String getNestedFilterName(
-        @Nonnull String prefix,
-        @Nonnull String name) {
+        @NonNull String prefix,
+        @NonNull String name) {
         return escape(prefix, name) + NESTEDFILTER_POSTFIX;
     }
 
 
 
     public static String getSubSearchName(
-        @Nonnull String name) {
+        @NonNull String name) {
         return getSubSearchName("", name);
     }
 
 
     public static String getSubSearchName(
-        @Nonnull String prefix,
-        @Nonnull String name) {
+        @NonNull String prefix,
+        @NonNull String name) {
         return escape(prefix, name) + SUBSEARCH_POSTFIX;
     }
 
 
     public static String getNestedName(
         @Nullable String prefix,
-        @Nonnull String name) {
+        @NonNull String name) {
         return escape(prefix, name) + NESTED_POSTFIX;
     }
 
     public static String getNestedFieldName(
-        @Nonnull String nestField,
-        @Nonnull String fieldName) {
+        @NonNull String nestField,
+        @NonNull String fieldName) {
         return nestField + "." + fieldName;
     }
 
@@ -407,12 +407,12 @@ public abstract class ESFacetsBuilder {
     }
 
 
-    protected static String esExtendedTextField(@Nonnull String field, boolean caseSensitive) {
+    protected static String esExtendedTextField(@NonNull String field, boolean caseSensitive) {
         return caseSensitive ? field + ".full" : field + ".lower";
     }
 
     public static String esExtendedTextField(
-        @Nonnull String field,
+        @NonNull String field,
         @Nullable ExtendedTextFacet<?> facet) {
         return esExtendedTextField(field, facet == null || facet.isCaseSensitive());
     }

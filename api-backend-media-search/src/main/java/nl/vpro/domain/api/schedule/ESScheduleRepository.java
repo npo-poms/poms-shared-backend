@@ -13,7 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.ActionFuture;
@@ -56,7 +56,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     @Override
     @Value("${elasticSearch.schedule.index}")
-    public void setIndexName(@Nonnull String indexName) {
+    public void setIndexName(@NonNull String indexName) {
         super.setIndexName(indexName);
     }
 

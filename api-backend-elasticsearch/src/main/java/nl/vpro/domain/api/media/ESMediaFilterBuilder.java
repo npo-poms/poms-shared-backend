@@ -4,8 +4,8 @@
  */
 package nl.vpro.domain.api.media;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -35,7 +35,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
     }
 
      public static QueryBuilder filter(
-         @Nonnull String prefix,
+         @NonNull String prefix,
          @Nullable MediaSearch searches) {
         if (searches == null) {
             return QueryBuilders.matchAllQuery();
@@ -48,7 +48,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
 
 
       public static QueryBuilder filterRelationsNested(
-          @Nonnull String prefix,
+          @NonNull String prefix,
           @Nullable RelationSearch relationSearch) {
           if (relationSearch == null) {
               return QueryBuilders.matchAllQuery();
@@ -60,7 +60,7 @@ public class ESMediaFilterBuilder extends ESFilterBuilder {
       }
 
        public static QueryBuilder filterRelations(
-          @Nonnull String prefix,
+          @NonNull String prefix,
           @Nullable RelationSearch relationSearch) {
           if (relationSearch == null) {
               return QueryBuilders.matchAllQuery();

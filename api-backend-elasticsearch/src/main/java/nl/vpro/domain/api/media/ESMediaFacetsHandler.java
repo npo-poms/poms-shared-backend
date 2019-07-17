@@ -10,8 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
@@ -38,18 +38,18 @@ import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 public class ESMediaFacetsHandler extends ESFacetsHandler {
 
     public static MediaFacetsResult extractMediaFacets(
-        @Nonnull SearchResponse response,
+        @NonNull SearchResponse response,
         @Nullable MediaFacets facets,
-        @Nonnull MediaLoader mediaRepository) {
+        @NonNull MediaLoader mediaRepository) {
         return extractMediaFacets("", response, facets, mediaRepository);
     }
 
     @Nullable
     public static MediaFacetsResult extractMediaFacets(
-        @Nonnull String prefix,
-        @Nonnull SearchResponse response,
+        @NonNull String prefix,
+        @NonNull SearchResponse response,
         @Nullable MediaFacets request,
-        @Nonnull MediaLoader mediaRepository) {
+        @NonNull MediaLoader mediaRepository) {
         if (request == null || !request.isFaceted()) {
             return null;
 
@@ -144,7 +144,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
 
     protected static List<GenreFacetResultItem> getGenreAggregationResultItems(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable Filter root) {
         if (root == null) {
             return null;
@@ -171,8 +171,8 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
 
     protected static List<MemberRefFacetResultItem> getMemberRefAggregationResultItems(
-        @Nonnull  final String prefix,
-        @Nonnull  final String nestedObject,
+        @NonNull  final String prefix,
+        @NonNull  final String nestedObject,
         @NonNull  final MediaLoader mediaRepository,
         @Nullable final Filter root) {
         if (root == null) {
@@ -202,9 +202,9 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
     }
 
     protected static List<MultipleFacetsResult> getMediaRelationAggregationResultItems(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable RelationFacetList requestedRelations,
-        @Nonnull Filter root) {
+        @NonNull Filter root) {
         if (requestedRelations == null) {
             return null;
         }

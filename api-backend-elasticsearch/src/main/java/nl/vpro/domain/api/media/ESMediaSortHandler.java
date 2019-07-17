@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -39,7 +39,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
     interface SortHandler extends BiFunction<MediaSortOrder, MediaObject, FieldSortBuilder> {
         @Override
         default FieldSortBuilder apply(
-            @Nonnull MediaSortOrder order,
+            @NonNull MediaSortOrder order,
             @Nullable MediaObject mediaObject) {
             return new FieldSortBuilder(order.getField().name())
                 .order(order(order.getOrder()));
@@ -64,7 +64,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
 
         @Override
         public FieldSortBuilder apply(
-            @Nonnull MediaSortOrder sortOrder,
+            @NonNull MediaSortOrder sortOrder,
             @Nullable MediaObject mediaObject) {
             FieldSortBuilder sortBuilder = new FieldSortBuilder(field)
                 .setNestedPath(nestedField)
@@ -84,7 +84,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
 
         @Override
         public FieldSortBuilder apply(
-            @Nonnull MediaSortOrder sortOrder,
+            @NonNull MediaSortOrder sortOrder,
             @Nullable MediaObject mediaObject) {
             FieldSortBuilder sortBuilder = new FieldSortBuilder(field)
                 .setNestedPath(titlesField)

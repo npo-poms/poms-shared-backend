@@ -10,8 +10,8 @@ import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,9 +59,9 @@ public abstract class ESQueryBuilder {
     }
 
     protected static <MT extends MatchType> BoolQueryBuilder buildTextQuery(
-        @Nonnull String prefix,
-        @Nonnull AbstractTextMatcher<MT> textSearch,
-        @Nonnull List<SearchFieldDefinition> searchFields) {
+        @NonNull String prefix,
+        @NonNull AbstractTextMatcher<MT> textSearch,
+        @NonNull List<SearchFieldDefinition> searchFields) {
         final BoolQueryBuilder answer = QueryBuilders.boolQuery();
 
         //answer(QueryBuilders.hasChildQuery(ApiCueIndex.NAME))
@@ -116,8 +116,8 @@ public abstract class ESQueryBuilder {
     }
 
     static MatchPhraseQueryBuilder phraseQuery(
-        @Nonnull String prefix,
-        @Nonnull SearchFieldDefinition searchField,
+        @NonNull String prefix,
+        @NonNull SearchFieldDefinition searchField,
         String value, float boost, int slop) {
         return QueryBuilders.matchPhraseQuery(prefix + searchField.getName(), value)
             .boost(searchField.getBoost() * boost)
@@ -126,7 +126,7 @@ public abstract class ESQueryBuilder {
     }
 
     static Fuzziness getFuzziness(
-        @Nonnull AbstractTextMatcher<?> textMatcher) {
+        @NonNull AbstractTextMatcher<?> textMatcher) {
         String fuzziness = textMatcher.getFuzziness();
         if (StringUtils.isBlank(fuzziness)) {
             return null;
@@ -151,7 +151,7 @@ public abstract class ESQueryBuilder {
     }
 
     // NPA-186
-    protected static String filterStopWords(@Nonnull String value) {
+    protected static String filterStopWords(@NonNull String value) {
         String textWithoutStopWords = value;
 
         try {
@@ -183,7 +183,7 @@ public abstract class ESQueryBuilder {
     private static final Set<Character> QUOTES = new HashSet<>(Arrays.asList('\'', '\"'));
 
     protected static List<String> split(
-        @Nonnull String value) {
+        @NonNull String value) {
         List<String> result = new ArrayList<>();
         value = value.trim();
         int start = 0;
@@ -221,15 +221,15 @@ public abstract class ESQueryBuilder {
     }
 
     protected static boolean isQuoted(
-        @Nonnull  String value) {
+        @NonNull  String value) {
         char charAtStart = value.charAt(0);
         return QUOTES.contains(charAtStart) && charAtStart == value.charAt(value.length() - 1);
     }
 
     public static void apply(
-        @Nonnull BoolQueryBuilder answer,
-        @Nonnull QueryBuilder subQuery,
-        @Nonnull Match match) {
+        @NonNull BoolQueryBuilder answer,
+        @NonNull QueryBuilder subQuery,
+        @NonNull Match match) {
 
         if (match == null) {
             match = Match.MUST;
@@ -371,10 +371,10 @@ public abstract class ESQueryBuilder {
 
     protected static <MT extends MatchType, TM extends AbstractTextMatcher<MT>, TML extends AbstractTextMatcherList<TM, MT>>
     void buildFromList(
-        @Nonnull String prefix,
-        @Nonnull BoolQueryBuilder booleanQueryBuilder,
+        @NonNull String prefix,
+        @NonNull BoolQueryBuilder booleanQueryBuilder,
         @Nullable TML textMatchers,
-        @Nonnull FieldApplier<TM> applier) {
+        @NonNull FieldApplier<TM> applier) {
         if (textMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
             for (TM matcher : textMatchers.asList()) {
@@ -385,10 +385,10 @@ public abstract class ESQueryBuilder {
     }
 
     protected static void buildFromList(
-        @Nonnull String prefix,
-        @Nonnull BoolQueryBuilder booleanQuery,
+        @NonNull String prefix,
+        @NonNull BoolQueryBuilder booleanQuery,
         @Nullable DateRangeMatcherList rangeMatchers,
-        @Nonnull FieldApplier<DateRangeMatcher> applier) {
+        @NonNull FieldApplier<DateRangeMatcher> applier) {
         if (rangeMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
 
@@ -401,10 +401,10 @@ public abstract class ESQueryBuilder {
 
 
     protected static void buildFromList(
-        @Nonnull String prefix,
-        @Nonnull BoolQueryBuilder booleanQuery,
+        @NonNull String prefix,
+        @NonNull BoolQueryBuilder booleanQuery,
         @Nullable DurationRangeMatcherList rangeMatchers,
-        @Nonnull FieldApplier<DurationRangeMatcher> applier) {
+        @NonNull FieldApplier<DurationRangeMatcher> applier) {
         if (rangeMatchers != null) {
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
 
@@ -416,11 +416,11 @@ public abstract class ESQueryBuilder {
     }
 
     protected static void nested(
-        @Nonnull String prefix,
-        @Nonnull String path,
-        @Nonnull BoolQueryBuilder booleanQueryBuilder,
+        @NonNull String prefix,
+        @NonNull String path,
+        @NonNull BoolQueryBuilder booleanQueryBuilder,
         @Nullable TextMatcherList textMatchers,
-        @Nonnull FieldApplier<TextMatcher> applier) {
+        @NonNull FieldApplier<TextMatcher> applier) {
         if (textMatchers != null) {
             BoolQueryBuilder query = QueryBuilders.boolQuery();
             for (TextMatcher matcher : textMatchers) {
@@ -434,20 +434,20 @@ public abstract class ESQueryBuilder {
 
 
     protected static void build(
-        @Nonnull String prefix,
-        @Nonnull BoolQueryBuilder booleanQuery,
+        @NonNull String prefix,
+        @NonNull BoolQueryBuilder booleanQuery,
         @Nullable ExtendedTextMatcher textMatcher,
-        @Nonnull ExtendedTextSingleFieldApplier applier) {
+        @NonNull ExtendedTextSingleFieldApplier applier) {
         if (textMatcher != null) {
             applier.applyField(prefix, booleanQuery, textMatcher);
         }
     }
 
     protected static void build(
-        @Nonnull String prefix,
-        @Nonnull BoolQueryBuilder booleanQuery,
+        @NonNull String prefix,
+        @NonNull BoolQueryBuilder booleanQuery,
         @Nullable SimpleTextMatcher textMatcher,
-        @Nonnull FieldApplier<SimpleTextMatcher> applier) {
+        @NonNull FieldApplier<SimpleTextMatcher> applier) {
         if (textMatcher != null) {
             applier.applyField(prefix, booleanQuery, textMatcher);
         }
@@ -455,10 +455,10 @@ public abstract class ESQueryBuilder {
 
 
     public static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> QueryBuilder buildQuery(
-        @Nonnull String prefix,
-        @Nonnull String fieldName,
-        @Nonnull TM matcher,
-        @Nonnull ESMatchType.FieldInfo fieldInfo) {
+        @NonNull String prefix,
+        @NonNull String fieldName,
+        @NonNull TM matcher,
+        @NonNull ESMatchType.FieldInfo fieldInfo) {
         String value = matcher.getValue();
         ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
         return matchType.getQueryBuilder(prefix + fieldName, ESMatchType.esValue(value, matcher.isCaseSensitive()), fieldInfo);
@@ -507,8 +507,8 @@ public abstract class ESQueryBuilder {
 
 
     public static RangeQueryBuilder buildQuery(
-        @Nonnull String fieldName,
-        @Nonnull DateRangeMatcher matcher) {
+        @NonNull String fieldName,
+        @NonNull DateRangeMatcher matcher) {
         RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(fieldName);
 
         rangeQuery.includeLower(matcher.includeBegin());
@@ -526,8 +526,8 @@ public abstract class ESQueryBuilder {
     }
 
     public static RangeQueryBuilder buildQuery(
-        @Nonnull String fieldName,
-        @Nonnull DurationRangeMatcher matcher) {
+        @NonNull String fieldName,
+        @NonNull DurationRangeMatcher matcher) {
         RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery(fieldName);
 
         rangeQuery.includeLower(matcher.includeBegin());
@@ -544,7 +544,7 @@ public abstract class ESQueryBuilder {
         return rangeQuery;
     }
 
-    public static QueryBuilder simplifyQuery(@Nonnull BoolQueryBuilder booleanQuery) {
+    public static QueryBuilder simplifyQuery(@NonNull BoolQueryBuilder booleanQuery) {
         if (booleanQuery.hasClauses()) {
             if ((booleanQuery.must().size() + booleanQuery.should().size() == 1 && booleanQuery.filter().isEmpty())) {
                 if (booleanQuery.must().size() == 1) {
@@ -573,15 +573,15 @@ public abstract class ESQueryBuilder {
 
     public static QueryBuilder search(
         @Nullable TermSearch searches,
-        @Nonnull String axis,
+        @NonNull String axis,
         @NonNull String field) {
         return search(searches, "", axis, field);
     }
 
     public static QueryBuilder search(
         @Nullable TermSearch searches,
-        @Nonnull String prefix,
-        @Nonnull String axis,
+        @NonNull String prefix,
+        @NonNull String axis,
         @NonNull String field) {
         if (searches == null || searches.getIds() == null || searches.getIds().isEmpty()) {
             return matchAllQuery();

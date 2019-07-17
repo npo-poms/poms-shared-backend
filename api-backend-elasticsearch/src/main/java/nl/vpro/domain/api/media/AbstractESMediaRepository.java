@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.Null;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.elasticsearch.action.search.SearchRequest;
@@ -39,6 +39,8 @@ import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 import nl.vpro.util.TimeUtils;
+
+;
 
 /**
  * @author Michiel Meeuwissen
@@ -74,7 +76,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     @Override
     @Value("${elasticSearch.media.index}")
-    public void setIndexName(@Nonnull String indexName) {
+    public void setIndexName(@NonNull String indexName) {
         super.setIndexName(indexName);
     }
 
@@ -121,7 +123,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     final protected SearchRequest mediaSearchRequest(
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
-        @Nonnull BoolQueryBuilder boolQueryBuilder,
+        @NonNull BoolQueryBuilder boolQueryBuilder,
         long offset,
         @Nullable Integer max) {
 
@@ -144,11 +146,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      *                will handle {@link MediaForm#getFacets()}
      */
     final protected SearchRequest mediaSearchRequest(
-        @Nonnull String[] types,
+        @NonNull String[] types,
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
-        @Nonnull BoolQueryBuilder filter,
+        @NonNull BoolQueryBuilder filter,
         long offset,
         Integer max) {
         SearchRequest request = new SearchRequest(indexName);
@@ -162,7 +164,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     final protected SearchSourceBuilder mediaSearchBuilder(
         @Null ProfileDefinition<MediaObject> profile,
-        @Nonnull AbstractMediaForm form,
+        @NonNull AbstractMediaForm form,
         @Nullable BoolQueryBuilder filter,
         long offset,
         Integer max) {
@@ -177,7 +179,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
-        @Nonnull BoolQueryBuilder filter,
+        @NonNull BoolQueryBuilder filter,
         long offset,
         @Nullable Integer max) {
 
@@ -218,11 +220,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      * @param facets The requested facets. Will not be used to change the search request, but only to properly extract the facet results
      */
     protected <S extends MediaObject> GenericMediaSearchResult<S> executeSearchRequest(
-        @Nonnull SearchRequest request,
+        @NonNull SearchRequest request,
         @Nullable MediaFacets facets,
         long offset,
         @Nullable Integer max,
-        @Nonnull Class<S> clazz) {
+        @NonNull Class<S> clazz) {
         ActionFuture<SearchResponse> searchResponseFuture = client()
             .search(request)
             ;

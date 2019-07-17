@@ -1,7 +1,7 @@
 package nl.vpro.domain.api;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -31,7 +31,7 @@ public abstract class ESFilterBuilder {
 
     public static <T> void filter(
         @Nullable ProfileDefinition<T> definition,
-        @Nonnull BoolQueryBuilder filter) {
+        @NonNull BoolQueryBuilder filter) {
         if (!isEmpty(definition)) {
             filter.filter(
                 handleConstraint(definition.getFilter().getConstraint())

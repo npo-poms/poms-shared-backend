@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.elasticsearch.action.search.SearchResponse;
@@ -51,7 +51,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     @Override
     @Value("${elasticSearch.query.index}")
     public void setIndexName(
-        @Nonnull String indexName) {
+        @NonNull String indexName) {
         super.setIndexName(indexName);
     }
 

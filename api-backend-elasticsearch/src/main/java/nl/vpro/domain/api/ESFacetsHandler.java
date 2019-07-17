@@ -13,8 +13,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.HasAggregations;
@@ -38,9 +38,9 @@ public abstract class ESFacetsHandler {
 
 
     protected static <A extends Aggregation> A getAggregation(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable HasAggregations root,
-        @Nonnull String name) {
+        @NonNull String name) {
 
         return getAggregation(prefix, root, name,
             getParentAggregationNames(prefix, name)
@@ -49,19 +49,19 @@ public abstract class ESFacetsHandler {
 
 
     protected static <A extends Aggregation> A getNestedAggregation(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable HasAggregations root,
-        @Nonnull String name) {
+        @NonNull String name) {
 
         return getAggregation(prefix, root, name,
             getNestedParentAggregationNames(prefix, name)
         );
     }
     protected static <A extends Aggregation> A getAggregation(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable HasAggregations root,
-        @Nonnull String name,
-        @Nonnull String... names
+        @NonNull String name,
+        @NonNull String... names
     ) {
         if (root == null) {
             return null;
@@ -85,7 +85,7 @@ public abstract class ESFacetsHandler {
 
      protected static HasAggregations getAggregations(
         @Nullable HasAggregations root,
-        @Nonnull String... names
+        @NonNull String... names
         ) {
         if (root == null) {
             return null;
@@ -105,9 +105,9 @@ public abstract class ESFacetsHandler {
 
 
     protected static List<TermFacetResultItem> getFacetResultItems(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable HasAggregations facets,
-        @Nonnull String fieldName) {
+        @NonNull String fieldName) {
         if(facets != null) {
 
             MultiBucketsAggregation a = getAggregation(prefix, facets, fieldName);
@@ -120,9 +120,9 @@ public abstract class ESFacetsHandler {
 
 
     protected static List<TermFacetResultItem> getFacetResultItems(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         HasAggregations rootFilter,
-        @Nonnull String fieldName,
+        @NonNull String fieldName,
         @Nullable ExtendedTextFacet<?> extendedTextFacet) {
         if (extendedTextFacet != null) {
             return getFacetResultItems(
@@ -136,13 +136,13 @@ public abstract class ESFacetsHandler {
     }
 
     protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable HasAggregations rootFilter,
-        @Nonnull String fieldName,
+        @NonNull String fieldName,
         @Nullable TextFacet<?> requestFacet,
-        @Nonnull Class<T> enumClass,
-        @Nonnull Function<String, T> valueOf,
-        @Nonnull Function<T, String> xmlId) {
+        @NonNull Class<T> enumClass,
+        @NonNull Function<String, T> valueOf,
+        @NonNull Function<T, String> xmlId) {
         if(requestFacet != null) {
 
             MultiBucketsAggregation facet = getAggregation(prefix, rootFilter, fieldName);
@@ -166,18 +166,18 @@ public abstract class ESFacetsHandler {
     }
 
     protected static <T extends Enum<T>> List<TermFacetResultItem> getFacetResultItemsForEnum(
-        @Nonnull String prefix,
-        @Nonnull HasAggregations facets,
-        @Nonnull String fieldName,
+        @NonNull String prefix,
+        @NonNull HasAggregations facets,
+        @NonNull String fieldName,
         @Nullable TextFacet<?> requestedFacet,
-        @Nonnull final Class<T> enumClass) {
+        @NonNull final Class<T> enumClass) {
         return getFacetResultItemsForEnum(
             prefix, facets, fieldName, requestedFacet, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name
         );
     }
 
     protected static List<TermFacetResultItem> getBroadcasterResultItems(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         @Nullable HasAggregations facets) {
         if (facets == null) {
             return null;
@@ -199,10 +199,10 @@ public abstract class ESFacetsHandler {
 
 
     protected static List<DateFacetResultItem> getDateRangeFacetResultItems(
-        @Nonnull String prefix,
-        @Nonnull HasAggregations root,
+        @NonNull String prefix,
+        @NonNull HasAggregations root,
         @Nullable DateRangeFacets<?> dateRangeFacets,
-        @Nonnull String facetName) {
+        @NonNull String facetName) {
 
         if (dateRangeFacets == null) {
             return null;
@@ -261,10 +261,10 @@ public abstract class ESFacetsHandler {
     }
 
     protected static List<DurationFacetResultItem> getDurationRangeFacetResultItems(
-        @Nonnull String prefix,
-        @Nonnull HasAggregations root,
+        @NonNull String prefix,
+        @NonNull HasAggregations root,
         DurationRangeFacets<?> durationRangeFacets,
-        @Nonnull String facetName) {
+        @NonNull String facetName) {
 
         HasAggregations aggregations = getAggregations(root, getParentAggregationNames(prefix, facetName));
 
@@ -294,8 +294,8 @@ public abstract class ESFacetsHandler {
     }
 
     private static int indexOf(
-        @Nonnull DateFacetResultItem item,
-        @Nonnull List<nl.vpro.domain.api.RangeFacet<Instant>> ranges) {
+        @NonNull DateFacetResultItem item,
+        @NonNull List<nl.vpro.domain.api.RangeFacet<Instant>> ranges) {
         int i = 0;
         for (nl.vpro.domain.api.RangeFacet<Instant> range : ranges) {
             if (range.matches(item.getBegin(), item.getEnd())) {
@@ -307,8 +307,8 @@ public abstract class ESFacetsHandler {
     }
 
     private static int indexOf(
-        @Nonnull DurationFacetResultItem item,
-        @Nonnull List<nl.vpro.domain.api.RangeFacet<Duration>> ranges) {
+        @NonNull DurationFacetResultItem item,
+        @NonNull List<nl.vpro.domain.api.RangeFacet<Duration>> ranges) {
         int i = 0;
         for (nl.vpro.domain.api.RangeFacet<Duration> range : ranges) {
             if (range.matches(item.getBegin(), item.getEnd())) {
@@ -373,7 +373,7 @@ public abstract class ESFacetsHandler {
         return new AggregationResultItemList<MultiBucketsAggregation, Terms.Bucket, TermFacetResultItem>(facet) {
             @Override
             protected TermFacetResultItem adapt(
-                @Nonnull Terms.Bucket bucket) {
+                @NonNull Terms.Bucket bucket) {
                 String value = bucket.getKeyAsString();
                 String name;
 
@@ -390,7 +390,7 @@ public abstract class ESFacetsHandler {
         };
     }
     protected static <T extends Enum<T>> String enumValueToString(
-        @Nonnull T enumValue) {
+        @NonNull T enumValue) {
         if (enumValue instanceof Displayable) {
             return ((Displayable) enumValue).getDisplayName();
         } else {
@@ -398,8 +398,8 @@ public abstract class ESFacetsHandler {
         }
     }
     protected static <T extends Enum<T>> TermFacetResultItem emptyItem(
-        @Nonnull T enumValue,
-        @Nonnull Function<T, String> xmlId) {
+        @NonNull T enumValue,
+        @NonNull Function<T, String> xmlId) {
         String name = ESFacetsHandler.enumValueToString(enumValue);
         return new TermFacetResultItem(name, xmlId.apply(enumValue), 0);
 

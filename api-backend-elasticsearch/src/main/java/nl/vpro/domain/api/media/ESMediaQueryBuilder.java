@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
@@ -82,7 +82,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * @param searches or <code>null</code> (resulting in a matchAllQuery)
      */
     public static QueryBuilder query(
-        @Nonnull String prefix,
+        @NonNull String prefix,
         MediaSearch searches) {
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
@@ -101,8 +101,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * @param searches The 'searches' part of a MediaForm
      */
     public static void buildMediaQuery(
-        @Nonnull final String prefix,
-        @Nonnull final BoolQueryBuilder booleanQuery,
+        @NonNull final String prefix,
+        @NonNull final BoolQueryBuilder booleanQuery,
         @Nullable final MediaSearch searches) {
 
         if (searches == null) {
@@ -312,8 +312,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
      * @param axis Non empty string
      */
     public static QueryBuilder filter(
-        @Nonnull String prefix,
-        @Nonnull String axis,
+        @NonNull String prefix,
+        @NonNull String axis,
         MemberRefSearch searches) {
         if(searches == null) {
             return QueryBuilders.matchAllQuery();
@@ -331,15 +331,15 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
-    public static QueryBuilder filter(MemberRefSearch searches, @Nonnull String axis) {
+    public static QueryBuilder filter(MemberRefSearch searches, @NonNull String axis) {
         return filter("", axis, searches);
     }
 
-    public static QueryBuilder filter(@Nonnull String axis, TitleSearch searches) {
+    public static QueryBuilder filter(@NonNull String axis, TitleSearch searches) {
         return filter("", axis, searches);
     }
 
-    public static QueryBuilder filter(@Nonnull String prefix, String axis, TitleSearch titleSearch) {
+    public static QueryBuilder filter(@NonNull String prefix, String axis, TitleSearch titleSearch) {
         if(titleSearch == null) {
             return QueryBuilders.matchAllQuery();
         }
@@ -353,8 +353,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
 
     private static void buildLocationQuery(
-        @Nonnull BoolQueryBuilder boolQueryBuilder,
-        @Nonnull final String prefix,
+        @NonNull BoolQueryBuilder boolQueryBuilder,
+        @NonNull final String prefix,
         TextMatcherList locations) {
 
         buildFromList(prefix, boolQueryBuilder, locations, (pref, booleanQueryBuilder, matcher) -> {

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
@@ -36,7 +36,7 @@ public class GTAAServiceImpl implements GTAAService {
     private SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
 
         @Override
-        public byte[] resolveSigningKeyBytes(@Nonnull JwsHeader header, @Nonnull Claims claims) {
+        public byte[] resolveSigningKeyBytes(@NonNull JwsHeader header, @NonNull Claims claims) {
             Assert.notNull(claims.get("iss"), "no value for 'iss' available");
             try {
                 return keysRepo.getKeyFor((String) claims.get("iss"))
