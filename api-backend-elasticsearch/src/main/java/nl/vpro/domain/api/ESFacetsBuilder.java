@@ -157,7 +157,7 @@ public abstract class ESFacetsBuilder {
     }
 
     protected static DateHistogramInterval from(
-        @NonNull DateRangeInterval.Interval interval) {
+        DateRangeInterval.@NonNull Interval interval) {
         switch(interval.getUnit()) {
             case YEAR:
                 return interval.amount == 1 ? DateHistogramInterval.YEAR : DateHistogramInterval.days(interval.amount * 365);

@@ -373,7 +373,7 @@ public abstract class ESFacetsHandler {
         return new AggregationResultItemList<MultiBucketsAggregation, Terms.Bucket, TermFacetResultItem>(facet) {
             @Override
             protected TermFacetResultItem adapt(
-                @NonNull Terms.Bucket bucket) {
+               Terms.@NonNull Bucket bucket) {
                 String value = bucket.getKeyAsString();
                 String name;
 
