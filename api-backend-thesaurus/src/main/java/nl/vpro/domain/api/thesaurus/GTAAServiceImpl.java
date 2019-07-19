@@ -13,7 +13,7 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
-import nl.vpro.domain.media.gtaa.*;
+import nl.vpro.domain.gtaa.*;
 import nl.vpro.util.DateUtils;
 
 /**

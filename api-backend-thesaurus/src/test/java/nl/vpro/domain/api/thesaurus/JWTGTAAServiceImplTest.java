@@ -20,9 +20,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import nl.vpro.domain.media.gtaa.GTAANewPerson;
-import nl.vpro.domain.media.gtaa.GTAAPerson;
-import nl.vpro.domain.media.gtaa.GTAARepository;
+import nl.vpro.domain.gtaa.GTAANewPerson;
+import nl.vpro.domain.gtaa.GTAAPerson;
+import nl.vpro.domain.gtaa.GTAARepository;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;

@@ -1,6 +1,6 @@
 package nl.vpro.domain.api.thesaurus;
 
-import nl.vpro.domain.media.gtaa.*;
+import nl.vpro.domain.gtaa.*;
 
 public interface GTAAService {
 

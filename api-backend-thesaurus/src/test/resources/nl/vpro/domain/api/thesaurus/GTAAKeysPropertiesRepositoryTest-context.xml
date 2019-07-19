@@ -4,7 +4,7 @@
        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
  <bean class="org.mockito.Mockito" factory-method="mock">
-      <constructor-arg value="nl.vpro.domain.media.gtaa.GTAARepository" />
+      <constructor-arg value="nl.vpro.domain.gtaa.GTAARepository" />
    </bean>
 
 
