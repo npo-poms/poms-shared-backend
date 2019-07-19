@@ -18,12 +18,11 @@ public class RSContextResolver implements ContextResolver<JAXBContext> {
     public static final JAXBContext ERROR_CONTEXT;
     static {
         try {
-            JAXBContext jxb = JAXBContext.newInstance(
+            ERROR_CONTEXT = JAXBContext.newInstance(
                 nl.vpro.domain.api.Error.class,
                 ResteasyConstraintViolation.class
 
             );
-            ERROR_CONTEXT = jxb;
         } catch (JAXBException ex) {
             throw new RuntimeException(ex);
         }
