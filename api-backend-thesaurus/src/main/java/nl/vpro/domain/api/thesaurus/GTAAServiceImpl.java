@@ -60,19 +60,19 @@ public class GTAAServiceImpl implements GTAAService {
      *            to the {@link GTAARepository}. Extra check on expiration date (jwt should not be issued > 12h ago)
      */
     @Override
-    public GTAAPerson submit(GTAANewPerson newPerson, String jws) {
+    public GTAAPerson submit(@NonNull GTAANewPerson newPerson, @NonNull String jws) {
         String issuer = authenticate(jws);
         return gtaaService.submit(newPerson, issuer);
     }
 
     @Override
-    public  <T extends ThesaurusObject, S extends NewThesaurusObject>  T submit(S newObject, String jws) {
+    public  <T extends ThesaurusObject, S extends NewThesaurusObject>  T submit(@NonNull S newObject, @NonNull String jws) {
         String issuer = authenticate(jws);
         return gtaaService.submit(newObject, issuer);
     }
 
 
-    private String authenticate(String jws) throws SecurityException{
+    private String authenticate(@NonNull String jws) throws SecurityException{
         JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
         parser.setAllowedClockSkewSeconds(5);
 

@@ -8,17 +8,15 @@
 
   <context:component-scan base-package="nl.vpro.domain.api.thesaurus" />
 
-  <bean id="GTAAKeysPropertiesRepository" class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
+  <bean class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
     <property name="locations">
-         <list>
-           <value>classpath:/gtaa-keys.properties</value>
-           <value>file:${user.home}/conf/gtaa-keys.properties</value>
-           <value>#{npo.configDirectory.toString()}/gtaa-keys.properties</value>
-         </list>
+      <list>
+        <value>classpath:/gtaa-keys.properties</value>
+        <value>file:${user.home}/conf/gtaa-keys.properties</value>
+        <value>#{npo.configDirectory.toString()}/gtaa-keys.properties</value>
+      </list>
     </property>
   </bean>
-
-
 </beans>
 
 

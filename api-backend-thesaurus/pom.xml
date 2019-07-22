@@ -24,10 +24,6 @@
        <artifactId>jjwt-jackson</artifactId>
      </dependency>
      <dependency>
-       <groupId>nl.vpro.media</groupId>
-       <artifactId>media-domain</artifactId>
-     </dependency>
-     <dependency>
        <groupId>nl.vpro.poms</groupId>
        <artifactId>poms-shared-domain</artifactId>
      </dependency>

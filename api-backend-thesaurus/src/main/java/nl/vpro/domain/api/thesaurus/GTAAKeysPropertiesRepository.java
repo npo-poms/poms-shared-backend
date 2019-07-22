@@ -10,6 +10,7 @@ import java.util.*;
 
 import javax.annotation.PostConstruct;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.core.io.Resource;
 
 
@@ -24,7 +25,7 @@ public class GTAAKeysPropertiesRepository implements GTAAKeysRepository {
 
 
     @PostConstruct
-    public void init() throws IOException {
+    public void init() {
         Set<Object> keys = new HashSet<>();
         for (Resource location : locations) {
             keys.addAll(getProperties(location).keySet());
@@ -35,27 +36,21 @@ public class GTAAKeysPropertiesRepository implements GTAAKeysRepository {
 
 
     @Override
-    public Optional<String> getKeyFor(String issuer) {
+    public Optional<String> getKeyFor(@NonNull String issuer) {
 
          for (Resource location : locations ) {
-            try {
-                log.debug("Searching key for {} in {}...", issuer, location);
-                String key = getProperties(location).getProperty(issuer);
-                if (key != null) {
-                    log.debug("Key found for {} in {}", issuer, location);
-                    return Optional.of(key);
-                }
-            } catch (FileNotFoundException fne) {
-                continue;
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
+             log.debug("Searching key for {} in {}...", issuer, location);
+             String key = getProperties(location).getProperty(issuer);
+             if (key != null) {
+                 log.debug("Key found for {} in {}", issuer, location);
+                 return Optional.of(key);
+             }
 
         }
         return Optional.empty();
     }
 
-    private  Properties getProperties(Resource inputStream) throws IOException {
+    private  Properties getProperties(@NonNull Resource inputStream) {
         Properties props = new Properties();
         try {
             props.load(inputStream.getInputStream());

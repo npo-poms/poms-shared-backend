@@ -1,5 +1,7 @@
 package nl.vpro.domain.api.thesaurus;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import nl.vpro.domain.gtaa.*;
 
 public interface GTAAService {
@@ -11,7 +13,7 @@ public interface GTAAService {
      * @param jwt The JWT string for authentication. It will also be decrypted to get information about the 'creator'.
      */
 
-    GTAAPerson submit(GTAANewPerson newPerson, String jwt);
+    GTAAPerson submit(@NonNull GTAANewPerson newPerson, String jwt);
 
 
     /**
@@ -20,7 +22,7 @@ public interface GTAAService {
      * @param newObject The new person
      * @param jwt The JWT string for authentication. It will also be decrypted to get information about the 'creator'.
      */
-    <T extends ThesaurusObject, S extends NewThesaurusObject>  T submit(S newObject, String jwt);
+    <T extends ThesaurusObject, S extends NewThesaurusObject>  T submit(@NonNull S newObject, @NonNull String jwt);
 
 
 }
