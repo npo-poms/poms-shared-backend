@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
 import javax.inject.Inject;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.stereotype.Service;
 
 import nl.vpro.domain.gtaa.*;
@@ -66,7 +66,7 @@ public class GTAAServiceImpl implements GTAAService {
     }
 
     @Override
-    public  <T extends ThesaurusObject, S extends NewThesaurusObject<T>>  T submit(S newObject, String jws) {
+    public  <T extends ThesaurusObject, S extends NewThesaurusObject>  T submit(S newObject, String jws) {
         String issuer = authenticate(jws);
         return gtaaService.submit(newObject, issuer);
     }

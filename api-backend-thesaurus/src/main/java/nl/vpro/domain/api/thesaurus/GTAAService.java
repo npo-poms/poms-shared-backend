@@ -20,7 +20,7 @@ public interface GTAAService {
      * @param newObject The new person
      * @param jwt The JWT string for authentication. It will also be decrypted to get information about the 'creator'.
      */
-    <T extends ThesaurusObject, S extends NewThesaurusObject<T>>  T submit(S newObject, String jwt);
+    <T extends ThesaurusObject, S extends NewThesaurusObject>  T submit(S newObject, String jwt);
 
 
 }
