@@ -13,7 +13,7 @@ public interface GTAAService {
      * @param jwt The JWT string for authentication. It will also be decrypted to get information about the 'creator'.
      */
 
-    GTAAPerson submit(@NonNull GTAANewPerson newPerson, String jwt);
+    GTAAPerson submit(@NonNull GTAANewPerson newPerson, @NonNull  String jwt);
 
 
     /**
