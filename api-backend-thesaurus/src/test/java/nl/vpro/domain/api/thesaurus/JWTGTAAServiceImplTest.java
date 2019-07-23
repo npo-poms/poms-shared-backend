@@ -94,7 +94,7 @@ public class JWTGTAAServiceImplTest {
      */
 
     protected static String encrypt1(String issuer, String key, String user) {
-        Map<String, Object> claims = new HashMap<String, Object>();
+        Map<String, Object> claims = new HashMap<>();
         claims.put("iss", issuer);
         claims.put("usr", user);
         SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes());
