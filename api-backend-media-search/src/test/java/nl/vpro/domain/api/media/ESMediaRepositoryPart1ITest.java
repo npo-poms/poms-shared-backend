@@ -1223,11 +1223,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     /**
      * We create an index with all the MediaObject and all their properties
      * to test that our mapping is complete.
-     *
-     * @throws Exception
      */
     @Test
-    public void bleToIndexAllMediaObject(){
+    public void ableToIndexAllMediaObject(){
 
         assertThatCode(() -> {
             Group group = index(MediaTestDataBuilder.group().withEverything().published().build());
