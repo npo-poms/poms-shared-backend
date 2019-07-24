@@ -55,8 +55,6 @@ import static org.mockito.Mockito.when;
  * @author Roelof Jan Koekoek
  * @since 3.5
  */
-
-@SuppressWarnings("ConstantConditions")
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -1229,7 +1227,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
      * @throws Exception
      */
     @Test
-    public void ableToIndexAllMediaObject(){
+    public void bleToIndexAllMediaObject(){
 
         assertThatCode(() -> {
             Group group = index(MediaTestDataBuilder.group().withEverything().published().build());
