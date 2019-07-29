@@ -66,7 +66,7 @@ public class GTAAServiceImpl implements GTAAService {
     }
 
     @Override
-    public  <T extends ThesaurusObject, S extends NewThesaurusObject>  T submit(@NonNull S newObject, @NonNull String jws) {
+    public  <T extends ThesaurusObject, S extends GTAANewConcept>  T submit(@NonNull S newObject, @NonNull String jws) {
         String issuer = authenticate(jws);
         return gtaaService.submit(newObject, issuer);
     }
