@@ -10,6 +10,11 @@
     <level value="DEBUG" />
   </logger>
 
+  <logger name="nl.vpro.domain.api.schedule.ESScheduleRepository">
+    <level value="DEBUG" />
+  </logger>
+
+
   <root>
     <level value="INFO"/>
     <appender-ref ref="stdout"/>

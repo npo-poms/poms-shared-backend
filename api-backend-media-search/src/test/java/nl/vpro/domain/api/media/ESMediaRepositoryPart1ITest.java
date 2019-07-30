@@ -1904,19 +1904,36 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     // NPA-490
     public void reruns() throws IOException {
         index(program()
+            .mid("mid_1")
+            .mainTitle("original on ned1")
             .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 12, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
             .build());
 
         index(program()
+            .mid("mid_2")
+            .mainTitle("rerun on ned1")
             .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 13, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
             .build());
 
         index(program()
+            .mid("mid_3")
+            .mainTitle("original on ned2")
             .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 14, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
             .build());
 
         index(program()
+            .mid("mid_4")
+            .mainTitle("rerun on ned2")
             .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
+            .build());
+
+
+        // now for the more convulated. The question is, should this match or not?
+        index(program()
+            .mid("mid_5")
+            .mainTitle("rereun on ned1 but original on ned2")
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
             .build());
 
          MediaForm form = MediaForm.builder()
@@ -1929,6 +1946,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
              .build();
 
         MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+        log.info("{}", resultWithSearch);
         assertThat(resultWithSearch).hasSize(1);
 
 

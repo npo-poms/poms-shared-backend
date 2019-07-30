@@ -35,12 +35,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     @Override
     protected void firstRun() {
         createIndexIfNecessary(ApiMediaIndex.NAME);
-    }
+            }
 
     @Before
     public void setup() {
         repository = new ESScheduleRepository(clientFactory, null);
         repository.setIndexName(indexName);
+        repository.setScore(false);
         clearIndex();
     }
 
@@ -294,7 +295,9 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Test
     public void findSchedulesForOriginal() throws Exception {
-        Program broadcast = MediaBuilder.program().mid("p1")
+        Program broadcast = MediaBuilder.program()
+            .mid("p1")
+            .mainTitle("original and rerun on the same channel")
             .descendantOf("DESCENDANT1")
             .type(ProgramType.BROADCAST)
             .scheduleEvents(
@@ -305,6 +308,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
         Program movie = MediaBuilder.program().mid("p2")
             .descendantOf("DESCENDANT2")
+            .mainTitle("original on a channel")
             .type(ProgramType.MOVIE)
             .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
             .build();

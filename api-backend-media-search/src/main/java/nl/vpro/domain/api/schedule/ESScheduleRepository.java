@@ -327,8 +327,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         }
         ScheduleEventSearch scheduleEventSearch = scheduleEventSearches != null && ! scheduleEventSearches.isEmpty() ? scheduleEventSearches.get(0) : null;
         if (scheduleEventSearch != null) {
-            Instant  start = scheduleEventSearch.getBegin();
-            Instant stop = scheduleEventSearch.getEnd();
+            Instant  start  = scheduleEventSearch.getBegin();
+            Instant stop    = scheduleEventSearch.getEnd();
             Channel channel = scheduleEventSearch.getChannel();
             Net net = null;
             if (StringUtils.isNotEmpty(scheduleEventSearch.getNet())) {
@@ -357,6 +357,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         // Make sure we query enough as to get a 'full' schedule
         int maxresult = Math.max(max, MAXRESULT);
         SearchRequest request = mediaSearchRequest(getScheduleEventTypes(), profile, form, null, QueryBuilders.boolQuery(), 0L, maxresult);
+        log.debug("Executing {}", request);
         GenericMediaSearchResult<MediaObject> result = executeSearchRequest(request, null, 0, maxresult, MediaObject.class);
 
 
