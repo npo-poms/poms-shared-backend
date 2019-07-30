@@ -1899,6 +1899,41 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(resultWithSearch.getSelectedFacets().getTitles()).hasSize(1);
     }
 
+
+    @Test
+    // NPA-490
+    public void reruns() throws IOException {
+        index(program()
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 12, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
+            .build());
+
+        index(program()
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 13, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
+            .build());
+
+        index(program()
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 14, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
+            .build());
+
+        index(program()
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
+            .build());
+
+         MediaForm form = MediaForm.builder()
+             .scheduleEvents(
+                 ScheduleEventSearch.builder()
+                     .rerun(false)
+                     .channel(Channel.NED1)
+                     .build()
+             )
+             .build();
+
+        MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+        assertThat(resultWithSearch).hasSize(1);
+
+
+    }
+
     @SuppressWarnings("SameParameterValue")
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
