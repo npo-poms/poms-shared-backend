@@ -1929,6 +1929,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
 
         // now for the more convulated. The question is, should this match or not?
+
+        // we do match now
         index(program()
             .mid("mid_5")
             .mainTitle("rereun on ned1 but original on ned2")
@@ -1939,15 +1941,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
          MediaForm form = MediaForm.builder()
              .scheduleEvents(
                  ScheduleEventSearch.builder()
-                     .rerun(false)
-                     .channel(Channel.NED1)
+                     .original()
+                     .channel(Channel.NED1) // not necessary at the same time!
                      .build()
              )
              .build();
 
         MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
         log.info("{}", resultWithSearch);
-        assertThat(resultWithSearch).hasSize(1);
+        assertThat(resultWithSearch).hasSize(2); // mid_1 and mid_5
 
 
     }
