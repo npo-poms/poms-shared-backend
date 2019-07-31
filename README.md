@@ -9,6 +9,9 @@ You can run the elastic search locally.
 -- Install icu tokenizer plugin
 `sudo ${ELASTIC_HOME}/bin/elasticsearch-plugin install analysis-icu`
 
+## ES Console
+We use **ElasticSearch Head** chrome plugin to connect to ES 
+
 ## Configure your local ES
 
 Generate ES indexes for our resources:

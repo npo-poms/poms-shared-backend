@@ -218,6 +218,80 @@
         }
       }
     },
+    "geoLocations": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "properties": {
+            "name": {
+              "type": "text",
+              "index": false,
+              "fields": {
+                "text": {
+                  "type": "text",
+                  "norms": false
+                }
+              }
+            },
+            "description": {
+              "type": "text",
+              "index": false,
+              "fields": {
+                "text": {
+                  "type": "text",
+                  "norms": false
+                }
+              }
+            },
+            "role": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "expandedGeoLocations": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "properties": {
+            "name": {
+              "type": "text",
+              "index": false,
+              "fields": {
+                "text": {
+                  "type": "text",
+                  "norms": false
+                }
+              }
+            },
+            "description": {
+              "type": "text",
+              "index": false,
+              "fields": {
+                "text": {
+                  "type": "text",
+                  "norms": false
+                }
+              }
+            },
+            "role": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
     "intentions": {
       "properties": {
         "owner": {
