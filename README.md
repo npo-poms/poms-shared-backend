@@ -35,6 +35,12 @@ Connect to elastic search and find out what's the highest index.
 Then run the command to generate a new index with an incremented version number:
 `./push-es-media-mapping.sh localhost:9200 old_plus_1`
 
+To be able to change the dev/test or even prod environment
+you need to have a tunneling from your machine (ask to get a copy of the .ssh/config)
+
+There you will find all the servers (any node in the cluster will do)
+Tunneling via poms-test machine will allow you to reach dev and test only.
+
 ## Deploy
 Once you push jenkins will build your changes.
 
@@ -49,7 +55,8 @@ to push the changes to Frontend (readonly) API in dev.
 Ensure you publish the [npo-publish](https://subversion.vpro.nl/reponl/publiekeomroep/npo-publish/trunk) (writer) 
 and [npo api](https://subversion.vpro.nl/repo/nl/vpro/api/trunk) (reader)
 
-You will have to manually update the ES index with the new mapping configuration.
+You will have to manually update the ES index with 
+the new mapping configuration. (see  [How to update index] section)
 
 ## Testing
 At the moment the test is a manual changes in the gui that get published
