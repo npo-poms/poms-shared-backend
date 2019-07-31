@@ -109,7 +109,7 @@ public abstract class AbstractESRepositoryITest {
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
         if (indexName != null) {
-            client.admin().indices().prepareDelete(indexName).execute().get();
+            //client.admin().indices().prepareDelete(indexName).execute().get();
         }
     }
 

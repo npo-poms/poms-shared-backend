@@ -413,9 +413,9 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
         if(matcher.getRerun() != null) {
             if (matcher.getRerun()) {
-                scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.repeat.isRerun", true));
+                scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.rerun", true));
             } else {
-                scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.repeat.isRerun", false));
+                scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.rerun", false));
             }
         }
 

@@ -36,7 +36,6 @@ import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.data.Index.atIndex;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -823,7 +822,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         AbstractESRepositoryITest.client
             .index(
                 new IndexRequest(indexName, getTypeName(object), object.getMid())
-                    .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object), XContentType.JSON)
+                    .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
             ).get();
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();

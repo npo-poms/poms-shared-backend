@@ -677,6 +677,10 @@
             }
           }
         },
+        "rerun": {
+          "type": "boolean",
+          "null_value": false
+        },
         "secondaryLifestyle": {
           "properties": {
             "value": {
