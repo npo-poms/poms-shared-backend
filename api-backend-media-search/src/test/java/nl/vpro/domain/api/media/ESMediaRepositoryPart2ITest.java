@@ -820,7 +820,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         AbstractESRepositoryITest.client
             .index(
                 new IndexRequest(indexName, getTypeName(object), object.getMid())
-                    .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object), XContentType.JSON)
+                    .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
             ).get();
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();

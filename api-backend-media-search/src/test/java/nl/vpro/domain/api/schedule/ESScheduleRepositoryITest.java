@@ -391,7 +391,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                 .setIndex(indexName)
                 .setType(mediaType)
                 .setId(o.getMid())
-                .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(o), XContentType.JSON)
+                .setSource(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(o), XContentType.JSON)
                 .get();
         refresh();
 
