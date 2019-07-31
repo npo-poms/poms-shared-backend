@@ -157,9 +157,8 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     /**
      * This reproduces API-249
-     * This test is failing we open an bug to fix it
      */
-    @Ignore
+    @Ignore("Fails, see API-249")
     @Test
     public void listSchedulesForBroadcasterWithMax() throws Exception {
 
