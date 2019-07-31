@@ -413,7 +413,9 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         }
         if(matcher.getRerun() != null) {
             if (matcher.getRerun()) {
-                scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.rerun", true));
+                scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.repeat.isRerun", true));
+                // This would be simpler, but reindex should be done first otherwise it's even more broken
+                //scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.rerun", true));
             } else {
                 scheduleSub.must(QueryBuilders.termQuery(prefix + "scheduleEvents.rerun", false));
             }
