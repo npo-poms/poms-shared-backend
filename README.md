@@ -50,6 +50,9 @@ Once you push jenkins will build your changes.
 2. Ensure the job [Maven project API NPO v1 Development](https://jenkins.vpro.nl/view/POMS/job/API%20NPO%20v1%20Development/)
 is completed.
 3. Execute the task [Deploy naar dev (rs-dev.poms.omroep.nl v1)](https://jenkins.vpro.nl/view/POMS/job/API%20NPO%20v1%20Development/batchTasks/)
+4. Manually run [Maven project npo-publish Development](https://jenkins.vpro.nl/view/POMS/job/npo-publish%20Development/)
+to ensure the publisher is aware of the new changes.
+5. Execute the task [Deploy naar NPO DEV](https://jenkins.vpro.nl/view/POMS/job/npo-publish%20Development/batchTasks/)
 to push the changes to Frontend (readonly) API in dev. 
 
 Ensure you publish the [npo-publish](https://subversion.vpro.nl/reponl/publiekeomroep/npo-publish/trunk) (writer) 
