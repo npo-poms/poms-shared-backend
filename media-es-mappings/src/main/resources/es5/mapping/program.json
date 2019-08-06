@@ -269,6 +269,9 @@
             },
             "gtaaUri": {
               "type": "keyword"
+            },
+            "gtaaStatus": {
+              "type": "keyword"
             }
           }
         }
@@ -305,6 +308,9 @@
               "type": "keyword"
             },
             "gtaaUri": {
+              "type": "keyword"
+            },
+            "gtaaStatus": {
               "type": "keyword"
             }
           }
@@ -1067,6 +1073,9 @@
                 },
                 "gtaaUri": {
                   "type": "keyword"
+                },
+                "gtaaStatus": {
+                  "type": "keyword"
                 }
               }
             }
@@ -1103,6 +1112,9 @@
                   "type": "keyword"
                 },
                 "gtaaUri": {
+                  "type": "keyword"
+                },
+                "gtaaStatus": {
                   "type": "keyword"
                 }
               }
