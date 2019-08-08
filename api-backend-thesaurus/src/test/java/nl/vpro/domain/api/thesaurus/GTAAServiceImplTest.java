@@ -67,7 +67,7 @@ public class GTAAServiceImplTest {
             .note("opmerking")
             .build();
         String jws = encrypt("demo-app", SECRET_KEY, "m.meeuwissen@vpro.nl", 10);
-        gtaaService.submit(newPerson, jws);
+        gtaaService.submitGTAAPerson(newPerson, jws);
 
         verify(gtaa).submit(any(GTAANewPerson.class), eq("demo-app"));
     }
@@ -81,14 +81,14 @@ public class GTAAServiceImplTest {
             .note("opmerking")
             .build();
         String jws = encrypt("demo-app", SECRET_KEY, "m.meeuwissen@vpro.nl", 13);
-        gtaaService.submit(newPerson, jws);
+        gtaaService.submitGTAAPerson(newPerson, jws);
     }
 
     @Test (expected = IllegalArgumentException.class)
     public void testAddPersonWithoutIssuer() {
         GTAANewPerson newPerson = GTAANewPerson.builder().givenName("piet").familyName("hein").note("opmerking").build();
         String jws = encrypt(null, SECRET_KEY, "user y", 13);
-        gtaaService.submit(newPerson, jws);
+        gtaaService.submitGTAAPerson(newPerson, jws);
     }
 
     /**

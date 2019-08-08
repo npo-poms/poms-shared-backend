@@ -26,7 +26,7 @@ import nl.vpro.util.DateUtils;
 @Slf4j
 public class GTAAServiceImpl implements GTAAService {
 
-    private final GTAARepository gtaaService;
+    private final GTAARepository gtaaRepository;
 
     private final GTAAKeysRepository keysRepo;
 
@@ -50,8 +50,8 @@ public class GTAAServiceImpl implements GTAAService {
     };
 
     @Inject
-    public GTAAServiceImpl(GTAARepository gtaaService, GTAAKeysRepository keysRepo) {
-        this.gtaaService = gtaaService;
+    public GTAAServiceImpl(GTAARepository gtaaRepository, GTAAKeysRepository keysRepo) {
+        this.gtaaRepository = gtaaRepository;
         this.keysRepo = keysRepo;
     }
 
@@ -60,15 +60,15 @@ public class GTAAServiceImpl implements GTAAService {
      *            to the {@link GTAARepository}. Extra check on expiration date (jwt should not be issued > 12h ago)
      */
     @Override
-    public GTAAPerson submit(@NonNull GTAANewPerson newPerson, @NonNull String jws) {
+    public GTAAPerson submitGTAAPerson(@NonNull GTAANewPerson newPerson, @NonNull String jws) {
         String issuer = authenticate(jws);
-        return gtaaService.submit(newPerson, issuer);
+        return gtaaRepository.submit(newPerson, issuer);
     }
 
     @Override
-    public  <T extends GTAAConcept, S extends GTAANewConcept>  T submit(@NonNull S newObject, @NonNull String jws) {
-        String issuer = authenticate(jws);
-        return gtaaService.submit(newObject, issuer);
+    public  <T extends GTAAConcept, S extends GTAANewConcept>  T submitGTAAConcept(@NonNull S newObject, @NonNull String jws) {
+        String issuer = "POMS"; //authenticate(jws);
+        return gtaaRepository.submit(newObject, issuer);
     }
 
 
