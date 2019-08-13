@@ -253,22 +253,24 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             MediaObject mo = searchIterator.next();
             int eventCountForMediaObject = 0;
             mediaObjectCount++;
-            for (ScheduleEvent e : mo.getScheduleEvents()) {
-                if (form.test(e)) {
-                    if (skipped < offset) {
-                        skipped++;
+            if (mo instanceof Program) {
+                for (ScheduleEvent e : ((Program) mo).getScheduleEvents()) {
+                    if (form.test(e)) {
+                        if (skipped < offset) {
+                            skipped++;
+                        } else {
+                            ApiScheduleEvent ae = new ApiScheduleEvent(e);
+                            ae.setParent(e.getParent());
+                            results.add(ae);
+                            eventCountForMediaObject++;
+                            count++;
+                        }
+                        if (count == max) {
+                            break OUTER;
+                        }
                     } else {
-                        ApiScheduleEvent ae = new ApiScheduleEvent(e);
-                        ae.setParent(e.getParent());
-                        results.add(ae);
-                        eventCountForMediaObject++;
-                        count++;
+                        log.debug("{} not in {}", e, form);
                     }
-                    if (count == max) {
-                        break OUTER;
-                    }
-                } else {
-                    log.debug("{} not in {}", e, form);
                 }
             }
             if (eventCountForMediaObject == 0) {
@@ -363,9 +365,12 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
         for (SearchResultItem<? extends MediaObject> resultItem : result.getItems()) {
             MediaObject mediaObject = resultItem.getResult();
-            for (nl.vpro.domain.media.ScheduleEvent event : mediaObject.getScheduleEvents()) {
-                ApiScheduleEvent apiEvent = new ApiScheduleEvent(event, mediaObject);
-                schedule.addScheduleEvent(apiEvent);
+            if (mediaObject instanceof Program) {
+                Program program = (Program) mediaObject;
+                for (nl.vpro.domain.media.ScheduleEvent event : program.getScheduleEvents()) {
+                    ApiScheduleEvent apiEvent = new ApiScheduleEvent(event, program);
+                    schedule.addScheduleEvent(apiEvent);
+                }
             }
         }
         List<SearchResultItem<? extends ApiScheduleEvent>> items = new ArrayList<>();
