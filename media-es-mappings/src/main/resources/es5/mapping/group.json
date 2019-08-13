@@ -218,7 +218,7 @@
         }
       }
     },
-    "geoLocations": {
+       "geoLocations": {
       "properties": {
         "owner": {
           "type": "keyword"
@@ -227,23 +227,11 @@
           "properties": {
             "name": {
               "type": "text",
-              "index": false,
-              "fields": {
-                "text": {
-                  "type": "text",
-                  "norms": false
-                }
-              }
+              "norms": false
             },
-            "description": {
+            "scopeNotes": {
               "type": "text",
-              "index": false,
-              "fields": {
-                "text": {
-                  "type": "text",
-                  "norms": false
-                }
-              }
+              "norms": false
             },
             "role": {
               "type": "keyword"
@@ -267,23 +255,11 @@
           "properties": {
             "name": {
               "type": "text",
-              "index": false,
-              "fields": {
-                "text": {
-                  "type": "text",
-                  "norms": false
-                }
-              }
+              "norms": false
             },
-            "description": {
+            "scopeNotes": {
               "type": "text",
-              "index": false,
-              "fields": {
-                "text": {
-                  "type": "text",
-                  "norms": false
-                }
-              }
+              "norms": false
             },
             "role": {
               "type": "keyword"
