@@ -102,6 +102,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testLoad() {
         index(program().mainTitle("foo bar").mid("MID_FOR_LOAD").build());
+        target.setScore(false);
         MediaObject result = target.load("MID_FOR_LOAD");
         assertThat(result.getMainTitle()).isEqualTo("foo bar");
         assertThat(result.getMid()).isEqualTo("MID_FOR_LOAD");
@@ -1962,10 +1963,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         assertThat(resultWithSearch).hasSize(2); // mid_1 and mid_5
 
     }
-
-    @Test
-    public void testFindByGeoName() {
-        index(program()
+    private void indexWithGeoLocations() {
+          index(program()
             .mid("mid_geo_1")
             .mainTitle("according to broadcaster about amsterdam")
             .geoLocations(BROADCASTER, GeoLocation.subject(AMSTERDAM))
@@ -1993,7 +1992,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .geoLocations(AUTHORITY, GeoLocation.subject(AMSTERDAM))
             .geoLocations(BROADCASTER) // not according to broadcaster
             .build());
+    }
 
+    @Test
+    public void testFindByGeoName() {
+        indexWithGeoLocations();
         {
             // Now find all objects that according to broadcaster are about amsterdam
             MediaForm form = MediaForm.builder()
@@ -2053,6 +2056,21 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             log.info("{}", resultWithSearch);
             assertThat(resultWithSearch).hasSize(0);  // It's Amsterdam
         }
+
+    }
+
+    @Test
+    public void testFacetByGeoName() {
+        indexWithGeoLocations();
+
+        MediaForm form = MediaForm.builder()
+            .geoLocationFacet()
+            .build();
+        form.getFacets().getGeoLocations().setFilter(MediaSearch.builder().geoLocations(Arrays.asList(
+            GeoLocationSearch.builder().owner(BROADCASTER).build())).build());
+        MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+        List<GeoLocationFacetResultItem> facets = resultWithSearch.getFacets().getGeoLocations();
+        assertThat(facets).isNotEmpty();
 
     }
 

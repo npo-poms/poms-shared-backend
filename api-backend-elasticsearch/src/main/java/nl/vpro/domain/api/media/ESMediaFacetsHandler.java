@@ -137,6 +137,12 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 getMediaRelationAggregationResultItems(prefix, request.getRelations(), rootFilter)
             );
 
+            // TODO
+            /*
+            facetsResult.setGeoLocations(
+                getMediaRelationAggregationResultItems(prefix, request.getRelations(), rootFilter)
+            );
+*/
         }
         return facetsResult;
     }

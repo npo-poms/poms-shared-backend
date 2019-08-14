@@ -6,10 +6,10 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
 import javax.validation.constraints.NotNull;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -18,6 +18,8 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import nl.vpro.domain.api.*;
+
+;
 
 /**
  * @author Roelof Jan Koekoek
@@ -95,6 +97,9 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
             addMediaFacet(prefix, rootAggregation, "contentRatings",  facets.getContentRatings());
 
+            addMediaNestedAggregation(prefix, rootAggregation, "expandedGeoLocations", "values.gtaaUri", facets.getGeoLocations());
+
+
         }
     }
 
@@ -106,7 +111,8 @@ public class ESMediaFacetsBuilder extends ESFacetsBuilder {
         @Nullable SearchableLimitableFacet<MediaSearch, TermSearch> facet) {
         addNestedAggregation(
             pathPrefix,
-            rootAggregation, nestedObject,
+            rootAggregation,
+            nestedObject,
             facetField,
             facet,
             mediaSearch -> ESMediaFilterBuilder.filter(pathPrefix, mediaSearch),
