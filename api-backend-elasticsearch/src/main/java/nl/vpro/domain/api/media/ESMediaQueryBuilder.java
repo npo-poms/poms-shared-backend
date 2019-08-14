@@ -303,6 +303,15 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                 }
             }
         }
+        {
+            List<GeoLocationSearch> geoLocationSearches = searches.getGeoLocations();
+            if (geoLocationSearches != null && ! geoLocationSearches.isEmpty()) {
+                for (GeoLocationSearch geoLocationSearch : geoLocationSearches) {
+                    buildOwnedFieldQuery(prefix, "expandedGeoLocations", booleanQuery, geoLocationSearch);
+
+                }
+            }
+        }
     }
 
 
@@ -368,7 +377,10 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
-    static BoolQueryBuilder buildTitleQuery(String prefix, BoolQueryBuilder boolQueryBuilder, TitleSearch titleSearch) {
+    static BoolQueryBuilder buildTitleQuery(
+        @NonNull String prefix,
+        @NonNull BoolQueryBuilder boolQueryBuilder,
+        TitleSearch titleSearch) {
 
         if (titleSearch == null) {
             return boolQueryBuilder;
@@ -398,7 +410,44 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
+    /**
+     * @since 5.11
+     */
+    static BoolQueryBuilder buildOwnedFieldQuery(
+        @NonNull String prefix,
+        @NonNull String expandedValuesField,
+        @NonNull BoolQueryBuilder boolQueryBuilder,
+        @NonNull GeoLocationSearch geoLocationSearch) {
 
+
+        BoolQueryBuilder sub = QueryBuilders.boolQuery();
+        if(geoLocationSearch.getOwner() != null) {
+            QueryBuilder ownerQuery = QueryBuilders.termQuery(prefix + expandedValuesField + ".owner", geoLocationSearch.getOwner().name());
+            sub.must(ownerQuery);
+        }
+        if(geoLocationSearch.getGtaaURI() != null) {
+            QueryBuilder uriQuery =
+                QueryBuilders.termQuery(prefix + expandedValuesField + ".values.gtaaUri", geoLocationSearch.getGtaaURI().toString());
+            sub.must(uriQuery);
+        }
+
+        if(geoLocationSearch.getRole() != null) {
+            QueryBuilder roleQuery =
+                QueryBuilders.termQuery(prefix + expandedValuesField + ".values.role", geoLocationSearch.getRole().name());
+            sub.must(roleQuery);
+        }
+        if(geoLocationSearch.getValue() != null) {
+            ExtendedTextSingleFieldApplier valueApplier = new ExtendedTextSingleFieldApplier(expandedValuesField + ".value");
+            //valueApplier.applyField(prefix, sub, titleSearch.asExtendedTextMatcher());
+        }
+
+
+        NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery(prefix + expandedValuesField , sub, ScoreMode.Max);
+
+        apply(boolQueryBuilder, nestedQuery, geoLocationSearch.getMatch());
+
+        return boolQueryBuilder;
+    }
 
 
     private static void buildScheduleQuery(String prefix, BoolQueryBuilder boolQueryBuilder, ScheduleEventSearch matcher) {

@@ -35,11 +35,19 @@ import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
+import static nl.vpro.domain.api.Match.MUST;
+import static nl.vpro.domain.api.StandardMatchType.WILDCARD;
 import static nl.vpro.domain.api.TextMatcher.must;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
+import static nl.vpro.domain.media.Channel.NED2;
 import static nl.vpro.domain.media.ContentRating.*;
+import static nl.vpro.domain.media.GeoRoleType.PRODUCED_IN;
+import static nl.vpro.domain.media.GeoRoleType.SUBJECT;
 import static nl.vpro.domain.media.MediaTestDataBuilder.*;
+import static nl.vpro.domain.media.Schedule.ZONE_ID;
+import static nl.vpro.domain.media.support.OwnerType.*;
+import static nl.vpro.domain.media.support.TextualType.MAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.Assert.assertEquals;
@@ -199,7 +207,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(Match.MUST, ExtendedTextMatcher.must("FOO", false)).build(), 0, null);
+                    form().tags(MUST, ExtendedTextMatcher.must("FOO", false)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
@@ -238,18 +246,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.should("fo*bar", StandardMatchType.WILDCARD)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.should("fo*bar", WILDCARD)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.should("FO*BAR", StandardMatchType.WILDCARD)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.should("FO*BAR", WILDCARD)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.should("FO*BAR", StandardMatchType.WILDCARD, false)).build(), 0,
+                    form().tags(ExtendedTextMatcher.should("FO*BAR", WILDCARD, false)).build(), 0,
                     null);
             assertThat(result.getSize()).isEqualTo(1);
         }
@@ -522,7 +530,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().genres(new Genre("3.0.1.2.7")).build());
 
 
-        MediaForm form = form().genres(Match.MUST, new TextMatcher("3.0.1.1.*", Match.MUST, StandardMatchType.WILDCARD)).build();
+        MediaForm form = form().genres(MUST, new TextMatcher("3.0.1.1.*", MUST, WILDCARD)).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
         assertThat(result.getSize()).isEqualTo(2);
@@ -537,7 +545,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().genres(new Genre("3.0.1.2.7")).build());
 
 
-        MediaForm form = form().genres(Match.MUST, new TextMatcher("4.0.1.*", Match.MUST, StandardMatchType.WILDCARD)).build();
+        MediaForm form = form().genres(MUST, new TextMatcher("4.0.1.*", MUST, WILDCARD)).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
         assertThat(result.getSize()).isEqualTo(0);
@@ -937,11 +945,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testWithLocationFilter() {
 
         index(program().build()); // no locations
-        final Location location1 = new Location("http://www.locations.nl/1", OwnerType.BROADCASTER);
+        final Location location1 = new Location("http://www.locations.nl/1", BROADCASTER);
         location1.setId(1L);
         index(program().locations(location1).build()); // just a location with
                                                        // no platform
-        final Location location2 = new Location("http://www.locations.nl/2", OwnerType.BROADCASTER,
+        final Location location2 = new Location("http://www.locations.nl/2", BROADCASTER,
                 Platform.INTERNETVOD);
         location2.setId(2L);
         index(program().authoritativeRecord(Platform.INTERNETVOD).locations(location2).build()); // a location with  a specific platform
@@ -1122,8 +1130,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         Group group = index(season().mid("MID_0").build());
         index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf(group, 2).build());
         index(broadcast().mid("MID_2").episodeOf(group, 1).build());
-        index(broadcast().mid("MID_3").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
-        index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(Schedule.ZONE_ID).toInstant()).build()).build());
+        index(broadcast().mid("MID_3").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(ZONE_ID).toInstant()).build()).build());
+        index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(ZONE_ID).toInstant()).build()).build());
         index(broadcast().mid("MID_5").episodeOf(group, 4).build());
 
         ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
@@ -1434,7 +1442,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             MediaForm form = new MediaForm();
-            form.addSortField(TitleSortOrder.builder().textualType(TextualType.MAIN).order(Order.ASC).build());
+            form.addSortField(TitleSortOrder.builder().textualType(MAIN).order(Order.ASC).build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
             assertThat(result.getSize()).isEqualTo(2);
@@ -1486,15 +1494,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testSortByLexicoForOwner() {
         index(program()
             .mainTitle("bbmis", OwnerType.MIS)      // so this is its npo lexico title
-            .mainTitle("cc", OwnerType.BROADCASTER) // so this is its broadcaster lexico title
+            .mainTitle("cc", BROADCASTER) // so this is its broadcaster lexico title
             .mid("MID1")
             .build());
         index(program()
             .mainTitle("ccmis", OwnerType.MIS)
-            .mainTitle("bb", OwnerType.BROADCASTER)
+            .mainTitle("bb", BROADCASTER)
             .lexicoTitle("ccnpolexico", OwnerType.NPO)      // so this is its npo lexico title
             .lexicoTitle("aa", OwnerType.MIS)      // so this is NOT its npo lexico title
-            .lexicoTitle("bblexico", OwnerType.BROADCASTER) // so this is it's broadcaster lexico title
+            .lexicoTitle("bblexico", BROADCASTER) // so this is it's broadcaster lexico title
             .mid("MID2")
             .build());
         {
@@ -1514,7 +1522,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             MediaForm form = new MediaForm();
             form.addSortField(TitleSortOrder.builder()
                 .textualType(TextualType.LEXICO)
-                .ownerType(OwnerType.BROADCASTER)
+                .ownerType(BROADCASTER)
                 .order(Order.ASC)
                 .build());
 
@@ -1543,7 +1551,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindByTitlesCaseSensitive() {
         index(program()
-            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mainTitle("abcde", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
             .build());
@@ -1568,10 +1576,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaForm form = form()
             .titles(
                 TitleSearch.builder()
-                    .owner(OwnerType.BROADCASTER)
-                    .type(TextualType.MAIN)
+                    .owner(BROADCASTER)
+                    .type(MAIN)
                     .value("a*")
-                    .matchType(StandardMatchType.WILDCARD)
+                    .matchType(WILDCARD)
                     .caseSensitive(true)
                     .build()
             )
@@ -1589,7 +1597,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindByTitlesCaseInSensitive() {
         index(program()
-            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mainTitle("abcde", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
             .build());
@@ -1614,11 +1622,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaForm form = form()
             .titles(
                 TitleSearch.builder()
-                    .owner(OwnerType.BROADCASTER)
-                    .type(TextualType.MAIN)
+                    .owner(BROADCASTER)
+                    .type(MAIN)
                     .value("a*")
-                    .match(Match.MUST)
-                    .matchType(StandardMatchType.WILDCARD)
+                    .match(MUST)
+                    .matchType(WILDCARD)
                     .caseSensitive(false)
                     .build()
             )
@@ -1638,7 +1646,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testTitlesFacetsBackwards() {
         target.setScore(false);
         index(program()
-            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mainTitle("abcde", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
             .build());
@@ -1704,9 +1712,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             TitleSearch subSearch1 = TitleSearch.builder()
                 .value("a*")
-                .match(Match.MUST)
-                .matchType(StandardMatchType.WILDCARD)
-                .type(TextualType.MAIN)
+                .match(MUST)
+                .matchType(WILDCARD)
+                .type(MAIN)
                 .build();
 
             mainTitles  = new TitleFacet();
@@ -1716,8 +1724,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             TitleSearch subSearch2 = TitleSearch.builder()
                 .value("b*")
-                .match(Match.MUST)
-                .matchType(StandardMatchType.WILDCARD)
+                .match(MUST)
+                .matchType(WILDCARD)
                 .type(TextualType.SUB)
                 .build();
 
@@ -1770,10 +1778,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             TitleSearch subSearch1 = TitleSearch.builder()
                 .value("A*")
-                .match(Match.MUST)
+                .match(MUST)
                 .caseSensitive(true)
-                .matchType(StandardMatchType.WILDCARD)
-                .type(TextualType.MAIN)
+                .matchType(WILDCARD)
+                .type(MAIN)
                 .build();
 
             aMainTitlesCaseSensitive = new TitleFacet();
@@ -1783,9 +1791,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             TitleSearch subSearch2 = TitleSearch.builder()
                 .value("A*")
-                .match(Match.MUST)
+                .match(MUST)
                 .caseSensitive(false)
-                .matchType(StandardMatchType.WILDCARD)
+                .matchType(WILDCARD)
                 .build();
 
             aCaseInsensitive = new TitleFacet();
@@ -1796,10 +1804,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         {
             TitleSearch subSearch3 = TitleSearch.builder()
                 .value("A*")
-                .match(Match.MUST)
+                .match(MUST)
                 .type(TextualType.SUB)
                 .caseSensitive(false)
-                .matchType(StandardMatchType.WILDCARD)
+                .matchType(WILDCARD)
                 .build();
 
             aSubTitlesCaseInsensitive = new TitleFacet();
@@ -1824,12 +1832,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void expandedTitles() throws IOException {
         index(program()
-            .mainTitle("christmas", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mainTitle("christmas", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("POW_123")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
             .build());
         index(program()
-            .mainTitle("abcde", OwnerType.WHATS_ON) // no broadcaster title, so it should fall back to this.
+            .mainTitle("abcde", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("POW_234")
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 0))
             .build());
@@ -1883,8 +1891,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         form.setSearches(MediaSearch.builder()
             .title(TitleSearch.builder()
                 .value("b*")
-                .type(TextualType.MAIN)
-                .matchType(StandardMatchType.WILDCARD)
+                .type(MAIN)
+                .matchType(WILDCARD)
                 .build())
             .build());
 
@@ -1906,25 +1914,25 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program()
             .mid("mid_1")
             .mainTitle("original on ned1")
-            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 12, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 12, 0).atZone(ZONE_ID).toInstant()).rerun(false).build())
             .build());
 
         index(program()
             .mid("mid_2")
             .mainTitle("rerun on ned1")
-            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 13, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 13, 0).atZone(ZONE_ID).toInstant()).rerun(true).build())
             .build());
 
         index(program()
             .mid("mid_3")
             .mainTitle("original on ned2")
-            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 14, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
+            .scheduleEvent(ScheduleEvent.builder().channel(NED2).start(LocalDateTime.of(2019, 7, 30, 14, 0).atZone(ZONE_ID).toInstant()).rerun(false).build())
             .build());
 
         index(program()
             .mid("mid_4")
             .mainTitle("rerun on ned2")
-            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
+            .scheduleEvent(ScheduleEvent.builder().channel(NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant()).rerun(true).build())
             .build());
 
 
@@ -1934,8 +1942,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program()
             .mid("mid_5")
             .mainTitle("rereun on ned1 but original on ned2")
-            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(true).build())
-            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(Schedule.ZONE_ID).toInstant()).rerun(false).build())
+            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant()).rerun(true).build())
+            .scheduleEvent(ScheduleEvent.builder().channel(NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant()).rerun(false).build())
             .build());
 
          MediaForm form = MediaForm.builder()
@@ -1951,6 +1959,37 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         log.info("{}", resultWithSearch);
         assertThat(resultWithSearch).hasSize(2); // mid_1 and mid_5
 
+    }
+
+    @Test
+    public void testFindByGeoName() {
+        index(program()
+            .mid("mid_geo_1")
+            .mainTitle("according to broadcaster about amsterdam")
+            .geoLocations(BROADCASTER, GeoLocation.of(SUBJECT, AMSTERDAM))
+            .build());
+        index(program()
+            .mid("mid_geo_2")
+            .mainTitle("according to broadcaster produced in  amsterdam")
+            .geoLocations(BROADCASTER, GeoLocation.of(PRODUCED_IN, AMSTERDAM))
+            .build());
+        index(program()
+            .mid("mid_geo_3")
+            .mainTitle("according to authority about utrecht")
+            .geoLocations(AUTHORITY, GeoLocation.of(SUBJECT, UTRECHT))
+            .build());
+
+        // Now find all objects that according to broadcaster are about amsterdam
+        MediaForm form = MediaForm.builder()
+            .geoLocation(GeoLocationSearch.builder()
+                .owner(BROADCASTER)
+                .gtaaURI(AMSTERDAM.getUri())
+                .role(SUBJECT)
+                .build())
+            .build();
+        MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+        log.info("{}", resultWithSearch);
+        assertThat(resultWithSearch).hasSize(1);  // mid_geo_1
 
     }
 
