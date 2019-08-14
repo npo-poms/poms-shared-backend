@@ -245,12 +245,10 @@
         "values": {
           "properties": {
             "name": {
-              "type": "text",
-              "norms": false
+              "type": "keyword"
             },
             "scopeNotes": {
-              "type": "text",
-              "norms": false
+              "type": "keyword"
             },
             "role": {
               "type": "keyword"
@@ -274,13 +272,22 @@
         },
         "values": {
           "properties": {
-            "name": {
-              "type": "text",
-              "norms": false
+             "name": {
+               "type": "text",
+               "norms": false,
+               "fields": {
+                 "full": {
+                   "type": "keyword",
+                   "index": true
+                 },
+                 "lower": {
+                   "type": "text",
+                   "analyzer": "lowercase"
+                 }
+               }
             },
             "scopeNotes": {
-              "type": "text",
-              "norms": false
+              "type": "keyword"
             },
             "role": {
               "type": "keyword"
@@ -1027,24 +1034,10 @@
             "values": {
               "properties": {
                 "name": {
-                  "type": "text",
-                  "index": false,
-                  "fields": {
-                    "text": {
-                      "type": "text",
-                      "norms": false
-                    }
-                  }
+                  "type": "keyword"
                 },
-                "description": {
-                  "type": "text",
-                  "index": false,
-                  "fields": {
-                    "text": {
-                      "type": "text",
-                      "norms": false
-                    }
-                  }
+                "scopeNotes": {
+                  "type": "keyword"
                 },
                 "role": {
                   "type": "keyword"
@@ -1054,7 +1047,7 @@
                 },
                 "gtaaStatus": {
                   "type": "keyword"
-                }
+            }
               }
             }
           }
@@ -1070,23 +1063,20 @@
               "properties": {
                 "name": {
                   "type": "text",
-                  "index": false,
+                  "norms": false,
                   "fields": {
-                    "text": {
-                      "type": "text",
-                      "norms": false
+                    "full": {
+                      "type": "keyword",
+                      "index": true
+                    },
+                    "lower": {
+                   "type": "text",
+                      "analyzer": "lowercase"
                     }
                   }
                 },
-                "description": {
-                  "type": "text",
-                  "index": false,
-                  "fields": {
-                    "text": {
-                      "type": "text",
-                      "norms": false
-                    }
-                  }
+                "scopeNotes": {
+                  "type": "keyword"
                 },
                 "role": {
                   "type": "keyword"
@@ -1095,7 +1085,7 @@
                   "type": "keyword"
                 },
                 "gtaaStatus": {
-                  "type": "keyword"
+              "type": "keyword"
                 }
               }
             }

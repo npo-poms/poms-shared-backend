@@ -33,6 +33,7 @@ import nl.vpro.domain.media.AVType;
 import nl.vpro.domain.media.AgeRating;
 import nl.vpro.domain.media.ContentRating;
 import nl.vpro.domain.media.MediaType;
+import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.ApiCueIndex;
 
@@ -421,24 +422,28 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
 
         BoolQueryBuilder sub = QueryBuilders.boolQuery();
-        if(geoLocationSearch.getOwner() != null) {
-            QueryBuilder ownerQuery = QueryBuilders.termQuery(prefix + expandedValuesField + ".owner", geoLocationSearch.getOwner().name());
-            sub.must(ownerQuery);
+        OwnerType owner = geoLocationSearch.getOwner();
+        if (owner == null) {
+            owner = OwnerType.BROADCASTER;
         }
+        QueryBuilder ownerQuery = QueryBuilders.termQuery(prefix + expandedValuesField + ".owner", owner.name());
+        sub.must(ownerQuery);
+
         if(geoLocationSearch.getGtaaURI() != null) {
             QueryBuilder uriQuery =
                 QueryBuilders.termQuery(prefix + expandedValuesField + ".values.gtaaUri", geoLocationSearch.getGtaaURI().toString());
             sub.must(uriQuery);
         }
 
+        // TODO Not all owned fields will have role.
         if(geoLocationSearch.getRole() != null) {
             QueryBuilder roleQuery =
                 QueryBuilders.termQuery(prefix + expandedValuesField + ".values.role", geoLocationSearch.getRole().name());
             sub.must(roleQuery);
         }
         if(geoLocationSearch.getValue() != null) {
-            ExtendedTextSingleFieldApplier valueApplier = new ExtendedTextSingleFieldApplier(expandedValuesField + ".value");
-            //valueApplier.applyField(prefix, sub, titleSearch.asExtendedTextMatcher());
+            ExtendedTextSingleFieldApplier valueApplier = new ExtendedTextSingleFieldApplier(expandedValuesField + ".values.name");
+            valueApplier.applyField(prefix, sub, geoLocationSearch.asExtendedTextMatcher());
         }
 
 

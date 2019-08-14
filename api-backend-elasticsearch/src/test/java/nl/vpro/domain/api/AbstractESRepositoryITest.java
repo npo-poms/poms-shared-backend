@@ -1,5 +1,6 @@
 package nl.vpro.domain.api;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -199,13 +200,16 @@ public abstract class AbstractESRepositoryITest {
 
     }
 
-
+    @SneakyThrows
     protected static void refresh() {
         try {
             client.admin().indices().refresh(new RefreshRequest(indexName)).get();
+            return;
         } catch (InterruptedException | ExecutionException e) {
             log.error(e.getMessage(), e);
+            return;
         }
+
 
     }
 

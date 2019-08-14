@@ -15,7 +15,10 @@ import javax.xml.bind.JAXB;
 
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.FixMethodOrder;
+import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +45,6 @@ import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.Channel.NED2;
 import static nl.vpro.domain.media.ContentRating.*;
-import static nl.vpro.domain.media.GeoRoleType.PRODUCED_IN;
 import static nl.vpro.domain.media.GeoRoleType.SUBJECT;
 import static nl.vpro.domain.media.MediaTestDataBuilder.*;
 import static nl.vpro.domain.media.Schedule.ZONE_ID;
@@ -1966,30 +1968,91 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program()
             .mid("mid_geo_1")
             .mainTitle("according to broadcaster about amsterdam")
-            .geoLocations(BROADCASTER, GeoLocation.of(SUBJECT, AMSTERDAM))
+            .geoLocations(BROADCASTER, GeoLocation.subject(AMSTERDAM))
+            .geoLocations(AUTHORITY, GeoLocation.subject(UTRECHT))
             .build());
         index(program()
             .mid("mid_geo_2")
             .mainTitle("according to broadcaster produced in  amsterdam")
-            .geoLocations(BROADCASTER, GeoLocation.of(PRODUCED_IN, AMSTERDAM))
+            .geoLocations(BROADCASTER, GeoLocation.producedIn(AMSTERDAM))
             .build());
         index(program()
             .mid("mid_geo_3")
+            .mainTitle("according to broadcaster about hilversum")
+            .geoLocations(BROADCASTER, GeoLocation.subject(HILVERSUM))
+            .build());
+        index(program()
+            .mid("mid_geo_4")
             .mainTitle("according to authority about utrecht")
-            .geoLocations(AUTHORITY, GeoLocation.of(SUBJECT, UTRECHT))
+            .geoLocations(AUTHORITY, GeoLocation.subject(UTRECHT))
+            .geoLocations(BROADCASTER) // not according to broadcaster
+            .build());
+        index(program()
+            .mid("mid_geo_5")
+            .mainTitle("according to authority about amsterdam")
+            .geoLocations(AUTHORITY, GeoLocation.subject(AMSTERDAM))
+            .geoLocations(BROADCASTER) // not according to broadcaster
             .build());
 
-        // Now find all objects that according to broadcaster are about amsterdam
-        MediaForm form = MediaForm.builder()
-            .geoLocation(GeoLocationSearch.builder()
-                .owner(BROADCASTER)
-                .gtaaURI(AMSTERDAM.getUri())
-                .role(SUBJECT)
-                .build())
-            .build();
-        MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
-        log.info("{}", resultWithSearch);
-        assertThat(resultWithSearch).hasSize(1);  // mid_geo_1
+        {
+            // Now find all objects that according to broadcaster are about amsterdam
+            MediaForm form = MediaForm.builder()
+                .geoLocation(GeoLocationSearch.builder()
+                    .owner(BROADCASTER)
+                    .gtaaURI(AMSTERDAM.getUri())
+                    .role(SUBJECT)
+                    .build())
+                .build();
+            MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+            log.info("{}", resultWithSearch);
+            assertThat(resultWithSearch).hasSize(1);  // mid_geo_1
+            form.getSearches().getGeoLocations().get(0).setOwner(null);
+            // if you don't specify owner, it will be implicit 'broadcaster' too.
+            resultWithSearch = target.find(null, form, 0, 10);
+            log.info("{}", resultWithSearch);
+            assertThat(resultWithSearch).hasSize(1);  // mid_geo_1
+
+        }
+        {
+            // Now find all objects that according to authority are about amsterdam
+            MediaForm form = MediaForm.builder()
+                .geoLocation(GeoLocationSearch.builder()
+                    .owner(AUTHORITY)
+                    .gtaaURI(AMSTERDAM.getUri())
+                    .role(SUBJECT)
+                    .build())
+                .build();
+            MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+            log.info("{}", resultWithSearch);
+            assertThat(resultWithSearch).hasSize(1);  // mid_geo_4
+        }
+
+        {
+            // Now search by name
+            MediaForm form = MediaForm.builder()
+                .geoLocation(GeoLocationSearch.builder()
+                    .value("amsterdam")
+                    .caseSensitive(false)
+                    .role(SUBJECT)
+                    .build())
+                .build();
+            MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+            log.info("{}", resultWithSearch);
+            assertThat(resultWithSearch).hasSize(1);  // mid_geo_4
+        }
+         {
+            // Now search by name case sensitive!
+            MediaForm form = MediaForm.builder()
+                .geoLocation(GeoLocationSearch.builder()
+                    .value("amsterdam")
+                    .caseSensitive(true)
+                    .role(SUBJECT)
+                    .build())
+                .build();
+            MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+            log.info("{}", resultWithSearch);
+            assertThat(resultWithSearch).hasSize(0);  // It's Amsterdam
+        }
 
     }
 

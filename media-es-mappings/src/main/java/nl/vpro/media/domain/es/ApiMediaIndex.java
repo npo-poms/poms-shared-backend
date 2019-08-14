@@ -41,6 +41,11 @@ public class ApiMediaIndex {
 
 
     public static Map<String, Supplier<String>> mappingsAsMap() {
+
+    /*    return Arrays.stream(new MediaESType[] {MediaESType.program})
+            .collect(
+                Collectors.toMap(Enum::name, (v) -> v::source)
+            );*/
         return Arrays.stream(MediaESType.values())
             .collect(
                 Collectors.toMap(Enum::name, (v) -> v::source)
