@@ -2002,7 +2002,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             MediaForm form = MediaForm.builder()
                 .geoLocation(GeoLocationSearch.builder()
                     .owner(BROADCASTER)
-                    .gtaaURI(AMSTERDAM.getUri())
+                    .gtaaUri(AMSTERDAM.getUri())
                     .role(SUBJECT)
                     .build())
                 .build();
@@ -2021,7 +2021,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             MediaForm form = MediaForm.builder()
                 .geoLocation(GeoLocationSearch.builder()
                     .owner(AUTHORITY)
-                    .gtaaURI(AMSTERDAM.getUri())
+                    .gtaaUri(AMSTERDAM.getUri())
                     .role(SUBJECT)
                     .build())
                 .build();

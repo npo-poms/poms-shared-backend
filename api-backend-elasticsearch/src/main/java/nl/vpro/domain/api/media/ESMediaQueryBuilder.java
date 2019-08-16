@@ -429,9 +429,9 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         QueryBuilder ownerQuery = QueryBuilders.termQuery(prefix + expandedValuesField + ".owner", owner.name());
         sub.must(ownerQuery);
 
-        if(geoLocationSearch.getGtaaURI() != null) {
+        if(geoLocationSearch.getGtaaUri() != null) {
             QueryBuilder uriQuery =
-                QueryBuilders.termQuery(prefix + expandedValuesField + ".values.gtaaUri", geoLocationSearch.getGtaaURI().toString());
+                QueryBuilders.termQuery(prefix + expandedValuesField + ".values.gtaaUri", geoLocationSearch.getGtaaUri().toString());
             sub.must(uriQuery);
         }
 
