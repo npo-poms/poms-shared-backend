@@ -213,6 +213,9 @@
                 },
                 "gtaaUri": {
                   "type": "keyword"
+                },
+                "gtaaStatus": {
+                  "type": "keyword"
                 }
               }
             },
@@ -732,6 +735,10 @@
                       "norms": false
                     }
                   }
+                },
+                "rerun": {
+                  "type": "boolean",
+                  "null_value": false
                 },
                 "secondaryLifestyle": {
                   "properties": {
