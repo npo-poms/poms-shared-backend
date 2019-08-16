@@ -137,6 +137,9 @@
         },
         "gtaaUri": {
           "type": "keyword"
+        },
+        "gtaaStatus": {
+          "type": "keyword"
         }
       }
     },
