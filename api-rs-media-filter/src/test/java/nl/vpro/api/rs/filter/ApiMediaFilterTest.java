@@ -14,10 +14,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import nl.vpro.domain.media.Location;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.Program;
 import nl.vpro.domain.media.Segment;
 import nl.vpro.domain.media.exceptions.ModificationException;
+import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -192,9 +194,14 @@ public class ApiMediaFilterTest {
                         .withLocations()
                         .build());
         assertThat(segment.getLocations()).hasSize(4);
+        assertThat(segment.getLocations().first().getWorkflow()).isEqualTo(Workflow.FOR_PUBLICATION);
         ApiMediaFilter.set("location");
 
         assertThat(segment.getLocations()).hasSize(1);
+        Location location = segment.getLocations().first();
+        Workflow wf = location.getWorkflow();
+        assertThat(wf).isEqualTo(Workflow.FOR_PUBLICATION);
+
 
         assertThat(segment.getMidRef()).isEqualTo("ABC_DEF");
     }

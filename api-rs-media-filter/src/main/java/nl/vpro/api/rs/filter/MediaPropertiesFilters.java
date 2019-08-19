@@ -28,7 +28,8 @@ public class MediaPropertiesFilters {
         "avType",
         "sortDate",
         "isEmbeddable",
-        "parent"
+        "parent",
+        "workflow"
     );
 
     private static final List<String> ignoreSignatures = Arrays.asList(
@@ -102,6 +103,7 @@ public class MediaPropertiesFilters {
                                         log.debug("Never filtering {}", fieldName);
                                         return;
                                     }
+
 
                                     if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
                                         log.debug("Instrumenting Set {}", fieldName);
