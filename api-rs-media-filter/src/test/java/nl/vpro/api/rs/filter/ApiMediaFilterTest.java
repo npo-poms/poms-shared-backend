@@ -14,10 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import nl.vpro.domain.media.Location;
-import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.Segment;
+import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.exceptions.ModificationException;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
@@ -43,13 +40,19 @@ public class ApiMediaFilterTest {
 
     @Test
     public void testFilterObjectField() throws Exception {
-        Program program = MediaTestDataBuilder.program().withSource().build();
+        Program program = MediaTestDataBuilder.program()
+            .withMemberOf()
+            .withSource().build();
 
         ApiMediaFilter.set("source");
         assertThat(program.getSource()).isNotNull();
 
         ApiMediaFilter.set("titles");
         assertThat(program.getSource()).isNull();
+
+        ApiMediaFilter.removeFilter();
+        assertThat(program.getMemberOf().first().getType()).isEqualTo(MediaType.SEASON);
+
     }
 
     @Test
