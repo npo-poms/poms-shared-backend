@@ -201,12 +201,12 @@ public class ApiMediaFilterTest {
                         .build());
         assertThat(segment.getLocations()).hasSize(4);
         assertThat(segment.getLocations().first().getWorkflow()).isEqualTo(Workflow.FOR_PUBLICATION);
-        ApiMediaFilter.set("location");
+        ApiMediaFilter.set("location,workflow");
 
         assertThat(segment.getLocations()).hasSize(1);
         Location location = segment.getLocations().first();
         Workflow wf = location.getWorkflow();
-        assertThat(wf).isEqualTo(Workflow.FOR_PUBLICATION);
+        assertThat(wf).isEqualTo(Workflow.FOR_PUBLICATION); // it is a bit odd that you have to request 'workflow' to also receive the workflow of location
         assertThat(location.getProgramUrl()).isEqualTo("http://cgi.omroep.nl/legacy/nebo?/ceres/1/vpro/rest/2009/VPRO_1132492/bb.20090317.m4v");
 
 
