@@ -120,7 +120,13 @@ public class ApiMediaFilterTest {
 
         ApiMediaFilter.set("type");
         assertThat(new FilteredObject<>("type", program.getType()).value()).isNotNull();
+        assertThat(program.getType()).isNotNull();
+
+        ApiMediaFilter.set("title");
+        assertThat(new FilteredObject<>("type", program.getType()).value()).isNull();
+        //assertThat(program.getType()).isNull(); // 'type' is excludes, so wont be filtered implicitely.
     }
+
 
     @Test
     public void testFilterUnknownProperty() {
@@ -201,6 +207,8 @@ public class ApiMediaFilterTest {
         Location location = segment.getLocations().first();
         Workflow wf = location.getWorkflow();
         assertThat(wf).isEqualTo(Workflow.FOR_PUBLICATION);
+        assertThat(location.getProgramUrl()).isEqualTo("http://cgi.omroep.nl/legacy/nebo?/ceres/1/vpro/rest/2009/VPRO_1132492/bb.20090317.m4v");
+
 
 
         assertThat(segment.getMidRef()).isEqualTo("ABC_DEF");
