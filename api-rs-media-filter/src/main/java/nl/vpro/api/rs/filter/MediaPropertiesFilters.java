@@ -9,10 +9,7 @@ import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Roelof Jan Koekoek
@@ -21,20 +18,17 @@ import java.util.List;
 @Slf4j
 public class MediaPropertiesFilters {
 
-    private static final List<String> ignoreFields = Arrays.asList(
+    private static final Set<String> ignoreFields = new HashSet<>(Arrays.asList(
         "mid",
         "midRef",
         "type",
         "avType",
         "sortDate",
         "isEmbeddable",
-        "parent",
-        "workflow"
-    );
+        "parent"
+    ));
 
-    private static final List<String> ignoreSignatures = Arrays.asList(
-        //"Ljava/util/Date;",
-        //"Ljava/lang/String;"
+    private static final Set<String> ignoreSignatures = new HashSet<>(Arrays.asList(
         "Z", // boolean
         "B", // byte
         "C", // char
@@ -43,7 +37,8 @@ public class MediaPropertiesFilters {
         "J", // long
         "F", // float
         "D" // double
-    );
+    ));
+
 
     private static final List<String> knownProperties = new ArrayList<>();
 
@@ -86,6 +81,7 @@ public class MediaPropertiesFilters {
             CtClass[] ctClasses = cp.get(classNames);
 
             for (final CtClass ctClass : ctClasses) {
+                log.info("Instrumenting {}", ctClass.getName());
                 try {
                     ctClass.instrument(new ExprEditor() {
                         @Override
@@ -94,19 +90,26 @@ public class MediaPropertiesFilters {
                                 /* Ignore static fields / methods */
                                 if ((f.getField().getModifiers() & Modifier.STATIC) == 0) {
                                     String fieldName = f.getFieldName();
-                                    if (!knownProperties.contains(fieldName)) {
-                                        knownProperties.add(fieldName);
-                                    } else {
-                                        log.debug("Found {} more than once!", fieldName);
+                                    String fieldDescription = f.getSignature() + " " + f.getClassName() + "." + f.getFieldName();
+                                    markKnown(fieldName, fieldDescription);
+
+
+                                    if (ignoreSignatures.contains(f.getSignature())) {
+                                        log.trace("Never filtering {} because signature {}", fieldName, f.getSignature());
+                                        return;
                                     }
-                                    if (ignoreSignatures.contains(f.getSignature()) || ignoreFields.contains(fieldName)) {
-                                        log.debug("Never filtering {}", fieldName);
+                                    if (ignoreFields.contains(f.getFieldName())) {
+                                        log.trace("Never filtering {} because fieldName", fieldName);
+                                        return;
+                                    }
+                                    if (f.getField().getType().isPrimitive()) {
+                                        log.trace("Never filtering {} because is a primitive", fieldName);
                                         return;
                                     }
 
 
                                     if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
-                                        log.debug("Instrumenting Set {}", fieldName);
+                                        log.debug("Instrumenting Set {}", fieldDescription);
                                         if ("titles".equals(fieldName)) {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
                                         } else if ("descriptions".equals(fieldName)) {
@@ -115,11 +118,12 @@ public class MediaPropertiesFilters {
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                         }
                                     } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
-                                        log.debug("Instrumenting List {}", fieldName);
+                                        log.debug("Instrumenting List {}", fieldDescription);
                                         f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
                                     } else {
-                                        log.debug("Instrumenting {}", fieldName);
-                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\", $proceed($$)).value();");
+                                        log.debug("Instrumenting {}", fieldDescription);
+                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\"," +
+                                            " $proceed($$)).value();");
                                     }
                                 }
                             } catch (RuntimeException | NotFoundException | CannotCompileException wtf) {
@@ -136,6 +140,13 @@ public class MediaPropertiesFilters {
         } catch (CannotCompileException | NotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+    private static void markKnown(String fieldName, String fieldDescription) {
+          if (!knownProperties.contains(fieldName)) {
+              knownProperties.add(fieldName);
+          } else {
+              log.trace("Found {} more than once!", fieldDescription);
+          }
     }
 
     private static void instrumentScheduleEvents(String... classNames) {
@@ -155,7 +166,7 @@ public class MediaPropertiesFilters {
                         public void edit(FieldAccess f) throws CannotCompileException {
                             if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() && f.getFieldName().equals("scheduleEvents")) {
                                 log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
-                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.v3.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
+                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
                             }
 
                         }
