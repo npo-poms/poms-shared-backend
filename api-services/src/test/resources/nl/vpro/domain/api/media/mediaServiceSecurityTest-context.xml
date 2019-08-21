@@ -13,24 +13,17 @@
   <bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
     <property name="properties">
       <props>
-       
-        <prop key="mediaService.loadRepository">ELASTICSEARCH</prop>
-        <prop key="mediaService.listRepository">ELASTICSEARCH</prop>
-        <prop key="mediaService.changesRepository">ELASTICSEARCH</prop>
-        <prop key="mediaService.redirectsRepository">COUCHDB</prop>
-        <prop key="mediaService.membersRepository">ELASTICSEARCH</prop>
-        <prop key="scheduleService.repository">ELASTICSEARCH</prop>
       </props>
     </property>
   </bean>
-  
-  
+
+
   <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider ref="authenticationProvider"/>
   </security:authentication-manager>
 
   <bean id="authenticationProvider" class="org.springframework.security.authentication.TestingAuthenticationProvider" />
-  
+
   <security:global-method-security pre-post-annotations="enabled" />
   <bean class="org.mockito.Mockito" factory-method="mock">
     <constructor-arg value="nl.vpro.domain.api.profile.ProfileService"/>
@@ -50,9 +43,7 @@
   <bean class="org.mockito.Mockito" factory-method="mock">
     <constructor-arg value="nl.vpro.domain.api.media.TopSpinRepository" />
   </bean>
-                     
- 
-  <bean class="nl.vpro.api.Settings" />
+
   <bean id="mediaService" class="nl.vpro.domain.api.media.MediaServiceImpl" />
 
 </beans>
