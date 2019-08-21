@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
@@ -24,7 +23,6 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Test;
 
-import nl.vpro.api.Settings;
 import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
@@ -34,9 +32,6 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author r.jansen
@@ -58,9 +53,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     protected void firstRun() throws Exception {
         createIndexIfNecessary(ApiMediaIndex.NAME);
 
-        target.mediaRepository = mock(MediaRepository.class);
-        target.settings = new Settings();
-        when(target.mediaRepository.redirect(anyString())).thenReturn(Optional.empty());
+
 
         target.setIndexName(indexName);
         clearIndex();

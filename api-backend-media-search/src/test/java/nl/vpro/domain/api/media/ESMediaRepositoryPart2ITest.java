@@ -20,7 +20,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.*;
@@ -49,7 +48,6 @@ import static org.mockito.Mockito.when;
  * @since 2.0
  */
 
-@SuppressWarnings("unchecked")
 @Slf4j
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
@@ -117,9 +115,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         createIndexIfNecessary(ApiMediaIndex.NAME);
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
-        target.mediaRepository = mock(MediaRepository.class);
-        target.settings = new Settings();
-        when(target.mediaRepository.redirect(anyString())).thenReturn(Optional.empty());
 
         target.setIndexName(indexName);
 
@@ -230,9 +225,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         // 33 (3 deleted)
         refresh();
-
-        Map<String, String> redirects = new HashMap<>();
-        when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
 
         assertThat(indexedObjectCount).isEqualTo(indexedGroupCount + indexedProgramCount);
         assertThat(deletedObjectCount).isEqualTo(deletedGroupCount + deletedProgramCount);

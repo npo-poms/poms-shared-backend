@@ -16,10 +16,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
-import javax.inject.Inject;
-import javax.inject.Named;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -37,7 +34,6 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
-import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.AgeRating;
@@ -48,6 +44,8 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.media.domain.es.MediaESType;
 import nl.vpro.util.*;
+
+;
 
 /**
  * @author Roelof Jan Koekoek
@@ -61,12 +59,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private final String[] relatedFields;
 
-    @Inject
-    Settings settings;
 
-    @Inject
-    @Named("couchDBMediaRepository")
-    MediaRepository mediaRepository;
 
     int iterateBatchSize = 1000;
 
@@ -105,7 +98,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     protected Redirector getDirectsRepository() {
-        return RepositoryType.switchRepository(settings.redirectsRepository, mediaRepository, this);
+        return this;
 
     }
 

@@ -20,11 +20,9 @@ import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-import nl.vpro.api.Settings;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.*;
@@ -38,7 +36,9 @@ import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.MediaESType;
 
+import static nl.vpro.domain.api.FacetOrder.VALUE_ASC;
 import static nl.vpro.domain.api.Match.MUST;
+import static nl.vpro.domain.api.StandardMatchType.REGEX;
 import static nl.vpro.domain.api.StandardMatchType.WILDCARD;
 import static nl.vpro.domain.api.TextMatcher.must;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
@@ -53,8 +53,6 @@ import static nl.vpro.domain.media.support.TextualType.MAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
 
 /**
  *
@@ -73,10 +71,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Autowired
     private ESMediaRepository target;
 
-    @Autowired
-    private Settings settings;
-
-
     @Override
     protected void firstRun() {
         createIndexIfNecessary(ApiMediaIndex.NAME);
@@ -91,10 +85,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Before
     public void before() {
-        Mockito.reset(target.mediaRepository);
-        settings.setRedirectsRepository("COUCHDB");
-        Map<String, String> redirects = new HashMap<>();
-        when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
+
     }
 
 
@@ -223,18 +214,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.must("fo.*", StandardMatchType.REGEX)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.must("fo.*", REGEX)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.must("FO.*", StandardMatchType.REGEX)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.must("FO.*", REGEX)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(0);
         }
         {
             SearchResult<MediaObject> result = target.find(null,
-                    form().tags(ExtendedTextMatcher.must("FO.*", StandardMatchType.REGEX, false)).build(), 0, null);
+                    form().tags(ExtendedTextMatcher.must("FO.*", REGEX, false)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
 
@@ -312,7 +303,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         }
 
         {
-            MediaForm valueAsc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.VALUE_ASC, null)).build();
+            MediaForm valueAsc = form().broadcasterFacet(new MediaFacet(null, VALUE_ASC, null)).build();
             MediaSearchResult result = target.find(null, valueAsc, 0, null);
             assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
         }
@@ -330,7 +321,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         index(program().withMid().broadcasters(new Broadcaster("A")).build());
 
-        MediaForm form = form().broadcasterFacet(new MediaFacet(2, FacetOrder.VALUE_ASC, null)).build();
+        MediaForm form = form().broadcasterFacet(new MediaFacet(2, VALUE_ASC, null)).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
@@ -342,7 +333,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithFacetWithMax() {
         index(program().withMid().broadcasters(new Broadcaster("A"), new Broadcaster("B")).build());
 
-        MediaForm form = form().broadcasterFacet(new MediaFacet(null, FacetOrder.VALUE_ASC, 1)).build();
+        MediaForm form = form().broadcasterFacet(new MediaFacet(null, VALUE_ASC, 1)).build();
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
@@ -564,7 +555,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().withGenres().build());
 
         MediaForm form = form().genreFacet().build();
-        form.getFacets().getGenres().setSort(FacetOrder.VALUE_ASC);
+        form.getFacets().getGenres().setSort(VALUE_ASC);
 
         MediaSearchResult result = target.find(null, form, 0, null);
 
@@ -667,8 +658,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         final Group group = index(group().withMid().mainTitle("Group title").build());
         final Program program = index(program().withMid().memberOf(group, 1).build());
-
-        when(target.mediaRepository.redirect(anyString())).thenReturn(Optional.empty());
 
         MediaForm form = form().memberOfFacet().build();
 
@@ -1196,7 +1185,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testRedirect() {
-        settings.setRedirectsRepository("ELASTICSEARCH");
         Group group1 = index(group().published().mid("MID_0").build());
         Group group2 = index(group().mergedTo(group1).mid("MID_1").build());
         target.refillRedirectCache();
@@ -2078,7 +2066,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private void redirect(String from, String to) {
         Map<String, String> redirects = new HashMap<>();
         redirects.put(from, to);
-        when(target.mediaRepository.redirects()).thenReturn(new RedirectList(null, null, redirects));
     }
 
     private <T extends MediaObject> T index(T object)  {
