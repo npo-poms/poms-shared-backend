@@ -32,8 +32,6 @@
     <constructor-arg value="nl.vpro.domain.api.media.TopSpinRepository"/>
   </bean>
 
-  <bean class="nl.vpro.api.Settings" />
-
   <bean class="nl.vpro.domain.api.media.ESMediaScoreBuilder" />
 
 
