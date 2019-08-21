@@ -10,7 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import nl.vpro.api.Settings;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
@@ -32,7 +31,6 @@ import static org.mockito.Mockito.when;
  */
 public class MediaServiceImplTest {
 
-    private final MediaRepository mediaRepository = Mockito.mock(MediaRepository.class);
 
     private final MediaSearchRepository mediaSearchRepository = Mockito.mock(MediaSearchRepository.class);
 
@@ -40,7 +38,7 @@ public class MediaServiceImplTest {
 
     private final QuerySearchRepository querySearchRepository = Mockito.mock(QuerySearchRepository.class);
 
-    private final MediaServiceImpl target = new MediaServiceImpl(profileService, mediaRepository, mediaSearchRepository, querySearchRepository, new SinceToTimeStampServiceImpl(), null, new Settings());
+    private final MediaServiceImpl target = new MediaServiceImpl(profileService,  mediaSearchRepository, querySearchRepository, new SinceToTimeStampServiceImpl(), null);
 
     private ProfileDefinition<MediaObject> profileDefinition = new ProfileDefinition<>();
 
@@ -68,7 +66,7 @@ public class MediaServiceImplTest {
     @Test
     public void testLoad()  {
         target.findByMid(media.getMid());
-        verify(mediaRepository).findByMid(media.getMid());
+        verify(mediaSearchRepository).findByMid(media.getMid());
     }
 
     @Test

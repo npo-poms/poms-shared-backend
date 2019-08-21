@@ -7,7 +7,9 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -19,7 +21,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import com.google.common.collect.Iterators;
 
-import nl.vpro.api.Settings;
 import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.Profile;
@@ -33,6 +34,8 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
 import nl.vpro.util.FilteringIterator;
 
+import static nl.vpro.domain.Roles.API_USER;
+
 /**
  * @author Roelof Jan Koekoek
  * @since 2.0
@@ -44,7 +47,7 @@ public class MediaServiceImpl implements MediaService {
 
     private final ProfileService profileService;
 
-    private final MediaRepository mediaLoadRepository;
+
 
     private final MediaSearchRepository mediaSearchRepository;
 
@@ -52,32 +55,27 @@ public class MediaServiceImpl implements MediaService {
 
     private final TopSpinRepository topSpinRepository;
 
-    private final Settings settings;
 
     private final SinceToTimeStampService sinceToTimeStampService;
 
     @Autowired
     public MediaServiceImpl(
         ProfileService profileService,
-        @Named("mediaLoadRepository") MediaRepository mediaRepository,
         MediaSearchRepository mediaSearchRepository,
         @Named("mediaQueryRepository") QuerySearchRepository querySearchRepository,
         SinceToTimeStampService sinceToTimeStampService,
-        TopSpinRepository topSpinRepository,
-        Settings settings
+        TopSpinRepository topSpinRepository
 
     ) {
         this.profileService = profileService;
-        this.mediaLoadRepository = mediaRepository;
         this.mediaSearchRepository = mediaSearchRepository;
         this.querySearchRepository = querySearchRepository;
         this.topSpinRepository = topSpinRepository;
         this.sinceToTimeStampService = sinceToTimeStampService;
-        this.settings = settings;
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
@@ -91,14 +89,10 @@ public class MediaServiceImpl implements MediaService {
                 return changesWithES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes);
             } else {
                 Iterator<MediaChange> iterator;
-                if (settings.changesRepository == RepositoryType.ELASTICSEARCH) {
-                    Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
-                    log.info("Since {} is couchdb like, taking {}. Explicitely configured to use elastic search for changes feed. Note that clients don't receive sequences.", since.toEpochMilli(), i);
-                    iterator = changesWithES(profile, profileCheck, i, mid, order, max, keepAlive, deletes);
-                } else {
-                    //noinspection deprecation
-                    iterator = changesWithCouchDB(profile, profileCheck, since, order, max, keepAlive, deletes);
-                }
+
+                Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
+                log.info("Since {} is couchdb like, taking {}. Explicitely configured to use elastic search for changes feed. Note that clients don't receive sequences.", since.toEpochMilli(), i);
+                iterator = changesWithES(profile, profileCheck, i, mid, order, max, keepAlive, deletes);
                 return iterator;
             }
         } else {
@@ -110,17 +104,6 @@ public class MediaServiceImpl implements MediaService {
                     }
                     return c;});
         }
-    }
-
-    @Deprecated
-    protected Iterator<MediaChange> changesWithCouchDB(final String profile, final boolean profileCheck, Instant since, final Order order, final Integer max, final Long keepAlive, Deletes deletes) throws ProfileNotFoundException {
-        ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
-
-        ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? null : profileService.getMediaProfileDefinition(profile, sinceToTimeStampService.getInstance(since.toEpochMilli())); //getCombinedProfile(profile, since);
-        if (currentProfile == null && previousProfile == null && profile != null) {
-            throw new ProfileNotFoundException("No such media profile " + profile);
-        }
-        return mediaLoadRepository.changes(since.toEpochMilli(),  currentProfile, previousProfile, order, max, keepAlive);
     }
 
 
@@ -136,86 +119,86 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public <T extends MediaObject> T findByMid(String mid) {
-        return switchRepository(settings.loadRepository).findByMid(mid);
+        return mediaSearchRepository.findByMid(mid);
     }
 
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public List<MediaObject> loadAll(List<String> ids) {
-        return switchRepository(settings.loadRepository).loadAll(ids);
+        return mediaSearchRepository.loadAll(ids);
     }
 
     @Override
     //@PreAuthorize("permitAll()")
     public RedirectList redirects() {
-        return switchRepository(settings.redirectsRepository).redirects();
+        return mediaSearchRepository.redirects();
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaResult list(Order order, Long offset, Integer max) {
-        return switchRepository(settings.listRepository).list(order, offset, max);
+        return mediaSearchRepository.list(order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
-        return switchRepository(settings.listRepository).iterate(getProfile(profile), form, offset, max, keepAlive);
+        return mediaSearchRepository.iterate(getProfile(profile), form, offset, max, keepAlive);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaSearchResult find(String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaResult listMembers(MediaObject media, String profile, Order order, Long offset, Integer max) {
-        return switchRepository(settings.membersRepository).listMembers(media, getProfile(profile), order, offset, max);
+        return mediaSearchRepository.listMembers(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaSearchResult findMembers(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findMembers(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public ProgramResult listEpisodes(MediaObject media, String profile,  Order order, Long offset, Integer max) {
-        return switchRepository(settings.membersRepository).listEpisodes(media, getProfile(profile), order, offset, max);
+        return mediaSearchRepository.listEpisodes(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public ProgramSearchResult findEpisodes(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findEpisodes(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaResult listDescendants(MediaObject media, String profile, Order order, Long offset, Integer max) {
-        return switchRepository(settings.membersRepository).listDescendants(media, getProfile(profile), order, offset, max);
+        return mediaSearchRepository.listDescendants(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaSearchResult findDescendants(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findDescendants(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaSearchResult findRelated(MediaObject media, String profile, MediaForm form, Integer max) {
         return mediaSearchRepository.findRelated(media, getProfile(profile), form, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max, String partyId, String clazz) {
         Recommendations recommendations = topSpinRepository.getForMid(media.getMid(), partyId, clazz);
 
@@ -246,7 +229,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(API_USER)
     public MediaType getType(final String id) {
         MediaObject owner = findByMid(id);
         return owner != null ? MediaType.getMediaType(owner) : null;
@@ -255,12 +238,8 @@ public class MediaServiceImpl implements MediaService {
     @Override
     @PreAuthorize("permitAll()")
     public Optional<String> redirect(String mid) {
-        return switchRepository(settings.redirectsRepository).redirect(mid);
+        return mediaSearchRepository.redirect(mid);
 
-    }
-
-    private MediaRepository switchRepository(RepositoryType repository) {
-        return RepositoryType.switchRepository(repository, mediaLoadRepository, mediaSearchRepository);
     }
 
     private ProfileDefinition<MediaObject> getProfile(String profile) {

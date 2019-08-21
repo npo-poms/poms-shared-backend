@@ -11,11 +11,8 @@ import javax.inject.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-
-import nl.vpro.api.Settings;
 import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.RepositoryType;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.api.profile.ProfileService;
 import nl.vpro.domain.media.Channel;
@@ -30,21 +27,18 @@ import nl.vpro.domain.media.Net;
 public class ScheduleServiceImpl implements ScheduleService {
     private final ProfileService profileRepository;
 
-    private final ScheduleRepository scheduleRepository;
+
     private final ScheduleRepository searchRespository;
-    private final Settings settings;
+
 
     @Autowired
     public ScheduleServiceImpl(
         ProfileService profileService,
-        @Named("scheduleRepository") ScheduleRepository scheduleRepository,
-        @Named("scheduleSearchRepository") ScheduleRepository searchRespository,
-        Settings settings
+
+        @Named("scheduleSearchRepository") ScheduleRepository searchRespository
         ) {
         this.profileRepository = profileService;
-        this.scheduleRepository = scheduleRepository;
         this.searchRespository = searchRespository;
-        this.settings = settings;
     }
 
     @Override
@@ -87,6 +81,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 
     private ScheduleRepository getScheduleRepository() {
-        return RepositoryType.switchRepository(settings.scheduleRepository, scheduleRepository, searchRespository);
+        return  searchRespository;
     }
 }
