@@ -1336,7 +1336,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             MediaSearchResult result1 = target.find(null, form().ageRating(_16).ageRatingFacet().build(), 0, null);
-            assertEquals(1L, (long) result1.getSelectedFacets().getAgeRatings().size());
+            assertEquals(1L, result1.getSelectedFacets().getAgeRatings().size());
             assertEquals(_16.getXmlValue(), result1.getSelectedFacets().getAgeRatings().get(0).getValue());
             assertEquals(0, result1.getSelectedFacets().getAgeRatings().get(0).getCount());
         }
@@ -1895,7 +1895,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     // NPA-490
-    public void reruns() throws IOException {
+    public void reruns() {
         index(program()
             .mid("mid_1")
             .mainTitle("original on ned1")
@@ -2059,8 +2059,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @SuppressWarnings("SameParameterValue")
     private void redirect(String from, String to) {
-        Map<String, String> redirects = new HashMap<>();
-        redirects.put(from, to);
+        if (target.redirects == null) {
+            target.redirects = new HashMap<>();
+        }
+        target.redirects.clear();
+        target.redirects.put(from, to);
     }
 
     private <T extends MediaObject> T index(T object)  {

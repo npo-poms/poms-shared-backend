@@ -65,7 +65,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    private Map<String, String> redirects;
+    Map<String, String> redirects;
 
     private Instant lastRedirectRead = Instant.EPOCH;
 
