@@ -19,10 +19,9 @@ public class FilteredSortedTitleSet extends FilteredSortedTextualTypableSet<Titl
         super(property, wrapped);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Typable<TextualType>> FilteredSortedTitleSet wrapTitles(String property, Set<T> wrapped) {
+    public static <T extends Typable<TextualType> & Comparable<?>> FilteredSortedTitleSet wrapTitles(String property, Set<T> wrapped) {
         if (!(wrapped instanceof SortedSet)) {
-            wrapped = new ResortedSortedSet<>(wrapped);
+            wrapped = ResortedSortedSet.of(wrapped);
         }
 
         if (wrapped instanceof FilteredSortedTitleSet) {

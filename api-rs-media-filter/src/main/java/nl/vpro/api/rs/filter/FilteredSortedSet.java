@@ -10,6 +10,8 @@ import java.util.*;
 
 import javax.validation.constraints.NotNull;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import nl.vpro.util.ResortedSortedSet;
 
 /**
@@ -31,9 +33,9 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
         this.wrapped = wrapped;
     }
 
-    public static <T> FilteredSortedSet<T> wrap(String property, Set<T> wrapped) {
+    public static <T extends Comparable<?>> FilteredSortedSet<T> wrap(String property, Set<T> wrapped) {
         if(!(wrapped instanceof SortedSet)) {
-            wrapped = new ResortedSortedSet<>(wrapped);
+            wrapped = ResortedSortedSet.of(wrapped);
         }
 
         log.debug("Wrapping {}", wrapped);
@@ -50,7 +52,7 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
     }
 
     @Override
-    @NotNull
+    @NonNull
     public Iterator<T> iterator() {
         if (filterHelper.isFiltered()) {
             return new Iterator<T>() {
@@ -102,17 +104,20 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
     }
 
     @Override
+    @NonNull
     public SortedSet<T> subSet(T fromElement, T toElement) {
         return new FilteredSortedSet<>(filterHelper, wrapped.subSet(fromElement, toElement));
 
     }
 
     @Override
+    @NonNull
     public SortedSet<T> headSet(T toElement) {
         return new FilteredSortedSet<T>(filterHelper, wrapped.headSet(toElement));
     }
 
     @Override
+    @NonNull
     public SortedSet<T> tailSet(T fromElement) {
         return new FilteredSortedSet<>(filterHelper, wrapped.tailSet(fromElement));
     }

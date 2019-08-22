@@ -17,10 +17,9 @@ public class FilteredSortedDescriptionSet extends FilteredSortedTextualTypableSe
         super(property, wrapped);
     }
 
-    @SuppressWarnings("unchecked")
     public static FilteredSortedDescriptionSet wrapDescriptions(String property, Set<Description> wrapped) {
         if (!(wrapped instanceof SortedSet)) {
-            wrapped = new ResortedSortedSet<>(wrapped);
+            wrapped = ResortedSortedSet.of(wrapped);
         }
 
         if (wrapped instanceof FilteredSortedTextualTypableSet) {
