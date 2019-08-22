@@ -1977,7 +1977,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testFindByGeoName() {
+    public void testFindByGeoLocation() {
         indexWithGeoLocations();
         {
             // Now find all objects that according to broadcaster are about amsterdam
@@ -2025,7 +2025,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             log.info("{}", resultWithSearch);
             assertThat(resultWithSearch).hasSize(1);  // mid_geo_4
         }
-         {
+        {
             // Now search by name case sensitive!
             MediaForm form = MediaForm.builder()
                 .geoLocation(GeoLocationSearch.builder()
@@ -2038,7 +2038,30 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             log.info("{}", resultWithSearch);
             assertThat(resultWithSearch).hasSize(0);  // It's Amsterdam
         }
-
+        {
+            // Get all the values without role filter
+            MediaForm form = MediaForm.builder()
+                    .geoLocation(GeoLocationSearch.builder()
+                            .value("amsterdam")
+                            .caseSensitive(false)
+                            .build())
+                    .build();
+            MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+            log.info("{}", resultWithSearch);
+            assertThat(resultWithSearch).hasSize(2);
+        }
+        {
+            // Get all the values without role filter
+            MediaForm form = MediaForm.builder()
+                    .geoLocation(GeoLocationSearch.builder()
+                            .value("amsterdam")
+                            .caseSensitive(false)
+                            .build())
+                    .build();
+            MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
+            log.info("{}", resultWithSearch);
+            assertThat(resultWithSearch).hasSize(2);
+        }
     }
 
     @Test

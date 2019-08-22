@@ -21,6 +21,7 @@ import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.TransportSerializationException;
@@ -172,8 +173,18 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
     /**
-     * TODO javadoc
+     * Here is where the actual search query get built
      *
+     * Builds  an Elastic Search {@link QueryBuilder} from a {@link MediaSearch}
+     * If a score is present it will add it to the query see {@link FunctionScoreQueryBuilder }
+     * If the {@link MediaForm} has facets {@link MediaFacets} it will add them to the query {@link QueryBuilder}
+     * @param profile
+     * @param form the data necessary to build the query
+     * @param mediaObject we use the mid to sort in the nested fields
+     * @param filter
+     * @param offset response position (for pagination)
+     * @param max amount of results
+     * @return the ES query ready to be executed.
      */
     final protected SearchSourceBuilder mediaSearchBuilder(
         @Nullable ProfileDefinition<MediaObject> profile,
