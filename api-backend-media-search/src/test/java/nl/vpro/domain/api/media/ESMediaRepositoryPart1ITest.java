@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.xml.bind.JAXB;
 
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
@@ -21,8 +22,7 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
-import nl.vpro.domain.media.support.OwnerType;
-import nl.vpro.domain.media.support.TextualType;
+import nl.vpro.domain.media.support.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.Portal;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -1221,9 +1221,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void ableToIndexAllMediaObject(){
 
         assertThatCode(() -> {
-            Group group = index(MediaTestDataBuilder.group().withEverything().published().build());
-            Segment segment = index(MediaTestDataBuilder.segment().withEverything().build());
-            Program program = index(MediaTestDataBuilder.program().withEverything().withSegmentsWithEveryting().build());
+            index(MediaTestDataBuilder.group().withEverything().published().build());
+            index(MediaTestDataBuilder.segment().withEverything().build());
+            index(MediaTestDataBuilder.program().withEverything().withSegmentsWithEveryting().build());
+            index(MediaTestDataBuilder.group().withEverything().deleted().build());
+            index(MediaTestDataBuilder.segment().withEverything().deleted().build());
+            index(MediaTestDataBuilder.program().withEverything().withSegmentsWithEveryting().deleted().build());
+
 
         }).doesNotThrowAnyException();
 
@@ -2107,9 +2111,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private void indexMediaObject(MediaObject object) {
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
-            client.index(new IndexRequest(indexName, getTypeName(object), object.getMid())
+            String type = getTypeName(object);
+            IndexResponse indexResponse = client.index(new IndexRequest(indexName, type, object.getMid())
                 .source(bytes, XContentType.JSON))
                 .actionGet();
+            log.info("Indexed {} {}", indexResponse.getType(), indexResponse.getId());
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
@@ -2124,15 +2130,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .build();
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
-            client.index(new IndexRequest(indexName, type, ref.getId())
+            IndexResponse indexResponse = client.index(new IndexRequest(indexName, type, ref.getId())
                 .source(bytes, XContentType.JSON)
                 .routing(object.getMidRef())
                 .parent(object.getMidRef()))
                 .actionGet();
+            log.info("Indexed {} {}", indexResponse.getType(), indexResponse.getId());
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-        log.info("Indexed {} {}", type, ref.getId());
         refresh();
     }
 
