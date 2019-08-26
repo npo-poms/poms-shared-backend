@@ -168,7 +168,6 @@ public class MediaPropertiesFilters {
                                 log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
                                 f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
                             }
-
                         }
                     });
                     ctClass.toClass();

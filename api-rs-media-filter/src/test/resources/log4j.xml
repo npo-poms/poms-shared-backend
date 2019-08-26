@@ -8,7 +8,7 @@
   </appender>
 
   <logger name="nl.vpro.api.rs.filter.MediaPropertiesFilters">
-    <level value="DEBUG" />
+    <level value="INFO" />
   </logger>
   <root>
     <level value="INFO"/>
