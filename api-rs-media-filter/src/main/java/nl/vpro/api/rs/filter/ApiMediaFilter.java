@@ -56,6 +56,8 @@ public class ApiMediaFilter {
         aliasToProperty.put("exclusives", "portalrestrictions");
         aliasToProperty.put("region", "georestriction");
         aliasToProperty.put("regions", "georestrictions");
+        aliasToProperty.put("sortdate", "sortinstant");
+
 
         // Makes no sense, but for backwards compatibility
         aliasToProperty.put("descendant", "descendantOf");

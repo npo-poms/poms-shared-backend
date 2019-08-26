@@ -23,7 +23,7 @@ public class MediaPropertiesFilters {
         "midRef",
         "type",
         "avType",
-        "sortDate",
+        "sortInstant",
         "isEmbeddable",
         "parent"
     ));

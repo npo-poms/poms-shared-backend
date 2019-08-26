@@ -7,6 +7,7 @@ package nl.vpro.api.rs.filter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.time.LocalDateTime;
 
 import javax.xml.bind.JAXB;
 
@@ -216,4 +217,30 @@ public class ApiMediaFilterTest {
 
         assertThat(segment.getMidRef()).isEqualTo("ABC_DEF");
     }
+
+    @Test
+    public void testFilterIgnoreFields() {
+        Program program = MediaTestDataBuilder.program()
+            .mid("MID_123")
+            .avType(AVType.MIXED)
+            .type(ProgramType.PROMO)
+            .creationDate(LocalDateTime.of(2019, 8, 26, 21, 50)).build();
+        assertThat(program.getSortInstant()).isEqualTo("2019-08-26T19:50:00Z");
+
+
+        ApiMediaFilter.set("title");
+        assertThat(program.getSortInstant()).isEqualTo("2019-08-26T19:50:00Z");
+        assertThat(program.getMid()).isEqualTo("MID_123");
+        assertThat(program.getAVType()).isEqualTo(AVType.MIXED);
+        assertThat(program.getType()).isEqualTo(ProgramType.PROMO);
+
+         Segment segment  = MediaTestDataBuilder.segment()
+             .midRef("MID_123")
+             .mid("MID_124")
+             .build();
+        assertThat(segment.getMidRef()).isEqualTo("MID_123");
+
+
+ }
+
 }
