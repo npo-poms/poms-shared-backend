@@ -22,7 +22,7 @@ public class Exceptions {
         return new NotFoundException(arrayFormat(message, args).getMessage());
     }
 
-    public static NotFoundException notFound(PredicateTestResult<?> testResult) {
+    public static NotFoundException notFound(PredicateTestResult testResult) {
         return new NotFoundInProfileException(testResult);
     }
 
