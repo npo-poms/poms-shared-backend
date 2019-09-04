@@ -292,10 +292,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     }
 
 
+
     @Test
     @Ignore("Known to fail, will be fixed in 5.11, or 5.10.2")
     public void findSchedulesForOriginal() throws Exception {
-        Program broadcast = MediaBuilder.program().mid("p1")
+        Program broadcast = MediaBuilder.program()
+            .mid("p1")
+            .mainTitle("original and rerun on the same channel")
             .descendantOf("DESCENDANT1")
             .type(ProgramType.BROADCAST)
             .scheduleEvents(
@@ -306,6 +309,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
         Program movie = MediaBuilder.program().mid("p2")
             .descendantOf("DESCENDANT2")
+            .mainTitle("original on a channel")
             .type(ProgramType.MOVIE)
             .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
             .build();
@@ -328,7 +332,6 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
 
     }
-
     @Test
     public void findScheduleWithGenre() throws JsonProcessingException {
         Program broadcast1 = MediaBuilder.program().mid("p1")
