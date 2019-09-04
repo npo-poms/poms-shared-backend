@@ -1120,16 +1120,31 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(ZONE_ID).toInstant()).build()).build());
         index(broadcast().mid("MID_5").episodeOf(group, 4).build());
 
-        ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
+        {
+            ProgramResult result = target.listEpisodes(group, null, Order.ASC, 0L, 10);
 
-        assertThat(result).hasSize(6);
-        assertThat(result.getTotal()).isEqualTo(6);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
-        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(3).getMid()).isEqualTo("MID_4");
-        assertThat(result.getItems().get(4).getMid()).isEqualTo("MID_3");
-        assertThat(result.getItems().get(5).getMid()).isEqualTo("MID_5");
+            assertThat(result).hasSize(6);
+            assertThat(result.getTotal()).isEqualTo(6);
+            assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+            assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
+            assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
+            assertThat(result.getItems().get(3).getMid()).isEqualTo("MID_4");
+            assertThat(result.getItems().get(4).getMid()).isEqualTo("MID_3");
+            assertThat(result.getItems().get(5).getMid()).isEqualTo("MID_5");
+        }
+
+        { // now wit offset
+
+            ProgramResult result = target.listEpisodes(group, null, Order.ASC, 3L, 10);
+            assertThat(result).hasSize(3);
+            assertThat(result.getTotal()).isEqualTo(6);
+            assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_4");
+            assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
+            assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_5");
+
+
+
+        }
 
     }
 

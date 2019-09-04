@@ -292,6 +292,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     }
 
 
+
     @Test
     public void findSchedulesForOriginal() throws Exception {
         Program broadcast = MediaBuilder.program()
@@ -330,7 +331,6 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
 
     }
-
     @Test
     public void findScheduleWithGenre() throws JsonProcessingException {
         Program broadcast1 = MediaBuilder.program().mid("p1")

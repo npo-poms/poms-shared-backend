@@ -361,31 +361,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @NonNull Order order,
         long offset,
         @Nullable Integer max) {
-        long offsetForES = offset;
-        Integer maxForES = max;
-        if (profile != null) {
-            offsetForES = 0;
-            maxForES = null;
-        }
-        ElasticSearchIterator<String> iterator
-            = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSource().get("childRef"));
-
-        SearchRequestBuilder builder = iterator
-            .prepareSearch(indexName)
-            .setTypes(type)
-            .setQuery(QueryBuilders.parentId(type, media.getMid()).ignoreUnmapped(false))
-            .addSort("index", SortOrder.valueOf(order.name()))
-            .addSort("added", SortOrder.ASC)
-            .addSort("childRef", SortOrder.ASC)
-            .setRouting(media.getMid())
-            .setFrom((int) offsetForES);
-
-        if (maxForES != null) {
-            builder.setSize(maxForES);
-        }
         List<String> mids;
         Long total = null;
         if (profile == null) {
+            SearchRequestBuilder builder = client().prepareSearch(indexName);
+            listMembersOrEpisodesBuildRequest(builder, type, media, order);
+            builder.setFrom((int) offset);
+            if (max != null) {
+                builder.setSize(max);
+            }
             SearchResponse response = builder.get();
             SearchHit[] hits = response.getHits().getHits();
             mids = Arrays.stream(hits)
@@ -393,10 +377,25 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .collect(Collectors.toList());
             total = response.getHits().getTotalHits();
         } else {
+            ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSource().get("childRef"));
+            SearchRequestBuilder builder = iterator.prepareSearch(indexName);
+            listMembersOrEpisodesBuildRequest(builder, type, media, order);
             mids = new ArrayList<>();
             iterator.forEachRemaining(mids::add);
         }
         return Pair.of(total, mids);
+    }
+
+
+    protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, String type, MediaObject media, Order order) {
+        builder.setTypes(type)
+            .setQuery(QueryBuilders.parentId(type, media.getMid()).ignoreUnmapped(false))
+            .addSort("index", SortOrder.valueOf(order.name()))
+            .addSort("added", SortOrder.ASC)
+            .addSort("childRef", SortOrder.ASC)
+            .setRouting(media.getMid())
+        ;
+
     }
 
     private <T extends MediaObject> Long filterWithProfile(
