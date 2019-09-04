@@ -4,7 +4,7 @@
   <parent>
     <groupId>nl.publiekeomroep</groupId>
     <artifactId>poms-shared-backend-parent</artifactId>
-    <version>5.11-SNAPSHOT</version>
+    <version>5.11.0</version>
   </parent>
 
   <artifactId>query-es-mappings</artifactId>
