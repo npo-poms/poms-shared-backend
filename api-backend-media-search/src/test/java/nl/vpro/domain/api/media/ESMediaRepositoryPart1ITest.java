@@ -1055,24 +1055,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     }
 
-    @Test
-    public void testWrongListMembers() {
 
-        MediaResult preconditions = target.listMembers(group().mid("MID_0").build(), null, Order.ASC, 0L, 10);
-        assertThat(preconditions).hasSize(0);
-
-        Group group = index(group().mid("MID_0").build(), true);
-        index(program().mid("MID_1").memberOf(group, 0).memberOf(group, 2).build(), true);
-        index(program().mid("MID_2").memberOf(group, 1).build(), true);
-
-        MediaResult result = target.listMembers(group, null, Order.ASC, 0L, 10);
-
-        assertThat(result).hasSize(3);
-        assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
-        assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_2");
-        assertThat(result.getItems().get(2).getMid()).isEqualTo("MID_1");
-
-    }
 
     @Test
     public void testListMembers3WithProfile() {
@@ -2126,18 +2109,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     private <T extends MediaObject> T index(T object)  {
-        return index(object, false);
-    }
-
-    private <T extends MediaObject> T index(T object, boolean simulateWrongIndexer)  {
         indexMediaObject(object);
         for (MemberRef ref : object.getMemberOf()) {
-            String memberRefType;
-            if(simulateWrongIndexer)
-                memberRefType = MediaESType.memberRef(object.getClass()).name();
-            else
-                memberRefType = MediaESType.memberRef(ref.getGroup().getClass()).name();
-
+            String memberRefType = MediaESType.memberRef(ref.getGroup().getClass()).name();
             index(memberRefType, object, ref);
         }
 
