@@ -21,10 +21,7 @@ import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -388,14 +385,26 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
     protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, String type, MediaObject media, Order order) {
-        builder.setTypes(type)
-            .setQuery(QueryBuilders.parentId(type, media.getMid()).ignoreUnmapped(false))
+        String[] types;
+        QueryBuilder query;
+        if(MediaESType.episodeRef.name().equals(type)) {
+            types = new String[]{type};
+            query = QueryBuilders.parentId(type, media.getMid()).ignoreUnmapped(false);
+        } else {
+            types = MediaESType.memberRefs();
+            final BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+            for(String typeItem: types)
+                boolQueryBuilder.should(QueryBuilders.parentId(typeItem, media.getMid()).ignoreUnmapped(false));
+            query = boolQueryBuilder;
+        }
+
+        builder.setTypes(types)
+            .setQuery(query)
             .addSort("index", SortOrder.valueOf(order.name()))
             .addSort("added", SortOrder.ASC)
             .addSort("childRef", SortOrder.ASC)
             .setRouting(media.getMid())
         ;
-
     }
 
     private <T extends MediaObject> Long filterWithProfile(
