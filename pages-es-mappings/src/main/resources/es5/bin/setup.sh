@@ -42,7 +42,7 @@ if [ "$needssettings" = true ]; then
 
 else
     echo "previndex $previndex . No settings necessary"
-    echo curl -XPUT -H'content-type: application/json' $desthost/page/_mapping -d@$basedir/mapping/page.json
+    echo curl -XPUT -H'content-type: application/json' $desthost/$destindex/page/_mapping -d@$basedir/mapping/page.json
     curl -XPUT -H'content-type: application/json' $desthost/$destindex/page/_mapping -d@$basedir/mapping/page.json
 fi
 
