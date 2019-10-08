@@ -315,7 +315,31 @@
         }
       }
     },
+    "expandedIntentions": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
     "targetGroups": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
+    "expandedTargetGroups": {
+      "type": "nested",
+      "include_in_parent": true,
       "properties": {
         "owner": {
           "type": "keyword"
@@ -1059,8 +1083,6 @@
           }
         },
         "expandedGeoLocations": {
-          "type": "nested",
-          "include_in_parent": true,
           "properties": {
             "owner": {
               "type": "keyword"
@@ -1068,18 +1090,7 @@
             "values": {
               "properties": {
                 "name": {
-                  "type": "text",
-                  "norms": false,
-                  "fields": {
-                    "full": {
-                      "type": "keyword",
-                      "index": true
-                    },
-                    "lower": {
-                   "type": "text",
-                      "analyzer": "lowercase"
-                    }
-                  }
+                  "type": "keyword"
                 },
                 "scopeNotes": {
                   "type": "keyword"
@@ -1107,8 +1118,28 @@
             }
           }
         },
+        "expandedIntentions": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "type": "keyword"
+            }
+          }
+        },
         "targetGroups": {
           "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "type": "keyword"
+            }
+          }
+        },
+        "expandedTargetGroups": {
+           "properties": {
             "owner": {
               "type": "keyword"
             },

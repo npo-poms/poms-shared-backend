@@ -322,6 +322,115 @@
                 }
               }
             },
+            "geoLocations": {
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "properties": {
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "scopeNotes": {
+                      "type": "keyword"
+                    },
+                    "role": {
+                      "type": "keyword"
+                    },
+                    "gtaaUri": {
+                      "type": "keyword"
+                    },
+                    "gtaaStatus": {
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
+            },
+            "expandedGeoLocations": {
+              "type": "nested",
+              "include_in_parent": true,
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "properties": {
+                    "name": {
+                      "type": "text",
+                      "norms": false,
+                      "fields": {
+                        "full": {
+                          "type": "keyword",
+                          "index": true
+                        },
+                        "lower": {
+                          "type": "text",
+                          "analyzer": "lowercase"
+                        }
+                      }
+                    },
+                    "scopeNotes": {
+                      "type": "keyword"
+                    },
+                    "role": {
+                      "type": "keyword"
+                    },
+                    "gtaaUri": {
+                      "type": "keyword"
+                    },
+                    "gtaaStatus": {
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
+            },
+            "intentions": {
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "expandedIntentions": {
+              "type": "nested",
+              "include_in_parent": true,
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "targetGroups": {
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "expandedTargetGroups": {
+              "type": "nested",
+              "include_in_parent": true,
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "type": "keyword"
+                }
+              }
+            },
             "availableSubtitles": {
               "properties": {
                 "language": {

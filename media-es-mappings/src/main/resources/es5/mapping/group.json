@@ -296,7 +296,31 @@
         }
       }
     },
+    "expandedIntentions": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
     "targetGroups": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
+    "expandedTargetGroups": {
+      "type": "nested",
+      "include_in_parent": true,
       "properties": {
         "owner": {
           "type": "keyword"
