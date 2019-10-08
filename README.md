@@ -16,9 +16,9 @@ We use **ElasticSearch Head** chrome plugin to connect to ES
 
 Generate ES indexes for our resources:
 - Execute the scripts in this folder: `./push-es-*-mapping.sh`
-eg.
-`./push-es-media-mapping.sh localhost:9200 1`
-(pageupdate script is not relevant for API)
+eg. via this helper script
+`./push-es-localhost.sh`
+(this presumes an empty elastic search on http://localhost:9200)
 
 ## Update the configuration
 The ES mapping can be changed in the files under:

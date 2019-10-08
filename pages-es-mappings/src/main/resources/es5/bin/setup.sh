@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-
-source /Users/michiel/github/mihxil/es-mappings/push-mappings.sh
+curl -s "https://raw.githubusercontent.com/mihxil/es-mappings/master/push-mappings.sh" > /tmp/push-mappings.sh
+source /tmp/push-mappings.sh
 
 basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
