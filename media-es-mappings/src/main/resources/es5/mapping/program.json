@@ -1083,6 +1083,8 @@
           }
         },
         "expandedGeoLocations": {
+          "type": "nested",
+          "include_in_parent": true,
           "properties": {
             "owner": {
               "type": "keyword"
@@ -1090,7 +1092,18 @@
             "values": {
               "properties": {
                 "name": {
-                  "type": "keyword"
+                  "type": "text",
+                  "norms": false,
+                  "fields": {
+                    "full": {
+                      "type": "keyword",
+                      "index": true
+                    },
+                    "lower": {
+                      "type": "text",
+                      "analyzer": "lowercase"
+                    }
+                  }
                 },
                 "scopeNotes": {
                   "type": "keyword"
