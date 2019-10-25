@@ -120,7 +120,7 @@ public abstract class AbstractESRepositoryITest {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                indexName = "test-" + index + "-" + DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss").format(LocalDateTime.now());
+                indexName = "test-" + index + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
                 IndexHelper
                     .builder()
                     .log(log)

@@ -1,0 +1,37 @@
+{
+  "_routing": {
+    "required": true
+  },
+  "dynamic": "strict",
+  "properties": {
+
+    "parent": {
+      "type": "keyword"
+    },
+    "lang": {
+      "type": "keyword"
+    },
+    "type": {
+      "type": "keyword"
+    },
+    "sequence": {
+      "type": "long"
+    },
+    "identifier": {
+      "type": "keyword"
+    },
+    "start": {
+      "type": "long"
+    },
+    "end": {
+      "type": "long"
+    },
+    "offset": {
+      "type": "long"
+    },
+    "content": {
+      "type": "text"
+    }
+  }
+
+}

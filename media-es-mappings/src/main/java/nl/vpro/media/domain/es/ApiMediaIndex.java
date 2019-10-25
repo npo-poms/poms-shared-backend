@@ -22,7 +22,7 @@ public class ApiMediaIndex {
         return source(settings());
     }
     public static String settings() {
-        return "es5/setting/apimedia.json";
+        return "es7/setting/apimedia.json";
     }
 
     public static String source(String name) {
