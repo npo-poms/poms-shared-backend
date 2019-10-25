@@ -13,11 +13,9 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runners.MethodSorters;
 
 import nl.vpro.domain.api.*;
@@ -36,9 +34,7 @@ import nl.vpro.util.FilteringIterator;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Index.atIndex;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * These are integration tests where the index is build in the @BeforeClass.
@@ -235,7 +231,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testGroupBy() {
 
         SearchResponse response = client.prepareSearch(indexName)
-            .addAggregation(AggregationBuilders.terms("types").field("_type").order(Terms.Order.term(true)))
+            .addAggregation(AggregationBuilders.terms("types").field("_type").order(BucketOrder.key(true)))
             .setSize(0)
             .get();
 

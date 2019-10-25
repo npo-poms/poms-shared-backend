@@ -124,7 +124,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
 
                 SearchResponse response = searchResponseFuture.actionGet(5000, TimeUnit.MILLISECONDS);
                 SearchHits hits = response.getHits();
-                count = hits.getTotalHits();
+                count = hits.getTotalHits().value;
                 if (count > 0 && foundDataTime == 0) {
                     log.info("Found first document");
                     foundDataTime = System.currentTimeMillis();

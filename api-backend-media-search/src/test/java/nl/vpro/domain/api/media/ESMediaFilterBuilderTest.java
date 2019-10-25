@@ -188,7 +188,6 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testFilterProfileWithExtraFilter() throws Exception {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("Vpro")
@@ -297,6 +296,6 @@ public class ESMediaFilterBuilderTest {
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
         xContentBuilder.prettyPrint();
         builder.toXContent(xContentBuilder, QueryBuilder.EMPTY_PARAMS);
-        return xContentBuilder.string();
+        return xContentBuilder.toString();
     }
 }

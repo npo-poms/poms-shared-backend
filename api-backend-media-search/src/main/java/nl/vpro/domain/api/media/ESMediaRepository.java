@@ -25,6 +25,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.join.query.ParentIdQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -251,7 +252,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .request();
             future = client().search(request);
         } catch (Exception e) {
-            LOG_ERRORS.warn("findRelated max {}, {}, {}", max, profile, search, moreLikeThisQueryBuilder);
+            LOG_ERRORS.warn("findRelated max {}, {}, {}, {}", max, profile, search, moreLikeThisQueryBuilder);
             throw e;
         }
         SearchResponse response = future.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
@@ -260,7 +261,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         //MediaSearchResults.setSelectedFacets(hits.getFa, form); // TODO
-        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits());
+        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits().value);
 
     }
 
@@ -372,12 +373,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             }
             SearchResponse response = builder.get();
             SearchHit[] hits = response.getHits().getHits();
+
             mids = Arrays.stream(hits)
-                .map(sh -> String.valueOf(sh.getSource().get("childRef")))
+                .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
                 .collect(Collectors.toList());
-            total = response.getHits().getTotalHits();
+            total = response.getHits().getTotalHits().value;
         } else {
-            ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSource().get("childRef"));
+            ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSourceAsMap().get("childRef"));
             SearchRequestBuilder builder = iterator.prepareSearch(indexName);
             listMembersOrEpisodesBuildRequest(builder, type, media, order);
             mids = new ArrayList<>();
@@ -389,7 +391,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, String type, MediaObject media, Order order) {
         builder.setTypes(type)
-            .setQuery(QueryBuilders.parentId(type, media.getMid()).ignoreUnmapped(false))
+            .setQuery(new ParentIdQueryBuilder(type, media.getMid()).ignoreUnmapped(false))
             .addSort("index", SortOrder.valueOf(order.name()))
             .addSort("added", SortOrder.ASC)
             .addSort("childRef", SortOrder.ASC)

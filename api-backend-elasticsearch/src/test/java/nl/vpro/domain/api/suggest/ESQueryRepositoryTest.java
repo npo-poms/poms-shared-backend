@@ -7,7 +7,6 @@ import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.suggest.SortBy;
 import org.elasticsearch.search.suggest.Suggest;
-import org.elasticsearch.search.suggest.phrase.PhraseSuggestion;
 import org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.junit.Test;
 
@@ -59,8 +58,7 @@ public class ESQueryRepositoryTest {
         TermSuggestion suggestEntry = new TermSuggestion("suggest", 5, SortBy.FREQUENCY);
         suggestionList.add(suggestEntry);
 
-
-        TermSuggestion suggestion = new TermSuggestion("suggestion", 0, SortBy.FREQUENCY);
+        TermSuggestion.Entry suggestion = new TermSuggestion.Entry(new Text("suggestion"), 0, 10);
         suggestEntry.addTerm(suggestion);
 
         addOptions(suggestion, text);
@@ -70,15 +68,16 @@ public class ESQueryRepositoryTest {
 
     }
 
-    private void addOptions(Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion, String... text) {
+    private void addOptions(TermSuggestion.Entry suggestionEntry, String... text) {
         for (String s : text) {
-            addOption(suggestion, s);
+            addOption(suggestionEntry, s);
         }
     }
 
 
-    private void addOption(Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion, String text) {
-        suggestion.addOption(new Suggest.Suggestion.Entry.Option(new Text(text), 0.5f));
+    private void addOption(TermSuggestion.Entry suggestionEntry, String text) {
+
+        suggestionEntry.addOption(new TermSuggestion.Entry.Option(new Text(text), 10, 0.5f));
 
     }
 

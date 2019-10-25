@@ -2148,8 +2148,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             IndexResponse indexResponse = client.index(new IndexRequest(indexName, type, ref.getId())
                 .source(bytes, XContentType.JSON)
                 .routing(object.getMidRef())
-                .parent(object.getMidRef()))
-                .actionGet();
+                //.parent(object.getMidRef()))
+            ).actionGet();
+
             log.info("Indexed {} {}", indexResponse.getType(), indexResponse.getId());
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);

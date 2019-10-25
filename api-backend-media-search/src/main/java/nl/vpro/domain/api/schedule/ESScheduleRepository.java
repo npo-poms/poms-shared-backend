@@ -171,7 +171,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         SearchResponse response = searchResponseFuture.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
 
         SearchHits hits = response.getHits();
-        if(hits.getTotalHits() == 0) {
+        if(hits.getTotalHits().value == 0) {
             return null;
         }
         return Jackson2Mapper.getInstance().readValue(hits.getHits()[0].getSourceAsString(), MediaObject.class);
