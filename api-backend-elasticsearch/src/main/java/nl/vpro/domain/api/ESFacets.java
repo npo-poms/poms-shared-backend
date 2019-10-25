@@ -1,6 +1,6 @@
 package nl.vpro.domain.api;
 
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.BucketOrder;
 
 /**
  * @author Michiel Meeuwissen
@@ -8,37 +8,37 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
  */
 public class ESFacets {
 
-    static Terms.Order getComparatorType(LimitableFacet<?> facet) {
+    static BucketOrder getComparatorType(LimitableFacet<?> facet) {
         if (facet.getSort() == null) {
-            return Terms.Order.count(false);
+            return BucketOrder.count(false);
         }
         switch (facet.getSort()) {
             case VALUE_ASC:
-                return Terms.Order.term(true);
+                return BucketOrder.key(true);
             case VALUE_DESC:
-                return Terms.Order.term(false);
+                return BucketOrder.key(false);
             case COUNT_DESC:
-                return Terms.Order.count(false);
+                return BucketOrder.count(false);
             case COUNT_ASC:
             default:
-                return Terms.Order.count(true);
+                return BucketOrder.count(true);
         }
     }
 
-    static Terms.Order getTermsOrder(LimitableFacet<?> facet) {
+    static BucketOrder getTermsOrder(LimitableFacet<?> facet) {
         if (facet.getSort() == null) {
-            return Terms.Order.count(false);
+            return BucketOrder.count(false);
         }
         switch (facet.getSort()) {
             case VALUE_ASC:
-                return Terms.Order.term(true);
+                return BucketOrder.key(true);
             case VALUE_DESC:
-                return Terms.Order.term(false);
+                return BucketOrder.key(false);
             case COUNT_ASC:
-                return Terms.Order.count(true);
+                return BucketOrder.count(true);
             case COUNT_DESC:
             default:
-                return Terms.Order.count(false);
+                return BucketOrder.count(false);
         }
     }
 }

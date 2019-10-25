@@ -10,24 +10,21 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import org.apache.commons.text.similarity.LevenshteinDistance;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.reindex.BulkByScrollResponse;
-import org.elasticsearch.index.reindex.DeleteByQueryAction;
+import org.elasticsearch.index.reindex.*;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import nl.vpro.domain.api.AbstractESRepository;
-import nl.vpro.domain.api.SuggestResult;
-import nl.vpro.domain.api.Suggestion;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -64,7 +61,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     }
 
     public void cleanSuggestions() {
-        BulkByScrollResponse response = DeleteByQueryAction.INSTANCE.newRequestBuilder(client())
+        BulkByScrollResponse response = new DeleteByQueryRequestBuilder(client(), DeleteByQueryAction.INSTANCE)
             .filter(QueryBuilders.rangeQuery("sortDate")
                 .lte(Instant.now().minus(ttl).toEpochMilli()))
             .source(indexName)

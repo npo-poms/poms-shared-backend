@@ -6,33 +6,26 @@ package nl.vpro.domain.api;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.regex.Pattern;
-
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.util.automaton.RegExp;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.script.Script;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.*;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
-import org.elasticsearch.search.aggregations.bucket.histogram.HistogramAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.*;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.IncludeExclude;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.support.IncludeExclude;
 
 import nl.vpro.util.TriFunction;
+
+;
 
 /**
  * @author Roelof Jan Koekoek
@@ -58,7 +51,7 @@ public abstract class ESFacetsBuilder {
         @NonNull BiConsumer<BoolQueryBuilder, T> buildFilter
         ) {
         if(facet != null) {
-            Terms.Order order = ESFacets.getComparatorType(facet);
+            BucketOrder order = ESFacets.getComparatorType(facet);
 
 
             TermsAggregationBuilder aggregationBuilder = AggregationBuilders

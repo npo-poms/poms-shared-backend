@@ -4,11 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
+
+import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.env.Environment;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.node.Node;
@@ -32,7 +35,7 @@ public class ESClientTest  {
             //.put("cluster.name", "elasticsearch")
             .build();
         TransportClient client = new PreBuiltTransportClient(settings)
-            .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+            .addTransportAddress(new TransportAddress(InetAddress.getByName("localhost"), 9300));
         log.info("Built {}", client);
         log.info("" + client.connectedNodes());
         QueryBuilder builder = QueryBuilders.matchAllQuery();
@@ -46,7 +49,8 @@ public class ESClientTest  {
             .put("node.master", false)
             .put("node.data", false)
             .build();
-        Node node = new Node(settings);
+        Environment environment = new Environment(settings, Paths.get("/tmp"));
+        Node node = new Node(environment);
 
         Client client = node.client();
 

@@ -6,22 +6,17 @@ import lombok.Setter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
 import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.get.MultiGetItemResponse;
-import org.elasticsearch.action.get.MultiGetRequest;
-import org.elasticsearch.action.get.MultiGetResponse;
+import org.elasticsearch.action.ListenableActionFuture;
+import org.elasticsearch.action.get.*;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.text.Text;
@@ -30,6 +25,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
@@ -38,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.vpro.domain.api.media.Redirector;
@@ -45,6 +42,8 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
+
+;
 
 
 /**
@@ -105,7 +104,7 @@ public abstract class AbstractESRepository<T> {
                             .setTypes(getRelevantTypes())
                             .addAggregation(AggregationBuilders.terms("types")
                                 .field("_type")
-                                .order(Terms.Order.term(true))
+                                .order(BucketOrder.key(true))
                             )
                             .setSize(0)
                             .get();
@@ -205,7 +204,10 @@ public abstract class AbstractESRepository<T> {
         @NonNull String id,
         @NonNull Class<T> clazz,
         @NonNull String indexName) {
-        CompletableFuture<GetResponse> reponseFuture = ESUtils.fromListenableActionFuture(client().prepareGet(indexName, "_all", id).execute());
+        ListenableActionFuture<GetResponse> all = (ListenableActionFuture<GetResponse>) client().prepareGet(indexName, "_all", id).execute();
+
+        CompletableFuture<GetResponse> reponseFuture = ESUtils.fromListenableActionFuture(all);
+
         return reponseFuture.thenApply(r -> transformResponse(r, clazz));
     }
 
@@ -307,7 +309,8 @@ public abstract class AbstractESRepository<T> {
     protected long executeCount(
         @NonNull QueryBuilder builder,
         @NonNull String indexName) {
-        return client().prepareSearch(indexName).setSource(new SearchSourceBuilder().size(0).query(builder)).get().getHits().getTotalHits();
+        return client().prepareSearch(indexName)
+            .setSource(new SearchSourceBuilder().size(0).query(builder)).get().getHits().getTotalHits().value;
 
     }
 

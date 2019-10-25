@@ -5,7 +5,10 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.search.suggest.SortBy;
 import org.elasticsearch.search.suggest.Suggest;
+import org.elasticsearch.search.suggest.phrase.PhraseSuggestion;
+import org.elasticsearch.search.suggest.term.TermSuggestion;
 import org.junit.Test;
 
 import nl.vpro.domain.api.SuggestResult;
@@ -51,12 +54,13 @@ public class ESQueryRepositoryTest {
 
     private Suggest getSuggestResult(String... text) {
 
-        List<Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>>> suggestionList = new ArrayList<>();
-        Suggest.Suggestion<Suggest.Suggestion.Entry<?>> suggestEntry = new Suggest.Suggestion<>("suggest", 5);
+        List<Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>>>
+            suggestionList = new ArrayList<>();
+        TermSuggestion suggestEntry = new TermSuggestion("suggest", 5, SortBy.FREQUENCY);
         suggestionList.add(suggestEntry);
 
 
-        Suggest.Suggestion.Entry<Suggest.Suggestion.Entry.Option> suggestion = new Suggest.Suggestion.Entry<>(new Text("suggestion"), 0, 10);
+        TermSuggestion suggestion = new TermSuggestion("suggestion", 0, SortBy.FREQUENCY);
         suggestEntry.addTerm(suggestion);
 
         addOptions(suggestion, text);

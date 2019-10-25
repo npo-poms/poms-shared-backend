@@ -7,7 +7,7 @@ package nl.vpro.domain.api.media;
 import java.time.Duration;
 import java.time.Instant;
 
-import org.elasticsearch.common.lucene.search.function.FiltersFunctionScoreQuery;
+import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
@@ -55,9 +55,9 @@ public class ESMediaScoreBuilder {
 
         builder
 
-            .scoreMode(FiltersFunctionScoreQuery.ScoreMode.SUM) // Add the individual functions scores (mainly their  boost factors) below
+            .scoreMode(FunctionScoreQuery.ScoreMode.SUM) // Add the individual functions scores (mainly their  boost factors) below
             .maxBoost(maxBoost) // restrict range from 0 to 2
             ;
-        return builder.scoreMode(FiltersFunctionScoreQuery.ScoreMode.MULTIPLY);
+        return builder.scoreMode(FunctionScoreQuery.ScoreMode.MULTIPLY);
     }
 }

@@ -24,9 +24,9 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHitField;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -180,7 +180,7 @@ public abstract class AbstractESRepositoryITest {
                 log.info("deleting {}/{}/{}", hit.getIndex(), hit.getType(), hit.getId());
 
                 DeleteRequestBuilder deleteRequestBuilder = client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId());
-                SearchHitField routing = hit.getFields().get("_routing");
+                DocumentField routing = hit.getFields().get("_routing");
                 if (routing != null) {
                     for (Object r : routing.getValues()) {
                         deleteRequestBuilder.setRouting(r.toString());
