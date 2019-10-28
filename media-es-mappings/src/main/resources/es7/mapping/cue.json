@@ -1,14 +1,6 @@
 {
-
-  "_parent": {
-    "type": "program"
-  },
-  "_routing": {
-    "required": true
-  },
   "dynamic": "strict",
   "properties": {
-
     "parent": {
       "type": "keyword"
     },
