@@ -37,7 +37,7 @@
       "type": "text"
     },
     "settings": {
-      "type": "text"
+      "type": "keyword"
     }
   }
 
