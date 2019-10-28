@@ -38,10 +38,8 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
-import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.util.TimeUtils;
-
-;
 
 /**
  * @author Michiel Meeuwissen
@@ -54,6 +52,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final IndexHelper helper;
+    private final IndexHelper refsHelper;
 
     @Getter
     @Setter
@@ -64,15 +63,27 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         this.helper = IndexHelper.builder()
             .log(log)
             .client(client)
-            .settings(ApiMediaIndex::source)
-            .mappings(ApiMediaIndex.mappingsAsMap())
+            .settings(ApiMediaIndex.INSTANCE.settings())
+            .mappings(ApiMediaIndex.INSTANCE.mappingsAsMap())
+            .build();
+        this.refsHelper = IndexHelper.builder()
+            .log(log)
+            .client(client)
+            .settings(ApiRefsIndex.INSTANCE.settings())
+            .mappings(ApiRefsIndex.INSTANCE.mappingsAsMap())
             .build();
     }
 
 
     @PostConstruct
     public void init() {
-        helper.setIndexName(indexName);
+        helper.setIndexName(getIndexName());
+        refsHelper.setIndexName(getRefsIndexName());
+
+    }
+
+    public String getRefsIndexName() {
+        return getIndexName() + "_refs";
     }
 
     @Override
@@ -106,11 +117,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
 
-    @Override
-    protected String[] getLoadTypes() {
-        return MediaESType.mediaObjects();
-    }
-
     protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         return loadAll(clazz, indexName, ids.toArray(new String[0]));
@@ -118,8 +124,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
 
     /**
-     * Defaulting version of {@link #mediaSearchRequest(String[], ProfileDefinition, AbstractMediaForm, MediaObject, BoolQueryBuilder, long, Integer)}
-     * Where the types is set to {@link #getLoadTypes()} and mediaObject is <code>null</code>
+     * Defaulting version of {@link #mediaSearchRequest(ProfileDefinition, AbstractMediaForm, MediaObject, BoolQueryBuilder, long, Integer)}
+     * Where  mediaObject is <code>null</code>
      */
     final protected SearchRequest mediaSearchRequest(
         @Nullable ProfileDefinition<MediaObject> profile,
@@ -129,7 +135,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable Integer max) {
 
         return mediaSearchRequest(
-            getLoadTypes(),
             profile,
             form,
             null,
@@ -141,13 +146,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     /**
      * Builds a {@link SearchRequest}
      *
-     * @param types   Which types to search (defaults to {@link #getLoadTypes()})
      * @param profile The profile will be added as a filter on the resulting query
      * @param form    Handles {@link AbstractMediaForm#getSearches()} and {@link MediaForm#getSortFields()}. Also, if applicate it
      *                will handle {@link MediaForm#getFacets()}
      */
     final protected SearchRequest mediaSearchRequest(
-        @NonNull String[] types,
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
@@ -155,7 +158,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         long offset,
         Integer max) {
         SearchRequest request = new SearchRequest(indexName);
-        request.types(types);
 
         request.source(
             mediaSearchBuilder(profile, form, mediaObject, filter, offset, max)
@@ -166,7 +168,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     final protected SearchSourceBuilder mediaSearchBuilder(
         @Null ProfileDefinition<MediaObject> profile,
         @NonNull AbstractMediaForm form,
-        @Nullable BoolQueryBuilder filter,
+        @NonNull BoolQueryBuilder filter,
         long offset,
         Integer max) {
         return mediaSearchBuilder(profile, form, null, filter, offset, max);

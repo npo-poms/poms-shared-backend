@@ -44,6 +44,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.elasticsearch.TransportClientFactory;
+import nl.vpro.poms.es.AbstractIndex;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -114,20 +115,20 @@ public abstract class AbstractESRepositoryITest {
         }
     }
 
-    protected static String createIndexIfNecessary(String index, Supplier<String> settings, Map<String, Supplier<String>> mappings)  {
+    protected static String createIndexIfNecessary(AbstractIndex abstractIndex)  {
         if (indexName == null) {
             try {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                indexName = "test-" + index + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
+                indexName = "test-" + abstractIndex.getIndexName() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
                 IndexHelper
                     .builder()
                     .log(log)
                     .client((s) -> client)
                     .indexName(indexName)
-                    .settings(settings)
-                    .mappings(mappings)
+                    .settings(abstractIndex.settings())
+                    .mappings(abstractIndex.mappingsAsMap())
                     .build()
                     .createIndex();
             } catch (NoNodeAvailableException noNodeAvailableException) {

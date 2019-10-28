@@ -68,8 +68,6 @@ public abstract class AbstractESRepository<T> {
     @Getter
     protected String indexName = null;
 
-    private final Set<String> loadTypes;
-
     @Getter
     @Setter
     protected Duration commitDelay = Duration.ofSeconds(10);
@@ -81,7 +79,6 @@ public abstract class AbstractESRepository<T> {
         if (this.factory == null) {
             throw new IllegalArgumentException("The ES client factory cannot be null");
         }
-        loadTypes = new HashSet<>(Arrays.asList(getLoadTypes()));
     }
 
     public void setIndexName(
@@ -101,7 +98,7 @@ public abstract class AbstractESRepository<T> {
                     if (indexName != null) {
                         SearchResponse response = client()
                             .prepareSearch(indexName)
-                            .setTypes(getRelevantTypes())
+                            //.setTypes(getRelevantTypes())
                             .addAggregation(AggregationBuilders.terms("types")
                                 .field("_type")
                                 .order(BucketOrder.key(true))
@@ -152,16 +149,6 @@ public abstract class AbstractESRepository<T> {
         return factory.client(getClass());
     }
 
-    /**
-     * Returns all types relevant, this e.g. als includes 'deleted' objects types
-     */
-    abstract protected  String[] getRelevantTypes();
-
-    /**
-     * All type relevant for loading objects.
-     */
-    abstract protected String[] getLoadTypes();
-
 
     protected T load(
         @NonNull String id,
@@ -169,9 +156,7 @@ public abstract class AbstractESRepository<T> {
         try {
             MultiGetRequest getRequest =
                 new MultiGetRequest();
-            for (String s : loadTypes) {
-                getRequest.add(indexName, s, id);
-            }
+            getRequest.add(indexName, id);
             ActionFuture<MultiGetResponse> future = client().multiGet(getRequest);
             MultiGetResponse response = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
             for (MultiGetItemResponse r : response.getResponses()) {
@@ -225,9 +210,7 @@ public abstract class AbstractESRepository<T> {
             }
             MultiGetRequest request = new MultiGetRequest();
             for(String id : ids) {
-                for (String t : loadTypes) {
-                    request.add(indexName, t, id);
-                }
+                request.add(indexName, id);
             }
             ActionFuture<MultiGetResponse> future =
                 client()
@@ -442,9 +425,6 @@ public abstract class AbstractESRepository<T> {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
-            "indexName='" + indexName + '\'' +
-            ", loadTypes=" + loadTypes +
-            '}';
+        return getClass().getSimpleName() + "{indexName='" + indexName + '}';
     }
 }

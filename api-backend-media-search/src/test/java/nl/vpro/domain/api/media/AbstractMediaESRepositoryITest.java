@@ -13,7 +13,7 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     protected static String createIndexIfNecessary(String index) {
-        return createIndexIfNecessary(index, ApiMediaIndex::source, ApiMediaIndex.mappingsAsMap());
+        return createIndexIfNecessary(ApiMediaIndex.INSTANCE);
     }
 
 
