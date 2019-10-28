@@ -3,34 +3,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>nl.vpro.poms</groupId>
+    <groupId>nl.publiekeomroep</groupId>
     <artifactId>poms-shared-backend-parent</artifactId>
     <version>5.12-SNAPSHOT</version>
   </parent>
-
-  <artifactId>pages-es-mappings</artifactId>
-  <name>pages-es-mappings</name>
+  <groupId>nl.vpro.media</groupId>
+  <artifactId>es-mappings</artifactId>
 
   <build>
     <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptors>
-            <descriptor>assembly/package.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <id>make-assembly</id>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+
     </plugins>
+
   </build>
   <dependencies>
     <dependency>

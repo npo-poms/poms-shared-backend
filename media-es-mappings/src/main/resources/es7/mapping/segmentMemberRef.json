@@ -1,5 +1,7 @@
 {
-
+  "_parent": {
+    "type": "segment"
+  },
   "_routing": {
     "required": true
   },

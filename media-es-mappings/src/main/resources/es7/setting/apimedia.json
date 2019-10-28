@@ -1,7 +1,7 @@
 {
 
   "mapper": {
-
+    "dynamic": false
   },
   "analysis": {
     "analyzer": {

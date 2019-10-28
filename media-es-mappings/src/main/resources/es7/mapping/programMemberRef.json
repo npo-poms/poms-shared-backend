@@ -1,5 +1,8 @@
 {
 
+  "_parent": {
+    "type": "program"
+  },
   "_routing": {
     "required": true
   },

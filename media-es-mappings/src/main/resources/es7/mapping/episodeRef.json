@@ -1,4 +1,8 @@
 {
+
+  "_parent": {
+    "type": "group"
+  },
   "_routing": {
     "required": true
   },

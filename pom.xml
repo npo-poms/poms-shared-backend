@@ -5,8 +5,6 @@
     <artifactId>poms-parent</artifactId>
     <version>5.12-SNAPSHOT</version>
   </parent>
-
-  <groupId>nl.publiekeomroep</groupId>
   <artifactId>poms-shared-backend-parent</artifactId>
   <version>5.12-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -32,6 +30,7 @@
     <module>api-backend-media-search</module>
     <module>api-backend-thesaurus</module>
 
+    <module>es-mappings</module>
     <module>media-es-mappings</module>
     <module>pages-es-mappings</module>
     <module>query-es-mappings</module>
