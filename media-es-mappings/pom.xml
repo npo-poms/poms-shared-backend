@@ -15,7 +15,6 @@
         <configuration>
           <descriptors>
             <descriptor>assembly/package.xml</descriptor>
-            <descriptor>assembly/package-es1.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
@@ -33,8 +32,9 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
+      <groupId>nl.vpro.poms</groupId>
+      <artifactId>es-mappings</artifactId>
     </dependency>
+
   </dependencies>
 </project>
