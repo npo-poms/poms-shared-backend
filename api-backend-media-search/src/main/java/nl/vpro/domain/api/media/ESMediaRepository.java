@@ -9,41 +9,32 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MoreLikeThisQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.join.query.ParentIdQueryBuilder;
+import org.elasticsearch.action.search.*;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
+
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.media.AgeRating;
-import nl.vpro.domain.media.MediaObject;
-import nl.vpro.domain.media.Program;
+import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
-import nl.vpro.media.domain.es.MediaESType;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.*;
 
 ;
@@ -93,8 +84,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    protected String[] getRelevantTypes() {
-        return MediaESType.toString(MediaESType.values());
+    protected String getType() {
+        return ApiMediaIndex.NAME;
     }
 
     @Override
@@ -246,7 +237,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         try {
             SearchRequest request = client()
                 .prepareSearch(indexName)
-                .setTypes(MediaESType.mediaObjects())
                 .setSize(max)
                 .setQuery(moreLikeThisQueryBuilder)
                 .request();
@@ -282,7 +272,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable  Integer max) {
         SearchRequest request = client()
             .prepareSearch(indexName)
-            .setTypes(MediaESType.mediaObjects())
+            .setQuery(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED))
             .addSort("mid", SortOrder.valueOf(order.name()))
             .setFrom((int) offset)
             .setSize(max)
@@ -300,7 +290,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @NonNull Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.memberRef(media.getClass()).name(), media, profile, order, offset, max);
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes("memberRef", media, profile, order, offset, max);
         List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
         Long total = queryResult.getFirst();
 
@@ -319,8 +309,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @NonNull Integer max) {
         SearchRequest request = client()
-            .prepareSearch(indexName)
-            .setTypes(MediaESType.mediaObjects())
+            .prepareSearch(getRefsIndexName())
             .addSort(MediaSortField.sortDate.name(), SortOrder.valueOf(order.name()))
             .setQuery(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
             .setFrom((int) offset)
@@ -344,7 +333,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @Nullable Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(MediaESType.episodeRef.name(), media, profile, order, offset, max);
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes("episodeRef", media, profile, order, offset, max);
         List<Program> objects = loadAll(Program.class, queryResult.getSecond());
         Long total = queryResult.getFirst();
 
@@ -356,7 +345,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     private Pair<Long, List<String>> listMembersOrEpisodes(
-        @NonNull String type,
+        @NonNull String objectType,
         @NonNull MediaObject media,
         @Nullable ProfileDefinition<MediaObject> profile,
         @NonNull Order order,
@@ -366,7 +355,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         Long total = null;
         if (profile == null) {
             SearchRequestBuilder builder = client().prepareSearch(indexName);
-            listMembersOrEpisodesBuildRequest(builder, type, media, order);
+            listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             builder.setFrom((int) offset);
             if (max != null) {
                 builder.setSize(max);
@@ -381,7 +370,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         } else {
             ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSourceAsMap().get("childRef"));
             SearchRequestBuilder builder = iterator.prepareSearch(indexName);
-            listMembersOrEpisodesBuildRequest(builder, type, media, order);
+            listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             mids = new ArrayList<>();
             iterator.forEachRemaining(mids::add);
         }
@@ -389,9 +378,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
 
-    protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, String type, MediaObject media, Order order) {
-        builder.setTypes(type)
-            .setQuery(new ParentIdQueryBuilder(type, media.getMid()).ignoreUnmapped(false))
+    protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, String objectType, MediaObject media, Order order) {
+        BoolQueryBuilder must = QueryBuilders.boolQuery();
+        must.must(QueryBuilders.termQuery("objectType", objectType));
+        must.must(QueryBuilders.termQuery("mediaRef", media.getMid()));
+        builder
+            .setQuery(must)
             .addSort("index", SortOrder.valueOf(order.name()))
             .addSort("added", SortOrder.ASC)
             .addSort("childRef", SortOrder.ASC)
@@ -561,7 +553,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         SearchRequestBuilder builder = i.prepareSearch(indexName);
         ESMediaSortHandler.sort(form, null, builder::addSort);
-        builder.setTypes(MediaESType.mediaObjects())
+        builder
             .setSize(iterateBatchSize)
             .setQuery(ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null))
             .setPostFilter(ESMediaFilterBuilder.filter(profile))
@@ -582,7 +574,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject);
         i.prepareSearch(indexName)
-            .setTypes(MediaESType.deletedMediaObjects())
             .setQuery(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
             .setSize(iterateBatchSize)
         ;
@@ -627,7 +618,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         BoolQueryBuilder booleanFilter =
             QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
 
-        SearchRequest request = mediaSearchRequest(getLoadTypes(), profile, form, media, booleanFilter, offset, max);
+        SearchRequest request = mediaSearchRequest(profile, form, media, booleanFilter, offset, max);
 
         return executeSearchRequest(request, form != null ? form.getFacets() : null, offset, max, clazz);
     }

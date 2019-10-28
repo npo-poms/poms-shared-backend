@@ -70,16 +70,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         log.info("Deleted {}", response.getDeleted());
     }
 
-    @Override
-    protected String[] getRelevantTypes() {
-        return RELEVANT_TYPES;
-    }
 
-    @Override
-    protected String[] getLoadTypes() {
-        return RELEVANT_TYPES;
-
-    }
 
     @Override
     protected Redirector getDirectsRepository() {

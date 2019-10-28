@@ -1,0 +1,30 @@
+{
+  "index": {
+    "number_of_shards": 2,
+    "number_of_replicas": 1,
+    "mapper": {
+      "dynamic": false
+    },
+    "analysis": {
+      "analyzer": {
+        "default": {
+          "type": "dutch"
+        },
+        "dutch": {
+          "type": "custom",
+          "tokenizer": "icu_tokenizer",
+          "filter": [
+            "dutch",
+            "icu_folding"
+          ]
+        }
+      },
+      "filter": {
+        "dutch": {
+          "language": "Dutch",
+          "type": "snowball"
+        }
+      }
+    }
+  }
+}

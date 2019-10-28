@@ -12,32 +12,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.join.ScoreMode;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.index.query.*;
-import org.elasticsearch.join.query.JoinQueryBuilders;
 
 import nl.vpro.domain.api.ESMatchType.FieldInfo;
 import nl.vpro.domain.api.ESMatchType.FieldInfoWrapper;
-import nl.vpro.domain.api.ESQueryBuilder;
-import nl.vpro.domain.api.SearchFieldDefinition;
-import nl.vpro.domain.api.SimpleTextMatcher;
-import nl.vpro.domain.api.TextMatcherList;
-import nl.vpro.domain.api.subtitles.ESSubtitlesQueryBuilder;
-import nl.vpro.domain.api.subtitles.SubtitlesSearch;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.classification.ClassificationServiceLocator;
-import nl.vpro.domain.media.AVType;
-import nl.vpro.domain.media.AgeRating;
-import nl.vpro.domain.media.ContentRating;
-import nl.vpro.domain.media.MediaType;
+import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
+import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
-import nl.vpro.media.domain.es.ApiCueIndex;
 
 import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
+
+;
 
 //import org.elasticsearch.join.query.JoinQueryBuilders;
 
@@ -73,7 +65,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         new SearchFieldDefinition("titles.stemmed", 3.0f, false)
     );
 
-    public static final SearchFieldDefinition SUBTITLES = new SearchFieldDefinition("subtitles", 0.0f);
+    //public static final SearchFieldDefinition SUBTITLES = new SearchFieldDefinition("subtitles", 0.0f);
 
     private static final FieldInfo MEDIA_TYPE = FieldInfo.enumValue(MediaType.class);
 
@@ -89,6 +81,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             return QueryBuilders.matchAllQuery();
         }
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        builder.must(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED));
         buildMediaQuery(prefix, builder, searches);
         return simplifyQuery(builder);
     }
@@ -118,7 +111,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                     SEARCH_FIELDS
                 );
 
-                if (SUBTITLES.getBoost() > 0.0f) {
+            /*    if (SUBTITLES.getBoost() > 0.0f) {
                     SubtitlesSearch subtitlesSearch = new SubtitlesSearch();
                     subtitlesSearch.setText(textSearch);
                     //subtitlesSearch.setLanguages(TextMatcherList.must(TextMatcher.must("nl")));
@@ -131,7 +124,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                 } else {
                     log.debug("Searching in subtitles is disabled");
                 }
-
+*/
                 apply(booleanQuery, textQuery, textSearch.getMatch());
             }
         }
@@ -518,6 +511,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
     static Stream<SearchFieldDefinition> getSearchFieldStream() {
-        return Stream.concat(SEARCH_FIELDS.stream(), Stream.of(SUBTITLES));
+        //return Stream.concat(SEARCH_FIELDS.stream(), Stream.of(SUBTITLES));
+        return SEARCH_FIELDS.stream();
     }
 }

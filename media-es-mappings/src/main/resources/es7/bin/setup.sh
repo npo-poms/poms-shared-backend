@@ -11,4 +11,5 @@ if [ ${#commandline_args[@]} -gt 2 ]; then
    basename=${commandline_args[2]}
 fi
 
-put $basedir $basename "group" "program" "segment" "deletedprogram" "deletedgroup" "deletedsegment" "cue" "programMemberRef" "groupMemberRef" "segmentMemberRef" "episodeRef"
+put $basedir $basename "media"
+put $basedir "subtitles" "cue"

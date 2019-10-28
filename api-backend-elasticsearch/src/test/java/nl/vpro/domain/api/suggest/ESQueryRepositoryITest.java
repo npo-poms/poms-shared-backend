@@ -41,10 +41,10 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
     @Override
     protected void firstRun() throws IOException {
         ByteArrayOutputStream settings = new ByteArrayOutputStream();
-        IOUtils.copy(ESQueryRepositoryITest.class.getResourceAsStream("/es5/setting/apiqueries.json"), settings);
+        IOUtils.copy(ESQueryRepositoryITest.class.getResourceAsStream("/es7/setting/apiqueries.json"), settings);
 
         ByteArrayOutputStream mapping = new ByteArrayOutputStream();
-        IOUtils.copy(ESQueryRepositoryITest.class.getResourceAsStream("/es5/mapping/query.json"), mapping);
+        IOUtils.copy(ESQueryRepositoryITest.class.getResourceAsStream("/es7/mapping/query.json"), mapping);
         Map<String, Supplier<String>> mappings = new HashMap<>();
         mappings.put("query", mapping::toString);
         createIndexIfNecessary("queries", settings::toString, mappings);

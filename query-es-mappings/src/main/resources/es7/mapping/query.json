@@ -1,0 +1,23 @@
+{
+  "query": {
+    "dynamic": "strict",
+    "properties": {
+      "id": {
+        "type": "keyword"
+      },
+      "text": {
+        "type": "string"
+      },
+      "profile": {
+        "type": "keyword"
+      },
+      "sortDate": {
+        "type": "date",
+        "format": "epoch_millis"
+      },
+      "suggest": {
+        "type": "completion"
+      }
+    }
+  }
+}
