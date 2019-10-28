@@ -35,6 +35,9 @@
     },
     "content": {
       "type": "text"
+    },
+    "settings": {
+      "type": "text"
     }
   }
 
