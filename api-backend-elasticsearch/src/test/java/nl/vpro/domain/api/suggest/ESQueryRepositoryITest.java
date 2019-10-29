@@ -2,16 +2,10 @@ package nl.vpro.domain.api.suggest;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,6 +13,7 @@ import org.springframework.test.context.ContextConfiguration;
 import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.es.ApiQueryIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -39,20 +34,13 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
 
 
     @Override
-    protected void firstRun() throws IOException {
-        ByteArrayOutputStream settings = new ByteArrayOutputStream();
-        IOUtils.copy(ESQueryRepositoryITest.class.getResourceAsStream("/es7/setting/apiqueries.json"), settings);
-
-        ByteArrayOutputStream mapping = new ByteArrayOutputStream();
-        IOUtils.copy(ESQueryRepositoryITest.class.getResourceAsStream("/es7/mapping/query.json"), mapping);
-        Map<String, Supplier<String>> mappings = new HashMap<>();
-        mappings.put("query", mapping::toString);
-        //createIndexIfNecessary("queries", settings::toString, mappings);
+    protected void firstRun() {
+        createIndexIfNecessary(ApiQueryIndex.INSTANCE);
     }
     @Before
     public void init() {
         repository = new ESQueryRepository(factory);
-        repository.setIndexName(indexName);
+        repository.setIndexName(indexNames.get(ApiQueryIndex.INSTANCE));
     }
 
 

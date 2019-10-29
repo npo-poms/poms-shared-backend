@@ -52,7 +52,8 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public abstract class AbstractESRepositoryITest {
 
-    protected static String indexName = null;
+    protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
+    protected static Map<AbstractIndex, String> indexNames = null;
 
     protected static Client client;
 
@@ -90,7 +91,7 @@ public abstract class AbstractESRepositoryITest {
             return new Broadcaster(id, id + "display");
 
         });
-        if (indexName == null) {
+        if (indexNames == null) {
             firstRun();
         }
     }
@@ -99,23 +100,27 @@ public abstract class AbstractESRepositoryITest {
 
     @BeforeClass
     public static void staticSetup() {
-        indexName = null;
+        indexNames = null;
     }
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
-        if (indexName != null) {
-            //client.admin().indices().prepareDelete(indexName + "*").execute().get();
+        if (indexNames != null) {
+            for (String name : indexNames.values()) {
+                client.admin().indices().prepareDelete(name).execute().get();
+            }
         }
     }
 
     protected static String createIndexIfNecessary(AbstractIndex abstractIndex)  {
-        if (indexName == null) {
+        String indexName;
+        if (indexNames == null) {
+            indexNames = new HashMap<>();
             try {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                indexName = "test-" + abstractIndex.getIndexName() + "-" + DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
+                indexName = "test-" + abstractIndex.getIndexName() + "-" + NOW;
                 IndexHelper
                     .builder()
                     .log(log)
@@ -125,6 +130,7 @@ public abstract class AbstractESRepositoryITest {
                     .mappings(abstractIndex.mappingsAsMap())
                     .build()
                     .createIndex();
+                indexNames.put(abstractIndex, indexName);
             } catch (NoNodeAvailableException noNodeAvailableException) {
                 log.warn("No elastic search node could be found with {}", client);
                 log.info("Please start up local elasticsearch");
@@ -133,7 +139,7 @@ public abstract class AbstractESRepositoryITest {
             }
         }
         refresh();
-        return indexName;
+        return indexNames.get(abstractIndex);
     }
 
 
@@ -166,13 +172,20 @@ public abstract class AbstractESRepositoryITest {
     }
 
 
-    protected static void clearIndex() {
+    protected static void clearIndices() {
+        for (String indexName : indexNames.values()) {
+            clearIndex(indexName);
+        }
+
+    }
+    protected static void clearIndex(String indexName) {
         client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
         while (true) {
             long shouldDelete = 0;
             BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
-            for (SearchHit hit : client.prepareSearch(indexName).setQuery(QueryBuilders.matchAllQuery()).setSize(100).get().getHits()) {
-                log.info("deleting {}/{}/{}", hit.getIndex(), hit.getType(), hit.getId());
+            for (SearchHit hit : client.prepareSearch(indexName)
+                .setQuery(QueryBuilders.matchAllQuery()).setSize(100).get().getHits()) {
+                log.info("deleting {}/{}", hit.getIndex(), hit.getId());
 
                 DeleteRequestBuilder deleteRequestBuilder = client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId());
                 DocumentField routing = hit.getFields().get("_routing");
@@ -197,14 +210,13 @@ public abstract class AbstractESRepositoryITest {
 
     @SneakyThrows
     protected static void refresh() {
-        try {
-            client.admin().indices().refresh(new RefreshRequest(indexName)).get();
-            return;
-        } catch (InterruptedException | ExecutionException e) {
-            log.error(e.getMessage(), e);
-            return;
+        for (String indexName : indexNames.values()) {
+            try {
+                client.admin().indices().refresh(new RefreshRequest(indexName)).get();
+            } catch (InterruptedException | ExecutionException e) {
+                log.error(e.getMessage(), e);
+            }
         }
-
 
     }
 

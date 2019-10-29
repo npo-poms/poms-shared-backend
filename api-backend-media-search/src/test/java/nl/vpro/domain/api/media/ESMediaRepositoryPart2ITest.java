@@ -108,7 +108,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Override
     protected void firstRun() throws InterruptedException, ExecutionException, IOException {
 
-        createIndexIfNecessary();
+        createIndicesIfNecessary();
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
 
@@ -232,7 +232,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         SearchResponse response = client.prepareSearch(indexName)
             .addAggregation(AggregationBuilders.terms("types")
-                .field("typedworkflow")
+                .field("workflow")
                 .order(BucketOrder.key(true)))
             .setSize(0)
             .get();

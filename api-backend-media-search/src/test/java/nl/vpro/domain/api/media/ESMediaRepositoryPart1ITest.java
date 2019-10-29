@@ -65,7 +65,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Override
     protected void firstRun() {
-        createIndexIfNecessary();
+        createIndicesIfNecessary();
     }
     @Before
     public  void setup() {

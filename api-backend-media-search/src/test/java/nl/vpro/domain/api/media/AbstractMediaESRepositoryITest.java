@@ -13,9 +13,11 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 @Slf4j
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
-    protected static void  createIndexIfNecessary() {
+    protected static void createIndicesIfNecessary() {
         createIndexIfNecessary(ApiMediaIndex.INSTANCE);
-        createIndexIfNecessary(ApiCueIndex.INSTANCE);
+        for (ApiCueIndex i : ApiCueIndex.getInstances()) {
+            createIndexIfNecessary(i);
+        }
     }
 
 

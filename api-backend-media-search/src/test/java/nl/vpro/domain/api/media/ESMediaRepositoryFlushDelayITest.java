@@ -49,7 +49,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
 
     @Override
     protected void firstRun() {
-        createIndexIfNecessary();
+        createIndicesIfNecessary();
 
 
 

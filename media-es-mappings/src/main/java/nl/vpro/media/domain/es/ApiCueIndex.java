@@ -13,7 +13,7 @@ public abstract class ApiCueIndex extends AbstractIndex {
 
     protected static List<ApiCueIndex> instances = new ArrayList<>();
 
-    public static List<ApiCueIndex> getInstance() {
+    public static List<ApiCueIndex> getInstances() {
         return Collections.unmodifiableList(instances);
     }
     @lombok.Getter
