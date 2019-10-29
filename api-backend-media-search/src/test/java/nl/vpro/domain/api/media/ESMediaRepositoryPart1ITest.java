@@ -27,6 +27,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.Portal;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.ApiRefsIndex;
 import static nl.vpro.domain.api.FacetOrder.VALUE_ASC;
 import static nl.vpro.domain.api.Match.MUST;
@@ -40,6 +41,8 @@ import static nl.vpro.domain.media.ContentRating.*;
 import static nl.vpro.domain.media.GeoRoleType.SUBJECT;
 import static nl.vpro.domain.media.MediaTestDataBuilder.*;
 import static nl.vpro.domain.media.Schedule.ZONE_ID;
+import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
+import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
 import static nl.vpro.domain.media.support.OwnerType.*;
 import static nl.vpro.domain.media.support.TextualType.MAIN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,11 +72,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
     @Before
     public  void setup() {
-        target.setIndexName(indexName);
-        clearIndex();
+        target.setIndexName(indexNames.get(ApiMediaIndex.INSTANCE));
+        clearIndices();
     }
-
-
 
     @Before
     public void before() {
@@ -2106,7 +2107,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     private <B extends MediaBuilder<B, T>, T extends MediaObject> T index(B builder)  {
-        if (Workflow.PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
+        if (builder.mediaObject().isMerged()) {
+            builder.workflow(Workflow.MERGED);
+        } else if (Workflow.DELETES.contains(builder.getWorkflow())) {
             builder.workflow(Workflow.DELETED);
         } else {
             builder.workflow(Workflow.PUBLISHED);
@@ -2114,12 +2117,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         T object = builder.build();
         indexMediaObject(object);
         for (MemberRef ref : object.getMemberOf()) {
-            indexRef(object, ref);
+            indexRef(object, ref, memberRef);
         }
 
         if (object instanceof Program) {
             for (MemberRef ref : ((Program) object).getEpisodeOf()) {
-                indexRef(object, ref);
+                indexRef(object, ref, episodeRef);
             }
         }
         return object;
@@ -2128,12 +2131,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private void indexMediaObject(MediaObject object) {
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
+            String indexName = indexNames.get(ApiMediaIndex.INSTANCE);
             IndexResponse indexResponse = client.index(
                 new IndexRequest(indexName)
                     .id(object.getMid())
                     .source(bytes, XContentType.JSON))
                 .actionGet();
-            log.info("Indexed {} {}", indexName, indexResponse.getId());
+            log.info("Indexed {} {} ({})", indexName, indexResponse.getId(), object.getWorkflow());
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
@@ -2141,14 +2145,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     }
 
-    private void indexRef(MediaObject child, MemberRef object) {
+    private void indexRef(MediaObject child, MemberRef object,  StandaloneMemberRef.ObjectType objectType) {
         StandaloneMemberRef ref = StandaloneMemberRef.builder()
             .childRef(child.getMid())
             .memberRef(object)
+            .objectType(objectType)
             .build();
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
-            String indexName = ApiRefsIndex.NAME;
+            String indexName = indexNames.get(ApiRefsIndex.INSTANCE);
             IndexResponse indexResponse = client.index(
                 new IndexRequest(indexName)
                     .id(ref.getId())

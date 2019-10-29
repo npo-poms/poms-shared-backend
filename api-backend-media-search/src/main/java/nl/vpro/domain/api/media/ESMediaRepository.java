@@ -36,7 +36,8 @@ import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.util.*;
 
-;
+;import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
+import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
 
 /**
  * @author Roelof Jan Koekoek
@@ -282,7 +283,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @NonNull Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes("memberRef", media, profile, order, offset, max);
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(memberRef, media, profile, order, offset, max);
         List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
         Long total = queryResult.getFirst();
 
@@ -325,7 +326,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @Nullable Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes("episodeRef", media, profile, order, offset, max);
+        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(episodeRef, media, profile, order, offset, max);
         List<Program> objects = loadAll(Program.class, queryResult.getSecond());
         Long total = queryResult.getFirst();
 
@@ -337,7 +338,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     private Pair<Long, List<String>> listMembersOrEpisodes(
-        @NonNull String objectType,
+        StandaloneMemberRef.@NonNull ObjectType objectType,
         @NonNull MediaObject media,
         @Nullable ProfileDefinition<MediaObject> profile,
         @NonNull Order order,
@@ -346,7 +347,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         List<String> mids;
         Long total = null;
         if (profile == null) {
-            SearchRequestBuilder builder = client().prepareSearch(indexName);
+            SearchRequestBuilder builder = client().prepareSearch(getRefsIndexName());
             listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             builder.setFrom((int) offset);
             if (max != null) {
@@ -361,7 +362,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             total = response.getHits().getTotalHits().value;
         } else {
             ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSourceAsMap().get("childRef"));
-            SearchRequestBuilder builder = iterator.prepareSearch(indexName);
+            SearchRequestBuilder builder = iterator.prepareSearch(getRefsIndexName());
             listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             mids = new ArrayList<>();
             iterator.forEachRemaining(mids::add);
@@ -370,9 +371,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
 
-    protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, String objectType, MediaObject media, Order order) {
+    protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
         BoolQueryBuilder must = QueryBuilders.boolQuery();
-        must.must(QueryBuilders.termQuery("objectType", objectType));
+        must.must(QueryBuilders.termQuery("objectType", objectType.name()));
         must.must(QueryBuilders.termQuery("mediaRef", media.getMid()));
         builder
             .setQuery(must)

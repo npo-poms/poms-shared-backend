@@ -53,7 +53,8 @@ import static org.mockito.Mockito.when;
 public abstract class AbstractESRepositoryITest {
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
-    protected static Map<AbstractIndex, String> indexNames = null;
+    protected static final  Map<AbstractIndex, String> indexNames = new HashMap<>();
+    protected static boolean firstRun = true;
 
     protected static Client client;
 
@@ -91,8 +92,9 @@ public abstract class AbstractESRepositoryITest {
             return new Broadcaster(id, id + "display");
 
         });
-        if (indexNames == null) {
+        if (firstRun) {
             firstRun();
+            firstRun = false;
         }
     }
 
@@ -100,27 +102,26 @@ public abstract class AbstractESRepositoryITest {
 
     @BeforeClass
     public static void staticSetup() {
-        indexNames = null;
+        indexNames.clear();
     }
 
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
-        if (indexNames != null) {
-            for (String name : indexNames.values()) {
-                client.admin().indices().prepareDelete(name).execute().get();
-            }
+        for (String name : indexNames.values()) {
+            client.admin().indices().prepareDelete(name).execute().get();
         }
     }
 
     protected static String createIndexIfNecessary(AbstractIndex abstractIndex)  {
-        String indexName;
-        if (indexNames == null) {
-            indexNames = new HashMap<>();
+        return createIndexIfNecessary(abstractIndex, "test-" + abstractIndex.getIndexName() + "-" + NOW);
+    }
+
+    protected static String createIndexIfNecessary(AbstractIndex abstractIndex, String indexName)  {
+        if (! indexNames.containsKey(abstractIndex)) {
             try {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                indexName = "test-" + abstractIndex.getIndexName() + "-" + NOW;
                 IndexHelper
                     .builder()
                     .log(log)
@@ -137,8 +138,9 @@ public abstract class AbstractESRepositoryITest {
             } catch (InterruptedException | ExecutionException e) {
                 log.error(e.getMessage(), e);
             }
+
+            refresh();
         }
-        refresh();
         return indexNames.get(abstractIndex);
     }
 

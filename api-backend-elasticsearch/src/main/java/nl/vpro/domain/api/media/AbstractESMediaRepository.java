@@ -83,7 +83,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
     public String getRefsIndexName() {
-        return getIndexName() + "_refs";
+        return getIndexName() + ApiRefsIndex.POSTFIX;
     }
 
     @Override

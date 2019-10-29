@@ -8,9 +8,12 @@ import nl.vpro.poms.es.AbstractIndex;
  */
 public class ApiRefsIndex extends AbstractIndex {
 
-    public static String NAME = "apimedia_refs";
+    public static String POSTFIX = "_refs";
+    public static String NAME = ApiMediaIndex.NAME + POSTFIX;
     public static final ApiRefsIndex INSTANCE = new ApiRefsIndex();
+
     private ApiRefsIndex() {
         super(NAME, "/es7/mapping/ref.json");
     }
+
 }

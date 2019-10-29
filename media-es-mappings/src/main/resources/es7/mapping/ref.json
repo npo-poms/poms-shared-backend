@@ -26,6 +26,9 @@
     },
     "childRef": {
       "type": "keyword"
+    },
+    "objectType": {
+      "type": "keyword"
     }
   }
 }

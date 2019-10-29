@@ -3,8 +3,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import nl.vpro.domain.api.AbstractESRepositoryITest;
-import nl.vpro.media.domain.es.ApiCueIndex;
-import nl.vpro.media.domain.es.ApiMediaIndex;
+import nl.vpro.media.domain.es.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -14,7 +13,8 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     protected static void createIndicesIfNecessary() {
-        createIndexIfNecessary(ApiMediaIndex.INSTANCE);
+        String indexName = createIndexIfNecessary(ApiMediaIndex.INSTANCE);
+        createIndexIfNecessary(ApiRefsIndex.INSTANCE, indexName + ApiRefsIndex.POSTFIX);
         for (ApiCueIndex i : ApiCueIndex.getInstances()) {
             createIndexIfNecessary(i);
         }

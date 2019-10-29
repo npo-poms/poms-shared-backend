@@ -22,6 +22,7 @@ import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.user.Broadcaster;
+import nl.vpro.es.ApiQueryIndex;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
@@ -36,14 +37,14 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     @Override
     protected void firstRun() {
         createIndexIfNecessary(ApiMediaIndex.INSTANCE);
-            }
+    }
 
     @Before
     public void setup() {
         repository = new ESScheduleRepository(clientFactory, null);
-        repository.setIndexName(indexName);
+        repository.setIndexName(indexNames.get(ApiMediaIndex.INSTANCE));
         repository.setScore(false);
-        clearIndex();
+        clearIndices();
     }
 
     @Test
@@ -391,7 +392,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     private void index(MediaObject o, String mediaType) throws JsonProcessingException {
         client.prepareIndex()
-                .setIndex(indexName)
+                .setIndex(indexNames.get(ApiQueryIndex.INSTANCE))
                 .setType(mediaType)
                 .setId(o.getMid())
                 .setSource(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(o), XContentType.JSON)

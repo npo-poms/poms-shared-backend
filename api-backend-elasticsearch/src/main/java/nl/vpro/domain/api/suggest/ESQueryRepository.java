@@ -35,7 +35,6 @@ import nl.vpro.util.ThreadPools;
  * @since 3.2
  */
 public class ESQueryRepository extends AbstractESRepository<Query> implements QuerySearchRepository {
-    private static final String[] RELEVANT_TYPES = new String[]{"query"};
     private static final Integer PROFILE_SEPARATOR_LENGTH = "||".length();
 
     @Getter
@@ -81,7 +80,8 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     @Override
     public void index(Query query) {
         try {
-            client().prepareIndex(getIndexName(), "query")
+            client().prepareIndex()
+                .setIndex(getIndexName())
                 //.setOpType(DocWriteRequest.)
                 .setSource(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON)
                 .setId(query.getId())

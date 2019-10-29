@@ -28,6 +28,7 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,10 +52,8 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     protected void firstRun() {
         createIndicesIfNecessary();
 
-
-
-        target.setIndexName(indexName);
-        clearIndex();
+        target.setIndexName(indexNames.get(ApiMediaIndex.INSTANCE));
+        clearIndices();
     }
 
     @Test
@@ -113,7 +112,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
             long count = 0;
             log.info("Querier start");
             while (count < DOCCOUNT) {
-                final SearchRequestBuilder searchRequestBuilder = AbstractMediaESRepositoryITest.client.prepareSearch(indexName)
+                final SearchRequestBuilder searchRequestBuilder = AbstractMediaESRepositoryITest.client.prepareSearch(indexNames.get(ApiMediaIndex.INSTANCE))
                     .addSort("publishDate", SortOrder.ASC)
                     .addSort("mid", SortOrder.ASC);
                 ActionFuture<SearchResponse> searchResponseFuture = AbstractMediaESRepositoryITest.client
@@ -140,7 +139,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryITest.client
             .index(
-                new IndexRequest(indexName)
+                new IndexRequest(indexNames.get(ApiMediaIndex.INSTANCE))
                     .id(object.getMid())
                     .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object), XContentType.JSON)
             ).get();
