@@ -113,7 +113,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
 
-        target.setIndexName(indexNames.get(ApiMediaIndex.INSTANCE));
+        target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
 
         group = index(groupBuilder.published().build());
         group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid().build());
@@ -231,7 +231,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testGroupBy() {
 
-        SearchResponse response = client.prepareSearch(indexNames.get(ApiMediaIndex.INSTANCE))
+        SearchResponse response = client.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
             .addAggregation(AggregationBuilders.terms("types")
                 .field("workflow")
                 .order(BucketOrder.key(true)))
@@ -810,7 +810,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryITest.client
             .index(
-                new IndexRequest(indexNames.get(ApiMediaIndex.INSTANCE))
+                new IndexRequest(indexNames.get(ApiMediaIndex.APIMEDIA))
                     .id(object.getMid())
                     .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
             ).get();

@@ -8,7 +8,7 @@ import nl.vpro.poms.es.AbstractIndex;
  */
 public class ApiScheduleEventsIndex extends AbstractIndex {
     public static final String NAME = "scheduleevents";
-    public static final ApiScheduleEventsIndex INSTANCE = new ApiScheduleEventsIndex();
+    public static final ApiScheduleEventsIndex APISCHEDULEEVENTS = new ApiScheduleEventsIndex();
 
     private ApiScheduleEventsIndex() {
         super(NAME,  "/es7/mapping/scheduleevent.json");

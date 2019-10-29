@@ -52,7 +52,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     protected void firstRun() {
         createIndicesIfNecessary();
 
-        target.setIndexName(indexNames.get(ApiMediaIndex.INSTANCE));
+        target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
         clearIndices();
     }
 
@@ -112,7 +112,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
             long count = 0;
             log.info("Querier start");
             while (count < DOCCOUNT) {
-                final SearchRequestBuilder searchRequestBuilder = AbstractMediaESRepositoryITest.client.prepareSearch(indexNames.get(ApiMediaIndex.INSTANCE))
+                final SearchRequestBuilder searchRequestBuilder = AbstractMediaESRepositoryITest.client.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
                     .addSort("publishDate", SortOrder.ASC)
                     .addSort("mid", SortOrder.ASC);
                 ActionFuture<SearchResponse> searchResponseFuture = AbstractMediaESRepositoryITest.client
@@ -139,7 +139,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryITest.client
             .index(
-                new IndexRequest(indexNames.get(ApiMediaIndex.INSTANCE))
+                new IndexRequest(indexNames.get(ApiMediaIndex.APIMEDIA))
                     .id(object.getMid())
                     .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object), XContentType.JSON)
             ).get();

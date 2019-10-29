@@ -36,13 +36,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Override
     protected void firstRun() {
-        createIndexIfNecessary(ApiMediaIndex.INSTANCE);
+        createIndexIfNecessary(ApiMediaIndex.APIMEDIA);
     }
 
     @Before
     public void setup() {
         repository = new ESScheduleRepository(clientFactory, null);
-        repository.setIndexName(indexNames.get(ApiMediaIndex.INSTANCE));
+        repository.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
         repository.setScore(false);
         clearIndices();
     }

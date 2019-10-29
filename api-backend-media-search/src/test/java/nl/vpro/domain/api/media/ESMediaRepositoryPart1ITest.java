@@ -72,7 +72,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
     @Before
     public  void setup() {
-        target.setIndexName(indexNames.get(ApiMediaIndex.INSTANCE));
+        target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
         clearIndices();
     }
 
@@ -2131,7 +2131,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private void indexMediaObject(MediaObject object) {
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
-            String indexName = indexNames.get(ApiMediaIndex.INSTANCE);
+            String indexName = indexNames.get(ApiMediaIndex.APIMEDIA);
             IndexResponse indexResponse = client.index(
                 new IndexRequest(indexName)
                     .id(object.getMid())
@@ -2153,7 +2153,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .build();
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
-            String indexName = indexNames.get(ApiRefsIndex.INSTANCE);
+            String indexName = indexNames.get(ApiRefsIndex.APIMEDIA_REFS);
             IndexResponse indexResponse = client.index(
                 new IndexRequest(indexName)
                     .id(ref.getId())

@@ -7,6 +7,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
 import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.mockito.Mockito.mock;
 
@@ -21,7 +22,7 @@ public class AbstractMediaESRepositoryTest {
 
     };
     {
-        repository.setIndexName("media");
+        repository.setIndexName(ApiMediaIndex.NAME);
     }
 
     @Test

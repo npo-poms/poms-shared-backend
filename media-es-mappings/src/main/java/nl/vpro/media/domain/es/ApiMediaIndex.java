@@ -9,7 +9,7 @@ import nl.vpro.poms.es.AbstractIndex;
 public class ApiMediaIndex extends AbstractIndex {
 
     public static final String NAME = "apimedia";
-    public static final ApiMediaIndex INSTANCE = new ApiMediaIndex();
+    public static final ApiMediaIndex APIMEDIA = new ApiMediaIndex();
 
     private ApiMediaIndex() {
         super(NAME,  "/es7/mapping/apimedia.json");

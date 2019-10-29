@@ -63,14 +63,14 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         this.helper = IndexHelper.builder()
             .log(log)
             .client(client)
-            .settings(ApiMediaIndex.INSTANCE.settings())
-            .mappings(ApiMediaIndex.INSTANCE.mappingsAsMap())
+            .settings(ApiMediaIndex.APIMEDIA.settings())
+            .mappings(ApiMediaIndex.APIMEDIA.mappingsAsMap())
             .build();
         this.refsHelper = IndexHelper.builder()
             .log(log)
             .client(client)
-            .settings(ApiRefsIndex.INSTANCE.settings())
-            .mappings(ApiRefsIndex.INSTANCE.mappingsAsMap())
+            .settings(ApiRefsIndex.APIMEDIA_REFS.settings())
+            .mappings(ApiRefsIndex.APIMEDIA_REFS.mappingsAsMap())
             .build();
     }
 

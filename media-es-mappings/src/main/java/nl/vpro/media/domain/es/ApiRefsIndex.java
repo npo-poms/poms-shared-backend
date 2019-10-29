@@ -10,7 +10,7 @@ public class ApiRefsIndex extends AbstractIndex {
 
     public static String POSTFIX = "_refs";
     public static String NAME = ApiMediaIndex.NAME + POSTFIX;
-    public static final ApiRefsIndex INSTANCE = new ApiRefsIndex();
+    public static final ApiRefsIndex APIMEDIA_REFS = new ApiRefsIndex();
 
     private ApiRefsIndex() {
         super(NAME, "/es7/mapping/ref.json");
