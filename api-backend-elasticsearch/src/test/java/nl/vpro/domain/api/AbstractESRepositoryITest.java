@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -104,7 +105,7 @@ public abstract class AbstractESRepositoryITest {
     @AfterClass
     public static void shutdown() throws ExecutionException, InterruptedException {
         if (indexName != null) {
-            client.admin().indices().prepareDelete(indexName).execute().get();
+            //client.admin().indices().prepareDelete(indexName + "*").execute().get();
         }
     }
 
@@ -144,7 +145,7 @@ public abstract class AbstractESRepositoryITest {
                 if (inputStream == null) {
                     throw new IllegalStateException("Could not find " + name);
                 }
-                IOUtils.copy(inputStream, writer, "utf-8");
+                IOUtils.copy(inputStream, writer, StandardCharsets.UTF_8);
                 return writer.toString();
             } catch (IOException e) {
                 throw new IllegalStateException(e);
