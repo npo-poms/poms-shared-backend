@@ -352,8 +352,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void     testFind() {
         SearchResult<MediaObject> result = target.find(null, null, 2L, 5);
-
-
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount);
         assertThat(result.getOffset()).isEqualTo(2);
         assertThat(result.getMax()).isEqualTo(5);
@@ -844,7 +842,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
 
-    @SuppressWarnings("unchecked")
     private <T> void assertRelatedMediaResult(SearchResult<T> result, Program expectedProgram) {
         assertThat(result.getItems()).hasSize(1);
         SearchResultItem<? extends T> actual = result.getItems().get(0);

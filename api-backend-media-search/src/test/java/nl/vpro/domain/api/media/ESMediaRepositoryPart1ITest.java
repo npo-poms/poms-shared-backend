@@ -2133,7 +2133,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                     .id(object.getMid())
                     .source(bytes, XContentType.JSON))
                 .actionGet();
-            log.info("Indexed {} {}", indexResponse.getType(), indexResponse.getId());
+            log.info("Indexed {} {}", indexName, indexResponse.getId());
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
@@ -2148,10 +2148,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .build();
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
-            IndexResponse indexResponse = client.index(new IndexRequest(ApiRefsIndex.NAME)
-                .id(ref.getId())
-                .source(bytes, XContentType.JSON)
-                .routing(object.getMidRef())
+            IndexResponse indexResponse = client.index(
+                new IndexRequest(ApiRefsIndex.NAME)
+                    .id(ref.getId())
+                    .source(bytes, XContentType.JSON)
+                    .routing(object.getMidRef())
                 //.parent(object.getMidRef()))
             ).actionGet();
 

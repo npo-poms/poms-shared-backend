@@ -77,11 +77,12 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     public static QueryBuilder query(
         @NonNull String prefix,
         MediaSearch searches) {
+        TermQueryBuilder published = QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name());
         if(searches == null) {
-            return QueryBuilders.matchAllQuery();
+            return published;
         }
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        builder.must(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()));
+        builder.must(published);
         buildMediaQuery(prefix, builder, searches);
         return simplifyQuery(builder);
     }

@@ -47,10 +47,7 @@ import nl.vpro.util.*;
 @ManagedResource(objectName = "nl.vpro.api:name=esMediaRepository")
 public class ESMediaRepository extends AbstractESMediaRepository implements MediaSearchRepository {
 
-
     private final String[] relatedFields;
-
-
 
     int iterateBatchSize = 1000;
 
@@ -61,6 +58,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     private Instant lastRedirectRead = Instant.EPOCH;
 
     private Instant lastRedirectChange = Instant.now();
+
+    private int defaultMax = 1000;
 
 
     public ESMediaRepository(ESClientFactory client, String relatedFields) {
@@ -212,9 +211,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         SearchSourceBuilder search = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
         String type = media.getClass().getSimpleName().toLowerCase();
-        MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(indexName, type, media.getMid());
+        MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(indexName, media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
-            filterFields(media, relatedFields, "titles.value"),
+            filterFields(media, relatedFields, "objectType,titles.value"),
             new String[] {},
             new MoreLikeThisQueryBuilder.Item[] {item});
 
@@ -224,7 +223,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .minWordLength(4) // longer terms are more unique and randomize the outcome at a cost
             .minTermFreq(1)  // on limited text high term frequency gives strange results f.e. everything with "actueel"
             .minDocFreq(10)
-
         ;
 
 
@@ -232,7 +230,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         try {
             SearchRequest request = client()
                 .prepareSearch(indexName)
-                .setSize(max)
+                .setSize(max == null ? defaultMax : max)
                 .setQuery(moreLikeThisQueryBuilder)
                 .request();
             future = client().search(request);
@@ -270,7 +268,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .setQuery(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()))
             .addSort("mid", SortOrder.valueOf(order.name()))
             .setFrom((int) offset)
-            .setSize(max)
+            .setSize(max == null ? defaultMax : max)
             .request();
 
         GenericMediaSearchResult<MediaObject> result = executeSearchRequest(request, null, offset, max, MediaObject.class);
