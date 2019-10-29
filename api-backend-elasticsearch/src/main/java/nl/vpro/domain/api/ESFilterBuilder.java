@@ -12,6 +12,7 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.*;
 import nl.vpro.domain.constraint.media.HasLocationConstraint;
 import nl.vpro.domain.constraint.media.HasPredictionConstraint;
+import nl.vpro.domain.media.support.Workflow;
 
 import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
 import static org.elasticsearch.index.query.QueryBuilders.*;
@@ -29,11 +30,16 @@ public abstract class ESFilterBuilder {
         return simplifyQuery(boolQueryBuilder);
     }
 
+    /**
+     * Handle profile and workflow filtering
+     *
+     */
     public static <T> void filter(
         @Nullable ProfileDefinition<T> definition,
-        @NonNull BoolQueryBuilder filter) {
+        @NonNull BoolQueryBuilder rootQuery) {
+        rootQuery.filter(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()));
         if (!isEmpty(definition)) {
-            filter.filter(
+            rootQuery.filter(
                 handleConstraint(definition.getFilter().getConstraint())
             );
         }

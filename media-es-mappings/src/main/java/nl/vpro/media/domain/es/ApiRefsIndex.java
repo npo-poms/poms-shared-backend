@@ -10,9 +10,7 @@ public class ApiRefsIndex extends AbstractIndex {
 
     public static String NAME = "apimedia_refs";
     public static final ApiRefsIndex INSTANCE = new ApiRefsIndex();
-
-
-    public ApiRefsIndex() {
-        super(NAME, "es7/mapping/ref.json");
+    private ApiRefsIndex() {
+        super(NAME, "/es7/mapping/ref.json");
     }
 }

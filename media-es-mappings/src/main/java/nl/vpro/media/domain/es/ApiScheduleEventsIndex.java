@@ -10,8 +10,8 @@ public class ApiScheduleEventsIndex extends AbstractIndex {
     public static final String NAME = "scheduleevents";
     public static final ApiScheduleEventsIndex INSTANCE = new ApiScheduleEventsIndex();
 
-    public ApiScheduleEventsIndex() {
-        super(NAME,  "es7/mapping/scheduleevent.json");
+    private ApiScheduleEventsIndex() {
+        super(NAME,  "/es7/mapping/scheduleevent.json");
     }
 
 

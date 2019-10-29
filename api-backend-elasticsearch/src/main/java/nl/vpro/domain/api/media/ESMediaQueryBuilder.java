@@ -24,7 +24,6 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
-import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 
 import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
@@ -77,12 +76,10 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     public static QueryBuilder query(
         @NonNull String prefix,
         MediaSearch searches) {
-        TermQueryBuilder published = QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name());
         if(searches == null) {
-            return published;
+            return QueryBuilders.matchAllQuery();
         }
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        builder.must(published);
         buildMediaQuery(prefix, builder, searches);
         return simplifyQuery(builder);
     }

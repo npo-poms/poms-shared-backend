@@ -130,7 +130,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     final protected SearchRequest mediaSearchRequest(
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
-        @NonNull BoolQueryBuilder boolQueryBuilder,
+        @NonNull BoolQueryBuilder rootQuery,
         long offset,
         @Nullable Integer max) {
 
@@ -138,7 +138,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             profile,
             form,
             null,
-            boolQueryBuilder,
+            rootQuery,
             offset,
             max);
     }
@@ -154,13 +154,13 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
-        @NonNull BoolQueryBuilder filter,
+        @NonNull BoolQueryBuilder rootQuery,
         long offset,
         Integer max) {
         SearchRequest request = new SearchRequest(indexName);
 
         request.source(
-            mediaSearchBuilder(profile, form, mediaObject, filter, offset, max)
+            mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max)
         );
         return request;
     }
@@ -183,7 +183,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      * @param profile
      * @param form the data necessary to build the query
      * @param mediaObject we use the mid to sort in the nested fields
-     * @param filter
+     * @param rootQuery
      * @param offset response position (for pagination)
      * @param max amount of results
      * @return the ES query ready to be executed.
@@ -192,28 +192,34 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
-        @NonNull BoolQueryBuilder filter,
+        @NonNull BoolQueryBuilder rootQuery,
         long offset,
         @Nullable Integer max) {
 
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+        // Handle profile and workflow filtering
+        ESFilterBuilder.filter(profile, rootQuery);
 
-        // Handle profile filtering
-        ESFilterBuilder.filter(profile, filter);
-        if (filter.hasClauses()) {
-            searchBuilder.postFilter(filter);
-        }
-        QueryBuilder queryBuilder = ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null);
+        /* This use to be here, I don't know why. I think it is silly.
+        // Filtering _should_ influene aggragation
+        if (rootQuery.hasClauses()) {
+            searchBuilder.post_filter(rootQuery);
+        }*/
+
+        QueryBuilder queryBuilder = ESMediaQueryBuilder
+            .query("", form != null ? form.getSearches() : null);
+        rootQuery.must(queryBuilder);
+
         if (score) {
             searchBuilder.query(
-                ESMediaScoreBuilder.score(queryBuilder, Instant.now())
+                ESMediaScoreBuilder.score(rootQuery, Instant.now())
             );
         } else {
-            searchBuilder.query(queryBuilder);
+            searchBuilder.query(rootQuery);
         }
 
         if (form instanceof MediaForm) {
-            ESMediaFacetsBuilder.buildMediaFacets("", searchBuilder, (MediaForm) form, filter);
+            ESMediaFacetsBuilder.buildMediaFacets("", searchBuilder, (MediaForm) form, rootQuery);
 
             ESMediaSortHandler.sort(searchBuilder, (MediaForm) form, mediaObject);
         }

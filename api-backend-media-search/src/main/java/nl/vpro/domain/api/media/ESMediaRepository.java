@@ -111,13 +111,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         form = redirectForm(form);
 
-        BoolQueryBuilder rootFilter = QueryBuilders.boolQuery();
-
+        BoolQueryBuilder rootQuery = QueryBuilders.boolQuery();
 
         SearchRequest request = mediaSearchRequest(
             profile,
             form,
-            rootFilter,
+            rootQuery,
             offset,
             max
         );

@@ -96,7 +96,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Before
     public void init() {
-        target.setScore(true);
+        // during debugging you could set this to false, which would simplify queries
+        target.setScore(false);
     }
 
     /**
@@ -230,7 +231,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testGroupBy() {
 
         SearchResponse response = client.prepareSearch(indexName)
-            .addAggregation(AggregationBuilders.terms("types").field("_type").order(BucketOrder.key(true)))
+            .addAggregation(AggregationBuilders.terms("types")
+                .field("typedworkflow")
+                .order(BucketOrder.key(true)))
             .setSize(0)
             .get();
 
