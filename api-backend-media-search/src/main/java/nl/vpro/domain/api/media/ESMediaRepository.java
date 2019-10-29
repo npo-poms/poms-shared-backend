@@ -267,7 +267,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable  Integer max) {
         SearchRequest request = client()
             .prepareSearch(indexName)
-            .setQuery(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED))
+            .setQuery(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()))
             .addSort("mid", SortOrder.valueOf(order.name()))
             .setFrom((int) offset)
             .setSize(max)

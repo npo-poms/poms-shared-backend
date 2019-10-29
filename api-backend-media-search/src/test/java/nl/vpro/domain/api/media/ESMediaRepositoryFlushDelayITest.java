@@ -140,7 +140,8 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryITest.client
             .index(
-                new IndexRequest(indexName, getTypeName(object), object.getMid())
+                new IndexRequest(indexName)
+                    .id(object.getMid())
                     .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object), XContentType.JSON)
             ).get();
         assertThat(object.getLastPublishedInstant()).isNotNull();

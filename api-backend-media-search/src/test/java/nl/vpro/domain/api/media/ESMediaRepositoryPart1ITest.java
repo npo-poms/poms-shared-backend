@@ -2123,9 +2123,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private void indexMediaObject(MediaObject object) {
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
-            String type = getTypeName(object);
-            IndexResponse indexResponse = client.index(new IndexRequest(indexName, type, object.getMid())
-                .source(bytes, XContentType.JSON))
+            IndexResponse indexResponse = client.index(
+                new IndexRequest(indexName)
+                    .id(object.getMid())
+                    .source(bytes, XContentType.JSON))
                 .actionGet();
             log.info("Indexed {} {}", indexResponse.getType(), indexResponse.getId());
         } catch (IOException ioe) {

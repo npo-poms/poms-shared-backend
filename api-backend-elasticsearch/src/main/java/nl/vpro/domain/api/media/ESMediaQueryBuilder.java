@@ -81,7 +81,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             return QueryBuilders.matchAllQuery();
         }
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        builder.must(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED));
+        builder.must(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()));
         buildMediaQuery(prefix, builder, searches);
         return simplifyQuery(builder);
     }
