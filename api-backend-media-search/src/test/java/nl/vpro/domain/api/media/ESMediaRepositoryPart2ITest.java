@@ -28,7 +28,6 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
-import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
@@ -108,7 +107,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Override
     protected void firstRun() throws InterruptedException, ExecutionException, IOException {
 
-        createIndexIfNecessary(ApiMediaIndex.NAME);
+        createIndexIfNecessary();
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
 
@@ -809,7 +808,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryITest.client
             .index(
-                new IndexRequest(indexName, getTypeName(object), object.getMid())
+                new IndexRequest(indexName)
+                    .id(object.getMid())
                     .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
             ).get();
         indexed.add(object);

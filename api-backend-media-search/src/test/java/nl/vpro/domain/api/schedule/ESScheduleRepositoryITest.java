@@ -35,7 +35,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Override
     protected void firstRun() {
-        createIndexIfNecessary(ApiMediaIndex.NAME);
+        createIndexIfNecessary(ApiMediaIndex.INSTANCE);
             }
 
     @Before

@@ -47,7 +47,7 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
         IOUtils.copy(ESQueryRepositoryITest.class.getResourceAsStream("/es7/mapping/query.json"), mapping);
         Map<String, Supplier<String>> mappings = new HashMap<>();
         mappings.put("query", mapping::toString);
-        createIndexIfNecessary("queries", settings::toString, mappings);
+        //createIndexIfNecessary("queries", settings::toString, mappings);
     }
     @Before
     public void init() {

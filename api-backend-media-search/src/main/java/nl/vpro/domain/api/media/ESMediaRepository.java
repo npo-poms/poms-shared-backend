@@ -34,7 +34,6 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
-import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.*;
 
 ;
@@ -83,10 +82,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return load(mid, MediaObject.class);
     }
 
-    @Override
-    protected String getType() {
-        return ApiMediaIndex.NAME;
-    }
 
     @Override
     protected Redirector getDirectsRepository() {

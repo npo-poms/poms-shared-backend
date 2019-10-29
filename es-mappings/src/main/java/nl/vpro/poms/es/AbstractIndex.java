@@ -20,7 +20,7 @@ public abstract class AbstractIndex {
 
     protected AbstractIndex(String indexName, String mappingResource) {
         this.indexName = indexName;
-        this.settingsResource = "es7/setting/" + indexName + ".json";
+        this.settingsResource = "/es7/setting/" + indexName + ".json";
         this.mappingResource = mappingResource;
     }
 

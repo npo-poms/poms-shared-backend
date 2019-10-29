@@ -12,7 +12,7 @@ public class ApiMediaIndex extends AbstractIndex {
     public static final ApiMediaIndex INSTANCE = new ApiMediaIndex();
 
     public ApiMediaIndex() {
-        super(NAME,  "es7/mapping/apimedia.json");
+        super(NAME,  "/es7/mapping/apimedia.json");
     }
 
 }

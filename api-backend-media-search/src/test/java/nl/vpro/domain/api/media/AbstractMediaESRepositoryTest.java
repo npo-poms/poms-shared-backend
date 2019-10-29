@@ -7,7 +7,6 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.Test;
 
 import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.media.domain.es.MediaESType;
 
 import static org.mockito.Mockito.mock;
 
@@ -19,10 +18,7 @@ import static org.mockito.Mockito.mock;
 public class AbstractMediaESRepositoryTest {
 
     AbstractESMediaRepository repository = new AbstractESMediaRepository(mock(ESClientFactory.class)) {
-        @Override
-        protected String[] getRelevantTypes() {
-            return MediaESType.mediaObjects();
-        }
+
     };
     {
         repository.setIndexName("media");

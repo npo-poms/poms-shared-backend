@@ -37,7 +37,6 @@ import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.media.domain.es.MediaESType;
 import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
@@ -161,7 +160,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     private MediaObject findByCrid(String crid) throws IOException {
         TermQueryBuilder query = QueryBuilders.termQuery("crids", crid);
         SearchRequest request = new SearchRequest(indexName);
-        request.types(getLoadTypes());
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         searchBuilder.query(query);
 
@@ -235,7 +233,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
         requestBuilder.setQuery(toExecute);
         requestBuilder.addSort("sortDate", SortOrder.DESC);
-        requestBuilder.setTypes(getScheduleEventTypes());
 
         List<ApiScheduleEvent> results = new ArrayList<>();
 
@@ -246,7 +243,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         long mediaObjectCount = 0;
 
         long offset = form.getPager().getOffset();
-        int max = form.getPager().getMax();
+        Integer max = form.getPager().getMax();
 
         OUTER:
         while (searchIterator.hasNext()) {
@@ -265,7 +262,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                             eventCountForMediaObject++;
                             count++;
                         }
-                        if (count == max) {
+                        if (max != null && count == max) {
                             break OUTER;
                         }
                     } else {
@@ -304,14 +301,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         }
     }
 
-    protected String[] getScheduleEventTypes() {
-        return MediaESType.toString(MediaESType.program);
-    }
-
-    @Override
-    protected String[] getRelevantTypes() {
-        return getLoadTypes();
-    }
 
 
 
@@ -358,7 +347,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
         // Make sure we query enough as to get a 'full' schedule
         int maxresult = Math.max(max, MAXRESULT);
-        SearchRequest request = mediaSearchRequest(getScheduleEventTypes(), profile, form, null, QueryBuilders.boolQuery(), 0L, maxresult);
+        SearchRequest request = mediaSearchRequest(profile, form, null, QueryBuilders.boolQuery(), 0L, maxresult);
         log.debug("Executing {}", request);
         GenericMediaSearchResult<MediaObject> result = executeSearchRequest(request, null, 0, maxresult, MediaObject.class);
 
@@ -380,7 +369,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         }
         int total = items.size();
         int end = new Long(offset + max).intValue();
-        items = items.subList((int) offset, end < total ? end : total);
+        items = items.subList((int) offset, Math.min(end, total));
         return new ScheduleSearchResult(items, offset, max, total);
     }
 

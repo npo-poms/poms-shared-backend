@@ -27,9 +27,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.Portal;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
-import nl.vpro.media.domain.es.ApiMediaIndex;
-import nl.vpro.media.domain.es.MediaESType;
-
+import nl.vpro.media.domain.es.ApiRefsIndex;
 import static nl.vpro.domain.api.FacetOrder.VALUE_ASC;
 import static nl.vpro.domain.api.Match.MUST;
 import static nl.vpro.domain.api.StandardMatchType.REGEX;
@@ -67,7 +65,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @Override
     protected void firstRun() {
-        createIndexIfNecessary(ApiMediaIndex.NAME);
+        createIndexIfNecessary();
     }
     @Before
     public  void setup() {
@@ -2111,13 +2109,12 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private <T extends MediaObject> T index(T object)  {
         indexMediaObject(object);
         for (MemberRef ref : object.getMemberOf()) {
-            String memberRefType = MediaESType.memberRef(ref.getGroup().getClass()).name();
-            index(memberRefType, object, ref);
+            indexRef(object, ref);
         }
 
         if (object instanceof Program) {
             for (MemberRef ref : ((Program) object).getEpisodeOf()) {
-                index(MediaESType.episodeRef.name(), object, ref);
+                indexRef(object, ref);
             }
         }
         return object;
@@ -2138,14 +2135,15 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     }
 
-    private void index(String type, MediaObject child, MemberRef object) {
+    private void indexRef(MediaObject child, MemberRef object) {
         StandaloneMemberRef ref = StandaloneMemberRef.builder()
             .childRef(child.getMid())
             .memberRef(object)
             .build();
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
-            IndexResponse indexResponse = client.index(new IndexRequest(indexName, type, ref.getId())
+            IndexResponse indexResponse = client.index(new IndexRequest(ApiRefsIndex.NAME)
+                .id(ref.getId())
                 .source(bytes, XContentType.JSON)
                 .routing(object.getMidRef())
                 //.parent(object.getMidRef()))

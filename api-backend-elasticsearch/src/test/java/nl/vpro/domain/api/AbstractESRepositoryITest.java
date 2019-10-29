@@ -3,10 +3,7 @@ package nl.vpro.domain.api;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -27,10 +24,7 @@ import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
+import org.junit.*;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.junit.runners.model.Statement;
@@ -39,7 +33,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.MediaClassificationService;
-import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.IndexHelper;
@@ -215,19 +208,5 @@ public abstract class AbstractESRepositoryITest {
     }
 
 
-    protected static String getTypeName(MediaObject media) {
-        boolean deletedType = false;
-
-        switch (media.getWorkflow()) {
-            case DELETED:
-            case REVOKED:
-            case MERGED:
-                deletedType = true;
-                break;
-            default:
-                break;
-        }
-        return (deletedType ? "deleted" : "") + media.getClass().getSimpleName().toLowerCase();
-    }
 
 }

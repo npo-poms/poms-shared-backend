@@ -28,8 +28,6 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.media.domain.es.ApiMediaIndex;
-import nl.vpro.media.domain.es.MediaESType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,8 +48,8 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     private int DOCCOUNT = 1000;
 
     @Override
-    protected void firstRun() throws Exception {
-        createIndexIfNecessary(ApiMediaIndex.NAME);
+    protected void firstRun() {
+        createIndexIfNecessary();
 
 
 
@@ -117,8 +115,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
             while (count < DOCCOUNT) {
                 final SearchRequestBuilder searchRequestBuilder = AbstractMediaESRepositoryITest.client.prepareSearch(indexName)
                     .addSort("publishDate", SortOrder.ASC)
-                    .addSort("mid", SortOrder.ASC)
-                    .setTypes(MediaESType.mediaObjects());
+                    .addSort("mid", SortOrder.ASC);
                 ActionFuture<SearchResponse> searchResponseFuture = AbstractMediaESRepositoryITest.client
                     .search(searchRequestBuilder.request());
 

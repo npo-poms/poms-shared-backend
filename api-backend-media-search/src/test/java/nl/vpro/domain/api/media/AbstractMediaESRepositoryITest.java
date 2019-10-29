@@ -3,6 +3,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import nl.vpro.domain.api.AbstractESRepositoryITest;
+import nl.vpro.media.domain.es.ApiCueIndex;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
 /**
@@ -12,8 +13,9 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 @Slf4j
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
-    protected static String createIndexIfNecessary(String index) {
-        return createIndexIfNecessary(ApiMediaIndex.INSTANCE);
+    protected static void  createIndexIfNecessary() {
+        createIndexIfNecessary(ApiMediaIndex.INSTANCE);
+        createIndexIfNecessary(ApiCueIndex.INSTANCE);
     }
 
 
