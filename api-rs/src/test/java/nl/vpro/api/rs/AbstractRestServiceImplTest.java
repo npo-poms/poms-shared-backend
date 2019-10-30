@@ -11,17 +11,16 @@ import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.jboss.resteasy.spi.Dispatcher;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.mock.web.MockHttpServletResponse;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.resteasy.DateParamConverterProvider;
-import nl.vpro.resteasy.JacksonContextResolver;
-import nl.vpro.resteasy.LocaleParamConverterProvider;
+import nl.vpro.resteasy.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 
 /**
@@ -48,7 +47,7 @@ public abstract class AbstractRestServiceImplTest<T> {
     protected final Dispatcher dispatcher = MockDispatcherFactory.createDispatcher();
 
 
-    @Before
+    @BeforeEach
     public void setup() {
         ContextResolver<ObjectMapper> contextResolver = new JacksonContextResolver();
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);

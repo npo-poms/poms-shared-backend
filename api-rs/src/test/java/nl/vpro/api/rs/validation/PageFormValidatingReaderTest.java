@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
@@ -35,11 +36,12 @@ public class PageFormValidatingReaderTest {
         "  </facets>\n" +
         "</pagesForm>\n").getBytes();
 
-    @Test(expected = UnmarshalException.class)
-    public void testReadFromInvalid() throws Exception {
-        PageFormValidatingReader reader = createReader();
-        reader.setDoValidate(true);
-        reader.init();
+    @Test
+    public void testReadFromInvalid() {
+        Assertions.assertThatThrownBy(() -> {
+            PageFormValidatingReader reader = createReader();
+            reader.setDoValidate(true);
+            reader.init();
 
         byte[] bytes = ("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
             "<pagesForm xmlns=\"urn:vpro:api:2013\" xmlns:media=\"urn:vpro:media:2009\" highlight=\"false\">\n" +
@@ -59,6 +61,7 @@ public class PageFormValidatingReaderTest {
             "  </facets>\n" +
             "</pagesForm>\n").getBytes();
         reader.unmarshal(new ByteArrayInputStream(bytes));
+        }).isInstanceOf(UnmarshalException.class);
     }
 
     @Test
