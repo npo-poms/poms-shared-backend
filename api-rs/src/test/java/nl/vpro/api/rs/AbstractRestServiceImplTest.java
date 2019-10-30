@@ -49,7 +49,7 @@ public abstract class AbstractRestServiceImplTest<T> {
 
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         ContextResolver<ObjectMapper> contextResolver = new JacksonContextResolver();
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
         dispatcher.getProviderFactory().registerProvider(DateParamConverterProvider.class);

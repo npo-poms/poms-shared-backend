@@ -13,7 +13,7 @@ public class CorsPolicyImplTest {
 
 
     @Test
-    public void test() throws Exception {
+    public void test() {
         CorsPolicyImpl impl = new CorsPolicyImpl(true, "classpath:/cors/policy.properties");
 
         assertTrue(impl.allowedOriginAndMethod("localhost", "GET"));

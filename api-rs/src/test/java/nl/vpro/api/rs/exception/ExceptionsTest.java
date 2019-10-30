@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ExceptionsTest {
 
     @Test
-    public void testNotFound() throws Exception {
+    public void testNotFound() {
         Exception exception = Exceptions.notFound("the message");
 
         assertThat(exception).isInstanceOf(NotFoundException.class);
@@ -26,7 +26,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testNotFoundWithArgs() throws Exception {
+    public void testNotFoundWithArgs() {
         Exception exception = Exceptions.notFound("the message {}", "arg");
 
         assertThat(exception).isInstanceOf(NotFoundException.class);
@@ -34,7 +34,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testQueryParamNotFound() throws Exception {
+    public void testQueryParamNotFound() {
         Exception exception = Exceptions.badRequest("the message");
 
         assertThat(exception).isInstanceOf(BadRequestException.class);
@@ -42,7 +42,7 @@ public class ExceptionsTest {
     }
 
     @Test
-    public void testQueryParamNotFoundWithArgs() throws Exception {
+    public void testQueryParamNotFoundWithArgs() {
         Exception exception = Exceptions.badRequest("the message {}", "arg");
 
         assertThat(exception).isInstanceOf(BadRequestException.class);

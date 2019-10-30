@@ -32,7 +32,7 @@ public class CorsInterceptorTest {
     }
 
     @Test
-    public void testFilterDisabled() throws Exception {
+    public void testFilterDisabled() {
 
         MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
 
