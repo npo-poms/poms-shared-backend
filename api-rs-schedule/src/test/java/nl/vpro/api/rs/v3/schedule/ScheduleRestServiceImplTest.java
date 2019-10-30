@@ -1,15 +1,8 @@
 package nl.vpro.api.rs.v3.schedule;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
@@ -18,18 +11,14 @@ import javax.xml.bind.JAXBException;
 
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.ArgumentCaptor;
 import org.xml.sax.SAXException;
 
 import nl.vpro.api.rs.AbstractRestServiceImplTest;
 import nl.vpro.api.rs.validation.ScheduleFormValidatingReader;
-import nl.vpro.domain.api.ApiScheduleEvent;
 import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.Result;
-import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
 
@@ -44,7 +33,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     private final ScheduleService scheduleService = mock(ScheduleService.class);
 
 
-    @Before
+    @BeforeEach
     public void setupSchedule() throws JAXBException, IOException, SAXException {
         ScheduleFormValidatingReader reader = new ScheduleFormValidatingReader();
         reader.setDoValidate(true);
@@ -52,7 +41,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         dispatcher.getProviderFactory().register(reader);
     }
 
-    @After
+    @AfterEach
     public void after() {
         reset(scheduleService);
     }
