@@ -36,7 +36,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.IndexHelper;
 import nl.vpro.elasticsearch.TransportClientFactory;
-import nl.vpro.poms.es.AbstractIndex;
+import nl.vpro.poms.es.ApiElasticSearchIndex;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -51,7 +51,7 @@ import static org.mockito.Mockito.when;
 public abstract class AbstractESRepositoryITest {
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
-    protected static final  Map<AbstractIndex, String> indexNames = new HashMap<>();
+    protected static final  Map<ApiElasticSearchIndex, String> indexNames = new HashMap<>();
     protected static boolean firstRun = true;
 
     protected static Client client;
@@ -103,11 +103,11 @@ public abstract class AbstractESRepositoryITest {
         }
     }
 
-    protected static String createIndexIfNecessary(AbstractIndex abstractIndex)  {
+    protected static String createIndexIfNecessary(ApiElasticSearchIndex abstractIndex)  {
         return createIndexIfNecessary(abstractIndex, "test-" + abstractIndex.getIndexName() + "-" + NOW);
     }
 
-    protected static String createIndexIfNecessary(AbstractIndex abstractIndex, String indexName)  {
+    protected static String createIndexIfNecessary(ApiElasticSearchIndex abstractIndex, String indexName)  {
         if (! indexNames.containsKey(abstractIndex)) {
             try {
                 NodesInfoResponse response = client.admin()

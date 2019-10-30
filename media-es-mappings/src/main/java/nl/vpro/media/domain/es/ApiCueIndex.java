@@ -1,19 +1,25 @@
 package nl.vpro.media.domain.es;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 
-import nl.vpro.poms.es.AbstractIndex;
+import nl.vpro.poms.es.ApiElasticSearchIndex;
+
+import static nl.vpro.i18n.Locales.score;
 
 /**
  * @author Michiel Meeuwissen
  * @since 4.8
  */
-public abstract class ApiCueIndex extends AbstractIndex {
+@Slf4j
+public abstract class ApiCueIndex extends ApiElasticSearchIndex {
 
     protected static List<ApiCueIndex> instances = new ArrayList<>();
 
     public static List<ApiCueIndex> getInstances() {
+        log.debug("Loading classes {}, {}, {}", ApiCueIndexNL.INSTANCE, ApiCueIndexAR.INSTANCE, ApiCueIndexEN.INSTANCE);
         return Collections.unmodifiableList(instances);
     }
     @lombok.Getter
@@ -26,8 +32,24 @@ public abstract class ApiCueIndex extends AbstractIndex {
     }
 
 
+    public String getIndexName(String baseName) {
+        return baseName + "_" + locale.toLanguageTag();
+    }
+
     public static Optional<ApiCueIndex> forLanguage(Locale locale) {
-        return instances.stream().filter(i -> i.locale.equals(locale)).findFirst();
+        ApiCueIndex result = null;
+        int score = 0;
+        Iterator<ApiCueIndex> iterator = getInstances().iterator();
+        while(iterator.hasNext()) {
+            ApiCueIndex candidate = iterator.next();
+            int scoreOfCandidate = score(locale, candidate.getLocale());
+            if (scoreOfCandidate > score) {
+                result = candidate;
+                score = scoreOfCandidate;
+            }
+        }
+        return Optional.ofNullable(result);
+
     }
 
 }

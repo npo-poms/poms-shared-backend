@@ -12,13 +12,13 @@ import static nl.vpro.poms.es.Utils.resourceToString;
  * @since 4.8
  */
 @lombok.Getter()
-public abstract class AbstractIndex {
+public abstract class ApiElasticSearchIndex {
 
     private final String indexName;
     private final String mappingResource;
     private final String settingsResource;
 
-    protected AbstractIndex(String indexName, String mappingResource) {
+    protected ApiElasticSearchIndex(String indexName, String mappingResource) {
         this.indexName = indexName;
         this.settingsResource = "/es7/setting/" + indexName + ".json";
         this.mappingResource = mappingResource;

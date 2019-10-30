@@ -392,7 +392,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     private void index(MediaObject o, String mediaType) throws JsonProcessingException {
         client.prepareIndex()
-                .setIndex(indexNames.get(ApiQueryIndex.INSTANCE))
+                .setIndex(indexNames.get(ApiQueryIndex.APIQUERIES))
                 .setType(mediaType)
                 .setId(o.getMid())
                 .setSource(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(o), XContentType.JSON)

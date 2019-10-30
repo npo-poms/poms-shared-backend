@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
@@ -40,6 +39,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.poms.es.ApiElasticSearchIndex;
 import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
 
@@ -66,7 +66,7 @@ public abstract class AbstractESRepository<T> {
     protected Duration timeOut = Duration.ofSeconds(15);
 
     @Getter
-    protected String indexName = null;
+    protected Map<ApiElasticSearchIndex, String> indexNames = new HashMap<>();
 
     @Getter
     @Setter
@@ -81,27 +81,22 @@ public abstract class AbstractESRepository<T> {
         }
     }
 
-    public void setIndexName(
-        @NonNull String indexName) {
-        if (! Objects.equals(indexName, this.indexName)) {
-            this.indexName = indexName;
-            logIntro();
-        }
+    public void setIndexName(ApiElasticSearchIndex index, @NonNull String indexName) {
+        indexNames.put(index, indexName);
     }
 
     protected void logIntro() {
-        if (StringUtils.isNotBlank(getIndexName())) {
-            log.info("ES Repository {} with factory {}", this, factory);
+        log.info("ES Repository {} with factory {}", this, factory);
+        for (String indexName : indexNames.values()) {
             ThreadPools.backgroundExecutor.execute(() -> {
                 try {
-                    String indexName = getIndexName();
                     if (indexName != null) {
                         SearchResponse response = client()
                             .prepareSearch(indexName)
                             //.setTypes(getRelevantTypes())
                             .addAggregation(AggregationBuilders.terms("types")
-                                .field("_type")
-                                .order(BucketOrder.key(true))
+                                    .field("_type")
+                                    .order(BucketOrder.key(true))
                             )
                             .setSize(0)
                             .get();
@@ -112,9 +107,8 @@ public abstract class AbstractESRepository<T> {
                     } else {
                         log.error("No indexname in {}", this);
                     }
-                } catch (IndexNotFoundException ime) {
-                    log.info("{} does exist yet ({})",
-                        getIndexName(), ime.getMessage());
+                    } catch (IndexNotFoundException ime) {
+                    log.info("{} does exist yet ({})", indexName, ime.getMessage());
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -149,14 +143,22 @@ public abstract class AbstractESRepository<T> {
         return factory.client(getClass());
     }
 
+    protected abstract ApiElasticSearchIndex getIndex(String id, Class<?> clazz);
+
+    protected String getIndexName(String id, Class<?> clazz) {
+        ApiElasticSearchIndex index = getIndex(id, clazz);
+        String indexName = indexNames.get(index);
+        return indexName;
+    }
 
     protected T load(
         @NonNull String id,
         @NonNull Class<T> clazz) {
         try {
+
             MultiGetRequest getRequest =
                 new MultiGetRequest();
-            getRequest.add(indexName, id);
+            getRequest.add(getIndexName(id, clazz), id);
             ActionFuture<MultiGetResponse> future = client().multiGet(getRequest);
             MultiGetResponse response = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
             for (MultiGetItemResponse r : response.getResponses()) {
@@ -254,12 +256,12 @@ public abstract class AbstractESRepository<T> {
         @Nullable Integer max,
         @NonNull SearchSourceBuilder searchBuilder,
         @NonNull QueryBuilder queryBuilder,
-        @NonNull String indexName) {
+        @NonNull String... indexNames) {
         if (offset != 0) {
             searchBuilder.from((int) offset);
         }
         if (max == null) {
-            max = (int) executeCount(queryBuilder, indexName);
+            max = (int) executeCount(queryBuilder, indexNames);
             searchBuilder.size(max);
         } else {
             searchBuilder.size(max);
@@ -291,8 +293,8 @@ public abstract class AbstractESRepository<T> {
 
     protected long executeCount(
         @NonNull QueryBuilder builder,
-        @NonNull String indexName) {
-        return client().prepareSearch(indexName)
+        @NonNull String... indexNames) {
+        return client().prepareSearch(indexNames)
             .setSource(new SearchSourceBuilder().size(0).query(builder)).get().getHits().getTotalHits().value;
 
     }
@@ -425,6 +427,6 @@ public abstract class AbstractESRepository<T> {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{indexName='" + indexName + '}';
+        return getClass().getSimpleName() + "{indexNames='" + indexNames.values() + '}';
     }
 }

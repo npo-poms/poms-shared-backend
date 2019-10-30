@@ -28,7 +28,10 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.poms.es.ApiElasticSearchIndex;
 import nl.vpro.util.ThreadPools;
+
+import static nl.vpro.es.ApiQueryIndex.APIQUERIES;
 
 /**
  * @author Roelof Jan Koekoek
@@ -44,13 +47,15 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     @Setter
     private Duration ttl  = Duration.ofDays(14);
 
-    @Override
     @Value("${elasticSearch.query.index}")
     public void setIndexName(
         @NonNull String indexName) {
-        super.setIndexName(indexName);
+        super.setIndexName(APIQUERIES, indexName);
     }
 
+    public String getIndexName() {
+        return indexNames.get(APIQUERIES);
+    }
 
     @Autowired
     public ESQueryRepository(ESClientFactory client) {
@@ -59,11 +64,17 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
             0, cleanInterval.toMillis(), TimeUnit.MILLISECONDS );
     }
 
+    @Override
+    protected ApiElasticSearchIndex getIndex(String id, Class<?> clazz) {
+        return APIQUERIES;
+
+    }
+
     public void cleanSuggestions() {
         BulkByScrollResponse response = new DeleteByQueryRequestBuilder(client(), DeleteByQueryAction.INSTANCE)
             .filter(QueryBuilders.rangeQuery("sortDate")
                 .lte(Instant.now().minus(ttl).toEpochMilli()))
-            .source(indexName)
+            .source(indexNames.get(APIQUERIES))
             .get();
 
         log.info("Deleted {}", response.getDeleted());

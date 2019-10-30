@@ -35,12 +35,12 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
 
     @Override
     protected void firstRun() {
-        createIndexIfNecessary(ApiQueryIndex.INSTANCE);
+        createIndexIfNecessary(ApiQueryIndex.APIQUERIES);
     }
     @Before
     public void init() {
         repository = new ESQueryRepository(factory);
-        repository.setIndexName(indexNames.get(ApiQueryIndex.INSTANCE));
+        repository.setIndexName(indexNames.get(ApiQueryIndex.APIQUERIES));
     }
 
 

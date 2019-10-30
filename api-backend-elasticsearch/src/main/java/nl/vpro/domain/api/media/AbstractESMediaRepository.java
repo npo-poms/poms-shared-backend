@@ -1,11 +1,10 @@
 package nl.vpro.domain.api.media;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -16,9 +15,7 @@ import javax.validation.constraints.Null;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.search.SearchPhaseExecutionException;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
@@ -29,17 +26,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
-import nl.vpro.domain.api.AbstractESRepository;
-import nl.vpro.domain.api.ESFilterBuilder;
-import nl.vpro.domain.api.GenericMediaSearchResult;
-import nl.vpro.domain.api.SearchResultItem;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.IndexHelper;
-import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.ApiRefsIndex;
+import nl.vpro.poms.es.ApiElasticSearchIndex;
 import nl.vpro.util.TimeUtils;
+
+import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 
 /**
  * @author Michiel Meeuwissen
@@ -63,8 +59,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         this.helper = IndexHelper.builder()
             .log(log)
             .client(client)
-            .settings(ApiMediaIndex.APIMEDIA.settings())
-            .mappings(ApiMediaIndex.APIMEDIA.mappingsAsMap())
+            .settings(APIMEDIA.settings())
+            .mappings(APIMEDIA.mappingsAsMap())
             .build();
         this.refsHelper = IndexHelper.builder()
             .log(log)
@@ -86,10 +82,13 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         return getIndexName() + ApiRefsIndex.POSTFIX;
     }
 
-    @Override
+    public String getIndexName() {
+        return indexNames.get(APIMEDIA);
+    }
+
     @Value("${elasticSearch.media.index}")
     public void setIndexName(@NonNull String indexName) {
-        super.setIndexName(indexName);
+        super.setIndexName(APIMEDIA, indexName);
     }
 
     @Override
@@ -103,6 +102,16 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     public void setTimeout(String timeout) {
         super.setTimeOut(TimeUtils.parseDuration(timeout).orElse(Duration.ofSeconds(15)));
     }
+
+    @Override
+    protected  ApiElasticSearchIndex getIndex(String id, Class<?> clazz) {
+        if (MediaObject.class.isAssignableFrom(clazz)) {
+            return APIMEDIA;
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
 
 
     @Override
@@ -119,7 +128,10 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
-        return loadAll(clazz, indexName, ids.toArray(new String[0]));
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return loadAll(clazz, getIndexName(ids.get(0), clazz), ids.toArray(new String[0]));
     }
 
 
@@ -157,7 +169,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
         Integer max) {
-        SearchRequest request = new SearchRequest(indexName);
+        SearchRequest request = new SearchRequest(indexNames.get(APIMEDIA));
 
         request.source(
             mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max)
@@ -226,7 +238,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
         buildHighlights(searchBuilder, form, ESMediaQueryBuilder.SEARCH_FIELDS);
 
-        handlePaging(offset, max, searchBuilder, queryBuilder, indexName);
+        handlePaging(offset, max, searchBuilder, queryBuilder, indexNames.get(APIMEDIA));
 
         log.debug("ES query: {}", searchBuilder);
 
