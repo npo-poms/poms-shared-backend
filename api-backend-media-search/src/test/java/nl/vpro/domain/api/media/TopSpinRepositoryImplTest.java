@@ -29,10 +29,10 @@ public class TopSpinRepositoryImplTest {
 
 
     @Test
-    public void testNoExists(@Wiremock WireMockServer server, @WiremockUri String ur) {
+    public void testNoExists(@Wiremock WireMockServer server, @WiremockUri String url) {
         server.stubFor(get(urlEqualTo("/notexist")).willReturn(notFound()));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
-        repo.topspinUrl = "http://localhost:9999/{mediaId}";
+        repo.topspinUrl = url + "/{mediaId}";
         Recommendations forMid = repo.getForMid("notexist", null, null);
         assertNotNull(forMid);
         assertTrue(forMid.getRecommendations().isEmpty());
@@ -43,7 +43,7 @@ public class TopSpinRepositoryImplTest {
         String json = IOUtils.toString(getClass().getResourceAsStream("/topspin-response.json"), StandardCharsets.UTF_8);
         server.stubFor(get(urlEqualTo("/exists")).willReturn(okJson(json)));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
-        repo.topspinUrl = "http://localhost:9999/{mediaId}";
+        repo.topspinUrl = url + "/{mediaId}";
         Recommendations forMid = repo.getForMid("exists", null, null);
         assertThat(forMid.getRecommendations().size()).isEqualTo(87);
     }
