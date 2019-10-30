@@ -19,10 +19,16 @@ public abstract class ApiElasticSearchIndex {
     private final String settingsResource;
 
     protected ApiElasticSearchIndex(String indexName, String mappingResource) {
+        this(indexName, "/es7/setting/" + indexName + ".json", mappingResource);
+    }
+
+
+    public ApiElasticSearchIndex(String indexName, String settingsResource, String mappingResource) {
         this.indexName = indexName;
-        this.settingsResource = "/es7/setting/" + indexName + ".json";
+        this.settingsResource = settingsResource;
         this.mappingResource = mappingResource;
     }
+
 
     public Supplier<String> settings() {
         return () -> resourceToString(settingsResource);
