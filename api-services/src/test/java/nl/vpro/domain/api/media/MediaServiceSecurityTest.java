@@ -52,9 +52,9 @@ public class MediaServiceSecurityTest {
             Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_DOESNOTEXISTS"));
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(new TestingAuthenticationToken("user","dontcare", (List<GrantedAuthority>) roles));
+            mediaService.getType("album");
         }).isInstanceOf(AccessDeniedException.class);
 
-        mediaService.getType("album");
     }
 
     @Test
