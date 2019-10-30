@@ -1,0 +1,558 @@
+{
+  "bool" : {
+    "should" : [ {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "broadcasters.value.text" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 2.0
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "broadcasters.value.text" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 4.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "countries.value.text" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.2
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "countries.value.text" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.4
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "credits.fullName.text" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 2.0
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "credits.fullName.text" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 4.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "descriptions.value" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.1
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "descriptions.value" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.2
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "descriptions.stemmed" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.0
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "descriptions.stemmed" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "genres.terms.text" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 2.0
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "genres.terms.text" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 4.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "images.title" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.1
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "images.title" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.2
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "images.title.stemmed" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.5
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "images.title.stemmed" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 3.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "images.description" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.1
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "images.description" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.2
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "images.description.stemmed" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.0
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "images.description.stemmed" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "portals.value.text" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.5
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "portals.value.text" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 3.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "segments.tags.text" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.1
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "segments.tags.text" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.2
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "segments.tags.stemmed" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.2
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "segments.tags.stemmed" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.4
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "segments.titles.value" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.1
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "segments.titles.value" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.2
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "segments.titles.stemmed" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.5
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "segments.titles.stemmed" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 3.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "tags.text" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.2
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "tags.text" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.4
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "tags.stemmed" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 2.0
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "tags.stemmed" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 4.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "titles.value" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 1.3
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "titles.value" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 2.6
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    }, {
+      "bool" : {
+        "should" : [ {
+          "match" : {
+            "titles.stemmed" : {
+              "query" : "Text to search for",
+              "operator" : "OR",
+              "prefix_length" : 0,
+              "max_expansions" : 50,
+              "fuzzy_transpositions" : true,
+              "lenient" : false,
+              "zero_terms_query" : "NONE",
+              "auto_generate_synonyms_phrase_query" : true,
+              "boost" : 3.0
+            }
+          }
+        }, {
+          "match_phrase" : {
+            "titles.stemmed" : {
+              "query" : "Text to search for",
+              "slop" : 4,
+              "zero_terms_query" : "NONE",
+              "boost" : 6.0
+            }
+          }
+        } ],
+        "adjust_pure_negative" : true,
+        "boost" : 1.0
+      }
+    } ],
+    "adjust_pure_negative" : true,
+    "boost" : 1.0
+  }
+}

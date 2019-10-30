@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.Match;
 
+import static nl.vpro.test.util.jackson2.Jackson2TestUtil.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -35,624 +36,8 @@ public class ESMediaQueryBuilderTest {
 
         QueryBuilder builder = ESMediaQueryBuilder.query("", form.getSearches());
 
-        assertThat(builder.toString()).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"should\" : [\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"broadcasters.value.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 2.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"broadcasters.value.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 4.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"countries.value.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"countries.value.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.4\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"credits.fullName.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 2.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"credits.fullName.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 4.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"descriptions.value\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.1\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"descriptions.value\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"descriptions.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"descriptions.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"genres.terms.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 2.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"genres.terms.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 4.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"images.title\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.1\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"images.title\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"images.title.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.5\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"images.title.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 3.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"images.description\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.1\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"images.description\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"images.description.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"images.description.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"portals.value.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.5\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"portals.value.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 3.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"segments.tags.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.1\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"segments.tags.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"segments.tags.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"segments.tags.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.4\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"segments.titles.value\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.1\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"segments.titles.value\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"segments.titles.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.5\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"segments.titles.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 3.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"tags.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.2\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"tags.text\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.4\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"tags.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 2.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"tags.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 4.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"titles.value\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 1.3\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"titles.value\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 2.6\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"match\" : {\n" +
-                "                \"titles.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"operator\" : \"OR\",\n" +
-                "                  \"prefix_length\" : 0,\n" +
-                "                  \"max_expansions\" : 50,\n" +
-                "                  \"fuzzy_transpositions\" : true,\n" +
-                "                  \"lenient\" : false,\n" +
-                "                  \"zero_terms_query\" : \"NONE\",\n" +
-                "                  \"boost\" : 3.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"match_phrase\" : {\n" +
-                "                \"titles.stemmed\" : {\n" +
-                "                  \"query\" : \"Text to search for\",\n" +
-                "                  \"slop\" : 4,\n" +
-                "                  \"boost\" : 6.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}");
+        assertThatJson(builder.toString()).isSimilarToResource("/query-text-without-profile.json");
+
     }
 
     @Test
@@ -693,7 +78,6 @@ public class ESMediaQueryBuilderTest {
                 "              }\n" +
                 "            }\n" +
                 "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
                 "          \"adjust_pure_negative\" : true,\n" +
                 "          \"boost\" : 1.0\n" +
                 "        }\n" +
@@ -726,13 +110,11 @@ public class ESMediaQueryBuilderTest {
                 "              }\n" +
                 "            }\n" +
                 "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
                 "          \"adjust_pure_negative\" : true,\n" +
                 "          \"boost\" : 1.0\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
                 "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
@@ -766,7 +148,6 @@ public class ESMediaQueryBuilderTest {
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
                 "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
@@ -803,13 +184,11 @@ public class ESMediaQueryBuilderTest {
                 "              }\n" +
                 "            }\n" +
                 "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
                 "          \"adjust_pure_negative\" : true,\n" +
                 "          \"boost\" : 1.0\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
                 "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
@@ -841,7 +220,6 @@ public class ESMediaQueryBuilderTest {
             "        }\n" +
             "      }\n" +
             "    ],\n" +
-            "    \"disable_coord\" : false,\n" +
             "    \"adjust_pure_negative\" : true,\n" +
             "    \"boost\" : 1.0\n" +
             "  }\n" +
@@ -884,7 +262,6 @@ public class ESMediaQueryBuilderTest {
             "              }\n" +
             "            }\n" +
             "          ],\n" +
-            "          \"disable_coord\" : false,\n" +
             "          \"adjust_pure_negative\" : true,\n" +
             "          \"boost\" : 1.0\n" +
             "        }\n" +
@@ -917,13 +294,11 @@ public class ESMediaQueryBuilderTest {
             "              }\n" +
             "            }\n" +
             "          ],\n" +
-            "          \"disable_coord\" : false,\n" +
             "          \"adjust_pure_negative\" : true,\n" +
             "          \"boost\" : 1.0\n" +
             "        }\n" +
             "      }\n" +
             "    ],\n" +
-            "    \"disable_coord\" : false,\n" +
             "    \"adjust_pure_negative\" : true,\n" +
             "    \"boost\" : 1.0\n" +
             "  }\n" +
@@ -957,7 +332,6 @@ public class ESMediaQueryBuilderTest {
             "            }\n" +
             "          }\n" +
             "        ],\n" +
-            "        \"disable_coord\" : false,\n" +
             "        \"adjust_pure_negative\" : true,\n" +
             "        \"boost\" : 1.0\n" +
             "      }\n" +
