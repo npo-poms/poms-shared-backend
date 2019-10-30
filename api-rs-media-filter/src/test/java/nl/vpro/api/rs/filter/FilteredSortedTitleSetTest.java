@@ -3,7 +3,7 @@ package nl.vpro.api.rs.filter;
 import java.util.*;
 
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Title;

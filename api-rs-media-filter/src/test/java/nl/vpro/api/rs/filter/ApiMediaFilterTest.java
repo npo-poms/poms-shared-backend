@@ -13,7 +13,7 @@ import javax.xml.bind.JAXB;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.exceptions.ModificationException;
