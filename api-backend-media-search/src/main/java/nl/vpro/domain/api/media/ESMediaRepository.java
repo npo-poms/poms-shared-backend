@@ -210,7 +210,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
 
         SearchSourceBuilder search = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
-        String type = media.getClass().getSimpleName().toLowerCase();
         MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(getIndexName(), media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
             filterFields(media, relatedFields, "objectType,titles.value"),

@@ -1738,6 +1738,9 @@
     "objectType": {
       "type": "keyword"
     },
+    "workflow": {
+      "type": "keyword"
+    },
     "paragraphs": {
       "properties": {
         "body": {

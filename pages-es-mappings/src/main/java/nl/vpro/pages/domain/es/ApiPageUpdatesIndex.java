@@ -1,29 +1,19 @@
 package nl.vpro.pages.domain.es;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
+import nl.vpro.poms.es.ApiElasticSearchIndex;
 
 /**
  * @author Michiel Meeuwissen
  * @since 5.1
  */
-public class ApiPageUpdatesIndex {
+public class ApiPageUpdatesIndex extends ApiElasticSearchIndex {
 
     public static String NAME = "pageupdates";
 
+     public static final ApiPageUpdatesIndex PAGEUPDATES = new ApiPageUpdatesIndex();
 
-    public static String source() {
-        return ApiPagesIndex.source("es5/setting/apipages.json");
-    }
-
-
-    public static Map<String, Supplier<String>> mappingsAsMap() {
-        return Arrays.stream(PageUpdateESType.values())
-            .collect(Collectors.toMap(Enum::name, (v) -> v::source, (k,v) -> k, TreeMap::new)
-            );
+    protected ApiPageUpdatesIndex() {
+        super(NAME,  "/es7/mapping/pageupdate.json");
     }
 
 }
