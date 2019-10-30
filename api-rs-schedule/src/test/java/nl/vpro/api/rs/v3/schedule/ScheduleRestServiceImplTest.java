@@ -58,7 +58,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void activeEvent() throws Exception {
+    public void activeEvent() {
 
         ScheduleRestServiceImpl scheduleRestService = getTestObject();
 
@@ -72,7 +72,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void inactiveEvent() throws Exception {
+    public void inactiveEvent() {
         ScheduleRestServiceImpl scheduleRestService = getTestObject();
 
 
@@ -87,7 +87,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void testGuideDayStartStop() throws ParseException {
+    public void testGuideDayStartStop() {
 
         ScheduleRestService scheduleRestService = getTestObject();
         Result res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 3, 28), null, null, null, "ASC", 0L, 100);
@@ -99,7 +99,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
 
     @Test
-    public void testStartStop() throws ParseException {
+    public void testStartStop() {
 
 
         ScheduleRestService scheduleRestService = getTestObject();
