@@ -37,6 +37,7 @@ import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.elasticsearch.ESClientFactory;
 import nl.vpro.elasticsearch.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
@@ -159,7 +160,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     private MediaObject findByCrid(String crid) throws IOException {
         TermQueryBuilder query = QueryBuilders.termQuery("crids", crid);
-        SearchRequest request = new SearchRequest(indexName);
+        SearchRequest request = new SearchRequest(indexNames.get(ApiMediaIndex.APIMEDIA));
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         searchBuilder.query(query);
 

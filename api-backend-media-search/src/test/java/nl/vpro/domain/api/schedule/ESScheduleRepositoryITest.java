@@ -11,9 +11,7 @@ import java.time.format.DateTimeFormatter;
 import javax.xml.bind.JAXB;
 
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -39,7 +37,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         createIndexIfNecessary(ApiMediaIndex.APIMEDIA);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         repository = new ESScheduleRepository(clientFactory, null);
         repository.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
@@ -159,7 +157,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     /**
      * This reproduces API-249
      */
-    @Ignore("Fails, see API-249")
+    @Disabled("Fails, see API-249")
     @Test
     public void listSchedulesForBroadcasterWithMax() throws Exception {
 

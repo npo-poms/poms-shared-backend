@@ -48,7 +48,7 @@ import static nl.vpro.domain.media.support.OwnerType.*;
 import static nl.vpro.domain.media.support.TextualType.MAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *

@@ -99,7 +99,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     protected <S extends MediaObject> List<S> loadAll(@NonNull Class<S> clazz,
                                                       @NonNull List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
-        return loadAll(clazz, indexName, ids.toArray(new String[0]));
+        return loadAll(clazz, getIndexName(), ids.toArray(new String[0]));
     }
 
 
@@ -211,7 +211,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         SearchSourceBuilder search = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
         String type = media.getClass().getSimpleName().toLowerCase();
-        MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(indexName, media.getMid());
+        MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(getIndexName(), media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
             filterFields(media, relatedFields, "objectType,titles.value"),
             new String[] {},
@@ -229,7 +229,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         ActionFuture<SearchResponse> future;
         try {
             SearchRequest request = client()
-                .prepareSearch(indexName)
+                .prepareSearch(getIndexName())
                 .setSize(max == null ? defaultMax : max)
                 .setQuery(moreLikeThisQueryBuilder)
                 .request();
@@ -264,7 +264,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @Nullable  Integer max) {
         SearchRequest request = client()
-            .prepareSearch(indexName)
+            .prepareSearch(getIndexName())
             .setQuery(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()))
             .addSort("mid", SortOrder.valueOf(order.name()))
             .setFrom((int) offset)
@@ -423,7 +423,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         final ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
         final SearchRequestBuilder searchRequestBuilder =
-            i.prepareSearch(indexName)
+            i.prepareSearch(getIndexName())
                 .addSort("publishDate", SortOrder.valueOf(order.name()))
                 .addSort("mid", SortOrder.ASC);
 
@@ -544,7 +544,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     public Iterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
         ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject);
 
-        SearchRequestBuilder builder = i.prepareSearch(indexName);
+        SearchRequestBuilder builder = i.prepareSearch(getIndexName());
         ESMediaSortHandler.sort(form, null, builder::addSort);
         builder
             .setSize(iterateBatchSize)
@@ -566,7 +566,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         Map<String, String> newRedirects = new HashMap<>();
 
         ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject);
-        i.prepareSearch(indexName)
+        i.prepareSearch(getIndexName())
             .setQuery(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
             .setSize(iterateBatchSize)
         ;
