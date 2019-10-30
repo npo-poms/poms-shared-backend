@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Title;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michiel Meeuwissen
