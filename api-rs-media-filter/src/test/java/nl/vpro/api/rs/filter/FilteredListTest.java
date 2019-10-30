@@ -21,7 +21,7 @@ public class FilteredListTest {
     }
 
     @Test
-    public void contains() throws Exception {
+    public void contains() {
         ApiMediaFilter.set("title:1");
         List<String> list = Arrays.asList("a", "b");
         FilteredList<String> filtered = FilteredList.wrap("title", list);
@@ -31,7 +31,7 @@ public class FilteredListTest {
     }
 
     @Test
-    public void containsNegativeTruncate() throws Exception {
+    public void containsNegativeTruncate() {
         ApiMediaFilter.set("title:-1");
         List<String> list = Arrays.asList("a", "b");
         FilteredList<String> filtered = FilteredList.wrap("title", list);
@@ -43,7 +43,7 @@ public class FilteredListTest {
 
 
     @Test
-    public void containsEmpty() throws Exception {
+    public void containsEmpty() {
         ApiMediaFilter.set("title:1");
         List<String> list = Arrays.asList();
         FilteredList<String> filtered = FilteredList.wrap("title", list);
@@ -56,7 +56,7 @@ public class FilteredListTest {
 
 
     @Test
-    public void scheduleEvent() throws Exception {
+    public void scheduleEvent() {
         ApiMediaFilter.set("");
         List<String> list = new ArrayList<>();
         list.addAll(Collections.nCopies(50, "a"));
@@ -84,7 +84,7 @@ public class FilteredListTest {
     }
 
     @Test
-    public void somethingElse() throws Exception {
+    public void somethingElse() {
         ApiMediaFilter.set("");
         List<String> list = Collections.nCopies(101, "a");
         FilteredList<String> filtered = FilteredList.wrap("somethingelse", list);

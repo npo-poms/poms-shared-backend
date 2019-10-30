@@ -23,7 +23,7 @@ public class FilteredSortedSetTest {
     }
 
     @Test
-    public void contains() throws Exception {
+    public void contains() {
         ApiMediaFilter.set("title:1");
         Set<String> list = new HashSet<>(Arrays.asList("b", "a"));
         FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("title", list);
@@ -33,7 +33,7 @@ public class FilteredSortedSetTest {
     }
 
     @Test
-    public void containsFromBack() throws Exception {
+    public void containsFromBack() {
         ApiMediaFilter.set("title:-1");
         Set<String> list = new HashSet<>(Arrays.asList("b", "a"));
         FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("title", list);
@@ -44,7 +44,7 @@ public class FilteredSortedSetTest {
 
 
     @Test
-    public void firstAndLast() throws Exception {
+    public void firstAndLast() {
         ApiMediaFilter.set("title:1");
         Set<String> list = new HashSet<>(Arrays.asList("b", "a", "c"));
         FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("title", list);
@@ -55,7 +55,7 @@ public class FilteredSortedSetTest {
 
 
     @Test
-    public void subset() throws Exception {
+    public void subset() {
         ApiMediaFilter.set("title:1");
         Set<String> list = new HashSet<>(Arrays.asList("b", "a", "c", "d"));
 
@@ -79,7 +79,7 @@ public class FilteredSortedSetTest {
     }
 
     @Test
-    public void containsEmpty() throws Exception {
+    public void containsEmpty() {
         ApiMediaFilter.set("title:1");
         Set<String> list = new HashSet<>();
         FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("title", list);
@@ -89,7 +89,7 @@ public class FilteredSortedSetTest {
 
 
     @Test
-    public void somethingElse() throws Exception {
+    public void somethingElse() {
         ApiMediaFilter.set("");
         AtomicInteger i = new AtomicInteger();
         Set<String> list = Collections.nCopies(101, "a").stream().map(a -> a + i.incrementAndGet()).collect(Collectors.toSet());

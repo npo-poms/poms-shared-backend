@@ -12,7 +12,6 @@ import javax.xml.bind.JAXB;
 import org.junit.jupiter.api.*;
 
 import nl.vpro.domain.media.*;
-import nl.vpro.domain.media.exceptions.ModificationException;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 
@@ -36,7 +35,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterObjectField() throws Exception {
+    public void testFilterObjectField() {
         Program program = MediaTestDataBuilder.program()
             .withMemberOf()
             .withSource().build();
@@ -53,7 +52,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testJaxbReadWrite() throws Exception {
+    public void testJaxbReadWrite() {
         ApiMediaFilter.set("titles");
 
         final Program program = JAXB.unmarshal(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
@@ -166,7 +165,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterCrids() throws ModificationException {
+    public void testFilterCrids() {
         Program program = MediaTestDataBuilder.program().crids("crid1", "crid2", "crid3").build();
         assertThat(program.getCrids()).isNotNull();
         assertThat(program.getCrids()).hasSize(3);
