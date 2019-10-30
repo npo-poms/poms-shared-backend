@@ -2,7 +2,7 @@ package nl.vpro.domain.api.page;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.IdList;
 import nl.vpro.domain.api.profile.Profile;

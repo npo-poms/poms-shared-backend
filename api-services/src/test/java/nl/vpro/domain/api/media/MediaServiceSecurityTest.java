@@ -4,9 +4,11 @@
  */
 package nl.vpro.domain.api.media;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -16,38 +18,41 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author rico
  * @since 3.0
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "classpath:/nl/vpro/domain/api/media/mediaServiceSecurityTest-context.xml")
 public class MediaServiceSecurityTest {
 
     @Autowired
     MediaService mediaService;
 
-    @Before
+    @BeforeEach
     public void init() {
         SecurityContextHolder.clearContext();
     }
 
-    @Test(expected=AuthenticationCredentialsNotFoundException.class)
+    @Test
     public void testWithoutRole() {
-        mediaService.getType("album");
+        assertThatThrownBy(() ->
+            mediaService.getType("album")
+        ).isInstanceOf(AuthenticationCredentialsNotFoundException.class);
     }
 
-    @Test(expected = AccessDeniedException.class)
+    @Test
     public void testWithWrongRole() {
-        Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_DOESNOTEXISTS"));
-        SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new TestingAuthenticationToken("user","dontcare", (List<GrantedAuthority>) roles));
+        assertThatThrownBy(() -> {
+
+            Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_DOESNOTEXISTS"));
+            SecurityContext context = SecurityContextHolder.getContext();
+            context.setAuthentication(new TestingAuthenticationToken("user","dontcare", (List<GrantedAuthority>) roles));
+        }).isInstanceOf(AccessDeniedException.class);
 
         mediaService.getType("album");
     }

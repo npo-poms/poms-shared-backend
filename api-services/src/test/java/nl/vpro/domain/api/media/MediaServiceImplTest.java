@@ -6,13 +6,11 @@ package nl.vpro.domain.api.media;
 
 import java.time.Instant;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import nl.vpro.domain.api.profile.Profile;
-import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.api.profile.ProfileService;
+import nl.vpro.domain.api.profile.*;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.constraint.media.Filter;
@@ -21,6 +19,7 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.util.FilteringIterator;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,7 +49,7 @@ public class MediaServiceImplTest {
 
     private final Integer max = 25;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         Mockito.reset(profileService, mediaSearchRepository);
         Filter filter = new Filter();
@@ -99,38 +98,56 @@ public class MediaServiceImplTest {
         verify(mediaSearchRepository).findRelated(media, profileDefinition, form, max);
     }
 
-    @Test(expected = ProfileNotFoundException.class)
+    @Test
     public void testChangesProfileNotFound() {
-        target.changes("notfound", true, Instant.EPOCH,  null, null, 10, 100L, false, null);
+        assertThatThrownBy(() ->
+            target.changes("notfound", true, Instant.EPOCH,  null, null, 10, 100L, false, null)
+        ).isInstanceOf(ProfileNotFoundException.class);
     }
 
-    @Test(expected = ProfileNotFoundException.class)
+    @Test
     public void testIterateProfileNotFound() {
-        target.iterate("notfound", null, 0L, 10, FilteringIterator.keepAliveWithoutBreaks((c) -> {}));
+        assertThatThrownBy(() ->
+            target.iterate("notfound", null, 0L, 10, FilteringIterator.keepAliveWithoutBreaks((c) -> {}))
+        ).isInstanceOf(ProfileNotFoundException.class);
     }
 
-    @Test(expected = ProfileNotFoundException.class)
+    @Test
     public void testFindProfileNotFound() {
-        target.find("notfound", null, 0L, 10);
+        assertThatThrownBy(() ->
+            target.find("notfound", null, 0L, 10)
+        ).isInstanceOf(ProfileNotFoundException.class);
+
     }
 
-    @Test(expected = ProfileNotFoundException.class)
+    @Test
     public void testFindMembersProfileNotFound() {
-        target.findMembers(media, "notfound", null, 0L, 10);
+        assertThatThrownBy(() ->
+                target.findMembers(media, "notfound", null, 0L, 10)
+        ).isInstanceOf(ProfileNotFoundException.class);
+
     }
 
-    @Test(expected = ProfileNotFoundException.class)
+    @Test
     public void testFindEpisodesProfileNotFound() {
-        target.findEpisodes(media, "notfound", null, 0L, 10);
+        assertThatThrownBy(() ->
+            target.findEpisodes(media, "notfound", null, 0L, 10)
+        ).isInstanceOf(ProfileNotFoundException.class);
+
     }
 
-    @Test(expected = ProfileNotFoundException.class)
+    @Test
     public void testFindDescendantsProfileNotFound() {
-        target.findDescendants(media, "notfound", null, 0L, 10);
+        assertThatThrownBy(() ->
+            target.findDescendants(media, "notfound", null, 0L, 10)
+        ).isInstanceOf(ProfileNotFoundException.class);
     }
 
-    @Test(expected = ProfileNotFoundException.class)
+    @Test
     public void testFindRelatedProfileNotFound() {
-        target.findRelated(media, "notfound", null, 10);
+        assertThatThrownBy(() ->
+            target.findRelated(media, "notfound", null, 10)
+        ).isInstanceOf(ProfileNotFoundException.class);
+
     }
 }

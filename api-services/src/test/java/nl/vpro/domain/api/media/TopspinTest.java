@@ -3,19 +3,16 @@ package nl.vpro.domain.api.media;
 
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
 import com.google.common.collect.ImmutableList;
 
-import nl.vpro.domain.api.profile.Profile;
-import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.api.profile.ProfileService;
+import nl.vpro.domain.api.profile.*;
 import nl.vpro.domain.api.topspin.Recommendation;
 import nl.vpro.domain.api.topspin.Recommendations;
-import nl.vpro.domain.constraint.media.BroadcasterConstraint;
-import nl.vpro.domain.constraint.media.Filter;
-import nl.vpro.domain.constraint.media.Not;
+import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -35,7 +32,7 @@ public class TopspinTest {
 
     Program program;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         // Given
