@@ -15,9 +15,9 @@ import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.junit.*;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.*;
 
+import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.*;
@@ -45,7 +45,7 @@ import static org.mockito.Mockito.mock;
  */
 
 @Slf4j
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.Alphanumeric.class)
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();
@@ -95,7 +95,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
 
-    @Before
+    @BeforeEach
     public void init() {
         // during debugging you could set this to false, which would simplify queries
         target.setScore(false);
@@ -438,7 +438,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
     @Test
-    @Ignore("Dropped support for finding by urn")
+    @Disabled("Dropped support for finding by urn")
     public void testFindWithWithUrnMediaId() {
         MediaForm form = form().mediaIds(programBuilder.build().getUrn()).build();
         SearchResult<MediaObject> result = target.find(null, form, 0, null);

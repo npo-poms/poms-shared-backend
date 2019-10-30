@@ -21,7 +21,7 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.sort.SortOrder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.media.MediaObject;

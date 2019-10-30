@@ -25,12 +25,10 @@ import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.junit.*;
-import org.junit.rules.TestRule;
-import org.junit.runner.RunWith;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.MediaClassificationService;
@@ -47,7 +45,7 @@ import static org.mockito.Mockito.when;
  * @author Michiel Meeuwissen
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:/broadcasterService.xml", "classpath:/esclientfactory.xml"})
 @Slf4j
 public abstract class AbstractESRepositoryITest {
@@ -62,13 +60,6 @@ public abstract class AbstractESRepositoryITest {
         log.info("JAVAPORT " + System.getProperty("integ.java.port"));
 
     }
-    @Rule
-    public TestRule noElasticSearch = (base, description) -> new Statement() {
-        @Override
-        public void evaluate() throws Throwable {
-            base.evaluate();
-        }
-    };
 
     @Inject
     protected TransportClientFactory clientFactory;
@@ -78,7 +69,7 @@ public abstract class AbstractESRepositoryITest {
     protected BroadcasterService broadcasterService;
 
 
-    @Before
+    @BeforeEach
     public void abstractSetup() throws Exception {
         if (client == null) {
             client = clientFactory.client("test");
@@ -100,12 +91,12 @@ public abstract class AbstractESRepositoryITest {
 
     protected abstract void firstRun() throws Exception;
 
-    @BeforeClass
+    @BeforeAll
     public static void staticSetup() {
         indexNames.clear();
     }
 
-    @AfterClass
+    @AfterAll
     public static void shutdown() throws ExecutionException, InterruptedException {
         for (String name : indexNames.values()) {
             client.admin().indices().prepareDelete(name).execute().get();

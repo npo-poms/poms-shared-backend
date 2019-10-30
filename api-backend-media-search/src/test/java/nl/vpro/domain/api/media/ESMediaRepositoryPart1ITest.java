@@ -13,11 +13,11 @@ import javax.xml.bind.JAXB;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.junit.*;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.*;
@@ -29,6 +29,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.ApiRefsIndex;
+
 import static nl.vpro.domain.api.FacetOrder.VALUE_ASC;
 import static nl.vpro.domain.api.Match.MUST;
 import static nl.vpro.domain.api.StandardMatchType.REGEX;
@@ -60,7 +61,6 @@ import static org.junit.Assert.assertEquals;
  */
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Slf4j
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest {
 
     @Autowired
@@ -70,13 +70,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     protected void firstRun() {
         createIndicesIfNecessary();
     }
-    @Before
+    @BeforeEach
     public  void setup() {
         target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
         clearIndices();
     }
 
-    @Before
+    @BeforeEach
     public void before() {
 
     }
@@ -124,8 +124,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             assertThat(result.getSize()).isEqualTo(2);
             List<? extends SearchResultItem<? extends MediaObject>> items = result.getItems();
             assertThat(items.get(1).getScore()).isLessThanOrEqualTo(items.get(0).getScore());
-            Assert.assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foo")));
-            Assert.assertTrue(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foa")));
+            assertThat(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foo"))).isTrue();
+            assertThat(items.stream().anyMatch(item -> item.getResult().getMainTitle().equals("foa"))).isTrue();
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().text("FOO").build(), 0, null);
@@ -1535,18 +1535,18 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSortByLexicoForOwnerIllegalOwner() {
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            MediaForm form = new MediaForm();
+            form.addSortField(TitleSortOrder.builder()
+                .textualType(TextualType.LEXICO)
+                .ownerType(OwnerType.MIS)
+                .order(Order.ASC)
+                .build());
 
-        MediaForm form = new MediaForm();
-        form.addSortField(TitleSortOrder.builder()
-            .textualType(TextualType.LEXICO)
-            .ownerType(OwnerType.MIS)
-            .order(Order.ASC)
-            .build());
-
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
-
+            SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        });
 
     }
 
@@ -2082,7 +2082,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    @Ignore("Not yet implemented")
+    @Disabled("Not yet implemented")
     public void testFacetByGeoName() {
         indexWithGeoLocations();
 

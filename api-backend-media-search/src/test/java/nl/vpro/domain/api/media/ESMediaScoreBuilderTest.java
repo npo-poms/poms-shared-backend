@@ -20,7 +20,7 @@ import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 public class ESMediaScoreBuilderTest {
 
     @Test
-    public void testScore() throws Exception {
+    public void testScore() {
         QueryBuilder scored = ESMediaScoreBuilder.score(QueryBuilders.matchAllQuery(), LocalDateTime.of(2017, 9, 13, 15, 12).atZone(Schedule.ZONE_ID).toInstant());
 
         Jackson2TestUtil.assertThatJson(scored.toString()).isSimilarTo(
