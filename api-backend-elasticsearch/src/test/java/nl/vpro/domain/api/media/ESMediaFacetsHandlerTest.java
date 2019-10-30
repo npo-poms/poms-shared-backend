@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 public class ESMediaFacetsHandlerTest {
 
     @Test
-    public void testBuildRelationsFacets() throws Exception {
+    public void testBuildRelationsFacets() {
         MediaForm form = new MediaForm();
         MediaFacets facets = new MediaFacets();
         RelationFacetList list = new RelationFacetList();
@@ -18,7 +18,7 @@ public class ESMediaFacetsHandlerTest {
     }
 
     @Test
-    public void testAgeRatingFacet() throws Exception {
+    public void testAgeRatingFacet() {
         MediaForm form = new MediaForm();
         MediaFacets facets = new MediaFacets();
         facets.setAgeRatings(new MediaFacet());

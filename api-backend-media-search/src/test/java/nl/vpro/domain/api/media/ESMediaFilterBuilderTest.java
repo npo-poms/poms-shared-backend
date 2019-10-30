@@ -331,7 +331,7 @@ public class ESMediaFilterBuilderTest {
         );
     }
 
-    private String toString(QueryBuilder builder) throws IOException {
+    private String toString(QueryBuilder builder) {
         return builder.toString();
         // We did this in ES5:
         /*

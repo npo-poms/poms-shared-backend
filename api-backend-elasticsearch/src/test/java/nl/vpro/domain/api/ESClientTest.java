@@ -42,7 +42,7 @@ public class ESClientTest  {
     }
 
     @Test
-    public void nodeTest() throws UnknownHostException {
+    public void nodeTest() {
         Settings settings = Settings.builder()
             .put("path.home", "/tmp")
             .put("node.master", false)

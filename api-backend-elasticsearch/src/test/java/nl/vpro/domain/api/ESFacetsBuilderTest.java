@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ESFacetsBuilderTest {
 
     @Test
-    public void testEscapeFacetName() throws Exception {
+    public void testEscapeFacetName() {
         assertThat(ESFacetsBuilder.escape("Eerste componist")).isEqualTo("Eerste/componist");
     }
 /*

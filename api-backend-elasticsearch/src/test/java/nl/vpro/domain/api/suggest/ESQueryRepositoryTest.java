@@ -34,7 +34,7 @@ public class ESQueryRepositoryTest {
         );
     }
 
-    public void testAdapt(String input, String... suggestions) throws Exception {
+    public void testAdapt(String input, String... suggestions) {
         ESClientFactory factory = mock(ESClientFactory.class);
         ESQueryRepository instance = new ESQueryRepository(factory);
         org.elasticsearch.search.suggest.Suggest suggest = getSuggestResult(suggestions);

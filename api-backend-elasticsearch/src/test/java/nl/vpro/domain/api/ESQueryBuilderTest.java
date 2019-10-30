@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ESQueryBuilderTest {
 
     @Test
-    public void testFilterStopWords() throws Exception {
+    public void testFilterStopWords() {
         assertThat(ESQueryBuilder.filterStopWords("de vogels in de bomen")).isEqualTo("vogels bomen");
         assertThat(ESQueryBuilder.filterStopWords("de het een")).isEqualTo("de het een");
     }
