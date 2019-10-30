@@ -11,7 +11,7 @@ import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.ESQueryBuilder;
 import nl.vpro.domain.api.profile.ProfileDefinition;

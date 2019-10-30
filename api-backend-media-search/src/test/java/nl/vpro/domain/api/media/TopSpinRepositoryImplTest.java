@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 
 import nl.vpro.domain.api.topspin.Recommendations;

@@ -5,7 +5,7 @@
 package nl.vpro.domain.api.media;
 
 import org.elasticsearch.index.query.QueryBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.Match;
 

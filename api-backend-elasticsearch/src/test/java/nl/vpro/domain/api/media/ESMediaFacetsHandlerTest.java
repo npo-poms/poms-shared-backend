@@ -1,7 +1,7 @@
 package nl.vpro.domain.api.media;
 
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ESMediaFacetsHandlerTest {
 

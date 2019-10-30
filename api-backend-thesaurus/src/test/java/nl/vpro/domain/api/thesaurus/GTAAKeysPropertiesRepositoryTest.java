@@ -3,15 +3,17 @@ package nl.vpro.domain.api.thesaurus;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@RunWith(SpringRunner.class) //  implicitely uses GTAAKeysPropertiesRepositoryTest-context.xml ?
+
+@ExtendWith(SpringExtension.class) //  implicitely uses GTAAKeysPropertiesRepositoryTest-context.xml ?
 public class GTAAKeysPropertiesRepositoryTest {
 
     @Autowired
@@ -19,18 +21,20 @@ public class GTAAKeysPropertiesRepositoryTest {
 
     @Test
     public void testGetKeyFor1() throws IOException {
-        assertEquals("***REMOVED***", repo.getKeyFor("npo-functional-tests").get());
+        assertThat(repo.getKeyFor("npo-functional-tests").get()).isEqualTo("***REMOVED***");
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void testGetKeyFor2() throws IOException {
-        assertEquals("test", repo.getKeyFor("issuer").get());
+        assertThat(repo.getKeyFor("issuer").get()).isEqualTo("test");
     }
 
-    @Test (expected = NoSuchElementException.class)
+    @Test
     public void testGetKeyFor3() throws IOException {
-        assertEquals("test2", repo.getKeyFor("demo-user").get());
+        assertThatThrownBy(() -> {
+            repo.getKeyFor("demo-user").get();
+        }).isInstanceOf(NoSuchElementException.class);
     }
 
 }

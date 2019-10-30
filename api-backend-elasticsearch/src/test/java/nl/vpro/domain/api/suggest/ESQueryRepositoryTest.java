@@ -8,7 +8,7 @@ import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.suggest.SortBy;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.term.TermSuggestion;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.domain.api.Suggestion;

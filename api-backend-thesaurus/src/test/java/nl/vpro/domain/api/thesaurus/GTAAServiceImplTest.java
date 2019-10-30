@@ -10,23 +10,20 @@ import java.sql.Date;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import javax.crypto.SecretKey;
 
+import org.assertj.core.api.Assertions;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import nl.vpro.domain.gtaa.GTAANewPerson;
-import nl.vpro.domain.gtaa.GTAAPerson;
-import nl.vpro.domain.gtaa.GTAARepository;
+import nl.vpro.domain.gtaa.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,7 +36,7 @@ import static org.mockito.Mockito.when;
  * @author machiel
  * @since 5.4
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 @Slf4j
 public class GTAAServiceImplTest {
 
@@ -52,7 +49,7 @@ public class GTAAServiceImplTest {
     GTAAKeysRepository keysRepo;
 
     GTAAServiceImpl gtaaService;
-    @Before
+    @BeforeEach
     public void init() {
         gtaaService = new GTAAServiceImpl(gtaa, keysRepo);
     }
@@ -72,23 +69,29 @@ public class GTAAServiceImplTest {
         verify(gtaa).submit(any(GTAANewPerson.class), eq("demo-app"));
     }
 
-    @Test (expected = SecurityException.class)
+    @Test
     public void testSubmitPersonWithExpiredToken() throws IOException {
         when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of(SECRET_KEY));
-        GTAANewPerson newPerson = GTAANewPerson.builder()
-            .givenName("piet")
-            .familyName("hein")
-            .scopeNote("opmerking")
-            .build();
-        String jws = encrypt("demo-app", SECRET_KEY, "m.meeuwissen@vpro.nl", 13);
-        gtaaService.submitGTAAPerson(newPerson, jws);
-    }
 
-    @Test (expected = IllegalArgumentException.class)
+        Assertions.assertThatThrownBy(() -> {
+
+            GTAANewPerson newPerson = GTAANewPerson.builder()
+                .givenName("piet")
+                .familyName("hein")
+                .scopeNote("opmerking")
+                .build();
+            String jws = encrypt("demo-app", SECRET_KEY, "m.meeuwissen@vpro.nl", 13);
+            gtaaService.submitGTAAPerson(newPerson, jws);
+        }).isInstanceOf(SecurityException.class);
+    }
+    @Test
     public void testAddPersonWithoutIssuer() {
         GTAANewPerson newPerson = GTAANewPerson.builder().givenName("piet").familyName("hein").scopeNote("opmerking").build();
-        String jws = encrypt(null, SECRET_KEY, "user y", 13);
-        gtaaService.submitGTAAPerson(newPerson, jws);
+        Assertions.assertThatThrownBy(() -> {
+
+                String jws = encrypt(null, SECRET_KEY, "user y", 13);
+                gtaaService.submitGTAAPerson(newPerson, jws);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     /**

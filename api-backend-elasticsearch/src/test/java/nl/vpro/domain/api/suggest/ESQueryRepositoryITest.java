@@ -6,8 +6,8 @@ import java.time.Duration;
 
 import javax.inject.Inject;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
 import nl.vpro.domain.api.AbstractESRepositoryITest;
@@ -37,7 +37,7 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
     protected void firstRun() {
         createIndexIfNecessary(ApiQueryIndex.APIQUERIES);
     }
-    @Before
+    @BeforeEach
     public void init() {
         repository = new ESQueryRepository(factory);
         repository.setIndexName(indexNames.get(ApiQueryIndex.APIQUERIES));

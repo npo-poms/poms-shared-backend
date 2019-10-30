@@ -1,12 +1,10 @@
 package nl.vpro.domain.api;
 
+import org.junit.jupiter.api.Test;
+
 import nl.vpro.domain.media.MediaBuilder;
 import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.support.OwnerType;
-import nl.vpro.domain.media.support.Tag;
-import nl.vpro.domain.media.support.TextualType;
-import nl.vpro.domain.media.support.Title;
-import org.junit.Test;
+import nl.vpro.domain.media.support.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
