@@ -3,8 +3,7 @@ package nl.vpro.domain.api;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.ListenableActionFuture;
+import org.elasticsearch.action.*;
 
 public class ESUtils {
 
@@ -22,6 +21,13 @@ public class ESUtils {
             }
         });
         return cFuture;
+    }
+
+    public static <T> CompletableFuture<T> fromActionFuture(ActionFuture<T> future) {
+
+        CompletableFuture<T> cFuture = CompletableFuture.<T>supplyAsync(future::actionGet);
+        return cFuture;
+
     }
 
     public static String wildcard2regex(String wildcard) {

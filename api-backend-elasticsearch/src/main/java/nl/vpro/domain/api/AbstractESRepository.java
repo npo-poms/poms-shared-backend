@@ -14,7 +14,6 @@ import javax.validation.constraints.NotNull;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.get.*;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.Client;
@@ -191,9 +190,8 @@ public abstract class AbstractESRepository<T> {
         @NonNull String id,
         @NonNull Class<T> clazz,
         @NonNull String indexName) {
-        ListenableActionFuture<GetResponse> all = (ListenableActionFuture<GetResponse>) client().prepareGet(indexName, "_all", id).execute();
-
-        CompletableFuture<GetResponse> reponseFuture = ESUtils.fromListenableActionFuture(all);
+        ActionFuture<GetResponse> all = client().prepareGet(indexName, "_all", id).execute();
+        CompletableFuture<GetResponse> reponseFuture = ESUtils.fromActionFuture(all);
 
         return reponseFuture.thenApply(r -> transformResponse(r, clazz));
     }
