@@ -95,11 +95,18 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
             IndexResponse response = client()
                 .prepareIndex().setIndex(getIndexName()).setId(update.getId().toString())
                 .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(update), XContentType.JSON).get();
-            log.info("Indexed {} {}", update, response.getVersion());
+            if (response.status() == RestStatus.ACCEPTED) {
+                log.info("Indexed {} {}", update, response.getVersion());
+                return update;
+            } else {
+                log.warn("Error during update {} {}", update, response.status());
+                return null;
+            }
         } catch (JsonProcessingException e) {
-            log.error("Error saving notification {} {}", update, e.getMessage());
+            log.error("Error saving {}} {} {}", clazz.getSimpleName(), update, e.getMessage());
+            return null;
         }
-        return update;
+
     }
 
     public Optional<T> get(I id) {
