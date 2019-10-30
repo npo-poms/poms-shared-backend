@@ -82,10 +82,14 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
                 throw new RuntimeException(e);
             }
         }
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Set<ConstraintViolation<T>> result = factory.getValidator().validate(update);
-        if (result.size() > 0) {
-            throw  new ConstraintViolationException(result.toString(), result);
+        try {
+            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+            Set<ConstraintViolation<T>> result = factory.getValidator().validate(update);
+            if (result.size() > 0) {
+                throw  new ConstraintViolationException(result.toString(), result);
+            }
+        } catch (NoProviderFoundException npfe) {
+            log.warn("Could not validate because {}", npfe.getMessage());
         }
         try {
             IndexResponse response = client()
