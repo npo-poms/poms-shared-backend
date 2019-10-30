@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import nl.vpro.api.util.ApiMappings;

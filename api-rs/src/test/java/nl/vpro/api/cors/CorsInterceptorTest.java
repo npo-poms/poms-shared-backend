@@ -10,8 +10,9 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.jboss.resteasy.core.ResteasyContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.google.common.net.HttpHeaders;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.*;
 public class CorsInterceptorTest {
     private final CorsPolicy corsPolicy = mock(CorsPolicy.class);
 
-    @Before
+    @BeforeEach
     public void resetMocks() {
         reset(corsPolicy);
     }
@@ -53,7 +54,7 @@ public class CorsInterceptorTest {
     }
 
     @Test
-    public void testIEHack() throws Exception {
+    public void testIEHack() {
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
 
@@ -70,7 +71,7 @@ public class CorsInterceptorTest {
     }
 
     @Test
-    public void testIEHack2() throws Exception {
+    public void testIEHack2() {
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, new ArrayList<>(Collections.singletonList("text/plain")));
