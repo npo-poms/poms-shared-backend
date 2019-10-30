@@ -101,7 +101,6 @@ public abstract class AbstractESRepositoryITest {
         for (String name : indexNames.values()) {
             client.admin().indices().prepareDelete(name).execute().get();
         }
-        refresh();
         indexNames.clear();
         firstRun = true;
     }
