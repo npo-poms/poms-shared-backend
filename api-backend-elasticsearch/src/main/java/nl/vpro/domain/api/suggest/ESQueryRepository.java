@@ -26,7 +26,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.Redirector;
-import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.poms.es.ApiElasticSearchIndex;
 import nl.vpro.util.ThreadPools;

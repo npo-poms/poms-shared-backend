@@ -34,8 +34,8 @@ import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.MediaClassificationService;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
-import nl.vpro.elasticsearch.IndexHelper;
-import nl.vpro.elasticsearch.TransportClientFactory;
+import nl.vpro.elasticsearch7.IndexHelper;
+import nl.vpro.elasticsearch7.TransportClientFactory;
 import nl.vpro.poms.es.ApiElasticSearchIndex;
 
 import static org.mockito.ArgumentMatchers.any;

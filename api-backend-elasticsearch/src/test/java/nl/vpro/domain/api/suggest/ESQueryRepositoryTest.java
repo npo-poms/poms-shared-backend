@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.domain.api.Suggestion;
-import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch7.ESClientFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

@@ -6,7 +6,7 @@
                ">
 
 
-  <bean id="clientFactory" class="nl.vpro.elasticsearch.TransportClientFactory">
+  <bean id="clientFactory" class="nl.vpro.elasticsearch7.TransportClientFactory">
     <property name="transportAddresses">
       <list>
         <bean class="nl.vpro.util.UrlProvider">

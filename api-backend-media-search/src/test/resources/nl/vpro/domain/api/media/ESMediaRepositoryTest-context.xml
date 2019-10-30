@@ -25,7 +25,7 @@
   </bean>
 
   <bean class="org.mockito.Mockito" factory-method="mock" id="clientFactory">
-    <constructor-arg value="nl.vpro.elasticsearch.ESClientFactory"/>
+    <constructor-arg value="nl.vpro.elasticsearch7.ESClientFactory"/>
   </bean>
 
   <bean class="org.mockito.Mockito" factory-method="mock" id="couchDBMediaRepository">

@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.api.SuggestResult;
-import nl.vpro.elasticsearch.ESClientFactory;
+import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.es.ApiQueryIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;

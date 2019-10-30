@@ -32,8 +32,8 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.elasticsearch.ESClientFactory;
-import nl.vpro.elasticsearch.ElasticSearchIterator;
+import nl.vpro.elasticsearch7.ESClientFactory;
+import nl.vpro.elasticsearch7.ElasticSearchIterator;
 import nl.vpro.util.*;
 
 ;import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
