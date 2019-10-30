@@ -106,6 +106,14 @@ public abstract class AbstractESRepositoryITest {
         firstRun = true;
     }
 
+    public static String getIndexName() {
+        if (indexNames.size() == 1) {
+            return indexNames.values().iterator().next();
+        } else {
+            throw new IllegalStateException("Expected exactly one index, but found " + indexNames);
+        }
+    }
+
     protected static String createIndexIfNecessary(ApiElasticSearchIndex abstractIndex)  {
         return createIndexIfNecessary(abstractIndex, "test-" + abstractIndex.getIndexName() + "-" + NOW);
     }
