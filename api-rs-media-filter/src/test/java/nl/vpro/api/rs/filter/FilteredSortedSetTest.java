@@ -1,13 +1,10 @@
 package nl.vpro.api.rs.filter;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -19,7 +16,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  */
 public class FilteredSortedSetTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         // Not really needed for this, but otherwise...
         MediaPropertiesFilters.instrument();

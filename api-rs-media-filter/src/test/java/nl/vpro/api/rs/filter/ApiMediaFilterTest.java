@@ -4,16 +4,12 @@
  */
 package nl.vpro.api.rs.filter;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.time.LocalDateTime;
 
 import javax.xml.bind.JAXB;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.exceptions.ModificationException;
@@ -29,12 +25,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 public class ApiMediaFilterTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         MediaPropertiesFilters.instrument();
     }
 
-    @Before()
+    @BeforeEach
     public void setUp() {
         ApiMediaFilter.removeFilter();
     }
@@ -140,7 +136,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterAwards() throws ModificationException {
+    public void testFilterAwards() {
         Program program = MediaTestDataBuilder.program().awards("AWARD").build();
         assertThat(program.getAwards()).isNotNull();
 

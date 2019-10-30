@@ -2,7 +2,7 @@ package nl.vpro.api.rs.filter;
 
 import java.util.*;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.media.support.OwnerType;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
 public class FilteredSortedTitleSetTest {
 
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         MediaPropertiesFilters.instrument();
     }

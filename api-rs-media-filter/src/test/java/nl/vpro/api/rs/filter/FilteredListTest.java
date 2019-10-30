@@ -1,11 +1,8 @@
 package nl.vpro.api.rs.filter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
@@ -17,7 +14,7 @@ import static org.assertj.core.api.Java6Assertions.assertThat;
  */
 public class FilteredListTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         // Not really needed for this, but otherwise...
         MediaPropertiesFilters.instrument();
