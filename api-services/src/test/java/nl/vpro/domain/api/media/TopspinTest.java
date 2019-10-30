@@ -15,7 +15,7 @@ import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
