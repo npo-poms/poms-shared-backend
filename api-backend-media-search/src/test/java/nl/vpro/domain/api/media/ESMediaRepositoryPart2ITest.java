@@ -32,6 +32,7 @@ import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
+import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.data.Index.atIndex;
 import static org.mockito.Mockito.mock;
@@ -112,8 +113,11 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         createIndicesIfNecessary();
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
+        if (! indexNames.containsKey(APIMEDIA)) {
+            throw new IllegalStateException("Didn't create index " + APIMEDIA);
+        }
 
-        target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
+        target.setIndexName(indexNames.get(APIMEDIA));
 
         group = index(groupBuilder.published().build());
         group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid().build());
@@ -231,7 +235,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testGroupBy() {
 
-        SearchResponse response = client.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
+        SearchResponse response = client.prepareSearch(indexNames.get(APIMEDIA))
             .addAggregation(AggregationBuilders.terms("types")
                 .field("workflow")
                 .order(BucketOrder.key(true)))
@@ -810,7 +814,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryITest.client
             .index(
-                new IndexRequest(indexNames.get(ApiMediaIndex.APIMEDIA))
+                new IndexRequest(indexNames.get(APIMEDIA))
                     .id(object.getMid())
                     .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
             ).get();
