@@ -6,11 +6,7 @@ package nl.vpro.domain.api.media;
 
 import java.io.IOException;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.common.xcontent.XContentFactory;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.*;
 import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.ESQueryBuilder;
@@ -32,7 +28,18 @@ public class ESMediaFilterBuilderTest {
     public void testFilterProfileOnNullArgument() throws Exception {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo("{\n" +
-            "  \"match_all\" : {\n" +
+            "  \"bool\" : {\n" +
+            "    \"filter\" : [\n" +
+            "      {\n" +
+            "        \"term\" : {\n" +
+            "          \"workflow\" : {\n" +
+            "            \"value\" : \"PUBLISHED\",\n" +
+            "            \"boost\" : 1.0\n" +
+            "          }\n" +
+            "        }\n" +
+            "      }\n" +
+            "    ],\n" +
+            "    \"adjust_pure_negative\" : true,\n" +
             "    \"boost\" : 1.0\n" +
             "  }\n" +
             "}"
@@ -51,6 +58,14 @@ public class ESMediaFilterBuilderTest {
                 "    \"filter\" : [\n" +
                 "      {\n" +
                 "        \"term\" : {\n" +
+                "          \"workflow\" : {\n" +
+                "            \"value\" : \"PUBLISHED\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
                 "          \"broadcasters.id\" : {\n" +
                 "            \"value\" : \"vpro\",\n" +
                 "            \"boost\" : 1.0\n" +
@@ -58,7 +73,6 @@ public class ESMediaFilterBuilderTest {
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
                 "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
@@ -86,6 +100,14 @@ public class ESMediaFilterBuilderTest {
             "{\n" +
                 "  \"bool\" : {\n" +
                 "    \"filter\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"workflow\" : {\n" +
+                "            \"value\" : \"PUBLISHED\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
                 "      {\n" +
                 "        \"bool\" : {\n" +
                 "          \"must\" : [\n" +
@@ -115,7 +137,6 @@ public class ESMediaFilterBuilderTest {
                 "                    }\n" +
                 "                  }\n" +
                 "                ],\n" +
-                "                \"disable_coord\" : false,\n" +
                 "                \"adjust_pure_negative\" : true,\n" +
                 "                \"boost\" : 1.0\n" +
                 "              }\n" +
@@ -132,7 +153,6 @@ public class ESMediaFilterBuilderTest {
                 "                    }\n" +
                 "                  }\n" +
                 "                ],\n" +
-                "                \"disable_coord\" : false,\n" +
                 "                \"adjust_pure_negative\" : true,\n" +
                 "                \"boost\" : 1.0\n" +
                 "              }\n" +
@@ -144,13 +164,11 @@ public class ESMediaFilterBuilderTest {
                 "              }\n" +
                 "            }\n" +
                 "          ],\n" +
-                "          \"disable_coord\" : false,\n" +
                 "          \"adjust_pure_negative\" : true,\n" +
                 "          \"boost\" : 1.0\n" +
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
                 "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
@@ -163,7 +181,18 @@ public class ESMediaFilterBuilderTest {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
-                "  \"match_all\" : {\n" +
+                "  \"bool\" : {\n" +
+                "    \"filter\" : [\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"workflow\" : {\n" +
+                "            \"value\" : \"PUBLISHED\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
                 "}"
@@ -212,6 +241,14 @@ public class ESMediaFilterBuilderTest {
                 "    \"filter\" : [\n" +
                 "      {\n" +
                 "        \"term\" : {\n" +
+                "          \"workflow\" : {\n" +
+                "            \"value\" : \"PUBLISHED\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"term\" : {\n" +
                 "          \"broadcasters.id\" : {\n" +
                 "            \"value\" : \"Vpro\",\n" +
                 "            \"boost\" : 1.0\n" +
@@ -219,7 +256,6 @@ public class ESMediaFilterBuilderTest {
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
                 "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
@@ -250,6 +286,14 @@ public class ESMediaFilterBuilderTest {
                 "    ],\n" +
                 "    \"filter\" : [\n" +
                 "      {\n" +
+                "        \"term\" : {\n" +
+                "          \"workflow\" : {\n" +
+                "            \"value\" : \"PUBLISHED\",\n" +
+                "            \"boost\" : 1.0\n" +
+                "          }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
                 "        \"nested\" : {\n" +
                 "          \"query\" : {\n" +
                 "            \"bool\" : {\n" +
@@ -269,7 +313,6 @@ public class ESMediaFilterBuilderTest {
                 "                  }\n" +
                 "                }\n" +
                 "              ],\n" +
-                "              \"disable_coord\" : false,\n" +
                 "              \"adjust_pure_negative\" : true,\n" +
                 "              \"boost\" : 1.0\n" +
                 "            }\n" +
@@ -281,7 +324,6 @@ public class ESMediaFilterBuilderTest {
                 "        }\n" +
                 "      }\n" +
                 "    ],\n" +
-                "    \"disable_coord\" : false,\n" +
                 "    \"adjust_pure_negative\" : true,\n" +
                 "    \"boost\" : 1.0\n" +
                 "  }\n" +
@@ -289,13 +331,14 @@ public class ESMediaFilterBuilderTest {
         );
     }
 
-    /**
-     * In the current ES release the toString override on FilterBuilder is missing...
-     */
     private String toString(QueryBuilder builder) throws IOException {
+        return builder.toString();
+        // We did this in ES5:
+        /*
         XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
         xContentBuilder.prettyPrint();
         builder.toXContent(xContentBuilder, QueryBuilder.EMPTY_PARAMS);
         return xContentBuilder.toString();
+         */
     }
 }
