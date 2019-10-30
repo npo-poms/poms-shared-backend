@@ -6,14 +6,10 @@ package nl.vpro.api.rs.filter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,7 +18,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import nl.vpro.domain.media.*;
 
@@ -33,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 3.0
  */
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "classpath:/nl/vpro/api/rs/v3/filter/scheduleFilterTest-context.xml")
 public class ScheduleFilterTest {
 
@@ -41,7 +37,7 @@ public class ScheduleFilterTest {
     UserDetailsService userDetailsService;
 
     @SuppressWarnings("unchecked")
-    @Before
+    @BeforeEach
     public void init() {
         Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
         SecurityContext context = SecurityContextHolder.getContext();
@@ -49,7 +45,7 @@ public class ScheduleFilterTest {
     }
 
     @Test
-    @Ignore("See nl.vpro.api.rs.v3.filter.ScheduleEventViewSortedSetTest for how it's done.")
+    @Disabled("See nl.vpro.api.rs.v3.filter.ScheduleEventViewSortedSetTest for how it's done.")
     public void testFilter() {
         Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
         ScheduleEvent event = new ScheduleEvent(Channel.NED3, Instant.now().plus(Duration.ofDays(4)), Duration.ofMillis(1000));
