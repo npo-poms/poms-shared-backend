@@ -31,7 +31,7 @@ public class PageServiceImplTest {
     final PageServiceImpl impl = new PageServiceImpl(profileService, pageSearchRepository, querySearchRepository);
 
     @Test
-    public void testFind() throws Exception {
+    public void testFind() {
         when(profileService.getProfile("bla")).thenReturn(mock(Profile.class));
         impl.find(null, "bla", 0L, 10);
         verify(profileService).getProfile("bla");
@@ -39,7 +39,7 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void testLoad() throws Exception {
+    public void testLoad() {
         impl.load("1234");
         verify(pageSearchRepository).load("1234");
     }
