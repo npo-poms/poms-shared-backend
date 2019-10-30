@@ -3,9 +3,7 @@ package nl.vpro.domain.api.schedule;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.StringReader;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 import javax.xml.bind.JAXB;
@@ -20,10 +18,9 @@ import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.user.Broadcaster;
-import nl.vpro.es.ApiQueryIndex;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.media.domain.es.ApiMediaIndex;
 
+import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -34,13 +31,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Override
     protected void firstRun() {
-        createIndexIfNecessary(ApiMediaIndex.APIMEDIA);
+        createIndexIfNecessary(APIMEDIA);
     }
 
     @BeforeEach
     public void setup() {
         repository = new ESScheduleRepository(clientFactory, null);
-        repository.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
+        repository.setIndexName(indexNames.get(APIMEDIA));
         repository.setScore(false);
         clearIndices();
     }
@@ -374,27 +371,15 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         return LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(Schedule.ZONE_ID).toInstant();
     }
 
-    private void index(Program... ps) throws JsonProcessingException {
-        for (Program p : ps) {
-            index(p, "program");
-        }
-    }
 
-    private void index(Segment s) throws Exception {
-        index(s, "segment");
-    }
-
-    private void index(Group g) throws JsonProcessingException {
-        index(g, "group");
-    }
-
-    private void index(MediaObject o, String mediaType) throws JsonProcessingException {
-        client.prepareIndex()
-                .setIndex(indexNames.get(ApiQueryIndex.APIQUERIES))
-                .setType(mediaType)
+    private void index(MediaObject... os) throws JsonProcessingException {
+        for (MediaObject o : os) {
+            client.prepareIndex()
+                .setIndex(indexNames.get(APIMEDIA))
                 .setId(o.getMid())
                 .setSource(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(o), XContentType.JSON)
                 .get();
+        }
         refresh();
 
     }
