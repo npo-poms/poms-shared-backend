@@ -73,6 +73,10 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
         setIndexName(index, indexName);
     }
 
+    public String getPublishIndexName() {
+        return getIndexName();
+    }
+
 
     public T save(T update) {
         if (prePersist != null) {
@@ -93,7 +97,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
         }
         try {
             IndexResponse response = client()
-                .prepareIndex().setIndex(getIndexName()).setId(update.getId().toString())
+                .prepareIndex().setIndex(getPublishIndexName()).setId(update.getId().toString())
                 .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(update), XContentType.JSON).get();
             if (response.status() == RestStatus.ACCEPTED) {
                 log.info("Indexed {} {}", update, response.getVersion());
@@ -110,7 +114,10 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     }
 
     public Optional<T> get(I id) {
-        GetResponse response = client().prepareGet().setIndex(getIndexName()).setId(id.toString()).get();
+        GetResponse response = client().prepareGet()
+            .setIndex(getIndexName())
+            .setId(id.toString())
+            .get();
         if (response.isExists()) {
             return Optional.of(unMap(response.getSourceAsString()));
         }
@@ -121,7 +128,9 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     public boolean delete(I id) {
         DeleteResponse response =
             client()
-                .prepareDelete().setIndex(getIndexName()).setId(id.toString())
+                .prepareDelete()
+                .setIndex(getPublishIndexName())
+                .setId(id.toString())
                 .get();
         log.info("Deleted {} {} ({})", id, response.getVersion(), response.status());
         return response.status() != RestStatus.NOT_FOUND;
