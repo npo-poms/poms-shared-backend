@@ -232,8 +232,12 @@ public abstract class AbstractESRepository<T> {
                     }
                 } else {
                     if (response.getResponse().isExists()) {
-                        S item = Jackson2Mapper.INSTANCE.readValue(response.getResponse().getSourceAsString(), clazz);
-                        answerMap.put(response.getId(), item);
+                        try {
+                            S item = Jackson2Mapper.INSTANCE.readValue(response.getResponse().getSourceAsString(), clazz);
+                            answerMap.put(response.getId(), item);
+                        } catch (IllegalArgumentException iae) {
+                            log.warn(iae.getMessage());
+                        }
                     }
                 }
             }

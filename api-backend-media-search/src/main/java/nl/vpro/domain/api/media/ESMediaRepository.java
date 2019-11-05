@@ -372,8 +372,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
         BoolQueryBuilder must = QueryBuilders.boolQuery();
-        must.must(QueryBuilders.termQuery("objectType", objectType.name()));
-        must.must(QueryBuilders.termQuery("mediaRef", media.getMid()));
+        must.filter(QueryBuilders.termQuery("objectType", objectType.name()));
+        must.must(QueryBuilders.termQuery("midRef", media.getMid()));
         builder
             .setQuery(must)
             .addSort("index", SortOrder.valueOf(order.name()))
