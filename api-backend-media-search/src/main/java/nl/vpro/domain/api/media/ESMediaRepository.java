@@ -301,7 +301,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @NonNull Integer max) {
         SearchRequest request = client()
-            .prepareSearch(getRefsIndexName())
+            .prepareSearch(getIndexName())
             .addSort(MediaSortField.sortDate.name(), SortOrder.valueOf(order.name()))
             .setQuery(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
             .setFrom((int) offset)
