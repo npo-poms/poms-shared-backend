@@ -1336,20 +1336,24 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         );
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
 
-        assertEquals(5, ageRatings.size());
+        assertEquals(AgeRating.values().length, ageRatings.size());
 
         /* 3 x 6, 0 x 9, 2 * 12, 0 x 16, 1 * Alle Leeftijden */
-        assertEquals(3, ageRatings.get(0).getCount());
-        assertEquals(_6.getXmlValue(), ageRatings.get(0).getId());
-        assertEquals(0, ageRatings.get(1).getCount());
-        assertEquals(_9.getXmlValue(), ageRatings.get(1).getId());
-        assertEquals(2, ageRatings.get(2).getCount());
-        assertEquals(_12.getXmlValue(), ageRatings.get(2).getId());
-        assertEquals(0, ageRatings.get(3).getCount());
-        assertEquals(_16.getXmlValue(), ageRatings.get(3).getId());
-        assertEquals(1, ageRatings.get(4).getCount());
-        assertEquals(ALL.getXmlValue(), ageRatings.get(4).getId());
-        assertEquals(ALL.getDisplayName(), ageRatings.get(4).getValue());
+        assertEquals(3, ageRatings.get(_6.ordinal()).getCount());
+        assertEquals(_6.getXmlValue(), ageRatings.get(_6.ordinal()).getId());
+
+        assertEquals(0, ageRatings.get(_9.ordinal()).getCount());
+        assertEquals(_9.getXmlValue(), ageRatings.get(_9.ordinal()).getId());
+
+        assertEquals(2, ageRatings.get(_12.ordinal()).getCount());
+        assertEquals(_12.getXmlValue(), ageRatings.get(_12.ordinal()).getId());
+
+        assertEquals(0, ageRatings.get(_16.ordinal()).getCount());
+        assertEquals(_16.getXmlValue(), ageRatings.get(_16.ordinal()).getId());
+
+
+        assertEquals(ALL.getXmlValue(), ageRatings.get(ALL.ordinal()).getId());
+        assertEquals(ALL.getDisplayName(), ageRatings.get(ALL.ordinal()).getValue());
 
         {
             MediaSearchResult result1 = target.find(null, form().ageRating(_16).ageRatingFacet().build(), 0, null);
