@@ -235,15 +235,33 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testGroupBy() {
 
         SearchResponse response = client.prepareSearch(indexNames.get(APIMEDIA))
-            .addAggregation(AggregationBuilders.terms("types")
+            .addAggregation(AggregationBuilders.terms("workflows")
                 .field("workflow")
+                .order(BucketOrder.key(true)))
+            .addAggregation(AggregationBuilders.terms("objectTypes")
+                .field("objectType")
+                .order(BucketOrder.key(true)))
+            .addAggregation(AggregationBuilders.terms("types")
+                .field("type")
                 .order(BucketOrder.key(true)))
             .setSize(0)
             .get();
 
-        Terms a = response.getAggregations().get("types");
-        String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
-        assertThat(result).isEqualTo("deletedgroup:1,deletedprogram:2,group:14,program:19");
+        {
+            Terms a = response.getAggregations().get("workflows");
+            String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
+            assertThat(result).isEqualTo("DELETED:1,MERGED:1,PUBLISHED:33,REVOKED:1");
+        }
+        {
+            Terms a = response.getAggregations().get("objectTypes");
+            String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
+            assertThat(result).isEqualTo("group:15,program:21");
+        }
+        {
+            Terms a = response.getAggregations().get("types");
+            String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
+            assertThat(result).isEqualTo("BROADCAST:19,CLIP:2,COLLECTION:1,PLAYLIST:10,SERIES:3");
+        }
     }
 
     @Test
@@ -773,10 +791,15 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             .getFacets()
             .getBroadcasters();
         assertThat(broadcasters).isNotNull();
+
+        // TODO: FAILS, but I think this can be consider a test error.
+        // Changing the test will however main that something will be backwards imcompatible, we
+        // need to a separate make issue for this at least.
+        // Leave this failing until this is sorted out!
+        assertThat(broadcasters).hasSize(5);
         long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
         // 3 with BNN + 3 with AVRO + 1 with OMROEP0, 1 with OMROEP2, 0 with OMROEP1, total 9.
         assertThat(totalBroadcasterCount).isEqualTo(9);
-        assertThat(broadcasters).hasSize(5);
 
         assertThat(broadcasters.get(0).getId()).isEqualTo("AVRO");
         assertThat(broadcasters.get(0).getCount()).isEqualTo(3);
