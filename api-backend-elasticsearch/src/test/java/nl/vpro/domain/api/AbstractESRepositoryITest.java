@@ -3,18 +3,14 @@ package nl.vpro.domain.api;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.Supplier;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
 import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
@@ -146,33 +142,7 @@ public abstract class AbstractESRepositoryITest {
     }
 
 
-    public static Supplier<String> sourceSupplier(String name) {
-        return () -> {
-            try {
-                StringWriter writer = new StringWriter();
-                InputStream inputStream = AbstractESRepositoryITest.class.getClassLoader().getResourceAsStream(name);
-                if (inputStream == null) {
-                    throw new IllegalStateException("Could not find " + name);
-                }
-                IOUtils.copy(inputStream, writer, StandardCharsets.UTF_8);
-                return writer.toString();
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-        };
-    }
 
-
-    public static Map<String, Supplier<String>> mappingSupplier(String... name) {
-        Map<String, Supplier<String>> result  = new HashMap<>();
-        for (String n :name) {
-            String key = new File(n).getName();
-            int lastIndexOfDot = key.lastIndexOf(".");
-            key = key.substring(0, lastIndexOfDot);
-            result.put(key, sourceSupplier(n));
-        }
-        return result;
-    }
 
 
     protected static void clearIndices() {
