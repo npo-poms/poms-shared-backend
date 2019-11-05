@@ -18,6 +18,7 @@ import javax.persistence.PrePersist;
 import javax.validation.*;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexResponse;
@@ -98,14 +99,13 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
         try {
             IndexResponse response = client()
                 .prepareIndex().setIndex(getPublishIndexName()).setId(update.getId().toString())
-                .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(update), XContentType.JSON).get();
-            if (response.status() == RestStatus.ACCEPTED) {
-                log.info("Indexed {} {}", update, response.getVersion());
-                return update;
-            } else {
-                log.warn("Error during update {} {}", update, response.status());
-                return null;
-            }
+                .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(update), XContentType.JSON)
+                .get();
+            log.info("Indexed {} {}", update, response.getVersion());
+            return update;
+        } catch (ElasticsearchException e) {
+            log.warn("Error during update {} {}", update, e.getDetailedMessage());
+            return null;
         } catch (JsonProcessingException e) {
             log.error("Error saving {}} {} {}", clazz.getSimpleName(), update, e.getMessage());
             return null;
