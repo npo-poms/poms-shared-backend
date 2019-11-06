@@ -30,9 +30,9 @@ import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.MediaClassificationService;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
+import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.IndexHelper;
 import nl.vpro.elasticsearch7.TransportClientFactory;
-import nl.vpro.poms.es.ApiElasticSearchIndex;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
 public abstract class AbstractESRepositoryITest {
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
-    protected static final  Map<ApiElasticSearchIndex, String> indexNames = new HashMap<>();
+    protected static final  Map<ElasticSearchIndex, String> indexNames = new HashMap<>();
     protected static boolean firstRun = true;
 
     protected static Client client;
@@ -109,23 +109,18 @@ public abstract class AbstractESRepositoryITest {
         }
     }
 
-    protected static String createIndexIfNecessary(ApiElasticSearchIndex abstractIndex)  {
+    protected static String createIndexIfNecessary(ElasticSearchIndex abstractIndex)  {
         return createIndexIfNecessary(abstractIndex, "test-" + abstractIndex.getIndexName() + "-" + NOW);
     }
 
-    protected static String createIndexIfNecessary(ApiElasticSearchIndex abstractIndex, String indexName)  {
+    protected static String createIndexIfNecessary(ElasticSearchIndex abstractIndex, String indexName)  {
         if (! indexNames.containsKey(abstractIndex)) {
             try {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                IndexHelper
-                    .builder()
-                    .log(log)
-                    .client((s) -> client)
+                IndexHelper.of(log, (s) -> client, abstractIndex)
                     .indexName(indexName)
-                    .settings(abstractIndex.settings())
-                    .mappings(abstractIndex.mappingsAsMap())
                     .build()
                     .createIndex();
                 indexNames.put(abstractIndex, indexName);

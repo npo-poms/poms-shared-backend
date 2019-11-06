@@ -29,9 +29,9 @@ import org.springframework.stereotype.Repository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.Identifiable;
+import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.poms.es.ApiElasticSearchIndex;
 
 /**
  * A repository that talks to exactly one type in exaclty one index
@@ -42,14 +42,14 @@ import nl.vpro.poms.es.ApiElasticSearchIndex;
 public class SimpleESRepository<T extends Identifiable<I>, I extends Serializable> extends AbstractESRepository<T> {
 
     @Getter
-    private final ApiElasticSearchIndex index;
+    private final ElasticSearchIndex index;
 
     private final Class<T> clazz;
 
     private Method prePersist;
 
     @Inject
-    public SimpleESRepository(ESClientFactory factory, Class<T> clazz, ApiElasticSearchIndex apiElasticSearchIndex) {
+    public SimpleESRepository(ESClientFactory factory, Class<T> clazz, ElasticSearchIndex apiElasticSearchIndex) {
         super(factory);
         this.setIndexName(apiElasticSearchIndex, apiElasticSearchIndex.getIndexName());
         this.index = apiElasticSearchIndex;
@@ -62,7 +62,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     }
 
     @Override
-    protected ApiElasticSearchIndex getIndex(String id, Class clazz) {
+    protected ElasticSearchIndex getIndex(String id, Class clazz) {
         return index;
     }
 

@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
-import nl.vpro.poms.es.ApiElasticSearchIndex;
+import nl.vpro.elasticsearch.ElasticSearchIndex;
 
 import static nl.vpro.i18n.Locales.score;
 
@@ -14,7 +14,7 @@ import static nl.vpro.i18n.Locales.score;
  * @since 4.8
  */
 @Slf4j
-public abstract class ApiCueIndex extends ApiElasticSearchIndex {
+public abstract class ApiCueIndex extends ElasticSearchIndex {
 
     protected static List<ApiCueIndex> instances = new ArrayList<>();
 

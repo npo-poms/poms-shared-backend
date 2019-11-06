@@ -34,8 +34,8 @@
   </build>
   <dependencies>
     <dependency>
-      <groupId>nl.vpro.poms</groupId>
-      <artifactId>es-mappings</artifactId>
+      <groupId>nl.vpro.shared</groupId>
+      <artifactId>vpro-shared-elasticsearch</artifactId>
     </dependency>
   </dependencies>
 </project>

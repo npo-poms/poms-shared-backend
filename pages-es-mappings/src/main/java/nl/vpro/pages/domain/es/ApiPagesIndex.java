@@ -1,12 +1,13 @@
 package nl.vpro.pages.domain.es;
 
-import nl.vpro.poms.es.ApiElasticSearchIndex;
+
+import nl.vpro.elasticsearch.ElasticSearchIndex;
 
 /**
  * @author Michiel Meeuwissen
  * @since 4.7
  */
-public class ApiPagesIndex extends ApiElasticSearchIndex {
+public class ApiPagesIndex extends ElasticSearchIndex {
 
     public static final String NAME = "apipages";
 

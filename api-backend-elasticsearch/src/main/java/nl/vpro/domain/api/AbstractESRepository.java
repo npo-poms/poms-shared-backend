@@ -36,9 +36,9 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.vpro.domain.api.media.Redirector;
+import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.poms.es.ApiElasticSearchIndex;
 import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
 
@@ -65,7 +65,7 @@ public abstract class AbstractESRepository<T> {
     protected Duration timeOut = Duration.ofSeconds(15);
 
     @Getter
-    protected Map<ApiElasticSearchIndex, String> indexNames = new HashMap<>();
+    protected Map<ElasticSearchIndex, String> indexNames = new HashMap<>();
 
     @Getter
     @Setter
@@ -80,7 +80,7 @@ public abstract class AbstractESRepository<T> {
         }
     }
 
-    public void setIndexName(ApiElasticSearchIndex index, @NonNull String indexName) {
+    public void setIndexName(ElasticSearchIndex index, @NonNull String indexName) {
         indexNames.put(index, indexName);
     }
 
@@ -142,10 +142,10 @@ public abstract class AbstractESRepository<T> {
         return factory.client(getClass());
     }
 
-    protected abstract ApiElasticSearchIndex getIndex(String id, Class<?> clazz);
+    protected abstract ElasticSearchIndex getIndex(String id, Class<?> clazz);
 
     protected String getIndexName(String id, Class<?> clazz) {
-        ApiElasticSearchIndex index = getIndex(id, clazz);
+        ElasticSearchIndex index = getIndex(id, clazz);
         String indexName = indexNames.get(index);
         return indexName;
     }

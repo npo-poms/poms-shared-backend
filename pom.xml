@@ -31,8 +31,6 @@
     <module>api-backend-elasticsearch</module>
     <module>api-backend-media-search</module>
     <module>api-backend-thesaurus</module>
-
-    <module>es-mappings</module>
     <module>media-es-mappings</module>
     <module>pages-es-mappings</module>
     <module>query-es-mappings</module>
