@@ -29,10 +29,10 @@ import org.springframework.beans.factory.annotation.Value;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.elasticsearch7.IndexHelper;
 import nl.vpro.media.domain.es.ApiRefsIndex;
-import nl.vpro.poms.es.ApiElasticSearchIndex;
 import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
@@ -104,7 +104,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
     @Override
-    protected  ApiElasticSearchIndex getIndex(String id, Class<?> clazz) {
+    protected ElasticSearchIndex getIndex(String id, Class<?> clazz) {
         if (MediaObject.class.isAssignableFrom(clazz)) {
             return APIMEDIA;
         } else {

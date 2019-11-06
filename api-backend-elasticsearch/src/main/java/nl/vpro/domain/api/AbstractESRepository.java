@@ -233,7 +233,7 @@ public abstract class AbstractESRepository<T> {
                 } else {
                     if (response.getResponse().isExists()) {
                         try {
-                            S item = Jackson2Mapper.INSTANCE.readValue(response.getResponse().getSourceAsString(), clazz);
+                            S item = Jackson2Mapper.LENIENT.readValue(response.getResponse().getSourceAsString(), clazz);
                             answerMap.put(response.getId(), item);
                         } catch (IllegalArgumentException iae) {
                             log.warn(iae.getMessage());
