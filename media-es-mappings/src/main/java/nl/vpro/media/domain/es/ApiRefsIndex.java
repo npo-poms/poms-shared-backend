@@ -13,7 +13,7 @@ public class ApiRefsIndex extends ElasticSearchIndex {
     public static final ApiRefsIndex APIMEDIA_REFS = new ApiRefsIndex();
 
     private ApiRefsIndex() {
-        super(NAME, "/es7/mapping/ref.json");
+        super(NAME, "/es7/mapping/ref.json", NAME + "-publish");
     }
 
 }

@@ -14,7 +14,7 @@ public class ApiPagesIndex extends ElasticSearchIndex {
     public static final ApiPagesIndex APIPAGES = new ApiPagesIndex();
 
     protected ApiPagesIndex() {
-        super(NAME,  "/es7/mapping/page.json");
+        super(NAME,  "/es7/mapping/page.json", NAME + "-publish");
     }
 
 }

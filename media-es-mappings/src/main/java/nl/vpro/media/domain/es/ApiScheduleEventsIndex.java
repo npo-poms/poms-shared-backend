@@ -12,7 +12,7 @@ public class ApiScheduleEventsIndex extends ElasticSearchIndex {
     public static final ApiScheduleEventsIndex APISCHEDULEEVENTS = new ApiScheduleEventsIndex();
 
     private ApiScheduleEventsIndex() {
-        super(NAME,  "/es7/mapping/scheduleevent.json");
+        super(NAME,  "/es7/mapping/scheduleevent.json", NAME + "-publish");
     }
 
 

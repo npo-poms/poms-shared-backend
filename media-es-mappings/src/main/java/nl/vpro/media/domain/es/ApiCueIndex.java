@@ -26,15 +26,12 @@ public abstract class ApiCueIndex extends ElasticSearchIndex {
     private final Locale locale;
 
 
-    protected ApiCueIndex(String name, Locale locale) {
-        super(name,  "/es7/mapping/cue.json");
+    protected ApiCueIndex(String baseName, Locale locale) {
+        super(baseName + "_" + locale.toLanguageTag(),  "/es7/setting/" + baseName+ ".json", "/es7/mapping/cue.json", Arrays.asList(baseName + "_" + locale.toLanguageTag() + "-publish"));
         this.locale = locale;
     }
 
 
-    public String getIndexName(String baseName) {
-        return baseName + "_" + locale.toLanguageTag();
-    }
 
     public static Optional<ApiCueIndex> forLanguage(Locale locale) {
         ApiCueIndex result = null;

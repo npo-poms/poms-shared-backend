@@ -13,7 +13,7 @@ public class ApiMediaIndex extends ElasticSearchIndex {
     public static final ApiMediaIndex APIMEDIA = new ApiMediaIndex();
 
     private ApiMediaIndex() {
-        super(NAME,  "/es7/mapping/apimedia.json");
+        super(NAME,  "/es7/mapping/apimedia.json", NAME + "-publish");
     }
 
 }
