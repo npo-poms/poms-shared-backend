@@ -76,11 +76,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         clearIndices();
     }
 
-    @BeforeEach
-    public void before() {
-
-    }
-
 
 
     @Test
@@ -1041,7 +1036,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     public void testListMembers() {
 
         Group group = index(group().mid("MID_0"));
-        index(program().mid("MID_1").memberOf(group, 0).memberOf(group, 2));
+        index(program().mid("MID_1")
+            .memberOf(group, 0)
+            .memberOf(group, 2)
+        );
         index(program().mid("MID_2").memberOf(group, 1));
 
         MediaResult result = target.listMembers(group, null, Order.ASC, 0L, 10);
@@ -1178,12 +1176,26 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         );
 
         Group group = index(season().mid("MID_0"));
-        index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf("MID_0", 2).broadcasters("BNN"));
-        index(broadcast().mid("MID_2").episodeOf(group, 1));
-        index(broadcast().mid("MID_3").episodeOf(group, 3).broadcasters("BNN"));
+        index(broadcast().mid("MID_1")
+            .episodeOf(group, 0)
+            .episodeOf("MID_0", 2)
+            .broadcasters("BNN")
+        );
+        index(broadcast().mid("MID_2")
+            .episodeOf(group, 1)
+        );
+        index(broadcast().mid("MID_3")
+            .episodeOf(group, 3)
+            .broadcasters("BNN")
+        );
+
+        // group MID_0 contains episodes:
+        // MID_1,MID_2,MID_1,MID_3
+        // only MID_1 and MID3 are of BNN
 
         ProgramResult result = target.listEpisodes(group, omroepProfile, Order.ASC, 1L, 10);
 
+        // so the list of offset 1 = MID_2, MID_1, MID3, but MID_2 is not on the profile. Hence the result should look like this:
         assertThat(result).hasSize(2);
         assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
         assertThat(result.getItems().get(1).getMid()).isEqualTo("MID_3");
@@ -2158,6 +2170,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
             String indexName = indexNames.get(ApiRefsIndex.APIMEDIA_REFS);
+            assertThat(object.getMidRef()).isNotEmpty();
             IndexResponse indexResponse = client.index(
                 new IndexRequest(indexName)
                     .id(ref.getId())
