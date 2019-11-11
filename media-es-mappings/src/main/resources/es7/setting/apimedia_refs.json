@@ -1,10 +1,14 @@
 {
 
-  "mapper": {
+  "index": {
+    "number_of_shards" : 6,
+    "number_of_replicas" : 1,
+    "mapper": {
 
-  },
-  "analysis": {
+    },
+    "analysis": {
 
+    }
   }
 }
 
