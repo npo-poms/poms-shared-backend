@@ -24,6 +24,9 @@
     "identifier": {
       "type": "keyword"
     },
+    "settings": {
+      "type": "keyword"
+    },
     "start": {
       "type": "long"
     },
