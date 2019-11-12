@@ -12,6 +12,6 @@ public class ApiCueIndexAR extends ApiCueIndex {
         instances.add(INSTANCE);
     }
     private ApiCueIndexAR() {
-        super("subtitles_ar", Locales.ARABIC);
+        super(Locales.ARABIC);
     }
 }

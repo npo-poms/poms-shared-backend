@@ -1,0 +1,22 @@
+
+{
+  "index" : {
+    "number_of_shards" : 1,
+    "number_of_replicas" : 1,
+    "analysis": {
+      "filter": {
+
+      },
+      "analyzer": {
+        "rebuilt_english": {
+          "tokenizer":  "standard",
+          "filter": [
+            "lowercase"
+          ]
+        }
+      }
+    }
+  }
+}
+
+

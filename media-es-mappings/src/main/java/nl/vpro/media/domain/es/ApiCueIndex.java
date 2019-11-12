@@ -19,15 +19,19 @@ public abstract class ApiCueIndex extends ElasticSearchIndex {
     protected static List<ApiCueIndex> instances = new ArrayList<>();
 
     public static List<ApiCueIndex> getInstances() {
-        log.debug("Loading classes {}, {}, {}", ApiCueIndexNL.INSTANCE, ApiCueIndexAR.INSTANCE, ApiCueIndexEN.INSTANCE);
+        log.debug("Loading classes {}, {}, {}, {}", ApiCueIndexNL.INSTANCE, ApiCueIndexAR.INSTANCE, ApiCueIndexEN.INSTANCE, ApiCueIndexUnd.INSTANCE);
         return Collections.unmodifiableList(instances);
     }
     @lombok.Getter
     private final Locale locale;
 
 
-    protected ApiCueIndex(String baseName, Locale locale) {
-        super(baseName + "_" + locale.toLanguageTag(),  "/es7/setting/" + baseName+ ".json", "/es7/mapping/cue.json", Arrays.asList(baseName + "_" + locale.toLanguageTag() + "-publish"));
+    protected ApiCueIndex(Locale locale) {
+        super("subtitles_" + locale.toLanguageTag(),
+            "/es7/setting/subtitles_" + locale.toLanguageTag() + ".json",
+            "/es7/mapping/cue.json",
+            Arrays.asList("subtitles_" + locale.toLanguageTag() + "-publish")
+        );
         this.locale = locale;
     }
 

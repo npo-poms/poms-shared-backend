@@ -33,9 +33,9 @@
   <dependencies>
     <dependency>
       <groupId>nl.vpro.shared</groupId>
-      <artifactId>vpro-shared-elasticsearch7</artifactId>
+      <artifactId>vpro-shared-elasticsearch</artifactId>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
     </dependency>

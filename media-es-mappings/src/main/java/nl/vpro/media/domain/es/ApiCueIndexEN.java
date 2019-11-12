@@ -13,6 +13,6 @@ public class ApiCueIndexEN extends ApiCueIndex {
         instances.add(INSTANCE);
     }
     private ApiCueIndexEN() {
-        super("subtitles_en", Locale.ENGLISH);
+        super(Locale.ENGLISH);
     }
 }
