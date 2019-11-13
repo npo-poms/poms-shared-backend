@@ -34,6 +34,8 @@
     <module>media-es-mappings</module>
     <module>pages-es-mappings</module>
     <module>query-es-mappings</module>
+    <module>push-es-mappings</module>
+
 
   </modules>
 
