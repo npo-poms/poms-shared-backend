@@ -54,9 +54,9 @@ echo
  }
 
 
-reindex "pageupdates"
-reindex "pages"
-reindex "apiqueries"
+reindex "pageupdates-publish"
+#reindex "apipages"
+#reindex "apiqueries"
 
 #reindex "service"
 #reindexComplex "3voor12" "3voor12-update" "3voor12_updates" '{ "match_all": {}}'

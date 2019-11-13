@@ -14,7 +14,7 @@ public class ApiPageUpdatesIndex extends ElasticSearchIndex {
      public static final ApiPageUpdatesIndex PAGEUPDATES = new ApiPageUpdatesIndex();
 
     protected ApiPageUpdatesIndex() {
-        super(NAME,  "/es7/mapping/pageupdate.json");
+        super(NAME,  "/es7/mapping/pageupdate.json", "pageupdates-publish");
     }
 
 }
