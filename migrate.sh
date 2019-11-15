@@ -126,7 +126,6 @@ function reindexRefs {
      source: $script
   }
 }')
-   echo $command
    post "$command"
 }
 
