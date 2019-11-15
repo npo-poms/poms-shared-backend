@@ -3,6 +3,7 @@ package nl.vpro.npopublisher.pushesmappings;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
@@ -36,6 +37,7 @@ public class PushMappings {
             factory.setClusterName(argv[1]);
             log.info("Cluster name {}", argv[1]);
         }
+        Pattern only = Pattern.compile("apimedia.*");
         try {
 
             List<ElasticSearchIndex> desired = new ArrayList<>(Arrays.asList(
@@ -49,6 +51,9 @@ public class PushMappings {
             desired.addAll(ApiCueIndex.getInstances());
 
             for (ElasticSearchIndex elasticSearchIndex : desired) {
+                if (! only.matcher(elasticSearchIndex.getIndexName()).matches()) {
+                    break;
+                }
                 try {
                     IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
                     if (!helper.createIndexIfNotExists(CreateIndex.builder()
