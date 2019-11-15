@@ -2,7 +2,8 @@
 
 source="http://pomz11aas:9200"
 dest="localhost:9215"
-while getopts ":s:d:" opt; do
+only=".*"
+while getopts ":s:d:o:" opt; do
   case ${opt} in
     s )
       source=$OPTARG
@@ -11,13 +12,24 @@ while getopts ":s:d:" opt; do
     d )
       dest=$OPTARG
       ;;
-    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>]"
+    o )
+      only="^$OPTARG\$"
+      ;;
+    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>]"
       exit
       ;;
    esac
 done
-#set -x
+
+function post {
+   echo $dest $1
+   curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
+}
+
+
 function reindex {
+   [[ "$1" =~ $only ]] || return
+
     command=$( jq -n \
                   --arg index "$1" \
                   --arg source "$source" \
@@ -33,14 +45,12 @@ function reindex {
     type: "_doc"
   }
 }')
-
-echo $dest $command
-curl -X POST "$dest/_reindex?wait_for_completion=false" -H 'Content-Type: application/json' -d"$command"
-echo
-  }
+   post "$command"
+}
 
 function reindexType {
-  command=$( jq  -n -R \
+   [[ "$1" =~ $only ]] || [[ "$2" =~ $only ]] || return
+   command=$( jq  -n -R \
                   --arg index "$1" \
                   --arg source "$source" \
                   --arg sourceType "$2" \
@@ -60,26 +70,80 @@ function reindexType {
     type: "_doc"
   }
 }')
-
-echo $dest $command
-curl -X POST "$dest/_reindex?wait_for_completion=false" -H 'Content-Type: application/json' -d"$command"
-echo
- }
+  post "$command"
+}
 
 
-#reindex "pageupdates-publish"
-#reindex "apipages"
-#reindex "apiqueries"
-#reindexType "apimedia" "program" "apimedia"
-#reindexType "apimedia" "group" "apimedia"
-#reindexType "apimedia" "segment" "apimedia"
+function reindexCues {
+   [[ "$1" =~ $only ]] || return
+   command=$( jq  -n -R \
+                  --arg source "$source" \
+                  --arg language "$1" \
+                  --arg destIndex "subtitles_$1" \
+                  '
+ { source: {
+    remote: {
+      host: $source
+    },
+    index: "apimedia",
+    type: "cue",
+    query: { term: { language: { value: $language }}},
+    size: 100
+
+  },
+  dest: {
+    index: $destIndex,
+    type: "_doc"
+  }
+}')
+  post "$command"
+
+}
+
+function reindexRefs {
+   [[ "$1" =~ $only ]] || return
+
+   script="ctx._source.objectType = '$2'"
+   command=$( jq  -n -R \
+                  --arg refType "$1" \
+                  --arg source "$source" \
+                  --arg script "$script" \
+                  '
+ { source: {
+    remote: {
+      host: $source
+    },
+    index: "apimedia",
+    type: $refType,
+    size: 100
+
+  },
+  dest: {
+    index: "apimedia_refs",
+    type: "_doc"
+  },
+  script: {
+     source: $script
+  }
+}')
+   echo $command
+   post "$command"
+}
+
+
+reindex "pageupdates-publish"
+reindex "apipages"
+reindex "apiqueries"
+reindexType "apimedia" "program" "apimedia"
+reindexType "apimedia" "group" "apimedia"
+reindexType "apimedia" "segment" "apimedia"
 reindexType "apimedia" "deletedprogram" "apimedia"
-#reindexType "apimedia" "deletedgroup" "apimedia"
-#reindexType "apimedia" "deletedsegment" "apimedia"
-#reindex "service"
-#reindexComplex "3voor12" "3voor12-update" "3voor12_updates" '{ "match_all": {}}'
-#reindexComplex "3voor12" "3voor12-suggest" "3voor12_suggestions" '{ "match_all": {}}'
-#reindex "cinema"
-#reindexComplex "media" "program" "apimedia" '{ "range": { "scheduleEvents.start": { "gte": "1561935600000" }}}'
-
-
+reindexType "apimedia" "deletedgroup" "apimedia"
+reindexType "apimedia" "deletedsegment" "apimedia"
+reindexCues "ar"
+reindexCues "nl"
+reindexCues "en"
+reindexRefs "episodeRef" "episodeRef"
+reindexRefs "programMemberRef" "memberRef"
+reindexRefs "groupMemberRef" "memberRef"
+reindexRefs "segmentMemberRef" "memberRef"

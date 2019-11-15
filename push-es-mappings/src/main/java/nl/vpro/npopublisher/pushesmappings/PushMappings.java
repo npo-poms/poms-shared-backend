@@ -31,13 +31,14 @@ public class PushMappings {
         if (argv.length > 0) {
             factory.setUnicastHosts(argv[0]);
         } else {
-            factory.setUnicastHosts("http://localhost:9200");
+            factory.setUnicastHosts("http://localhost:9215");
         }
         if (argv.length > 1) {
             factory.setClusterName(argv[1]);
             log.info("Cluster name {}", argv[1]);
         }
-        Pattern only = Pattern.compile("apimedia.*");
+        //Pattern only = Pattern.compile("apimedia.*");
+        Pattern only = Pattern.compile("^apimedia.*$");
         try {
 
             List<ElasticSearchIndex> desired = new ArrayList<>(Arrays.asList(
@@ -62,7 +63,7 @@ public class PushMappings {
                         .build())
                     ) {
                         log.info("{} : {}", elasticSearchIndex, helper.count());
-                        helper.reputSettings();
+                        helper.reputSettings(false);
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
