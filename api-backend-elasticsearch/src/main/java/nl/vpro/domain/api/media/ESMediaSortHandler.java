@@ -153,7 +153,12 @@ public class ESMediaSortHandler extends ESFacetsHandler {
         }
 
         // add last resort
-        consumer.accept(SortBuilders.scoreSort());
+        if (form != null && form.hasSearches()) {
+            // score
+            consumer.accept(SortBuilders.scoreSort());
+        }
+        // And even more last, if everything else equals, or undecidable, sort on descending sort date (newest stuff first)
+        consumer.accept(new FieldSortBuilder(MediaSortField.sortDate.name()).order(SortOrder.DESC));
 
     }
 

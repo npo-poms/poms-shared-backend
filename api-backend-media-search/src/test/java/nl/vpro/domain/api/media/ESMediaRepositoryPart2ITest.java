@@ -98,7 +98,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @BeforeEach
     public void init() {
         // during debugging you could set this to false, which would simplify queries
-        target.setScore(false);
+        target.setScore(true);
     }
 
     /**
@@ -612,12 +612,15 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         // or
         // program2, program3, sub_group, program1, sub_program1, sub_program2
 
+        assertThat(resultList).hasSize(6);
         assertThat(resultList).contains(program2, atIndex(0));
         assertThat(resultList).contains(program3, atIndex(1));
         assertThat(resultList).contains(sub_group, atIndex(2));
         assertThat(resultList).contains(program1, atIndex(3));
 
-        // TODO: doubtfull
+        // We can't really know the order because these are not direct members of group_ordered
+        // We here  say that they should be ordered by descending sort date
+        // Should we indeed garantee that?
         assertThat(resultList).contains(sub_program1, atIndex(4));
         assertThat(resultList).contains(sub_program2, atIndex(5));
     }
