@@ -365,6 +365,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             mids = new ArrayList<>();
             iterator.forEachRemaining(mids::add);
+            total = iterator.getTotalSize().orElse(null);
         }
         return Pair.of(total, mids);
     }
