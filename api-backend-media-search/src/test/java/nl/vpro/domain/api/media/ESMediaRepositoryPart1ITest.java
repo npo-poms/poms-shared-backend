@@ -73,6 +73,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @BeforeEach
     public  void setup() {
         target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
+        target.redirects = new HashMap<>();
         clearIndices();
     }
 
@@ -2115,10 +2116,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @SuppressWarnings("SameParameterValue")
     private void redirect(String from, String to) {
-        if (target.redirects == null) {
-            target.redirects = new HashMap<>();
-        }
-        target.redirects.clear();
         target.redirects.put(from, to);
     }
 

@@ -145,6 +145,7 @@ public abstract class AbstractESRepositoryITest {
             clearIndex(indexName);
         }
 
+
     }
     protected static void clearIndex(String indexName) {
         client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
@@ -173,6 +174,7 @@ public abstract class AbstractESRepositoryITest {
                 break;
             }
         }
+        log.info("Cleared {}", indexName);
 
     }
 
