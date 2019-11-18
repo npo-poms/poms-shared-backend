@@ -20,6 +20,11 @@ while getopts ":s:d:o:" opt; do
       ;;
    esac
 done
+shift $((OPTIND -1))
+if [[ $# -ge 1 ]] ; then
+ echo unrecognized argument
+ exit 1;
+fi
 
 function post {
    echo $dest $1
