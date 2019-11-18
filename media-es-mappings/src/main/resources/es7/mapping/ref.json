@@ -4,7 +4,6 @@
   },
   "dynamic": "strict",
   "properties": {
-
     "added": {
       "type": "date",
       "format": "epoch_millis"
