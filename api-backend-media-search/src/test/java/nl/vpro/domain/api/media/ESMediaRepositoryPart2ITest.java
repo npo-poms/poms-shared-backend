@@ -7,6 +7,8 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.elasticsearch.action.index.IndexRequest;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.*;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
+import nl.vpro.domain.constraint.PredicateTestResult;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
@@ -30,9 +33,12 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.util.FilteringIterator;
 
+import static nl.vpro.domain.api.FacetResults.toSimpleMap;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
+import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.data.Index.atIndex;
 import static org.mockito.Mockito.mock;
 
@@ -169,6 +175,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D1").lastPublished(NOW).workflow(Workflow.MERGED).title("Deleted Merged Program").mergedTo(program1).build());
         // 2 deleted programs
 
+        AgeRating[] ORIGINAL = {_6, _9, _12, _16, ALL};
         for (int i = 0; i < 10; i++) {
             Group g = index(MediaTestDataBuilder.group()
                 .constrained()
@@ -192,7 +199,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .broadcasters("OMROEP" + (i % 3))
                 .memberOf(g, 1)
                 .avType(AVType.values()[i % AVType.values().length])
-                .ageRating(AgeRating.values()[i % AgeRating.values().length])
+                .ageRating(ORIGINAL[i % ORIGINAL.length])
                 .predictions(Platform.INTERNETVOD)
                 .mid("MID-" + i)
                 .build());
@@ -733,6 +740,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testWithMultipleFacetsAndFiltersAndProfile() {
         target.setScore(false);
 
+        LocalDateTime since = LocalDateTime.of(2010, 1, 1, 12, 0);
         // for reference: These are all mids:
         // [MID-0, MID-1, MID-2, MID-3, MID-4, MID-5, MID-6, MID-7, MID-8, MID-9, MID_DRENTHE, MID_G_0, MID_G_1, MID_G_2, MID_G_3, MID_G_4, MID_G_5, MID_G_6, MID_G_7, MID_G_8, MID_G_9, MID_HIGH_SCORE, MID_SCORING_ON_DESCRIPTION, MID_WITH_LOCATION, MID_WITH_RELATIONS, POMS_S_12345, VPROWON_12346, VPROWON_12349, VPROWON_12351, VPROWON_12353, sub_group, sub_program_1, sub_program_2]
         MediaForm form = MediaFormBuilder.form()
@@ -749,7 +757,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                         TextMatcherList.must(
                             TextMatcher.must("MID-[024]", StandardMatchType.REGEX)) // only 3 objects match
                         // namely
-                        // MID-0, BNN, AVRO, OMROEP0
+                        // MID-0, BNN, AVRO,OMROEP0
                         // MID-2, BNN, AVRO,OMROEP2
                         // MID-4, BNN, AVRO,OMROEP1
                     )
@@ -774,7 +782,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                     .builder()
                     .value(
                         DateRangeMatcher.builder()
-                            .localBegin(LocalDateTime.of(2010, 1, 1, 12, 0))
+                            .localBegin(since)
                         .build()
                     )
                     .build()
@@ -787,39 +795,68 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             new Filter(new Not(new AgeRatingConstraint(AgeRating._16)))
         );
 
-        MediaSearchResult result = target.find(ageRatingProfile, form, 0L, 100);
+        List<MediaObject> indexedInProfile = new ArrayList<>();
+        for (MediaObject m : indexed) {
+            PredicateTestResult predicateTestResult = ageRatingProfile.getPredicate().testWithReason(m);
+            boolean applies = predicateTestResult.applies();
+            if (m.getAgeRating() == AgeRating._16) {
+                if (applies) {
+                    fail("Unexpected");
+                }
+                log.info("Skipping {} because agerating", m);
+                continue;
+            }
+            if (! applies) {
+                fail("Unexpected");
+            }
+            indexedInProfile.add(m);
+        }
+        Map<String, Long> broadcasterFacet;
+        Map<String, Long> ageRatingFacet;
 
+        {
+            Map<String, AtomicLong> broadcasterFacetAtomic = new HashMap<>();
+            Map<String, AtomicLong> ageRatingFacetAtomic = new HashMap<>();
+            for (MediaObject m : indexedInProfile) {
+                if (m.getSortInstant() == null || m.getSortInstant().isBefore(since.atZone(Schedule.ZONE_ID).toInstant())) {
+                    continue;
+                }
+                if (Pattern.compile("MID-[024]").matcher(m.getMid()).matches()) {
+                    for (Broadcaster b : m.getBroadcasters()) {
+                        broadcasterFacetAtomic.computeIfAbsent(b.getId(), (br) -> new AtomicLong(0)).incrementAndGet();
+                    }
+                }
+                if (Pattern.compile("MID-[04]").matcher(m.getMid()).matches()) {
+                    ageRatingFacetAtomic.computeIfAbsent(m.getAgeRating().getXmlValue(), (br) -> new AtomicLong(0)).incrementAndGet();
+                }
+            }
+            broadcasterFacet = sort(broadcasterFacetAtomic);
+            ageRatingFacet =  sort(ageRatingFacetAtomic);
+        }
+
+        log.info("{}", broadcasterFacet);
+
+        MediaSearchResult result = target.find(ageRatingProfile, form, 0L, 100);
 
         List<TermFacetResultItem> broadcasters = result
             .getFacets()
             .getBroadcasters();
         assertThat(broadcasters).isNotNull();
+        Map<String, Long> simple = toSimpleMap(broadcasters);
 
-        // TODO: FAILS, but I think this can be consider a test error.
-        // Changing the test will however main that something will be backwards imcompatible, we
-        // need to a separate make issue for this at least.
-        // Leave this failing until this is sorted out!
+        assertThat(simple).isEqualTo(broadcasterFacet);
+
         assertThat(broadcasters).hasSize(5);
         long totalBroadcasterCount = broadcasters.stream().mapToLong(FacetResultItem::getCount).sum();
-        // 3 with BNN + 3 with AVRO + 1 with OMROEP0, 1 with OMROEP2, 0 with OMROEP1, total 9.
+        //// 3 with BNN + 3 with AVRO + 1 with OMROEP0, 1 with OMROEP2, 0 with OMROEP1, total 9.
         assertThat(totalBroadcasterCount).isEqualTo(9);
-
-        assertThat(broadcasters.get(0).getId()).isEqualTo("AVRO");
-        assertThat(broadcasters.get(0).getCount()).isEqualTo(3);
-        assertThat(broadcasters.get(1).getId()).isEqualTo("BNN");
-        assertThat(broadcasters.get(1).getCount()).isEqualTo(3);
-        assertThat(broadcasters.get(2).getId()).isEqualTo("OMROEP0");
-        assertThat(broadcasters.get(2).getCount()).isEqualTo(1);
-        assertThat(broadcasters.get(3).getId()).isEqualTo("OMROEP1");
-        assertThat(broadcasters.get(3).getCount()).isEqualTo(1);
-        assertThat(broadcasters.get(4).getId()).isEqualTo("OMROEP2");
-        assertThat(broadcasters.get(4).getCount()).isEqualTo(1);
-
 
 
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
         assertThat(ageRatings).isNotNull();
         long totalAgeRatingCount = ageRatings.stream().mapToLong(FacetResultItem::getCount).sum();
+
+        assertThat(toSimpleMap(ageRatings)).isEqualTo(ageRatingFacet);
         assertThat(totalAgeRatingCount).isEqualTo(2);
         assertThat(ageRatings).hasSize(2);
 
@@ -880,5 +917,16 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         SearchResultItem<? extends T> actual = result.getItems().get(0);
         assertThat(actual.getResult()).isNotNull();
         assertThat(actual.getResult()).isEqualTo(expectedProgram);
+    }
+
+
+    protected Map<String, Long> sort(Map<String, AtomicLong> fromResult) {
+       return fromResult
+            .entrySet()
+            .stream()
+            .map((e) -> new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue().get()))
+            .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
+                LinkedHashMap::new));
     }
 }
