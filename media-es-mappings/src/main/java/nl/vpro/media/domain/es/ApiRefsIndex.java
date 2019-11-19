@@ -8,8 +8,8 @@ import nl.vpro.elasticsearch.ElasticSearchIndex;
  */
 public class ApiRefsIndex extends ElasticSearchIndex {
 
-    public static String POSTFIX = "_refs";
-    public static String NAME = ApiMediaIndex.NAME + POSTFIX;
+    public static final String POSTFIX = "_refs";
+    public static final String NAME = ApiMediaIndex.NAME + POSTFIX;
     public static final ApiRefsIndex APIMEDIA_REFS = new ApiRefsIndex();
 
     private ApiRefsIndex() {
