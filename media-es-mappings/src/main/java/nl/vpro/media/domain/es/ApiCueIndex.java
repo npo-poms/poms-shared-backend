@@ -16,6 +16,8 @@ import static nl.vpro.i18n.Locales.score;
 @Slf4j
 public abstract class ApiCueIndex extends ElasticSearchIndex {
 
+    public static final String NAME = "subtitles_%s";
+
     protected static List<ApiCueIndex> instances = new ArrayList<>();
 
     public static List<ApiCueIndex> getInstances() {
@@ -27,10 +29,10 @@ public abstract class ApiCueIndex extends ElasticSearchIndex {
 
 
     protected ApiCueIndex(Locale locale) {
-        super("subtitles_" + locale.toLanguageTag(),
+        super(String.format(NAME, locale.toLanguageTag()),
             "/es7/setting/subtitles_" + locale.toLanguageTag() + ".json",
             "/es7/mapping/cue.json",
-            Arrays.asList("subtitles_" + locale.toLanguageTag() + "-publish")
+            Arrays.asList(String.format(NAME, locale.toLanguageTag()) + "-publish")
         );
         this.locale = locale;
     }
