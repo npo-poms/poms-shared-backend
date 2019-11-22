@@ -1,7 +1,6 @@
 package nl.vpro.domain.api.page;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -15,12 +14,11 @@ import org.springframework.stereotype.Service;
 import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.IdList;
 import nl.vpro.domain.api.SuggestResult;
-import nl.vpro.domain.api.profile.Profile;
-import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.api.profile.ProfileService;
+import nl.vpro.domain.api.profile.*;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.page.Page;
+import nl.vpro.util.CloseableIterator;
 import nl.vpro.util.FilteringIterator;
 
 /**
@@ -119,7 +117,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     @PreAuthorize(Roles.API_CHANGES_USER)
-    public Iterator<Page> iterate(String profile, PageForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
+    public CloseableIterator<Page> iterate(String profile, PageForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
         return pageSearchRepository.iterate(getProfile(profile), form, offset, max, keepAlive);
 
     }
