@@ -2,16 +2,22 @@ package nl.vpro.api.rs;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
+import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
+import java.util.function.Consumer;
 
-import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.*;
 
-import org.apache.http.entity.ContentType;
+import org.apache.commons.io.IOUtils;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+
+import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.util.ThreadPools;
 
 /**
  * @author Michiel Meeuwissen
@@ -20,9 +26,26 @@ import com.fasterxml.jackson.core.JsonGenerator;
 @Slf4j
 public class Iterate {
 
+    public static Response streamingJson(Consumer<JsonGenerator> create) throws IOException {
+        PipedOutputStream pipedOutputStream = new PipedOutputStream();
+        PipedInputStream pipedInputStream = new PipedInputStream();
+        pipedInputStream.connect(pipedOutputStream);
+        StreamingOutput streamingOutput = output -> IOUtils.copy(pipedInputStream, output);
+        JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory().createGenerator(pipedOutputStream);
+        final SecurityContext context = SecurityContextHolder.getContext();
+        ThreadPools.copyExecutor.submit(() -> {
+            SecurityContextHolder.setContext(context);
+            create.accept(jg);
+            SecurityContextHolder.clearContext();
+        });
 
-    public static void iterate(Iterator<?> i, JsonGenerator jg, HttpServletResponse response, String fieldName, String forString) throws IOException {
-        response.setContentType(ContentType.APPLICATION_JSON.toString());
+        return Response.ok()
+            .type(MediaType.APPLICATION_JSON_TYPE)
+            .entity(streamingOutput)
+            .build();
+    }
+
+    public static <T> void iterate(Iterator<T> i, JsonGenerator jg, String fieldName, String forString) throws IOException {
         jg.writeStartObject();
         jg.writeArrayFieldStart(fieldName);
 
@@ -33,7 +56,7 @@ public class Iterate {
         try {
             while (i.hasNext()) {
                 try {
-                    Object mo = i.next();
+                    T mo = i.next();
                     jg.writeObject(mo);
                     count++;
                     if (count % 5000 == 0) {
