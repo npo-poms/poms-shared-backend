@@ -33,10 +33,8 @@ public class Iterate {
         StreamingOutput streamingOutput = output -> IOUtils.copy(pipedInputStream, output);
         JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory().createGenerator(pipedOutputStream);
         final SecurityContext context = SecurityContextHolder.getContext();
-
         // ForkJoinPool.commonPool() doesn't work because serviceloader may not be available in classloader of tomcat?
         // see e.g. also https://github.com/talsma-ict/context-propagation/issues/94
-
         ThreadPools.copyExecutor.submit(() -> {
             SecurityContextHolder.setContext(context);
             create.accept(jg);
