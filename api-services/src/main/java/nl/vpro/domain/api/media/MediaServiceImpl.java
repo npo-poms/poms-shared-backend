@@ -7,9 +7,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -19,19 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import com.google.common.collect.Iterators;
 
 import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.profile.Profile;
-import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.api.profile.ProfileService;
+import nl.vpro.domain.api.profile.*;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.api.topspin.Recommendation;
 import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
+import nl.vpro.util.CloseableIterator;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.Roles.API_USER;
@@ -83,12 +79,12 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(Roles.API_CHANGES_USER)
-    public Iterator<MediaChange> changes(final String profile,  final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences, Deletes deletes) throws ProfileNotFoundException {
+    public CloseableIterator<MediaChange> changes(final String profile, final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences, Deletes deletes) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
                 return changesWithES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes);
             } else {
-                Iterator<MediaChange> iterator;
+                CloseableIterator<MediaChange> iterator;
 
                 Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
                 log.info("Since {} is couchdb like, taking {}. Explicitely configured to use elastic search for changes feed. Note that clients don't receive sequences.", since.toEpochMilli(), i);
@@ -98,16 +94,20 @@ public class MediaServiceImpl implements MediaService {
         } else {
             // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' any more.
             return
-                Iterators.transform(changesWithES(profile, profileCheck, since, mid, order, max, keepAlive, deletes), c -> {
-                    if (c != null) {
-                        c.setSequence(null);
-                    }
-                    return c;});
+                FilteringIterator.<MediaChange>builder()
+                    .wrapped(changesWithES(profile, profileCheck, since, mid, order, max, keepAlive, deletes))
+                    .filter((c) -> {
+                        if (c != null) {
+                            c.setSequence(null);
+                        }
+                        return true;
+                    })
+                    .build();
         }
     }
 
 
-    protected Iterator<MediaChange> changesWithES(final String profile, boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, Deletes deletes) throws ProfileNotFoundException {
+    protected CloseableIterator<MediaChange> changesWithES(final String profile, boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, Deletes deletes) throws ProfileNotFoundException {
         ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? currentProfile : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
