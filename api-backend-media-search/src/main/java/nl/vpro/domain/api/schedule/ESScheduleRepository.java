@@ -229,55 +229,55 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
             toExecute = simplifyQuery(query);
         }
-
-        ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject);
-        SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
-        requestBuilder.setQuery(toExecute);
-        requestBuilder.addSort("sortDate", SortOrder.DESC);
-
         List<ApiScheduleEvent> results = new ArrayList<>();
-
-        long skipped = 0;
-
-
-        long count = 0;
         long mediaObjectCount = 0;
-
         long offset = form.getPager().getOffset();
         Integer max = form.getPager().getMax();
+        try (ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject)) {
+            SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
+            requestBuilder.setQuery(toExecute);
+            requestBuilder.addSort("sortDate", SortOrder.DESC);
 
-        OUTER:
-        while (searchIterator.hasNext()) {
-            MediaObject mo = searchIterator.next();
-            int eventCountForMediaObject = 0;
-            mediaObjectCount++;
-            if (mo instanceof Program) {
-                for (ScheduleEvent e : ((Program) mo).getScheduleEvents()) {
-                    if (form.test(e)) {
-                        if (skipped < offset) {
-                            skipped++;
+            long skipped = 0;
+            long count = 0;
+
+
+
+            OUTER:
+            while (searchIterator.hasNext()) {
+                MediaObject mo = searchIterator.next();
+                int eventCountForMediaObject = 0;
+                mediaObjectCount++;
+                if (mo instanceof Program) {
+                    for (ScheduleEvent e : ((Program) mo).getScheduleEvents()) {
+                        if (form.test(e)) {
+                            if (skipped < offset) {
+                                skipped++;
+                            } else {
+                                ApiScheduleEvent ae = new ApiScheduleEvent(e);
+                                ae.setParent(e.getParent());
+                                results.add(ae);
+                                eventCountForMediaObject++;
+                                count++;
+                            }
+                            if (max != null && count == max) {
+                                break OUTER;
+                            }
                         } else {
-                            ApiScheduleEvent ae = new ApiScheduleEvent(e);
-                            ae.setParent(e.getParent());
-                            results.add(ae);
-                            eventCountForMediaObject++;
-                            count++;
+                            log.debug("{} not in {}", e, form);
                         }
-                        if (max != null && count == max) {
-                            break OUTER;
-                        }
-                    } else {
-                        log.debug("{} not in {}", e, form);
                     }
                 }
+                if (eventCountForMediaObject == 0) {
+                    // this may happen if it broadcaster on the correct channel, and on the correct time
+                    // _but not together_
+                    // 1 schedule event has the correct channel, the other one the correct scheduleEvent.start
+                    // it doesn't really matter for now, we simply didn't add it to the result
+                    log.debug("Mediaobject {} not added, since it did unexpectedly not apply to {}", mo, form);
+                }
             }
-            if (eventCountForMediaObject == 0) {
-                // this may happen if it broadcaster on the correct channel, and on the correct time
-                // _but not together_
-                // 1 schedule event has the correct channel, the other one the correct scheduleEvent.start
-                // it doesn't really matter for now, we simply didn't add it to the result
-                log.debug("Mediaobject {} not added, since it did unexpectedly not apply to {}", mo, form);
-            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         log.debug("Found {} different media objects" , mediaObjectCount);
 

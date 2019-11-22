@@ -342,7 +342,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable ProfileDefinition<MediaObject> profile,
         @NonNull Order order,
         long offset,
-        @Nullable Integer max) {
+        @Nullable Integer max)  {
         List<String> mids;
         Long total = null;
         if (profile == null) {
@@ -360,12 +360,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .collect(Collectors.toList());
             total = response.getHits().getTotalHits().value;
         } else {
-            ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSourceAsMap().get("childRef"));
-            SearchRequestBuilder builder = iterator.prepareSearch(getRefsIndexName());
-            listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             mids = new ArrayList<>();
-            iterator.forEachRemaining(mids::add);
-            total = iterator.getTotalSize().orElse(null);
+            try (ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSourceAsMap().get("childRef"))) {
+                SearchRequestBuilder builder = iterator.prepareSearch(getRefsIndexName());
+                listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
+                iterator.forEachRemaining(mids::add);
+                total = iterator.getTotalSize().orElse(null);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         }
         return Pair.of(total, mids);
     }
@@ -409,7 +412,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public Iterator<MediaChange> changes(
+    public CloseableIterator<MediaChange> changes(
         Instant since,
         String mid,
         ProfileDefinition<MediaObject> currentProfile,
@@ -438,7 +441,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             } else {
                 log.debug("Since is after commited changes window (before {}). Returing empty iterator.", changesUpto);
                 // This will result exactly nothing, so we return empty iterator immediately:
-                return Collections.emptyIterator();
+                return CloseableIterator.empty();
             }
         }
         searchRequestBuilder.setQuery(QueryBuilders.boolQuery()
@@ -535,13 +538,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     @Deprecated
-    public Iterator<MediaChange> changes(Long since, ProfileDefinition<MediaObject> current, ProfileDefinition<MediaObject> previous, Order order, Integer max, Long keepAlive) {
+    public CloseableIterator<MediaChange> changes(Long since, ProfileDefinition<MediaObject> current, ProfileDefinition<MediaObject> previous, Order order, Integer max, Long keepAlive) {
         throw new UnsupportedOperationException("Not supported");
     }
 
 
     @Override
-    public Iterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
+    public CloseableIterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
         ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject);
 
         SearchRequestBuilder builder = i.prepareSearch(getIndexName());
@@ -565,14 +568,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     synchronized void refillRedirectCache() {
         Map<String, String> newRedirects = new HashMap<>();
 
-        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject);
-        i.prepareSearch(getIndexName())
-            .setQuery(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
-            .setSize(iterateBatchSize)
-        ;
-        while(i.hasNext()) {
-            MediaObject o = i.next();
-            newRedirects.put(o.getMid(), o.getMergedToRef());
+        try(ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject)) {
+            i.prepareSearch(getIndexName())
+                .setQuery(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
+                .setSize(iterateBatchSize)
+            ;
+            while(i.hasNext()) {
+                MediaObject o = i.next();
+                newRedirects.put(o.getMid(), o.getMergedToRef());
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
         }
         if (! newRedirects.equals(redirects)) {
             redirects = newRedirects;
