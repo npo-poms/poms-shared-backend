@@ -145,7 +145,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(API_USER)
-    public Iterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
+    public CloseableIterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
         return mediaSearchRepository.iterate(getProfile(profile), form, offset, max, keepAlive);
     }
 
