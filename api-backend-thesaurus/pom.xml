@@ -5,6 +5,7 @@
      <artifactId>poms-shared-backend-parent</artifactId>
      <version>5.12.0.pre1</version>
    </parent>
+   <groupId>nl.vpro.api</groupId>
    <artifactId>api-backend-thesaurus</artifactId>
    <dependencies>
      <dependency>
