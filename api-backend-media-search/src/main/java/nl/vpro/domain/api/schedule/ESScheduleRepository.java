@@ -290,7 +290,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 break;
         }
 
-        return new ScheduleResult(new Result<>(results, offset, max, null));
+        return new ScheduleResult(new Result<>(results, offset, max, null, Result.TotalQualifier.MISSING));
     }
 
     protected MediaObject getMediaObject(SearchHit hit) {
@@ -371,7 +371,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         int total = items.size();
         int end = new Long(offset + max).intValue();
         items = items.subList((int) offset, Math.min(end, total));
-        return new ScheduleSearchResult(items, offset, max, total);
+        return new ScheduleSearchResult(items, offset, max, (long) total, Result.TotalQualifier.EQUAL_TO);
     }
 
     @Override

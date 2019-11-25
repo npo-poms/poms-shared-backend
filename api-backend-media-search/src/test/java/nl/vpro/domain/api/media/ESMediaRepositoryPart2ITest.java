@@ -378,6 +378,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.asList().stream().map(MediaObject::getMid).sorted()).containsExactlyElementsOf(mids);
 
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount);
+        assertThat(result.getTotalQualifier()).isEqualTo(Result.TotalQualifier.EQUAL_TO);
+
 
     }
 

@@ -243,7 +243,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         //MediaSearchResults.setSelectedFacets(hits.getFa, form); // TODO
-        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits().value);
+        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits().value, Result.TotalQualifier.valueOf(hits.getTotalHits().relation.name()));
 
     }
 
@@ -289,7 +289,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (profile != null) {
             total = filterWithProfile(objects, profile, offset, max);
         }
-        return new MediaResult(objects, offset, max, total);
+        return new MediaResult(objects, offset, max, total, Result.TotalQualifier.EQUAL_TO);
 
     }
 
