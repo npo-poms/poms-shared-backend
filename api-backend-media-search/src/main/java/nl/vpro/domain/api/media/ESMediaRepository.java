@@ -13,6 +13,7 @@ import java.util.concurrent.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.lucene.search.TotalHits;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
@@ -243,7 +244,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         //MediaSearchResults.setSelectedFacets(hits.getFa, form); // TODO
-        return new MediaSearchResult(adapted, 0L, max, hits.getTotalHits().value, Result.TotalQualifier.valueOf(hits.getTotalHits().relation.name()));
+        return new MediaSearchResult(adapted, 0L, max, getTotal(hits), getTotalQualifier(hits));
 
     }
 
@@ -282,14 +283,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @NonNull Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(memberRef, media, profile, order, offset, max);
+        Pair<TotalHits, List<String>> queryResult = listMembersOrEpisodes(memberRef, media, profile, order, offset, max);
         List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
-        Long total = queryResult.getFirst();
+        TotalHits totalHits = queryResult.getFirst();
+        Long total = totalHits.value;
+        Result.TotalQualifier totalQualifier = Result.TotalQualifier.valueOf(totalHits.relation.name());
 
         if (profile != null) {
             total = filterWithProfile(objects, profile, offset, max);
+            totalQualifier = Result.TotalQualifier.APPROXIMATE;
         }
-        return new MediaResult(objects, offset, max, total, Result.TotalQualifier.EQUAL_TO);
+        return new MediaResult(objects, offset, max, total, totalQualifier);
 
     }
 
@@ -325,18 +329,21 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @Nullable Integer max) {
 
-        Pair<Long, List<String>> queryResult = listMembersOrEpisodes(episodeRef, media, profile, order, offset, max);
+        Pair<TotalHits, List<String>> queryResult = listMembersOrEpisodes(episodeRef, media, profile, order, offset, max);
         List<Program> objects = loadAll(Program.class, queryResult.getSecond());
-        Long total = queryResult.getFirst();
+        TotalHits totalHits = queryResult.getFirst();
+        Long total = totalHits.value;
+        Result.TotalQualifier totalQualifier = Result.TotalQualifier.valueOf(totalHits.relation.name());
 
         if (profile != null) {
             total = filterWithProfile(objects, profile, offset, max);
+            totalQualifier = Result.TotalQualifier.APPROXIMATE;
         }
 
-        return new ProgramResult(objects, offset, max, total);
+        return new ProgramResult(objects, offset, max, total, totalQualifier);
     }
 
-    private Pair<Long, List<String>> listMembersOrEpisodes(
+    private Pair<TotalHits, List<String>> listMembersOrEpisodes(
         StandaloneMemberRef.@NonNull ObjectType objectType,
         @NonNull MediaObject media,
         @Nullable ProfileDefinition<MediaObject> profile,
@@ -344,7 +351,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @Nullable Integer max)  {
         List<String> mids;
-        Long total = null;
+        TotalHits total = null;
         if (profile == null) {
             SearchRequestBuilder builder = client().prepareSearch(getRefsIndexName());
             listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
@@ -358,14 +365,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             mids = Arrays.stream(hits)
                 .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
                 .collect(Collectors.toList());
-            total = response.getHits().getTotalHits().value;
+            total = response.getHits().getTotalHits();
         } else {
             mids = new ArrayList<>();
             try (ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSourceAsMap().get("childRef"))) {
                 SearchRequestBuilder builder = iterator.prepareSearch(getRefsIndexName());
                 listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
                 iterator.forEachRemaining(mids::add);
-                total = iterator.getTotalSize().orElse(null);
+
+                total = iterator.getTotalSize().map(s -> new TotalHits(s, TotalHits.Relation.EQUAL_TO)).orElse(null);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }

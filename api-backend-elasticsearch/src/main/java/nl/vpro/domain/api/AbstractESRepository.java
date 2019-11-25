@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.lucene.search.TotalHits;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
@@ -427,7 +428,16 @@ public abstract class AbstractESRepository<T> {
         throw new UnsupportedOperationException();
     }
 
-    @Override
+    protected Long getTotal(SearchHits hits) {
+        TotalHits totalHits = hits.getTotalHits();
+        return totalHits.value;
+    }
+    protected Result.TotalQualifier getTotalQualifier(SearchHits hits) {
+        TotalHits totalHits = hits.getTotalHits();
+        return Result.TotalQualifier.valueOf(totalHits.relation.name());
+    }
+
+                  @Override
     public String toString() {
         return getClass().getSimpleName() + "{indexNames='" + indexNames.values() + '}';
     }
