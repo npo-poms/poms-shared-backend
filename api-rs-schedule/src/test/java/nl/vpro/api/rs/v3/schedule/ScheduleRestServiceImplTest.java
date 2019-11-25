@@ -268,7 +268,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         Program program = MediaTestDataBuilder.program().withDescendantOf().withScheduleEvents().build();
         ApiScheduleEvent event = new ApiScheduleEvent(program.getScheduleEvents().first(), program);
         SearchResultItem<ApiScheduleEvent> apiScheduleEventSearchResultItem = new SearchResultItem<>(event);
-        ScheduleSearchResult result = new ScheduleSearchResult(Arrays.asList(apiScheduleEventSearchResultItem), 0L, 10, 100);
+        ScheduleSearchResult result = new ScheduleSearchResult(Arrays.asList(apiScheduleEventSearchResultItem), 0L, 10, 100L, Result.TotalQualifier.EQUAL_TO);
         when(scheduleService.find(any(ScheduleForm.class), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(result);
 
         MockHttpRequest request = MockHttpRequest.post("/schedule?properties=none");
