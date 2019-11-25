@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.ws.rs.core.*;
 
@@ -45,6 +46,19 @@ public class Iterate {
             .type(MediaType.APPLICATION_JSON_TYPE)
             .entity(streamingOutput)
             .build();
+    }
+
+    public static Function<Character, Boolean> keepAlive(JsonGenerator jg) {
+        return c -> {
+            try {
+                jg.writeRaw(c);
+                jg.flush();
+                return false;
+            } catch (IOException e) { // Client Aborted?
+                log.warn(e.getClass().getName() + " " + e.getMessage());
+                return true;
+            }
+        };
     }
 
     public static <T> void iterate(Iterator<T> i, JsonGenerator jg, String fieldName, String forString) throws IOException {
