@@ -1,15 +1,18 @@
 package nl.vpro.domain.api;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * @author Michiel Meeuwissen
  * @since 4.1
  */
+@Getter
+@Setter
 public class SearchFieldDefinition {
 
     private final String name;
-
     private float boost;
-
     private final boolean highlight;
 
     public SearchFieldDefinition(String name, float boost, boolean highlight) {
@@ -20,22 +23,6 @@ public class SearchFieldDefinition {
 
     public SearchFieldDefinition(String name, float boost) {
         this(name, boost, true);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public float getBoost() {
-        return boost;
-    }
-
-    public void setBoost(float boost) {
-        this.boost = boost;
-    }
-
-    public boolean isHighlight() {
-        return highlight;
     }
 
     @Override
