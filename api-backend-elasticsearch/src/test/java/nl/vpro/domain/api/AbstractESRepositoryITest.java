@@ -30,6 +30,7 @@ import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.MediaClassificationService;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
+import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.IndexHelper;
 import nl.vpro.elasticsearch7.TransportClientFactory;
@@ -122,7 +123,7 @@ public abstract class AbstractESRepositoryITest {
                 IndexHelper.of(log, (s) -> client, abstractIndex)
                     .indexName(indexName)
                     .build()
-                    .createIndex();
+                    .createIndexIfNotExists(CreateIndex.FOR_TEST);
                 indexNames.put(abstractIndex, indexName);
             } catch (NoNodeAvailableException noNodeAvailableException) {
                 log.warn("No elastic search node could be found with {}", client);

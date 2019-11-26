@@ -43,8 +43,6 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
 
-;
-
 
 /**
  * @author Michiel Meeuwissen
@@ -207,7 +205,7 @@ public abstract class AbstractESRepository<T> {
         @NonNull String... ids) {
         try {
             if (ids.length == 0) {
-                return new ArrayList<S>();
+                return new ArrayList<>();
             }
             MultiGetRequest request = new MultiGetRequest();
             for(String id : ids) {
