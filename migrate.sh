@@ -134,9 +134,32 @@ function reindexRefs {
    post "$command"
 }
 
+function reindexPages {
+   [[ "apipages" =~ $only ]] || return
+
+    command=$( jq -n \
+                  --arg source "$source" \
+                  '
+ { source: {
+    remote: {
+      host: $source
+    },
+    index: "apipages"
+  },
+  dest: {
+    index: "apipages",
+    type: "_doc"
+  },
+  script: {
+     source: "ctx._source.workflow = \"PUBLISHED\""
+  }
+}')
+   post "$command"
+}
+
 
 reindex "pageupdates-publish"
-reindex "apipages"
+reindexPages
 reindex "apiqueries"
 reindexType "apimedia" "program" "apimedia"
 reindexType "apimedia" "group" "apimedia"

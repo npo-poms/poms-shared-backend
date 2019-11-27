@@ -37,7 +37,7 @@ public class PushMappings {
             factory.setClusterName(argv[1]);
             log.info("Cluster name {}", argv[1]);
         }
-        Pattern only = Pattern.compile(".*");
+        Pattern only = Pattern.compile("^.*$");
         //Pattern only = Pattern.compile("^apimedia.*$");
         try {
 
@@ -53,7 +53,8 @@ public class PushMappings {
 
             for (ElasticSearchIndex elasticSearchIndex : desired) {
                 if (! only.matcher(elasticSearchIndex.getIndexName()).matches()) {
-                    break;
+                    log.info("Skipping {}", elasticSearchIndex.getIndexName());
+                    continue;
                 }
                 try {
                     IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
