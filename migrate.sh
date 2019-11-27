@@ -151,7 +151,7 @@ function reindexPages {
     type: "_doc"
   },
   script: {
-     source: "ctx._source.workflow = \"PUBLISHED\""
+     source: "ctx._source.workflow = ctx._type == \"page\" ? \"PUBLISHED\" : \"DELETED\""
   }
 }')
    post "$command"
