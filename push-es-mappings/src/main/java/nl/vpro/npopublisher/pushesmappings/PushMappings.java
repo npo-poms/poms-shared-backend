@@ -37,8 +37,8 @@ public class PushMappings {
             factory.setClusterName(argv[1]);
             log.info("Cluster name {}", argv[1]);
         }
-        //Pattern only = Pattern.compile("^.*$");
-        Pattern only = Pattern.compile("^apipages.*$");
+        Pattern only = Pattern.compile("^.*$");
+        //Pattern only = Pattern.compile("^apipages.*$");
         try {
 
             List<ElasticSearchIndex> desired = new ArrayList<>(Arrays.asList(
