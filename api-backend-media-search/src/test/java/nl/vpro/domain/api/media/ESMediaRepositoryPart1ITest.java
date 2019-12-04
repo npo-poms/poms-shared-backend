@@ -17,6 +17,7 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
+import nl.vpro.domain.Displayable;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -1349,7 +1350,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         );
         List<TermFacetResultItem> ageRatings = result.getFacets().getAgeRatings();
 
-        assertEquals(AgeRating.values().length, ageRatings.size());
+        assertEquals((int) Arrays.stream(AgeRating.values()).filter(Displayable::display).count(), ageRatings.size());
 
         /* 3 x 6, 0 x 9, 2 * 12, 0 x 16, 1 * Alle Leeftijden */
         assertEquals(3, ageRatings.get(_6.ordinal()).getCount());
@@ -1367,6 +1368,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertEquals(ALL.getXmlValue(), ageRatings.get(ALL.ordinal()).getId());
         assertEquals(ALL.getDisplayName(), ageRatings.get(ALL.ordinal()).getValue());
+
 
         {
             MediaSearchResult result1 = target.find(null, form().ageRating(_16).ageRatingFacet().build(), 0, null);

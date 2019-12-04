@@ -151,6 +151,10 @@ public abstract class ESFacetsHandler {
             }
             Integer threshold = requestFacet.getThreshold();
             Set<T> notFound = new HashSet<T>(Arrays.asList(enumClass.getEnumConstants()));
+
+            // possible enum values that are displayable but on default should not be displayed should also not be available in facet result if not values
+            notFound.removeIf(e -> e instanceof Displayable && ! ((Displayable) e).display());
+
             List<TermFacetResultItem> result =  new ArrayList<>(enumTextFacetResult(facet, valueOf, xmlId));
             for (TermFacetResultItem i : result) {
                 notFound.remove(valueOf.apply(i.getId()));
