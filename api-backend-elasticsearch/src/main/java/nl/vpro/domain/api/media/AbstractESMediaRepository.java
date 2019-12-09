@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.*;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.elasticsearch7.IndexHelper;
@@ -43,7 +43,7 @@ import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
  */
 
 @ToString(callSuper = true)
-public abstract class AbstractESMediaRepository extends AbstractESRepository<MediaObject> implements MediaLoader {
+public abstract class AbstractESMediaRepository extends AbstractESRepository<MediaObject> implements MediaLoader, MediaRedirector {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
