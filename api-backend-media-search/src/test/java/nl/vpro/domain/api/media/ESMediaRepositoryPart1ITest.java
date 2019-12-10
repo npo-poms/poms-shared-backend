@@ -165,8 +165,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             float score1 = result.getItems().get(1).getScore();
             float score2 = result.getItems().get(2).getScore();
             assertThat(score0).isGreaterThan(score1);
-            assertThat(score1).isGreaterThan(score2);
             assertThat(score1).isGreaterThanOrEqualTo(score2);
+            //assertThat(score1).isGreaterThan(score2);
             assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("De Ideale Wereld");
             //assertThat(result.getItems().get(1).getResult().getMainTitle()).isEqualTo("Alleen op de Wereld");
             //assertThat(result.getItems().get(2).getResult().getMainTitle()).isEqualTo("De Wereld Draait Door");
