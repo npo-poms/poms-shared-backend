@@ -57,7 +57,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>nl.vpro.vproapi.pushesmappings.PushMappings</mainClass>
+          <mainClass>nl.vpro.npopublisher.pushesmappings.PushMappings</mainClass>
           <arguments>
             <argument>${host}</argument>
             <argument>${cluster}</argument>

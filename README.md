@@ -14,26 +14,20 @@ We use **ElasticSearch Head** chrome plugin to connect to ES
 
 ## Configure your local ES
 
-Generate ES indexes for our resources:
-- Execute the scripts in this folder: `./push-es-*-mapping.sh`
-eg. via this helper script
-`./push-es-localhost.sh`
-(this presumes an empty elastic search on http://localhost:9200)
+Generate local ES indexes for our resources:
+
+` 
+(cd push-es-mappings/ ; mvn -Dhost=localhost:9200)
+`
 
 ## Update the configuration
-The ES mapping can be changed in the files under:
+
+Via the same way mappings can be update. After changing the mappings under:
+
 `./*-es-mapping/src/main/resources/es*/mapping/*.json`
 
 you can test your changes by executing the UnitTest in `ESMediaRepositoryPart1ITest`
 
-### How to update index
-The script will create a new index already mapped for writing (apimedia alias)
-Follow the instruction in the output to manually copy the old index into the new one
-and flag the new index for reading.
-
-Connect to elastic search and find out what's the highest index.
-Then run the command to generate a new index with an incremented version number:
-`./push-es-media-mapping.sh localhost:9200 old_plus_1`
 
 To be able to change the dev/test or even prod environment
 you need to have a tunneling from your machine (ask to get a copy of the .ssh/config)

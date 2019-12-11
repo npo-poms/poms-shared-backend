@@ -21,7 +21,7 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
 
 /**
  * @author Michiel Meeuwissen
- * @since ...
+ * @since 5.12
  */
 @Slf4j
 public class PushMappings {
