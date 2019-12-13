@@ -270,7 +270,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
             MediaFacetsResult facetsResult =
                 ESMediaFacetsHandler.extractMediaFacets(response, facets, this);
-            return new GenericMediaSearchResult<>(adapted, facetsResult, offset, max, getTotal(hits), getTotalQualifier(hits));
+            return new GenericMediaSearchResult<>(adapted, facetsResult, offset, max, getTotal(hits));
         } catch (TransportSerializationException e) {
             String detail = e.getDetailedMessage();
             log.warn(e.getMessage() + ":" + detail);

@@ -37,8 +37,10 @@ import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.elasticsearch7.ElasticSearchIterator;
 import nl.vpro.util.*;
 
-;import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
+import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
+
+;
 
 /**
  * @author Roelof Jan Koekoek
@@ -244,7 +246,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         List<SearchResultItem<? extends MediaObject>> adapted = adapt(hits, MediaObject.class);
         //MediaSearchResults.setSelectedFacets(hits.getFa, form); // TODO
-        return new MediaSearchResult(adapted, 0L, max, getTotal(hits), getTotalQualifier(hits));
+        return new MediaSearchResult(adapted, 0L, max, getTotal(hits));
 
     }
 
@@ -286,14 +288,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         Pair<TotalHits, List<String>> queryResult = listMembersOrEpisodes(memberRef, media, profile, order, offset, max);
         List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
         TotalHits totalHits = queryResult.getFirst();
-        Long total = totalHits.value;
-        Result.TotalQualifier totalQualifier = Result.TotalQualifier.valueOf(totalHits.relation.name());
 
-        if (profile != null) {
-            total = filterWithProfile(objects, profile, offset, max);
-            totalQualifier = Result.TotalQualifier.APPROXIMATE;
-        }
-        return new MediaResult(objects, offset, max, total, totalQualifier);
+        return new MediaResult(objects, offset, max, getTotal(totalHits, profile, objects, offset, max));
 
     }
 
@@ -332,15 +328,29 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         Pair<TotalHits, List<String>> queryResult = listMembersOrEpisodes(episodeRef, media, profile, order, offset, max);
         List<Program> objects = loadAll(Program.class, queryResult.getSecond());
         TotalHits totalHits = queryResult.getFirst();
-        Long total = totalHits.value;
-        Result.TotalQualifier totalQualifier = Result.TotalQualifier.valueOf(totalHits.relation.name());
+
+
+        return new ProgramResult(objects, offset, max, getTotal(totalHits, profile, objects, offset, max));
+    }
+
+    <T extends MediaObject> Result.Total getTotal(TotalHits totalHits, ProfileDefinition<MediaObject> profile, List<T> objects, long offset, Integer max) {
+        final Long total;
+        final Result.TotalQualifier totalQualifier;
 
         if (profile != null) {
             total = filterWithProfile(objects, profile, offset, max);
             totalQualifier = Result.TotalQualifier.APPROXIMATE;
+        } else {
+            if (totalHits == null){
+                total = null;
+                totalQualifier = Result.TotalQualifier.MISSING;
+            }  else {
+                total = totalHits.value;
+                totalQualifier = Result.TotalQualifier.valueOf(totalHits.relation.name());
+            }
         }
+        return new Result.Total(total, totalQualifier);
 
-        return new ProgramResult(objects, offset, max, total, totalQualifier);
     }
 
     private Pair<TotalHits, List<String>> listMembersOrEpisodes(

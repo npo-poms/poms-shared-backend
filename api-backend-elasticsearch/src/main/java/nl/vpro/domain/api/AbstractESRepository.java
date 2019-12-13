@@ -426,16 +426,17 @@ public abstract class AbstractESRepository<T> {
         throw new UnsupportedOperationException();
     }
 
-    protected Long getTotal(SearchHits hits) {
+    protected Result.Total getTotal(SearchHits hits) {
         TotalHits totalHits = hits.getTotalHits();
-        return totalHits.value;
+        Result.TotalQualifier qualifier = getTotalQualifier(hits);
+        return new Result.Total(totalHits.value, qualifier);
     }
     protected Result.TotalQualifier getTotalQualifier(SearchHits hits) {
         TotalHits totalHits = hits.getTotalHits();
         return Result.TotalQualifier.valueOf(totalHits.relation.name());
     }
 
-                  @Override
+    @Override
     public String toString() {
         return getClass().getSimpleName() + "{indexNames='" + indexNames.values() + '}';
     }
