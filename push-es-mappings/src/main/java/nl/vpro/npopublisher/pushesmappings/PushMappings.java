@@ -37,8 +37,8 @@ public class PushMappings {
             factory.setClusterName(argv[1]);
             log.info("Cluster name {}", argv[1]);
         }
-        Pattern only = Pattern.compile("^.*$");
-        //Pattern only = Pattern.compile("^apipages.*$");
+        //Pattern only = Pattern.compile("^.*$");
+        Pattern only = Pattern.compile("^pageupdates.*$");
         try {
 
             List<ElasticSearchIndex> desired = new ArrayList<>(Arrays.asList(
@@ -65,6 +65,7 @@ public class PushMappings {
                     ) {
                         log.info("{} : {}", elasticSearchIndex, helper.count());
                         helper.reputSettings(false);
+                        helper.reputMappings();
                     }
                 } catch (Exception e) {
                     log.error(e.getMessage());
