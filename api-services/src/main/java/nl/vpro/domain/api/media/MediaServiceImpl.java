@@ -225,7 +225,7 @@ public class MediaServiceImpl implements MediaService {
                 }
             }
         }
-        return new MediaSearchResult(filtered, 0L, max, (long) filtered.size(), Result.TotalQualifier.EQUAL_TO);
+        return new MediaSearchResult(filtered, 0L, max, Result.Total.equalsTo(filtered.size()));
     }
 
     @Override
