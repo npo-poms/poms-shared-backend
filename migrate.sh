@@ -108,7 +108,7 @@ function reindexCues {
 function reindexRefs {
    [[ "$1" =~ $only ]] || return
 
-   script="ctx._source.objectType = '$2'; ctx._id = ctx._id + '/$2'; ctx._source.id = ctx._id";
+   script="ctx._source.objectType = '$2'; ctx._id = ctx._id + '/$2';";
    command=$( jq  -n -R \
                   --arg refType "$1" \
                   --arg source "$source" \
