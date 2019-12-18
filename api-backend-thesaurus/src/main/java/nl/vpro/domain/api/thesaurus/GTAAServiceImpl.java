@@ -18,7 +18,7 @@ import nl.vpro.util.DateUtils;
 
 /**
  * Wraps the {@link GTAARepository} to accept signed JWT to ensure the sender is
- * known. This allows anyone who has a known signing key to add GTAA people.
+ * known. This allows anyone who has a known signing key to add GTAA people and other concepts.
  *
  * @author machiel
  */

@@ -8,7 +8,7 @@
    </bean>
 
 
-  <bean id="GTAAKeysPropertiesRepository" class="nl.vpro.domain.api.thesaurus.GTAAKeysPropertiesRepository">
+  <bean id="GTAAKeysPropertiesRepository" class="nl.vpro.domain.api.thesaurus.GTAAKeysRepositoryImpl">
     <property name="locations">
       <list>
         <value>classpath:/gtaa-keys.properties</value>

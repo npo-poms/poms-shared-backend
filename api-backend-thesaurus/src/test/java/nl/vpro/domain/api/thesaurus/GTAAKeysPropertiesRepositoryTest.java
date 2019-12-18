@@ -1,6 +1,5 @@
 package nl.vpro.domain.api.thesaurus;
 
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Disabled;
@@ -17,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class GTAAKeysPropertiesRepositoryTest {
 
     @Autowired
-    GTAAKeysPropertiesRepository repo;
+    GTAAKeysRepositoryImpl repo;
 
     @Test
     public void testGetKeyFor1() {

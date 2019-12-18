@@ -4,10 +4,16 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import nl.vpro.domain.gtaa.*;
 
+
+/**
+ * The Service that facilitates sumbitting new GTAA concepts to the GTAA API from Beeld en Geluid
+ */
 public interface GTAAService {
 
     /**
      * Submits a new person to the GTAA.
+     *
+     * This method is largely superseded by {@link #submitGTAAConcept(GTAANewConcept, String)}. A person is alo a gtaa concept.
      *
      * @param newPerson The new person
      * @param jwt The JWT string for authentication. It will also be decrypted to get information about the 'creator'.

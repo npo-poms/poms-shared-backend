@@ -14,9 +14,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.core.io.Resource;
 
 
+/**
+ * The implementation of {@link GTAAKeysRepositoryImpl} backed by a (number of) property file(s).
+ */
 @Slf4j
 @NoArgsConstructor
-public class GTAAKeysPropertiesRepository implements GTAAKeysRepository {
+public class GTAAKeysRepositoryImpl implements GTAAKeysRepository {
 
 
     @Getter
