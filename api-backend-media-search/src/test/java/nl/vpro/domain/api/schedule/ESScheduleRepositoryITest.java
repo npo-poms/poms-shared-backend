@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import nl.vpro.domain.api.ApiScheduleEvent;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
@@ -78,6 +78,9 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
         ScheduleResult result = repository.listSchedules((Instant) null, null, Order.ASC, 0L, 100000);
         assertThat(result).hasSize(3);
+        assertThat(result.getTotal()).isEqualTo(3);
+        assertThat(result.getTotalQualifier()).isEqualTo(Result.TotalQualifier.GREATER_THAN_OR_EQUAL_TO);
+
     }
 
 
@@ -156,7 +159,6 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     /**
      * This reproduces API-249
      */
-    @Disabled("Fails, see API-249")
     @Test
     public void listSchedulesForBroadcasterWithMax() throws Exception {
 

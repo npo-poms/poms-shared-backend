@@ -4,22 +4,14 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import org.apache.commons.lang.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
@@ -233,6 +225,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         long mediaObjectCount = 0;
         long offset = form.getPager().getOffset();
         Integer max = form.getPager().getMax();
+        Optional<Long> total = Optional.empty();
         try (ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject)) {
             SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
             requestBuilder.setQuery(toExecute);
@@ -240,8 +233,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
             long skipped = 0;
             long count = 0;
-
-
+            searchIterator.getTotalSize();
+            total = searchIterator.getTotalSize();
 
             OUTER:
             while (searchIterator.hasNext()) {
@@ -290,7 +283,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 break;
         }
 
-        return new ScheduleResult(new Result<>(results, offset, max, Result.Total.MISSING));
+
+        return new ScheduleResult(new Result<>(results, offset, max, total.map(t -> Result.Total.atLeast(Math.max(t, results.size()))).orElse(Result.Total.MISSING)));
     }
 
     protected MediaObject getMediaObject(SearchHit hit) {
