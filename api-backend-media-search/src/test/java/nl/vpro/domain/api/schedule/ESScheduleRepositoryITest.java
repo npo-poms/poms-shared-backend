@@ -160,6 +160,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
      * This reproduces API-249
      */
     @Test
+    @Disabled("API-249")
     public void listSchedulesForBroadcasterWithMax() throws Exception {
 
         Instant now = Instant.now();
