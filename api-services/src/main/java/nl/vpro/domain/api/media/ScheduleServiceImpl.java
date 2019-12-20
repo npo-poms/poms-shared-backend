@@ -42,38 +42,38 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult list(Instant start, Instant stop, Order order, long offset, Integer max) {
         return getScheduleRepository().listSchedules(start, stop, order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult list(Channel channel, Instant start, Instant stop, Order order, long offset, Integer max) {
         return getScheduleRepository().listSchedules(channel, start, stop, order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult list(Net net, Instant start, Instant stop, Order order, long offset, Integer max) {
         return getScheduleRepository().listSchedules(net, start, stop, order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult listForBroadcaster(String broadcaster, Instant start, Instant stop, Order order, long offset, Integer max) {
         return getScheduleRepository().listSchedulesForBroadcaster(broadcaster, start, stop, order, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult listForAncestor(String mediaId, Instant start, Instant stop, Order order, long offset, Integer max) {
         return getScheduleRepository().listSchedulesForAncestor(mediaId, start, stop, order, offset, max);
     }
 
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleSearchResult find(ScheduleForm form, String profile, long offset, Integer max) {
         ProfileDefinition<MediaObject> profileDefinition = profileRepository.getMediaProfileDefinition(profile);
         return searchRespository.findSchedules(profileDefinition, form, offset, max);

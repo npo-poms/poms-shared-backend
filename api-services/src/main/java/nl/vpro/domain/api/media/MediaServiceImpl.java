@@ -7,7 +7,8 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,6 @@ import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.*;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
@@ -30,7 +30,8 @@ import nl.vpro.domain.media.MediaType;
 import nl.vpro.util.CloseableIterator;
 import nl.vpro.util.FilteringIterator;
 
-import static nl.vpro.domain.Roles.API_USER;
+import static nl.vpro.domain.Roles.HAS_API_CHANGES_ROLE;
+import static nl.vpro.domain.Roles.HAS_API_ROLE;
 
 /**
  * @author Roelof Jan Koekoek
@@ -71,14 +72,14 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
 
     @Override
-    @PreAuthorize(Roles.API_CHANGES_USER)
+    @PreAuthorize(HAS_API_CHANGES_ROLE)
     public CloseableIterator<MediaChange> changes(final String profile, final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences, Deletes deletes) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
@@ -119,14 +120,14 @@ public class MediaServiceImpl implements MediaService {
 
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public <T extends MediaObject> T findByMid(String mid) {
         return mediaSearchRepository.findByMid(mid);
     }
 
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public List<MediaObject> loadAll(List<String> ids) {
         return mediaSearchRepository.loadAll(ids);
     }
@@ -138,67 +139,67 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaResult list(Order order, Long offset, Integer max) {
         return mediaSearchRepository.list(order, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public CloseableIterator<MediaObject> iterate(String profile, MediaForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
         return mediaSearchRepository.iterate(getProfile(profile), form, offset, max, keepAlive);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaSearchResult find(String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaResult listMembers(MediaObject media, String profile, Order order, Long offset, Integer max) {
         return mediaSearchRepository.listMembers(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaSearchResult findMembers(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findMembers(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public ProgramResult listEpisodes(MediaObject media, String profile,  Order order, Long offset, Integer max) {
         return mediaSearchRepository.listEpisodes(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public ProgramSearchResult findEpisodes(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findEpisodes(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaResult listDescendants(MediaObject media, String profile, Order order, Long offset, Integer max) {
         return mediaSearchRepository.listDescendants(media, getProfile(profile), order, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaSearchResult findDescendants(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findDescendants(media, getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaSearchResult findRelated(MediaObject media, String profile, MediaForm form, Integer max) {
         return mediaSearchRepository.findRelated(media, getProfile(profile), form, max);
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max, String partyId, String clazz) {
         Recommendations recommendations = topSpinRepository.getForMid(media.getMid(), partyId, clazz);
 
@@ -229,7 +230,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    @PreAuthorize(API_USER)
+    @PreAuthorize(HAS_API_ROLE)
     public MediaType getType(final String id) {
         MediaObject owner = findByMid(id);
         return owner != null ? MediaType.getMediaType(owner) : null;

@@ -45,31 +45,31 @@ public class PageServiceImpl implements PageService {
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public PageSearchResult find(PageForm form, String profile, Long offset, Integer max) {
         return pageSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public Page load(String url) {
         return pageSearchRepository.load(url);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public Page[] loadByCrid(String... crid) {
         return pageSearchRepository.loadByCrid(crid);
     }
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public List<Page> loadForIds(IdList ids) {
         String[] idArray = ids.toArray(new String[0]);
         CompletableFuture<Page[]> urlPages     = pageSearchRepository.loadByUrlsAsync(idArray);
@@ -109,14 +109,14 @@ public class PageServiceImpl implements PageService {
 
 
     @Override
-    @PreAuthorize(Roles.API_USER)
+    @PreAuthorize(Roles.HAS_API_ROLE)
     public PageSearchResult findRelated(Page page, String profile, PageForm form, Integer max) throws ProfileNotFoundException {
         return pageSearchRepository.findRelated(page, getProfile(profile), form, max);
     }
 
 
     @Override
-    @PreAuthorize(Roles.API_CHANGES_USER)
+    @PreAuthorize(Roles.HAS_API_CHANGES_ROLE)
     public CloseableIterator<Page> iterate(String profile, PageForm form, Long offset, Integer max, FilteringIterator.KeepAlive keepAlive) throws ProfileNotFoundException {
         return pageSearchRepository.iterate(getProfile(profile), form, offset, max, keepAlive);
 
