@@ -16,8 +16,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import nl.vpro.domain.Roles;
 import nl.vpro.domain.media.Schedule;
 import nl.vpro.domain.media.ScheduleEvent;
+
+import static nl.vpro.domain.Roles.USER;
 
 /**
  * @author rico
@@ -35,16 +38,10 @@ public class ScheduleEventViewPredicate implements Predicate<ScheduleEvent> {
         for(GrantedAuthority role : roles) {
             String roleName = role.getAuthority();
             if(roleName != null) {
+                roleName = roleName.substring(Roles.ROLE.length());
                 switch(roleName) {
-                    case "ROLE_API_USER":
-                    case "ROLE_API_SUPERUSER":
-                    case "ROLE_API_SUPERCLIENT":
-                    case "ROLE_API_CHANGES_SUPERCLIENT":
+                    case USER:
                         daysToAdd = -1;
-                        break;
-                    case "ROLE_API_CLIENT":
-                    case "ROLE_API_CHANGES_CLIENT":
-                        daysToAdd = 3;
                         break;
                     default:
                         break;
