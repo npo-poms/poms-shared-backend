@@ -37,7 +37,7 @@ public abstract class ESFilterBuilder {
     public static <T> void filter(
         @Nullable ProfileDefinition<T> definition,
         @NonNull BoolQueryBuilder rootQuery) {
-        rootQuery.filter(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()));
+        rootQuery.filter(QueryBuilders.termQuery("expandedWorkflow", Workflow.PUBLISHED.name()));
         if (!isEmpty(definition)) {
             rootQuery.filter(
                 handleConstraint(definition.getFilter().getConstraint())

@@ -1741,6 +1741,9 @@
     "workflow": {
       "type": "keyword"
     },
+    "expandedWorkflow": {
+      "type": "keyword"
+    },
     "paragraphs": {
       "properties": {
         "body": {
