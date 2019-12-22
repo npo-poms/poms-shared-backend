@@ -25,7 +25,8 @@ public class ESUtils {
 
     public static <T> CompletableFuture<T> fromActionFuture(ActionFuture<T> future) {
 
-        CompletableFuture<T> cFuture = CompletableFuture.<T>supplyAsync(future::actionGet);
+        CompletableFuture<T> cFuture = CompletableFuture
+            .<T>supplyAsync(future::actionGet);
         return cFuture;
 
     }
