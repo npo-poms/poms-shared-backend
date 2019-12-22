@@ -210,7 +210,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         // Handle profile and workflow filtering
-        ESFilterBuilder.filter(profile, rootQuery);
+        ESMediaFilterBuilder.filter(profile, rootQuery);
 
         /* This use to be here, I don't know why. I think it is silly.
         // Filtering _should_ influene aggragation

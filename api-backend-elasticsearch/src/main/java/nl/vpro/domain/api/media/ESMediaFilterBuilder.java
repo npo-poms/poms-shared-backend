@@ -13,6 +13,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 
 import nl.vpro.domain.api.ESFilterBuilder;
 import nl.vpro.domain.api.ESQueryBuilder;
+import nl.vpro.domain.api.profile.ProfileDefinition;
+import nl.vpro.domain.media.support.Workflow;
 
 /**
  * NOTE!: There is also a{@link ESMediaQueryBuilder} equivalent that more or less contains the same code for
@@ -24,6 +26,18 @@ import nl.vpro.domain.api.ESQueryBuilder;
  *
  */
 public class ESMediaFilterBuilder extends ESFilterBuilder {
+
+
+    public static <T, W extends Enum<W>> QueryBuilder filter(ProfileDefinition<T> definition) {
+        return filter(definition, "workflow", Workflow.PUBLISHED);
+    }
+
+    public static <T, W extends Enum<W>> void filter(
+        @Nullable ProfileDefinition<T> definition,
+        @NonNull BoolQueryBuilder rootQuery
+        ) {
+         filter(definition, rootQuery, "workflow", Workflow.PUBLISHED);
+     }
 
     /**
      *

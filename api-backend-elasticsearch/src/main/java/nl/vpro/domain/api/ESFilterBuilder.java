@@ -1,21 +1,19 @@
 package nl.vpro.domain.api;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
-
 import org.apache.lucene.search.join.ScoreMode;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.*;
 import nl.vpro.domain.constraint.media.HasLocationConstraint;
 import nl.vpro.domain.constraint.media.HasPredictionConstraint;
-import nl.vpro.domain.media.support.Workflow;
 
 import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
 import static org.elasticsearch.index.query.QueryBuilders.*;
+
+;
 
 /**
  * @author Michiel Meeuwissen
@@ -24,9 +22,9 @@ import static org.elasticsearch.index.query.QueryBuilders.*;
 public abstract class ESFilterBuilder {
 
 
-    public static <T> QueryBuilder filter(ProfileDefinition<T> definition) {
+    protected static <T, W extends Enum<W>> QueryBuilder filter(ProfileDefinition<T> definition, String workflowField, W published) {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        filter(definition, boolQueryBuilder);
+        filter(definition, boolQueryBuilder, workflowField, published);
         return simplifyQuery(boolQueryBuilder);
     }
 
@@ -34,10 +32,14 @@ public abstract class ESFilterBuilder {
      * Handle profile and workflow filtering
      *
      */
-    public static <T> void filter(
+    protected static <T, W extends Enum<W>> void filter(
         @Nullable ProfileDefinition<T> definition,
-        @NonNull BoolQueryBuilder rootQuery) {
-        rootQuery.filter(QueryBuilders.termQuery("expandedWorkflow", Workflow.PUBLISHED.name()));
+        @NonNull BoolQueryBuilder rootQuery,
+        String workflowField,
+        W published
+        ) {
+        rootQuery.filter(
+            QueryBuilders.termQuery(workflowField, published.name()));
         if (!isEmpty(definition)) {
             rootQuery.filter(
                 handleConstraint(definition.getFilter().getConstraint())
