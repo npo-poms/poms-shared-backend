@@ -26,7 +26,6 @@ import nl.vpro.util.FilteringIterator;
  * @since 2.0
  */
 @Service
-@PreAuthorize("hasRole('ROLE_EVERYBODY_EXCLUDED')")
 public class PageServiceImpl implements PageService {
     private final ProfileService profileService;
 
