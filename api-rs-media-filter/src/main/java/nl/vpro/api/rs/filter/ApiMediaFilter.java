@@ -158,7 +158,7 @@ public class ApiMediaFilter {
             String name = aliasToProperty.getOrDefault(property, property);
             Integer max = null;
 
-            String[] split = name.split("\\:", 3);
+            String[] split = name.split(":", 3);
             String[] extra = new String[] {null};
             boolean fromBack = false;
             name = split[0];
