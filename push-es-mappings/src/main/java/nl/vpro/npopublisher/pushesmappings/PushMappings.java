@@ -20,6 +20,11 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
 
 
 /**
+ * Pushes the required mappings.
+ * The indices are default configured for reindexation, so with a very long refresh rate.
+ *
+ * If this is run when the indices exist already, then the index is only changed, and the refresh will be set to the default (30s)
+ *
  * @author Michiel Meeuwissen
  * @since 5.12
  */

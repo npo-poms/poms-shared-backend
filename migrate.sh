@@ -29,6 +29,7 @@ fi
 function post {
    echo $dest $1
    curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
+   echo
 }
 
 
