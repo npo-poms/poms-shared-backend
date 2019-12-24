@@ -136,6 +136,7 @@ public abstract class ESFacetsBuilder {
                             .field(prefix + fieldName)
                             .format(format)
                             .keyed(false)
+                            .minDocCount(1)
                             ;
                         rootAggregation.subAggregation(histogramAggregationBuilder);
                     } else {
