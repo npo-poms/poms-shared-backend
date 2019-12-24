@@ -593,7 +593,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             ;
             while(i.hasNext()) {
                 MediaObject o = i.next();
-                newRedirects.put(o.getMid(), o.getMergedToRef());
+                if (o.getMergedToRef() != null) {
+                    newRedirects.put(o.getMid(), o.getMergedToRef());
+                } else {
+                    log.warn("Found merged object without meged to {}", o.getMid());
+                }
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
