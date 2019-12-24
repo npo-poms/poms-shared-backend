@@ -171,6 +171,7 @@ reindexType "apimedia" "deletedsegment" "apimedia"
 reindexCues "ar"
 reindexCues "nl"
 reindexCues "en"
+# other language don't occur on production
 reindexRefs "episodeRef" "episodeRef"
 reindexRefs "programMemberRef" "memberRef"
 reindexRefs "groupMemberRef" "memberRef"
