@@ -596,7 +596,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 if (o.getMergedToRef() != null) {
                     newRedirects.put(o.getMid(), o.getMergedToRef());
                 } else {
-                    log.warn("Found merged object without meged to {}", o.getMid());
+                    log.warn("Found merged object without merged to {}", o.getMid());
                 }
             }
         } catch (Exception e) {
