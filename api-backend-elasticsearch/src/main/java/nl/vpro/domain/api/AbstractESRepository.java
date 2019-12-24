@@ -199,7 +199,7 @@ public abstract class AbstractESRepository<T> {
     /**
      * Returns a list with ${ids.length} entries. Nulls if not found.
      */
-    protected <S extends T> List<S> loadAll(
+    protected <S extends T> List<Optional<S>> loadAll(
         @NonNull Class<S> clazz,
         @NonNull String indexName,
         @NonNull String... ids) {
@@ -237,12 +237,15 @@ public abstract class AbstractESRepository<T> {
                         } catch (IllegalArgumentException iae) {
                             log.warn(iae.getMessage());
                         }
+                    } else {
+                        log.debug("{}", response);
                     }
                 }
             }
-            List<S> answer = new ArrayList<>(ids.length);
+            List<Optional<S>> answer = new ArrayList<>(ids.length);
             for (String id : ids) {
-                answer.add(answerMap.get(id));
+                S object = answerMap.get(id);
+                answer.add(Optional.ofNullable(object));
             }
             return answer;
         } catch(InterruptedException | ExecutionException | IOException | TimeoutException e) {

@@ -94,12 +94,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public List<MediaObject> loadAll(@NonNull List<String> ids) {
-        return loadAll(MediaObject.class, ids);
+        return loadAll(MediaObject.class, ids).stream().map(o -> o.orElse(null)).collect(Collectors.toList());
     }
 
 
     @Override
-    protected <S extends MediaObject> List<S> loadAll(@NonNull Class<S> clazz,
+    protected <S extends MediaObject> List<Optional<S>> loadAll(@NonNull Class<S> clazz,
                                                       @NonNull List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         return loadAll(clazz, getIndexName(), ids.toArray(new String[0]));
@@ -285,9 +285,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @NonNull Integer max) {
 
-        Pair<TotalHits, List<String>> queryResult = listMembersOrEpisodes(memberRef, media, profile, order, offset, max);
-        List<MediaObject> objects = loadAll(MediaObject.class, queryResult.getSecond());
-        TotalHits totalHits = queryResult.getFirst();
+        MemberRefResult queryResult = listMembersOrEpisodes(memberRef, media, profile, order, offset, max);
+        List<MediaObject> objects = loadAll(MediaObject.class, queryResult.mids).stream()
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
+        TotalHits totalHits = queryResult.totalHits;
 
         return new MediaResult(objects, offset, max, getTotal(totalHits, profile, objects, offset, max));
 
@@ -325,9 +328,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         @Nullable Integer max) {
 
-        Pair<TotalHits, List<String>> queryResult = listMembersOrEpisodes(episodeRef, media, profile, order, offset, max);
-        List<Program> objects = loadAll(Program.class, queryResult.getSecond());
-        TotalHits totalHits = queryResult.getFirst();
+        MemberRefResult queryResult = listMembersOrEpisodes(episodeRef, media, profile, order, offset, max);
+        List<Program> objects = loadAll(Program.class, queryResult.mids).stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+        TotalHits totalHits = queryResult.totalHits;
 
 
         return new ProgramResult(objects, offset, max, getTotal(totalHits, profile, objects, offset, max));
@@ -353,7 +356,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     }
 
-    private Pair<TotalHits, List<String>> listMembersOrEpisodes(
+    private MemberRefResult listMembersOrEpisodes(
         StandaloneMemberRef.@NonNull ObjectType objectType,
         @NonNull MediaObject media,
         @Nullable ProfileDefinition<MediaObject> profile,
@@ -388,9 +391,19 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 log.error(e.getMessage(), e);
             }
         }
-        return Pair.of(total, mids);
+        return new MemberRefResult(total, mids);
     }
 
+
+    protected static class MemberRefResult {
+        final TotalHits totalHits;
+        final List<String> mids;
+
+        public MemberRefResult(TotalHits totalHits, List<String> mids) {
+            this.totalHits = totalHits;
+            this.mids = mids;
+        }
+    }
 
     protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
         BoolQueryBuilder must = QueryBuilders.boolQuery();

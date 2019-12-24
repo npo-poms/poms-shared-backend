@@ -4,8 +4,7 @@ import lombok.*;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -122,11 +121,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     @Override
     public List<MediaObject> loadAll(List<String> ids) {
-        return loadAll(MediaObject.class, ids);
+        return loadAll(MediaObject.class, ids).stream().map(o -> o.orElse(null)).collect(Collectors.toList());
     }
 
 
-    protected <S extends MediaObject> List<S> loadAll(Class<S> clazz, List<String> ids) {
+    protected <S extends MediaObject> List<Optional<S>> loadAll(Class<S> clazz, List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         if (ids.isEmpty()) {
             return Collections.emptyList();
