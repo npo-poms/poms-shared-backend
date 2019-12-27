@@ -6,7 +6,6 @@ import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.ws.rs.core.*;
@@ -27,7 +26,7 @@ import nl.vpro.util.ThreadPools;
 @Slf4j
 public class Iterate {
 
-    public static Response streamingJson(Consumer<JsonGenerator> create) throws IOException {
+    public static Response streamingJson(Streamer create) throws IOException {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
@@ -38,7 +37,12 @@ public class Iterate {
         // see e.g. also https://github.com/talsma-ict/context-propagation/issues/94
         ThreadPools.copyExecutor.submit(() -> {
             SecurityContextHolder.setContext(context);
-            create.accept(jg);
+            try {
+                create.accept(jg);
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+
+            }
             SecurityContextHolder.clearContext();
         });
 
@@ -46,6 +50,17 @@ public class Iterate {
             .type(MediaType.APPLICATION_JSON_TYPE)
             .entity(streamingOutput)
             .build();
+    }
+
+
+    @FunctionalInterface
+    public interface Streamer {
+
+
+        void accept(JsonGenerator jg) throws Exception;
+
+
+
     }
 
     public static Function<Character, Boolean> keepAlive(JsonGenerator jg) {
