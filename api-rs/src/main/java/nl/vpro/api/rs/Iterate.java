@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.util.CloseableIterator;
 import nl.vpro.util.ThreadPools;
 
 /**
@@ -26,22 +27,31 @@ import nl.vpro.util.ThreadPools;
 @Slf4j
 public class Iterate {
 
-    public static Response streamingJson(Streamer create) throws IOException {
+    public static <T> Response streamingJson(Function<JsonGenerator, CloseableIterator<T>> creator, JsonConsumer<T> streamer) throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
         StreamingOutput streamingOutput = output -> IOUtils.copy(pipedInputStream, output);
         JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory().createGenerator(pipedOutputStream);
+
+        CloseableIterator<T> iterator;
+        try {
+            iterator = creator.apply(jg);
+        } catch (Exception e) {
+            CloseableIterator.closeQuietly(jg);
+            throw e;
+        }
         final SecurityContext context = SecurityContextHolder.getContext();
         // ForkJoinPool.commonPool() doesn't work because serviceloader may not be available in classloader of tomcat?
         // see e.g. also https://github.com/talsma-ict/context-propagation/issues/94
         ThreadPools.copyExecutor.submit(() -> {
             SecurityContextHolder.setContext(context);
             try {
-                create.accept(jg);
+                streamer.accept(iterator, jg);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
-
+            } finally {
+                CloseableIterator.closeQuietly(jg, iterator);
             }
             SecurityContextHolder.clearContext();
         });
@@ -50,17 +60,14 @@ public class Iterate {
             .type(MediaType.APPLICATION_JSON_TYPE)
             .entity(streamingOutput)
             .build();
+
+
     }
 
 
     @FunctionalInterface
-    public interface Streamer {
-
-
-        void accept(JsonGenerator jg) throws Exception;
-
-
-
+    public interface JsonConsumer<T> {
+        void accept(CloseableIterator<T> stream, JsonGenerator jg) throws Exception;
     }
 
     public static Function<Character, Boolean> keepAlive(JsonGenerator jg) {
