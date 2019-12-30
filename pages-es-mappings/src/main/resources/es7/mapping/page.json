@@ -1798,31 +1798,6 @@
         }
       }
     },
-    "persons": {
-      "properties": {
-        "familyName": {
-          "type": "keyword",
-          "copy_to": "persons.fullName"
-        },
-        "givenName": {
-          "type": "keyword",
-          "copy_to": "persons.fullName"
-        },
-        "fullName": {
-          "type": "text",
-          "index": false,
-          "fields": {
-            "text": {
-              "type": "text",
-              "norms": false
-            }
-          }
-        },
-        "role": {
-          "type": "keyword"
-        }
-      }
-    },
     "portal": {
       "properties": {
         "name": {

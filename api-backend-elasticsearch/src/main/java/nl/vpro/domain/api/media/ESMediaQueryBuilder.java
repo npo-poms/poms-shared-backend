@@ -45,7 +45,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     public static final List<SearchFieldDefinition> SEARCH_FIELDS = Arrays.asList(
         new SearchFieldDefinition("broadcasters.value.text", 2f),
         new SearchFieldDefinition("countries.value.text", 1.2f),
-        new SearchFieldDefinition("credits.fullName.text", 2f),
+        new SearchFieldDefinition("credits.name.text", 2f),
         new SearchFieldDefinition("descriptions.value", 1.1f),
         new SearchFieldDefinition("descriptions.stemmed", 1.0f, false),
         new SearchFieldDefinition("genres.terms.text", 2f),

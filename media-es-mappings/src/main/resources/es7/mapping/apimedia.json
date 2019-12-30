@@ -122,16 +122,12 @@
     "credits": {
       "properties": {
         "familyName": {
-          "type": "text",
-          "index": false,
-          "copy_to": "credits.fullName"
+          "type": "keyword"
         },
         "givenName": {
-          "type": "text",
-          "index": false,
-          "copy_to": "credits.fullName"
+          "type": "keyword"
         },
-        "fullName": {
+        "name": {
           "type": "text",
           "index": false,
           "fields": {
@@ -148,6 +144,9 @@
           "type": "keyword"
         },
         "gtaaStatus": {
+          "type": "keyword"
+        },
+        "objectType": {
           "type": "keyword"
         }
       }
@@ -959,16 +958,12 @@
         "credits": {
           "properties": {
             "familyName": {
-              "type": "text",
-              "index": false,
-              "copy_to": "segments.credits.fullName"
+              "type": "keyword"
             },
             "givenName": {
-              "type": "text",
-              "index": false,
-              "copy_to": "segments.credits.fullName"
+              "type": "keyword"
             },
-            "fullName": {
+            "name": {
               "type": "text",
               "index": false,
               "fields": {
@@ -976,7 +971,6 @@
                   "type": "text",
                   "norms": false
                 }
-              }
             },
             "role": {
               "type": "keyword"
@@ -985,6 +979,9 @@
               "type": "keyword"
             },
             "gtaaStatus": {
+              "type": "keyword"
+            },
+            "objectType": {
               "type": "keyword"
             }
           }

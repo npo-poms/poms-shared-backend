@@ -143,6 +143,12 @@
         },
         "gtaaStatus": {
           "type": "keyword"
+        },
+        "name": {
+          "type": "keyword"
+        },
+        "objectType": {
+          "type": "keyword"
         }
       }
     },

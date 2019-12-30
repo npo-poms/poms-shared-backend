@@ -126,6 +126,9 @@
             }
           }
         },
+        "name": {
+          "type": "text"
+        },
         "role": {
           "type": "keyword"
         },
@@ -133,6 +136,9 @@
           "type": "keyword"
         },
         "gtaaStatus": {
+          "type": "keyword"
+        },
+        "objectType": {
           "type": "keyword"
         }
       }
@@ -974,6 +980,12 @@
               "type": "keyword"
             },
             "gtaaStatus": {
+              "type": "keyword"
+            },
+            "objectType": {
+              "type": "keyword"
+            },
+            "name": {
               "type": "keyword"
             }
           }
