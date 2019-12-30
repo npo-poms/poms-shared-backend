@@ -54,13 +54,18 @@ function reindex {
    post "$command"
 }
 
-function reindexType {
+function reindexMediaType {
    [[ "$1" =~ $only ]] || [[ "$2" =~ $only ]] || return
+
+   script="ctx._source.credits.forEach(function(c) {c.name = c.fullName; c.objectType = 'person'};";
+
    command=$( jq  -n -R \
                   --arg index "$1" \
                   --arg source "$source" \
                   --arg sourceType "$2" \
                   --arg destIndex "$3" \
+                  --arg script "$script" \
+
                   '
  { source: {
     remote: {
@@ -74,6 +79,9 @@ function reindexType {
   dest: {
     index: $destIndex,
     type: "_doc"
+  },
+  script: {
+     source: $script
   }
 }')
   post "$command"
@@ -162,12 +170,12 @@ function reindexPages {
 reindex "pageupdates-publish"
 reindexPages
 reindex "apiqueries"
-reindexType "apimedia" "program" "apimedia"
-reindexType "apimedia" "group" "apimedia"
-reindexType "apimedia" "segment" "apimedia"
-reindexType "apimedia" "deletedprogram" "apimedia"
-reindexType "apimedia" "deletedgroup" "apimedia"
-reindexType "apimedia" "deletedsegment" "apimedia"
+reindexMediaType "apimedia" "program" "apimedia"
+reindexMediaType "apimedia" "group" "apimedia"
+reindexMediaType "apimedia" "segment" "apimedia"
+reindexMediaType "apimedia" "deletedprogram" "apimedia"
+reindexMediaType "apimedia" "deletedgroup" "apimedia"
+reindexMediaType "apimedia" "deletedsegment" "apimedia"
 reindexCues "ar"
 reindexCues "nl"
 reindexCues "en"
