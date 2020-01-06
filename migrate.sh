@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 source="http://pomz11aas:9200"
 dest="localhost:9215"
 only=".*"
@@ -57,16 +56,21 @@ function reindex {
 function reindexMediaType {
    [[ "$1" =~ $only ]] || [[ "$2" =~ $only ]] || return
 
-   script="ctx._source.credits.forEach(function(c) {c.name = c.fullName; c.objectType = 'person'};";
+   script="if (ctx._source.credits != null ) {\
+           for (int i = 0; i < ctx._source.credits.length; ++i) { \
+               Map c = ctx._source.credits[i];\
+               c.name = c.fullName;\
+               c.objectType = 'person'; \
+               c.fullName = null;\
+           }\
+           }"
 
    command=$( jq  -n -R \
                   --arg index "$1" \
                   --arg source "$source" \
                   --arg sourceType "$2" \
                   --arg destIndex "$3" \
-                  --arg script "$script" \
-
-                  '
+                  --arg script "$script" \ '
  { source: {
     remote: {
       host: $source
@@ -81,7 +85,8 @@ function reindexMediaType {
     type: "_doc"
   },
   script: {
-     source: $script
+     source: $script,
+     lang: "painless"
   }
 }')
   post "$command"

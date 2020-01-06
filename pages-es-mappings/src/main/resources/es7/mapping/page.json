@@ -189,16 +189,12 @@
             "credits": {
               "properties": {
                 "familyName": {
-                  "type": "text",
-                  "index": false,
-                  "copy_to": "embeds.media.credits.fullName"
+                  "type": "keyword"
                 },
                 "givenName": {
-                  "type": "text",
-                  "index": false,
-                  "copy_to": "embeds.media.credits.fullName"
+                  "type": "keyword"
                 },
-                "fullName": {
+                "name": {
                   "type": "text",
                   "index": false,
                   "fields": {
@@ -1058,16 +1054,12 @@
                 "credits": {
                   "properties": {
                     "familyName": {
-                      "type": "text",
-                      "index": false,
-                      "copy_to": "embeds.media.segments.credits.fullName"
+                      "type": "keyword"
                     },
                     "givenName": {
-                      "type": "text",
-                      "index": false,
-                      "copy_to": "embeds.media.segments.credits.fullName"
+                      "type": "keyword"
                     },
-                    "fullName": {
+                    "name": {
                       "type": "text",
                       "index": false,
                       "fields": {
@@ -1081,6 +1073,9 @@
                       "type": "keyword"
                     },
                     "gtaaUri": {
+                      "type": "keyword"
+                    },
+                    "gtaaStatus": {
                       "type": "keyword"
                     }
                   }
