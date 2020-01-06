@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
+import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.elasticsearch7.IndexHelper;
@@ -114,14 +115,23 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
 
     @Override
-    public MediaObject load(String mid) {
+    public MediaObject load(boolean loadDeleted, String mid) {
         mid = redirect(mid).orElse(mid);
-        return load(mid, MediaObject.class);
+        MediaObject mediaObject = load(mid, MediaObject.class);
+        if (loadDeleted ||  Workflow.PUBLICATIONS.contains(mediaObject.getWorkflow())) {
+            return mediaObject;
+        } else {
+            return null;
+        }
     }
 
     @Override
-    public List<MediaObject> loadAll(List<String> ids) {
-        return loadAll(MediaObject.class, ids).stream().map(o -> o.orElse(null)).collect(Collectors.toList());
+    public List<MediaObject> loadAll(boolean loadDeleted, List<String> ids) {
+        return loadAll(MediaObject.class, ids)
+            .stream()
+            .map(o -> o.orElse(null))
+            .map(o -> o == null || loadDeleted || Workflow.PUBLICATIONS.contains(o.getWorkflow()) ? o : null)
+            .collect(Collectors.toList());
     }
 
 
