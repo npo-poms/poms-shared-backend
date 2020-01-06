@@ -1123,6 +1123,88 @@
                     }
                   }
                 },
+                 "geoLocations": {
+                   "properties": {
+                     "owner": {
+                       "type": "keyword"
+                     },
+                     "values": {
+                       "properties": {
+                         "name": {
+                           "type": "keyword"
+                         },
+                         "scopeNotes": {
+                           "type": "keyword"
+                         },
+                         "role": {
+                           "type": "keyword"
+                         },
+                         "gtaaUri": {
+                           "type": "keyword"
+                         },
+                         "gtaaStatus": {
+                           "type": "keyword"
+                         }
+                       }
+                     }
+                   }
+                 },
+                "expandedGeoLocations": {
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "properties": {
+                        "name": {
+                          "type": "keyword"
+                        },
+                        "scopeNotes": {
+                          "type": "keyword"
+                        },
+                        "role": {
+                          "type": "keyword"
+                        },
+                        "gtaaUri": {
+                          "type": "keyword"
+                        },
+                        "gtaaStatus": {
+                          "type": "keyword"
+                        }
+                      }
+                    }
+                  }
+                },
+                "expandedIntentions": {
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "targetGroups": {
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "expandedTargetGroups": {
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "type": "keyword"
+                    }
+                  }
+                },
                 "availableSubtitles": {
                   "properties": {
                     "language": {
@@ -1215,6 +1297,26 @@
                       "type": "long"
                     },
                     "workflow": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "intentions": {
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
                       "type": "keyword"
                     }
                   }
