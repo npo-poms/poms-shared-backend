@@ -56,15 +56,20 @@ function reindex {
 function reindexMediaType {
    [[ "$1" =~ $only ]] || [[ "$2" =~ $only ]] || return
 
-   script="if (ctx._source.credits != null ) {\
-           for (int i = 0; i < ctx._source.credits.length; ++i) { \
-               Map c = ctx._source.credits[i];\
-               c.name = c.fullName;\
-               c.objectType = 'person'; \
-               c.fullName = null;\
-           }\
-           }"
-
+   read -r -d '' script << EOM
+      if (ctx._source.credits != null ) {
+           for (int i = 0; i < ctx._source.credits.length; ++i) {
+               Map c = ctx._source.credits[i];
+               String fullName = c.fullName;
+               if (c.fullName == null) {
+                  c.name = (c.familyName == null ? "" : c.familyName) + (c.givenName == null ? "":  ", " + c.givenName);
+               }
+               c.name = c.fullName;
+               c.objectType = 'person';
+               c.remove('fullName');
+           }
+      }
+EOM
    command=$( jq  -n -R \
                   --arg index "$1" \
                   --arg source "$source" \
