@@ -431,6 +431,28 @@
                 }
               }
             },
+            "topics": {
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "expandedTopics": {
+              "type": "nested",
+              "include_in_parent": true,
+              "properties": {
+                "owner": {
+                  "type": "keyword"
+                },
+                "values": {
+                  "type": "keyword"
+                }
+              }
+            },
             "availableSubtitles": {
               "properties": {
                 "language": {
@@ -1196,6 +1218,26 @@
                   }
                 },
                 "expandedTargetGroups": {
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "topics": {
+                  "properties": {
+                    "owner": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "expandedTopics": {
                   "properties": {
                     "owner": {
                       "type": "keyword"
