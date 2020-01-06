@@ -368,7 +368,17 @@
           "type": "keyword"
         },
         "values": {
-          "type": "keyword"
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            },
+            "gtaaStatus": {
+              "type": "keyword"
+            }
+          }
         }
       }
     },
@@ -380,7 +390,17 @@
           "type": "keyword"
         },
         "values": {
-          "type": "keyword"
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            },
+            "gtaaStatus": {
+              "type": "keyword"
+            }
+          }
         }
       }
     },
@@ -1178,13 +1198,24 @@
               }
             }
           },
+
           "topics": {
             "properties": {
               "owner": {
                 "type": "keyword"
               },
               "values": {
-                "type": "keyword"
+                "properties": {
+                  "name": {
+                    "type": "keyword"
+                  },
+                  "gtaaUri": {
+                    "type": "keyword"
+                  },
+                  "gtaaStatus": {
+                    "type": "keyword"
+                  }
+                }
               }
             }
           },
@@ -1194,7 +1225,17 @@
                 "type": "keyword"
               },
               "values": {
-                "type": "keyword"
+                "properties": {
+                  "name": {
+                    "type": "keyword"
+                  },
+                  "gtaaUri": {
+                    "type": "keyword"
+                  },
+                  "gtaaStatus": {
+                    "type": "keyword"
+                  }
+                }
               }
             }
           },

@@ -437,19 +437,37 @@
                   "type": "keyword"
                 },
                 "values": {
-                  "type": "keyword"
+                  "properties": {
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "gtaaUri": {
+                      "type": "keyword"
+                    },
+                    "gtaaStatus": {
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
             "expandedTopics": {
-              "type": "nested",
-              "include_in_parent": true,
               "properties": {
                 "owner": {
                   "type": "keyword"
                 },
                 "values": {
-                  "type": "keyword"
+                  "properties": {
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "gtaaUri": {
+                      "type": "keyword"
+                    },
+                    "gtaaStatus": {
+                      "type": "keyword"
+                    }
+                  }
                 }
               }
             },
