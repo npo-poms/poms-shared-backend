@@ -26,6 +26,7 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.InstantRange;
 import nl.vpro.domain.media.search.SchedulePager;
+import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.elasticsearch7.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -77,12 +78,22 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
 
     @Override
-    public List<MediaObject> loadAll(List<String> ids) {
+    public List<MediaObject> loadAll(boolean loadDeleted, List<String> ids) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public MediaObject load(String id) {
+    public MediaObject load(boolean loadDeleted, String id) {
+        MediaObject mo = loadWithCrid(id);
+        if (mo == null || loadDeleted || Workflow.PUBLICATIONS.contains(mo.getWorkflow())) {
+            return mo;
+        } else {
+            return null;
+        }
+    }
+
+
+    protected MediaObject loadWithCrid(String id) {
         if(id.startsWith("crid://")) {
             try {
                 return findByCrid(id);
