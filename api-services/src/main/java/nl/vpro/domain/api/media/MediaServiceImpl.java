@@ -129,7 +129,7 @@ public class MediaServiceImpl implements MediaService {
     @Override
     @PreAuthorize(HAS_API_ROLE)
     public List<MediaObject> loadAll(List<String> ids) {
-        return mediaSearchRepository.loadAll(ids);
+        return mediaSearchRepository.loadAll(false, ids);
     }
 
     @Override
