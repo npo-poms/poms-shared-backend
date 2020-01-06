@@ -16,8 +16,8 @@ import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 public class TopspinTest {
@@ -77,8 +77,8 @@ public class TopspinTest {
         // When
 
         when(topSpinRepository.getForMid(startingMid, null, null)).thenReturn(recommendations);
-        doReturn(objects).when(mediaRepository).loadAll(anyList());
-        when(mediaRepository.loadAll(anyList())).thenReturn(objects);
+        when(mediaRepository.loadAll(anyBoolean(), anyList())).thenReturn(objects);
+        when(mediaRepository.loadAll(anyList())).thenCallRealMethod();
         when(profileService.getProfile("noteoprofile")).thenReturn(profile);
     }
 
