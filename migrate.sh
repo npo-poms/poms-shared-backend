@@ -156,8 +156,16 @@ function reindexRefs {
 function reindexPages {
    [[ "apipages" =~ $only ]] || return
 
+    read -r -d '' script << EOM
+      if ( ctx._type != "page") {
+          ctx._source.workflow =  "DELETED";
+      }
+      ctx._source.expandedWorkflow = ctx._type == "page" ? "PUBLISHED" : "DELETED";
+EOM
+
     command=$( jq -n \
                   --arg source "$source" \
+                  --arg script "$script" \
                   '
  { source: {
     remote: {
@@ -170,7 +178,9 @@ function reindexPages {
     type: "_doc"
   },
   script: {
-     source: "if ( ctx._type != \"page\") { ctx._source.workflow =  \"DELETED\"; }  ctx._source.expandedWorkflow = ctx._type == \"page\" ? \"PUBLISHED\" : \"DELETED\";"
+     source: $script,
+     lang: "painless"
+
   }
 }')
    post "$command"
