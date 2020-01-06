@@ -118,7 +118,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     public MediaObject load(boolean loadDeleted, String mid) {
         mid = redirect(mid).orElse(mid);
         MediaObject mediaObject = load(mid, MediaObject.class);
-        if (loadDeleted ||  Workflow.PUBLICATIONS.contains(mediaObject.getWorkflow())) {
+        if (mediaObject == null || loadDeleted ||  Workflow.PUBLICATIONS.contains(mediaObject.getWorkflow())) {
             return mediaObject;
         } else {
             return null;

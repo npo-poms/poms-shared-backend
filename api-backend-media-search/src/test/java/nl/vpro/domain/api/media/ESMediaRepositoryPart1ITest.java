@@ -1246,7 +1246,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
      */
     @Test
     public void ableToIndexAllMediaObject(){
-
         assertThatCode(() -> {
             index(MediaTestDataBuilder.group().withEverything().published());
             index(MediaTestDataBuilder.segment().withEverything());
