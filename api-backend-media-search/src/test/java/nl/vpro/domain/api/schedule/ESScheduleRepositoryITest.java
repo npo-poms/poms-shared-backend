@@ -76,6 +76,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
             ));
 
 
+        index(program().mid("DONNA_DELETED")
+            .workflow(Workflow.DELETED)
+            .scheduleEvents(
+                event(Channel.BBC2, "2015-06-19T10:01:00")
+            ));
+
+
         ScheduleResult result = repository.listSchedules((Instant) null, null, Order.ASC, 0L, 100000);
         assertThat(result).hasSize(3);
         assertThat(result.getTotal()).isEqualTo(3);
@@ -378,7 +385,9 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         MediaObject[] result = new MediaObject[os.length];
         int i = 0;
         for (B o : os) {
-            o.workflow(Workflow.PUBLISHED);
+            if (o.getWorkflow() != Workflow.DELETED) {
+                o.workflow(Workflow.PUBLISHED);
+            }
             MO program = o.build();
             result[i++] = program;
             client.prepareIndex()

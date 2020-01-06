@@ -183,6 +183,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         QueryBuilder toExecute;
         {
             BoolQueryBuilder query = QueryBuilders.boolQuery();
+            query.filter(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()));
             if (form.hasChannels()) {
                 BoolQueryBuilder channelQuery = QueryBuilders.boolQuery();
                 for (Channel channel : form.getChannels()) {
