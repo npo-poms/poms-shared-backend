@@ -62,7 +62,7 @@
       "bool" : {
         "should" : [ {
           "match" : {
-            "credits.fullName.text" : {
+            "credits.name.text" : {
               "query" : "Text to search for",
               "operator" : "OR",
               "prefix_length" : 0,
@@ -76,7 +76,7 @@
           }
         }, {
           "match_phrase" : {
-            "credits.fullName.text" : {
+            "credits.name.text" : {
               "query" : "Text to search for",
               "slop" : 4,
               "zero_terms_query" : "NONE",
