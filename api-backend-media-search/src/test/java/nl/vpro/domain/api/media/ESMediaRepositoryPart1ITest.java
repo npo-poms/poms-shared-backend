@@ -3,6 +3,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -2019,7 +2020,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             MediaForm form = MediaForm.builder()
                 .geoLocation(GeoLocationSearch.builder()
                     .owner(BROADCASTER)
-                    .gtaaUri(AMSTERDAM.getUri())
+                    .gtaaUri(URI.create(AMSTERDAM.getUri()))
                     .role(SUBJECT)
                     .build())
                 .build();
@@ -2038,7 +2039,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             MediaForm form = MediaForm.builder()
                 .geoLocation(GeoLocationSearch.builder()
                     .owner(AUTHORITY)
-                    .gtaaUri(AMSTERDAM.getUri())
+                    .gtaaUri(URI.create(AMSTERDAM.getUri()))
                     .role(SUBJECT)
                     .build())
                 .build();
