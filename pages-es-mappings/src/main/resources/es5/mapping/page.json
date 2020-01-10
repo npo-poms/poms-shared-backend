@@ -216,6 +216,15 @@
                 },
                 "gtaaStatus": {
                   "type": "keyword"
+                },
+                "scopeNotes": {
+                  "type": "text"
+                },
+                "objectType": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "string"
                 }
               }
             },
@@ -1042,6 +1051,15 @@
                     },
                     "gtaaUri": {
                       "type": "keyword"
+                    },
+                    "scopeNotes": {
+                      "type": "text"
+                    },
+                    "objectType": {
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "type": "string"
                     }
                   }
                 },

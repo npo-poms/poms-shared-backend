@@ -205,6 +205,18 @@
                       }
                     }
                   },
+                  "name": {
+                    "type": "string",
+                    "index": "not_analyzed",
+                    "fields": {
+                      "text": {
+                        "type": "string",
+                        "norms": {
+                          "enabled": false
+                        }
+                      }
+                    }
+                  },
                   "givenName": {
                     "type": "string",
                     "index": "not_analyzed",
@@ -219,6 +231,9 @@
                   "role": {
                     "type": "string",
                     "index": "not_analyzed"
+                  },
+                  "scopeNotes": {
+                    "type": "text"
                   }
                 }
               },

@@ -146,6 +146,9 @@
         "gtaaStatus": {
           "type": "keyword"
         },
+        "scopeNotes": {
+          "type": "text"
+        },
         "objectType": {
           "type": "keyword"
         }
@@ -1023,6 +1026,9 @@
             },
             "gtaaStatus": {
               "type": "keyword"
+            },
+            "scopeNotes": {
+              "type": "text"
             },
             "objectType": {
               "type": "keyword"

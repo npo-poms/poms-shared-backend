@@ -147,6 +147,9 @@
         "name": {
           "type": "keyword"
         },
+        "scopeNotes": {
+          "type": "text"
+        },
         "objectType": {
           "type": "keyword"
         }
