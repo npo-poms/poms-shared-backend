@@ -8,9 +8,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Collections;
 import java.util.List;
 
@@ -294,14 +292,15 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ApiScheduleEvent nowForBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
             @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-            @ApiParam()  @QueryParam("mustberunning") @DefaultValue("true") boolean mustBeRunning,
+            @ApiParam(value = "if false then there may also be returned an event that was recently finished.")  @QueryParam("mustberunning") @DefaultValue("true") boolean mustBeRunning,
             @QueryParam(NOW) Instant now
 
     ) {
         if (now == null) {
             now = Instant.now();
         }
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, null, now, Order.DESC, 0L, 100).getItems();
+        Instant start = mustBeRunning ? now.minus(Duration.ofDays(1)) : now.minus(Duration.ofDays(7));
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, start, now, Order.DESC, 0L, 100).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No current event for broadcaster " + broadcaster);
@@ -578,17 +577,13 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         }
     }
 
-    boolean isActiveEvent(ScheduleEvent scheduleEvent, Instant time) {
-        if (scheduleEvent == null || time == null) {
+    boolean isActiveEvent(ScheduleEvent scheduleEvent, Instant now) {
+        if (scheduleEvent == null || now == null) {
             return false;
         }
-
-        Instant start = scheduleEvent.getStartInstant();
         if (scheduleEvent.getDuration() == null){
             return false;
         }
-        Instant end = start.plus(scheduleEvent.getDuration());
-
-        return ! start.isAfter(time) && end.isAfter(time);
+        return scheduleEvent.asRange().contains(now);
     }
 }
