@@ -28,47 +28,47 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final ProfileService profileRepository;
 
 
-    private final ScheduleRepository searchRespository;
+    private final ScheduleRepository searchRepository;
 
 
     @Autowired
     public ScheduleServiceImpl(
         ProfileService profileService,
 
-        @Named("scheduleSearchRepository") ScheduleRepository searchRespository
+        @Named("scheduleSearchRepository") ScheduleRepository searchRepository
         ) {
         this.profileRepository = profileService;
-        this.searchRespository = searchRespository;
+        this.searchRepository = searchRepository;
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult list(Instant start, Instant stop, Order order, long offset, Integer max) {
-        return getScheduleRepository().listSchedules(start, stop, order, offset, max);
+        return searchRepository.listSchedules(start, stop, order, offset, max);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult list(Channel channel, Instant start, Instant stop, Order order, long offset, Integer max) {
-        return getScheduleRepository().listSchedules(channel, start, stop, order, offset, max);
+        return searchRepository.listSchedules(channel, start, stop, order, offset, max);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult list(Net net, Instant start, Instant stop, Order order, long offset, Integer max) {
-        return getScheduleRepository().listSchedules(net, start, stop, order, offset, max);
+        return searchRepository.listSchedules(net, start, stop, order, offset, max);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult listForBroadcaster(String broadcaster, Instant start, Instant stop, Order order, long offset, Integer max) {
-        return getScheduleRepository().listSchedulesForBroadcaster(broadcaster, start, stop, order, offset, max);
+        return searchRepository.listSchedulesForBroadcaster(broadcaster, start, stop, order, offset, max);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleResult listForAncestor(String mediaId, Instant start, Instant stop, Order order, long offset, Integer max) {
-        return getScheduleRepository().listSchedulesForAncestor(mediaId, start, stop, order, offset, max);
+        return searchRepository.listSchedulesForAncestor(mediaId, start, stop, order, offset, max);
     }
 
 
@@ -76,11 +76,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     @PreAuthorize(Roles.HAS_API_ROLE)
     public ScheduleSearchResult find(ScheduleForm form, String profile, long offset, Integer max) {
         ProfileDefinition<MediaObject> profileDefinition = profileRepository.getMediaProfileDefinition(profile);
-        return searchRespository.findSchedules(profileDefinition, form, offset, max);
+        return searchRepository.findSchedules(profileDefinition, form, offset, max);
     }
 
-
-    private ScheduleRepository getScheduleRepository() {
-        return  searchRespository;
-    }
 }
