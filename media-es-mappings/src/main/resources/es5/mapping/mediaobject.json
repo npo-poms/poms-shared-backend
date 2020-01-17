@@ -26,8 +26,14 @@
       "properties": {
         "audioAttributes": {
           "properties": {
+            "audioCoding": {
+              "type": "keyword"
+            },
             "numberOfChannels": {
               "type": "long"
+            },
+            "language": {
+              "type": "keyword"
             }
           }
         },
@@ -35,6 +41,9 @@
           "type": "keyword"
         },
         "bitrate": {
+          "type": "long"
+        },
+        "byteSize": {
           "type": "long"
         },
         "videoAttributes": {
@@ -132,6 +141,9 @@
             }
           }
         },
+        "name": {
+          "type": "keyword"
+        },
         "role": {
           "type": "keyword"
         },
@@ -139,6 +151,12 @@
           "type": "keyword"
         },
         "gtaaStatus": {
+          "type": "keyword"
+        },
+        "scopeNotes": {
+          "type": "text"
+        },
+        "objectType": {
           "type": "keyword"
         }
       }
@@ -246,71 +264,157 @@
         }
       }
     },
-     "geoLocations": {
+    "geoLocations": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
           "properties": {
-            "owner": {
+            "name": {
               "type": "keyword"
             },
-            "values": {
-              "properties": {
-                "name": {
-                  "type": "keyword"
-                },
-                "scopeNotes": {
-                  "type": "keyword"
-                },
-                "role": {
-                  "type": "keyword"
-                },
-                "gtaaUri": {
-                  "type": "keyword"
-                },
-                "gtaaStatus": {
-                  "type": "keyword"
-            }
-              }
+            "scopeNotes": {
+              "type": "keyword"
+            },
+            "role": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            },
+            "gtaaStatus": {
+              "type": "keyword"
             }
           }
+        }
+      }
+    },
+    "expandedGeoLocations": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "keyword"
         },
-        "expandedGeoLocations": {
-          "type": "nested",
-          "include_in_parent": true,
+        "values": {
           "properties": {
-            "owner": {
-              "type": "keyword"
-            },
-            "values": {
-              "properties": {
-                "name": {
-                  "type": "text",
-                  "norms": false,
-                  "fields": {
-                    "full": {
-                      "type": "keyword",
-                      "index": true
-                    },
-                    "lower": {
+             "name": {
+               "type": "text",
+               "norms": false,
+               "fields": {
+                 "full": {
+                   "type": "keyword",
+                   "index": true
+                 },
+                 "lower": {
                    "type": "text",
-                      "analyzer": "lowercase"
-                    }
-                  }
-                },
-                "scopeNotes": {
-                  "type": "keyword"
-                },
-                "role": {
-                  "type": "keyword"
-                },
-                "gtaaUri": {
-                  "type": "keyword"
-                },
-                "gtaaStatus": {
-                  "type": "keyword"
-                }
-              }
+                   "analyzer": "lowercase"
+                 }
+               }
+            },
+            "scopeNotes": {
+              "type": "keyword"
+            },
+            "role": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            },
+            "gtaaStatus": {
+              "type": "keyword"
             }
           }
+        }
+      }
+    },
+    "intentions": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
         },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
+    "expandedIntentions": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
+    "targetGroups": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
+    "expandedTargetGroups": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "type": "keyword"
+        }
+      }
+    },
+    "topics": {
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            },
+            "gtaaStatus": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
+    "expandedTopics": {
+      "type": "nested",
+      "include_in_parent": true,
+      "properties": {
+        "owner": {
+          "type": "keyword"
+        },
+        "values": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "gtaaUri": {
+              "type": "keyword"
+            },
+            "gtaaStatus": {
+              "type": "keyword"
+            }
+          }
+        }
+      }
+    },
     "availableSubtitles": {
       "properties": {
         "language": {
@@ -329,6 +433,9 @@
         "creationDate": {
           "type": "date",
           "format": "epoch_millis"
+        },
+        "crids": {
+          "type": "keyword"
         },
         "description": {
           "type": "text",
@@ -659,6 +766,9 @@
             "bitrate": {
               "type": "long"
             },
+            "byteSize": {
+              "type": "long"
+            },
             "videoAttributes": {
               "properties": {
                 "aspectRatio": {
@@ -808,8 +918,14 @@
           "properties": {
             "audioAttributes": {
               "properties": {
+                "audioCoding": {
+                  "type": "keyword"
+                },
                 "numberOfChannels": {
                   "type": "long"
+                },
+                "language": {
+                  "type": "keyword"
                 }
               }
             },
@@ -817,6 +933,9 @@
               "type": "keyword"
             },
             "bitrate": {
+              "type": "long"
+            },
+            "byteSize": {
               "type": "long"
             },
             "videoAttributes": {
@@ -922,6 +1041,15 @@
             },
             "gtaaStatus": {
               "type": "keyword"
+            },
+            "objectType": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "scopeNotes": {
+              "type": "text"
             }
           }
         },
@@ -1003,6 +1131,151 @@
             }
           }
         },
+        "geoLocations": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "scopeNotes": {
+                  "type": "keyword"
+                },
+                "role": {
+                  "type": "keyword"
+                },
+                "gtaaUri": {
+                  "type": "keyword"
+                },
+                "gtaaStatus": {
+                  "type": "keyword"
+            }
+              }
+            }
+          }
+        },
+        "expandedGeoLocations": {
+          "type": "nested",
+          "include_in_parent": true,
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "properties": {
+                "name": {
+                  "type": "text",
+                  "norms": false,
+                  "fields": {
+                    "full": {
+                      "type": "keyword",
+                      "index": true
+                    },
+                    "lower": {
+                      "type": "text",
+                      "analyzer": "lowercase"
+                    }
+                  }
+                },
+                "scopeNotes": {
+                  "type": "keyword"
+                },
+                "role": {
+                  "type": "keyword"
+                },
+                "gtaaUri": {
+                  "type": "keyword"
+                },
+                "gtaaStatus": {
+                  "type": "keyword"
+                }
+              }
+            }
+          }
+        },
+        "intentions": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "type": "keyword"
+            }
+          }
+        },
+        "expandedIntentions": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "type": "keyword"
+            }
+          }
+        },
+        "targetGroups": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "type": "keyword"
+            }
+          }
+        },
+        "expandedTargetGroups": {
+           "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "type": "keyword"
+            }
+          }
+        },
+        "topics": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "gtaaUri": {
+                  "type": "keyword"
+                },
+                    "gtaaStatus": {
+                      "type": "keyword"
+                    }
+              }
+            }
+          }
+        },
+        "expandedTopics": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "values": {
+              "properties": {
+                "name": {
+                  "type": "keyword"
+                },
+                "gtaaUri": {
+                  "type": "keyword"
+                },
+                "gtaaStatus": {
+                  "type": "keyword"
+                }
+              }
+                }
+          }
+        },
         "availableSubtitles": {
           "properties": {
             "language": {
@@ -1021,6 +1294,9 @@
             "creationDate": {
               "type": "date",
               "format": "epoch_millis"
+            },
+            "crids": {
+              "type": "keyword"
             },
             "description": {
               "type": "text",
@@ -1293,15 +1569,15 @@
             }
           }
         },
+        "publishDate": {
+          "type": "date",
+          "format": "epoch_millis"
+        },
         "publishStart": {
           "type": "date",
           "format": "epoch_millis"
         },
         "publishStop": {
-          "type": "date",
-          "format": "epoch_millis"
-        },
-        "publishDate": {
           "type": "date",
           "format": "epoch_millis"
         },
@@ -1460,6 +1736,10 @@
           "fields": {
             "full": {
               "type": "keyword"
+            },
+            "lower": {
+              "type": "keyword",
+              "normalizer": "lowercase_normalizer"
             },
             "stemmed": {
               "type": "text",

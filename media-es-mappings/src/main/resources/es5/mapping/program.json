@@ -127,7 +127,7 @@
           }
         },
         "name": {
-          "type": "text"
+          "type": "keyword"
         },
         "role": {
           "type": "keyword"
