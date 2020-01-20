@@ -15,6 +15,9 @@ while getopts ":s:d:o:" opt; do
       only="^$OPTARG\$"
       ;;
     \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>]"
+      echo "for test:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
+      echo "for production:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
+
       exit
       ;;
    esac
