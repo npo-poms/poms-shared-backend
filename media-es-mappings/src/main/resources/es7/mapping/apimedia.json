@@ -202,8 +202,6 @@
       "type": "boolean"
     },
     "episodeOf": {
-      "type": "nested",
-      "include_in_parent": true,
       "properties": {
         "added": {
           "type": "date",
@@ -223,6 +221,21 @@
         },
         "urnRef": {
           "type": "keyword"
+        },
+        "memberOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
+        },
+        "episodeOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
+        },
+        "segmentOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
         }
       }
     },
@@ -631,8 +644,6 @@
       }
     },
     "memberOf": {
-      "type": "nested",
-      "include_in_parent": true,
       "properties": {
         "added": {
           "type": "date",
@@ -652,6 +663,21 @@
         },
         "urnRef": {
           "type": "keyword"
+        },
+        "memberOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
+        },
+        "episodeOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
+        },
+        "segmentOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
         }
       }
     },
@@ -1469,8 +1495,6 @@
           }
         },
         "memberOf": {
-          "type": "nested",
-          "include_in_parent": true,
           "properties": {
             "added": {
               "type": "date",
@@ -1490,6 +1514,21 @@
             },
             "urnRef": {
               "type": "keyword"
+            },
+            "memberOf": {
+              "type": "object",
+              "enabled": false,
+              "dynamic": false
+            },
+            "episodeOf": {
+              "type": "object",
+              "enabled": false,
+              "dynamic": false
+            },
+            "segmentOf": {
+              "type": "object",
+              "enabled": false,
+              "dynamic": false
             }
           }
         },
@@ -1658,6 +1697,29 @@
         },
         "workflow": {
           "type": "keyword"
+        },
+        "segmentOf": {
+          "properties": {
+            "midRef": {
+              "type": "keyword"
+            },
+            "urnRef": {
+              "type": "keyword"
+            },
+            "type": {
+              "type": "keyword"
+            },
+            "memberOf": {
+              "type": "object",
+              "enabled": false,
+              "dynamic": false
+            },
+            "episodeOf": {
+              "type": "object",
+              "enabled": false,
+              "dynamic": false
+            }
+          }
         }
       }
     },
@@ -1771,6 +1833,29 @@
     },
     "workflow": {
       "type": "keyword"
+    },
+    "segmentOf": {
+      "properties": {
+        "midRef": {
+          "type": "keyword"
+        },
+        "urnRef": {
+          "type": "keyword"
+        },
+        "type": {
+          "type": "keyword"
+        },
+        "memberOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
+        },
+        "episodeOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
+        }
+      }
     }
   }
 }
