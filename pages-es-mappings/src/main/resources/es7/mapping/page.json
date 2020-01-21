@@ -278,8 +278,6 @@
               "type": "boolean"
             },
             "episodeOf": {
-              "type": "nested",
-              "include_in_parent": true,
               "properties": {
                 "added": {
                   "type": "date",
@@ -299,6 +297,21 @@
                 },
                 "urnRef": {
                   "type": "keyword"
+                },
+                "memberOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
+                },
+                "episodeOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
+                },
+                "segmentOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
                 }
               }
             },
@@ -726,6 +739,21 @@
                 },
                 "urnRef": {
                   "type": "keyword"
+                },
+                "memberOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
+                },
+                "episodeOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
+                },
+                "segmentOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
                 }
               }
             },
@@ -1564,6 +1592,21 @@
                     },
                     "urnRef": {
                       "type": "keyword"
+                    },
+                    "memberOf": {
+                      "type": "object",
+                      "enabled": false,
+                      "dynamic": false
+                    },
+                    "episodeOf": {
+                      "type": "object",
+                      "enabled": false,
+                      "dynamic": false
+                    },
+                    "segmentOf": {
+                      "type": "object",
+                      "enabled": false,
+                      "dynamic": false
                     }
                   }
                 },
@@ -1732,6 +1775,26 @@
                 },
                 "workflow": {
                   "type": "keyword"
+                },
+                "segmentOf": {
+                  "properties": {
+                    "midRef": {
+                      "type": "keyword"
+                    },
+                    "type": {
+                      "type": "keyword"
+                    },
+                    "memberOf": {
+                      "type": "object",
+                      "enabled": false,
+                      "dynamic": false
+                    },
+                    "episodeOf": {
+                      "type": "object",
+                      "enabled": false,
+                      "dynamic": false
+                    }
+                  }
                 }
               }
             },
@@ -1845,6 +1908,26 @@
             },
             "workflow": {
               "type": "keyword"
+            },
+            "segmentOf": {
+              "properties": {
+                "midRef": {
+                  "type": "keyword"
+                },
+                "type": {
+                  "type": "keyword"
+                },
+                "memberOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
+                },
+                "episodeOf": {
+                  "type": "object",
+                  "enabled": false,
+                  "dynamic": false
+                }
+              }
             }
           }
         }
