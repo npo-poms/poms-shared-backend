@@ -1495,6 +1495,7 @@
           }
         },
         "memberOf": {
+
           "properties": {
             "added": {
               "type": "date",
@@ -1701,9 +1702,6 @@
         "segmentOf": {
           "properties": {
             "midRef": {
-              "type": "keyword"
-            },
-            "urnRef": {
               "type": "keyword"
             },
             "type": {
