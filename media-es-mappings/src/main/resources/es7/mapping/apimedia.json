@@ -202,6 +202,8 @@
       "type": "boolean"
     },
     "episodeOf": {
+      "type": "nested",
+      "include_in_parent": true,
       "properties": {
         "added": {
           "type": "date",
@@ -644,6 +646,8 @@
       }
     },
     "memberOf": {
+      "type": "nested",
+      "include_in_parent": true,
       "properties": {
         "added": {
           "type": "date",
