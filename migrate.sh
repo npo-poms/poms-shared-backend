@@ -2,6 +2,7 @@
 source="http://pomz11aas:9200"
 dest="localhost:9215"
 only=".*"
+since=0
 while getopts ":s:d:o:" opt; do
   case ${opt} in
     s )
@@ -14,7 +15,10 @@ while getopts ":s:d:o:" opt; do
     o )
       only="^$OPTARG\$"
       ;;
-    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>]"
+    s )
+      since="^$OPTARG\$"
+      ;;
+    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>] -s <since time stamp min millis since 1970>"
       echo "for test:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
       echo "for production:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
 
@@ -57,7 +61,7 @@ function reindex {
 }
 
 function reindexMediaType {
-   [[ "$1" =~ $only ]] || [[ "$2" =~ $only ]] || return
+   [[ "apimedia" =~ $only ]] || [[ "$1" =~ $only ]] || return
 
    read -r -d '' script << EOM
       if (ctx._source.credits != null ) {
@@ -74,22 +78,27 @@ function reindexMediaType {
       }
 EOM
    command=$( jq  -n -R \
-                  --arg index "$1" \
                   --arg source "$source" \
-                  --arg sourceType "$2" \
-                  --arg destIndex "$3" \
-                  --arg script "$script" \ '
+                  --arg sourceType "$1" \
+                  --arg script "$script" \
+                  --arg since "$since" \
+                  '
  { source: {
     remote: {
       host: $source
     },
-    index: $index,
+    index: "apimedia",
     type: $sourceType,
-    size: 100
-
+    size: 100,
+    query: {
+      range: {
+        publishDate: {
+           gte: $since
+        }
+      }
   },
   dest: {
-    index: $destIndex,
+    index: "apimedia",
     type: "_doc"
   },
   script: {
@@ -107,6 +116,7 @@ function reindexCues {
                   --arg source "$source" \
                   --arg language "$1" \
                   --arg destIndex "subtitles_$1" \
+                   --arg since "$since" \
                   '
  { source: {
     remote: {
@@ -115,8 +125,14 @@ function reindexCues {
     index: "apimedia",
     type: "cue",
     query: { term: { language: { value: $language }}},
-    size: 100
-
+    size: 100,
+    query: {
+      range: {
+        publishDate: {
+           gte: $since
+        }
+      }
+    }
   },
   dest: {
     index: $destIndex,
@@ -135,6 +151,7 @@ function reindexRefs {
                   --arg refType "$1" \
                   --arg source "$source" \
                   --arg script "$script" \
+                  --arg since "$since" \
                   '
  { source: {
     remote: {
@@ -142,7 +159,14 @@ function reindexRefs {
     },
     index: "apimedia",
     type: $refType,
-    size: 100
+    size: 100,
+    query: {
+      range: {
+        publishDate: {
+           gte: $since
+        }
+      }
+    }
 
   },
   dest: {
@@ -174,7 +198,14 @@ EOM
     remote: {
       host: $source
     },
-    index: "apipages"
+    index: "apipages",
+    query: {
+      range: {
+        lastPublished: {
+           gte: $since
+        }
+      }
+    }
   },
   dest: {
     index: "apipages",
@@ -190,15 +221,50 @@ EOM
 }
 
 
-reindex "pageupdates-publish"
+function reindexPageUpdates {
+   [[ "pageupdates-publish" =~ $only ]] || return
+
+    command=$( jq -n \
+                  --arg index "$1" \
+                  --arg source "$source" \
+                  --arg since "$since" \
+                  '
+ { source: {
+    remote: {
+      host: $source
+    },
+    index: "pageupdates-publish",
+    query: {
+      range: {
+        lastPublished: {
+           gte: $since
+        }
+      }
+    }
+  },
+  dest: {
+    index: $index,
+    type: "_doc"
+  }
+}')
+   post "$command"
+}
+timeinseconds=`date +%s`
+timeinmillis=$(( $timeinseconds * 1000 ))
+
+if [ $since == 0 ] ; then
+  echo "Current time in millisecond: -s ${timeinmillis}. Use this an argument for the second run (when the publisher is off)"
+fi
+
+reindexPageUpdates
 reindexPages
 reindex "apiqueries"
-reindexMediaType "apimedia" "program" "apimedia"
-reindexMediaType "apimedia" "group" "apimedia"
-reindexMediaType "apimedia" "segment" "apimedia"
-reindexMediaType "apimedia" "deletedprogram" "apimedia"
-reindexMediaType "apimedia" "deletedgroup" "apimedia"
-reindexMediaType "apimedia" "deletedsegment" "apimedia"
+reindexMediaType "program"
+reindexMediaType  "group"
+reindexMediaType "segment"
+reindexMediaType "deletedprogram"
+reindexMediaType "deletedgroup"
+reindexMediaType "deletedsegment"
 reindexCues "ar"
 reindexCues "nl"
 reindexCues "en"
