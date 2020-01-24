@@ -33,8 +33,10 @@ if [[ $# -ge 1 ]] ; then
 fi
 
 function post {
-   echo $dest $1
-   curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
+   #echo $dest $1
+   set -x
+   time curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
+   set +x
    echo
 }
 
@@ -79,8 +81,8 @@ function reindexMediaType {
 EOM
    command=$( jq  -n -R \
                   --arg source "$source" \
-                  --arg sourceType "$1" \
                   --arg script "$script" \
+                  --arg sourceType "$1" \
                   --arg since "$since" \
                   '
  { source: {
@@ -96,6 +98,7 @@ EOM
            gte: $since
         }
       }
+    }
   },
   dest: {
     index: "apimedia",
@@ -256,23 +259,23 @@ timeinmillis=$(( $timeinseconds * 1000 ))
 echo "Current time in millisecond: $timeinmillis. Use this as an argument for a subsequent run (if the publisher is currently still running)"
 echo $0 -o $source -d $dest -s $timeinmillis
 
-time reindexPageUpdates
-time reindexPages
-time reindex "apiqueries"
-time reindexMediaType "program"
-time reindexMediaType  "group"
-time reindexMediaType "segment"
-time reindexMediaType "deletedprogram"
-time reindexMediaType "deletedgroup"
-time reindexMediaType "deletedsegment"
-time reindexCues "ar"
-time reindexCues "nl"
-time reindexCues "en"
+reindexPageUpdates
+reindexPages
+reindex "apiqueries"
+reindexMediaType "program"
+reindexMediaType  "group"
+reindexMediaType "segment"
+reindexMediaType "deletedprogram"
+reindexMediaType "deletedgroup"
+reindexMediaType "deletedsegment"
+reindexCues "ar"
+reindexCues "nl"
+reindexCues "en"
 # other language don't occur on production
-time reindexRefs "episodeRef" "episodeRef"
-time reindexRefs "programMemberRef" "memberRef"
-time reindexRefs "groupMemberRef" "memberRef"
-time reindexRefs "segmentMemberRef" "memberRef"
+reindexRefs "episodeRef" "episodeRef"
+reindexRefs "programMemberRef" "memberRef"
+reindexRefs "groupMemberRef" "memberRef"
+reindexRefs "segmentMemberRef" "memberRef"
 
 echo next run might be:
 echo $0 -o $source -d $dest -s $timeinmillis
