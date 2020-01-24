@@ -36,7 +36,7 @@ public class PushMappings {
         if (argv.length > 0) {
             factory.setUnicastHosts(argv[0]);
         } else {
-            factory.setUnicastHosts("http://localhost:9221");
+            factory.setUnicastHosts("http://localhost:9215");
         }
         if (argv.length > 1) {
             factory.setClusterName(argv[1]);

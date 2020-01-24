@@ -193,6 +193,7 @@ EOM
     command=$( jq -n \
                   --arg source "$source" \
                   --arg script "$script" \
+                  --arg since "$since" \
                   '
  { source: {
     remote: {
@@ -243,7 +244,7 @@ function reindexPageUpdates {
     }
   },
   dest: {
-    index: $index,
+    index: "pageupdates-publish",
     type: "_doc"
   }
 }')
@@ -252,24 +253,27 @@ function reindexPageUpdates {
 timeinseconds=`date +%s`
 timeinmillis=$(( $timeinseconds * 1000 ))
 
-if [ $since == 0 ] ; then
-  echo "Current time in millisecond: -s ${timeinmillis}. Use this an argument for the second run (when the publisher is off)"
-fi
+echo "Current time in millisecond: $timeinmillis. Use this as an argument for a subsequent run (if the publisher is currently still running)"
+echo $0 -o $source -d $dest -s $timeinmillis
 
-reindexPageUpdates
-reindexPages
-reindex "apiqueries"
-reindexMediaType "program"
-reindexMediaType  "group"
-reindexMediaType "segment"
-reindexMediaType "deletedprogram"
-reindexMediaType "deletedgroup"
-reindexMediaType "deletedsegment"
-reindexCues "ar"
-reindexCues "nl"
-reindexCues "en"
+time reindexPageUpdates
+time reindexPages
+time reindex "apiqueries"
+time reindexMediaType "program"
+time reindexMediaType  "group"
+time reindexMediaType "segment"
+time reindexMediaType "deletedprogram"
+time reindexMediaType "deletedgroup"
+time reindexMediaType "deletedsegment"
+time reindexCues "ar"
+time reindexCues "nl"
+time reindexCues "en"
 # other language don't occur on production
-reindexRefs "episodeRef" "episodeRef"
-reindexRefs "programMemberRef" "memberRef"
-reindexRefs "groupMemberRef" "memberRef"
-reindexRefs "segmentMemberRef" "memberRef"
+time reindexRefs "episodeRef" "episodeRef"
+time reindexRefs "programMemberRef" "memberRef"
+time reindexRefs "groupMemberRef" "memberRef"
+time reindexRefs "segmentMemberRef" "memberRef"
+
+echo next run might be:
+echo $0 -o $source -d $dest -s $timeinmillis
+
