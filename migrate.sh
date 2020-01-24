@@ -3,7 +3,7 @@ source="http://pomz11aas:9200"
 dest="localhost:9215"
 only=".*"
 since=0
-while getopts ":s:d:o:" opt; do
+while getopts ":s:d:o:f:" opt; do
   case ${opt} in
     s )
       source=$OPTARG
@@ -15,10 +15,10 @@ while getopts ":s:d:o:" opt; do
     o )
       only="^$OPTARG\$"
       ;;
-    s )
-      since="^$OPTARG\$"
+    f )
+      since="$OPTARG"
       ;;
-    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>] -s <since time stamp min millis since 1970>"
+    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>] -f <since time stamp min millis since 1970>"
       echo "for test:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
       echo "for production:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
 
@@ -32,11 +32,10 @@ if [[ $# -ge 1 ]] ; then
  exit 1;
 fi
 
+
 function post {
-   #echo $dest $1
-   set -x
+   echo curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
    time curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
-   set +x
    echo
 }
 
@@ -257,7 +256,7 @@ timeinseconds=`date +%s`
 timeinmillis=$(( $timeinseconds * 1000 ))
 
 echo "Current time in millisecond: $timeinmillis. Use this as an argument for a subsequent run (if the publisher is currently still running)"
-echo $0 -o $source -d $dest -s $timeinmillis
+echo $0 -s $source -d $dest -f $timeinmillis
 
 reindexPageUpdates
 reindexPages
@@ -278,5 +277,5 @@ reindexRefs "groupMemberRef" "memberRef"
 reindexRefs "segmentMemberRef" "memberRef"
 
 echo next run might be:
-echo $0 -o $source -d $dest -s $timeinmillis
+echo $0 -s $source -d $dest -f $timeinmillis
 
