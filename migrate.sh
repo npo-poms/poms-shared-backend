@@ -252,9 +252,8 @@ function reindexPageUpdates {
 }')
    post "$command"
 }
-timeinseconds=`date +%s`
-timeinmillis=$(( $timeinseconds * 1000 ))
 
+timeinmillis=$(( `date +%s` * 1000 ))
 echo "Current time in millisecond: $timeinmillis. Use this as an argument for a subsequent run (if the publisher is currently still running)"
 echo $0 -s $source -d $dest -f $timeinmillis
 
