@@ -39,6 +39,23 @@ function post {
    echo
 }
 
+function query_for_field {
+  field=$1;
+  if [[ $since == "0" ]] ; then
+      query='{"match_all": {}}'
+   else
+      read -r -d '' query << EOM
+      {
+       "range": {
+        "$field": {
+           "gte": ${since}
+        }
+      }
+    }
+EOM
+   fi
+   echo $query
+}
 
 function reindex {
    [[ "$1" =~ $only ]] || return
@@ -78,11 +95,13 @@ function reindexMediaType {
            }
       }
 EOM
+
+   query=$(query_for_field 'publishDate')
    command=$( jq  -n -R \
                   --arg source "$source" \
                   --arg script "$script" \
                   --arg sourceType "$1" \
-                  --arg since "$since" \
+                  --argjson query "$query" \
                   '
  { source: {
     remote: {
@@ -91,13 +110,7 @@ EOM
     index: "apimedia",
     type: $sourceType,
     size: 100,
-    query: {
-      range: {
-        publishDate: {
-           gte: $since
-        }
-      }
-    }
+    query: $query
   },
   dest: {
     index: "apimedia",
@@ -121,7 +134,6 @@ function reindexCues {
                   --arg source "$source" \
                   --arg language "$1" \
                   --arg destIndex "subtitles_$1" \
-                   --arg since "$since" \
                   '
  { source: {
     remote: {
@@ -145,11 +157,14 @@ function reindexRefs {
    [[ "$1" =~ $only ]] || return
 
    script="ctx._source.objectType = '$2'; ctx._id = ctx._id + '/$2';";
+
+
+   query=$(query_for_field 'added')
    command=$( jq  -n -R \
                   --arg refType "$1" \
                   --arg source "$source" \
                   --arg script "$script" \
-                  --arg since "$since" \
+                  --argjson query "$query" \
                   '
  { source: {
     remote: {
@@ -158,14 +173,7 @@ function reindexRefs {
     index: "apimedia",
     type: $refType,
     size: 100,
-    query: {
-      range: {
-        added: {
-           gte: $since
-        }
-      }
-    }
-
+    query: $query
   },
   dest: {
     index: "apimedia_refs",
@@ -187,24 +195,18 @@ function reindexPages {
       }
       ctx._source.expandedWorkflow = ctx._type == "page" ? "PUBLISHED" : "DELETED";
 EOM
-
+    query=$(query_for_field 'lastPublished')
     command=$( jq -n \
                   --arg source "$source" \
                   --arg script "$script" \
-                  --arg since "$since" \
+                  --argjson query "$query" \
                   '
  { source: {
     remote: {
       host: $source
     },
     index: "apipages",
-    query: {
-      range: {
-        lastPublished: {
-           gte: $since
-        }
-      }
-    }
+    query: $query
   },
   dest: {
     index: "apipages",
@@ -223,23 +225,18 @@ EOM
 function reindexPageUpdates {
    [[ "pageupdates-publish" =~ $only ]] || return
 
+    query=$(query_for_field 'lastPublished')
     command=$( jq -n \
                   --arg index "$1" \
                   --arg source "$source" \
-                  --arg since "$since" \
+                  --argjson query "$query" \
                   '
  { source: {
     remote: {
       host: $source
     },
     index: "pageupdates-publish",
-    query: {
-      range: {
-        lastPublished: {
-           gte: $since
-        }
-      }
-    }
+    query: $query
   },
   dest: {
     index: "pageupdates-publish",
