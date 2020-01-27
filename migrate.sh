@@ -114,6 +114,9 @@ EOM
 
 function reindexCues {
    [[ "$1" =~ $only ]] || return
+   if [[ "$since" !=  "0" ]] ; then
+      echo "Since not supported for cues. Reindexing them all"
+   fi
    command=$( jq  -n -R \
                   --arg source "$source" \
                   --arg language "$1" \
@@ -127,14 +130,7 @@ function reindexCues {
     index: "apimedia",
     type: "cue",
     query: { term: { language: { value: $language }}},
-    size: 100,
-    query: {
-      range: {
-        publishDate: {
-           gte: $since
-        }
-      }
-    }
+    size: 100
   },
   dest: {
     index: $destIndex,
@@ -164,7 +160,7 @@ function reindexRefs {
     size: 100,
     query: {
       range: {
-        publishDate: {
+        added: {
            gte: $since
         }
       }
