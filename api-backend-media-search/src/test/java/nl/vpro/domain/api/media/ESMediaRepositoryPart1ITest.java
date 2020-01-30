@@ -1208,7 +1208,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testRedirect() {
         Group group1 = index(group().published().mid("MID_0"));
-        Group group2 = index(group().mergedTo(group1).mid("MID_1"));
+        index(group().mergedTo(group1).mid("MID_1"));
         target.refillRedirectCache();
         Optional<String> result = target.redirect("MID_1");
         assertThat(result.isPresent()).isTrue();
@@ -1565,6 +1565,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .build());
 
             SearchResult<MediaObject> result = target.find(null, form, 0, null);
+            log.info("{}", result);
         });
 
     }
@@ -2108,8 +2109,10 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaForm form = MediaForm.builder()
             .geoLocationFacet()
             .build();
-        form.getFacets().getGeoLocations().setFilter(MediaSearch.builder().geoLocations(Arrays.asList(
-            GeoLocationSearch.builder().owner(BROADCASTER).build())).build());
+        form.getFacets().getGeoLocations().setFilter(MediaSearch.builder().geoLocations(
+            Arrays.asList(
+                GeoLocationSearch.builder().owner(BROADCASTER).build())
+        ).build());
         MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
         List<GeoLocationFacetResultItem> facets = resultWithSearch.getFacets().getGeoLocations();
         assertThat(facets).isNotEmpty();
