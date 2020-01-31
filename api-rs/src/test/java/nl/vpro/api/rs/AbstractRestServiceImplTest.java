@@ -17,7 +17,9 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.resteasy.*;
+import nl.vpro.jackson2.rs.JacksonContextResolver;
+import nl.vpro.rs.converters.DateParamConverterProvider;
+import nl.vpro.rs.converters.LocaleParamConverterProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.util.AssertionErrors.assertEquals;

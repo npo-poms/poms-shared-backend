@@ -8,7 +8,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
-import nl.vpro.util.rs.error.NotFoundException;
+import nl.vpro.rs.error.NotFoundException;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
