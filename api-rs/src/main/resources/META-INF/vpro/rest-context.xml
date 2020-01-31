@@ -6,17 +6,16 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-  <bean class="nl.vpro.resteasy.JacksonContextResolver"/>
+  <bean class="nl.vpro.jackson2.rs.JacksonContextResolver"/>
 
   <context:component-scan base-package="nl.vpro.api">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
     <context:include-filter type="annotation" expression="javax.ws.rs.NameBinding"/>
   </context:component-scan>
-  <context:component-scan base-package="nl.vpro.resteasy">
+  <context:component-scan base-package="nl.vpro.rs.converters">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
   </context:component-scan>
   <context:component-scan base-package="nl.vpro.api.rs"/>
-
 
   <bean class="nl.vpro.api.cors.CorsPolicyImpl" id="corsPolicy">
     <constructor-arg index="0" value="${cors.enabled}"/>
