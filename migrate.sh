@@ -2,7 +2,8 @@
 source="http://pomz11aas:9200"
 dest="localhost:9215"
 only=".*"
-while getopts ":s:d:o:" opt; do
+since=0
+while getopts ":s:d:o:f:" opt; do
   case ${opt} in
     s )
       source=$OPTARG
@@ -14,7 +15,13 @@ while getopts ":s:d:o:" opt; do
     o )
       only="^$OPTARG\$"
       ;;
-    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>]"
+    f )
+      since="$OPTARG"
+      ;;
+    \? ) echo "Usage: $0 [-s <source>]  [-d <destination>] [-o <regex>] -f <since time stamp min millis since 1970>"
+      echo "for test:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
+      echo "for production:  ./migrate.sh -s http://poms11aas:9200 -d http://localhost:9221"
+
       exit
       ;;
    esac
@@ -25,12 +32,30 @@ if [[ $# -ge 1 ]] ; then
  exit 1;
 fi
 
+
 function post {
-   echo $dest $1
-   curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
+   echo curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
+   time curl -X POST "$dest/_reindex?wait_for_completion=true" -H 'Content-Type: application/json' -d"$1"
    echo
 }
 
+function query_for_field {
+  field=$1;
+  if [[ $since == "0" ]] ; then
+      query='{"match_all": {}}'
+   else
+      read -r -d '' query << EOM
+      {
+       "range": {
+        "$field": {
+           "gte": ${since}
+        }
+      }
+    }
+EOM
+   fi
+   echo $query
+}
 
 function reindex {
    [[ "$1" =~ $only ]] || return
@@ -54,7 +79,7 @@ function reindex {
 }
 
 function reindexMediaType {
-   [[ "$1" =~ $only ]] || [[ "$2" =~ $only ]] || return
+   [[ "apimedia" =~ $only ]] || [[ "$1" =~ $only ]] || return
 
    read -r -d '' script << EOM
       if (ctx._source.credits != null ) {
@@ -70,23 +95,25 @@ function reindexMediaType {
            }
       }
 EOM
+
+   query=$(query_for_field 'publishDate')
    command=$( jq  -n -R \
-                  --arg index "$1" \
                   --arg source "$source" \
-                  --arg sourceType "$2" \
-                  --arg destIndex "$3" \
-                  --arg script "$script" \ '
+                  --arg script "$script" \
+                  --arg sourceType "$1" \
+                  --argjson query "$query" \
+                  '
  { source: {
     remote: {
       host: $source
     },
-    index: $index,
+    index: "apimedia",
     type: $sourceType,
-    size: 100
-
+    size: 100,
+    query: $query
   },
   dest: {
-    index: $destIndex,
+    index: "apimedia",
     type: "_doc"
   },
   script: {
@@ -100,6 +127,9 @@ EOM
 
 function reindexCues {
    [[ "$1" =~ $only ]] || return
+   if [[ "$since" !=  "0" ]] ; then
+      echo "Since not supported for cues. Reindexing them all"
+   fi
    command=$( jq  -n -R \
                   --arg source "$source" \
                   --arg language "$1" \
@@ -113,7 +143,6 @@ function reindexCues {
     type: "cue",
     query: { term: { language: { value: $language }}},
     size: 100
-
   },
   dest: {
     index: $destIndex,
@@ -128,10 +157,14 @@ function reindexRefs {
    [[ "$1" =~ $only ]] || return
 
    script="ctx._source.objectType = '$2'; ctx._id = ctx._id + '/$2';";
+
+
+   query=$(query_for_field 'added')
    command=$( jq  -n -R \
                   --arg refType "$1" \
                   --arg source "$source" \
                   --arg script "$script" \
+                  --argjson query "$query" \
                   '
  { source: {
     remote: {
@@ -139,8 +172,8 @@ function reindexRefs {
     },
     index: "apimedia",
     type: $refType,
-    size: 100
-
+    size: 100,
+    query: $query
   },
   dest: {
     index: "apimedia_refs",
@@ -162,16 +195,18 @@ function reindexPages {
       }
       ctx._source.expandedWorkflow = ctx._type == "page" ? "PUBLISHED" : "DELETED";
 EOM
-
+    query=$(query_for_field 'lastPublished')
     command=$( jq -n \
                   --arg source "$source" \
                   --arg script "$script" \
+                  --argjson query "$query" \
                   '
  { source: {
     remote: {
       host: $source
     },
-    index: "apipages"
+    index: "apipages",
+    query: $query
   },
   dest: {
     index: "apipages",
@@ -187,15 +222,43 @@ EOM
 }
 
 
-reindex "pageupdates-publish"
+function reindexPageUpdates {
+   [[ "pageupdates-publish" =~ $only ]] || return
+
+    query=$(query_for_field 'lastPublished')
+    command=$( jq -n \
+                  --arg index "$1" \
+                  --arg source "$source" \
+                  --argjson query "$query" \
+                  '
+ { source: {
+    remote: {
+      host: $source
+    },
+    index: "pageupdates-publish",
+    query: $query
+  },
+  dest: {
+    index: "pageupdates-publish",
+    type: "_doc"
+  }
+}')
+   post "$command"
+}
+
+timeinmillis=$(( `date +%s` * 1000 ))
+echo "Current time in millisecond: $timeinmillis. Use this as an argument for a subsequent run (if the publisher is currently still running)"
+echo $0 -s $source -d $dest -f $timeinmillis
+
+reindexPageUpdates
 reindexPages
 reindex "apiqueries"
-reindexMediaType "apimedia" "program" "apimedia"
-reindexMediaType "apimedia" "group" "apimedia"
-reindexMediaType "apimedia" "segment" "apimedia"
-reindexMediaType "apimedia" "deletedprogram" "apimedia"
-reindexMediaType "apimedia" "deletedgroup" "apimedia"
-reindexMediaType "apimedia" "deletedsegment" "apimedia"
+reindexMediaType "program"
+reindexMediaType  "group"
+reindexMediaType "segment"
+reindexMediaType "deletedprogram"
+reindexMediaType "deletedgroup"
+reindexMediaType "deletedsegment"
 reindexCues "ar"
 reindexCues "nl"
 reindexCues "en"
@@ -204,3 +267,7 @@ reindexRefs "episodeRef" "episodeRef"
 reindexRefs "programMemberRef" "memberRef"
 reindexRefs "groupMemberRef" "memberRef"
 reindexRefs "segmentMemberRef" "memberRef"
+
+echo next run might be:
+echo $0 -s $source -d $dest -f $timeinmillis
+

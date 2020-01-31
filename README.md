@@ -14,7 +14,11 @@ We use **ElasticSearch Head** chrome plugin to connect to ES
 
 ## Configure your local ES
 
-Generate local ES indexes for our resources:
+Generate ES indexes for our resources:
+- Execute the scripts in this folder: `./push-es-*-mapping.sh`
+eg. via this helper script
+`./push-es-localhost.sh`
+(this presumes an empty elastic search on http://localhost:9200)
 
 ` 
 (cd push-es-mappings/ ; mvn -Dhost=localhost:9200)

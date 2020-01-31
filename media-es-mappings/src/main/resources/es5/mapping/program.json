@@ -358,48 +358,6 @@
         }
       }
     },
-    "topics": {
-      "properties": {
-        "owner": {
-          "type": "keyword"
-        },
-        "values": {
-          "properties": {
-            "name": {
-              "type": "keyword"
-            },
-            "gtaaUri": {
-              "type": "keyword"
-            },
-            "gtaaStatus": {
-              "type": "keyword"
-            }
-          }
-        }
-      }
-    },
-    "expandedTopics": {
-      "type": "nested",
-      "include_in_parent": true,
-      "properties": {
-        "owner": {
-          "type": "keyword"
-        },
-        "values": {
-          "properties": {
-            "name": {
-              "type": "keyword"
-            },
-            "gtaaUri": {
-              "type": "keyword"
-            },
-            "gtaaStatus": {
-              "type": "keyword"
-            }
-          }
-        }
-      }
-    },
     "availableSubtitles": {
       "properties": {
         "language": {
@@ -1219,46 +1177,6 @@
             "values": {
               "type": "keyword"
             }
-          }
-        },
-        "topics": {
-          "properties": {
-            "owner": {
-              "type": "keyword"
-            },
-            "values": {
-              "properties": {
-                "name": {
-                  "type": "keyword"
-                },
-                "gtaaUri": {
-                  "type": "keyword"
-                },
-                    "gtaaStatus": {
-                      "type": "keyword"
-                    }
-              }
-            }
-          }
-        },
-        "expandedTopics": {
-          "properties": {
-            "owner": {
-              "type": "keyword"
-            },
-            "values": {
-              "properties": {
-                "name": {
-                  "type": "keyword"
-                },
-                "gtaaUri": {
-                  "type": "keyword"
-                },
-                "gtaaStatus": {
-                  "type": "keyword"
-                }
-              }
-                }
           }
         },
         "availableSubtitles": {
