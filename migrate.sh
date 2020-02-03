@@ -141,7 +141,7 @@ function reindexCues {
     },
     index: "apimedia",
     type: "cue",
-    query: { term: { language: { value: $language }}},
+    query: { term: { lang: { value: $language }}},
     size: 100
   },
   dest: {
