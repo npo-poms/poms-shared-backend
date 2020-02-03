@@ -884,6 +884,11 @@
     },
     "segments": {
       "properties": {
+        "segmentOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
+        },
         "midRef": {
           "type": "keyword"
         },

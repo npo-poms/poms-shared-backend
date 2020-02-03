@@ -839,6 +839,11 @@
     },
     "workflow": {
       "type": "keyword"
+    },
+    "segmentOf": {
+      "type": "object",
+      "enabled": false,
+      "dynamic": false
     }
   }
 }
