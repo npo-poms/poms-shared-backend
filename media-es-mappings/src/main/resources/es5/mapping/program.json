@@ -215,6 +215,11 @@
         },
         "urnRef": {
           "type": "keyword"
+        },
+        "memberOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
         }
       }
     },
