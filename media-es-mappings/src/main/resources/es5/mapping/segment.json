@@ -629,6 +629,21 @@
         },
         "urnRef": {
           "type": "keyword"
+        },
+        "memberOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
+        },
+        "episodeOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
+        },
+        "segmentOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
         }
       }
     },
