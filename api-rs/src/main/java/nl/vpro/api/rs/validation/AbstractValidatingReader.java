@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
@@ -68,6 +69,11 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
             log.info("XML inputs for " + this.getClass().getName() + " will not be validated (Setting xml.input.validate=false)");
         }
     }
+    @PreDestroy
+    public void shutdown() {
+        unmarshaller.remove();
+    }
+
     public void setDoValidate(boolean doValidate) {
         this.doValidate = doValidate;
     }
