@@ -101,7 +101,10 @@ public class PageServiceImpl implements PageService {
             cridPages.cancel(true);
             statRefPages.cancel(true);
             return result;
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
