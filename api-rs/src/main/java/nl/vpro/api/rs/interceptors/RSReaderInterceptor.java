@@ -17,7 +17,7 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
 @Slf4j
 public class RSReaderInterceptor implements ReaderInterceptor {
 
-    public static ThreadLocal<Boolean> READEXCEPTION = ThreadLocal.withInitial(() -> false);
+    public static final ThreadLocal<Boolean> READEXCEPTION = ThreadLocal.withInitial(() -> false);
 
     @Override
     public Object aroundReadFrom(ReaderInterceptorContext context) throws IOException, WebApplicationException {
