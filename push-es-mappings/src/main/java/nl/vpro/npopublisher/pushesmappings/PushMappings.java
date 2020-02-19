@@ -25,6 +25,10 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  *
  * If this is run when the indices exist already, then the index is only changed, and the refresh will be set to the default (30s)
  *
+ * Can be used with maven exec plugin.
+ *
+ *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost -Dcluster=asfasd
+ *
  * @author Michiel Meeuwissen
  * @since 5.12
  */
@@ -63,11 +67,17 @@ public class PushMappings {
                 }
                 try {
                     IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
-                    if (!helper.createIndexIfNotExists(CreateIndex.builder()
+
+                    // Try to created the index if it didn't exist already
+
+                    boolean created = helper.createIndexIfNotExists(CreateIndex.builder()
                         .useNumberPostfix(true)
-                        .forReindex(true)
-                        .build())
-                    ) {
+                        .forReindex(true) // 1 shard only, very long refresh
+                        .build());
+
+                    if (! created) {
+                        // the index existed already, so simply reput the settings
+                        // and prepare the index for actual usage
                         log.info("{} : {}", elasticSearchIndex, helper.count());
                         helper.reputSettings(false);
                         helper.reputMappings();
