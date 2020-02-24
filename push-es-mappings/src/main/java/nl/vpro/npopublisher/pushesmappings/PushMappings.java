@@ -2,8 +2,16 @@ package nl.vpro.npopublisher.pushesmappings;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
+
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestTemplate;
 
 import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
@@ -36,12 +44,35 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
 public class PushMappings {
 
     public static void main(String[] argv) {
-        ClientElasticSearchFactory factory = new ClientElasticSearchFactory();
+
+        String host = "http://localhost:9221";
         if (argv.length > 0) {
-            factory.setUnicastHosts(argv[0]);
-        } else {
-            factory.setUnicastHosts("http://localhost:9221");
+            host = argv[0];
         }
+        ClientElasticSearchFactory factory = new ClientElasticSearchFactory();
+
+        RestTemplate restTemplate = new RestTemplate();
+        boolean serviceIsUp = false;
+        String healthCheckUrl = host + "/_cat/health";
+        while (!serviceIsUp) {
+            try {
+                TimeUnit.SECONDS.sleep(2);
+                String response = restTemplate.getForObject(new URI(healthCheckUrl), String.class);
+                log.info(response);
+                if (response != null && (response.contains("green") || response.contains("yellow"))) {
+                    serviceIsUp = true;
+                    log.info("service is up!");
+                }
+            } catch (URISyntaxException use) {
+                throw new RuntimeException("Wrong URI ", use);
+            } catch (InterruptedException ie) {
+                throw new RuntimeException("Sleep is interupted", ie);
+            } catch (ResourceAccessException rae) {
+                log.info("Access exception, service probably not up yet: " + rae.getMessage());
+            }
+        }
+
+        factory.setUnicastHosts(host);
         if (argv.length > 1) {
             factory.setClusterName(argv[1]);
             log.info("Cluster name {}", argv[1]);
