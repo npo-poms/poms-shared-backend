@@ -306,6 +306,16 @@
         },
         "urnRef": {
           "type": "keyword"
+        },
+        "memberOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
+        },
+        "episodeOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
         }
       }
     },
@@ -736,6 +746,16 @@
         },
         "urnRef": {
           "type": "keyword"
+        },
+        "memberOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
+        },
+        "episodeOf": {
+          "dynamic":true,
+          "type": "object",
+          "enabled": false
         }
       }
     },
@@ -975,6 +995,11 @@
     },
     "segments": {
       "properties": {
+        "segmentOf": {
+          "type": "object",
+          "enabled": false,
+          "dynamic": false
+        },
         "midRef": {
           "type": "keyword"
         },
@@ -1597,6 +1622,16 @@
             },
             "urnRef": {
               "type": "keyword"
+            },
+            "memberOf": {
+              "dynamic":true,
+              "type": "object",
+              "enabled": false
+            },
+            "episodeOf": {
+              "dynamic":true,
+              "type": "object",
+              "enabled": false
             }
           }
         },
