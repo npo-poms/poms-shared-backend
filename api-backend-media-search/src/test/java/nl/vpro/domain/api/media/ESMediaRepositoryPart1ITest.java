@@ -1964,8 +1964,19 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program()
             .mid("mid_5")
             .mainTitle("rereun on ned1 but original on ned2")
-            .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant()).rerun(true).build())
-            .scheduleEvent(ScheduleEvent.builder().channel(NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant()).rerun(false).build())
+            .scheduleEvent(
+                ScheduleEvent.builder()
+                    .channel(Channel.NED1)
+                    .start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant())
+                    .rerun(true)
+                    .build()
+            )
+            .scheduleEvent(
+                ScheduleEvent.builder()
+                    .channel(NED2)
+                    .start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant())
+                    .rerun(false).build()
+            )
         );
 
          MediaForm form = MediaForm.builder()
@@ -1979,7 +1990,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
         log.info("{}", resultWithSearch);
-        assertThat(resultWithSearch).hasSize(2); // mid_1 and mid_5
+        assertThat(resultWithSearch).hasSize(1); // mid_1 and _not_ mid_5
 
     }
     private void indexWithGeoLocations() {
