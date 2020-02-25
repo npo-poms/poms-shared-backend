@@ -282,7 +282,7 @@ public abstract class AbstractESRepository<T> {
                 try {
                     return getSearchResultItem(array[index], clazz);
                 } catch(Throwable e) {
-                    String string = "Error while reading " + array[index].getIndex() + "/" + array[index].getType() + "/" + array[index].getId() + " " + e.getClass().getName();
+                    String string = "Error while reading " + array[index].getIndex() + "/" + array[index].getId() + " " + e.getClass().getName();
                     log.warn(string, e);
                     throw new RuntimeException(string, e); // this exception seems to disappear completely, so logged above.
                 }

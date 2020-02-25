@@ -138,7 +138,31 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         MediaSearchResults.setSelectedFacets(result.getFacets(), result.getSelectedFacets(), form);
         MediaSearchResults.sortFacets(result.getFacets(), result.getSelectedFacets(), form);
 
-        return new MediaSearchResult(result);
+        boolean needsPostFilter = false;
+        if (form != null && form.hasSearches() && form.getSearches().getScheduleEvents() != null) {
+            for (ScheduleEventSearch ses : form.getSearches().getScheduleEvents()) {
+                if (ses.countSearches() > 1) {
+                    needsPostFilter = true;
+                    break;
+                }
+            }
+        }
+        if (needsPostFilter) {
+            List<SearchResultItem<? extends MediaObject>> filtered = new ArrayList<>();
+            Iterator<SearchResultItem<? extends MediaObject>> iterator = result.iterator();
+            while(iterator.hasNext()) {
+                SearchResultItem<? extends MediaObject> item = iterator.next();
+                if (form.test(item.getResult())) {
+                    filtered.add(item);
+                }
+            }
+            MediaSearchResult filteredResult =  new MediaSearchResult(filtered, result.getOffset(), result.getMax(), Result.Total.approximate(result.getTotal()));
+            filteredResult.setSelectedFacets(result.getSelectedFacets());
+            filteredResult.setFacets(result.getFacets());
+            return filteredResult;
+        } else {
+            return new MediaSearchResult(result);
+        }
     }
 
     @Override
