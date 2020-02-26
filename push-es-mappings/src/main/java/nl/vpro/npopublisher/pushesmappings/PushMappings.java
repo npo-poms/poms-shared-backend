@@ -69,10 +69,8 @@ public class PushMappings {
                 serviceIsUp = "green".equals(status) || "yellow".equals(status);
                 log.info("status {}", status);
             } catch (Exception e){
-                factory.invalidate();
                 log.info(e.getMessage());
             }
-
         }
 
         Pattern only = Pattern.compile("^.*$");
