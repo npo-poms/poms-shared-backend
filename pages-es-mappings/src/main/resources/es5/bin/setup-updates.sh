@@ -4,5 +4,5 @@ source /tmp/push-mappings.sh
 
 basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
-put $basedir "pageupdates" "pageupdate" "deletedpageupdate"
+put $basedir "pageupdates-publish" "pageupdate" "deletedpageupdate"
 
