@@ -2,21 +2,20 @@ package nl.vpro.npopublisher.pushesmappings;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearchclient.ClientElasticSearchFactory;
 import nl.vpro.elasticsearchclient.IndexHelper;
+import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiCueIndex;
 
 import static nl.vpro.es.ApiPageQueryIndex.APIPAGEQUERIES;
@@ -43,40 +42,39 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
 @Slf4j
 public class PushMappings {
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws InterruptedException {
 
-        String host = "http://localhost:9221";
+        String host = "http://localhost:9200";
         if (argv.length > 0) {
             host = argv[0];
         }
         ClientElasticSearchFactory factory = new ClientElasticSearchFactory();
-
-        RestTemplate restTemplate = new RestTemplate();
-        boolean serviceIsUp = false;
-        String healthCheckUrl = host + "/_cat/health";
-        while (!serviceIsUp) {
-            try {
-                TimeUnit.SECONDS.sleep(2);
-                String response = restTemplate.getForObject(new URI(healthCheckUrl), String.class);
-                log.info(response);
-                if (response != null && (response.contains("green") || response.contains("yellow"))) {
-                    serviceIsUp = true;
-                    log.info("service is up!");
-                }
-            } catch (URISyntaxException use) {
-                throw new RuntimeException("Wrong URI ", use);
-            } catch (InterruptedException ie) {
-                throw new RuntimeException("Sleep is interupted", ie);
-            } catch (ResourceAccessException rae) {
-                log.info("Access exception, service probably not up yet: " + rae.getMessage());
-            }
-        }
 
         factory.setUnicastHosts(host);
         if (argv.length > 1) {
             factory.setClusterName(argv[1]);
             log.info("Cluster name {}", argv[1]);
         }
+
+        boolean serviceIsUp = false;
+        while (!serviceIsUp) {
+            TimeUnit.SECONDS.sleep(2);
+            try {
+                Request request  = new Request("GET", "/_cat/health");
+                request.setOptions(request.getOptions().toBuilder().addHeader("accept", "application/json"));
+                Response response = factory.client(PushMappings.class).performRequest(request);
+                ArrayNode health = Jackson2Mapper.getLenientInstance().readerFor(ArrayNode.class).readValue(response.getEntity().getContent());
+
+                String status  = health.get(0).get("status").textValue();
+                serviceIsUp = "green".equals(status) || "yellow".equals(status);
+                log.info("status {}", status);
+            } catch (Exception e){
+                factory.invalidate();
+                log.info(e.getMessage());
+            }
+
+        }
+
         Pattern only = Pattern.compile("^.*$");
         //Pattern only = Pattern.compile("^pageupdates.*$");
         try {
