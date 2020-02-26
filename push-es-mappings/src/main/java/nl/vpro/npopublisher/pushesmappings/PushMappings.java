@@ -56,9 +56,7 @@ public class PushMappings {
             log.info("Cluster name {}", argv[1]);
         }
 
-        boolean serviceIsUp = false;
-        while (!serviceIsUp) {
-            TimeUnit.SECONDS.sleep(2);
+        while (true) {
             try {
                 Request request  = new Request("GET", "/_cat/health");
                 request.setOptions(request.getOptions().toBuilder().addHeader("accept", "application/json"));
@@ -66,11 +64,15 @@ public class PushMappings {
                 ArrayNode health = Jackson2Mapper.getLenientInstance().readerFor(ArrayNode.class).readValue(response.getEntity().getContent());
 
                 String status  = health.get(0).get("status").textValue();
-                serviceIsUp = "green".equals(status) || "yellow".equals(status);
+                boolean serviceIsUp = "green".equals(status) || "yellow".equals(status);
                 log.info("status {}", status);
+                if (serviceIsUp) {
+                    break;
+                }
             } catch (Exception e){
                 log.info(e.getMessage());
             }
+            TimeUnit.SECONDS.sleep(2);
         }
 
         Pattern only = Pattern.compile("^.*$");
