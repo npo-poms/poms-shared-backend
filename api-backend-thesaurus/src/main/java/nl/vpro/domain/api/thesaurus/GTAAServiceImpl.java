@@ -73,8 +73,9 @@ public class GTAAServiceImpl implements GTAAService {
 
 
     private String authenticate(@NonNull String jws) throws SecurityException{
-        JwtParser parser = Jwts.parser().setSigningKeyResolver(keyResolver);
-        parser.setAllowedClockSkewSeconds(5);
+        JwtParser parser = Jwts.parserBuilder()
+            .setAllowedClockSkewSeconds(5)
+            .setSigningKeyResolver(keyResolver).build();
 
         Jws<Claims> claims = parser.parseClaimsJws(jws);
         String issuer = claims.getBody().getIssuer();
