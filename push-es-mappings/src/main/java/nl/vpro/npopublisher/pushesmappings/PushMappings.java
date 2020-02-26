@@ -10,6 +10,7 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
@@ -52,8 +53,20 @@ public class PushMappings {
 
         factory.setUnicastHosts(host);
         if (argv.length > 1) {
-            factory.setClusterName(argv[1]);
-            log.info("Cluster name {}", argv[1]);
+            if (argv[1].length() > 0) {
+                factory.setClusterName(argv[1]);
+                log.info("Cluster name {}", argv[1]);
+            }
+        }
+
+        final Integer forceReplicas;
+        {
+            // for testing on localhost you may want to set this to 0, and create a green cluster with only one node.
+            Integer prop = null;
+            if (argv.length > 2) {
+                prop = Integer.parseInt(argv[2]);
+            }
+            forceReplicas = prop;
         }
 
         while (true) {
@@ -98,17 +111,21 @@ public class PushMappings {
                     IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
 
                     // Try to created the index if it didn't exist already
-
                     boolean created = helper.createIndexIfNotExists(CreateIndex.builder()
                         .useNumberPostfix(true)
-                        .forReindex(true) // 1 shard only, very long refresh
+                        .forReindex(true) // no replicas, very long refresh
                         .build());
 
                     if (! created) {
                         // the index existed already, so simply reput the settings
                         // and prepare the index for actual usage
                         log.info("{} : {}", elasticSearchIndex, helper.count());
-                        helper.reputSettings(false);
+                        helper.reputSettings((settings) -> {
+                            if (forceReplicas != null) {
+                                ObjectNode index = settings.with("settings").with("index");
+                                index.put("number_of_replicas", forceReplicas);
+                            }
+                        });
                         helper.reputMappings();
                     }
                 } catch (Exception e) {
