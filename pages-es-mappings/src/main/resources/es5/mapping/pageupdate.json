@@ -7,6 +7,12 @@
     "url": {
       "type": "keyword"
     },
+    "workflow": {
+      "type": "keyword"
+    },
+    "expandedWorkflow": {
+      "type": "keyword"
+    },
     "publishStart": {
       "type": "date",
       "format": "epoch_millis"
