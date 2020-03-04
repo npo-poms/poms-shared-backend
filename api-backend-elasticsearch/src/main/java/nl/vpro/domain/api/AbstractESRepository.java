@@ -167,7 +167,10 @@ public abstract class AbstractESRepository<T> {
             return null;
         } catch(IndexNotFoundException ime) {
             return null;
-        } catch(InterruptedException | ExecutionException | TimeoutException e) {
+        } catch(InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ie);
+        } catch(ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         }
     }
@@ -208,7 +211,7 @@ public abstract class AbstractESRepository<T> {
                 return new ArrayList<>();
             }
             MultiGetRequest request = new MultiGetRequest();
-            for(String id : ids) {
+            for (String id : ids) {
                 request.add(indexName, id);
             }
             ActionFuture<MultiGetResponse> future =
@@ -216,14 +219,14 @@ public abstract class AbstractESRepository<T> {
                     .multiGet(request);
 
             MultiGetResponse responses = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
-            if(responses == null || ! responses.iterator().hasNext()) {
+            if (responses == null || !responses.iterator().hasNext()) {
                 return null;
             }
 
             //List<T> answer = new ArrayList<>(responses.getResponses().length); // ES v > 0.20
             Map<String, S> answerMap = new HashMap<>(responses.getResponses().length);
-            for(MultiGetItemResponse response : responses) {
-                if(response.isFailed()) {
+            for (MultiGetItemResponse response : responses) {
+                if (response.isFailed()) {
                     if (response.getFailure() != null) {
                         log.error("{}", response.getFailure().getMessage(), response.getFailure().getFailure());
                     } else {
@@ -248,7 +251,10 @@ public abstract class AbstractESRepository<T> {
                 answer.add(Optional.ofNullable(object));
             }
             return answer;
-        } catch(InterruptedException | ExecutionException | IOException | TimeoutException e) {
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ie);
+        } catch(ExecutionException | IOException | TimeoutException e) {
             throw new RuntimeException(e);
         }
     }
