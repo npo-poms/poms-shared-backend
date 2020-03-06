@@ -31,6 +31,7 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
+import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.FacetResults.toSimpleMap;
@@ -874,6 +875,15 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     }
 
+    @Test
+    public void withMaxZero() {
+        MediaResult result = target.listMembers(target.load("POMS_S_12345"), null, Order.ASC, 0L, 10);
+
+        log.info("{}", result.getTotal());
+
+
+    }
+
 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         AbstractESRepositoryITest.client
@@ -882,6 +892,16 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                     .id(object.getMid())
                     .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
             ).get();
+        for (MemberRef r : object.getMemberOf()) {
+            StandaloneMemberRef ref = StandaloneMemberRef.builder().memberRef(r).build();
+            AbstractESRepositoryITest.client
+                .index(
+                new IndexRequest(indexNames.get(ApiRefsIndex.APIMEDIA_REFS))
+                    .id(ref.getId())
+                    .routing(ref.getMidRef())
+                    .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref), XContentType.JSON)
+            ).get();
+        }
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
         indexed.sort((o1, o2) -> (int) (o1.getLastPublishedInstant().toEpochMilli() - o2.getLastPublishedInstant().toEpochMilli()));
