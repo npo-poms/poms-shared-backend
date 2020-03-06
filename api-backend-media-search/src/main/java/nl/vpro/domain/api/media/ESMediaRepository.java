@@ -393,13 +393,25 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             SearchRequestBuilder builder = client().prepareSearch(getRefsIndexName());
             listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             builder.setFrom((int) offset);
+            boolean maxIsZero = false;
             if (max != null) {
+                if (max == 0) {
+
+                    // If we don't do this, then we may get this kind of problems:
+                    // org.elasticsearch.ElasticsearchException$1: numHits must be > 0; please use TotalHitCountCollector if you just need the total hit count
+                    // at org.elasticsearch.ElasticsearchException.guessRootCauses(ElasticsearchException.java:644) ~[elasticsearch-7.6.0.jar:7.6.0]
+                    // This ia quick en dirty work around, because I can't quickly figure out the use 'TotalHitCountCollector'
+
+                    maxIsZero = true;
+                    max = 1;
+                }
                 builder.setSize(max);
             }
+
             SearchResponse response = builder.get();
             SearchHit[] hits = response.getHits().getHits();
 
-            mids = Arrays.stream(hits)
+            mids = maxIsZero ? Collections.emptyList() : Arrays.stream(hits)
                 .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
                 .collect(Collectors.toList());
             total = response.getHits().getTotalHits();
