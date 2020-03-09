@@ -37,6 +37,10 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  *
  *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost -Dcluster=asfasd
  *
+ *
+ *  Production
+ *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost:9209 -Dcluster=production
+ *
  * @author Michiel Meeuwissen
  * @since 5.12
  */
