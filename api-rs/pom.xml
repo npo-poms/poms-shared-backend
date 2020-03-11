@@ -36,14 +36,8 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.user</groupId>
-      <artifactId>user-backend-npo</artifactId>
+      <artifactId>user-backend</artifactId>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>hibernate-search-analyzers</artifactId>
-          <groupId>org.hibernate</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
