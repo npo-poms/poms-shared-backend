@@ -40,8 +40,6 @@ import nl.vpro.util.*;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
 
-;
-
 /**
  * @author Roelof Jan Koekoek
  * @author Michiel Meeuwissen
@@ -149,9 +147,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         if (needsPostFilter) {
             List<SearchResultItem<? extends MediaObject>> filtered = new ArrayList<>();
-            Iterator<SearchResultItem<? extends MediaObject>> iterator = result.iterator();
-            while(iterator.hasNext()) {
-                SearchResultItem<? extends MediaObject> item = iterator.next();
+            for (SearchResultItem<? extends MediaObject> item : result) {
                 if (form.test(item.getResult())) {
                     filtered.add(item);
                 }
@@ -237,6 +233,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
 
         SearchSourceBuilder search = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
+        assert media.getMid() != null;
         MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(getIndexName(), media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
             filterFields(media, relatedFields, "objectType,titles.value"),
@@ -327,6 +324,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @NonNull Order order,
         long offset,
         @NonNull Integer max) {
+        assert media.getMid() != null;
         SearchRequest request = client()
             .prepareSearch(getIndexName())
             .addSort(MediaSortField.sortDate.name(), SortOrder.valueOf(order.name()))
@@ -444,6 +442,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
         BoolQueryBuilder must = QueryBuilders.boolQuery();
         must.filter(QueryBuilders.termQuery("objectType", objectType.name()));
+        assert media.getMid() != null;
         must.must(QueryBuilders.termQuery("midRef", media.getMid()));
         builder
             .setQuery(must)
@@ -685,6 +684,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable Integer max,
         @NonNull Class<S> clazz) {
         String ref = media.getMid();
+        assert ref != null;
         BoolQueryBuilder booleanFilter =
             QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
 
