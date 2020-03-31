@@ -167,7 +167,10 @@ public abstract class AbstractESRepository<T> {
             return null;
         } catch(IndexNotFoundException ime) {
             return null;
-        } catch(InterruptedException | ExecutionException | TimeoutException e) {
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ie);
+        } catch(ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         }
     }
