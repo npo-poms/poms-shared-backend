@@ -99,6 +99,7 @@ public abstract class AbstractESRepositoryITest {
             client.admin().indices().prepareDelete(name).execute().get();
         }
         indexNames.clear();
+        refresh();
         firstRun = true;
     }
 
@@ -120,7 +121,8 @@ public abstract class AbstractESRepositoryITest {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                IndexHelper.of(log, (s) -> client, abstractIndex)
+                IndexHelper.of(log,
+                    (s) -> client, abstractIndex)
                     .indexName(indexName)
                     .build()
                     .createIndexIfNotExists(CreateIndex.FOR_TEST);
@@ -176,6 +178,7 @@ public abstract class AbstractESRepositoryITest {
             }
         }
         log.info("Cleared {}", indexName);
+        refresh();
 
     }
 
