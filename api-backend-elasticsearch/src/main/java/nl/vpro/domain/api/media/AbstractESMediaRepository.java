@@ -148,7 +148,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      * Defaulting version of {@link #mediaSearchRequest(ProfileDefinition, AbstractMediaForm, MediaObject, BoolQueryBuilder, long, Integer)}
      * Where  mediaObject is <code>null</code>
      */
-    final protected SearchRequest mediaSearchRequest(
+    final protected SearchRequestWrapper mediaSearchRequest(
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @NonNull BoolQueryBuilder rootQuery,
@@ -171,7 +171,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      * @param form    Handles {@link AbstractMediaForm#getSearches()} and {@link MediaForm#getSortFields()}. Also, if applicate it
      *                will handle {@link MediaForm#getFacets()}
      */
-    final protected SearchRequest mediaSearchRequest(
+    final protected SearchRequestWrapper mediaSearchRequest(
         @Nullable ProfileDefinition<MediaObject> profile,
         @Nullable AbstractMediaForm form,
         @Nullable MediaObject mediaObject,
@@ -179,11 +179,13 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         long offset,
         Integer max) {
         SearchRequest request = new SearchRequest(indexNames.get(APIMEDIA));
+        SearchSourceBuilder searchSourceBuilder = mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max);
+        boolean maxWasZero = handleMaxZero(max, searchSourceBuilder::size);
 
         request.source(
             mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max)
         );
-        return request;
+        return new SearchRequestWrapper(request, maxWasZero);
     }
 
     final protected SearchSourceBuilder mediaSearchBuilder(
@@ -260,13 +262,13 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
      * @param facets The requested facets. Will not be used to change the search request, but only to properly extract the facet results
      */
     protected <S extends MediaObject> GenericMediaSearchResult<S> executeSearchRequest(
-        @NonNull SearchRequest request,
+        @NonNull SearchRequestWrapper request,
         @Nullable MediaFacets facets,
         long offset,
         @Nullable Integer max,
         @NonNull Class<S> clazz) {
         ActionFuture<SearchResponse> searchResponseFuture = client()
-            .search(request)
+            .search(request.getRequest())
             ;
 
         try {
@@ -275,11 +277,16 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
                 ;
             SearchHits hits = response.getHits();
 
-            List<SearchResultItem<? extends S>> adapted = adapt(hits, clazz);
+            List<SearchResultItem<? extends S>> adapted = request.maxWasZero ? Collections.emptyList() : adapt(hits, clazz);
 
             MediaFacetsResult facetsResult =
                 ESMediaFacetsHandler.extractMediaFacets(response, facets, this);
-            return new GenericMediaSearchResult<>(adapted, facetsResult, offset, max, getTotal(hits));
+            return new GenericMediaSearchResult<>(adapted,
+                facetsResult,
+                offset,
+                max,
+                getTotal(hits)
+            );
         } catch (TransportSerializationException e) {
             String detail = e.getDetailedMessage();
             log.warn(e.getMessage() + ":" + detail);
@@ -326,6 +333,20 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             return;
         }
         redirectTextMatchers(search.getMediaIds());
+    }
+
+
+    @Getter
+    @ToString
+    public static class SearchRequestWrapper {
+        final SearchRequest request;
+        final boolean maxWasZero;
+
+        SearchRequestWrapper(SearchRequest request, boolean maxWasZero) {
+            this.request = request;
+            this.maxWasZero = maxWasZero;
+        }
+
     }
 
 }
