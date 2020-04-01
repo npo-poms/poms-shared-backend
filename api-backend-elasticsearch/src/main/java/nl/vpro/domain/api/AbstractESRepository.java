@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
@@ -261,7 +262,7 @@ public abstract class AbstractESRepository<T> {
 
 
 
-    protected void handlePaging(
+    protected boolean handlePaging(
         long offset,
         @Nullable Integer max,
         @NonNull SearchSourceBuilder searchBuilder,
@@ -272,10 +273,26 @@ public abstract class AbstractESRepository<T> {
         }
         if (max == null) {
             max = (int) executeCount(queryBuilder, indexNames);
-            searchBuilder.size(max);
-        } else {
-            searchBuilder.size(max);
         }
+        return handleMaxZero(max, searchBuilder::size);
+    }
+
+    protected boolean handleMaxZero(Integer max,  Consumer<Integer> setSize) {
+         boolean maxIsZero = false;
+        if (max != null) {
+            if (max == 0) { // NPA-532
+
+                // If we don't do this, then we may get this kind of problems:
+                // org.elasticsearch.ElasticsearchException$1: numHits must be > 0; please use TotalHitCountCollector if you just need the total hit count
+                // at org.elasticsearch.ElasticsearchException.guessRootCauses(ElasticsearchException.java:644) ~[elasticsearch-7.6.0.jar:7.6.0]
+                // This ia quick en dirty work around, because I can't quickly figure out the use 'TotalHitCountCollector'
+
+                maxIsZero = true;
+                max = 1;
+            }
+            setSize.accept(max);
+        }
+        return maxIsZero;
     }
 
     protected <S extends T> List<SearchResultItem<? extends S>> adapt(

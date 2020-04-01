@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -115,7 +116,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         BoolQueryBuilder rootQuery = QueryBuilders.boolQuery();
 
-        SearchRequest request = mediaSearchRequest(
+        SearchRequestWrapper request = mediaSearchRequest(
             profile,
             form,
             rootQuery,
@@ -212,6 +213,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (form != null && form.getFacets() != null) {
             result.setSelectedFacets(new MediaFacetsResult());
         }
+
+
         MediaSearchResults.setSelectedFacets(result.getFacets(), result.getSelectedFacets(), form);
         MediaSearchResults.sortFacets(result.getFacets(), result.getSelectedFacets(), form);
 
@@ -286,15 +289,22 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @NonNull Order order,
         long offset,
         @Nullable  Integer max) {
+
+        if (max == null) {
+            max = defaultMax;
+        }
+        AtomicInteger atomicMax = new AtomicInteger(max);
+        boolean wasZero = handleMaxZero(max, atomicMax::set);
         SearchRequest request = client()
             .prepareSearch(getIndexName())
             .setQuery(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()))
             .addSort("mid", SortOrder.valueOf(order.name()))
             .setFrom((int) offset)
-            .setSize(max == null ? defaultMax : max)
+            .setSize(atomicMax.get())
             .request();
 
-        GenericMediaSearchResult<MediaObject> result = executeSearchRequest(request, null, offset, max, MediaObject.class);
+        SearchRequestWrapper wrapper = new SearchRequestWrapper(request, wasZero);
+        GenericMediaSearchResult<MediaObject> result = executeSearchRequest(wrapper, null, offset, max, MediaObject.class);
         return new MediaSearchResult(result).asResult();
     }
 
@@ -323,19 +333,22 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable ProfileDefinition<MediaObject> profile,
         @NonNull Order order,
         long offset,
-        @NonNull Integer max) {
+        Integer max) {
         assert media.getMid() != null;
+        AtomicInteger atomicMax = new AtomicInteger(max);
+        boolean wasZero = handleMaxZero(max, atomicMax::set);
         SearchRequest request = client()
             .prepareSearch(getIndexName())
             .addSort(MediaSortField.sortDate.name(), SortOrder.valueOf(order.name()))
             .setQuery(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
             .setFrom((int) offset)
-            .setSize(max)
+            .setSize(atomicMax.get())
             .setPostFilter(ESMediaFilterBuilder.filter(profile))
             .request();
 
+        SearchRequestWrapper wrapper = new SearchRequestWrapper(request, wasZero);
         GenericMediaSearchResult<MediaObject> objects =
-            executeSearchRequest(request, null, offset, max, MediaObject.class);
+            executeSearchRequest(wrapper, null, offset, max, MediaObject.class);
 
         return new MediaSearchResult(objects).asResult();
 
@@ -394,7 +407,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
             SearchResponse response = builder.get();
             SearchHit[] hits = response.getHits().getHits();
-            boolean maxIsZero = handleMaxZero(max, builder);
+            boolean maxIsZero = handleMaxZero(max, builder::setSize);
             mids = maxIsZero ? Collections.emptyList() : Arrays.stream(hits)
                 .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
                 .collect(Collectors.toList());
@@ -414,23 +427,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return new MemberRefResult(total, mids);
     }
 
-    boolean handleMaxZero(Integer max,  SearchRequestBuilder builder) {
-         boolean maxIsZero = false;
-        if (max != null) {
-            if (max == 0) { // NPA-532
-
-                // If we don't do this, then we may get this kind of problems:
-                // org.elasticsearch.ElasticsearchException$1: numHits must be > 0; please use TotalHitCountCollector if you just need the total hit count
-                // at org.elasticsearch.ElasticsearchException.guessRootCauses(ElasticsearchException.java:644) ~[elasticsearch-7.6.0.jar:7.6.0]
-                // This ia quick en dirty work around, because I can't quickly figure out the use 'TotalHitCountCollector'
-
-                maxIsZero = true;
-                max = 1;
-            }
-            builder.setSize(max);
-        }
-        return maxIsZero;
-    }
 
 
     protected static class MemberRefResult {
@@ -692,7 +688,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         BoolQueryBuilder booleanFilter =
             QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
 
-        SearchRequest request = mediaSearchRequest(profile, form, media, booleanFilter, offset, max);
+
+        SearchRequestWrapper request = mediaSearchRequest(profile, form, media, booleanFilter, offset, max);
 
         return executeSearchRequest(request, form != null ? form.getFacets() : null, offset, max, clazz);
     }

@@ -2,7 +2,6 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +27,7 @@ public class AbstractMediaESRepositoryTest {
     @Test
     public void searchRequest() {
 
-        SearchRequest sr = repository.mediaSearchRequest(
+        AbstractESMediaRepository.SearchRequestWrapper sr = repository.mediaSearchRequest(
             null,
             MediaForm.builder().withEverything().build(),
             QueryBuilders.boolQuery(),
