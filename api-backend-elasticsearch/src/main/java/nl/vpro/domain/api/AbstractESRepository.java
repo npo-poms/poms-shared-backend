@@ -440,9 +440,17 @@ public abstract class AbstractESRepository<T> {
     }
 
     public final Optional<String> redirect(String mid) {
-        return Optional.ofNullable(
-            getDirectsRepository().redirects().getMap().get(mid)
-        );
+        Map<String, String> map = getDirectsRepository().redirects().getMap();
+
+        String result = map.get(mid);
+        String to = result;
+        while(to != null) {
+            to = map.get(to);
+            if (to != null) {
+                result = to;
+            }
+        }
+        return Optional.ofNullable(result);
     }
 
     protected Redirector getDirectsRepository() {
