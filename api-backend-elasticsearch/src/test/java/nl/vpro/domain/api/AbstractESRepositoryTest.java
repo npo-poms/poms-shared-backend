@@ -26,7 +26,7 @@ class AbstractESRepositoryTest {
 
         @Override
         protected Redirector getDirectsRepository() {
-            return () -> new RedirectList(Instant.now(), Instant.now(), redirects);
+            return () -> new RedirectList(Instant.now(), redirects);
         }
     };
     {

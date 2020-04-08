@@ -443,7 +443,7 @@ public abstract class AbstractESRepository<T> {
     }
 
     public final Optional<String> redirect(String mid) {
-        return getDirectsRepository().redirect(mid);
+        return getDirectsRepository().redirects().redirect(mid);
     }
 
     protected Redirector getDirectsRepository() {

@@ -56,11 +56,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    Map<String, String> redirects;
-
-    private Instant lastRedirectRead = Instant.EPOCH;
-
-    private Instant lastRedirectChange = Instant.now();
+    RedirectList redirects;
+    Instant lastRedirectRead = Instant.EPOCH;
 
     private int defaultMax = 1000;
 
@@ -628,7 +625,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     @Override
     public RedirectList redirects() {
         fillRedirects();
-        return new RedirectList(lastRedirectRead, lastRedirectChange, redirects);
+        return redirects;
     }
 
     synchronized void refillRedirectCache() {
@@ -650,9 +647,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        if (! newRedirects.equals(redirects)) {
-            redirects = newRedirects;
-            lastRedirectChange = Instant.now();
+        if (! newRedirects.equals(redirects.getMap())) {
+            redirects = new RedirectList(Instant.now(), newRedirects);
             log.info("Read {} redirects from ES", redirects.size());
         }
         lastRedirectRead = Instant.now();

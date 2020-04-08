@@ -75,7 +75,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @BeforeEach
     public  void setup() {
         target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
-        target.redirects = new HashMap<>();
+        target.redirects = new RedirectList();
         clearIndices();
     }
 
