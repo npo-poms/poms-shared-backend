@@ -443,17 +443,7 @@ public abstract class AbstractESRepository<T> {
     }
 
     public final Optional<String> redirect(String mid) {
-        Map<String, String> map = getDirectsRepository().redirects().getMap();
-
-        String result = map.get(mid);
-        String to = result;
-        while(to != null) {
-            to = map.get(to);
-            if (to != null) {
-                result = to;
-            }
-        }
-        return Optional.ofNullable(result);
+        return getDirectsRepository().redirect(mid);
     }
 
     protected Redirector getDirectsRepository() {
