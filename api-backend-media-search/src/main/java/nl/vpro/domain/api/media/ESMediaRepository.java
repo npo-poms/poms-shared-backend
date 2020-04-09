@@ -401,10 +401,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             SearchRequestBuilder builder = client().prepareSearch(getRefsIndexName());
             listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             builder.setFrom((int) offset);
-
+            boolean maxIsZero = handleMaxZero(max, builder::setSize);
             SearchResponse response = builder.get();
             SearchHit[] hits = response.getHits().getHits();
-            boolean maxIsZero = handleMaxZero(max, builder::setSize);
             mids = maxIsZero ? Collections.emptyList() : Arrays.stream(hits)
                 .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
                 .collect(Collectors.toList());
