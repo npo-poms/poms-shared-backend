@@ -272,7 +272,7 @@ public abstract class AbstractESRepository<T> {
             searchBuilder.from((int) offset);
         }
         if (max == null) {
-            max = (int) executeCount(queryBuilder, indexNames);
+            max = (int) executeCount(queryBuilder, indexNames).value;
         }
         return handleMaxZero(max, searchBuilder::size);
     }
@@ -318,11 +318,11 @@ public abstract class AbstractESRepository<T> {
         };
     }
 
-    protected long executeCount(
+    protected TotalHits executeCount(
         @NonNull QueryBuilder builder,
         @NonNull String... indexNames) {
         return client().prepareSearch(indexNames)
-            .setSource(new SearchSourceBuilder().size(0).query(builder)).get().getHits().getTotalHits().value;
+            .setSource(new SearchSourceBuilder().size(1).query(builder)).get().getHits().getTotalHits();
 
     }
 
