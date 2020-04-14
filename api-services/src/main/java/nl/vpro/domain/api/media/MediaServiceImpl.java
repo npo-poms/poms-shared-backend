@@ -44,8 +44,6 @@ public class MediaServiceImpl implements MediaService {
 
     private final ProfileService profileService;
 
-
-
     private final MediaSearchRepository mediaSearchRepository;
 
     private final QuerySearchRepository querySearchRepository;
@@ -121,8 +119,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
-    public <T extends MediaObject> T findByMid(String mid) {
-        return mediaSearchRepository.findByMid(mid);
+    public <T extends MediaObject> T findByMid(String mid, boolean loadDeleted) {
+        return mediaSearchRepository.findByMid(mid, loadDeleted);
     }
 
 
