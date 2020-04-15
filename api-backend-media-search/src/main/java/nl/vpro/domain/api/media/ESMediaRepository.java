@@ -145,12 +145,21 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         if (needsPostFilter) {
             List<SearchResultItem<? extends MediaObject>> filtered = new ArrayList<>();
+            int correctTotal = 0;
             for (SearchResultItem<? extends MediaObject> item : result) {
                 if (form.test(item.getResult())) {
                     filtered.add(item);
+                } else {
+                    correctTotal++;
+
                 }
             }
-            MediaSearchResult filteredResult =  new MediaSearchResult(filtered, result.getOffset(), result.getMax(), Result.Total.approximate(result.getTotal()));
+            MediaSearchResult filteredResult =  new MediaSearchResult(
+                filtered,
+                result.getOffset(),
+                result.getMax(),
+                Result.Total.approximate(result.getTotal() - correctTotal)
+            );
             filteredResult.setSelectedFacets(result.getSelectedFacets());
             filteredResult.setFacets(result.getFacets());
             return filteredResult;
