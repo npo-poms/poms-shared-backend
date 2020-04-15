@@ -119,8 +119,8 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
-    public <T extends MediaObject> T findByMid(String mid, boolean loadDeleted) {
-        return mediaSearchRepository.findByMid(mid, loadDeleted);
+    public <T extends MediaObject> T findByMid(boolean loadDeleted, String mid) {
+        return mediaSearchRepository.findByMid(loadDeleted, mid);
     }
 
 
