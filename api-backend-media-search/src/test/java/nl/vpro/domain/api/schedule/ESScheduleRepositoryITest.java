@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.StringReader;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import javax.xml.bind.JAXB;
 
@@ -105,8 +106,31 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                 ));
 
 
-        ScheduleResult result = repository.listSchedules(Channel.BBC1, date("2015-06-19T00:00:00"), date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
+        ScheduleResult result = repository.listSchedules(
+            Channel.BBC1,
+            date("2015-06-19T00:00:00"),
+            date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
         assertThat(result).hasSize(1);
+    }
+    @Test
+    public void nowForChannel() throws Exception {
+
+        Instant now = LocalDateTime.of(2020, 4, 15, 20, 40).atZone(Schedule.ZONE_ID).toInstant();
+
+        index(program().mid("M_1")
+                .scheduleEvents(
+                        event(Channel.OPVO, "2020-04-15T20:20:00", Duration.ofMinutes(10)),
+                        event(Channel.BBC1, "2020-04-15T20:35:00", Duration.ofMinutes(10))
+                ));
+
+        index(program().mid("DONNA_2")
+                .scheduleEvents(
+                        event(Channel.BBC2, "2015-06-19T10:00:00")
+                ));
+        List<? extends ApiScheduleEvent> items = repository.listSchedules(Channel.OPVO, null, now, Order.DESC, 0L, 1).getItems();
+        // TODO, doesn't fail.
+
+        assertThat(items).hasSize(1);
     }
 
     @Test
@@ -167,7 +191,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
      * This reproduces API-249
      */
     @Test
-    @Disabled("API-249")
+    //@Disabled("API-249")
     public void listSchedulesForBroadcasterWithMax() throws Exception {
 
         Instant now = Instant.now();
@@ -358,13 +382,17 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         assertThat(schedules).hasSize(1);
     }
 
-    private ScheduleEvent event(Channel c, String start) {
+    private ScheduleEvent event(Channel c, String start, Duration duration) {
         return ScheduleEvent.builder()
             .channel(c)
             .start(date(start))
-            .duration(Duration.ofHours(1))
+            .duration(duration)
             .build();
     }
+    private ScheduleEvent event(Channel c, String start) {
+        return event(c, start, Duration.ofHours(1));
+    }
+
 
     private ScheduleEvent rerun(Channel c, String start) {
         return ScheduleEvent.builder()
