@@ -65,7 +65,7 @@ public class MediaServiceImplTest {
     @Test
     public void testLoad()  {
         target.findByMid(media.getMid());
-        verify(mediaSearchRepository).findByMid(media.getMid());
+        verify(mediaSearchRepository).findByMid(true, media.getMid());
     }
 
     @Test
