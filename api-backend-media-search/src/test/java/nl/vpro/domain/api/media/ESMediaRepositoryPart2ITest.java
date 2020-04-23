@@ -398,7 +398,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindOnProfileWithTextScore() {
         MediaForm form = form().text("Text with Score words").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
         assertThat(result.getItems().get(0).getResult()).isEqualTo(programBuilder.build());
@@ -408,7 +408,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithMidMediaId() {
         MediaForm form = form().mediaIds(programBuilder.build().getMid()).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -950,5 +950,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
                 LinkedHashMap::new));
+    }
+
+    protected MediaSearchResult getAndTestResult(MediaForm form) {
+        return getAndTestResult(target, form);
     }
 }

@@ -243,7 +243,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         try (ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject)) {
             SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
             requestBuilder.setQuery(toExecute);
-            requestBuilder.addSort("sortDate", SortOrder.DESC);
+            requestBuilder.addSort("scheduleEvents.start", SortOrder.DESC);
 
             long skipped = 0;
             long count = 0;
