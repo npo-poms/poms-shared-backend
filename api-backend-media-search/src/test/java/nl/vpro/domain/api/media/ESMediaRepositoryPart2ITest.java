@@ -416,7 +416,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithMidMediaIds() {
         MediaForm form = form().mediaIds("MID-1", "MID-2").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
     }
@@ -424,7 +424,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithSortDate() {
         MediaForm form = form().asc(MediaSortField.sortDate).sortDate(NOW,  NOW.plus(Duration.ofHours(2))).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
         for (int i = 1; i < result.getItems().size(); i++) {
@@ -439,7 +439,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
             .sortOrder(MediaSortOrder.asc(MediaSortField.publishDate))
             .build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(5);
         for (int i = 1; i < result.getItems().size(); i++) {
@@ -451,7 +451,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithPublishDateDesc() {
         MediaForm form = form().publishDate(LONGAGO, LONGAGO.plusSeconds(5)).sortOrder(MediaSortOrder.desc(MediaSortField.publishDate)).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(5);
         for (int i = 1; i < result.getItems().size(); i++) {
@@ -462,7 +462,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithDuration() {
         MediaForm form = form().duration(Duration.ZERO, Duration.ofMillis(200)).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
     }
@@ -472,7 +472,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Disabled("Dropped support for finding by urn")
     public void testFindWithWithUrnMediaId() {
         MediaForm form = form().mediaIds(programBuilder.build().getUrn()).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -481,7 +481,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithWithBroadcasterWithVariedCaseMiss() {
 
         MediaForm form = form().broadcasters("TVDrenthe").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(0);
     }
@@ -489,7 +489,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithBroadcasterWithVariedCaseHit() {
         MediaForm form = form().broadcasters("TVDRENTHE").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -497,7 +497,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithLocationsExtensionWithVariedCase() {
         MediaForm form = form().locations("mP3").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -505,7 +505,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithTags() {
         MediaForm form = form().tags("Tag 2").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(3);
     }
@@ -513,7 +513,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithTagsIgnoreCase() {
         MediaForm form = form().tags(Match.SHOULD, new ExtendedTextMatcher("OnderKast", StandardMatchType.TEXT, false)).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
     }
@@ -522,7 +522,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithExcludeMediaIds() {
         MediaForm form = form().mediaIds(Match.NOT, "MID-1", "MID-2").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         System.out.println("LIST" + result.getItems());
         assertThat(result.getSize()).isEqualTo(indexedObjectCount - 2 /* excluded */);
@@ -532,7 +532,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithExcludeTypes() {
         MediaForm form = form().types(Match.NOT, MediaType.BROADCAST).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         // so, just the groups
         assertThat(result.getSize()).isEqualTo(indexedGroupCount);
@@ -542,7 +542,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithAVType() {
         MediaForm form = form().avTypes(Match.MUST, AVType.AUDIO).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(4);
         assertThat(result.getItems().get(0).getResult().getAVType()).isEqualTo(AVType.AUDIO);
@@ -582,7 +582,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithHighlights() {
         MediaForm form = form().text("title").highlight(true).build();
 
-        MediaSearchResult result = target.find(null, form, 1L, 5);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount - 1); // One object has a different title
         SearchResultItem<? extends MediaObject> firstResult = result.getItems().get(0);
@@ -655,7 +655,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form().relationText(director, "Stanley Kubrick").build(), 0, null);
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form().relationText(director, "Stanley Kubrick"));
         assertThat(result.getSize()).isEqualTo(1);
         assertThat(result.iterator().next().getResult().getMainTitle()).isEqualTo("About Kubrick");
     }
@@ -665,7 +665,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
         ExtendedTextMatcher kubrick = new ExtendedTextMatcher("StanLey KubRick", false);
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form().relationText(director, kubrick).build(), 0, null);
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form().relationText(director, kubrick));
         assertThat(result.getSize()).isEqualTo(1);
         assertThat(result.iterator().next().getResult().getMainTitle()).isEqualTo("About Kubrick");
     }
@@ -709,10 +709,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithChannel() {
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form()
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form()
             .scheduleEvents(ScheduleEventSearch.builder().channel(Channel.NED1).build())
             .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
-            .build(), 0L, 100);
+        );
 
         assertThat(result).hasSize(3);
         assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID-0");
@@ -723,13 +723,12 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithChannels() {
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form()
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form()
             .scheduleEvents(
                 ScheduleEventSearch.builder().channel(Channel.NED1).match(Match.SHOULD).build(),
                 ScheduleEventSearch.builder().channel(Channel.NED2).match(Match.SHOULD).build()
             )
-            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
-            .build(), 0L, 100);
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate)));
 
         assertThat(result).hasSize(6);
         assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID-0");
@@ -954,5 +953,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     protected MediaSearchResult getAndTestResult(MediaForm form) {
         return getAndTestResult(target, form);
+    }
+    protected MediaSearchResult getAndTestResult(MediaFormBuilder form) {
+        return getAndTestResult(form.build());
     }
 }

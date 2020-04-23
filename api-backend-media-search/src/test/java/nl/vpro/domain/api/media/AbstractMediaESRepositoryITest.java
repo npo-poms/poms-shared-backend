@@ -42,7 +42,8 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
         Set<String> inResult = new HashSet<>();
         for (SearchResultItem<? extends MediaObject> sr : result) {
             MediaSearch.TestResult testResult = form.getTestResult(sr.getResult());
-            assertThat(testResult.test()).withFailMessage(testResult.getDescription()).isTrue();
+            log.info("Asserting that {} is in {}", sr.getResult(), form);
+            assertThat(testResult.test()).withFailMessage("But it is not! " +  testResult.getDescription()).isTrue();
             inResult.add(sr.getResult().getMid());
         }
         ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<MediaObject>(client,
@@ -60,7 +61,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
             if (! inResult.contains(mo.getMid())) {
                 MediaSearch.TestResult testResult = form.getTestResult(mo);
                 log.info("Asserting that {} is not in {}", mo, form);
-                assertThat(testResult.test()).withFailMessage(testResult.getDescription()).isFalse();
+                assertThat(testResult.test()).withFailMessage("But it is! :" +  testResult.getDescription()).isFalse();
 
             }
         });
