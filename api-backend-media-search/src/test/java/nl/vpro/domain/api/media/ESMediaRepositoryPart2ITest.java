@@ -88,7 +88,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     private static Program sub_program2;
 
 
-    private static String[] testTags = {"Onderkast", "Bovenkast", "Geen kast", "Hoge kast", "Lage kast"};
+    private static final String[] testTags = {"Onderkast", "Bovenkast", "Geen kast", "Hoge kast", "Lage kast"};
 
     static List<MediaObject> indexed = new ArrayList<>();
 
