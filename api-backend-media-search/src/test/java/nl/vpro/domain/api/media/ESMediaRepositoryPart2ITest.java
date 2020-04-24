@@ -125,41 +125,41 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         target.setIndexName(indexNames.get(APIMEDIA));
 
-        group = index(groupBuilder.published().build());
-        group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid().build());
+        group = index(groupBuilder.published());
+        group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid());
         // 2 groups
         program1 = index(programBuilder.copy()
             .publishStart(LocalDateTime.of(2017, 1, 30, 0, 0)) // sortDate is relevant for listDescendants
             .memberOf(group, 1)
-            .memberOf(group_ordered, 7).episodeOf(group, 3).build());
+            .memberOf(group_ordered, 7).episodeOf(group, 3));
         program2 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 29, 0, 0))
             .published(NOW).withMid()
-            .memberOf(group_ordered, 2).build());
+            .memberOf(group_ordered, 2));
         program3 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 28, 0, 0))
             .published(NOW)
             .withMid()
-            .memberOf(group_ordered, 3).build());
+            .memberOf(group_ordered, 3));
         sub_group = index(MediaTestDataBuilder.group().published()
             .mid("sub_group")
             .memberOf(group_ordered, 4)
             .published(NOW)
             .creationDate(NOW)
-            .build());
+            );
         sub_program1 = index(programBuilder.copy()
             .publishStart(LocalDateTime.of(2017, 1, 30, 1, 0)) // sortDate is relevant for listDescendants
             .mid("sub_program_1")
             .published(NOW)
             .creationDate(NOW)
             .memberOf(sub_group, 1)
-            .build());
+            );
         sub_program2 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 29, 2, 0))
             .mid("sub_program_2")
             .published(NOW)
             .creationDate(NOW)
-            .memberOf(sub_group, 2).build());
+            .memberOf(sub_group, 2));
 
         // order of descendant of group_ordered by sortDate should be
         // program3, program2, sub_program2, program1, sub_program1/sub_group
@@ -170,10 +170,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         //3 + 2 programs (broadcasts), 1 sub group
 
 
-        index(MediaTestDataBuilder.group().constrained().type(GroupType.COLLECTION).mid("VPGROUP_D1").lastPublished(NOW).workflow(Workflow.DELETED).title("Deleted Group").build());
+        index(MediaTestDataBuilder.group().constrained().type(GroupType.COLLECTION).mid("VPGROUP_D1").lastPublished(NOW).workflow(Workflow.DELETED).title("Deleted Group"));
         // 1 deleted group
-        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D").lastPublished(NOW).workflow(Workflow.REVOKED).title("Deleted Program").build());
-        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D1").lastPublished(NOW).workflow(Workflow.MERGED).title("Deleted Merged Program").mergedTo(program1).build());
+        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D").lastPublished(NOW).workflow(Workflow.REVOKED).title("Deleted Program"));
+        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D1").lastPublished(NOW).workflow(Workflow.MERGED).title("Deleted Merged Program").mergedTo(program1));
         // 2 deleted programs
 
         AgeRating[] ORIGINAL = {_6, _9, _12, _16, ALL};
@@ -186,7 +186,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .lastPublished(LONGAGO.plusSeconds(i * 2))
                 .withGenres()
                 .mid("MID_G_" + i)
-                .build());
+                );
             index(MediaTestDataBuilder.program()
                 .constrained()
                 .workflow(Workflow.PUBLISHED)
@@ -203,7 +203,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .ageRating(ORIGINAL[i % ORIGINAL.length])
                 .predictions(Platform.INTERNETVOD)
                 .mid("MID-" + i)
-                .build());
+                );
         }
         // 10 groups, and 10 programs (broadcasts)
 
@@ -211,25 +211,25 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
         // index some variations
-        index(programBuilder.copy().mid("MID_HIGH_SCORE").mainTitle("This should give us a high score").build());
+        index(programBuilder.copy().mid("MID_HIGH_SCORE").mainTitle("This should give us a high score"));
         // 29 objects, 14 programs
 
 
         index(groupBuilder.copy().mid("MID_SCORING_ON_DESCRIPTION")
-                .mainDescription("While scoring a hit on a description field is likely to receive a much lower score then a hit on a title.").build());
+                .mainDescription("While scoring a hit on a description field is likely to receive a much lower score then a hit on a title."));
 
         // 30, 13 groups
 
         Location wm = new Location("http://somedomain.com/path/to/file", OwnerType.BROADCASTER);
         wm.setAvFileFormat(AVFileFormat.WM);
 
-        index(programBuilder.copy().mid("MID_WITH_LOCATION").locations(wm).build());
+        index(programBuilder.copy().mid("MID_WITH_LOCATION").locations(wm));
 
-        index(programBuilder.copy().mid("MID_DRENTHE").broadcasters(new Broadcaster("TVDRENTHE", "TVDrenthe")).build());
+        index(programBuilder.copy().mid("MID_DRENTHE").broadcasters(new Broadcaster("TVDRENTHE", "TVDrenthe")));
 
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
-        index(programBuilder.copy().mid("MID_WITH_RELATIONS").mainTitle("About Kubrick").relations(new Relation(director, "", "Stanley Kubrick")).build());
+        index(programBuilder.copy().mid("MID_WITH_RELATIONS").mainTitle("About Kubrick").relations(new Relation(director, "", "Stanley Kubrick")));
 
         // 33 (3 deleted)
         refresh();
@@ -884,7 +884,11 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
 
-    private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
+    private static <T extends MediaObject> T index(MediaBuilder<?, T> builder) throws IOException, ExecutionException, InterruptedException {
+        if (builder.getWorkflow() != Workflow.DELETED) {
+             builder.workflow(Workflow.PUBLISHED);
+        }
+        T object = builder.build();
         AbstractESRepositoryITest.client
             .index(
                 new IndexRequest(indexNames.get(APIMEDIA))
