@@ -37,6 +37,7 @@ import nl.vpro.util.FilteringIterator;
 import static nl.vpro.domain.api.FacetResults.toSimpleMap;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
+import static nl.vpro.domain.media.support.Workflow.PUBLISHED_AS_DELETED;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -586,7 +587,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount - 1); // One object has a different title
         SearchResultItem<? extends MediaObject> firstResult = result.getItems().get(0);
-        assertThat(firstResult.getHighlights()).hasSize(1);
+        assertThat(firstResult.getHighlights()).hasSize(2);
 //        Assertions.assertThat(firstResult.getHighlights().get(0).getBody()).containsExactly("Main <em class=\"hlt1\">title</em> MIS', 'Short <em class=\"hlt1\">title</em>', 'Episode <em class=\"hlt1\">title</em> MIS");
     }
 
@@ -885,7 +886,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
     private static <T extends MediaObject> T index(MediaBuilder<?, T> builder) throws IOException, ExecutionException, InterruptedException {
-        if (builder.getWorkflow() != Workflow.DELETED) {
+        if (! PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
              builder.workflow(Workflow.PUBLISHED);
         }
         T object = builder.build();
