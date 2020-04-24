@@ -458,7 +458,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         ProfileDefinition<MediaObject> notExclusive = new ProfileDefinition<>(
             new Filter(new Not(new HasPortalRestrictionConstraint()))
         );
-        MediaSearchResult result = getAndTestResult(form);
+        MediaSearchResult result =  target.find(notExclusive, form, 0, null);
 
 
         for (SearchResultItem<? extends MediaObject> mo : result) {
