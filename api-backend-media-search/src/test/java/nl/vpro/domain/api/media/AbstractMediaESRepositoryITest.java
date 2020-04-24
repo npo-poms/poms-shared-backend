@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.media.MediaObject;
+import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch7.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.*;
@@ -46,7 +47,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
             assertThat(testResult.test()).withFailMessage("But it is not! " +  testResult.getDescription()).isTrue();
             inResult.add(sr.getResult().getMid());
         }
-        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<MediaObject>(client,
+        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client,
             (sh) -> {
                 try {
                     return Jackson2Mapper.getLenientInstance().readValue(sh.getSourceAsString(), MediaObject.class);
@@ -55,14 +56,18 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
                     return null;
                 }
             });
-        i.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA));
+        i.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
+
+        ;
 
         i.forEachRemaining(mo -> {
-            if (! inResult.contains(mo.getMid())) {
-                MediaSearch.TestResult testResult = form.getTestResult(mo);
-                log.info("Asserting that {} is not in {}", mo, form);
-                assertThat(testResult.test()).withFailMessage("But it is! :" +  testResult.getDescription()).isFalse();
+            if (Workflow.PUBLICATIONS.contains(mo.getWorkflow())) {
+                if (!inResult.contains(mo.getMid())) {
+                    MediaSearch.TestResult testResult = form.getTestResult(mo);
+                    log.info("Asserting that {} is not in {}", mo, form);
+                    assertThat(testResult.test()).withFailMessage("But it is! :" + testResult.getDescription()).isFalse();
 
+                }
             }
         });
 
