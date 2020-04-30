@@ -995,7 +995,32 @@
               }
             }
           }
+        },
+        "descriptions": {
+          "properties": {
+            "owner": {
+              "type": "keyword"
+            },
+            "type": {
+              "type": "keyword"
+            },
+            "value": {
+              "type": "text",
+              "norms": false,
+              "fields": {
+                "full": {
+                  "type": "keyword"
+                },
+                "stemmed": {
+                  "type": "text",
+                  "analyzer": "dutch_stemmed",
+                  "norms": false
+                }
+              }
+            }
+          }
         }
+
       }
     },
     "segments": {
