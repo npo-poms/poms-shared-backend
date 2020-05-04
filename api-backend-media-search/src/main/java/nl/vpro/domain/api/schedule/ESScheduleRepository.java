@@ -235,7 +235,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
             toExecute = simplifyQuery(query);
         }
-        List<ApiScheduleEvent> results = new ArrayList<>();
+        final List<ApiScheduleEvent> results = new ArrayList<>();
         long mediaObjectCount = 0;
         long offset = form.getPager().getOffset();
         Integer max = form.getPager().getMax();
@@ -267,7 +267,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                                 eventCountForMediaObject++;
                                 count++;
                             }
-                            if (max != null && count == max) {
+                            if (max != null && count > max + 2000) {
                                 break OUTER;
                             }
                         } else {
@@ -296,9 +296,17 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
                 results.sort(Comparator.reverseOrder());
                 break;
         }
-
-
-        return new ScheduleResult(new Result<>(results, offset, max, total.map(t -> Result.Total.atLeast(Math.max(t, results.size()))).orElse(Result.Total.MISSING)));
+        List<ApiScheduleEvent> truncated;
+        if (max != null && results.size() > max) {
+            truncated = results.subList(0, max);
+        } else {
+            truncated = results;
+        }
+        return new ScheduleResult(new Result<>(truncated,
+            offset,
+            max,
+            total.map(t -> Result.Total.atLeast(Math.max(t, truncated.size()))).orElse(Result.Total.MISSING))
+        );
     }
 
     protected MediaObject getMediaObject(SearchHit hit) {
