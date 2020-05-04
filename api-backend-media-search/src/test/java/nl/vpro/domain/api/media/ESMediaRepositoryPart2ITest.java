@@ -386,7 +386,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void     testFind() {
+    public void  testFind() {
         SearchResult<MediaObject> result = target.find(null, null, 2L, 5);
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount);
         assertThat(result.getOffset()).isEqualTo(2);
@@ -437,7 +437,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithPublishDateAsc() {
         MediaForm form = form()
-            .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
+            .publishDate(LONGAGO.plusSeconds(1), LONGAGO.plusSeconds(5))
             .sortOrder(MediaSortOrder.asc(MediaSortField.publishDate))
             .build();
         SearchResult<MediaObject> result = getAndTestResult(form);
