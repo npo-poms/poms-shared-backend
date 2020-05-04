@@ -4,9 +4,7 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 
 import java.time.*;
 import java.util.Collections;
@@ -23,20 +21,15 @@ import org.jboss.resteasy.annotations.cache.NoCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
 import com.newrelic.api.agent.Trace;
 
 import nl.vpro.api.rs.exception.Exceptions;
 import nl.vpro.api.rs.filter.ApiMediaFilter;
-import nl.vpro.domain.api.ApiScheduleEvent;
-import nl.vpro.domain.api.Constants;
-import nl.vpro.domain.api.Order;
-import nl.vpro.domain.api.media.ScheduleForm;
-import nl.vpro.domain.api.media.ScheduleResult;
-import nl.vpro.domain.api.media.ScheduleSearchResult;
-import nl.vpro.domain.api.media.ScheduleService;
-import nl.vpro.domain.media.Channel;
-import nl.vpro.domain.media.Net;
-import nl.vpro.domain.media.ScheduleEvent;
+import nl.vpro.api.rs.v3.media.MediaRestService;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.media.*;
+import nl.vpro.domain.media.*;
 import nl.vpro.swagger.SwaggerApplication;
 
 import static nl.vpro.api.rs.exception.Exceptions.handleTooManyResults;
@@ -47,11 +40,10 @@ import static nl.vpro.domain.api.Constants.*;
  * @author rico
  */
 @Service
-@Api(tags = ScheduleRestService.TAG)
+@Api(tags = {ScheduleRestService.TAG, MediaRestService.TAG}) //  documented with media, so also in that tag!
 @Path(ScheduleRestService.PATH)
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ScheduleRestServiceImpl implements ScheduleRestService {
-
 
     private static final String MESSAGE_GUIDE_DAY = "Guide day in simple ISO8601 format, e.g. 2014-02-27";
     private static final String MESSAGE_START = "Start time in full ISO8601 format, e.g. 2014-02-27T07:06:00Z";
@@ -300,7 +292,11 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             now = Instant.now();
         }
         Instant start = mustBeRunning ? now.minus(Duration.ofDays(1)) : now.minus(Duration.ofDays(7));
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, start, now, Order.DESC, 0L, 100).getItems();
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(
+            broadcaster,
+            start,
+            now,
+            Order.DESC, 0L, 100).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No current event for broadcaster " + broadcaster);
@@ -403,7 +399,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             now = Instant.now();
         }
         Channel chan = getChannel(channel);
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, null, now, Order.DESC, 0L, 1).getItems();
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, now.minus(Duration.ofDays(1)), now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No current event on channel " + chan);
