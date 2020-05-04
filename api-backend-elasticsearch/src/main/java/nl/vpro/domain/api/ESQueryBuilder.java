@@ -27,10 +27,7 @@ import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
 
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-
-;
+;import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -269,8 +266,9 @@ public abstract class ESQueryBuilder {
         @Override
         public void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, ExtendedTextMatcher matcher) {
 
-            QueryBuilder typeQuery = buildQuery(prefix, prefix + (matcher.isCaseSensitive() ? fieldName + ".full" : fieldName + ".lower"), matcher, ESMatchType.FieldInfo.TEXT);
-            apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
+            buildQuery(prefix, prefix + (matcher.isCaseSensitive() ? fieldName + ".full" : fieldName + ".lower"), matcher, ESMatchType.FieldInfo.TEXT).ifPresent(typeQuery -> {
+                apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
+            });
         }
 
     }
@@ -292,8 +290,9 @@ public abstract class ESQueryBuilder {
 
         @Override
         public void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, TM matcher) {
-            QueryBuilder typeQuery = buildQuery(prefix, fieldName, matcher, fieldInfo);
-            apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
+            buildQuery(prefix, fieldName, matcher, fieldInfo).ifPresent(typeQuery -> {
+                apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
+            });
         }
     }
 
@@ -341,10 +340,11 @@ public abstract class ESQueryBuilder {
         public void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, TM matcher) {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
             for (ESMatchType.FieldInfoWrapper field : fields) {
-                QueryBuilder extensionQuery = buildQuery(prefix, field.getName(), matcher, field.getFieldInfo());
-                bool.should(extensionQuery);
+                buildQuery(prefix, field.getName(), matcher, field.getFieldInfo()).ifPresent(bool::should);
             }
-            apply(booleanQueryBuilder, bool, matcher.getMatch());
+            if (bool.hasClauses()) {
+                apply(booleanQueryBuilder, bool, matcher.getMatch());
+            }
 
         }
 
@@ -453,14 +453,21 @@ public abstract class ESQueryBuilder {
     }
 
 
-    public static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> QueryBuilder buildQuery(
+    public static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> Optional<QueryBuilder> buildQuery(
         @NonNull String prefix,
         @NonNull String fieldName,
         @NonNull TM matcher,
         @NonNull ESMatchType.FieldInfo fieldInfo) {
         String value = matcher.getValue();
         ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
-        return matchType.getQueryBuilder(prefix + fieldName, ESMatchType.esValue(value, matcher.isCaseSensitive()), fieldInfo);
+        String esValue = ESMatchType.esValue(value, matcher.isCaseSensitive());
+        if (fieldInfo.getCardinality().isPresent()) {
+            if (!fieldInfo.getPossibleValues().contains(esValue)) {
+                return Optional.empty();
+            }
+
+        }
+        return Optional.of(matchType.getQueryBuilder(prefix + fieldName, esValue, fieldInfo));
     }
 
 
