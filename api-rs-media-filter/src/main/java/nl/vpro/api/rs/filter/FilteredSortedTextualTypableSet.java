@@ -19,7 +19,6 @@ public  abstract class FilteredSortedTextualTypableSet<T extends Typable<Textual
 
     protected FilteredSortedTextualTypableSet(String property, SortedSet<T> wrapped) {
         super(property, wrapped);
-
     }
 
     @Override
