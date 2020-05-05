@@ -234,6 +234,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         // 33 (3 deleted)
         refresh();
+        Thread.sleep(100);
 
         assertThat(indexedObjectCount).isEqualTo(indexedGroupCount + indexedProgramCount);
         assertThat(deletedObjectCount).isEqualTo(deletedGroupCount + deletedProgramCount);
@@ -444,7 +445,11 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(result.getSize()).isEqualTo(5);
         for (int i = 1; i < result.getItems().size(); i++) {
-            assertThat(result.getItems().get(i).getResult().getLastPublishedInstant()).isAfter(result.getItems().get(i - 1).getResult().getLastPublishedInstant());
+            assertThat(result.getItems().get(i)
+                .getResult()
+                .getLastPublishedInstant())
+                .isAfter(result.getItems().get(i - 1).getResult()
+                    .getLastPublishedInstant());
         }
     }
 
