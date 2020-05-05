@@ -34,6 +34,7 @@ import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.IndexHelper;
 import nl.vpro.elasticsearch7.TransportClientFactory;
+import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -80,6 +81,7 @@ public abstract class AbstractESRepositoryITest {
             return new Broadcaster(id, id + "display");
 
         });
+        BroadcasterServiceLocator.setInstance(broadcasterService);
         if (firstRun) {
             firstRun();
             firstRun = false;
