@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -13,6 +14,7 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch7.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.logging.Slf4jHelper;
 import nl.vpro.media.domain.es.*;
 
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
@@ -36,14 +38,16 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
 
 
     /**
-     * Testing wheter implemetation via es corresponds with predicate implemtation of form itself.
+     * Testing wheter implemetation via es corresponds with predicate implementation of form itself.
      */
 
     protected void testResult(MediaForm form, MediaSearchResult result) {
         Set<String> inResult = new HashSet<>();
+
+        //  check every result, they must be in the form
         for (SearchResultItem<? extends MediaObject> sr : result) {
             MediaSearch.TestResult testResult = form.getTestResult(sr.getResult());
-            log.info("Asserting that {} is in {}", sr.getResult(), form);
+            log.info("Asserting that {} is in form", sr.getResult());
             assertThat(testResult.test()).withFailMessage("But it is not! " +  testResult.getDescription()).isTrue();
             inResult.add(sr.getResult().getMid());
         }
@@ -59,20 +63,18 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
         i.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
 
         ;
-
+        AtomicLong misses = new AtomicLong(0);
         i.forEachRemaining(mo -> {
             if (Workflow.PUBLICATIONS.contains(mo.getWorkflow())) {
                 if (!inResult.contains(mo.getMid())) {
                     MediaSearch.TestResult testResult = form.getTestResult(mo);
-                    log.info("Asserting that {} is not in {}", mo, form);
+                    Slf4jHelper.debugOrInfo(log, misses.get()  == 0, "Asserting that {} is not in form", mo);
                     assertThat(testResult.test()).withFailMessage("But it is! :" + testResult.getDescription()).isFalse();
-
+                    misses.incrementAndGet();
                 }
             }
         });
-
-
-        // TODO test that the rest or repo indeed is false
+        log.info("hits {}, misses {}\nfor form\n{}", inResult.size(), misses.get(), form);
     }
 
 
