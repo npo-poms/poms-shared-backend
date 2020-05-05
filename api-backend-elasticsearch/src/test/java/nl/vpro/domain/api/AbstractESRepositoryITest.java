@@ -83,6 +83,7 @@ public abstract class AbstractESRepositoryITest {
         });
         BroadcasterServiceLocator.setInstance(broadcasterService);
         if (firstRun) {
+            log.info("First run of {}", this);
             firstRun();
             firstRun = false;
         }
@@ -119,6 +120,7 @@ public abstract class AbstractESRepositoryITest {
 
     protected static String createIndexIfNecessary(ElasticSearchIndex abstractIndex, String indexName)  {
         if (! indexNames.containsKey(abstractIndex)) {
+            log.info("Creating index {}: {}", abstractIndex, indexName);
             try {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
@@ -188,6 +190,7 @@ public abstract class AbstractESRepositoryITest {
     protected static void refresh() {
         for (String indexName : indexNames.values()) {
             try {
+                log.info("Refreshing {}", indexName);
                 client.admin().indices().refresh(new RefreshRequest(indexName)).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.error(e.getMessage(), e);
