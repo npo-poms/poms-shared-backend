@@ -360,8 +360,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
         buildFromList(prefix, boolQueryBuilder, locations, (pref, booleanQueryBuilder, matcher) -> {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
-            buildQuery(prefix, "locations.programUrl", matcher, TEXT).ifPresent(bool::should);
-            buildQuery(prefix, "locations.programUrl.extension", matcher.toLowerCase(), TEXT).ifPresent(bool::should);
+            buildOptionalQuery(prefix, "locations.programUrl", matcher, TEXT).ifPresent(bool::should);
+            buildOptionalQuery(prefix, "locations.programUrl.extension", matcher.toLowerCase(), TEXT).ifPresent(bool::should);
             apply(booleanQueryBuilder, bool, matcher.getMatch());
         });
     }
