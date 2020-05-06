@@ -75,7 +75,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @BeforeEach
     public  void setup() {
         target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
-        target.redirects = new HashMap<>();
+        target.redirects = new RedirectList();
         clearIndices();
     }
 
@@ -282,25 +282,25 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         {
             MediaForm countAsc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.COUNT_ASC, null)).build();
-            MediaSearchResult result = target.find(null, countAsc, 0, null);
+            MediaSearchResult result = getAndTestResult(countAsc);
             assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
         }
 
         {
             MediaForm countDesc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.COUNT_DESC, null)).build();
-            MediaSearchResult result = target.find(null, countDesc, 0, null);
+            MediaSearchResult result = getAndTestResult(countDesc);
             assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
         }
 
         {
             MediaForm valueAsc = form().broadcasterFacet(new MediaFacet(null, VALUE_ASC, null)).build();
-            MediaSearchResult result = target.find(null, valueAsc, 0, null);
+            MediaSearchResult result = getAndTestResult(valueAsc);
             assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
         }
 
         {
             MediaForm valueDesc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.VALUE_DESC, null)).build();
-            MediaSearchResult result = target.find(null, valueDesc, 0, null);
+            MediaSearchResult result = getAndTestResult(valueDesc);
             assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
         }
     }
@@ -313,7 +313,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().broadcasterFacet(new MediaFacet(2, VALUE_ASC, null)).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getBroadcasters()).hasSize(1);
         assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
@@ -325,7 +325,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().broadcasterFacet(new MediaFacet(null, VALUE_ASC, 1)).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getBroadcasters()).hasSize(1);
         assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
@@ -336,7 +336,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().withAVType());
 
         MediaForm form = form().avTypes(AVType.VIDEO).avTypeFacet().build();
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         //MediaSearchResult result = target.find(null, form().avTypes(AVType.VIDEO).avTypeFacet().build(), 0, null);
 
@@ -357,7 +357,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().typeFacet().build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getTypes()).isNotEmpty();
         List<TermFacetResultItem> types = result.getFacets().getTypes();
@@ -385,7 +385,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .build()
         ).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getSortDates()).isNotEmpty();
     }
@@ -400,7 +400,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             new DateRangeInterval(1, IntervalUnit.MONTH)
         ).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getSortDates()).isNotEmpty();
     }
@@ -414,7 +414,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             new DateRangeInterval("1 year")
         ).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getSortDates()).isNotEmpty();
     }
@@ -430,7 +430,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .durationFacet(interval)
             .build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         for (SearchResultItem<? extends MediaObject> mo : result) {
             log.info("{} {}", mo.getResult().getMid(), mo.getResult().getDuration());
@@ -458,7 +458,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         ProfileDefinition<MediaObject> notExclusive = new ProfileDefinition<>(
             new Filter(new Not(new HasPortalRestrictionConstraint()))
         );
-        MediaSearchResult result = target.find(notExclusive, form, 0, null);
+        MediaSearchResult result =  target.find(notExclusive, form, 0, null);
+
 
         for (SearchResultItem<? extends MediaObject> mo : result) {
             log.info("{} {}", mo.getResult().getMid(), mo.getResult().getDuration());
@@ -490,7 +491,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .build()
         ).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         for (SearchResultItem<? extends MediaObject> mo : result) {
             System.out.println(mo.getResult().getDuration());
@@ -514,9 +515,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().genres(new Genre("3.0.1.2.7")));
 
 
-        MediaForm form = form().genres(MUST, new TextMatcher("3.0.1.1.*", MUST, WILDCARD)).build();
+        MediaForm form = form()
+            .genres(MUST, new TextMatcher("3.0.1.1.*", MUST, WILDCARD)).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
+
         assertThat(result.getSize()).isEqualTo(2);
 
 
@@ -531,7 +534,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().genres(MUST, new TextMatcher("4.0.1.*", MUST, WILDCARD)).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
+
         assertThat(result.getSize()).isEqualTo(0);
 
 
@@ -547,7 +551,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaForm form = form().genreFacet().build();
         form.getFacets().getGenres().setSort(VALUE_ASC);
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getGenres()).hasSize(2);
         final GenreFacetResultItem first = result.getFacets().getGenres().get(0);
@@ -572,7 +576,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         search.setGenres(new TextMatcherList(new TextMatcher("3.0.1.1.6")));
         form.getFacets().getGenres().setFilter(search);
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
+
         assertThat(result.getFacets().getGenres()).hasSize(2);
         assertThat(result.getFacets().getGenres().get(0).getValue()).isEqualTo("Jeugd - Amusement");
         assertThat(result.getFacets().getGenres().get(0).getCount()).isEqualTo(2);
@@ -595,7 +600,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         // Since this matched only one, we will get only one facet result!
         form.getFacets().getGenres().setSubSearch(search);
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
+
         assertThat(result.getFacets().getGenres()).hasSize(1);
         assertThat(result.getFacets().getGenres().get(0).getId()).isEqualTo("3.0.1.1.6");
         assertThat(result.getFacets().getGenres().get(0).getCount()).isEqualTo(2);
@@ -608,7 +614,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().tagFacet().build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getTags()).hasSize(3);
     }
@@ -619,7 +625,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().tags("FOO", "BAR"));
 
         MediaForm form = form().tagFacet(false).build();
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getTags()).hasSize(2);
 
@@ -631,7 +637,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program().withMid().tags("FOO", "BAR"));
 
         MediaForm form = form().tagFacet(false).tags(false, "foo").build();
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getTags()).hasSize(2);
         assertThat(result.getFacets().getTags().get(1).getId()).isEqualTo("foo");
@@ -651,7 +657,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().memberOfFacet().build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         final List<MemberRefFacetResultItem> memberOf = result.getFacets().getMemberOf();
 
@@ -666,7 +672,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().episodeOfFacet().build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         final List<MemberRefFacetResultItem> episodeOf = result.getFacets().getEpisodeOf();
 
@@ -679,7 +685,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().descendantOfFacet().build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         final List<MemberRefFacetResultItem> descendantOf = result.getFacets().getDescendantOf();
 
@@ -700,7 +706,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaForm form = form().relationsFacet(relationFacet).build();
 
 
-        MediaSearchResult result = target.find(null, form, 0, 0);
+        MediaSearchResult result = getAndTestResult(form);
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
@@ -727,7 +733,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .relationsFacet(relationFacet)
             .build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
@@ -770,7 +776,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .relationText(label, ExtendedTextMatcher.must("blue note", false))
                 .build();
 
-            MediaSearchResult result = target.find(null, form, 0, null);
+            MediaSearchResult result = getAndTestResult(form);
 
             final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
@@ -837,7 +843,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                 .relationText(vproLabel, ExtendedTextMatcher.must("blue note", false))
                 .build();
 
-            MediaSearchResult result = target.find(null, form, 0, null);
+            MediaSearchResult result = getAndTestResult(form);
 
             final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
@@ -886,7 +892,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         MediaForm form = form().relationsFacet(relationFacet).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
@@ -914,7 +920,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         relationFacet.setFilter(search);
         MediaForm form = form().relationsFacet(relationFacet).build();
 
-        MediaSearchResult result = target.find(null, form, 0, null);
+        MediaSearchResult result = getAndTestResult(form);
 
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
@@ -2198,6 +2204,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         }
         refresh();
     }
-
+    protected MediaSearchResult getAndTestResult(MediaForm form) {
+        return getAndTestResult(target, form);
+    }
 
 }
