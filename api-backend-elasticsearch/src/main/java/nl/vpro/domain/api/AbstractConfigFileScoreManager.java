@@ -4,20 +4,19 @@
  */
 package nl.vpro.domain.api;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
-import org.apache.commons.io.monitor.FileAlterationMonitor;
-import org.apache.commons.io.monitor.FileAlterationObserver;
+import org.apache.commons.io.monitor.*;
+import org.springframework.jmx.export.annotation.ManagedOperation;
 
 /**
  * @author Roelof Jan Koekoek
@@ -34,6 +33,10 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
 
     protected abstract void loadScores();
 
+    @Getter
+    @Setter
+    private boolean score = true;
+
     protected Map<String, String> loadConfig() {
         Properties properties = new Properties();
         Path configPath = Paths.get(getConfigDir(), getConfigFileName());
@@ -42,7 +45,7 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
         if(configFile.canRead()) {
             log.info("Loading properties from {}", configFile);
             try {
-                properties.load(Files.newBufferedReader(configPath, Charset.forName("UTF-8")));
+                properties.load(Files.newBufferedReader(configPath, StandardCharsets.UTF_8));
             } catch(IOException ioe) {
                 throw new RuntimeException("Can't load configuration file " + getConfigFileName() + " from " + getConfigDir(), ioe);
             }
@@ -72,5 +75,17 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
         monitor.addObserver(observer);
         monitor.start();
     }
+
+    @Override
+    @ManagedOperation
+    public boolean getIsScoring() {
+        return score;
+    }
+    @ManagedOperation
+    @Override
+    public void setIsScoring(boolean score) {
+        this.score = score;
+    }
+
 
 }
