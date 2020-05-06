@@ -38,6 +38,8 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost -Dcluster=asfasd
  *
  *
+ * Test
+ * :  mvn  -Dhost=localhost:9221 -Dcluster=poms-test
  *  Production
  *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost:9209 -Dcluster=production
  *
