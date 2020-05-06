@@ -48,7 +48,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
         for (SearchResultItem<? extends MediaObject> sr : result) {
             MediaSearch.TestResult testResult = form.getTestResult(sr.getResult());
             log.info("Asserting that {} is in form", sr.getResult());
-            assertThat(testResult.test()).withFailMessage("But it is not! " +  testResult.getDescription()).isTrue();
+            assertThat(testResult.test().getAsBoolean()).withFailMessage("But it is not! " +  testResult.getDescription()).isTrue();
             inResult.add(sr.getResult().getMid());
         }
         ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client,
@@ -69,7 +69,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
                 if (!inResult.contains(mo.getMid())) {
                     MediaSearch.TestResult testResult = form.getTestResult(mo);
                     Slf4jHelper.debugOrInfo(log, misses.get()  == 0, "Asserting that {} is not in form", mo);
-                    assertThat(testResult.test()).withFailMessage("But it is! :" + testResult.getDescription()).isFalse();
+                    assertThat(testResult.test().getAsBoolean()).withFailMessage("But it is! :" + testResult.getDescription()).isFalse();
                     misses.incrementAndGet();
                 }
             }
