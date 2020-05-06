@@ -181,7 +181,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         boolean maxWasZero = handleMaxZero(max, searchSourceBuilder::size);
 
         request.source(
-            mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max)
+            searchSourceBuilder
         );
         return new SearchRequestWrapper(request, maxWasZero);
     }
