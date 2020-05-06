@@ -19,6 +19,17 @@ public class AbstractMediaESRepositoryTest {
 
     AbstractESMediaRepository repository = new AbstractESMediaRepository(mock(ESClientFactory.class)) {
 
+        @Override
+        public RedirectList redirects() {
+            throw new UnsupportedOperationException();
+
+        }
+
+        @Override
+        public boolean isScore() {
+            return true;
+
+        }
     };
     {
         repository.setIndexName(ApiMediaIndex.NAME);

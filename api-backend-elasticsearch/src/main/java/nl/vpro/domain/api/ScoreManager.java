@@ -10,6 +10,9 @@ package nl.vpro.domain.api;
  */
 public interface ScoreManager {
 
+    boolean getIsScoring();
+    void setIsScoring(boolean score);
+
     String getTextFieldBoosts();
 
     void setTextField(String field, float boost);

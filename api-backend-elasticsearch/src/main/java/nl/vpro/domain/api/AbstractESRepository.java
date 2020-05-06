@@ -424,7 +424,7 @@ public abstract class AbstractESRepository<T> {
         return item;
     }
 
-
+    public final Optional<String> redirect(String mid) {
     public final Optional<String> redirect(String mid) {
         return getDirectsRepository().redirects().redirect(mid);
     }

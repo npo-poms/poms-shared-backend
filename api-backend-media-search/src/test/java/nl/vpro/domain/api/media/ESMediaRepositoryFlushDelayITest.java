@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryITest {
 
-    private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags");
+    private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags", new MediaScoreManagerImpl());
 
     private long indexerStartTime;
     private long indexerStopTime;

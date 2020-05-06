@@ -1,6 +1,7 @@
 package nl.vpro.domain.api.media;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -43,16 +44,13 @@ import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
  */
 
 @ToString(callSuper = true)
-public abstract class AbstractESMediaRepository extends AbstractESRepository<MediaObject> implements MediaLoader, MediaRedirector {
+public abstract class AbstractESMediaRepository extends AbstractESRepository<MediaObject> implements MediaLoader, Redirector {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final IndexHelper helper;
     private final IndexHelper refsHelper;
 
-    @Getter
-    @Setter
-    private boolean score = true;
 
     protected AbstractESMediaRepository(ESClientFactory client) {
         super(client);
@@ -233,7 +231,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             .query("", form != null ? form.getSearches() : null);
         rootQuery.must(queryBuilder);
 
-        if (score) {
+        if (isScore()) {
             searchBuilder.query(
                 ESMediaScoreBuilder.score(rootQuery, Instant.now())
             );
@@ -327,6 +325,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         getDirectsRepository().redirectTextMatchers(search.getMediaIds());
     }
 
+    public abstract  boolean isScore();
 
     @Getter
     @ToString
