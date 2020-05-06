@@ -7,8 +7,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,6 +25,7 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 
+import static nl.vpro.domain.api.ESMatchType.FieldInfo.TEXT;
 import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
 
 ;
@@ -230,7 +230,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             new TextMultipleFieldsApplier<>(
                 FieldInfoWrapper.builder()
                     .name("descendantOf.midRef")
-                    .fieldInfo(FieldInfo.TEXT)
+                    .fieldInfo(TEXT)
                     .build(),
                 FieldInfoWrapper.builder()
                     .name("descendantOf.type")
@@ -245,7 +245,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             new TextMultipleFieldsApplier<>(
                 FieldInfoWrapper.builder()
                     .name("episodeOf.midRef")
-                    .fieldInfo(FieldInfo.TEXT)
+                    .fieldInfo(TEXT)
                     .build(),
                 FieldInfoWrapper.builder()
                     .name("episodeOf.type")
@@ -257,7 +257,7 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             new TextMultipleFieldsApplier<>(
                 FieldInfoWrapper.builder()
                     .name("memberOf.midRef")
-                    .fieldInfo(FieldInfo.TEXT)
+                    .fieldInfo(TEXT)
                     .build(),
                 FieldInfoWrapper.builder()
                     .name("memberOf.type")
@@ -360,10 +360,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
 
         buildFromList(prefix, boolQueryBuilder, locations, (pref, booleanQueryBuilder, matcher) -> {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
-            QueryBuilder extensionQuery = buildQuery(prefix, "locations.programUrl", matcher, FieldInfo.TEXT);
-            bool.should(extensionQuery);
-            QueryBuilder formatQuery = buildQuery(prefix, "locations.programUrl.extension", matcher.toLowerCase(), FieldInfo.TEXT);
-            bool.should(formatQuery);
+            buildOptionalQuery(prefix, "locations.programUrl", matcher, TEXT).ifPresent(bool::should);
+            buildOptionalQuery(prefix, "locations.programUrl.extension", matcher.toLowerCase(), TEXT).ifPresent(bool::should);
             apply(booleanQueryBuilder, bool, matcher.getMatch());
         });
     }

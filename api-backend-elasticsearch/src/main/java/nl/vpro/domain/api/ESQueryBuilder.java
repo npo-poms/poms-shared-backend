@@ -27,10 +27,7 @@ import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
 
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
-
-;
+import static org.elasticsearch.index.query.QueryBuilders.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -47,14 +44,19 @@ public abstract class ESQueryBuilder {
 
     private static final int PHRASE_SLOP = 4;
 
-    private static CharArraySet STOP_WORDS;
+    private static final CharArraySet STOP_WORDS;
 
     static {
+        CharArraySet sw;
         try {
-            STOP_WORDS = CharArraySet.unmodifiableSet(CharArraySet.copy(WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(SnowballFilter.class, DutchAnalyzer.DEFAULT_STOPWORD_FILE, StandardCharsets.UTF_8))));
+            sw = CharArraySet.unmodifiableSet(
+                CharArraySet.copy(WordlistLoader.getSnowballWordSet(IOUtils.getDecodingReader(SnowballFilter.class, DutchAnalyzer.DEFAULT_STOPWORD_FILE, StandardCharsets.UTF_8)))
+            );
         } catch (IOException ioe) {
-
+            log.warn(ioe.getMessage());
+            sw = CharArraySet.unmodifiableSet(new CharArraySet(0, false));
         }
+        STOP_WORDS = sw;
     }
 
     protected static <MT extends MatchType> BoolQueryBuilder buildTextQuery(
@@ -179,7 +181,7 @@ public abstract class ESQueryBuilder {
         return textWithoutStopWords;
     }
 
-    private static final Set<Character> QUOTES = new HashSet<>(Arrays.asList('\'', '\"'));
+    private static final Set<Character> QUOTES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList('\'', '\"')));
 
     protected static List<String> split(
         @NonNull String value) {
@@ -215,7 +217,7 @@ public abstract class ESQueryBuilder {
 
 
         }
-        result.add(value.substring(start, value.length()));
+        result.add(value.substring(start));
         return result;
     }
 
@@ -247,13 +249,13 @@ public abstract class ESQueryBuilder {
     }
 
 
-    public interface FieldApplier<M extends Matcher> {
+    public interface FieldApplier<M extends Matcher<?>> {
         void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, M matcher);
 
     }
 
 
-    protected static abstract class SingleFieldApplier<M extends Matcher> implements FieldApplier<M> {
+    protected static abstract class SingleFieldApplier<M extends Matcher<?>> implements FieldApplier<M> {
         protected final String fieldName;
 
         public SingleFieldApplier(String fieldName) {
@@ -268,9 +270,9 @@ public abstract class ESQueryBuilder {
 
         @Override
         public void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, ExtendedTextMatcher matcher) {
+            QueryBuilder queryBuilder = buildQuery(prefix, prefix + (matcher.isCaseSensitive() ? fieldName + ".full" : fieldName + ".lower"), matcher, ESMatchType.FieldInfo.TEXT);
 
-            QueryBuilder typeQuery = buildQuery(prefix, prefix + (matcher.isCaseSensitive() ? fieldName + ".full" : fieldName + ".lower"), matcher, ESMatchType.FieldInfo.TEXT);
-            apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
+            apply(booleanQueryBuilder, queryBuilder, matcher.getMatch());
         }
 
     }
@@ -292,8 +294,8 @@ public abstract class ESQueryBuilder {
 
         @Override
         public void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, TM matcher) {
-            QueryBuilder typeQuery = buildQuery(prefix, fieldName, matcher, fieldInfo);
-            apply(booleanQueryBuilder, typeQuery, matcher.getMatch());
+            QueryBuilder queryBuilder = buildQuery(prefix, fieldName, matcher, fieldInfo);
+            apply(booleanQueryBuilder, queryBuilder, matcher.getMatch());
         }
     }
 
@@ -341,10 +343,11 @@ public abstract class ESQueryBuilder {
         public void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, TM matcher) {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
             for (ESMatchType.FieldInfoWrapper field : fields) {
-                QueryBuilder extensionQuery = buildQuery(prefix, field.getName(), matcher, field.getFieldInfo());
-                bool.should(extensionQuery);
+                buildOptionalQuery(prefix, field.getName(), matcher, field.getFieldInfo()).ifPresent(bool::should);
             }
-            apply(booleanQueryBuilder, bool, matcher.getMatch());
+            if (bool.hasClauses()) {
+                apply(booleanQueryBuilder, bool, matcher.getMatch());
+            }
 
         }
 
@@ -453,14 +456,35 @@ public abstract class ESQueryBuilder {
     }
 
 
-    public static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> QueryBuilder buildQuery(
+    public static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> Optional<QueryBuilder> buildOptionalQuery(
+        @NonNull String prefix,
+        @NonNull String fieldName,
+        @NonNull TM matcher,
+        @NonNull ESMatchType.FieldInfo fieldInfo) {
+        if (fieldInfo.getCardinality().isPresent()) {
+            boolean canMatch = false;
+            for (String possibleValue : fieldInfo.getPossibleValues()) {
+                if (matcher.test(possibleValue)) {
+                    canMatch = true;
+                }
+            }
+            if (!canMatch) {
+                return Optional.empty();
+            }
+        }
+        return Optional.of(buildQuery(prefix, fieldName, matcher, fieldInfo));
+    }
+
+      public static <MT extends MatchType, TM extends AbstractTextMatcher<MT>> QueryBuilder buildQuery(
         @NonNull String prefix,
         @NonNull String fieldName,
         @NonNull TM matcher,
         @NonNull ESMatchType.FieldInfo fieldInfo) {
         String value = matcher.getValue();
         ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
-        return matchType.getQueryBuilder(prefix + fieldName, ESMatchType.esValue(value, matcher.isCaseSensitive()), fieldInfo);
+
+        String esValue = ESMatchType.esValue(value, matcher.isCaseSensitive());
+        return matchType.getQueryBuilder(prefix + fieldName, esValue, fieldInfo);
     }
 
 

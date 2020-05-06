@@ -34,6 +34,7 @@ import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.IndexHelper;
 import nl.vpro.elasticsearch7.TransportClientFactory;
+import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -80,7 +81,9 @@ public abstract class AbstractESRepositoryITest {
             return new Broadcaster(id, id + "display");
 
         });
+        BroadcasterServiceLocator.setInstance(broadcasterService);
         if (firstRun) {
+            log.info("First run of {}", this);
             firstRun();
             firstRun = false;
         }
@@ -99,6 +102,7 @@ public abstract class AbstractESRepositoryITest {
             client.admin().indices().prepareDelete(name).execute().get();
         }
         indexNames.clear();
+        refresh();
         firstRun = true;
     }
 
@@ -116,11 +120,13 @@ public abstract class AbstractESRepositoryITest {
 
     protected static String createIndexIfNecessary(ElasticSearchIndex abstractIndex, String indexName)  {
         if (! indexNames.containsKey(abstractIndex)) {
+            log.info("Creating index {}: {}", abstractIndex, indexName);
             try {
                 NodesInfoResponse response = client.admin()
                     .cluster().nodesInfo(new NodesInfoRequest()).get();
                 log.info("" + response.getNodesMap());
-                IndexHelper.of(log, (s) -> client, abstractIndex)
+                IndexHelper.of(log,
+                    (s) -> client, abstractIndex)
                     .indexName(indexName)
                     .build()
                     .createIndexIfNotExists(CreateIndex.FOR_TEST);
@@ -176,6 +182,7 @@ public abstract class AbstractESRepositoryITest {
             }
         }
         log.info("Cleared {}", indexName);
+        refresh();
 
     }
 
@@ -183,6 +190,7 @@ public abstract class AbstractESRepositoryITest {
     protected static void refresh() {
         for (String indexName : indexNames.values()) {
             try {
+                log.info("Refreshing {}", indexName);
                 client.admin().indices().refresh(new RefreshRequest(indexName)).get();
             } catch (InterruptedException | ExecutionException e) {
                 log.error(e.getMessage(), e);

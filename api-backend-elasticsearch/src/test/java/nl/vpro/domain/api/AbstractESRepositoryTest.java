@@ -4,38 +4,29 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.elasticsearch.client.Client;
 import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.media.RedirectList;
 import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.ESClientFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michiel Meeuwissen
- * @since ...
+ * @since 5.12
  */
 class AbstractESRepositoryTest {
     Map<String, String> redirects = new HashMap<>();
-    AbstractESRepository<String> repo = new AbstractESRepository<String>(new ESClientFactory() {
-        @Override
-        public Client client(String logName) {
-            return null;
-
-        }
-    }) {
+    AbstractESRepository<String> repo = new AbstractESRepository<String>(logName -> null) {
         @Override
         protected ElasticSearchIndex getIndex(String id, Class<?> clazz) {
-            return null;
-
+            throw new UnsupportedOperationException("Not tested here");
         }
 
         @Override
         protected Redirector getDirectsRepository() {
-            return () -> new RedirectList(Instant.now(), Instant.now(), redirects);
+            return () -> new RedirectList(Instant.now(), redirects);
         }
     };
     {

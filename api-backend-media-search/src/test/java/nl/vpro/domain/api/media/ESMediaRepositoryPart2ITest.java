@@ -31,11 +31,13 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
+import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.FacetResults.toSimpleMap;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
+import static nl.vpro.domain.media.support.Workflow.PUBLISHED_AS_DELETED;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -86,7 +88,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     private static Program sub_program2;
 
 
-    private static String[] testTags = {"Onderkast", "Bovenkast", "Geen kast", "Hoge kast", "Lage kast"};
+    private static final String[] testTags = {"Onderkast", "Bovenkast", "Geen kast", "Hoge kast", "Lage kast"};
 
     static List<MediaObject> indexed = new ArrayList<>();
 
@@ -124,41 +126,41 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         target.setIndexName(indexNames.get(APIMEDIA));
 
-        group = index(groupBuilder.published().build());
-        group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid().build());
+        group = index(groupBuilder.published());
+        group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid());
         // 2 groups
         program1 = index(programBuilder.copy()
             .publishStart(LocalDateTime.of(2017, 1, 30, 0, 0)) // sortDate is relevant for listDescendants
             .memberOf(group, 1)
-            .memberOf(group_ordered, 7).episodeOf(group, 3).build());
+            .memberOf(group_ordered, 7).episodeOf(group, 3));
         program2 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 29, 0, 0))
             .published(NOW).withMid()
-            .memberOf(group_ordered, 2).build());
+            .memberOf(group_ordered, 2));
         program3 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 28, 0, 0))
             .published(NOW)
             .withMid()
-            .memberOf(group_ordered, 3).build());
+            .memberOf(group_ordered, 3));
         sub_group = index(MediaTestDataBuilder.group().published()
             .mid("sub_group")
             .memberOf(group_ordered, 4)
             .published(NOW)
             .creationDate(NOW)
-            .build());
+            );
         sub_program1 = index(programBuilder.copy()
             .publishStart(LocalDateTime.of(2017, 1, 30, 1, 0)) // sortDate is relevant for listDescendants
             .mid("sub_program_1")
             .published(NOW)
             .creationDate(NOW)
             .memberOf(sub_group, 1)
-            .build());
+            );
         sub_program2 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 29, 2, 0))
             .mid("sub_program_2")
             .published(NOW)
             .creationDate(NOW)
-            .memberOf(sub_group, 2).build());
+            .memberOf(sub_group, 2));
 
         // order of descendant of group_ordered by sortDate should be
         // program3, program2, sub_program2, program1, sub_program1/sub_group
@@ -169,10 +171,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         //3 + 2 programs (broadcasts), 1 sub group
 
 
-        index(MediaTestDataBuilder.group().constrained().type(GroupType.COLLECTION).mid("VPGROUP_D1").lastPublished(NOW).workflow(Workflow.DELETED).title("Deleted Group").build());
+        index(MediaTestDataBuilder.group().constrained().type(GroupType.COLLECTION).mid("VPGROUP_D1").lastPublished(NOW).workflow(Workflow.DELETED).title("Deleted Group"));
         // 1 deleted group
-        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D").lastPublished(NOW).workflow(Workflow.REVOKED).title("Deleted Program").build());
-        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D1").lastPublished(NOW).workflow(Workflow.MERGED).title("Deleted Merged Program").mergedTo(program1).build());
+        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D").lastPublished(NOW).workflow(Workflow.REVOKED).title("Deleted Program"));
+        index(MediaTestDataBuilder.program().constrained().type(ProgramType.CLIP).mid("VPPROGRAM_D1").lastPublished(NOW).workflow(Workflow.MERGED).title("Deleted Merged Program").mergedTo(program1));
         // 2 deleted programs
 
         AgeRating[] ORIGINAL = {_6, _9, _12, _16, ALL};
@@ -185,7 +187,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .lastPublished(LONGAGO.plusSeconds(i * 2))
                 .withGenres()
                 .mid("MID_G_" + i)
-                .build());
+                );
             index(MediaTestDataBuilder.program()
                 .constrained()
                 .workflow(Workflow.PUBLISHED)
@@ -202,7 +204,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .ageRating(ORIGINAL[i % ORIGINAL.length])
                 .predictions(Platform.INTERNETVOD)
                 .mid("MID-" + i)
-                .build());
+                );
         }
         // 10 groups, and 10 programs (broadcasts)
 
@@ -210,25 +212,25 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
         // index some variations
-        index(programBuilder.copy().mid("MID_HIGH_SCORE").mainTitle("This should give us a high score").build());
+        index(programBuilder.copy().mid("MID_HIGH_SCORE").mainTitle("This should give us a high score"));
         // 29 objects, 14 programs
 
 
         index(groupBuilder.copy().mid("MID_SCORING_ON_DESCRIPTION")
-                .mainDescription("While scoring a hit on a description field is likely to receive a much lower score then a hit on a title.").build());
+                .mainDescription("While scoring a hit on a description field is likely to receive a much lower score then a hit on a title."));
 
         // 30, 13 groups
 
         Location wm = new Location("http://somedomain.com/path/to/file", OwnerType.BROADCASTER);
         wm.setAvFileFormat(AVFileFormat.WM);
 
-        index(programBuilder.copy().mid("MID_WITH_LOCATION").locations(wm).build());
+        index(programBuilder.copy().mid("MID_WITH_LOCATION").locations(wm));
 
-        index(programBuilder.copy().mid("MID_DRENTHE").broadcasters(new Broadcaster("TVDRENTHE", "TVDrenthe")).build());
+        index(programBuilder.copy().mid("MID_DRENTHE").broadcasters(new Broadcaster("TVDRENTHE", "TVDrenthe")));
 
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
-        index(programBuilder.copy().mid("MID_WITH_RELATIONS").mainTitle("About Kubrick").relations(new Relation(director, "", "Stanley Kubrick")).build());
+        index(programBuilder.copy().mid("MID_WITH_RELATIONS").mainTitle("About Kubrick").relations(new Relation(director, "", "Stanley Kubrick")));
 
         // 33 (3 deleted)
         refresh();
@@ -384,7 +386,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void     testFind() {
+    public void  testFind() {
         SearchResult<MediaObject> result = target.find(null, null, 2L, 5);
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount);
         assertThat(result.getOffset()).isEqualTo(2);
@@ -397,7 +399,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindOnProfileWithTextScore() {
         MediaForm form = form().text("Text with Score words").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
         assertThat(result.getItems().get(0).getResult()).isEqualTo(programBuilder.build());
@@ -407,7 +409,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithMidMediaId() {
         MediaForm form = form().mediaIds(programBuilder.build().getMid()).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -415,7 +417,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithMidMediaIds() {
         MediaForm form = form().mediaIds("MID-1", "MID-2").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
     }
@@ -423,7 +425,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithSortDate() {
         MediaForm form = form().asc(MediaSortField.sortDate).sortDate(NOW,  NOW.plus(Duration.ofHours(2))).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
         for (int i = 1; i < result.getItems().size(); i++) {
@@ -438,19 +440,26 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
             .sortOrder(MediaSortOrder.asc(MediaSortField.publishDate))
             .build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(5);
         for (int i = 1; i < result.getItems().size(); i++) {
-            assertThat(result.getItems().get(i).getResult().getLastPublishedInstant()).isAfter(result.getItems().get(i - 1).getResult().getLastPublishedInstant());
+            assertThat(result.getItems().get(i)
+                .getResult()
+                .getLastPublishedInstant())
+                .isAfter(result.getItems().get(i - 1).getResult()
+                    .getLastPublishedInstant());
         }
     }
 
 
     @Test
     public void testFindWithWithPublishDateDesc() {
-        MediaForm form = form().publishDate(LONGAGO, LONGAGO.plusSeconds(5)).sortOrder(MediaSortOrder.desc(MediaSortField.publishDate)).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        MediaForm form = form()
+            .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
+            .sortOrder(MediaSortOrder.desc(MediaSortField.publishDate))
+            .build();
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(5);
         for (int i = 1; i < result.getItems().size(); i++) {
@@ -461,7 +470,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithDuration() {
         MediaForm form = form().duration(Duration.ZERO, Duration.ofMillis(200)).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
     }
@@ -471,7 +480,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Disabled("Dropped support for finding by urn")
     public void testFindWithWithUrnMediaId() {
         MediaForm form = form().mediaIds(programBuilder.build().getUrn()).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -480,7 +489,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithWithBroadcasterWithVariedCaseMiss() {
 
         MediaForm form = form().broadcasters("TVDrenthe").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(0);
     }
@@ -488,7 +497,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithBroadcasterWithVariedCaseHit() {
         MediaForm form = form().broadcasters("TVDRENTHE").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -496,7 +505,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithLocationsExtensionWithVariedCase() {
         MediaForm form = form().locations("mP3").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(1);
     }
@@ -504,7 +513,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithTags() {
         MediaForm form = form().tags("Tag 2").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(3);
     }
@@ -512,7 +521,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithTagsIgnoreCase() {
         MediaForm form = form().tags(Match.SHOULD, new ExtendedTextMatcher("OnderKast", StandardMatchType.TEXT, false)).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(2);
     }
@@ -521,7 +530,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithExcludeMediaIds() {
         MediaForm form = form().mediaIds(Match.NOT, "MID-1", "MID-2").build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         System.out.println("LIST" + result.getItems());
         assertThat(result.getSize()).isEqualTo(indexedObjectCount - 2 /* excluded */);
@@ -531,7 +540,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithExcludeTypes() {
         MediaForm form = form().types(Match.NOT, MediaType.BROADCAST).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         // so, just the groups
         assertThat(result.getSize()).isEqualTo(indexedGroupCount);
@@ -541,7 +550,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithAVType() {
         MediaForm form = form().avTypes(Match.MUST, AVType.AUDIO).build();
-        SearchResult<MediaObject> result = target.find(null, form, 0, null);
+        SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(4);
         assertThat(result.getItems().get(0).getResult().getAVType()).isEqualTo(AVType.AUDIO);
@@ -581,11 +590,11 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     public void testFindWithHighlights() {
         MediaForm form = form().text("title").highlight(true).build();
 
-        MediaSearchResult result = target.find(null, form, 1L, 5);
+        MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount - 1); // One object has a different title
         SearchResultItem<? extends MediaObject> firstResult = result.getItems().get(0);
-        assertThat(firstResult.getHighlights()).hasSize(1);
+        assertThat(firstResult.getHighlights()).hasSize(2);
 //        Assertions.assertThat(firstResult.getHighlights().get(0).getBody()).containsExactly("Main <em class=\"hlt1\">title</em> MIS', 'Short <em class=\"hlt1\">title</em>', 'Episode <em class=\"hlt1\">title</em> MIS");
     }
 
@@ -654,7 +663,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form().relationText(director, "Stanley Kubrick").build(), 0, null);
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form().relationText(director, "Stanley Kubrick"));
         assertThat(result.getSize()).isEqualTo(1);
         assertThat(result.iterator().next().getResult().getMainTitle()).isEqualTo("About Kubrick");
     }
@@ -664,7 +673,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
         ExtendedTextMatcher kubrick = new ExtendedTextMatcher("StanLey KubRick", false);
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form().relationText(director, kubrick).build(), 0, null);
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form().relationText(director, kubrick));
         assertThat(result.getSize()).isEqualTo(1);
         assertThat(result.iterator().next().getResult().getMainTitle()).isEqualTo("About Kubrick");
     }
@@ -708,10 +717,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithChannel() {
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form()
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form()
             .scheduleEvents(ScheduleEventSearch.builder().channel(Channel.NED1).build())
             .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
-            .build(), 0L, 100);
+        );
 
         assertThat(result).hasSize(3);
         assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID-0");
@@ -722,13 +731,12 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithChannels() {
-        MediaSearchResult result = target.find(null, MediaFormBuilder.form()
+        MediaSearchResult result = getAndTestResult(MediaFormBuilder.form()
             .scheduleEvents(
                 ScheduleEventSearch.builder().channel(Channel.NED1).match(Match.SHOULD).build(),
                 ScheduleEventSearch.builder().channel(Channel.NED2).match(Match.SHOULD).build()
             )
-            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
-            .build(), 0L, 100);
+            .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate)));
 
         assertThat(result).hasSize(6);
         assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID-0");
@@ -874,14 +882,37 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     }
 
+    @Test
+    public void withMaxZero() {
+        MediaResult result = target.listMembers(target.load("POMS_S_12345"), null, Order.ASC, 0L, 10);
 
-    private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
+        log.info("{}", result.getTotal());
+
+
+    }
+
+
+    private static <T extends MediaObject> T index(MediaBuilder<?, T> builder) throws IOException, ExecutionException, InterruptedException {
+        if (! PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
+             builder.workflow(Workflow.PUBLISHED);
+        }
+        T object = builder.build();
         AbstractESRepositoryITest.client
             .index(
                 new IndexRequest(indexNames.get(APIMEDIA))
                     .id(object.getMid())
                     .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
             ).get();
+        for (MemberRef r : object.getMemberOf()) {
+            StandaloneMemberRef ref = StandaloneMemberRef.builder().memberRef(r).build();
+            AbstractESRepositoryITest.client
+                .index(
+                new IndexRequest(indexNames.get(ApiRefsIndex.APIMEDIA_REFS))
+                    .id(ref.getId())
+                    .routing(ref.getMidRef())
+                    .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref), XContentType.JSON)
+            ).get();
+        }
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
         indexed.sort((o1, o2) -> (int) (o1.getLastPublishedInstant().toEpochMilli() - o2.getLastPublishedInstant().toEpochMilli()));
@@ -930,5 +961,12 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             .sorted(Map.Entry.<String, Long>comparingByValue().reversed().thenComparing(Map.Entry.comparingByKey()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2,
                 LinkedHashMap::new));
+    }
+
+    protected MediaSearchResult getAndTestResult(MediaForm form) {
+        return getAndTestResult(target, form);
+    }
+    protected MediaSearchResult getAndTestResult(MediaFormBuilder form) {
+        return getAndTestResult(form.build());
     }
 }

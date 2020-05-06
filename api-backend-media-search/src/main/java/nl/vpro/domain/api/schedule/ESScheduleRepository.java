@@ -397,7 +397,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         } else {
             return RedirectList::new;
         }
-
     }
 
 

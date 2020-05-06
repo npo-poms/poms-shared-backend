@@ -168,7 +168,7 @@ public abstract class AbstractESRepository<T> {
             return null;
         } catch(IndexNotFoundException ime) {
             return null;
-        } catch (InterruptedException ie) {
+        } catch(InterruptedException ie) {
             Thread.currentThread().interrupt();
             throw new RuntimeException(ie);
         } catch(ExecutionException | TimeoutException e) {
@@ -212,7 +212,7 @@ public abstract class AbstractESRepository<T> {
                 return new ArrayList<>();
             }
             MultiGetRequest request = new MultiGetRequest();
-            for(String id : ids) {
+            for (String id : ids) {
                 request.add(indexName, id);
             }
             ActionFuture<MultiGetResponse> future =
@@ -220,14 +220,14 @@ public abstract class AbstractESRepository<T> {
                     .multiGet(request);
 
             MultiGetResponse responses = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
-            if(responses == null || ! responses.iterator().hasNext()) {
+            if (responses == null || !responses.iterator().hasNext()) {
                 return null;
             }
 
             //List<T> answer = new ArrayList<>(responses.getResponses().length); // ES v > 0.20
             Map<String, S> answerMap = new HashMap<>(responses.getResponses().length);
-            for(MultiGetItemResponse response : responses) {
-                if(response.isFailed()) {
+            for (MultiGetItemResponse response : responses) {
+                if (response.isFailed()) {
                     if (response.getFailure() != null) {
                         log.error("{}", response.getFailure().getMessage(), response.getFailure().getFailure());
                     } else {
@@ -252,7 +252,10 @@ public abstract class AbstractESRepository<T> {
                 answer.add(Optional.ofNullable(object));
             }
             return answer;
-        } catch(InterruptedException | ExecutionException | IOException | TimeoutException e) {
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ie);
+        } catch(ExecutionException | IOException | TimeoutException e) {
             throw new RuntimeException(e);
         }
     }
@@ -269,7 +272,7 @@ public abstract class AbstractESRepository<T> {
             searchBuilder.from((int) offset);
         }
         if (max == null) {
-            max = (int) executeCount(queryBuilder, indexNames);
+            max = (int) executeCount(queryBuilder, indexNames).value;
         }
         return handleMaxZero(max, searchBuilder::size);
     }
@@ -315,11 +318,11 @@ public abstract class AbstractESRepository<T> {
         };
     }
 
-    protected long executeCount(
+    protected TotalHits executeCount(
         @NonNull QueryBuilder builder,
         @NonNull String... indexNames) {
         return client().prepareSearch(indexNames)
-            .setSource(new SearchSourceBuilder().size(0).query(builder)).get().getHits().getTotalHits().value;
+            .setSource(new SearchSourceBuilder().size(1).query(builder)).get().getHits().getTotalHits();
 
     }
 
@@ -440,17 +443,7 @@ public abstract class AbstractESRepository<T> {
     }
 
     public final Optional<String> redirect(String mid) {
-        Map<String, String> map = getDirectsRepository().redirects().getMap();
-
-        String result = map.get(mid);
-        String to = result;
-        while(to != null) {
-            to = map.get(to);
-            if (to != null) {
-                result = to;
-            }
-        }
-        return Optional.ofNullable(result);
+        return getDirectsRepository().redirects().redirect(mid);
     }
 
     protected Redirector getDirectsRepository() {

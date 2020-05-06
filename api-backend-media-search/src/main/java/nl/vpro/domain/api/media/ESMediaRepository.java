@@ -41,8 +41,6 @@ import nl.vpro.util.*;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
 
-;
-
 /**
  * @author Roelof Jan Koekoek
  * @author Michiel Meeuwissen
@@ -58,11 +56,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private final ScheduledExecutorService EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    Map<String, String> redirects;
-
-    private Instant lastRedirectRead = Instant.EPOCH;
-
-    private Instant lastRedirectChange = Instant.now();
+    RedirectList redirects = null;
+    Instant lastRedirectRead = Instant.EPOCH;
 
     private int defaultMax = 1000;
 
@@ -150,14 +145,21 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         if (needsPostFilter) {
             List<SearchResultItem<? extends MediaObject>> filtered = new ArrayList<>();
-            Iterator<SearchResultItem<? extends MediaObject>> iterator = result.iterator();
-            while(iterator.hasNext()) {
-                SearchResultItem<? extends MediaObject> item = iterator.next();
+            int correctTotal = 0;
+            for (SearchResultItem<? extends MediaObject> item : result) {
                 if (form.test(item.getResult())) {
                     filtered.add(item);
+                } else {
+                    correctTotal++;
+
                 }
             }
-            MediaSearchResult filteredResult =  new MediaSearchResult(filtered, result.getOffset(), result.getMax(), Result.Total.approximate(result.getTotal()));
+            MediaSearchResult filteredResult =  new MediaSearchResult(
+                filtered,
+                result.getOffset(),
+                result.getMax(),
+                Result.Total.approximate(result.getTotal() - correctTotal)
+            );
             filteredResult.setSelectedFacets(result.getSelectedFacets());
             filteredResult.setFacets(result.getFacets());
             return filteredResult;
@@ -240,6 +242,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
 
         SearchSourceBuilder search = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
+        assert media.getMid() != null;
         MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(getIndexName(), media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
             filterFields(media, relatedFields, "objectType,titles.value"),
@@ -337,6 +340,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @NonNull Order order,
         long offset,
         Integer max) {
+        assert media.getMid() != null;
         AtomicInteger atomicMax = new AtomicInteger(max);
         boolean wasZero = handleMaxZero(max, atomicMax::set);
         SearchRequest request = client()
@@ -406,10 +410,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             SearchRequestBuilder builder = client().prepareSearch(getRefsIndexName());
             listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
             builder.setFrom((int) offset);
-
+            boolean maxIsZero = handleMaxZero(max, builder::setSize);
             SearchResponse response = builder.get();
             SearchHit[] hits = response.getHits().getHits();
-            boolean maxIsZero = handleMaxZero(max, builder::setSize);
             mids = maxIsZero ? Collections.emptyList() : Arrays.stream(hits)
                 .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
                 .collect(Collectors.toList());
@@ -444,6 +447,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
         BoolQueryBuilder must = QueryBuilders.boolQuery();
         must.filter(QueryBuilders.termQuery("objectType", objectType.name()));
+        assert media.getMid() != null;
         must.must(QueryBuilders.termQuery("midRef", media.getMid()));
         builder
             .setQuery(must)
@@ -629,7 +633,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     @Override
     public RedirectList redirects() {
         fillRedirects();
-        return new RedirectList(lastRedirectRead, lastRedirectChange, redirects);
+        return redirects;
     }
 
     synchronized void refillRedirectCache() {
@@ -651,9 +655,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-        if (! newRedirects.equals(redirects)) {
-            redirects = newRedirects;
-            lastRedirectChange = Instant.now();
+        if (redirects == null || ! newRedirects.equals(redirects.getMap())) {
+            redirects = new RedirectList(Instant.now(), newRedirects);
             log.info("Read {} redirects from ES", redirects.size());
         }
         lastRedirectRead = Instant.now();
@@ -685,6 +688,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable Integer max,
         @NonNull Class<S> clazz) {
         String ref = media.getMid();
+        assert ref != null;
         BoolQueryBuilder booleanFilter =
             QueryBuilders.boolQuery().must(QueryBuilders.termQuery(axis + ".midRef", ref));
 
