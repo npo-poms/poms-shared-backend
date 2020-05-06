@@ -27,7 +27,8 @@ import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
 
-import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
+import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
 /**
  * @author Michiel Meeuwissen
@@ -342,10 +343,18 @@ public abstract class ESQueryBuilder {
         @Override
         public void applyField(String prefix, BoolQueryBuilder booleanQueryBuilder, TM matcher) {
             BoolQueryBuilder bool = QueryBuilders.boolQuery();
+            List<QueryBuilder> clauses = new ArrayList<>();
             for (ESMatchType.FieldInfoWrapper field : fields) {
-                buildOptionalQuery(prefix, field.getName(), matcher, field.getFieldInfo()).ifPresent(bool::should);
+                buildOptionalQuery(prefix, field.getName(), matcher, field.getFieldInfo()).ifPresent(queryBuilder -> {
+                    bool.should(queryBuilder);
+                    clauses.add(queryBuilder);
+                });
             }
-            if (bool.hasClauses()) {
+            if (clauses.isEmpty()) {
+                return;
+            } else if (clauses.size() == 1) {
+                apply(booleanQueryBuilder, clauses.get(0), matcher.getMatch());
+            } else {
                 apply(booleanQueryBuilder, bool, matcher.getMatch());
             }
 

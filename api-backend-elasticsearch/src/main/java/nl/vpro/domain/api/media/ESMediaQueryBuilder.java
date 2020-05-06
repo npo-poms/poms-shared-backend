@@ -503,7 +503,9 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
     static List<SearchFieldDefinition> getSearchFields() {
-        return getSearchFieldStream().collect(Collectors.toList());
+        return getSearchFieldStream().collect(
+            Collectors.toList()
+        );
     }
 
     static Stream<SearchFieldDefinition> getSearchFieldStream() {

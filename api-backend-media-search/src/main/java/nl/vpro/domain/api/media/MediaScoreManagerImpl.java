@@ -28,6 +28,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
     @Value("${api.score.config.dir}")
     private String scoreConfigDir;
 
+
     @PostConstruct
     private void init() throws Exception {
         loadScores();
@@ -134,6 +135,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         ESMediaScoreBuilder.maxBoost = maxBoost;
     }
 
+
     @Override
     protected String getConfigDir() {
         return scoreConfigDir;
@@ -149,19 +151,19 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         final Map<String, String> properties = loadConfig();
         for(Map.Entry<String, String> entry : properties.entrySet()) {
             if(entry.getKey().startsWith(TEXT_BOOST_PREFIX)) {
-                ESMediaQueryBuilder.boostField(entry.getKey().substring(TEXT_BOOST_PREFIX.length()), Float.valueOf(entry.getValue()));
+                ESMediaQueryBuilder.boostField(entry.getKey().substring(TEXT_BOOST_PREFIX.length()), Float.parseFloat(entry.getValue()));
             } else {
                 switch(entry.getKey()) {
                     case "boost.max":
-                        setMaxBoost(Float.valueOf(entry.getValue()));
+                        setMaxBoost(Float.parseFloat(entry.getValue()));
                     case "boost.type.series":
-                        setSeriesBoost(Float.valueOf(entry.getValue()));
+                        setSeriesBoost(Float.parseFloat(entry.getValue()));
                     case "boost.type.broadcast":
-                        setBroadcastBoost(Float.valueOf(entry.getValue()));
+                        setBroadcastBoost(Float.parseFloat(entry.getValue()));
                     case "boost.location":
-                        setLocationBoost(Float.valueOf(entry.getValue()));
+                        setLocationBoost(Float.parseFloat(entry.getValue()));
                     case "sortDate.decay":
-                        setSortDateDecay(Float.valueOf(entry.getValue()));
+                        setSortDateDecay(Float.parseFloat(entry.getValue()));
                     case "sortDate.scale":
                         setSortDateScale(entry.getValue());
                     case "sortDate.offset":
@@ -171,4 +173,5 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
 
         }
     }
+
 }

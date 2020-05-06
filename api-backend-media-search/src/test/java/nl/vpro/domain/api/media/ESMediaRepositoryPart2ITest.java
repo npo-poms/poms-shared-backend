@@ -73,7 +73,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         .mid("POMS_S_12345")
         .type(GroupType.SERIES);
 
-    private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags");
+    private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags", new MediaScoreManagerImpl());
 
 
     private static Group group;

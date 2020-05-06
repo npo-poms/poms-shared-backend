@@ -61,10 +61,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private int defaultMax = 1000;
 
+    private final MediaScoreManager scoreManager;
 
-    public ESMediaRepository(ESClientFactory client, String relatedFields) {
+    public ESMediaRepository(ESClientFactory client, String relatedFields, MediaScoreManager scoreManager) {
         super(client);
         this.relatedFields = relatedFields.split(",");
+        this.scoreManager = scoreManager;
     }
 
     protected void fillRedirects() {
@@ -101,6 +103,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return loadAll(clazz, getIndexName(), ids.toArray(new String[0]));
     }
 
+    @Override
+    public boolean isScore() {
+        return scoreManager.getIsScoring();
+    }
+
+
+    public void setScore(boolean score) {
+        scoreManager.setIsScoring(score);
+    }
 
     @Override
     public MediaSearchResult find(

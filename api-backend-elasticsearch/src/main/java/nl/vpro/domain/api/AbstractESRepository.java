@@ -424,24 +424,6 @@ public abstract class AbstractESRepository<T> {
         return item;
     }
 
-    protected void redirectTextMatchers(
-        @Nullable TextMatcherList list) {
-        if (list == null) {
-            return;
-        }
-        List<TextMatcher> l = list.asList();
-        for (int i = 0; i < l.size(); i++) {
-            TextMatcher matcher = l.get(i);
-            Optional<String> redirect = redirect(matcher.getValue());
-            if (redirect.isPresent()) {
-                matcher = new TextMatcher(redirect.get(), matcher.getMatch());
-                matcher.setMatchType(matcher.getMatchType());
-                l.set(i, matcher);
-            }
-
-        }
-    }
-
     public final Optional<String> redirect(String mid) {
         return getDirectsRepository().redirects().redirect(mid);
     }

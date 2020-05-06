@@ -44,8 +44,10 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     private static final int MAXRESULT = 100;
 
-
     private final MediaRepository esMediaRepository;
+
+    private final MediaScoreManager scoreManager;
+
 
     @Override
     @Value("${elasticSearch.schedule.index}")
@@ -70,16 +72,27 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Inject
     public ESScheduleRepository(
         ESClientFactory client,
-        MediaRepository esMediaRepository) {
+        MediaRepository esMediaRepository, MediaScoreManager scoreManager) {
         super(client);
         this.esMediaRepository = esMediaRepository;
-
+        this.scoreManager = scoreManager;
     }
 
 
     @Override
     public List<MediaObject> loadAll(boolean loadDeleted, List<String> ids) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean isScore() {
+        return scoreManager.getIsScoring();
+
+    }
+
+    public void  setScore(boolean score) {
+        scoreManager.setIsScoring(score);
+
     }
 
     @Override
@@ -90,6 +103,12 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         } else {
             return null;
         }
+    }
+
+    @Override
+    public RedirectList redirects() {
+        return esMediaRepository.redirects();
+
     }
 
 
