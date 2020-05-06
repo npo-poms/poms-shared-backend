@@ -234,7 +234,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         // 33 (3 deleted)
         refresh();
-        Thread.sleep(100);
 
         assertThat(indexedObjectCount).isEqualTo(indexedGroupCount + indexedProgramCount);
         assertThat(deletedObjectCount).isEqualTo(deletedGroupCount + deletedProgramCount);
@@ -438,7 +437,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testFindWithWithPublishDateAsc() {
         MediaForm form = form()
-            .publishDate(LONGAGO.plusSeconds(1), LONGAGO.plusSeconds(5))
+            .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
             .sortOrder(MediaSortOrder.asc(MediaSortField.publishDate))
             .build();
         SearchResult<MediaObject> result = getAndTestResult(form);
@@ -456,7 +455,10 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testFindWithWithPublishDateDesc() {
-        MediaForm form = form().publishDate(LONGAGO, LONGAGO.plusSeconds(5)).sortOrder(MediaSortOrder.desc(MediaSortField.publishDate)).build();
+        MediaForm form = form()
+            .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
+            .sortOrder(MediaSortOrder.desc(MediaSortField.publishDate))
+            .build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(5);

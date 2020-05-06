@@ -70,7 +70,10 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
                 if (!inResult.contains(mo.getMid())) {
                     MediaSearch.TestResult testResult = form.getTestResult(mo);
                     Slf4jHelper.debugOrInfo(log, misses.get()  == 0, "Asserting that {} is not in form", mo);
-                    assertThat(testResult.test()).withFailMessage(mo + " is in " + form + " but it is not found! :" + testResult.getDescription()).isNotEqualTo(Truthiness.FALSE);
+                    assertThat(testResult.test())
+                        .withFailMessage(form + " matched " + mo + " but it is not found! :" +
+                            testResult.getDescription()
+                        ).isNotEqualTo(Truthiness.TRUE);
                     misses.incrementAndGet();
                 }
             }
