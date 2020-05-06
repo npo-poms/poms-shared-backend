@@ -24,7 +24,7 @@ public class StoreRequestInThreadLocal implements ContainerRequestFilter, Contai
 
     public static String getRequestBody() {
         byte[] body = REQUEST.get();
-        return String.valueOf(HEADERS.get()) + (body == null ? "" : ("\n" + new String(body)));
+        return HEADERS.get() + (body == null ? "" : ("\n" + new String(body)));
     }
 
     @Override
