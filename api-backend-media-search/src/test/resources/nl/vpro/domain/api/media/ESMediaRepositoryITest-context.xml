@@ -19,6 +19,7 @@
         <prop key="mediaService.membersRepository">ELASTICSEARCH</prop>
         <prop key="scheduleService.repository">ELASTICSEARCH</prop>
         <prop key="elasticSearch.commitDelay">10s</prop>
+        <prop key="api.score.config.dir"></prop>
       </props>
     </property>
   </bean>
@@ -33,6 +34,8 @@
   </bean>
 
   <bean class="nl.vpro.domain.api.media.ESMediaScoreBuilder" />
+
+  <bean class="nl.vpro.domain.api.media.MediaScoreManagerImpl"/>
 
 
   <bean class="nl.vpro.domain.api.media.ESMediaRepository">
