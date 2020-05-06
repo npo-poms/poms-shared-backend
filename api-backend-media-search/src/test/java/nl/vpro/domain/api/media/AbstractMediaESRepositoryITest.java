@@ -16,6 +16,7 @@ import nl.vpro.elasticsearch7.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.Slf4jHelper;
 import nl.vpro.media.domain.es.*;
+import nl.vpro.util.Truthiness;
 
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static nl.vpro.media.domain.es.ApiRefsIndex.APIMEDIA_REFS;
@@ -69,7 +70,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
                 if (!inResult.contains(mo.getMid())) {
                     MediaSearch.TestResult testResult = form.getTestResult(mo);
                     Slf4jHelper.debugOrInfo(log, misses.get()  == 0, "Asserting that {} is not in form", mo);
-                    assertThat(testResult.test().getAsBoolean()).withFailMessage("But it is! :" + testResult.getDescription()).isFalse();
+                    assertThat(testResult.test()).withFailMessage(mo + " is in " + form + " but it is not found! :" + testResult.getDescription()).isNotEqualTo(Truthiness.FALSE);
                     misses.incrementAndGet();
                 }
             }
