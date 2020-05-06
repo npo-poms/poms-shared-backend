@@ -302,7 +302,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         if (form == null) {
             return null;
         }
-        getDirectsRepository().redirectMediaSearch(form.getSearches());
+        redirectMediaSearch(form.getSearches());
         return form;
     }
 
@@ -314,7 +314,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         if (facet == null) {
             return;
         }
-        getDirectsRepository().redirectMediaSearch(facet.getFilter());
+        redirectMediaSearch(facet.getFilter());
         redirectMemberRefSearch(facet.getSubSearch());
     }
 
@@ -322,7 +322,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         if (search == null) {
             return;
         }
-        getDirectsRepository().redirectTextMatchers(search.getMediaIds());
+        redirectTextMatchers(search.getMediaIds());
     }
 
     public abstract  boolean isScore();

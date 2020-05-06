@@ -83,13 +83,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return load(mid, MediaObject.class);
     }
 
-
-    @Override
-    protected Redirector getDirectsRepository() {
-        return this;
-
-    }
-
     @Override
     public List<MediaObject> loadAll(@NonNull List<String> ids) {
         return loadAll(MediaObject.class, ids).stream().map(o -> o.orElse(null)).collect(Collectors.toList());

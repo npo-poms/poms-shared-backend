@@ -37,7 +37,6 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -424,13 +423,6 @@ public abstract class AbstractESRepository<T> {
         return item;
     }
 
-    public final Optional<String> redirect(String mid) {
-        return getDirectsRepository().redirects().redirect(mid);
-    }
-
-    protected Redirector getDirectsRepository() {
-        throw new UnsupportedOperationException();
-    }
 
     protected Result.Total getTotal(SearchHits hits) {
         TotalHits totalHits = hits.getTotalHits();

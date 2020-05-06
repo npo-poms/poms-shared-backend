@@ -408,15 +408,4 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         items = items.subList((int) offset, Math.min(end, total));
         return new ScheduleSearchResult(items, offset, max, Result.Total.equalsTo(total));
     }
-
-    @Override
-    protected Redirector getDirectsRepository() {
-        if (esMediaRepository != null) {
-            return esMediaRepository;
-        } else {
-            return RedirectList::new;
-        }
-    }
-
-
 }

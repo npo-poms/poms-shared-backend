@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Value;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.*;
-import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -82,11 +81,6 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
 
 
-    @Override
-    protected Redirector getDirectsRepository() {
-        throw new UnsupportedOperationException();
-
-    }
 
     @Override
     public void index(Query query) {
