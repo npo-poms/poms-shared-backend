@@ -304,27 +304,19 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         if (form == null) {
             return null;
         }
-        redirectMediaSearch(form.getSearches());
+        getDirectsRepository().redirectMediaSearch(form.getSearches());
         return form;
     }
 
 
-    protected void redirectMediaSearch(MediaSearch search) {
-        if (search == null) {
-            return;
-        }
-        redirectTextMatchers(search.getMediaIds());
-        redirectTextMatchers(search.getDescendantOf());
-        redirectTextMatchers(search.getEpisodeOf());
-        redirectTextMatchers(search.getMemberOf());
-    }
+
 
 
     protected void redirectMemberRefFacet(MemberRefFacet facet) {
         if (facet == null) {
             return;
         }
-        redirectMediaSearch(facet.getFilter());
+        getDirectsRepository().redirectMediaSearch(facet.getFilter());
         redirectMemberRefSearch(facet.getSubSearch());
     }
 
@@ -332,7 +324,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         if (search == null) {
             return;
         }
-        redirectTextMatchers(search.getMediaIds());
+        getDirectsRepository().redirectTextMatchers(search.getMediaIds());
     }
 
 
