@@ -10,6 +10,7 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import nl.vpro.VersionService;
 import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.poms.shared.Headers;
 
@@ -30,6 +31,8 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
         if (authentication != null) {
             response.getHeaders().putSingle(Headers.NPO_CURRENT_USER, authentication.getName());
         }
+        response.getHeaders().putSingle(Headers.NPO_VERSION, VersionService.version());
+
     }
 
     @Override
