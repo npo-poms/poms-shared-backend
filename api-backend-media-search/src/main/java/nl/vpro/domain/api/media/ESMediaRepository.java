@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -65,7 +66,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     public ESMediaRepository(ESClientFactory client, String relatedFields, MediaScoreManager scoreManager) {
         super(client);
-        this.relatedFields = relatedFields.split(",");
+        this.relatedFields = StringUtils.isBlank(relatedFields) ? new String[0] : relatedFields.split(",");
         this.scoreManager = scoreManager;
     }
 

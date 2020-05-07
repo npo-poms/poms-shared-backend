@@ -108,7 +108,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public RedirectList redirects() {
         return esMediaRepository.redirects();
-
     }
 
 

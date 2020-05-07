@@ -39,7 +39,8 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @BeforeEach
     public void setup() {
-        repository = new ESScheduleRepository(clientFactory, null, new MediaScoreManagerImpl());
+        repository = new ESScheduleRepository(clientFactory,
+            new ESMediaRepository(clientFactory, "", new MediaScoreManagerImpl()), new MediaScoreManagerImpl());
         repository.setIndexName(indexNames.get(APIMEDIA));
         repository.setScore(false);
         clearIndices();
