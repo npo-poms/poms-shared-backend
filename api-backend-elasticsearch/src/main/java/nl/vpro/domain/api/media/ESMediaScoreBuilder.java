@@ -29,9 +29,8 @@ public class ESMediaScoreBuilder {
     static GausianParameters<Duration, Instant> sortDate = new GausianParameters.Date("sortDate", Duration.ofDays(5 * 365), Duration.ofDays(7));
 
     static {
-        sortDate.setDecay(0.6);
+        sortDate.setDecay(0.5);
     }
-
     static float locationBoost = 2f;
 
     static float seriesBoost = 2.5f;
