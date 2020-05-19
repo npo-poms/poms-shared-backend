@@ -25,6 +25,11 @@ public class SearchFieldDefinition {
         this(name, boost, true);
     }
 
+
+    public boolean isActive() {
+        return boost > 0;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("SearchFieldDefinition{");

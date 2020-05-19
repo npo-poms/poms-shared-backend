@@ -331,9 +331,9 @@ public abstract class AbstractESRepository<T> {
             HighlightBuilder highlightBuilder = new HighlightBuilder();
             highlightBuilder.tagsSchema("styled");
 
-            for (SearchFieldDefinition highlight : searchFields) {
-                if (highlight.isHighlight()) {
-                    highlightBuilder.field(highlight.getName(), 100, 5);
+            for (SearchFieldDefinition searchFieldDefinition : searchFields) {
+                if (searchFieldDefinition.isActive() && searchFieldDefinition.isHighlight()) {
+                    highlightBuilder.field(searchFieldDefinition.getName(), 100, 5);
                 }
             }
             searchBuilder.highlighter(highlightBuilder);

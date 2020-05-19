@@ -493,13 +493,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     }
 
 
-    static void boostField(String field, float boost) {
-        getSearchFields().forEach(definition -> {
-            if (definition.getName().equals(field)) {
-                definition.setBoost(boost);
-            }
-        });
-
+    static boolean boostField(String field, float boost) {
+        return boostField(field, boost, SEARCH_FIELDS);
     }
 
     static List<SearchFieldDefinition> getSearchFields() {
