@@ -68,6 +68,9 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Value("${api.schedule.maxResults}")
     private int maxResults = Constants.MAX_RESULTS;
 
+    private Duration scheduleEventWindow = Duration.ofDays(7);
+
+
     @Autowired
     public ScheduleRestServiceImpl(ScheduleService scheduleService) {
         this.scheduleService = scheduleService;
@@ -284,14 +287,14 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ApiScheduleEvent nowForBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
             @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-            @ApiParam(value = "if false then there may also be returned an event that was recently finished.")  @QueryParam("mustberunning") @DefaultValue("true") boolean mustBeRunning,
+            @ApiParam(value = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
             @QueryParam(NOW) Instant now
 
     ) {
         if (now == null) {
             now = Instant.now();
         }
-        Instant start = mustBeRunning ? now.minus(Duration.ofDays(1)) : now.minus(Duration.ofDays(7));
+        Instant start = mustBeRunning ? now.minus(Duration.ofDays(1)) : now.minus(scheduleEventWindow);
         List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(
             broadcaster,
             start,
@@ -331,7 +334,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         if (now == null) {
             now = Instant.now();
         }
-        final List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, now, null, Order.ASC, 0L, 1).getItems();
+        Instant to = now.plus(Duration.ofDays(7));
+        final List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.listForBroadcaster(broadcaster, now, to, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No next event for broadcaster " + broadcaster);
@@ -392,14 +396,17 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ApiScheduleEvent nowForChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
         @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @ApiParam(value = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
         @QueryParam(NOW) Instant now
 
     ) {
         if (now == null) {
             now = Instant.now();
         }
+        Instant start = mustBeRunning ? now.minus(Duration.ofDays(1)) : now.minus(scheduleEventWindow);
+
         Channel chan = getChannel(channel);
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, now.minus(Duration.ofDays(1)), now, Order.DESC, 0L, 1).getItems();
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, start, now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No current event on channel " + chan);
@@ -407,7 +414,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
         ApiScheduleEvent scheduleEvent = scheduleEvents.get(0);
 
-        if (!isActiveEvent(scheduleEvent, now)) {
+        if (mustBeRunning && !isActiveEvent(scheduleEvent, now)) {
             throw Exceptions.notFound("No current event on channel " + chan);
         }
 
@@ -434,8 +441,9 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         if (now == null) {
             now = Instant.now();
         }
+        Instant to = now.plus(scheduleEventWindow);
         Channel chan = getChannel(channel);
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, now, null, Order.ASC, 0L, 1).getItems();
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(chan, now, to, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No next event on channel " + chan);
@@ -495,13 +503,16 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ApiScheduleEvent nowForNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
         @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @ApiParam(value = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
+
         @QueryParam(NOW) Instant now
 
     ) {
         if (now == null) {
             now = Instant.now();
         }
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), null, now, Order.DESC, 0L, 1).getItems();
+        Instant start = mustBeRunning ? now.minus(Duration.ofDays(1)) : now.minus(scheduleEventWindow);
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), start, now, Order.DESC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No current event on net " + net);
@@ -509,7 +520,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
         ApiScheduleEvent scheduleEvent = scheduleEvents.get(0);
 
-        if (!isActiveEvent(scheduleEvent, now)) {
+        if (mustBeRunning && !isActiveEvent(scheduleEvent, now)) {
             throw Exceptions.notFound("No current event on net " + net);
         }
 
@@ -536,7 +547,8 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         if (now == null) {
             now = Instant.now();
         }
-        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), now, null, Order.ASC, 0L, 1).getItems();
+        Instant to = now.plus(scheduleEventWindow);
+        List<? extends ApiScheduleEvent> scheduleEvents = scheduleService.list(new Net(net), now, to, Order.ASC, 0L, 1).getItems();
 
         if (scheduleEvents.isEmpty()) {
             throw Exceptions.notFound("No next event on net " + net);
