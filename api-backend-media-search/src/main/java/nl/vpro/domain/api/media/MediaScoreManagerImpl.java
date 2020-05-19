@@ -59,37 +59,61 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
     @ManagedAttribute
     @Override
     public String getSortDateScale() {
-        return ESMediaScoreBuilder.sortDateScale.toString();
+        return ESMediaScoreBuilder.sortDate.getScale().toString();
     }
 
     @ManagedOperation
     @Override
     public void setSortDateScale(String  sortDateScale) {
-        ESMediaScoreBuilder.sortDateScale = TimeUtils.parseDuration(sortDateScale).orElseThrow(IllegalArgumentException::new);
+        ESMediaScoreBuilder.sortDate.setScale(TimeUtils.parseDuration(sortDateScale).orElseThrow(IllegalArgumentException::new));
     }
 
     @ManagedAttribute
     @Override
     public String getSortDateOffset() {
-        return ESMediaScoreBuilder.sortDateOffset.toString();
+        return ESMediaScoreBuilder.sortDate.getOffset().toString();
     }
 
     @ManagedOperation
     @Override
     public void setSortDateOffset(String sortDateOffset) {
-        ESMediaScoreBuilder.sortDateOffset = TimeUtils.parseDuration(sortDateOffset).orElseThrow(IllegalArgumentException::new);
+        ESMediaScoreBuilder.sortDate.setOffset(TimeUtils.parseDuration(sortDateOffset).orElseThrow(IllegalArgumentException::new));
     }
 
     @ManagedAttribute
     @Override
     public double getSortDateDecay() {
-        return ESMediaScoreBuilder.sortDateDecay;
+        return ESMediaScoreBuilder.sortDate.getDecay();
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setSortDateDecay(double sortDateDecay) {
-        ESMediaScoreBuilder.sortDateDecay = sortDateDecay;
+        ESMediaScoreBuilder.sortDate.setDecay(sortDateDecay);
+    }
+
+    @ManagedAttribute
+    @Override
+    public double getSortDateFactorFactor() {
+        return ESMediaScoreBuilder.sortDate.getFactorFactor();
+    }
+
+    @ManagedAttribute
+    @Override
+    public void setSortDateFactorFactor(double sortDateFactorFactor) {
+        ESMediaScoreBuilder.sortDate.setFactorFactor(sortDateFactorFactor);
+    }
+
+    @ManagedAttribute
+    @Override
+    public double getSortDateFactorOffset() {
+        return ESMediaScoreBuilder.sortDate.getFactorOffset();
+    }
+
+    @ManagedAttribute
+    @Override
+    public void setSortDateFactorOffset(double sortDateFactorOffset) {
+        ESMediaScoreBuilder.sortDate.setFactorOffset(sortDateFactorOffset);
     }
 
     @ManagedAttribute
@@ -98,7 +122,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.locationBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setLocationBoost(float locationBoost) {
         ESMediaScoreBuilder.locationBoost = locationBoost;
@@ -110,7 +134,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.seriesBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setSeriesBoost(float seriesBoost) {
         ESMediaScoreBuilder.seriesBoost = seriesBoost;
@@ -122,7 +146,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.broadcastBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setBroadcastBoost(float broadcastBoost) {
         ESMediaScoreBuilder.broadcastBoost = broadcastBoost;
@@ -134,7 +158,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.maxBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setMaxBoost(float maxBoost) {
         ESMediaScoreBuilder.maxBoost = maxBoost;
