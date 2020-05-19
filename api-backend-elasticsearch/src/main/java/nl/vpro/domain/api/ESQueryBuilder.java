@@ -1,6 +1,5 @@
 package nl.vpro.domain.api;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -9,8 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.*;
@@ -21,6 +18,7 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.collation.CollationAttributeFactory;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.util.IOUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
@@ -78,17 +76,21 @@ public abstract class ESQueryBuilder {
         Fuzziness fuzziness = getFuzziness(textSearch);
         for (SearchFieldDefinition searchField : searchFields) {
             BoolQueryBuilder fieldQuery = QueryBuilders.boolQuery();
-
+            if (! searchField.isActive()) {
+                log.debug("Skipped {} since its boost == 0", searchField);
+                continue;
+            }
             quoted.forEach(entry -> {
                     String unquoted = entry.substring(1, entry.length() - 1);
-                    MatchPhraseQueryBuilder phraseQuery = phraseQuery(prefix, searchField, unquoted, PHRASE_FACTOR * QUOTE_FACTOR, 0);
 
-                    fieldQuery.should(phraseQuery);
-                    if (fuzziness != null) {
-                        fieldQuery.should(
-                            sloppy(fuzziness, phraseQuery)
-                        );
-                    }
+                MatchPhraseQueryBuilder phraseQuery = phraseQuery(prefix, searchField, unquoted, PHRASE_FACTOR * QUOTE_FACTOR, 0);
+
+                fieldQuery.should(phraseQuery);
+                if (fuzziness != null) {
+                    fieldQuery.should(
+                        sloppy(fuzziness, phraseQuery)
+                    );
+                }
                 }
             );
 
@@ -469,7 +471,7 @@ public abstract class ESQueryBuilder {
         @NonNull String prefix,
         @NonNull String fieldName,
         @NonNull TM matcher,
-        @NonNull ESMatchType.FieldInfo fieldInfo) {
+        ESMatchType.@NonNull FieldInfo fieldInfo) {
         if (fieldInfo.getCardinality().isPresent()) {
             boolean canMatch = false;
             for (String possibleValue : fieldInfo.getPossibleValues()) {
@@ -488,7 +490,7 @@ public abstract class ESQueryBuilder {
         @NonNull String prefix,
         @NonNull String fieldName,
         @NonNull TM matcher,
-        @NonNull ESMatchType.FieldInfo fieldInfo) {
+        ESMatchType. @NonNull FieldInfo fieldInfo) {
         String value = matcher.getValue();
         ESMatchType matchType = ESMatchType.valueOf(matcher.getMatchType().getName());
 
@@ -503,9 +505,9 @@ public abstract class ESQueryBuilder {
      * @param prefix not null path to the media node in the documents to search, including the last dot, can be blank
      */
     public static void relationNestedQuery(
-        @NotNull String prefix,
-        @NotNull AbstractRelationSearch relationSearch,
-        @NotNull BoolQueryBuilder booleanQuery) {
+        @NonNull String prefix,
+        @NonNull  AbstractRelationSearch relationSearch,
+        @NonNull BoolQueryBuilder booleanQuery) {
 
         BoolQueryBuilder fieldWrapper = QueryBuilders.boolQuery();
         relationQuery(prefix, relationSearch, fieldWrapper);
@@ -521,8 +523,8 @@ public abstract class ESQueryBuilder {
      * @param prefix not null path to the media node in the documents to search, including the last dot, can be blank
      */
     public static void relationQuery(
-        @NotNull String prefix,
-        @NotNull AbstractRelationSearch relationSearch,
+        @NonNull String prefix,
+        @NonNull AbstractRelationSearch relationSearch,
         @NonNull BoolQueryBuilder boolQueryBuilder) {
 
 
@@ -622,5 +624,27 @@ public abstract class ESQueryBuilder {
         BoolQueryBuilder booleanFilter = boolQuery();
         build(prefix, booleanFilter, searches.getIds(), new ESQueryBuilder.TextSingleFieldApplier<>(axis + '.' + field));
         return simplifyQuery(booleanFilter);
+    }
+
+
+    protected static boolean boostField(
+        @NonNull String field, float boost, Collection<SearchFieldDefinition> searchFieldDefinitions) {
+        boolean found = false;
+        for (SearchFieldDefinition definition : searchFieldDefinitions) {
+            if(definition.getName().equals(field)) {
+                float prevBoost = definition.getBoost();
+                if (prevBoost != boost) {
+                    definition.setBoost(boost);
+                    if (definition.isActive()) {
+                        log.info("Set boost of {} from {} to {}", definition.getName(), prevBoost, boost);
+                    }
+                }
+                found = true;
+            }
+        }
+        if (!found) {
+            log.warn("Could not set boost of field {}", field);
+        }
+        return found;
     }
 }
