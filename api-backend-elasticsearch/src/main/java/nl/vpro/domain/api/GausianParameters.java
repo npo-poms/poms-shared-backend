@@ -55,7 +55,8 @@ public abstract class GausianParameters<T, S> {
             params.put("decay", decay);
             params.put("factorOffset", factorOffset);
             params.put("factorFactor", factorFactor);
-            Script script = new Script(ScriptType.INLINE, "painless", "params.factorFactor * decayDateGauss(params.origin, params.scale, params.offset, params.decay, doc['" + field + "'].value) + params.factorOffset", params);
+            String value = "doc['" + field + "']";
+            Script script = new Script(ScriptType.INLINE, "painless", "params.factorFactor * (" + value +".size() == 0 ? 1 : decayDateGauss(params.origin, params.scale, params.offset, params.decay, " + value + ".value)) + params.factorOffset", params);
             return script;
         }
     }
