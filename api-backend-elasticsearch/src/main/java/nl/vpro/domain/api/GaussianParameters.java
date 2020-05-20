@@ -41,7 +41,7 @@ public abstract class GaussianParameters<T, S> {
 
     final String field;
 
-    public GaussianParameters(String field, T scale, T offset) {
+    protected GaussianParameters(String field, T scale, T offset) {
         this.field = field;
         this.scale = scale;
         this.offset = offset;

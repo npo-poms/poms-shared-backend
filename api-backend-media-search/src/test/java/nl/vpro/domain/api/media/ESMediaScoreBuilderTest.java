@@ -31,60 +31,55 @@ public class ESMediaScoreBuilderTest {
                 "        \"boost\" : 1.0\n" +
                 "      }\n" +
                 "    },\n" +
-                "    \"functions\" : [\n" +
-                "      {\n" +
-                "        \"filter\" : {\n" +
-                "          \"exists\" : {\n" +
-                "            \"field\" : \"locations\",\n" +
+                "    \"functions\" : [ {\n" +
+                "      \"filter\" : {\n" +
+                "        \"exists\" : {\n" +
+                "          \"field\" : \"locations\",\n" +
+                "          \"boost\" : 1.0\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"weight\" : 2.0\n" +
+                "    }, {\n" +
+                "      \"filter\" : {\n" +
+                "        \"term\" : {\n" +
+                "          \"type\" : {\n" +
+                "            \"value\" : \"SERIES\",\n" +
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
-                "        },\n" +
-                "        \"weight\" : 2.0\n" +
+                "        }\n" +
                 "      },\n" +
-                "      {\n" +
-                "        \"filter\" : {\n" +
-                "          \"term\" : {\n" +
-                "            \"type\" : {\n" +
-                "              \"value\" : \"SERIES\",\n" +
-                "              \"boost\" : 1.0\n" +
-                "            }\n" +
-                "          }\n" +
-                "        },\n" +
-                "        \"weight\" : 2.5\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"filter\" : {\n" +
-                "          \"term\" : {\n" +
-                "            \"type\" : {\n" +
-                "              \"value\" : \"BROADCAST\",\n" +
-                "              \"boost\" : 1.0\n" +
-                "            }\n" +
-                "          }\n" +
-                "        },\n" +
-                "        \"weight\" : 1.5\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"filter\" : {\n" +
-                "          \"match_all\" : {\n" +
+                "      \"weight\" : 2.5\n" +
+                "    }, {\n" +
+                "      \"filter\" : {\n" +
+                "        \"term\" : {\n" +
+                "          \"type\" : {\n" +
+                "            \"value\" : \"BROADCAST\",\n" +
                 "            \"boost\" : 1.0\n" +
                 "          }\n" +
-                "        },\n" +
-                "        \"script_score\" : {\n" +
-                "          \"script\" : {\n" +
-                "            \"source\" : \"params.factorFactor * (doc['sortDate'].size() == 0 ? 1 : decayDateGauss(params.origin, params.scale, params.offset, params.decay, doc['sortDate'].value)) + params.factorOffset\",\n" +
-                "            \"lang\" : \"painless\",\n" +
-                "            \"params\" : {\n" +
-                "              \"offset\" : \"604800000ms\",\n" +
-                "              \"factorFactor\" : 0.7,\n" +
-                "              \"origin\" : \"2017-09-13T13:12:00Z\"\n," +
-                "              \"scale\" : \"157680000000ms\",\n" +
-                "              \"decay\" : 0.5,\n" +
-                "              \"factorOffset\" : 0.5\n" +
-                "            }\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"weight\" : 1.5\n" +
+                "    }, {\n" +
+                "      \"filter\" : {\n" +
+                "        \"match_all\" : {\n" +
+                "          \"boost\" : 1.0\n" +
+                "        }\n" +
+                "      },\n" +
+                "      \"script_score\" : {\n" +
+                "        \"script\" : {\n" +
+                "          \"source\" : \"params.gaussFactor * (doc['sortDate'].size() == 0 ? 1 : decayDateGauss(params.origin, params.scale, params.offset, params.decay, doc['sortDate'].value)) + params.gaussOffset\",\n" +
+                "          \"lang\" : \"painless\",\n" +
+                "          \"params\" : {\n" +
+                "            \"origin\" : \"2017-09-13T13:12:00Z\",\n" +
+                "            \"scale\" : \"157680000000ms\",\n" +
+                "            \"offset\" : \"604800000ms\",\n" +
+                "            \"decay\" : 0.5,\n" +
+                "            \"gaussOffset\" : 0.5,\n" +
+                "            \"gaussFactor\" : 0.7\n" +
                 "          }\n" +
                 "        }\n" +
                 "      }\n" +
-                "    ],\n" +
+                "    } ],\n" +
                 "    \"score_mode\" : \"multiply\",\n" +
                 "    \"max_boost\" : 2.0,\n" +
                 "    \"boost\" : 1.0\n" +
