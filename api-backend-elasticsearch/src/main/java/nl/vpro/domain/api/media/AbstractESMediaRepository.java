@@ -28,7 +28,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
-import nl.vpro.domain.media.*;
+import nl.vpro.domain.media.MediaLoader;
+import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch7.ESClientFactory;
@@ -275,16 +276,19 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
                 ;
             SearchHits hits = response.getHits();
 
+            Duration took = Duration.ofMillis(response.getTook().getMillis());
             List<SearchResultItem<? extends S>> adapted = request.maxWasZero ? Collections.emptyList() : adapt(hits, clazz);
 
             MediaFacetsResult facetsResult =
                 ESMediaFacetsHandler.extractMediaFacets(response, facets, this);
-            return new GenericMediaSearchResult<>(adapted,
+            GenericMediaSearchResult<S> result =  new GenericMediaSearchResult<>(adapted,
                 facetsResult,
                 offset,
                 max,
                 getTotal(hits)
             );
+            result.setTook(took);
+            return result;
         } catch (TransportSerializationException e) {
             String detail = e.getDetailedMessage();
             log.warn(e.getMessage() + ":" + detail);

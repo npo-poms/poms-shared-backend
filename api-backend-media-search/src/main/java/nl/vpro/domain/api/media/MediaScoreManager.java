@@ -24,6 +24,14 @@ public interface MediaScoreManager extends ScoreManager {
 
     void setSortDateDecay(double sortDateDecay);
 
+    double getSortDateGaussOffset();
+
+    void setSortDateGaussOffset(double sortDateFactorOffset);
+
+    double getSortDateGaussFactor();
+
+    void setSortDateGaussFactor(double sortDateFactorFactor);
+
     float getLocationBoost();
 
     void setLocationBoost(float locationBoost);

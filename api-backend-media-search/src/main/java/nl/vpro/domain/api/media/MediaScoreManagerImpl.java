@@ -59,37 +59,61 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
     @ManagedAttribute
     @Override
     public String getSortDateScale() {
-        return ESMediaScoreBuilder.sortDateScale.toString();
+        return ESMediaScoreBuilder.sortDate.getScale().toString();
     }
 
     @ManagedOperation
     @Override
     public void setSortDateScale(String  sortDateScale) {
-        ESMediaScoreBuilder.sortDateScale = TimeUtils.parseDuration(sortDateScale).orElseThrow(IllegalArgumentException::new);
+        ESMediaScoreBuilder.sortDate.setScale(TimeUtils.parseDuration(sortDateScale).orElseThrow(IllegalArgumentException::new));
     }
 
     @ManagedAttribute
     @Override
     public String getSortDateOffset() {
-        return ESMediaScoreBuilder.sortDateOffset.toString();
+        return ESMediaScoreBuilder.sortDate.getOffset().toString();
     }
 
     @ManagedOperation
     @Override
     public void setSortDateOffset(String sortDateOffset) {
-        ESMediaScoreBuilder.sortDateOffset = TimeUtils.parseDuration(sortDateOffset).orElseThrow(IllegalArgumentException::new);
+        ESMediaScoreBuilder.sortDate.setOffset(TimeUtils.parseDuration(sortDateOffset).orElseThrow(IllegalArgumentException::new));
     }
 
     @ManagedAttribute
     @Override
     public double getSortDateDecay() {
-        return ESMediaScoreBuilder.sortDateDecay;
+        return ESMediaScoreBuilder.sortDate.getDecay();
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setSortDateDecay(double sortDateDecay) {
-        ESMediaScoreBuilder.sortDateDecay = sortDateDecay;
+        ESMediaScoreBuilder.sortDate.setDecay(sortDateDecay);
+    }
+
+    @ManagedAttribute
+    @Override
+    public double getSortDateGaussFactor() {
+        return ESMediaScoreBuilder.sortDate.getGaussFactor();
+    }
+
+    @ManagedAttribute
+    @Override
+    public void setSortDateGaussFactor(double sortDateFactorFactor) {
+        ESMediaScoreBuilder.sortDate.setGaussFactor(sortDateFactorFactor);
+    }
+
+    @ManagedAttribute
+    @Override
+    public double getSortDateGaussOffset() {
+        return ESMediaScoreBuilder.sortDate.getGaussOffset();
+    }
+
+    @ManagedAttribute
+    @Override
+    public void setSortDateGaussOffset(double sortDateFactorOffset) {
+        ESMediaScoreBuilder.sortDate.setGaussOffset(sortDateFactorOffset);
     }
 
     @ManagedAttribute
@@ -98,7 +122,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.locationBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setLocationBoost(float locationBoost) {
         ESMediaScoreBuilder.locationBoost = locationBoost;
@@ -110,7 +134,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.seriesBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setSeriesBoost(float seriesBoost) {
         ESMediaScoreBuilder.seriesBoost = seriesBoost;
@@ -122,7 +146,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.broadcastBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setBroadcastBoost(float broadcastBoost) {
         ESMediaScoreBuilder.broadcastBoost = broadcastBoost;
@@ -134,7 +158,7 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         return ESMediaScoreBuilder.maxBoost;
     }
 
-    @ManagedOperation
+    @ManagedAttribute
     @Override
     public void setMaxBoost(float maxBoost) {
         ESMediaScoreBuilder.maxBoost = maxBoost;
@@ -189,6 +213,12 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
                             break;
                         case "sortDate.offset":
                             setSortDateOffset(entry.getValue());
+                            break;
+                        case "sortDate.gaussFactor":
+                            setSortDateGaussFactor(Float.parseFloat(entry.getValue()));
+                            break;
+                        case "sortDate.gaussOffset":
+                            setSortDateGaussOffset(Float.parseFloat(entry.getValue()));
                             break;
                         default:
                             log.warn("Unrecognized entry {}", entry);

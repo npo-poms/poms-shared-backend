@@ -154,6 +154,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 }
             }
         }
+
         if (needsPostFilter) {
             List<SearchResultItem<? extends MediaObject>> filtered = new ArrayList<>();
             int correctTotal = 0;
@@ -671,8 +672,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             log.info("Read {} redirects from ES", redirects.size());
         }
         lastRedirectRead = Instant.now();
-
-
     }
 
 
