@@ -94,26 +94,26 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
 
     @ManagedAttribute
     @Override
-    public double getSortDateFactorFactor() {
-        return ESMediaScoreBuilder.sortDate.getFactorFactor();
+    public double getSortDateGaussFactor() {
+        return ESMediaScoreBuilder.sortDate.getGaussFactor();
     }
 
     @ManagedAttribute
     @Override
-    public void setSortDateFactorFactor(double sortDateFactorFactor) {
-        ESMediaScoreBuilder.sortDate.setFactorFactor(sortDateFactorFactor);
+    public void setSortDateGaussFactor(double sortDateFactorFactor) {
+        ESMediaScoreBuilder.sortDate.setGaussFactor(sortDateFactorFactor);
     }
 
     @ManagedAttribute
     @Override
-    public double getSortDateFactorOffset() {
-        return ESMediaScoreBuilder.sortDate.getFactorOffset();
+    public double getSortDateGaussOffset() {
+        return ESMediaScoreBuilder.sortDate.getGaussOffset();
     }
 
     @ManagedAttribute
     @Override
-    public void setSortDateFactorOffset(double sortDateFactorOffset) {
-        ESMediaScoreBuilder.sortDate.setFactorOffset(sortDateFactorOffset);
+    public void setSortDateGaussOffset(double sortDateFactorOffset) {
+        ESMediaScoreBuilder.sortDate.setGaussOffset(sortDateFactorOffset);
     }
 
     @ManagedAttribute
@@ -213,6 +213,12 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
                             break;
                         case "sortDate.offset":
                             setSortDateOffset(entry.getValue());
+                            break;
+                        case "sortDate.gaussFactor":
+                            setSortDateGaussFactor(Float.parseFloat(entry.getValue()));
+                            break;
+                        case "sortDate.gaussOffset":
+                            setSortDateGaussOffset(Float.parseFloat(entry.getValue()));
                             break;
                         default:
                             log.warn("Unrecognized entry {}", entry);

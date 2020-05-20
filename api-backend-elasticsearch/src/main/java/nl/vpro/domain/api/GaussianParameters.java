@@ -12,12 +12,22 @@ import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptType;
 
 /**
+ * We use a small variant of the decayDateGauss function of elasticsearch to boost down older search results.
+ *
+ * decayDateGauss is something like exp(-0.5*pow(valueExpl,2.0) + -1 * scale)
+ *
+ * We add to new parameters 'gaussFactor' and 'gaussOffset':
+ *
+ * gaussOffset + gaussFactor * exp(-0.5*pow(valueExpl,2.0) + -1 * scale)
+ *
+ * Like this we can ensure that we never boost things entirely to zero.
+ *
  * @author Michiel Meeuwissen
- * @since ...
+ * @since 5.12
  */
 @Getter
 @Setter
-public abstract class GausianParameters<T, S> {
+public abstract class GaussianParameters<T, S> {
 
     T scale;
 
@@ -25,20 +35,20 @@ public abstract class GausianParameters<T, S> {
 
     double decay = 0.5;
 
-    double factorOffset = 0.5;
+    double gaussOffset = 0.5;
 
-    double factorFactor = 0.7;
+    double gaussFactor = 0.7;
 
     final String field;
 
-    public GausianParameters(String field, T scale, T offset) {
+    public GaussianParameters(String field, T scale, T offset) {
         this.field = field;
         this.scale = scale;
         this.offset = offset;
     }
     public abstract Script asScript(S origin);
 
-    public static class Date extends GausianParameters<Duration, Instant> {
+    public static class Date extends GaussianParameters<Duration, Instant> {
 
         public Date(String field, Duration scale, Duration offset) {
             super(field, scale, offset);
@@ -53,11 +63,11 @@ public abstract class GausianParameters<T, S> {
             params.put("scale", scaleLong + "ms");
             params.put("offset", offsetLong + "ms");
             params.put("decay", decay);
-            params.put("factorOffset", factorOffset);
-            params.put("factorFactor", factorFactor);
+            params.put("gaussOffset", gaussOffset);
+            params.put("gaussFactor", gaussFactor);
             String value = "doc['" + field + "']";
 
-            Script script = new Script(ScriptType.INLINE, "painless", "params.factorFactor * (" + value +".size() == 0 ? 1 : decayDateGauss(params.origin, params.scale, params.offset, params.decay, " + value + ".value)) + params.factorOffset", params);
+            Script script = new Script(ScriptType.INLINE, "painless", "params.gaussFactor * (" + value +".size() == 0 ? 1 : decayDateGauss(params.origin, params.scale, params.offset, params.decay, " + value + ".value)) + params.gaussOffset", params);
             return script;
         }
     }

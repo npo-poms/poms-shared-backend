@@ -13,7 +13,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders;
 
-import nl.vpro.domain.api.GausianParameters;
+import nl.vpro.domain.api.GaussianParameters;
 import nl.vpro.domain.media.MediaType;
 
 import static org.elasticsearch.index.query.QueryBuilders.existsQuery;
@@ -26,7 +26,7 @@ import static org.elasticsearch.index.query.functionscore.ScoreFunctionBuilders.
  * @since 2.0
  */
 public class ESMediaScoreBuilder {
-    static GausianParameters<Duration, Instant> sortDate = new GausianParameters.Date("sortDate", Duration.ofDays(5 * 365), Duration.ofDays(7));
+    static GaussianParameters<Duration, Instant> sortDate = new GaussianParameters.Date("sortDate", Duration.ofDays(5 * 365), Duration.ofDays(7));
 
     static {
         sortDate.setDecay(0.5);
