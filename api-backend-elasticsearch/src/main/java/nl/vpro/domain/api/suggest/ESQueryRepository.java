@@ -44,7 +44,13 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     @Getter
     @Setter
+    @Value("${elasticSearch.query.ttl}")
     private Duration ttl  = Duration.ofDays(14);
+
+
+    @Value("${elasticSearch.query.readOnly}")
+    private boolean  readOnly;
+
 
     @Value("${elasticSearch.query.index}")
     public void setIndexName(
@@ -70,13 +76,17 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     }
 
     public void cleanSuggestions() {
-        BulkByScrollResponse response = new DeleteByQueryRequestBuilder(client(), DeleteByQueryAction.INSTANCE)
-            .filter(QueryBuilders.rangeQuery("sortDate")
-                .lte(Instant.now().minus(ttl).toEpochMilli()))
-            .source(indexNames.get(APIQUERIES))
-            .get();
+        if (! readOnly) {
+            BulkByScrollResponse response = new DeleteByQueryRequestBuilder(client(), DeleteByQueryAction.INSTANCE)
+                .filter(QueryBuilders.rangeQuery("sortDate")
+                    .lte(Instant.now().minus(ttl).toEpochMilli()))
+                .source(indexNames.get(APIQUERIES))
+                .get();
 
-        log.info("Deleted {}", response.getDeleted());
+            log.info("Deleted {}", response.getDeleted());
+        } else {
+            log.warn("Skipped wel configured read only");
+        }
     }
 
 
@@ -84,16 +94,21 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     @Override
     public void index(Query query) {
-        try {
-            client().prepareIndex()
-                .setIndex(getIndexName())
-                //.setOpType(DocWriteRequest.)
-                .setSource(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON)
-                .setId(query.getId())
-                .execute()
-                .actionGet();
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+        if (! readOnly) {
+
+            try {
+                client().prepareIndex()
+                    .setIndex(getIndexName())
+                    //.setOpType(DocWriteRequest.)
+                    .setSource(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON)
+                    .setId(query.getId())
+                    .execute()
+                    .actionGet();
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            log.warn("Skipped wel configured read only");
         }
     }
 
