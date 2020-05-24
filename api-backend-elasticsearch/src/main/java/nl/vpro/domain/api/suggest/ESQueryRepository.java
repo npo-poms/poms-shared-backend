@@ -85,7 +85,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
             log.info("Deleted {}", response.getDeleted());
         } else {
-            log.warn("Skipped wel configured read only");
+            log.warn("Skipped while configured read only");
         }
     }
 
@@ -108,7 +108,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
                 throw new RuntimeException(e);
             }
         } else {
-            log.warn("Skipped wel configured read only");
+            log.warn("Skipped while configured read only");
         }
     }
 
