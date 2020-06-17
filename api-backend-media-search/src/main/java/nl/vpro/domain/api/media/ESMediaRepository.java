@@ -533,7 +533,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         );
 
         log.debug("Found {} changes", i.getTotalSize());
-        ChangeIterator changes = new ChangeIterator(
+        Iterator<MediaChange> iterator = new ChangeIterator(
             i,
             since,
             currentProfile,
@@ -542,7 +542,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         );
 
 
-        Iterator<MediaChange> iterator = changes;
         if (since != null && mid != null) {
             PeekingIterator<MediaChange> peeking = Iterators.peekingIterator(iterator);
             iterator = peeking;
