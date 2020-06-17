@@ -48,7 +48,7 @@ import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
  * @since 2.0
  */
 @Slf4j
-@ManagedResource(objectName = "nl.vpro.api:name=esMediaRepository")
+@ManagedResource(objectName = "nl.vpro.api:name=ESMediaRepository")
 public class ESMediaRepository extends AbstractESMediaRepository implements MediaSearchRepository {
 
     private final String[] relatedFields;
