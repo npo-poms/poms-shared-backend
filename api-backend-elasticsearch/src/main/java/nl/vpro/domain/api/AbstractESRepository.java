@@ -126,7 +126,7 @@ public abstract class AbstractESRepository<T> {
     }
 
     @ManagedAttribute
-    public String setCommitDelayAsString() {
+    public String getCommitDelayAsString() {
         return String.valueOf(commitDelay);
     }
 
