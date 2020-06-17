@@ -17,6 +17,10 @@
       "type": "date",
       "format": "epoch_millis"
     },
+    "esPublishDate": {
+      "type": "date",
+      "format": "epoch_millis"
+    },
     "portal": {
       "properties": {
         "id": {
