@@ -497,15 +497,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         Order order,
         Integer max,
         Long keepAlive,
-        Deletes deletes) {
+        Deletes deletes,
+        Tail tail) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
-        final ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
-        final SearchRequestBuilder searchRequestBuilder =
-            i.prepareSearch(getIndexName())
-                .addSort("publishDate", SortOrder.valueOf(order.name()))
-                .addSort("mid", SortOrder.ASC);
 
 
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
@@ -518,9 +514,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             } else {
                 log.debug("Since is after commited changes window (before {}). Returing empty iterator.", changesUpto);
                 // This will result exactly nothing, so we return empty iterator immediately:
-                return CloseableIterator.empty();
+                return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
             }
         }
+        final ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
+        final SearchRequestBuilder searchRequestBuilder =
+            i.prepareSearch(getIndexName())
+                .addSort("publishDate", SortOrder.valueOf(order.name()))
+                .addSort("mid", SortOrder.ASC);
+
         searchRequestBuilder.setQuery(QueryBuilders.boolQuery()
             .must(restriction)
             .filter(QueryBuilders.existsQuery("publishDate"))
@@ -535,20 +537,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             keepAlive == null ? Long.MAX_VALUE : keepAlive
         );
 
+        Iterator<MediaChange> iterator = changes;
 
-        Iterator<MediaChange> iterator = TailAdder.withFunctions(changes, (last) -> {
-            if (last != null) {
-                throw new NoSuchElementException();
-            }
-            Instant se = changes.getPublishDate();
-            if (se != null) {
-                return MediaChange.tail(se);
-            } else {
-                return MediaChange.tail(Instant.now());
-            }
-        });
         if (since != null && mid != null) {
-            PeekingIterator<MediaChange> peeking = Iterators.peekingIterator(iterator);
+            PeekingIterator<MediaChange> peeking = Iterators.peekingIterator(changes);
             iterator = peeking;
             while(peeking.hasNext()) {
                 MediaChange peek = peeking.peek();
@@ -567,6 +559,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (deletes == null) {
             deletes = Deletes.ID_ONLY;
         }
+
         switch (deletes) {
             case INCLUDE:
                 break;
@@ -589,9 +582,24 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 };
                 break;
         }
+        Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
+
+        CloseableIterator<MediaChange> withTail = TailAdder.withFunctions(iterator, (last) -> {
+            if (actualTails == Tail.NEVER){
+                throw new NoSuchElementException();
+            }
+            if (last == null || actualTails == Tail.ALWAYS) {
+                return MediaChange.tail(changesUpto);
+            } else {
+                throw new NoSuchElementException();
+            }
+            }
+        );
+
+        CloseableIterator<MediaChange> result =  new MaxOffsetIterator<>(withTail, max, 0L, true);
+        return result;
 
 
-        return new MaxOffsetIterator<>(iterator, max, 0L, true);
     }
 
     private MediaChange of(
