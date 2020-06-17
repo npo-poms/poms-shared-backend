@@ -522,9 +522,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 long epoch = since.toEpochMilli();
                 restriction = restriction.from(epoch).includeLower(true);
             } else {
-                log.debug("Since is after commited changes window (before {}). Returing empty iterator.", changesUpto);
+                log.debug("Since is after commited changes window (before {}). Returning empty iterator.", changesUpto);
                 // This will result exactly nothing, so we return empty iterator immediately:
-                return CloseableIterator.empty();
+                return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
             }
         }
         searchRequestBuilder.setQuery(QueryBuilders.boolQuery()
@@ -542,17 +542,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         );
 
 
-        Iterator<MediaChange> iterator = TailAdder.withFunctions(changes, (last) -> {
-            if (last != null) {
-                throw new NoSuchElementException();
-            }
-            Instant se = changes.getPublishDate();
-            if (se != null) {
-                return MediaChange.tail(se);
-            } else {
-                return MediaChange.tail(Instant.now());
-            }
-        });
+        Iterator<MediaChange> iterator = changes;
         if (since != null && mid != null) {
             PeekingIterator<MediaChange> peeking = Iterators.peekingIterator(iterator);
             iterator = peeking;
@@ -596,8 +586,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 break;
         }
 
+        CloseableIterator<MediaChange> withTail = TailAdder.withFunctions(iterator, (last) -> {
+            if (last == null) {
+                return MediaChange.tail(changesUpto);
+            } else {
+                throw new NoSuchElementException();
+            }
+        });
 
-        return new MaxOffsetIterator<>(iterator, max, 0L, true);
+        return new MaxOffsetIterator<>(withTail, max, 0L, true);
     }
 
     private MediaChange of(
