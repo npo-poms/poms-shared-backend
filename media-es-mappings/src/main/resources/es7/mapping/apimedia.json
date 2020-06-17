@@ -742,6 +742,10 @@
       "type": "date",
       "format": "epoch_millis"
     },
+    "esPublishDate": {
+      "type": "date",
+      "format": "epoch_millis"
+    },
     "regions": {
       "type": "keyword"
     },

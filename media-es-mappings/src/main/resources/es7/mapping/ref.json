@@ -28,6 +28,10 @@
     },
     "objectType": {
       "type": "keyword"
+    },
+    "esPublishDate": {
+      "type": "date",
+      "format": "epoch_millis"
     }
   }
 }
