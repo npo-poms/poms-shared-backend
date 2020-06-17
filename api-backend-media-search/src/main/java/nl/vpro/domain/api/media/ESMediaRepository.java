@@ -584,22 +584,20 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
 
-        CloseableIterator<MediaChange> withTail = TailAdder.withFunctions(iterator, (last) -> {
-            if (actualTails == Tail.NEVER){
+        CloseableIterator<MediaChange> maxed =   new MaxOffsetIterator<>(iterator, max, 0L, true);
+        CloseableIterator<MediaChange> tailed =  TailAdder.withFunctions(maxed, (last) -> {
+            if (actualTails == Tail.NEVER) {
                 throw new NoSuchElementException();
             }
-            if (last == null || actualTails == Tail.ALWAYS) {
+            if (last == null) {
                 return MediaChange.tail(changesUpto);
+            } else if (tail == Tail.ALWAYS) {
+                return MediaChange.tail(last.asSince());
             } else {
                 throw new NoSuchElementException();
             }
-            }
-        );
-
-        CloseableIterator<MediaChange> result =  new MaxOffsetIterator<>(withTail, max, 0L, true);
-        return result;
-
-
+        });
+        return tailed;
     }
 
     private MediaChange of(
