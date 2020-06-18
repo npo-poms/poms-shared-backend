@@ -39,6 +39,7 @@ import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.elasticsearch7.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.media.domain.es.Common;
 import nl.vpro.util.*;
 
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
@@ -617,7 +618,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (version == -1) {
                 version = null;
             }
-            JsonNode esPublishDate= jsonNode.get("esPublishDate");
+            JsonNode esPublishDate= jsonNode.get(Common.ES_PUBLISH_DATE);
             return MediaChange.of(esPublishDate != null ? Instant.ofEpochMilli(esPublishDate.longValue()) : null, media, version);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
