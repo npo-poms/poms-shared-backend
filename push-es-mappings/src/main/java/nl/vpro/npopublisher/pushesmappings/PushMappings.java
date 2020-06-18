@@ -40,8 +40,10 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  *
  * Test
  * :  mvn  -Dhost=localhost:9221 -Dcluster=poms-test
+ * Dev
+ * : mvn -Dhost=localhost:9215 -Dcluster=poms-dev
  *  Production
- *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost:9209 -Dcluster=production
+ *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost:9209 -Dcluster=poms-prod
  *
  * @author Michiel Meeuwissen
  * @since 5.12
