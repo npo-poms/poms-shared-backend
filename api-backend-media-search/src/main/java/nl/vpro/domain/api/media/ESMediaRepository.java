@@ -521,6 +521,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             }
         }
         final ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
+        i.setVersion(true);
         final SearchRequestBuilder searchRequestBuilder =
             i.prepareSearch(getIndexName())
                 .addSort("publishDate", SortOrder.valueOf(order.name()))
