@@ -28,6 +28,7 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.PeekingIterator;
 
@@ -37,6 +38,7 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.elasticsearch7.ElasticSearchIterator;
+import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.*;
 
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
@@ -289,7 +291,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     protected MediaObject getMediaObject(
         @NonNull SearchHit hit) {
         try {
-            return getObject(hit, MediaObject.class);
+            return getObject(Jackson2Mapper.getLenientInstance().readTree(hit.getSourceRef().toBytesRef().bytes), MediaObject.class);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -603,7 +605,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     private MediaChange of(
         @NonNull SearchHit hit) {
         try {
-            MediaObject media = getObject(hit, MediaObject.class);
+            byte[] source = hit.getSourceRef().toBytesRef().bytes;
+            JsonNode jsonNode = Jackson2Mapper.getLenientInstance().readTree(source);
+            MediaObject media = getObject(jsonNode, MediaObject.class);
+
             if (media == null) {
                 log.warn("No media found in {}", hit);
                 return null;
@@ -612,7 +617,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (version == -1) {
                 version = null;
             }
-            return MediaChange.of(media, version);
+            JsonNode esPublishDate= jsonNode.get("esPublishDate");
+            return MediaChange.of(esPublishDate != null ? Instant.ofEpochMilli(esPublishDate.longValue()) : null, media, version);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
