@@ -44,7 +44,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     private static final int MAXRESULT = 100;
 
-    private final MediaRepository esMediaRepository;
+    private final Redirector mediaRedirector;
 
     private final MediaScoreManager scoreManager;
 
@@ -72,9 +72,10 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Inject
     public ESScheduleRepository(
         ESClientFactory client,
-        MediaRepository esMediaRepository, MediaScoreManager scoreManager) {
+        Redirector mediaRedirector,
+        MediaScoreManager scoreManager) {
         super(client);
-        this.esMediaRepository = esMediaRepository;
+        this.mediaRedirector = mediaRedirector;
         this.scoreManager = scoreManager;
     }
 
@@ -107,7 +108,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     @Override
     public RedirectList redirects() {
-        return esMediaRepository.redirects();
+        return mediaRedirector.redirects();
     }
 
 
