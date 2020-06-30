@@ -1121,8 +1121,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         Group group = index(season().mid("MID_0"));
         index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf(group, 2));
         index(broadcast().mid("MID_2").episodeOf(group, 1));
-        index(broadcast().mid("MID_3").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(ZONE_ID).toInstant()).build()));
-        index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().group(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(ZONE_ID).toInstant()).build()));
+        index(broadcast().mid("MID_3").episodeOf(MemberRef.builder().parent(group).number(3).added(LocalDate.of(2017, 7, 12).atStartOfDay(ZONE_ID).toInstant()).build()));
+        index(broadcast().mid("MID_4").episodeOf(MemberRef.builder().parent(group).number(3).added(LocalDate.of(2017, 7, 11).atStartOfDay(ZONE_ID).toInstant()).build()));
         index(broadcast().mid("MID_5").episodeOf(group, 4));
 
         {
@@ -2192,7 +2192,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             assertThat(object.getMidRef()).isNotEmpty();
             IndexResponse indexResponse = client.index(
                 new IndexRequest(indexName)
-                    .id(ref.getId())
+                    .id(ref.getId().toString())
                     .source(bytes, XContentType.JSON)
                     .routing(object.getMidRef())
                 //.parent(object.getMidRef()))
