@@ -908,7 +908,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             AbstractESRepositoryITest.client
                 .index(
                 new IndexRequest(indexNames.get(ApiRefsIndex.APIMEDIA_REFS))
-                    .id(ref.getId())
+                    .id(ref.getId().toString())
                     .routing(ref.getMidRef())
                     .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref), XContentType.JSON)
             ).get();
