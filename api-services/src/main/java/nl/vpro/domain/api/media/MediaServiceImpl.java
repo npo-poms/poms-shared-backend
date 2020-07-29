@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -210,7 +211,7 @@ public class MediaServiceImpl implements MediaService {
             filter = getProfile(profile);
         }
         if (form != null) {
-            filter = filter.and(form);
+            filter = filter == null ? form : filter.and(form);
         }
         List<SearchResultItem<? extends MediaObject>> filtered = mediaObjects.stream()
             .filter(filter)
@@ -241,6 +242,7 @@ public class MediaServiceImpl implements MediaService {
 
     }
 
+    @Nullable
     private ProfileDefinition<MediaObject> getProfile(String profile) {
         if (profile == null || "".equals(profile) // handy for scripting (profile=$2 and so on...)
             ) {
