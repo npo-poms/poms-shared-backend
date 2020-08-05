@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>5.14-SNAPSHOT</version>
+    <version>5.14.0</version>
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
@@ -21,8 +21,8 @@
   </properties>
 
   <scm>
-    <connection>scm:git:git@git.vpro.nl:npo/poms-shared-backend.git</connection>
-    <developerConnection>scm:git:git@git.vpro.nl:npo/poms-shared-backend.git</developerConnection>
+    <connection>scm:git:https://git.vpro.nl/npo/poms-shared-backend.git</connection>
+    <developerConnection>scm:git:https://git.vpro.nl/npo/poms-shared-backend.git</developerConnection>
     <url>https://git.vpro.nl/npo/poms-shared-backend</url>
   </scm>
 
@@ -34,8 +34,6 @@
     <module>pages-es-mappings</module>
     <module>query-es-mappings</module>
     <module>push-es-mappings</module>
-
-
   </modules>
 
   <dependencies>
