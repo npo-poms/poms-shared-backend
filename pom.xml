@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>5.14-SNAPSHOT</version>
+  <version>5.15-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
@@ -24,6 +24,7 @@
     <connection>scm:git:https://git.vpro.nl/npo/poms-shared-backend.git</connection>
     <developerConnection>scm:git:https://git.vpro.nl/npo/poms-shared-backend.git</developerConnection>
     <url>https://git.vpro.nl/npo/poms-shared-backend</url>
+    <tag>HEAD</tag>
   </scm>
 
   <modules>
