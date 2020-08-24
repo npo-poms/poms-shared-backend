@@ -509,7 +509,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
         final Instant changesUpto = Instant.now().minus(getCommitDelay());
-        RangeQueryBuilder restriction = QueryBuilders.rangeQuery("publishDate").to(changesUpto.toEpochMilli());
+        RangeQueryBuilder restriction = QueryBuilders.rangeQuery(Common.ES_PUBLISH_DATE).to(changesUpto.toEpochMilli());
         if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
             if (since.isBefore(changesUpto)) {
                 long epoch = since.toEpochMilli();
@@ -524,15 +524,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         i.setVersion(true);
         final SearchRequestBuilder searchRequestBuilder =
             i.prepareSearch(getIndexName())
-                .addSort("publishDate", SortOrder.valueOf(order.name()))
+                .addSort(Common.ES_PUBLISH_DATE, SortOrder.valueOf(order.name()))
                 .addSort("mid", SortOrder.ASC);
 
         searchRequestBuilder.setQuery(QueryBuilders.boolQuery()
             .must(restriction)
-            .filter(QueryBuilders.existsQuery("publishDate"))
+            .filter(QueryBuilders.existsQuery(Common.ES_PUBLISH_DATE))
         );
 
-        log.debug("Found {} changes", i.getTotalSize());
+        if (log.isDebugEnabled()) {
+            log.debug("Found {} changes", i.getTotalSize());
+        }
         ChangeIterator changes = new ChangeIterator(
             i,
             since,
