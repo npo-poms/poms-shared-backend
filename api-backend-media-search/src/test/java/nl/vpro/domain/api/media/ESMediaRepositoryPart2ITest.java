@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,9 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.junit.jupiter.api.*;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
@@ -32,6 +36,7 @@ import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.ApiRefsIndex;
+import nl.vpro.media.domain.es.Common;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.FacetResults.toSimpleMap;
@@ -896,12 +901,17 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         if (! PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
              builder.workflow(Workflow.PUBLISHED);
         }
+
         T object = builder.build();
+
+        Consumer<ObjectNode> addPublishdate = addPublishDate(object.getLastPublishedInstant());
+
         AbstractESRepositoryITest.client
+
             .index(
                 new IndexRequest(indexNames.get(APIMEDIA))
                     .id(object.getMid())
-                    .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object), XContentType.JSON)
+                    .source(map(object, addPublishdate), XContentType.JSON)
             ).get();
         for (MemberRef r : object.getMemberOf()) {
             StandaloneMemberRef ref = StandaloneMemberRef.builder().memberRef(r).build();
@@ -910,7 +920,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 new IndexRequest(indexNames.get(ApiRefsIndex.APIMEDIA_REFS))
                     .id(ref.getId().toString())
                     .routing(ref.getMidRef())
-                    .source(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref), XContentType.JSON)
+                    .source(map(ref, addPublishdate), XContentType.JSON)
             ).get();
         }
         indexed.add(object);
@@ -942,6 +952,16 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
         return object;
+    }
+
+    static byte[] map(Object obj, Consumer<ObjectNode> consumer) throws JsonProcessingException {
+        ObjectNode jsonNode = Jackson2Mapper.getPublisherInstance().valueToTree(obj);
+        consumer.accept(jsonNode);;
+        return Jackson2Mapper.getPublisherInstance().writeValueAsBytes(jsonNode);
+
+    }
+    static Consumer<ObjectNode> addPublishDate(Instant now){
+        return (jsonNode) -> jsonNode.put(Common.ES_PUBLISH_DATE, now.toEpochMilli());
     }
 
 
