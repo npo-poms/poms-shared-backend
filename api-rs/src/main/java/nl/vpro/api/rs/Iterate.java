@@ -6,6 +6,7 @@ import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.ws.rs.core.*;
@@ -27,7 +28,8 @@ import nl.vpro.util.ThreadPools;
 @Slf4j
 public class Iterate {
 
-    public static <T> Response streamingJson(Function<JsonGenerator, CloseableIterator<T>> creator, JsonConsumer<T> streamer) throws Exception {
+    @SafeVarargs
+    public static <T> Response streamingJson(Function<JsonGenerator, CloseableIterator<T>> creator, JsonConsumer<T> streamer, Consumer<Response.ResponseBuilder>... responseBuilderConsumer) throws Exception {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
@@ -56,12 +58,13 @@ public class Iterate {
             SecurityContextHolder.clearContext();
         });
 
-        return Response.ok()
+        Response.ResponseBuilder builder =  Response.ok()
             .type(MediaType.APPLICATION_JSON_TYPE)
-            .entity(streamingOutput)
-            .build();
-
-
+            .entity(streamingOutput);
+        for (Consumer<Response.ResponseBuilder> c : responseBuilderConsumer) {
+            c.accept(builder);
+        }
+        return builder.build();
     }
 
 
