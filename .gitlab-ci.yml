@@ -6,7 +6,3 @@ include:
 stages:
   - develop
   - integrate
-  - package
-  - test
-  - accept
-  - release
