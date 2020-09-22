@@ -1,7 +1,5 @@
 stages:
   - .pre
-  - develop
-  - integrate
   - .post
 
 include:
