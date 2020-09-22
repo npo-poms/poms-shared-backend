@@ -1,8 +1,8 @@
-stages:
-  - develop
-  - integrate
-
 include:
   - project: 'npo/gitlab-templates'
     ref: master
     file: 'java_maven_openshift.yml'
+
+stages:
+  - develop
+  - integrate
