@@ -1,6 +1,8 @@
 stages:
+  - .pre
   - develop
   - integrate
+  - .post
 
 include:
   - project: 'npo/gitlab-templates'
