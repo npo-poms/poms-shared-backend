@@ -54,7 +54,7 @@ public class GTAAKeysRepositoryImpl implements GTAAKeysRepository {
     }
 
     private  Properties getProperties(@NonNull Resource inputStream) {
-        Properties props = new Properties();
+        final Properties props = new Properties();
         try {
             if (inputStream.exists()) {
                 if (inputStream.isReadable()) {
@@ -66,7 +66,7 @@ public class GTAAKeysRepositoryImpl implements GTAAKeysRepository {
                 log.info("{} does not exist", inputStream);
             }
         } catch (IOException e) {
-            log.error("Failed to load properties file: {} {}", e.getClass().getName(), e.getMessage(), e);
+            log.error("Failed to load properties file {}: {} {}", inputStream, e.getClass().getName(), e.getMessage(), e);
         }
 
         return props;
