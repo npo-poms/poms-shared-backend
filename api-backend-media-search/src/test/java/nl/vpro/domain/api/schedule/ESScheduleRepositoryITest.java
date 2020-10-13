@@ -25,6 +25,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import static nl.vpro.domain.media.MediaBuilder.program;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Slf4j
 public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
@@ -381,6 +382,29 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         ScheduleForm form = JAXB.unmarshal(new StringReader(example), ScheduleForm.class);
         ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
         assertThat(schedules).hasSize(1);
+    }
+
+    @Test
+    public void illegalIfMoreScheduleEvents() {
+        ScheduleForm form = ScheduleForm.from(
+            MediaForm.builder()
+                .scheduleEvents(
+                    ScheduleEventSearch.builder()
+                        .begin(date("2016-07-08T00:00:00"))
+                        .end(date("2016-07-09T00:00:00"))
+                        .rerun(true)
+                        .build(),
+                    ScheduleEventSearch.builder()
+                        .begin(date("2017-07-08T00:00:00"))
+                        .end(date("2017-07-09T00:00:00"))
+                        .rerun(true)
+                        .build()
+                ).build());
+        assertThatThrownBy(() -> {
+            repository.findSchedules(null, form, 0L, 10);
+        }).isInstanceOf(IllegalArgumentException.class)
+            .hasMessageFindingMatch(".+");
+
     }
 
     private ScheduleEvent event(Channel c, String start, Duration duration) {
