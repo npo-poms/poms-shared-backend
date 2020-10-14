@@ -350,7 +350,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         Schedule schedule;
         List<ScheduleEventSearch> scheduleEventSearches = form.getSearches() == null ? null : form.getSearches().getScheduleEvents();
         if (scheduleEventSearches != null && scheduleEventSearches.size() > 1) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("It is impossible to create a schedule from more then one constraint on schedule event. Please search on media in stead.");
         }
         ScheduleEventSearch scheduleEventSearch = scheduleEventSearches != null && ! scheduleEventSearches.isEmpty() ? scheduleEventSearches.get(0) : null;
         if (scheduleEventSearch != null) {
