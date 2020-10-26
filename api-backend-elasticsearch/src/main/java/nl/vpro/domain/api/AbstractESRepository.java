@@ -68,7 +68,7 @@ public abstract class AbstractESRepository<T> {
 
     @Getter
     @Setter
-    protected Duration commitDelay = Duration.ofSeconds(10);
+    protected Duration commitDelay = Duration.ofSeconds(30);
 
 
     protected AbstractESRepository(
