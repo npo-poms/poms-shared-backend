@@ -1,4 +1,4 @@
-package nl.vpro.domain.api;
+ package nl.vpro.domain.api;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,8 +17,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.get.*;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
+import org.elasticsearch.client.*;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -38,7 +39,7 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.ESClientFactory;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
 import nl.vpro.util.TimeUtils;
@@ -53,7 +54,7 @@ public abstract class AbstractESRepository<T> {
     protected final Logger log = LoggerFactory.getLogger(getClass().getName());
     protected final Logger LOG_ERRORS = LoggerFactory.getLogger(getClass().getName() + ".ERRORS");
 
-    protected final ESClientFactory factory;
+    protected final HighLevelClientFactory factory;
 
     @Getter
     @Setter
@@ -72,7 +73,7 @@ public abstract class AbstractESRepository<T> {
 
 
     protected AbstractESRepository(
-        @NotNull ESClientFactory factory) {
+        @NotNull HighLevelClientFactory factory) {
         this.factory = factory;
         if (this.factory == null) {
             throw new IllegalArgumentException("The ES client factory cannot be null");
@@ -89,6 +90,8 @@ public abstract class AbstractESRepository<T> {
             ThreadPools.backgroundExecutor.execute(() -> {
                 try {
                     if (indexName != null) {
+                        SearchRequest searchRequest = new SearchRequest(indexName);
+
                         SearchResponse response = client()
                             .prepareSearch(indexName)
                             //.setTypes(getRelevantTypes())
@@ -137,9 +140,11 @@ public abstract class AbstractESRepository<T> {
     }
 
 
-    protected final Client client() {
-        return factory.client(getClass());
+    protected final RestHighLevelClient client() {
+        return factory.client(getClass().getName());
     }
+
+
 
     protected abstract ElasticSearchIndex getIndex(String id, Class<?> clazz);
 
@@ -157,7 +162,7 @@ public abstract class AbstractESRepository<T> {
             MultiGetRequest getRequest =
                 new MultiGetRequest();
             getRequest.add(getIndexName(id, clazz), id);
-            ActionFuture<MultiGetResponse> future = client().multiGet(getRequest);
+            ActionFuture<MultiGetResponse> future = client().mget(getRequest);
             MultiGetResponse response = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
             for (MultiGetItemResponse r : response.getResponses()) {
                 if (! r.isFailed() && r.getResponse().isExists()) {
@@ -192,7 +197,8 @@ public abstract class AbstractESRepository<T> {
         @NonNull String id,
         @NonNull Class<T> clazz,
         @NonNull String indexName) {
-        ActionFuture<GetResponse> all = client().prepareGet(indexName, "_all", id).execute();
+        GetRequest getRequest = new GetRequest(indexName, id);
+        ActionFuture<GetResponse> all = client().getAsync(getRequest, RequestOptions.DEFAULT);
         CompletableFuture<GetResponse> reponseFuture = ESUtils.fromActionFuture(all);
 
         return reponseFuture.thenApply(r -> transformResponse(r, clazz));
@@ -216,7 +222,7 @@ public abstract class AbstractESRepository<T> {
             }
             ActionFuture<MultiGetResponse> future =
                 client()
-                    .multiGet(request);
+                    .mget(request);
 
             MultiGetResponse responses = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
             if (responses == null || !responses.iterator().hasNext()) {

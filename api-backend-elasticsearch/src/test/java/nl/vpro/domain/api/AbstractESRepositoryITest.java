@@ -17,6 +17,7 @@ import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.transport.NoNodeAvailableException;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -32,8 +33,8 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.IndexHelper;
-import nl.vpro.elasticsearch7.TransportClientFactory;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -52,7 +53,7 @@ public abstract class AbstractESRepositoryITest {
     protected static final  Map<ElasticSearchIndex, String> indexNames = new HashMap<>();
     protected static boolean firstRun = true;
 
-    protected static Client client;
+    protected static RestHighLevelClient client;
 
     static {
         log.info("JAVAPORT " + System.getProperty("integ.java.port"));
@@ -60,7 +61,7 @@ public abstract class AbstractESRepositoryITest {
     }
 
     @Inject
-    protected TransportClientFactory clientFactory;
+    protected HighLevelClientFactory clientFactory;
 
 
     @Inject

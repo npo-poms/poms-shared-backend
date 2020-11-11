@@ -22,10 +22,8 @@ import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuil
 import org.elasticsearch.search.aggregations.bucket.range.RangeAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.IncludeExclude;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.meeuw.functional.TriFunction;
 
-import nl.vpro.util.TriFunction;
-
-;
 
 /**
  * @author Roelof Jan Koekoek
@@ -43,7 +41,7 @@ public abstract class ESFacetsBuilder {
 
     public static final String NESTED_POSTFIX = "_nested";
 
-    protected static <T extends AbstractSearch> TermsAggregationBuilder addFacet(
+    protected static <T extends AbstractSearch<?>> TermsAggregationBuilder addFacet(
         @NonNull String prefix,
         @NonNull  FilterAggregationBuilder rootAggregation,
         @NonNull  String fieldName,
@@ -210,7 +208,7 @@ public abstract class ESFacetsBuilder {
         }
     }
 
-     protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
+     protected static <F extends AbstractSearch<?>, S extends AbstractSearch<?>> void  addNestedAggregation(
          @NonNull String prefix,
          @NonNull FilterAggregationBuilder rootAggregation,
          @NonNull String nestedObject,
@@ -231,7 +229,7 @@ public abstract class ESFacetsBuilder {
         );
      }
 
-    protected static <F extends AbstractSearch, S extends AbstractSearch> void  addNestedAggregation(
+    protected static <F extends AbstractSearch<?>, S extends AbstractSearch<?>> void  addNestedAggregation(
         @NonNull String prefix,
         @NonNull FilterAggregationBuilder rootAggregation,
         @NonNull String nestedObject,
@@ -396,7 +394,7 @@ public abstract class ESFacetsBuilder {
         return nestField + "." + fieldName;
     }
 
-    public static String getName(Facet facet, String nestedObject, String facetField) {
+    public static String getName(Facet<?> facet, String nestedObject, String facetField) {
         return facet instanceof Nameable ? ((Nameable) facet).getName() : getNestedFieldName(nestedObject, facetField);
     }
 

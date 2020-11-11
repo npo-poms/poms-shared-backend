@@ -1,8 +1,8 @@
 package nl.vpro.domain.api.suggest;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
@@ -10,9 +10,15 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.*;
@@ -26,7 +32,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.ESClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
 
@@ -62,8 +67,8 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         return indexNames.get(APIQUERIES);
     }
 
-    @Autowired
-    public ESQueryRepository(ESClientFactory client) {
+
+    public ESQueryRepository(@Autowired HighLevelClientFactory client) {
         super(client);
         ThreadPools.backgroundExecutor.scheduleWithFixedDelay(this::cleanSuggestions,
             0, cleanInterval.toMillis(), TimeUnit.MILLISECONDS );
@@ -77,6 +82,13 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     public void cleanSuggestions() {
         if (! readOnly) {
+
+            SearchRequest searchRequest = new SearchRequest(indexNames.get(APIQUERIES));
+            searchRequest.source(
+                QueryBuilders.rangeQuery("sortDate")
+                .lte(Instant.now().minus(ttl).toEpochMilli()));
+            DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(searchRequest);
+            client().deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
             BulkByScrollResponse response = new DeleteByQueryRequestBuilder(client(), DeleteByQueryAction.INSTANCE)
                 .filter(QueryBuilders.rangeQuery("sortDate")
                     .lte(Instant.now().minus(ttl).toEpochMilli()))
@@ -97,14 +109,13 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         if (! readOnly) {
 
             try {
-                client().prepareIndex()
-                    .setIndex(getIndexName())
-                    //.setOpType(DocWriteRequest.)
-                    .setSource(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON)
-                    .setId(query.getId())
-                    .execute()
-                    .actionGet();
-            } catch (JsonProcessingException e) {
+                IndexRequest indexRequest = new IndexRequest(getIndexName());
+                indexRequest.id(query.getId());
+                indexRequest.source(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON);
+
+                IndexResponse response  = client().index(indexRequest, RequestOptions.DEFAULT);
+                log.info("indexed {}", response);
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
@@ -113,14 +124,12 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     }
 
     @Override
+    @SneakyThrows(IOException.class)
     public SuggestResult suggest(String input, String profile, Integer max) {
-        SearchResponse searchResponse = client().prepareSearch(getIndexName())
-            .suggest(
-                suggestBuilder(Query.queryId(input, profile), profile, max)
-            )
-            .execute()
-            .actionGet();
+        SearchRequest searchRequest = new SearchRequest(getIndexName());
+        searchRequest.source(suggestBuilder(Query.queryId(input, profile), profile, max));
 
+        SearchResponse searchResponse = client().search(searchRequest, RequestOptions.DEFAULT);
         Suggest suggest = searchResponse.getSuggest();
         return adapt(suggest, input, profile);
     }

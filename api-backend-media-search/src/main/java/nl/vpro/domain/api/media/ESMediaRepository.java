@@ -36,8 +36,8 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.elasticsearch7.ESClientFactory;
-import nl.vpro.elasticsearch7.ElasticSearchIterator;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.Common;
 import nl.vpro.util.*;
@@ -67,7 +67,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     private final MediaScoreManager scoreManager;
 
-    public ESMediaRepository(ESClientFactory client, String relatedFields, MediaScoreManager scoreManager) {
+    public ESMediaRepository(HighLevelClientFactory client, String relatedFields, MediaScoreManager scoreManager) {
         super(client);
         this.relatedFields = StringUtils.isBlank(relatedFields) ? new String[0] : relatedFields.split(",");
         this.scoreManager = scoreManager;
@@ -428,7 +428,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             total = response.getHits().getTotalHits();
         } else {
             mids = new ArrayList<>();
-            try (ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client(), (sh) -> (String) sh.getSourceAsMap().get("childRef"))) {
+            try (ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client().getLowLevelClient(), (sh) -> (String) sh.getSourceAsMap().get("childRef"))) {
                 SearchRequestBuilder builder = iterator.prepareSearch(getRefsIndexName());
                 listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
                 iterator.forEachRemaining(mids::add);
@@ -646,7 +646,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public CloseableIterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
-        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject);
+        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<MediaObject>(client().getLowLevelClient(), this::getMediaObject);
 
         SearchRequestBuilder builder = i.prepareSearch(getIndexName());
         ESMediaSortHandler.sort(form, null, builder::addSort);

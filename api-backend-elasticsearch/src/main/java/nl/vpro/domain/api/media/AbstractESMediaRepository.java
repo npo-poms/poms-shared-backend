@@ -3,19 +3,21 @@ package nl.vpro.domain.api.media;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.Null;
 
+import org.apache.http.client.config.RequestConfig;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
@@ -32,8 +34,8 @@ import nl.vpro.domain.media.MediaLoader;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.ESClientFactory;
-import nl.vpro.elasticsearch7.IndexHelper;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.util.TimeUtils;
 
@@ -53,11 +55,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     private final IndexHelper refsHelper;
 
 
-    protected AbstractESMediaRepository(ESClientFactory client) {
+    protected AbstractESMediaRepository(HighLevelClientFactory client) {
         super(client);
         this.helper = IndexHelper.builder()
             .log(log)
-            .client(client)
+            .client(client.client())
             .settings(APIMEDIA.settings())
             .mappings(APIMEDIA.mappingsAsMap())
             .build();
@@ -265,15 +267,15 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable MediaFacets facets,
         long offset,
         @Nullable Integer max,
-        @NonNull Class<S> clazz) {
-        ActionFuture<SearchResponse> searchResponseFuture = client()
-            .search(request.getRequest())
-            ;
+        @NonNull Class<S> clazz) throws IOException {
+        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+
+        builder.setRequestConfig(RequestConfig.custom().setConnectionRequestTimeout((int) timeOut.toMillis()).build());
+
+
 
         try {
-            SearchResponse response = searchResponseFuture
-                .actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS)
-                ;
+            SearchResponse response  = client().search(request.getRequest(), builder.build());
             SearchHits hits = response.getHits();
 
             Duration took = Duration.ofMillis(response.getTook().getMillis());
@@ -293,8 +295,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             String detail = e.getDetailedMessage();
             log.warn(e.getMessage() + ":" + detail);
             throw e;
-        } catch (SearchPhaseExecutionException ee) {
-            throw ee;
         }
     }
 
