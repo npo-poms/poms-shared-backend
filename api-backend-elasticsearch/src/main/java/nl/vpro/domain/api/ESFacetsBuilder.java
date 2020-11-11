@@ -137,9 +137,8 @@ public abstract class ESFacetsBuilder {
                             .dateHistogram(name)
                             .dateHistogramInterval(from(dateRange.getInterval()))
                             .field(prefix + fieldName)
-                            .format(FORMATTER_PATTERN + "'/" + format.replaceAll("'", "''") + "'")
+                            .format(format)
                             .keyed(false)
-                            .timeZone(Schedule.ZONE_ID)
                             .minDocCount(1)
                             ;
                         rootAggregation.subAggregation(histogramAggregationBuilder);
