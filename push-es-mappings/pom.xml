@@ -13,7 +13,9 @@
 
   <properties>
     <host>http://localhost:9215</host>
-    <cluster>elasticsearch</cluster>
+    <cluster></cluster>
+    <user>elasticsearch</user>
+    <password>***</password>
   </properties>
 
   <dependencies>
@@ -42,6 +44,11 @@
       <groupId>nl.vpro.poms</groupId>
       <artifactId>query-es-mappings</artifactId>
     </dependency>
+    <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+      <version>4.5.2</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -61,8 +68,14 @@
         <configuration>
           <mainClass>nl.vpro.npopublisher.pushesmappings.PushMappings</mainClass>
           <arguments>
+            <argument>--host</argument>
             <argument>${host}</argument>
+            <argument>--cluster</argument>
             <argument>${cluster}</argument>
+            <argument>--user</argument>
+            <argument>${user}</argument>
+            <argument>--password</argument>
+            <argument>${password}</argument>
           </arguments>
         </configuration>
       </plugin>

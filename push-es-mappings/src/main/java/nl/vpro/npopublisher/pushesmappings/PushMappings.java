@@ -1,8 +1,11 @@
 package nl.vpro.npopublisher.pushesmappings;
 
 import lombok.extern.slf4j.Slf4j;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
@@ -45,43 +48,120 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  *  Production
  *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost:9209 -Dcluster=poms-prod
  *
+ *  You can also just run it from Intellij.
+ *
  * @author Michiel Meeuwissen
  * @since 5.12
  */
+@SuppressWarnings("FieldMayBeFinal")
 @Slf4j
-public class PushMappings {
+public class PushMappings implements Callable<Integer> {
 
-    public static void main(String[] argv) throws InterruptedException {
 
-        String host = "http://localhost:9200";
-        if (argv.length > 0) {
-            host = argv[0];
-        }
-        ClientElasticSearchFactory factory = new ClientElasticSearchFactory();
+    @Option(names = {"-h", "--host"}, description = "host for elastisearch")
+    private String host = "localhost";
 
-        factory.setUnicastHosts(host);
-        if (argv.length > 1) {
-            if (argv[1].length() > 0) {
-                factory.setClusterName(argv[1]);
-                log.info("Cluster name {}", argv[1]);
+    @Option(names = {"-u", "--user"})
+    private String username = null;
+
+    @Option(names = {"-p", "--password"})
+    private String password = null;
+
+    @Option(names = {"-c", "--cluster"})
+    private String cluster  = null;
+
+    @Option(names = {"-r", "--force-replicas"})
+    private Integer forceReplicas  = null;
+
+    @Option(names = {"-o", "--only"})
+    private String only  = "^.*$";
+
+
+    public static void main(String[] argv) {
+        int exitCode = new CommandLine(new PushMappings()).execute(argv);
+        System.exit(exitCode);
+    }
+
+    @Override
+    public Integer call() throws Exception {
+        try (ClientElasticSearchFactory factory = new ClientElasticSearchFactory()) {
+            factory.setUnicastHosts(host);
+            if (cluster != null) {
+                factory.setClusterName(cluster);
+                log.info("Cluster name {}", cluster);
+            }
+            factory.setBasicUser(username);
+            factory.setBasicPassword(password);
+
+            waitForHealth(factory);
+
+            Pattern onlyPattern = Pattern.compile(only);
+
+            for (ElasticSearchIndex elasticSearchIndex : getIndices()) {
+                if (! onlyPattern.matcher(elasticSearchIndex.getIndexName()).matches()) {
+                    log.info("Skipping {}", elasticSearchIndex.getIndexName());
+                    continue;
+                }
+                pushMapping(factory, elasticSearchIndex);
             }
         }
+        return 0;
+    }
 
-        final Integer forceReplicas;
-        {
-            // for testing on localhost you may want to set this to 0, and create a green cluster with only one node.
-            Integer prop = null;
-            if (argv.length > 2) {
-                prop = Integer.parseInt(argv[2]);
+
+
+    protected  void pushMapping(ClientElasticSearchFactory factory, ElasticSearchIndex elasticSearchIndex ) {
+        try {
+            IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
+
+            // Try to created the index if it didn't exist already
+            boolean created = helper.createIndexIfNotExists(CreateIndex.builder()
+                .useNumberPostfix(true)
+                .forReindex(true) // no replicas, very long refresh
+                .build());
+
+            if (! created) {
+                // the index existed already, so simply reput the settings
+                // and prepare the index for actual usage
+                log.info("{} : {}", elasticSearchIndex, helper.count());
+                helper.reputSettings((settings) -> {
+                    if (forceReplicas != null) {
+                        ObjectNode index = settings.with("settings").with("index");
+                        index.put("number_of_replicas", forceReplicas);
+                    }
+                });
+                helper.reputMappings();
             }
-            forceReplicas = prop;
-        }
+        } catch (Exception e) {
+            log.error(e.getMessage());
 
+        }
+    }
+
+    protected List<ElasticSearchIndex> getIndices() {
+        List<ElasticSearchIndex> desired = new ArrayList<>(Arrays.asList(
+            APIMEDIA,
+            APIMEDIA_REFS,
+            APIPAGES,
+            PAGEUPDATES,
+            APIQUERIES,
+            APIPAGEQUERIES
+        ));
+        desired.addAll(ApiCueIndex.getInstances());
+        return desired;
+    }
+
+
+    protected void waitForHealth(ClientElasticSearchFactory factory) throws InterruptedException {
         while (true) {
             try {
                 Request request  = new Request("GET", "/_cat/health");
-                request.setOptions(request.getOptions().toBuilder().addHeader("accept", "application/json"));
-                Response response = factory.client(PushMappings.class).performRequest(request);
+                request.setOptions(request.getOptions()
+                    .toBuilder()
+                    .addHeader("accept", "application/json"));
+                Response response = factory
+                    .client(PushMappings.class)
+                    .performRequest(request);
                 ArrayNode health = Jackson2Mapper.getLenientInstance().readerFor(ArrayNode.class).readValue(response.getEntity().getContent());
 
                 String status  = health.get(0).get("status").textValue();
@@ -95,55 +175,5 @@ public class PushMappings {
             }
             TimeUnit.SECONDS.sleep(2);
         }
-
-        Pattern only = Pattern.compile("^.*$");
-        //Pattern only = Pattern.compile("^pageupdates.*$");
-        try {
-
-            List<ElasticSearchIndex> desired = new ArrayList<>(Arrays.asList(
-                APIMEDIA,
-                APIMEDIA_REFS,
-                APIPAGES,
-                PAGEUPDATES,
-                APIQUERIES,
-                APIPAGEQUERIES
-            ));
-            desired.addAll(ApiCueIndex.getInstances());
-
-            for (ElasticSearchIndex elasticSearchIndex : desired) {
-                if (! only.matcher(elasticSearchIndex.getIndexName()).matches()) {
-                    log.info("Skipping {}", elasticSearchIndex.getIndexName());
-                    continue;
-                }
-                try {
-                    IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
-
-                    // Try to created the index if it didn't exist already
-                    boolean created = helper.createIndexIfNotExists(CreateIndex.builder()
-                        .useNumberPostfix(true)
-                        .forReindex(true) // no replicas, very long refresh
-                        .build());
-
-                    if (! created) {
-                        // the index existed already, so simply reput the settings
-                        // and prepare the index for actual usage
-                        log.info("{} : {}", elasticSearchIndex, helper.count());
-                        helper.reputSettings((settings) -> {
-                            if (forceReplicas != null) {
-                                ObjectNode index = settings.with("settings").with("index");
-                                index.put("number_of_replicas", forceReplicas);
-                            }
-                        });
-                        helper.reputMappings();
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-
-                }
-            }
-        } finally {
-            factory.shutdown();
-        }
-
     }
 }
