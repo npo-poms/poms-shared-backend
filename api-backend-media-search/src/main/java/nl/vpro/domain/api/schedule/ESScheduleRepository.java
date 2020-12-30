@@ -1,25 +1,24 @@
 package nl.vpro.domain.api.schedule;
 
-import lombok.SneakyThrows;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.*;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.search.*;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.index.query.*;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.*;
@@ -28,9 +27,7 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.InstantRange;
 import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.elasticsearch.Constants;
-import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-import nl.vpro.elasticsearch.highlevel.HighLevelElasticSearchIterator;
+import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.TimeUtils;
@@ -73,7 +70,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     @Inject
     public ESScheduleRepository(
-        HighLevelClientFactory client,
+        ESClientFactory client,
         Redirector mediaRedirector,
         MediaScoreManager scoreManager) {
         super(client);
@@ -98,7 +95,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     }
 
-    @SneakyThrows
     @Override
     public MediaObject load(boolean loadDeleted, String id) {
         MediaObject mo = loadWithCrid(id);
@@ -115,7 +111,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     }
 
 
-    protected MediaObject loadWithCrid(String id) throws IOException {
+    protected MediaObject loadWithCrid(String id) {
         if(id.startsWith("crid://")) {
             try {
                 return findByCrid(id);
@@ -193,7 +189,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
         request.source(searchBuilder);
 
-        SearchResponse response = client().search(request, requestOptions());
+        ActionFuture<SearchResponse> searchResponseFuture = client().search(request);
+        SearchResponse response = searchResponseFuture.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
 
         SearchHits hits = response.getHits();
         if(hits.getTotalHits().value == 0) {
@@ -261,13 +258,10 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         long offset = form.getPager().getOffset();
         Integer max = form.getPager().getMax();
         Optional<Long> total = Optional.empty();
-        try (HighLevelElasticSearchIterator<MediaObject> searchIterator = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
-                     .client(factory.get())
-                     .adapt(this::getMediaObject)
-                     .build()) {
-            SearchSourceBuilder requestBuilder = searchIterator.prepareSearchSource(getIndexName());
-            requestBuilder.query(toExecute);
-            requestBuilder.sort("scheduleEvents.start", SortOrder.DESC);
+        try (ElasticSearchIterator<MediaObject> searchIterator = new ElasticSearchIterator<>(client(), this::getMediaObject)) {
+            SearchRequestBuilder requestBuilder = searchIterator.prepareSearch(getIndexName());
+            requestBuilder.setQuery(toExecute);
+            requestBuilder.addSort("scheduleEvents.start", SortOrder.DESC);
 
             long skipped = 0;
             long count = 0;
@@ -333,9 +327,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         );
     }
 
-    protected MediaObject getMediaObject(JsonNode hit) {
+    protected MediaObject getMediaObject(SearchHit hit) {
         try {
-            return getObject(hit.get(Constants.Fields.SOURCE), MediaObject.class);
+            return getObject(hit, MediaObject.class);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
@@ -345,7 +339,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
 
 
-    @SneakyThrows
     @Override
     public ScheduleSearchResult findSchedules(
         ProfileDefinition<MediaObject> profile,

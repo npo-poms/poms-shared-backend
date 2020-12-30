@@ -14,18 +14,16 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,18 +107,13 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
             long count = 0;
             log.info("Querier start");
             while (count < DOCCOUNT) {
-                IndexHelper helper = indexHelpers.get(ApiMediaIndex.APIMEDIA);
-                SearchSourceBuilder source = new SearchSourceBuilder();
+                final SearchRequestBuilder searchRequestBuilder = AbstractMediaESRepositoryITest.client.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
+                    .addSort("publishDate", SortOrder.ASC)
+                    .addSort("mid", SortOrder.ASC);
+                ActionFuture<SearchResponse> searchResponseFuture = AbstractMediaESRepositoryITest.client
+                    .search(searchRequestBuilder.request());
 
-
-
-                source.sort("publishDate", SortOrder.ASC)
-                    .sort("mid", SortOrder.ASC);
-
-                final SearchRequest searchRequest = new SearchRequest(helper.getIndexName());
-                searchRequest.source(source);
-
-                SearchResponse response = highLevelClient().search(searchRequest, RequestOptions.DEFAULT);
+                SearchResponse response = searchResponseFuture.actionGet(5000, TimeUnit.MILLISECONDS);
                 SearchHits hits = response.getHits();
                 count = hits.getTotalHits().value;
                 if (count > 0 && foundDataTime == 0) {

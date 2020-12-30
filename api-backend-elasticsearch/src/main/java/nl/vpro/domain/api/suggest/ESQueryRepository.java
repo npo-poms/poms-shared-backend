@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.elasticsearch.action.index.IndexRequest;
@@ -21,17 +19,18 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.reindex.*;
+import org.elasticsearch.index.reindex.BulkByScrollResponse;
+import org.elasticsearch.index.reindex.DeleteByQueryRequest;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.completion.CompletionSuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import nl.vpro.domain.api.*;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
 
@@ -82,20 +81,15 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     public void cleanSuggestions() {
         if (! readOnly) {
-
-            SearchRequest searchRequest = new SearchRequest(indexNames.get(APIQUERIES));
-            searchRequest.source(
-                QueryBuilders.rangeQuery("sortDate")
-                .lte(Instant.now().minus(ttl).toEpochMilli()));
-            DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(searchRequest);
-            client().deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
-            BulkByScrollResponse response = new DeleteByQueryRequestBuilder(client(), DeleteByQueryAction.INSTANCE)
-                .filter(QueryBuilders.rangeQuery("sortDate")
-                    .lte(Instant.now().minus(ttl).toEpochMilli()))
-                .source(indexNames.get(APIQUERIES))
-                .get();
-
-            log.info("Deleted {}", response.getDeleted());
+            try {
+                DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(indexNames.get(APIQUERIES));
+                deleteByQueryRequest.setQuery(QueryBuilders.rangeQuery("sortDate")
+                    .lte(Instant.now().minus(ttl).toEpochMilli()));
+                BulkByScrollResponse response = client().deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
+                log.info("Deleted {}", response.getDeleted());
+            } catch (IOException ioe) {
+                log.error(ioe.getMessage());
+            }
         } else {
             log.warn("Skipped while configured read only");
         }
@@ -127,7 +121,9 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
     @SneakyThrows(IOException.class)
     public SuggestResult suggest(String input, String profile, Integer max) {
         SearchRequest searchRequest = new SearchRequest(getIndexName());
-        searchRequest.source(suggestBuilder(Query.queryId(input, profile), profile, max));
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.suggest(suggestBuilder(Query.queryId(input, profile), profile, max));
+        searchRequest.source(sourceBuilder);
 
         SearchResponse searchResponse = client().search(searchRequest, RequestOptions.DEFAULT);
         Suggest suggest = searchResponse.getSuggest();

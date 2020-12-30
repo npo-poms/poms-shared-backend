@@ -6,16 +6,16 @@ import lombok.Setter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.http.client.config.RequestConfig;
 import org.apache.lucene.search.TotalHits;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.get.*;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -28,6 +28,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
@@ -36,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.vpro.elasticsearch.ElasticSearchIndex;
@@ -91,16 +93,17 @@ public abstract class AbstractESRepository<T> {
                 try {
                     if (indexName != null) {
                         SearchRequest searchRequest = new SearchRequest(indexName);
+                        TermsAggregationBuilder aggregationBuilder =
+                            AggregationBuilders.terms("types")
+                                .field("_type")
+                                .order(BucketOrder.key(true));
+                        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-                        SearchResponse response = client()
-                            .prepareSearch(indexName)
-                            //.setTypes(getRelevantTypes())
-                            .addAggregation(AggregationBuilders.terms("types")
-                                    .field("_type")
-                                    .order(BucketOrder.key(true))
-                            )
-                            .setSize(0)
-                            .get();
+                        searchSourceBuilder.aggregation(aggregationBuilder);
+                        searchSourceBuilder.size(0);
+                        searchRequest.source(searchSourceBuilder);
+
+                        SearchResponse response = client().search(searchRequest, RequestOptions.DEFAULT);
 
                         Terms a = response.getAggregations().get("types");
                         String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
@@ -141,10 +144,8 @@ public abstract class AbstractESRepository<T> {
 
 
     protected final RestHighLevelClient client() {
-        return factory.client(getClass().getName());
+        return factory.highLevelClient(getClass().getName());
     }
-
-
 
     protected abstract ElasticSearchIndex getIndex(String id, Class<?> clazz);
 
@@ -156,14 +157,13 @@ public abstract class AbstractESRepository<T> {
 
     protected T load(
         @NonNull String id,
-        @NonNull Class<T> clazz) {
+        @NonNull Class<T> clazz) throws IOException {
         try {
 
             MultiGetRequest getRequest =
                 new MultiGetRequest();
             getRequest.add(getIndexName(id, clazz), id);
-            ActionFuture<MultiGetResponse> future = client().mget(getRequest);
-            MultiGetResponse response = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+            MultiGetResponse response = client().mget(getRequest, requestOptions());
             for (MultiGetItemResponse r : response.getResponses()) {
                 if (! r.isFailed() && r.getResponse().isExists()) {
                     return transformResponse(r.getResponse(), clazz);
@@ -172,11 +172,6 @@ public abstract class AbstractESRepository<T> {
             return null;
         } catch(IndexNotFoundException ime) {
             return null;
-        } catch(InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(ie);
-        } catch(ExecutionException | TimeoutException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -198,10 +193,10 @@ public abstract class AbstractESRepository<T> {
         @NonNull Class<T> clazz,
         @NonNull String indexName) {
         GetRequest getRequest = new GetRequest(indexName, id);
-        ActionFuture<GetResponse> all = client().getAsync(getRequest, RequestOptions.DEFAULT);
-        CompletableFuture<GetResponse> reponseFuture = ESUtils.fromActionFuture(all);
+        CompletableFuture<GetResponse> responseFuture = new CompletableFuture<>();
+        Cancellable all = client().getAsync(getRequest, requestOptions(), ESUtils.actionListener(responseFuture));
 
-        return reponseFuture.thenApply(r -> transformResponse(r, clazz));
+        return responseFuture.thenApply(r -> transformResponse(r, clazz));
     }
 
 
@@ -211,60 +206,52 @@ public abstract class AbstractESRepository<T> {
     protected <S extends T> List<Optional<S>> loadAll(
         @NonNull Class<S> clazz,
         @NonNull String indexName,
-        @NonNull String... ids) {
-        try {
-            if (ids.length == 0) {
-                return new ArrayList<>();
-            }
-            MultiGetRequest request = new MultiGetRequest();
-            for (String id : ids) {
-                request.add(indexName, id);
-            }
-            ActionFuture<MultiGetResponse> future =
-                client()
-                    .mget(request);
+        @NonNull String... ids) throws IOException {
+        if (ids.length == 0) {
+            return new ArrayList<>();
+        }
+        MultiGetRequest request = new MultiGetRequest();
+        for (String id : ids) {
+            request.add(indexName, id);
+        }
+        MultiGetResponse responses =
+            client().mget(request, requestOptions());
 
-            MultiGetResponse responses = future.get(timeOut.toMillis(), TimeUnit.MILLISECONDS);
-            if (responses == null || !responses.iterator().hasNext()) {
-                return null;
-            }
+        if (responses == null || !responses.iterator().hasNext()) {
+            return null;
+        }
 
-            //List<T> answer = new ArrayList<>(responses.getResponses().length); // ES v > 0.20
-            Map<String, S> answerMap = new HashMap<>(responses.getResponses().length);
-            for (MultiGetItemResponse response : responses) {
-                if (response.isFailed()) {
-                    if (response.getFailure() != null) {
-                        log.error("{}", response.getFailure().getMessage(), response.getFailure().getFailure());
-                    } else {
-                        log.error("{}", response);
+        //List<T> answer = new ArrayList<>(responses.getResponses().length); // ES v > 0.20
+        Map<String, S> answerMap = new HashMap<>(responses.getResponses().length);
+        for (MultiGetItemResponse response : responses) {
+            if (response.isFailed()) {
+                if (response.getFailure() != null) {
+                    log.error("{}", response.getFailure().getMessage(), response.getFailure().getFailure());
+                } else {
+                    log.error("{}", response);
+                }
+            } else {
+                if (response.getResponse().isExists()) {
+                    try {
+                        S item = Jackson2Mapper.LENIENT.readValue(response.getResponse().getSourceAsString(), clazz);
+                        answerMap.put(response.getId(), item);
+                    } catch (IllegalArgumentException iae) {
+                        log.warn(iae.getMessage());
+                        } catch (JsonProcessingException e) {
+                        log.error(e.getMessage(), e);
                     }
                 } else {
-                    if (response.getResponse().isExists()) {
-                        try {
-                            S item = Jackson2Mapper.LENIENT.readValue(response.getResponse().getSourceAsString(), clazz);
-                            answerMap.put(response.getId(), item);
-                        } catch (IllegalArgumentException iae) {
-                            log.warn(iae.getMessage());
-                        }
-                    } else {
-                        log.debug("{}", response);
-                    }
+                    log.debug("{}", response);
                 }
             }
-            List<Optional<S>> answer = new ArrayList<>(ids.length);
-            for (String id : ids) {
-                S object = answerMap.get(id);
-                answer.add(Optional.ofNullable(object));
-            }
-            return answer;
-        } catch (InterruptedException ie) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(ie);
-        } catch(ExecutionException | IOException | TimeoutException e) {
-            throw new RuntimeException(e);
         }
+        List<Optional<S>> answer = new ArrayList<>(ids.length);
+        for (String id : ids) {
+            S object = answerMap.get(id);
+            answer.add(Optional.ofNullable(object));
+        }
+        return answer;
     }
-
 
 
     protected boolean handlePaging(
@@ -272,7 +259,7 @@ public abstract class AbstractESRepository<T> {
         @Nullable Integer max,
         @NonNull SearchSourceBuilder searchBuilder,
         @NonNull QueryBuilder queryBuilder,
-        @NonNull String... indexNames) {
+        @NonNull String... indexNames) throws IOException {
         if (offset != 0) {
             searchBuilder.from((int) offset);
         }
@@ -325,10 +312,10 @@ public abstract class AbstractESRepository<T> {
 
     protected TotalHits executeCount(
         @NonNull QueryBuilder builder,
-        @NonNull String... indexNames) {
-        return client().prepareSearch(indexNames)
-            .setSource(new SearchSourceBuilder().size(1).query(builder)).get().getHits().getTotalHits();
-
+        @NonNull String... indexNames) throws IOException {
+        SearchRequest request = new SearchRequest(indexNames);
+        request.source(new SearchSourceBuilder().size(1).query(builder));
+        return client().search(request, RequestOptions.DEFAULT).getHits().getTotalHits();
     }
 
     protected void buildHighlights(@NonNull SearchSourceBuilder searchBuilder, @Nullable Form form, List<SearchFieldDefinition> searchFields) {
@@ -444,6 +431,19 @@ public abstract class AbstractESRepository<T> {
         TotalHits totalHits = hits.getTotalHits();
         return Result.TotalQualifier.valueOf(totalHits.relation.name());
     }
+
+
+    protected RequestOptions requestOptions() {
+        return requestOptionsBuilder().build();
+    }
+
+     protected RequestOptions.Builder requestOptionsBuilder() {
+        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
+
+        builder.setRequestConfig(RequestConfig.custom().setConnectionRequestTimeout((int) timeOut.toMillis()).build());
+        return builder;
+    }
+
 
     @Override
     public String toString() {

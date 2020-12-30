@@ -14,6 +14,7 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearchclient.ElasticSearchIterator;
+import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.Slf4jHelper;
 import nl.vpro.media.domain.es.*;
@@ -31,16 +32,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     protected static void createIndicesIfNecessary() {
-        String indexName = createIndexIfNecessary(APIMEDIA).getIndexName();
+        IndexHelper indexName = createIndexIfNecessary(APIMEDIA);
         createIndexIfNecessary(APIMEDIA_REFS, indexName + ApiRefsIndex.POSTFIX);
         for (ApiCueIndex i : ApiCueIndex.getInstances()) {
             createIndexIfNecessary(i);
         }
     }
 
+
     /**
      * Testing wheter implemetation via es corresponds with predicate implementation of form itself.
      */
+
     protected void testResult(MediaForm form, MediaSearchResult result) {
         Set<String> inResult = new HashSet<>();
 
@@ -84,5 +87,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
         testResult(form, result);
         return result;
     }
+
+
 
 }

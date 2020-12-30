@@ -11,17 +11,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
-import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.delete.DeleteRequestBuilder;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.transport.NoNodeAvailableException;
-import org.elasticsearch.common.document.DocumentField;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,7 +23,7 @@ import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-
+import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -50,14 +39,13 @@ import static org.mockito.Mockito.when;
 public abstract class AbstractESRepositoryITest {
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
-    protected static final  Map<ElasticSearchIndex, String> indexNames = new HashMap<>();
+    protected static final  Map<ElasticSearchIndex, IndexHelper> indexHelpers = new HashMap<>();
     protected static boolean firstRun = true;
 
-    protected static RestHighLevelClient client;
+    protected static HighLevelClientFactory staticClientFactory;
 
     static {
         log.info("JAVAPORT " + System.getProperty("integ.java.port"));
-
     }
 
     @Inject
@@ -70,10 +58,9 @@ public abstract class AbstractESRepositoryITest {
 
     @BeforeEach
     public void abstractSetup() throws Exception {
-        if (client == null) {
-            client = clientFactory.client("test");
-            log.info("Built {}", client);
+        if (staticClientFactory == null) {
             ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
+            staticClientFactory = clientFactory;
         }
 
         when(broadcasterService.find(any())).thenAnswer(invocation -> {
@@ -94,112 +81,58 @@ public abstract class AbstractESRepositoryITest {
 
     @BeforeAll
     public static void staticSetup() {
-        indexNames.clear();
+        indexHelpers.clear();
     }
 
     @AfterAll
     public static void shutdown() throws ExecutionException, InterruptedException {
-        for (String name : indexNames.values()) {
-            client.admin().indices().prepareDelete(name).execute().get();
+        for (IndexHelper indexHelper : indexHelpers.values()) {
+            indexHelper.deleteIndex();
         }
-        indexNames.clear();
+        indexHelpers.clear();
         refresh();
         firstRun = true;
     }
 
     public static String getIndexName() {
-        if (indexNames.size() == 1) {
-            return indexNames.values().iterator().next();
+        if (indexHelpers.size() == 1) {
+            return indexHelpers.values().iterator().next().getIndexName();
         } else {
-            throw new IllegalStateException("Expected exactly one index, but found " + indexNames);
+            throw new IllegalStateException("Expected exactly one index, but found " + indexHelpers.keySet());
         }
     }
 
-    protected static String createIndexIfNecessary(ElasticSearchIndex abstractIndex)  {
+    protected static IndexHelper createIndexIfNecessary(ElasticSearchIndex abstractIndex)  {
         return createIndexIfNecessary(abstractIndex, "test-" + abstractIndex.getIndexName() + "-" + NOW);
     }
 
-    protected static String createIndexIfNecessary(ElasticSearchIndex abstractIndex, String indexName)  {
-        if (! indexNames.containsKey(abstractIndex)) {
+    protected static IndexHelper createIndexIfNecessary(ElasticSearchIndex abstractIndex, String indexName)  {
+        if (! indexHelpers.containsKey(abstractIndex)) {
             log.info("Creating index {}: {}", abstractIndex, indexName);
-            try {
-                NodesInfoResponse response = client.admin()
-                    .cluster().nodesInfo(new NodesInfoRequest()).get();
-                log.info("" + response.getNodesMap());
-                IndexHelper.of(log,
-                    (s) -> client, abstractIndex)
-                    .indexName(indexName)
-                    .build()
-                    .createIndexIfNotExists(CreateIndex.FOR_TEST);
-                indexNames.put(abstractIndex, indexName);
-            } catch (NoNodeAvailableException noNodeAvailableException) {
-                log.warn("No elastic search node could be found with {}", client);
-                log.info("Please start up local elasticsearch");
-            } catch (InterruptedException | ExecutionException e) {
-                log.error(e.getMessage(), e);
-            }
-
+            IndexHelper helper = IndexHelper.of(log, staticClientFactory, abstractIndex)
+                .indexName(indexName)
+                .build();
+            indexHelpers.put(abstractIndex, helper);
+            helper.createIndex(CreateIndex.FOR_TEST);
             refresh();
         }
-        return indexNames.get(abstractIndex);
+        return indexHelpers.get(abstractIndex);
     }
-
-
-
 
 
     protected static void clearIndices() {
-        for (String indexName : indexNames.values()) {
-            clearIndex(indexName);
+        for (IndexHelper indexHelper : indexHelpers.values()) {
+            indexHelper.clearIndex();
+
         }
-
-
-    }
-    protected static void clearIndex(String indexName) {
-        client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
-        while (true) {
-            long shouldDelete = 0;
-            BulkRequestBuilder bulkRequestBuilder = client.prepareBulk();
-            for (SearchHit hit : client.prepareSearch(indexName)
-                .setQuery(QueryBuilders.matchAllQuery()).setSize(100).get().getHits()) {
-                log.info("deleting {}/{}", hit.getIndex(), hit.getId());
-
-                DeleteRequestBuilder deleteRequestBuilder = client.prepareDelete(hit.getIndex(), hit.getType(), hit.getId());
-                DocumentField routing = hit.getFields().get("_routing");
-                if (routing != null) {
-                    for (Object r : routing.getValues()) {
-                        deleteRequestBuilder.setRouting(r.toString());
-                    }
-                }
-                bulkRequestBuilder.add(deleteRequestBuilder);
-                shouldDelete++;
-            }
-            if (shouldDelete > 0) {
-                client.bulk(bulkRequestBuilder.request()).actionGet();
-                client.admin().indices().refresh(new RefreshRequest(indexName)).actionGet();
-                log.info("Deleted {} ", shouldDelete);
-            } else {
-                break;
-            }
-        }
-        log.info("Cleared {}", indexName);
-        refresh();
-
     }
 
     @SneakyThrows
     protected static void refresh() {
-        for (String indexName : indexNames.values()) {
-            try {
-                log.info("Refreshing {}", indexName);
-                client.admin().indices().refresh(new RefreshRequest(indexName)).get();
-            } catch (InterruptedException | ExecutionException e) {
-                log.error(e.getMessage(), e);
-            }
+        for (IndexHelper indexHelper : indexHelpers.values()) {
+            log.info("Refreshing {}", indexHelper.getIndexName());
+            indexHelper.refresh();
         }
-
     }
-
-
 
 }
