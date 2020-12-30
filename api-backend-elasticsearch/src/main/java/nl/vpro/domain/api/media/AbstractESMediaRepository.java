@@ -1,7 +1,6 @@
 package nl.vpro.domain.api.media;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -12,12 +11,10 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.Null;
 
-import org.apache.http.client.config.RequestConfig;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
@@ -59,15 +56,15 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         super(client);
         this.helper = IndexHelper.builder()
             .log(log)
-            .client(client.client())
+            .client(client)
             .settings(APIMEDIA.settings())
-            .mappings(APIMEDIA.mappingsAsMap())
+            .mapping(APIMEDIA.mapping())
             .build();
         this.refsHelper = IndexHelper.builder()
             .log(log)
             .client(client)
             .settings(ApiRefsIndex.APIMEDIA_REFS.settings())
-            .mappings(ApiRefsIndex.APIMEDIA_REFS.mappingsAsMap())
+            .mapping(ApiRefsIndex.APIMEDIA_REFS.mapping())
             .build();
     }
 
@@ -115,6 +112,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
 
 
+    @SneakyThrows(IOException.class)
     @Override
     public MediaObject load(boolean loadDeleted, String mid) {
         mid = redirect(mid).orElse(mid);
@@ -126,6 +124,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         }
     }
 
+    @SneakyThrows(IOException.class)
     @Override
     public List<MediaObject> loadAll(boolean loadDeleted, List<String> ids) {
         return loadAll(MediaObject.class, ids)
@@ -136,7 +135,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
 
-    protected <S extends MediaObject> List<Optional<S>> loadAll(Class<S> clazz, List<String> ids) {
+    protected <S extends MediaObject> List<Optional<S>> loadAll(Class<S> clazz, List<String> ids) throws IOException {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         if (ids.isEmpty()) {
             return Collections.emptyList();
@@ -154,7 +153,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable AbstractMediaForm form,
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
-        @Nullable Integer max) {
+        @Nullable Integer max) throws IOException {
 
         return mediaSearchRequest(
             profile,
@@ -178,7 +177,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable MediaObject mediaObject,
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
-        Integer max) {
+        Integer max) throws IOException {
         SearchRequest request = new SearchRequest(indexNames.get(APIMEDIA));
         SearchSourceBuilder searchSourceBuilder = mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max);
         boolean maxWasZero = handleMaxZero(max, searchSourceBuilder::size);
@@ -194,7 +193,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @NonNull AbstractMediaForm form,
         @NonNull BoolQueryBuilder filter,
         long offset,
-        Integer max) {
+        Integer max) throws IOException {
         return mediaSearchBuilder(profile, form, null, filter, offset, max);
     }
 
@@ -218,7 +217,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable MediaObject mediaObject,
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
-        @Nullable Integer max) {
+        @Nullable Integer max) throws IOException {
 
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         // Handle profile and workflow filtering
@@ -268,14 +267,9 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         long offset,
         @Nullable Integer max,
         @NonNull Class<S> clazz) throws IOException {
-        RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
-
-        builder.setRequestConfig(RequestConfig.custom().setConnectionRequestTimeout((int) timeOut.toMillis()).build());
-
-
 
         try {
-            SearchResponse response  = client().search(request.getRequest(), builder.build());
+            SearchResponse response  = client().search(request.getRequest(),requestOptions());
             SearchHits hits = response.getHits();
 
             Duration took = Duration.ofMillis(response.getTook().getMillis());

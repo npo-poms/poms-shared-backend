@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.api.SuggestResult;
-import nl.vpro.elasticsearch7.ESClientFactory;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.es.ApiQueryIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +28,7 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
 
 
     @Inject
-    ESClientFactory factory = mock(ESClientFactory.class);
+    HighLevelClientFactory factory = mock(HighLevelClientFactory.class);
 
     ESQueryRepository repository;
 
@@ -40,7 +40,7 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
     @BeforeEach
     public void init() {
         repository = new ESQueryRepository(factory);
-        repository.setIndexName(indexNames.get(ApiQueryIndex.APIQUERIES));
+        repository.setIndexName(indexHelpers.get(ApiQueryIndex.APIQUERIES).getIndexName());
     }
 
 

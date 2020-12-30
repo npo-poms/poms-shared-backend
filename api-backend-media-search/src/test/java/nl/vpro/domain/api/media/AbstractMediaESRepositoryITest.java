@@ -12,7 +12,9 @@ import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.elasticsearch7.ElasticSearchIterator;
+import nl.vpro.elasticsearch.Constants;
+import nl.vpro.elasticsearchclient.ElasticSearchIterator;
+import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.Slf4jHelper;
 import nl.vpro.media.domain.es.*;
@@ -30,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     protected static void createIndicesIfNecessary() {
-        String indexName = createIndexIfNecessary(APIMEDIA);
+        IndexHelper indexName = createIndexIfNecessary(APIMEDIA);
         createIndexIfNecessary(APIMEDIA_REFS, indexName + ApiRefsIndex.POSTFIX);
         for (ApiCueIndex i : ApiCueIndex.getInstances()) {
             createIndexIfNecessary(i);
@@ -52,18 +54,16 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
             assertThat(testResult.test().getAsBoolean()).withFailMessage("But it is not! " +  testResult.getDescription()).isTrue();
             inResult.add(sr.getResult().getMid());
         }
-        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client,
-            (sh) -> {
+        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(staticClientFactory.get(),
+            (jn) -> {
                 try {
-                    return Jackson2Mapper.getLenientInstance().readValue(sh.getSourceAsString(), MediaObject.class);
+                    return Jackson2Mapper.getLenientInstance().treeToValue(jn.get(Constants.Fields.SOURCE), MediaObject.class);
                 } catch (JsonProcessingException e) {
                     log.error(e.getMessage(), e);
                     return null;
                 }
             });
-        i.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
-
-        ;
+        i.prepareSearch(indexHelpers.get(ApiMediaIndex.APIMEDIA).getIndexName());
         AtomicLong misses = new AtomicLong(0);
         i.forEachRemaining(mo -> {
             if (Workflow.PUBLICATIONS.contains(mo.getWorkflow())) {

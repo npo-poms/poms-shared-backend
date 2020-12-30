@@ -4,6 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -13,6 +14,10 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import nl.vpro.elasticsearch.Constants;
+
+import nl.vpro.elasticsearch.highlevel.HighLevelElasticSearchIterator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
@@ -80,6 +85,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
     }
 
+    @SneakyThrows
     @Override
     @ManagedAttribute
     public MediaObject load(@NonNull String mid) {
@@ -93,6 +99,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
 
+    @SneakyThrows
     @Override
     protected <S extends MediaObject> List<Optional<S>> loadAll(@NonNull Class<S> clazz,
                                                       @NonNull List<String> ids) {
@@ -110,6 +117,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         scoreManager.setIsScoring(score);
     }
 
+    @SneakyThrows
     @Override
     public MediaSearchResult find(
         @Nullable final ProfileDefinition<MediaObject> profile,
@@ -236,6 +244,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return new MediaSearchResult(result);
     }
 
+    @SneakyThrows
     @Override
     public MediaSearchResult findRelated(
         @NonNull MediaObject media,
@@ -267,19 +276,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         ;
 
 
-        ActionFuture<SearchResponse> future;
-        try {
-            SearchRequest request = client()
-                .prepareSearch(getIndexName())
-                .setSize(max == null ? defaultMax : max)
-                .setQuery(moreLikeThisQueryBuilder)
-                .request();
-            future = client().search(request);
-        } catch (Exception e) {
-            LOG_ERRORS.warn("findRelated max {}, {}, {}, {}", max, profile, search, moreLikeThisQueryBuilder);
-            throw e;
-        }
-        SearchResponse response = future.actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS);
+
+        SearchRequest searchRequest = new SearchRequest(getIndexName());
+
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.size(max == null ? defaultMax : max);
+        sourceBuilder.query(moreLikeThisQueryBuilder);
+        searchRequest.source(sourceBuilder);
+        SearchResponse response  = client().search(searchRequest, requestOptions());
 
         SearchHits hits = response.getHits();
 
@@ -290,15 +294,16 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     protected MediaObject getMediaObject(
-        @NonNull SearchHit hit) {
+        @NonNull JsonNode hit) {
         try {
-            return getObject(Jackson2Mapper.getLenientInstance().readTree(hit.getSourceRef().toBytesRef().bytes), MediaObject.class);
+            return getObject(hit.get(Constants.Fields.SOURCE), MediaObject.class);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
         }
     }
 
+    @SneakyThrows
     @Override
     public MediaResult list(
         @NonNull Order order,
@@ -310,15 +315,16 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         AtomicInteger atomicMax = new AtomicInteger(max);
         boolean wasZero = handleMaxZero(max, atomicMax::set);
-        SearchRequest request = client()
-            .prepareSearch(getIndexName())
-            .setQuery(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()))
-            .addSort("mid", SortOrder.valueOf(order.name()))
-            .setFrom((int) offset)
-            .setSize(atomicMax.get())
-            .request();
 
-        SearchRequestWrapper wrapper = new SearchRequestWrapper(request, wasZero);
+        SearchRequest searchRequest = new SearchRequest(getIndexName());
+        SearchSourceBuilder sourceBuilder= new SearchSourceBuilder();
+        sourceBuilder.query(QueryBuilders.termQuery("workflow", Workflow.PUBLISHED.name()))
+            .sort("mid", SortOrder.valueOf(order.name()))
+            .from((int) offset)
+            .size(atomicMax.get());
+        searchRequest.source(sourceBuilder);
+
+        SearchRequestWrapper wrapper = new SearchRequestWrapper(searchRequest, wasZero);
         GenericMediaSearchResult<MediaObject> result = executeSearchRequest(wrapper, null, offset, max, MediaObject.class);
         return new MediaSearchResult(result).asResult();
     }
@@ -342,6 +348,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     }
 
+    @SneakyThrows
     @Override
     public MediaResult listDescendants(
         @NonNull MediaObject media,
@@ -352,18 +359,18 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         assert media.getMid() != null;
         AtomicInteger atomicMax = new AtomicInteger(max);
         boolean wasZero = handleMaxZero(max, atomicMax::set);
-        SearchRequest request = client()
-            .prepareSearch(getIndexName())
-            .addSort(MediaSortField.sortDate.name(), SortOrder.valueOf(order.name()))
-            .setQuery(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
-            .setFrom((int) offset)
-            .setSize(atomicMax.get())
-            .setPostFilter(ESMediaFilterBuilder.filter(profile))
-            .request();
+
+        SearchRequest request = new SearchRequest(getIndexName());
+        SearchSourceBuilder source = new SearchSourceBuilder();
+        source.sort(MediaSortField.sortDate.name(), SortOrder.valueOf(order.name()))
+            .query(QueryBuilders.termQuery("descendantOf.midRef", media.getMid()))
+            .from((int) offset)
+            .size(atomicMax.get())
+            .postFilter(ESMediaFilterBuilder.filter(profile));
+        request.source(source);
 
         SearchRequestWrapper wrapper = new SearchRequestWrapper(request, wasZero);
-        GenericMediaSearchResult<MediaObject> objects =
-            executeSearchRequest(wrapper, null, offset, max, MediaObject.class);
+        GenericMediaSearchResult<MediaObject> objects = executeSearchRequest(wrapper, null, offset, max, MediaObject.class);
 
         return new MediaSearchResult(objects).asResult();
 
@@ -412,15 +419,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable ProfileDefinition<MediaObject> profile,
         @NonNull Order order,
         long offset,
-        @Nullable Integer max)  {
+        @Nullable Integer max) throws IOException {
         List<String> mids;
         TotalHits total = null;
         if (profile == null) {
-            SearchRequestBuilder builder = client().prepareSearch(getRefsIndexName());
-            listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
-            builder.setFrom((int) offset);
-            boolean maxIsZero = handleMaxZero(max, builder::setSize);
-            SearchResponse response = builder.get();
+            SearchRequest searchRequest = new SearchRequest(getRefsIndexName());
+            SearchSourceBuilder source = listMembersOrEpisodesBuildRequest(searchRequest, objectType, media, order).from((int) offset);
+            boolean maxIsZero = handleMaxZero(max, source::size);
+            SearchResponse response = client().search(searchRequest, requestOptions());
             SearchHit[] hits = response.getHits().getHits();
             mids = maxIsZero ? Collections.emptyList() : Arrays.stream(hits)
                 .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
@@ -428,8 +434,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             total = response.getHits().getTotalHits();
         } else {
             mids = new ArrayList<>();
-            try (ElasticSearchIterator<String> iterator = new ElasticSearchIterator<>(client().getLowLevelClient(), (sh) -> (String) sh.getSourceAsMap().get("childRef"))) {
-                SearchRequestBuilder builder = iterator.prepareSearch(getRefsIndexName());
+            try (HighLevelElasticSearchIterator<String> iterator = new HighLevelElasticSearchIterator<>(client().getLowLevelClient(), (sh) -> (String) sh.getSourceAsMap().get("childRef"))) {
+                SearchRequestBuilder builder = iterator.pre(getRefsIndexName());
                 listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
                 iterator.forEachRemaining(mids::add);
 
@@ -453,19 +459,21 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
     }
 
-    protected void listMembersOrEpisodesBuildRequest(SearchRequestBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
+    protected SearchSourceBuilder listMembersOrEpisodesBuildRequest(SearchRequest searchRequest, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
+
+        SearchSourceBuilder builder = new SearchSourceBuilder();
         BoolQueryBuilder must = QueryBuilders.boolQuery();
         must.filter(QueryBuilders.termQuery("objectType", objectType.name()));
         assert media.getMid() != null;
         must.must(QueryBuilders.termQuery("midRef", media.getMid()));
         builder
-            .setQuery(must)
-            .addSort("index", SortOrder.valueOf(order.name()))
-            .addSort("added", SortOrder.ASC)
-            .addSort("childRef", SortOrder.ASC)
-            .setRouting(media.getMid())
-        ;
-
+            .query(must)
+            .sort("index", SortOrder.valueOf(order.name()))
+            .sort("added", SortOrder.ASC)
+            .sort("childRef", SortOrder.ASC);
+        searchRequest.source(builder);
+        searchRequest.routing(media.getMid());
+        return builder;
     }
 
     private <T extends MediaObject> Long filterWithProfile(
@@ -615,17 +623,16 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     private MediaChange of(
-        @NonNull SearchHit hit) {
+        @NonNull JsonNode hit) {
         try {
-            byte[] source = hit.getSourceRef().toBytesRef().bytes;
-            JsonNode jsonNode = Jackson2Mapper.getLenientInstance().readTree(source);
+            JsonNode jsonNode = hit.get(Constants.Fields.SOURCE);
             MediaObject media = getObject(jsonNode, MediaObject.class);
 
             if (media == null) {
                 log.warn("No media found in {}", hit);
                 return null;
             }
-            Long version = hit.getVersion();
+            Long version = hit.get(Constants.Fields.VERSION).longValue();
             if (version == -1) {
                 version = null;
             }
@@ -670,6 +677,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         Map<String, String> newRedirects = new HashMap<>();
 
         try(ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject)) {
+
             i.prepareSearch(getIndexName())
                 .setQuery(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
                 .setSize(iterateBatchSize)
@@ -707,6 +715,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return form;
     }
 
+    @SneakyThrows
     private <S extends MediaObject> GenericMediaSearchResult<S> findAssociatedMedia(
         @NonNull String axis,
         @NonNull MediaObject media,
