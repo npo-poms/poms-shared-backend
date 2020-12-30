@@ -15,16 +15,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import nl.vpro.elasticsearch.Constants;
-
-import nl.vpro.elasticsearch.highlevel.HighLevelElasticSearchIterator;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -41,9 +37,9 @@ import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
+import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-import nl.vpro.elasticsearchclient.ElasticSearchIterator;
-import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.elasticsearch.highlevel.HighLevelElasticSearchIterator;
 import nl.vpro.media.domain.es.Common;
 import nl.vpro.util.*;
 
@@ -329,6 +325,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return new MediaSearchResult(result).asResult();
     }
 
+    @SneakyThrows
     @Override
     public MediaResult listMembers(
         @NonNull MediaObject media,
@@ -377,6 +374,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
 
+    @SneakyThrows
     @Override
     public ProgramResult listEpisodes(
         @NonNull MediaObject media,
@@ -423,10 +421,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         List<String> mids;
         TotalHits total = null;
         if (profile == null) {
-            SearchRequest searchRequest = new SearchRequest(getRefsIndexName());
-            SearchSourceBuilder source = listMembersOrEpisodesBuildRequest(searchRequest, objectType, media, order).from((int) offset);
+            SearchSourceBuilder source = new SearchSourceBuilder();
+
+            listMembersOrEpisodesBuildRequest(source, objectType, media, order).from((int) offset);
             boolean maxIsZero = handleMaxZero(max, source::size);
-            SearchResponse response = client().search(searchRequest, requestOptions());
+            SearchRequest request = new SearchRequest(getRefsIndexName());
+            request.source(source);
+            SearchResponse response = client().search(request, requestOptions());
             SearchHit[] hits = response.getHits().getHits();
             mids = maxIsZero ? Collections.emptyList() : Arrays.stream(hits)
                 .map(sh -> String.valueOf(sh.getSourceAsMap().get("childRef")))
@@ -434,8 +435,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             total = response.getHits().getTotalHits();
         } else {
             mids = new ArrayList<>();
-            try (HighLevelElasticSearchIterator<String> iterator = new HighLevelElasticSearchIterator<>(client().getLowLevelClient(), (sh) -> (String) sh.getSourceAsMap().get("childRef"))) {
-                SearchRequestBuilder builder = iterator.pre(getRefsIndexName());
+            try (HighLevelElasticSearchIterator<String> iterator = HighLevelElasticSearchIterator.<String>highLevelBuilder()
+                .client(factory.get())
+                .adapt((sh) -> sh.get("source").get("childRef").textValue()) // todo
+                .routing(media.getMid())
+                .build()) {
+                SearchSourceBuilder builder = iterator.prepareSearchSource(getRefsIndexName());
                 listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
                 iterator.forEachRemaining(mids::add);
 
@@ -459,9 +464,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
     }
 
-    protected SearchSourceBuilder listMembersOrEpisodesBuildRequest(SearchRequest searchRequest, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
+    protected SearchSourceBuilder listMembersOrEpisodesBuildRequest(SearchSourceBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
 
-        SearchSourceBuilder builder = new SearchSourceBuilder();
         BoolQueryBuilder must = QueryBuilders.boolQuery();
         must.filter(QueryBuilders.termQuery("objectType", objectType.name()));
         assert media.getMid() != null;
@@ -471,8 +475,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .sort("index", SortOrder.valueOf(order.name()))
             .sort("added", SortOrder.ASC)
             .sort("childRef", SortOrder.ASC);
-        searchRequest.source(builder);
-        searchRequest.routing(media.getMid());
         return builder;
     }
 
@@ -528,14 +530,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
             }
         }
-        final ElasticSearchIterator<MediaChange> i = new ElasticSearchIterator<>(client(), this::of);
-        i.setVersion(true);
-        final SearchRequestBuilder searchRequestBuilder =
-            i.prepareSearch(getIndexName())
-                .addSort(Common.ES_PUBLISH_DATE, SortOrder.valueOf(order.name()))
-                .addSort("mid", SortOrder.ASC);
+        final HighLevelElasticSearchIterator<MediaChange> i = HighLevelElasticSearchIterator.<MediaChange>highLevelBuilder()
+            .client(factory.get())
+            .adapt(this::of)
+            .requestVersion(true)
+            .build();
 
-        searchRequestBuilder.setQuery(QueryBuilders.boolQuery()
+        final SearchSourceBuilder searchRequestBuilder = i.prepareSearchSource(getIndexName());
+        searchRequestBuilder.sort(Common.ES_PUBLISH_DATE, SortOrder.valueOf(order.name()));
+        searchRequestBuilder.sort("mid", SortOrder.ASC);
+
+        searchRequestBuilder.query(QueryBuilders.boolQuery()
             .must(restriction)
             .filter(QueryBuilders.existsQuery(Common.ES_PUBLISH_DATE))
         );
@@ -653,14 +658,18 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public CloseableIterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
-        ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<MediaObject>(client().getLowLevelClient(), this::getMediaObject);
+        HighLevelElasticSearchIterator<MediaObject> i = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
+            .client(factory.get())
+            .adapt(this::getMediaObject)
+            .build();
 
-        SearchRequestBuilder builder = i.prepareSearch(getIndexName());
-        ESMediaSortHandler.sort(form, null, builder::addSort);
+
+        SearchSourceBuilder builder = i.prepareSearchSource(getIndexName());
+        ESMediaSortHandler.sort(form, null, builder::sort);
         builder
-            .setSize(iterateBatchSize)
-            .setQuery(ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null))
-            .setPostFilter(ESMediaFilterBuilder.filter(profile))
+            .size(iterateBatchSize)
+            .query(ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null))
+            .postFilter(ESMediaFilterBuilder.filter(profile))
         ;
 
         Predicate<MediaObject> filter = Objects::nonNull;
@@ -676,11 +685,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     synchronized void refillRedirectCache() {
         Map<String, String> newRedirects = new HashMap<>();
 
-        try(ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(client(), this::getMediaObject)) {
+        try(HighLevelElasticSearchIterator<MediaObject> i = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
+            .client(factory.get())
+            .adapt(this::getMediaObject)
+            .build()) {
 
-            i.prepareSearch(getIndexName())
-                .setQuery(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
-                .setSize(iterateBatchSize)
+            i.prepareSearchSource(getIndexName())
+                .query(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
+                .size(iterateBatchSize)
             ;
             while(i.hasNext()) {
                 MediaObject o = i.next();

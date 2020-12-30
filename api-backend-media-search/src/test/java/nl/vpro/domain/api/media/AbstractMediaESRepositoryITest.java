@@ -39,11 +39,9 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
         }
     }
 
-
     /**
      * Testing wheter implemetation via es corresponds with predicate implementation of form itself.
      */
-
     protected void testResult(MediaForm form, MediaSearchResult result) {
         Set<String> inResult = new HashSet<>();
 
@@ -87,7 +85,5 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
         testResult(form, result);
         return result;
     }
-
-
 
 }

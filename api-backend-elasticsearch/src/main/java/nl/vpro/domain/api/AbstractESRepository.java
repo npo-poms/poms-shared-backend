@@ -171,6 +171,7 @@ public abstract class AbstractESRepository<T> {
             }
             return null;
         } catch(IndexNotFoundException ime) {
+            log.warn("For {}:{} {}", id, clazz, ime.getMessage());
             return null;
         }
     }

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -33,11 +34,9 @@ import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
-import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.Common;
-import nl.vpro.util.CloseableIterator;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.FacetResults.toSimpleMap;
@@ -80,7 +79,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         .mid("POMS_S_12345")
         .type(GroupType.SERIES);
 
-    private static ESMediaRepository target;
+    private static final ESMediaRepository target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
 
 
     private static Group group;
@@ -112,16 +111,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @BeforeEach
     public void init() {
-
         // during debugging you could set this to false, which would simplify queries
         target.setScore(true);
     }
-
-    @AfterEach
-    public void checkScrollIds() {
-        assertThat(ElasticSearchIterator.getScrollIds()).isEmpty();
-    }
-
 
     /**
      * Builds a test database
@@ -129,11 +121,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
      * with all their attributes
      */
     @Override
-    protected void firstRun() throws IOException {
+    protected void firstRun() throws InterruptedException, ExecutionException, IOException {
 
         createIndicesIfNecessary();
-
-        target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
 
@@ -346,44 +336,40 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
      @Test
-    public void testMediaChangesSinceWithMax() throws Exception {
+    public void testMediaChangesSinceWithMax() {
         Instant prev = NOW.minus(1, ChronoUnit.SECONDS);
-        try (CloseableIterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, 5, null, null, null)) {
-            List<MediaChange> list = new ArrayList<>();
-            changes.forEachRemaining(list::add);
-            assertThat(list).hasSize(5);
+        Iterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, 5, null, null, null);
+        List<MediaChange> list = new ArrayList<>();
+        changes.forEachRemaining(list::add);
+        assertThat(list).hasSize(5);
 
-            for (MediaChange c : list) {
-                assertThat(c.getPublishDate().isBefore(prev)).isFalse();
-                prev = c.getPublishDate();
-                log.info("{}", c);
-            }
+        for (MediaChange c : list) {
+            assertThat(c.getPublishDate().isBefore(prev)).isFalse();
+            prev = c.getPublishDate();
+            log.info("{}", c);
         }
     }
 
     @Test
-    public void testMediaChangesWithMax() throws Exception {
-        try (CloseableIterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, null, Order.DESC, 10, null, null, null)) {
-            List<MediaChange> list = new ArrayList<>();
-            changes.forEachRemaining(list::add);
-            assertThat(list).hasSize(10);
-        }
+    public void testMediaChangesWithMax() {
+        Iterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, null, Order.DESC, 10, null, null, null);
+        List<MediaChange> list = new ArrayList<>();
+        changes.forEachRemaining(list::add);
+        assertThat(list).hasSize(10);
     }
 
     @Test
-    public void testIterate() throws Exception {
+    public void testIterate() {
         target.iterateBatchSize = 10;
-        try (CloseableIterator<MediaObject> results = target.iterate(null, null, 0L, 1000, FilteringIterator.noKeepAlive())) {
-            assertThat(results).toIterable().hasSize(indexedObjectCount);
-        }
+        Iterator<MediaObject> results = target.iterate(null, null, 0L, 1000, FilteringIterator.noKeepAlive());
+        assertThat(results).toIterable().hasSize(indexedObjectCount);
     }
 
     @Test
-    public void testIterateWithOffset() throws Exception {
+    public void testIterateWithOffset() {
         target.iterateBatchSize = 10;
-        try (CloseableIterator<MediaObject> results = target.iterate(null, null, 10L, 1000, FilteringIterator.noKeepAlive())) {
-            assertThat(results).toIterable().hasSize(indexedObjectCount - 10);
-        }
+        Iterator<MediaObject> results = target.iterate(null, null, 10L, 1000, FilteringIterator.noKeepAlive());
+        assertThat(results).toIterable().hasSize(indexedObjectCount - 10);
     }
 
 
