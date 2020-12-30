@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -79,7 +78,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         .mid("POMS_S_12345")
         .type(GroupType.SERIES);
 
-    private static final ESMediaRepository target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
+    private static ESMediaRepository target;
 
 
     private static Group group;
@@ -111,6 +110,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @BeforeEach
     public void init() {
+
         // during debugging you could set this to false, which would simplify queries
         target.setScore(true);
     }
@@ -121,9 +121,11 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
      * with all their attributes
      */
     @Override
-    protected void firstRun() throws InterruptedException, ExecutionException, IOException {
+    protected void firstRun() throws IOException {
 
         createIndicesIfNecessary();
+
+        target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
 
