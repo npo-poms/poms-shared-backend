@@ -9,18 +9,14 @@ import java.util.List;
 
 import javax.xml.bind.JAXB;
 
-import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.jupiter.api.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
-import nl.vpro.jackson2.Jackson2Mapper;
 
 import static nl.vpro.domain.media.MediaBuilder.program;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
@@ -42,13 +38,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     public void setup() {
         repository = new ESScheduleRepository(clientFactory,
             new ESMediaRepository(clientFactory, "", new MediaScoreManagerImpl()), new MediaScoreManagerImpl());
-        repository.setIndexName(indexNames.get(APIMEDIA));
+        repository.setIndexName(indexHelpers.get(APIMEDIA).getIndexName());
         repository.setScore(false);
         clearIndices();
     }
 
     @Test
-    public void list() throws Exception {
+    public void list() {
         index(program().mid("DONNA_1")
             .scheduleEvents(
                 event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -66,7 +62,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     }
 
     @Test
-    public void listTestScrolled() throws Exception {
+    public void listTestScrolled() {
         index(program().mid("DONNA_1")
             .scheduleEvents(
                 event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -95,7 +91,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @Test
-    public void listSchedulesWithChannel() throws Exception {
+    public void listSchedulesWithChannel() {
         index(program().mid("DONNA_1")
                 .scheduleEvents(
                         event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -115,7 +111,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         assertThat(result).hasSize(1);
     }
     @Test
-    public void nowForChannel() throws Exception {
+    public void nowForChannel() {
 
         Instant now = LocalDateTime.of(2020, 4, 15, 20, 40).atZone(Schedule.ZONE_ID).toInstant();
 
@@ -136,7 +132,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     }
 
     @Test
-    public void listSchedulesWithSubtitles() throws Exception {
+    public void listSchedulesWithSubtitles() {
         index(MediaTestDataBuilder.program().mid("SUBS_PROG_1").withDutchCaptions());
         index(MediaTestDataBuilder.group().mid("SUBS_GROUP_1").withDutchCaptions());
         index(MediaTestDataBuilder.segment().mid("SUBS_SEGMENT_1").withDutchCaptions());
@@ -147,7 +143,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     }
 
     @Test
-    public void findByCrid() throws Exception {
+    public void findByCrid() {
         String cridToFind = "crid://uitzending/1";
         //String cridToFind = "criduitzending1";
         index(program().mid("DONNA_2").crids(cridToFind));
@@ -160,7 +156,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @Test
-    public void listSchedulesForBroadcaster() throws Exception {
+    public void listSchedulesForBroadcaster() {
         index(program().mid("DONNA_1")
                 .broadcasters(new Broadcaster("VPRO"))
                 .scheduleEvents(
@@ -194,7 +190,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
      */
     @Test
     @Disabled("API-249")
-    public void listSchedulesForBroadcasterWithMax() throws Exception {
+    public void listSchedulesForBroadcasterWithMax() {
 
         Instant now = Instant.now();
         Instant first = LocalDateTime.parse("2018-11-19T10:00:00").atZone(Schedule.ZONE_ID).toInstant();
@@ -249,7 +245,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @Test
-    public void listSchedulesForMediaType() throws Exception {
+    public void listSchedulesForMediaType() {
         MediaObject[] indexed = index(
             program().mid("GEENMOVIE")
                 .type(ProgramType.BROADCAST)
@@ -265,7 +261,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @Test
-    public void listSchedulesForAncestors() throws Exception {
+    public void listSchedulesForAncestors() {
         MediaObject[] indexed = index(
             program().mid("p1")
                 .descendantOf("DESCENDANT1")
@@ -286,7 +282,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @Test
-    public void findSchedulesForRerun() throws Exception {
+    public void findSchedulesForRerun() {
         index(
             program().mid("p1")
                 .descendantOf("DESCENDANT1")
@@ -316,7 +312,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @Test
-    public void findSchedulesForOriginal() throws Exception {
+    public void findSchedulesForOriginal() {
 
         index(
             program()
@@ -351,7 +347,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     }
     @Test
-    public void findScheduleWithGenre() throws JsonProcessingException {
+    public void findScheduleWithGenre() {
         index(
             program().mid("p1")
                 .type(ProgramType.BROADCAST)
@@ -400,9 +396,8 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                         .rerun(true)
                         .build()
                 ).build());
-        assertThatThrownBy(() -> {
-            repository.findSchedules(null, form, 0L, 10);
-        }).isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() ->
+            repository.findSchedules(null, form, 0L, 10)).isInstanceOf(IllegalArgumentException.class)
             .hasMessageFindingMatch(".+");
 
     }
@@ -434,7 +429,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     @SafeVarargs
-    private final <MO extends MediaObject, B extends MediaBuilder<B, MO>> MediaObject[] index(B... os) throws JsonProcessingException {
+    private final <MO extends MediaObject, B extends MediaBuilder<B, MO>> MediaObject[] index(B... os) {
         MediaObject[] result = new MediaObject[os.length];
         int i = 0;
         for (B o : os) {
@@ -443,11 +438,10 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
             }
             MO program = o.build();
             result[i++] = program;
-            client.prepareIndex()
-                .setIndex(indexNames.get(APIMEDIA))
-                .setId(o.getMid())
-                .setSource(Jackson2Mapper.getPublisherInstance().writeValueAsBytes(program), XContentType.JSON)
-                .get();
+            indexHelpers.get(APIMEDIA).index(
+                o.getMid(),
+                program
+            );
         }
         refresh();
         return result;

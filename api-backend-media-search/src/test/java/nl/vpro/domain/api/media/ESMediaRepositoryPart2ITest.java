@@ -12,12 +12,13 @@ import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,7 +36,6 @@ import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
-import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.media.domain.es.Common;
 import nl.vpro.util.FilteringIterator;
 
@@ -44,6 +44,7 @@ import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.support.Workflow.PUBLISHED_AS_DELETED;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
+import static nl.vpro.media.domain.es.ApiRefsIndex.APIMEDIA_REFS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.data.Index.atIndex;
@@ -58,7 +59,7 @@ import static org.mockito.Mockito.mock;
  */
 
 @Slf4j
-@TestMethodOrder(MethodOrderer.Alphanumeric.class)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();
@@ -78,7 +79,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         .mid("POMS_S_12345")
         .type(GroupType.SERIES);
 
-    private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags", new MediaScoreManagerImpl());
+    private static final ESMediaRepository target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
 
 
     private static Group group;
@@ -125,11 +126,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         createIndicesIfNecessary();
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
-        if (! indexNames.containsKey(APIMEDIA)) {
-            throw new IllegalStateException("Didn't create index " + APIMEDIA);
-        }
 
-        target.setIndexName(indexNames.get(APIMEDIA));
+        target.setIndexName(indexHelpers.get(APIMEDIA).getIndexName());
 
         group = index(groupBuilder.published());
         group_ordered = index(MediaTestDataBuilder.group().constrained().published(NOW).type(GroupType.SERIES).withMid());
@@ -246,20 +244,23 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
     @Test
-    public void testGroupBy() {
+    public void testGroupBy() throws IOException {
 
-        SearchResponse response = client.prepareSearch(indexNames.get(APIMEDIA))
-            .addAggregation(AggregationBuilders.terms("workflows")
-                .field("workflow")
-                .order(BucketOrder.key(true)))
-            .addAggregation(AggregationBuilders.terms("objectTypes")
-                .field("objectType")
-                .order(BucketOrder.key(true)))
-            .addAggregation(AggregationBuilders.terms("types")
-                .field("type")
-                .order(BucketOrder.key(true)))
-            .setSize(0)
-            .get();
+        SearchSourceBuilder source = new SearchSourceBuilder();
+        source.aggregation(AggregationBuilders.terms("workflows")
+            .field("workflow")
+            .order(BucketOrder.key(true)));
+        source.aggregation(AggregationBuilders.terms("objectTypes")
+            .field("objectType")
+            .order(BucketOrder.key(true)));
+        source.aggregation(AggregationBuilders.terms("types")
+            .field("type")
+            .order(BucketOrder.key(true)));
+        source.size(0);
+
+        SearchRequest request = new SearchRequest(indexHelpers.get(APIMEDIA).getIndexName());
+        request.source(source);
+        SearchResponse response = highLevelClient().search(request, RequestOptions.DEFAULT);
 
         {
             Terms a = response.getAggregations().get("workflows");
@@ -897,7 +898,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
 
-    private static <T extends MediaObject> T index(MediaBuilder<?, T> builder) throws IOException, ExecutionException, InterruptedException {
+    private static <T extends MediaObject> T index(MediaBuilder<?, T> builder) throws IOException {
         if (! PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
              builder.workflow(Workflow.PUBLISHED);
         }
@@ -906,22 +907,16 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
         Consumer<ObjectNode> addPublishdate = addPublishDate(object.getLastPublishedInstant());
 
-        AbstractESRepositoryITest.client
+        indexHelpers.get(APIMEDIA).index(
+            object.getMid(),
+            map(object, addPublishdate));
 
-            .index(
-                new IndexRequest(indexNames.get(APIMEDIA))
-                    .id(object.getMid())
-                    .source(map(object, addPublishdate), XContentType.JSON)
-            ).get();
         for (MemberRef r : object.getMemberOf()) {
             StandaloneMemberRef ref = StandaloneMemberRef.builder().memberRef(r).build();
-            AbstractESRepositoryITest.client
-                .index(
-                new IndexRequest(indexNames.get(ApiRefsIndex.APIMEDIA_REFS))
-                    .id(ref.getId().toString())
-                    .routing(ref.getMidRef())
-                    .source(map(ref, addPublishdate), XContentType.JSON)
-            ).get();
+            indexHelpers.get(APIMEDIA_REFS).indexWithRouting(
+                ref.getId().toString(),
+                map(ref, addPublishdate),
+                ref.getMidRef());
         }
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
@@ -956,7 +951,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     static byte[] map(Object obj, Consumer<ObjectNode> consumer) throws JsonProcessingException {
         ObjectNode jsonNode = Jackson2Mapper.getPublisherInstance().valueToTree(obj);
-        consumer.accept(jsonNode);;
+        consumer.accept(jsonNode);
         return Jackson2Mapper.getPublisherInstance().writeValueAsBytes(jsonNode);
 
     }

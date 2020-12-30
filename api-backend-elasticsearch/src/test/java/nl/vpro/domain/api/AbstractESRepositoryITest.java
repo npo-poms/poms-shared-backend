@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
+import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -100,6 +101,14 @@ public abstract class AbstractESRepositoryITest {
         } else {
             throw new IllegalStateException("Expected exactly one index, but found " + indexHelpers.keySet());
         }
+    }
+
+    public static String getIndexName(ElasticSearchIndex elasticSearchIndex) {
+        return indexHelpers.get(elasticSearchIndex).getIndexName();
+    }
+
+    public static  RestHighLevelClient highLevelClient() {
+        return staticClientFactory.highLevelClient("test");
     }
 
     protected static IndexHelper createIndexIfNecessary(ElasticSearchIndex abstractIndex)  {
