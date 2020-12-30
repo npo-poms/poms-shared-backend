@@ -139,7 +139,7 @@ public abstract class AbstractESRepositoryITest {
     @SneakyThrows
     protected static void refresh() {
         for (IndexHelper indexHelper : indexHelpers.values()) {
-            log.info("Refreshing {}", indexHelper.getIndexName());
+            log.debug("Refreshing {}", indexHelper.getIndexName());
             indexHelper.refresh();
         }
     }

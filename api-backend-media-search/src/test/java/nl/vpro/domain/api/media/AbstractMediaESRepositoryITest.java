@@ -14,7 +14,6 @@ import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearchclient.ElasticSearchIterator;
-import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.Slf4jHelper;
 import nl.vpro.media.domain.es.*;
@@ -32,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     protected static void createIndicesIfNecessary() {
-        IndexHelper indexName = createIndexIfNecessary(APIMEDIA);
+        String indexName = createIndexIfNecessary(APIMEDIA).getIndexName();
         createIndexIfNecessary(APIMEDIA_REFS, indexName + ApiRefsIndex.POSTFIX);
         for (ApiCueIndex i : ApiCueIndex.getInstances()) {
             createIndexIfNecessary(i);
