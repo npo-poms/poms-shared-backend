@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -24,8 +25,10 @@ import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
 import nl.vpro.domain.Displayable;
+import nl.vpro.domain.media.Schedule;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
+import nl.vpro.i18n.Locales;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.*;
 
@@ -245,9 +248,17 @@ public abstract class ESFacetsHandler {
                             .build();
                         dateFacetResultItems.add(entry);
                     } else if (bucket instanceof Histogram.Bucket) {
+                        String[] split = bucket.getKeyAsString().split("/", 2);
+
+                        Instant instant = ESFacetsBuilder.FORMATTER.parse(split[0], Instant::from);
+                        String format = split[1];
+                        DateTimeFormatter formatter = DateTimeFormatter
+                            .ofPattern(format)
+                            .withLocale(/* first day of week must be monday */ Locales.DUTCH)
+                            .withZone(Schedule.ZONE_ID);
                         DateFacetResultItem entry = DateFacetResultItem
                             .builder()
-                            .value(bucket.getKeyAsString()) //
+                            .value(formatter.format(instant))
                             .count(bucket.getDocCount())
                             .build();
                         dateFacetResultItems.add(entry);
@@ -259,7 +270,9 @@ public abstract class ESFacetsHandler {
         }
         if (dateRangeFacets != null) {
             // make sure the results are ordered the same as the request.
-            dateFacetResultItems.sort(Comparator.comparingInt(resultItem -> indexOf(resultItem, dateRangeFacets.getRanges())));
+            dateFacetResultItems.sort(
+                Comparator.comparingInt(resultItem -> indexOf(resultItem, dateRangeFacets.getRanges()))
+            );
         }
         return dateFacetResultItems;
     }
