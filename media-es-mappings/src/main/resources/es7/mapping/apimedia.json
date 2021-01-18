@@ -792,6 +792,19 @@
             "bitrate": {
               "type": "long"
             },
+            "audioAttributes": {
+              "properties": {
+                "audioCoding": {
+                  "type": "keyword"
+                },
+                "language": {
+                  "type": "keyword"
+                },
+                "numberOfChannels": {
+                  "type": "long"
+                }
+              }
+            },
             "videoAttributes": {
               "properties": {
                 "aspectRatio": {
