@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
+import nl.vpro.mdc.MDCConstants;
+
 /**
  * @author rico
  */
@@ -33,8 +35,8 @@ public class MediaFilterThreadLocalFilter implements Filter {
             }
             String query = req.getQueryString();
             String path = req.getRequestURI().substring(req.getContextPath().length());
-            MDC.put("request", req.getMethod() + " " + path + (StringUtils.isEmpty(query) ? "" : ("?" + query)));
-            MDC.put("remoteHost", ip);
+            MDC.put(MDCConstants.REQUEST, req.getMethod() + " " + path + (StringUtils.isEmpty(query) ? "" : ("?" + query)));
+            MDC.put(MDCConstants.REMOTE_ADDR, ip);
 
             ApiMediaFilter.removeFilter();
 
@@ -47,7 +49,6 @@ public class MediaFilterThreadLocalFilter implements Filter {
             }
             throw ioe;
         } finally {
-
             ApiMediaFilter.removeFilter();
             MDC.clear();
         }
