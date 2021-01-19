@@ -22,4 +22,6 @@
     <constructor-arg index="1" value="${cors.policy}"/>
   </bean>
 
+  <bean class="nl.vpro.rs.interceptors.LoggingInterceptor" />
+
 </beans>
