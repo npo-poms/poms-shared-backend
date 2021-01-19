@@ -85,7 +85,7 @@ public class PushMappings implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         try (ClientElasticSearchFactory factory = new ClientElasticSearchFactory()) {
-            factory.setUnicastHosts(host);
+            factory.setHosts(host);
             if (cluster != null) {
                 factory.setClusterName(cluster);
                 log.info("Cluster name {}", cluster);
