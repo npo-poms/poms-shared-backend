@@ -429,6 +429,9 @@
         },
         "type": {
           "type": "keyword"
+        },
+        "workflow": {
+          "type": "keyword"
         }
       }
     },
