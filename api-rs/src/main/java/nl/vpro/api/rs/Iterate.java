@@ -6,9 +6,13 @@ import java.io.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.*;
 
 import org.apache.commons.io.IOUtils;
@@ -33,7 +37,7 @@ public class Iterate {
         PipedOutputStream pipedOutputStream = new PipedOutputStream();
         PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
-        StreamingOutput streamingOutput = output -> IOUtils.copy(pipedInputStream, output);
+
         JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory().createGenerator(pipedOutputStream);
 
         CloseableIterator<T> iterator;
@@ -43,20 +47,52 @@ public class Iterate {
             CloseableIterator.closeQuietly(jg);
             throw e;
         }
+
+        final AtomicInteger closed = new AtomicInteger(0);
+        final Runnable closeResources = () ->  {
+            if (closed.getAndIncrement() == 0) {
+                log.debug("Closing {}", iterator);
+                CloseableIterator.closeQuietly(iterator);
+            }  else {
+                log.info("Closed already {}", iterator);
+            }
+        };
+
+
         final SecurityContext context = SecurityContextHolder.getContext();
         // ForkJoinPool.commonPool() doesn't work because serviceloader may not be available in classloader of tomcat?
         // see e.g. also https://github.com/talsma-ict/context-propagation/issues/94
-        ThreadPools.copyExecutor.submit(() -> {
+        final Future<?> submit = ThreadPools.copyExecutor.submit(() -> {
             SecurityContextHolder.setContext(context);
             try {
                 streamer.accept(iterator, jg);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             } finally {
-                CloseableIterator.closeQuietly(jg, iterator);
+                closeResources.run();
             }
             SecurityContextHolder.clearContext();
         });
+
+        final StreamingOutput streamingOutput = output -> {
+            try {
+                IOUtils.copy(pipedInputStream, output);
+            } catch (ClientErrorException | IOException clientError) {
+                log.info(clientError.getMessage());
+                throw clientError;
+            } catch (WebApplicationException e) {
+                log.warn(e.getMessage(), e);
+                throw e;
+            } catch(Throwable t) {
+                log.warn(t.getMessage(), t);
+                throw new RuntimeException(t);
+            } finally {
+                if (submit.cancel(true)) {
+                    log.debug("Canceled {}", submit);
+                }
+            }
+        };
+
 
         Response.ResponseBuilder builder =  Response.ok()
             .type(MediaType.APPLICATION_JSON_TYPE)
