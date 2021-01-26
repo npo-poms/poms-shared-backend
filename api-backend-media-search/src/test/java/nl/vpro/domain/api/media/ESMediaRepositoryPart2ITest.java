@@ -34,9 +34,11 @@ import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
+import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.Common;
+import nl.vpro.util.CloseableIterator;
 import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.FacetResults.toSimpleMap;
@@ -114,6 +116,12 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         // during debugging you could set this to false, which would simplify queries
         target.setScore(true);
     }
+
+    @AfterEach
+    public void checkScrollIds() {
+        assertThat(ElasticSearchIterator.getScrollIds()).isEmpty();
+    }
+
 
     /**
      * Builds a test database
@@ -336,40 +344,44 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
      @Test
-    public void testMediaChangesSinceWithMax() {
+    public void testMediaChangesSinceWithMax() throws Exception {
         Instant prev = NOW.minus(1, ChronoUnit.SECONDS);
-        Iterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, 5, null, null, null);
-        List<MediaChange> list = new ArrayList<>();
-        changes.forEachRemaining(list::add);
-        assertThat(list).hasSize(5);
+        try (CloseableIterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, 5, null, null, null)) {
+            List<MediaChange> list = new ArrayList<>();
+            changes.forEachRemaining(list::add);
+            assertThat(list).hasSize(5);
 
-        for (MediaChange c : list) {
-            assertThat(c.getPublishDate().isBefore(prev)).isFalse();
-            prev = c.getPublishDate();
-            log.info("{}", c);
+            for (MediaChange c : list) {
+                assertThat(c.getPublishDate().isBefore(prev)).isFalse();
+                prev = c.getPublishDate();
+                log.info("{}", c);
+            }
         }
     }
 
     @Test
-    public void testMediaChangesWithMax() {
-        Iterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, null, Order.DESC, 10, null, null, null);
-        List<MediaChange> list = new ArrayList<>();
-        changes.forEachRemaining(list::add);
-        assertThat(list).hasSize(10);
+    public void testMediaChangesWithMax() throws Exception {
+        try (CloseableIterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, null, Order.DESC, 10, null, null, null)) {
+            List<MediaChange> list = new ArrayList<>();
+            changes.forEachRemaining(list::add);
+            assertThat(list).hasSize(10);
+        }
     }
 
     @Test
-    public void testIterate() {
+    public void testIterate() throws Exception {
         target.iterateBatchSize = 10;
-        Iterator<MediaObject> results = target.iterate(null, null, 0L, 1000, FilteringIterator.noKeepAlive());
-        assertThat(results).toIterable().hasSize(indexedObjectCount);
+        try (CloseableIterator<MediaObject> results = target.iterate(null, null, 0L, 1000, FilteringIterator.noKeepAlive())) {
+            assertThat(results).toIterable().hasSize(indexedObjectCount);
+        }
     }
 
     @Test
-    public void testIterateWithOffset() {
+    public void testIterateWithOffset() throws Exception {
         target.iterateBatchSize = 10;
-        Iterator<MediaObject> results = target.iterate(null, null, 10L, 1000, FilteringIterator.noKeepAlive());
-        assertThat(results).toIterable().hasSize(indexedObjectCount - 10);
+        try (CloseableIterator<MediaObject> results = target.iterate(null, null, 10L, 1000, FilteringIterator.noKeepAlive())) {
+            assertThat(results).toIterable().hasSize(indexedObjectCount - 10);
+        }
     }
 
 

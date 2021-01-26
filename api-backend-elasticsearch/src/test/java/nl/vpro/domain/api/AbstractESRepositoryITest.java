@@ -130,10 +130,19 @@ public abstract class AbstractESRepositoryITest {
 
 
     protected static void clearIndices() {
+        refresh();
         for (IndexHelper indexHelper : indexHelpers.values()) {
             indexHelper.clearIndex();
-
         }
+        refresh();
+        for (IndexHelper indexHelper : indexHelpers.values()) {
+            long count = indexHelper.count();
+            if (count > 0) {
+                throw new IllegalStateException();
+            }
+        }
+
+
     }
 
     @SneakyThrows
