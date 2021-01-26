@@ -7,11 +7,11 @@
     </layout>
   </appender>
   <logger name="nl.vpro.domain.api.media.ESMediaRepository">
-    <level value="DEBUG" />
+    <level value="INFO" />
   </logger>
 
   <logger name="nl.vpro.domain.api.schedule.ESScheduleRepository">
-    <level value="DEBUG" />
+    <level value="INFO" />
   </logger>
 
 
