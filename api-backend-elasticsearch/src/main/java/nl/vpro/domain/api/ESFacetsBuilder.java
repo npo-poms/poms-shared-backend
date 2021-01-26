@@ -6,6 +6,7 @@ package nl.vpro.domain.api;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.function.*;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,8 @@ import org.meeuw.functional.TriFunction;
  * @since 2.0
  */
 public abstract class ESFacetsBuilder {
+    private static final String FORMATTER_PATTERN = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ";
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(FORMATTER_PATTERN);
 
     public static final String FILTER_POSTFIX = "_filter";
 
@@ -132,8 +135,9 @@ public abstract class ESFacetsBuilder {
                             .dateHistogram(name)
                             .dateHistogramInterval(from(dateRange.getInterval()))
                             .field(prefix + fieldName)
-                            .format(format)
+                            .format(FORMATTER_PATTERN + "'/" + format.replaceAll("'", "''") + "'")
                             .keyed(false)
+                            .timeZone(Schedule.ZONE_ID)
                             .minDocCount(1)
                             ;
                         rootAggregation.subAggregation(histogramAggregationBuilder);
