@@ -27,6 +27,7 @@ import nl.vpro.domain.media.support.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.Portal;
 import nl.vpro.elasticsearch.Constants;
+import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
@@ -77,6 +78,11 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         target.setIndexName(indexHelpers.get(ApiMediaIndex.APIMEDIA).getIndexName());
         target.redirects = new RedirectList();
         clearIndices();
+    }
+
+    @AfterEach
+    public void checkScrollIds() {
+        assertThat(ElasticSearchIterator.getScrollIds()).isEmpty();
     }
 
 
@@ -2182,21 +2188,17 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .memberRef(object)
             .objectType(objectType)
             .build();
-        try {
-            byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
-            String indexName = indexHelpers.get(ApiRefsIndex.APIMEDIA_REFS).getIndexName();
-            assertThat(object.getMidRef()).isNotEmpty();
-            ObjectNode jsonNodes = indexHelpers.get(ApiRefsIndex.APIMEDIA_REFS).indexWithRouting(
-                ref.getId().toString(),
-                ref,
-                object.getMidRef());
+        String indexName = indexHelpers.get(ApiRefsIndex.APIMEDIA_REFS).getIndexName();
+        assertThat(object.getMidRef()).isNotEmpty();
+        ObjectNode jsonNodes = indexHelpers.get(ApiRefsIndex.APIMEDIA_REFS).indexWithRouting(
+            ref.getId().toString(),
+            ref,
+            object.getMidRef());
 
-            log.info("Indexed {} {}", indexName, jsonNodes.get(Constants.Fields.ID));
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
+        log.info("Indexed {} {}", indexName, jsonNodes.get(Constants.Fields.ID));
         refresh();
     }
+
     protected MediaSearchResult getAndTestResult(MediaForm form) {
         return getAndTestResult(target, form);
     }

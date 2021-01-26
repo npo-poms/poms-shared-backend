@@ -10,24 +10,22 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.checkerframework.checker.nullness.qual.Nullable;;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
-import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
+import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
-import nl.vpro.domain.api.ESFacetsBuilder;
-import nl.vpro.domain.api.ESFacetsHandler;
-import nl.vpro.domain.api.MultipleFacetsResult;
-import nl.vpro.domain.api.TermFacetResultItem;
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.media.*;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.getAggregationName;
 import static nl.vpro.domain.api.ESFacetsBuilder.getNestedFieldName;
 import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
+
+;
 
 /**
  * @author Roelof Jan Koekoek
@@ -64,12 +62,12 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
                 getTitleAggregationResultItems(request.getTitles(), rootFilter)
             );
             List<TermFacetResultItem> titles = facetsResult.getTitles();
-            StringTerms terms = rootFilter.getAggregations().get(getAggregationName(prefix, "titles.value.full"));
+            ParsedStringTerms terms = rootFilter.getAggregations().get(getAggregationName(prefix, "titles.value.full"));
             if (terms != null) {
                 if (titles == null) {
                     titles = new ArrayList<>();
                 }
-                for (StringTerms.Bucket bucket : terms.getBuckets()) {
+                for (Terms.Bucket bucket : terms.getBuckets()) {
                     titles.add(new TermFacetResultItem(bucket.getKeyAsString(), bucket.getKeyAsString(), bucket.getDocCount()));
                 }
             }

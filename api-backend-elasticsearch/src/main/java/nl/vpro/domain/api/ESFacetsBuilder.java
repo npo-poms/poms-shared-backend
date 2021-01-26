@@ -25,6 +25,8 @@ import org.elasticsearch.search.aggregations.bucket.terms.IncludeExclude;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.meeuw.functional.TriFunction;
 
+import nl.vpro.domain.media.Schedule;
+
 
 /**
  * @author Roelof Jan Koekoek

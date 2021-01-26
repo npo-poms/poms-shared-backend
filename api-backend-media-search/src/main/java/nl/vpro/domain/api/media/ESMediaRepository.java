@@ -30,8 +30,6 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.PeekingIterator;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -437,7 +435,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             mids = new ArrayList<>();
             try (HighLevelElasticSearchIterator<String> iterator = HighLevelElasticSearchIterator.<String>highLevelBuilder()
                 .client(factory.get())
-                .adapt((sh) -> sh.get("source").get("childRef").textValue()) // todo
+                .adapt((sh) -> sh.get(Constants.Fields.SOURCE).get("childRef").textValue()) // todo
                 .routing(media.getMid())
                 .build()) {
                 SearchSourceBuilder builder = iterator.prepareSearchSource(getRefsIndexName());
@@ -556,10 +554,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             keepAlive == null ? Long.MAX_VALUE : keepAlive
         );
 
-        Iterator<MediaChange> iterator = changes;
+        CloseableIterator<MediaChange> iterator = changes;
 
         if (since != null && mid != null) {
-            PeekingIterator<MediaChange> peeking = Iterators.peekingIterator(changes);
+            CloseablePeekingIterator<MediaChange> peeking = changes.peeking();
             iterator = peeking;
             while(peeking.hasNext()) {
                 MediaChange peek = peeking.peek();

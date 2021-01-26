@@ -18,6 +18,7 @@
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
+    <vpro.shared.version>2.21-SNAPSHOT</vpro.shared.version>
   </properties>
 
   <scm>
