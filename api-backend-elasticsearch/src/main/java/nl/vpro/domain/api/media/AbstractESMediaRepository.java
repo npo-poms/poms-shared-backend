@@ -31,8 +31,8 @@ import nl.vpro.domain.media.MediaLoader;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.ESClientFactory;
-import nl.vpro.elasticsearch7.IndexHelper;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.util.TimeUtils;
 
