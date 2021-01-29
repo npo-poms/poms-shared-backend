@@ -28,6 +28,7 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.search.InstantRange;
 import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.domain.media.support.Workflow;
+import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.elasticsearch.highlevel.HighLevelElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -334,7 +335,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
     protected MediaObject getMediaObject(JsonNode hit) {
         try {
-            return getObject(hit, MediaObject.class);
+            return getObject(hit.get(Constants.Fields.SOURCE), MediaObject.class);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
