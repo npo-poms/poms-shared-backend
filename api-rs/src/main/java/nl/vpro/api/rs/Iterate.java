@@ -155,6 +155,7 @@ public class Iterate {
             jg.writeEndArray();
             jg.writeEndObject();
             jg.flush();
+            jg.close();
         }
         Duration duration = Duration.between(start, Instant.now());
         log.info("Streamed for {} entries: {}, errors: {}. Took {}", forString, count, errors, duration);
