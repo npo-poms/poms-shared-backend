@@ -19,22 +19,24 @@ import javax.validation.*;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
 import org.springframework.stereotype.Repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import nl.vpro.domain.Identifiable;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.ESClientFactory;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.jackson2.Jackson2Mapper;
 
 /**
- * A repository that talks to exactly one type in exaclty one index
+ * A repository that talks to exactly one type in exactly one index
  * @author Michiel Meeuwisssen
  */
 @Slf4j
@@ -49,7 +51,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     private Method prePersist;
 
     @Inject
-    public SimpleESRepository(ESClientFactory factory, Class<T> clazz, ElasticSearchIndex apiElasticSearchIndex) {
+    public SimpleESRepository(HighLevelClientFactory factory, Class<T> clazz, ElasticSearchIndex apiElasticSearchIndex) {
         super(factory);
         this.setIndexName(apiElasticSearchIndex, apiElasticSearchIndex.getIndexName());
         this.index = apiElasticSearchIndex;
@@ -62,7 +64,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     }
 
     @Override
-    protected ElasticSearchIndex getIndex(String id, Class clazz) {
+    protected ElasticSearchIndex getIndex(String id, Class<?> clazz) {
         return index;
     }
 
@@ -97,27 +99,25 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
             log.warn("Could not validate because {}", npfe.getMessage());
         }
         try {
-            IndexResponse response = client()
-                .prepareIndex().setIndex(getPublishIndexName()).setId(update.getId().toString())
-                .setSource(Jackson2Mapper.getInstance().writeValueAsBytes(update), XContentType.JSON)
-                .get();
+            IndexRequest request = new IndexRequest(getPublishIndexName());
+            request.id(update.getId().toString());
+            request.source(Jackson2Mapper.getInstance().writeValueAsBytes(update), XContentType.JSON);
+            IndexResponse response = client().index(request, RequestOptions.DEFAULT);
             log.info("Indexed {} {}", update, response.getVersion());
             return update;
-        } catch (ElasticsearchException e) {
+        } catch (ElasticsearchException  e) {
             log.warn("Error during update {} {}", update, e.getDetailedMessage());
             return null;
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             log.error("Error saving {}} {} {}", clazz.getSimpleName(), update, e.getMessage());
             return null;
         }
 
     }
 
-    public Optional<T> get(I id) {
-        GetResponse response = client().prepareGet()
-            .setIndex(getIndexName())
-            .setId(id.toString())
-            .get();
+    public Optional<T> get(I id) throws IOException {
+        GetRequest request = new GetRequest(getIndexName(), id.toString());
+        GetResponse response = client().get(request, RequestOptions.DEFAULT);
         if (response.isExists()) {
             return Optional.of(unMap(response.getSourceAsString()));
         }
@@ -125,13 +125,10 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     }
 
 
-    public boolean delete(I id) {
+    public boolean delete(I id) throws IOException {
+        DeleteRequest request = new DeleteRequest(getIndexName(), id.toString());
         DeleteResponse response =
-            client()
-                .prepareDelete()
-                .setIndex(getPublishIndexName())
-                .setId(id.toString())
-                .get();
+            client().delete(request, RequestOptions.DEFAULT);
         log.info("Deleted {} {} ({})", id, response.getVersion(), response.status());
         return response.status() != RestStatus.NOT_FOUND;
 

@@ -38,8 +38,7 @@ you need to have a tunneling from your machine.
 
 == At openshift
 
-The script can also be run agains the elasticsearch implementation at amazon. This installation required username/password:
-
+The script can also be run against the elasticsearch implementation at amazon. This installation required username/password:
 
 `
 (cd push-es-mappings/ ; mvn -Dhost=localhost:9200 -Duser=elastsicsearch -Dpassword=<>)

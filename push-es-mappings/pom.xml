@@ -13,7 +13,7 @@
 
   <properties>
     <host>http://localhost:9215</host>
-    <cluster />
+    <cluster></cluster>
     <user>elasticsearch</user>
     <password>***</password>
   </properties>

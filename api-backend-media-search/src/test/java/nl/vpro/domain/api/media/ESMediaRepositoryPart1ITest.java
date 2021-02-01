@@ -11,12 +11,11 @@ import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXB;
 
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import nl.vpro.domain.Displayable;
 import nl.vpro.domain.api.Order;
@@ -27,6 +26,8 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.Portal;
+import nl.vpro.elasticsearch.Constants;
+import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
@@ -74,9 +75,14 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
     @BeforeEach
     public  void setup() {
-        target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
+        target.setIndexName(indexHelpers.get(ApiMediaIndex.APIMEDIA).getIndexName());
         target.redirects = new RedirectList();
         clearIndices();
+    }
+
+    @AfterEach
+    public void checkScrollIds() {
+        assertThat(ElasticSearchIterator.getScrollIds()).isEmpty();
     }
 
 
@@ -2166,13 +2172,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     private void indexMediaObject(MediaObject object) {
         try {
             byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(object);
-            String indexName = indexNames.get(ApiMediaIndex.APIMEDIA);
-            IndexResponse indexResponse = client.index(
-                new IndexRequest(indexName)
-                    .id(object.getMid())
-                    .source(bytes, XContentType.JSON))
-                .actionGet();
-            log.info("Indexed {} {} ({})", indexName, indexResponse.getId(), object.getWorkflow());
+            String indexName = indexHelpers.get(ApiMediaIndex.APIMEDIA).getIndexName();
+            ObjectNode indexResponse = indexHelpers.get(ApiMediaIndex.APIMEDIA).index(object.getMid(), bytes);
+            log.info("Indexed {} {} ({})", indexName, indexResponse.get(Constants.Fields.ID), object.getWorkflow());
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
@@ -2186,24 +2188,17 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .memberRef(object)
             .objectType(objectType)
             .build();
-        try {
-            byte[] bytes = Jackson2Mapper.getPublisherInstance().writeValueAsBytes(ref);
-            String indexName = indexNames.get(ApiRefsIndex.APIMEDIA_REFS);
-            assertThat(object.getMidRef()).isNotEmpty();
-            IndexResponse indexResponse = client.index(
-                new IndexRequest(indexName)
-                    .id(ref.getId().toString())
-                    .source(bytes, XContentType.JSON)
-                    .routing(object.getMidRef())
-                //.parent(object.getMidRef()))
-            ).actionGet();
+        String indexName = indexHelpers.get(ApiRefsIndex.APIMEDIA_REFS).getIndexName();
+        assertThat(object.getMidRef()).isNotEmpty();
+        ObjectNode jsonNodes = indexHelpers.get(ApiRefsIndex.APIMEDIA_REFS).indexWithRouting(
+            ref.getId().toString(),
+            ref,
+            object.getMidRef());
 
-            log.info("Indexed {} {}", indexName, indexResponse.getId());
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
+        log.info("Indexed {} {}", indexName, jsonNodes.get(Constants.Fields.ID));
         refresh();
     }
+
     protected MediaSearchResult getAndTestResult(MediaForm form) {
         return getAndTestResult(target, form);
     }

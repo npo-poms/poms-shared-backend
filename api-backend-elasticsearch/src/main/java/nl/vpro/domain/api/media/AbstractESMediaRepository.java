@@ -1,12 +1,11 @@
 package nl.vpro.domain.api.media;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -14,8 +13,8 @@ import javax.validation.constraints.Null;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
@@ -32,8 +31,8 @@ import nl.vpro.domain.media.MediaLoader;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch7.ESClientFactory;
-import nl.vpro.elasticsearch7.IndexHelper;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.util.TimeUtils;
 
@@ -53,19 +52,19 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     private final IndexHelper refsHelper;
 
 
-    protected AbstractESMediaRepository(ESClientFactory client) {
+    protected AbstractESMediaRepository(HighLevelClientFactory client) {
         super(client);
         this.helper = IndexHelper.builder()
             .log(log)
             .client(client)
             .settings(APIMEDIA.settings())
-            .mappings(APIMEDIA.mappingsAsMap())
+            .mapping(APIMEDIA.mapping())
             .build();
         this.refsHelper = IndexHelper.builder()
             .log(log)
             .client(client)
             .settings(ApiRefsIndex.APIMEDIA_REFS.settings())
-            .mappings(ApiRefsIndex.APIMEDIA_REFS.mappingsAsMap())
+            .mapping(ApiRefsIndex.APIMEDIA_REFS.mapping())
             .build();
     }
 
@@ -113,6 +112,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
 
 
+    @SneakyThrows(IOException.class)
     @Override
     public MediaObject load(boolean loadDeleted, String mid) {
         mid = redirect(mid).orElse(mid);
@@ -124,6 +124,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         }
     }
 
+    @SneakyThrows(IOException.class)
     @Override
     public List<MediaObject> loadAll(boolean loadDeleted, List<String> ids) {
         return loadAll(MediaObject.class, ids)
@@ -134,7 +135,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
 
-    protected <S extends MediaObject> List<Optional<S>> loadAll(Class<S> clazz, List<String> ids) {
+    protected <S extends MediaObject> List<Optional<S>> loadAll(Class<S> clazz, List<String> ids) throws IOException {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         if (ids.isEmpty()) {
             return Collections.emptyList();
@@ -152,7 +153,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable AbstractMediaForm form,
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
-        @Nullable Integer max) {
+        @Nullable Integer max) throws IOException {
 
         return mediaSearchRequest(
             profile,
@@ -176,7 +177,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable MediaObject mediaObject,
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
-        Integer max) {
+        Integer max) throws IOException {
         SearchRequest request = new SearchRequest(indexNames.get(APIMEDIA));
         SearchSourceBuilder searchSourceBuilder = mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max);
         boolean maxWasZero = handleMaxZero(max, searchSourceBuilder::size);
@@ -192,7 +193,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @NonNull AbstractMediaForm form,
         @NonNull BoolQueryBuilder filter,
         long offset,
-        Integer max) {
+        Integer max) throws IOException {
         return mediaSearchBuilder(profile, form, null, filter, offset, max);
     }
 
@@ -216,7 +217,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable MediaObject mediaObject,
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
-        @Nullable Integer max) {
+        @Nullable Integer max) throws IOException {
 
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
         // Handle profile and workflow filtering
@@ -265,15 +266,10 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable MediaFacets facets,
         long offset,
         @Nullable Integer max,
-        @NonNull Class<S> clazz) {
-        ActionFuture<SearchResponse> searchResponseFuture = client()
-            .search(request.getRequest())
-            ;
+        @NonNull Class<S> clazz) throws IOException {
 
         try {
-            SearchResponse response = searchResponseFuture
-                .actionGet(timeOut.toMillis(), TimeUnit.MILLISECONDS)
-                ;
+            SearchResponse response  = client().search(request.getRequest(),requestOptions());
             SearchHits hits = response.getHits();
 
             Duration took = Duration.ofMillis(response.getTook().getMillis());
@@ -293,8 +289,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
             String detail = e.getDetailedMessage();
             log.warn(e.getMessage() + ":" + detail);
             throw e;
-        } catch (SearchPhaseExecutionException ee) {
-            throw ee;
         }
     }
 

@@ -14,20 +14,18 @@ import java.util.List;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.jupiter.api.Test;
 
-import nl.vpro.domain.api.AbstractESRepositoryITest;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
 import nl.vpro.domain.media.support.Workflow;
-import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryITest {
 
-    private static final ESMediaRepository target = new ESMediaRepository((s) -> client, "tags", new MediaScoreManagerImpl());
+    private static final ESMediaRepository target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
 
     private long indexerStartTime;
     private long indexerStopTime;
@@ -46,13 +44,12 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     private long foundAllDataTime;
 
     // Number of documents to index
-    private int DOCCOUNT = 1000;
+    private static final int DOCCOUNT = 1000;
 
     @Override
     protected void firstRun() {
         createIndicesIfNecessary();
-
-        target.setIndexName(indexNames.get(ApiMediaIndex.APIMEDIA));
+        target.setIndexName(indexHelpers.get(ApiMediaIndex.APIMEDIA).getIndexName());
         clearIndices();
     }
 
@@ -112,13 +109,18 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
             long count = 0;
             log.info("Querier start");
             while (count < DOCCOUNT) {
-                final SearchRequestBuilder searchRequestBuilder = AbstractMediaESRepositoryITest.client.prepareSearch(indexNames.get(ApiMediaIndex.APIMEDIA))
-                    .addSort("publishDate", SortOrder.ASC)
-                    .addSort("mid", SortOrder.ASC);
-                ActionFuture<SearchResponse> searchResponseFuture = AbstractMediaESRepositoryITest.client
-                    .search(searchRequestBuilder.request());
+                IndexHelper helper = indexHelpers.get(ApiMediaIndex.APIMEDIA);
+                SearchSourceBuilder source = new SearchSourceBuilder();
 
-                SearchResponse response = searchResponseFuture.actionGet(5000, TimeUnit.MILLISECONDS);
+
+
+                source.sort("publishDate", SortOrder.ASC)
+                    .sort("mid", SortOrder.ASC);
+
+                final SearchRequest searchRequest = new SearchRequest(helper.getIndexName());
+                searchRequest.source(source);
+
+                SearchResponse response = highLevelClient().search(searchRequest, RequestOptions.DEFAULT);
                 SearchHits hits = response.getHits();
                 count = hits.getTotalHits().value;
                 if (count > 0 && foundDataTime == 0) {
@@ -137,13 +139,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
     }
 
     private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
-        AbstractESRepositoryITest.client
-            .index(
-                new IndexRequest(indexNames.get(ApiMediaIndex.APIMEDIA))
-                    .id(object.getMid())
-                    .source(Jackson2Mapper.INSTANCE.writeValueAsBytes(object), XContentType.JSON)
-            ).get();
-        assertThat(object.getLastPublishedInstant()).isNotNull();
+        indexHelpers.get(ApiMediaIndex.APIMEDIA).index(object.getMid(), object);
         return object;
     }
 }

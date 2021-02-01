@@ -7,7 +7,8 @@ package nl.vpro.domain.api.media;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -109,20 +110,19 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                     SEARCH_FIELDS
                 );
 
-            /*    if (SUBTITLES.getBoost() > 0.0f) {
+               /* if (SUBTITLES.getBoost() > 0.0f) {
                     SubtitlesSearch subtitlesSearch = new SubtitlesSearch();
                     subtitlesSearch.setText(textSearch);
                     //subtitlesSearch.setLanguages(TextMatcherList.must(TextMatcher.must("nl")));
                     QueryBuilder subtitlesQuery = ESSubtitlesQueryBuilder.query(subtitlesSearch);
                     textQuery
                         .should(
-                            JoinQueryBuilders.hasChildQuery(ApiCueIndex.TYPE, subtitlesQuery, ScoreMode.Max)
+                            JoinQueryBuilders.hasChildQuery(ApiCueIndex., subtitlesQuery, ScoreMode.Max)
                         )
                         .boost(SUBTITLES.getBoost());
                 } else {
                     log.debug("Searching in subtitles is disabled");
-                }
-*/
+                }*/
                 apply(booleanQuery, textQuery, textSearch.getMatch());
             }
         }

@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.domain.api.Suggestion;
-import nl.vpro.elasticsearch7.ESClientFactory;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -35,7 +35,7 @@ public class ESQueryRepositoryTest {
     }
 
     public void testAdapt(String input, String... suggestions) {
-        ESClientFactory factory = mock(ESClientFactory.class);
+        HighLevelClientFactory factory = mock(HighLevelClientFactory.class);
         ESQueryRepository instance = new ESQueryRepository(factory);
         org.elasticsearch.search.suggest.Suggest suggest = getSuggestResult(suggestions);
 

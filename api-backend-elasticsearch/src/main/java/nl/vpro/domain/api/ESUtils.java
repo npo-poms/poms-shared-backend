@@ -7,28 +7,18 @@ import org.elasticsearch.action.*;
 
 public class ESUtils {
 
-    public static <T> CompletableFuture<T> fromListenableActionFuture(ListenableActionFuture<T> future) {
-        CompletableFuture<T> cFuture = new CompletableFuture<>();
-        future.addListener(new ActionListener<T>() {
+    public static <T> ActionListener<T> actionListener(CompletableFuture<T> future) {
+        return new ActionListener<T>() {
             @Override
             public void onResponse(T t) {
-                cFuture.complete(t);
+                future.complete(t);
             }
 
             @Override
             public void onFailure(Exception e) {
-                cFuture.completeExceptionally(e);
+                future.completeExceptionally(e);
             }
-        });
-        return cFuture;
-    }
-
-    public static <T> CompletableFuture<T> fromActionFuture(ActionFuture<T> future) {
-
-        CompletableFuture<T> cFuture = CompletableFuture
-            .<T>supplyAsync(future::actionGet);
-        return cFuture;
-
+        };
     }
 
     public static String wildcard2regex(String wildcard) {

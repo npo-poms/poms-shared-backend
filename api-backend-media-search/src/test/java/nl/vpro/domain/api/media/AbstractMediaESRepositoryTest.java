@@ -2,10 +2,12 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+
 import org.elasticsearch.index.query.QueryBuilders;
 import org.junit.jupiter.api.Test;
 
-import nl.vpro.elasticsearch7.ESClientFactory;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 
 import static org.mockito.Mockito.mock;
@@ -17,7 +19,7 @@ import static org.mockito.Mockito.mock;
 @Slf4j
 public class AbstractMediaESRepositoryTest {
 
-    AbstractESMediaRepository repository = new AbstractESMediaRepository(mock(ESClientFactory.class)) {
+    AbstractESMediaRepository repository = new AbstractESMediaRepository(mock(HighLevelClientFactory.class)) {
 
         @Override
         public RedirectList redirects() {
@@ -36,7 +38,7 @@ public class AbstractMediaESRepositoryTest {
     }
 
     @Test
-    public void searchRequest() {
+    public void searchRequest() throws IOException {
 
         AbstractESMediaRepository.SearchRequestWrapper sr = repository.mediaSearchRequest(
             null,

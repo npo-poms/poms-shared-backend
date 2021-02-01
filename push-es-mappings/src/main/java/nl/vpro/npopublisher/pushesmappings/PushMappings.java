@@ -114,7 +114,7 @@ public class PushMappings implements Callable<Integer> {
         try {
             IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
 
-            // Try to created the index if it didn't exist already
+            // Try to create the index if it didn't exist already
             boolean created = helper.createIndexIfNotExists(CreateIndex.builder()
                 .useNumberPostfix(true)
                 .forReindex(true) // no replicas, very long refresh

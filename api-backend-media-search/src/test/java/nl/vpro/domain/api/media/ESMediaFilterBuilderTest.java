@@ -4,8 +4,6 @@
  */
 package nl.vpro.domain.api.media;
 
-import java.io.IOException;
-
 import org.elasticsearch.index.query.*;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ESMediaFilterBuilderTest {
 
     @Test
-    public void testFilterProfileOnNullArgument() throws Exception {
+    public void testFilterProfileOnNullArgument() {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo("{\n" +
             "  \"bool\" : {\n" +
@@ -47,7 +45,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileOnWrappedSingleArgument() throws Exception {
+    public void testFilterProfileOnWrappedSingleArgument() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("vpro")
         ));
@@ -81,7 +79,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileOnNestedArguments() throws Exception {
+    public void testFilterProfileOnNestedArguments() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             and(
                 broadcaster("VpRo"),
@@ -177,7 +175,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileWithExtraFilterOnNullArguments() throws Exception {
+    public void testFilterProfileWithExtraFilterOnNullArguments() {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo(
             "{\n" +
@@ -200,7 +198,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileWithExtraFilterOnNullProfile() throws Exception {
+    public void testFilterProfileWithExtraFilterOnNullProfile() {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.termQuery("name", "value"));
         ESMediaQueryBuilder.buildMediaQuery("", boolQueryBuilder,null);
@@ -217,7 +215,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileWithExtraFilter() throws Exception {
+    public void testFilterProfileWithExtraFilter() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("Vpro")
         ));
@@ -264,7 +262,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterLocationsWithPlatform() throws IOException {
+    public void testFilterLocationsWithPlatform() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             hasLocation("NONE")
         ));

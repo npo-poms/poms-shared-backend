@@ -5,16 +5,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                ">
 
-
-  <bean id="clientFactory" class="nl.vpro.elasticsearch7.TransportClientFactory">
-    <property name="transportAddresses">
-      <list>
-        <bean class="nl.vpro.util.UrlProvider">
-          <constructor-arg name="host" value="localhost"/>
-          <constructor-arg name="port" value="#{T(java.lang.System).getProperty('integ.java.port', '9300')}" />
-        </bean>
-      </list>
-    </property>
+  <bean id="lowlevelClientFactory" class="nl.vpro.elasticsearchclient.ClientElasticSearchFactory">
+    <property name="unicastHosts" value="localhost:#{T(java.lang.System).getProperty('integ.http.port', '9200')}" />
     <property name="clusterName" value="#{T(java.lang.System).getProperty('integ.cluster.name', 'elasticsearch')}" />
+  </bean>
+
+
+  <bean id="clientFactory" class="nl.vpro.elasticsearch.highlevel.HighLevelClientFactory">
+    <constructor-arg name="lowLevelFactory" ref="lowlevelClientFactory" />
+
   </bean>
 </beans>
