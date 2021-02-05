@@ -332,18 +332,16 @@ public abstract class AbstractESRepository<T> {
             searchBuilder.highlighter(highlightBuilder);
         }
     }
+
     protected final <S extends T> S getObject(@NonNull SearchHit hit, @NonNull Class<S> clazz) throws IOException {
         return getObject(Jackson2Mapper.getLenientInstance().readTree(hit.getSourceRef().toBytesRef().bytes), clazz);
     }
-
 
     protected final <S extends T> S getObject(@NonNull JsonNode source, @NonNull Class<S> clazz) throws IOException {
         return Jackson2Mapper.getLenientInstance()
             .readerFor(clazz)
             .readValue(source);
     }
-
-
 
     protected static <S> String[] filterFields(
         @NonNull S mo,
@@ -400,7 +398,7 @@ public abstract class AbstractESRepository<T> {
         }
     }
 
-    private <S extends T> SearchResultItem<S> getSearchResultItem(
+    protected <S extends T> SearchResultItem<S> getSearchResultItem(
         @NonNull SearchHit hit,
         @NonNull Class<S> clazz) throws IOException {
         S object = getObject(hit, clazz);
