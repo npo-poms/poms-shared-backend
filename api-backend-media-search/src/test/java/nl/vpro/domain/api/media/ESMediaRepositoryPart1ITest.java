@@ -1970,7 +1970,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         );
 
 
-        // now for the more convulated. The question is, should this match or not?
+        // now for the more convoluted. The question is, should this match or not?
 
         // we do match now
         index(program()
@@ -1995,7 +1995,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
              .scheduleEvents(
                  ScheduleEventSearch.builder()
                      .original()
-                     .channel(Channel.NED1) // not necessary at the same time!
+                     .channel(Channel.NED1) // not necessarily at the same time!
                      .build()
              )
              .build();
@@ -2003,8 +2003,9 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
         log.info("{}", resultWithSearch);
         assertThat(resultWithSearch).hasSize(1); // mid_1 and _not_ mid_5
-
     }
+
+
     private void indexWithGeoLocations() {
         index(program()
             .mid("mid_geo_1")
