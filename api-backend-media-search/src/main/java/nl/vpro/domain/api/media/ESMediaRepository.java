@@ -36,8 +36,8 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
+import nl.vpro.elasticsearch.highlevel.ExtendedElasticSearchIterator;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-import nl.vpro.elasticsearch.highlevel.HighLevelElasticSearchIterator;
 import nl.vpro.media.domain.es.Common;
 import nl.vpro.util.*;
 
@@ -433,7 +433,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             total = response.getHits().getTotalHits();
         } else {
             mids = new ArrayList<>();
-            try (HighLevelElasticSearchIterator<String> iterator = HighLevelElasticSearchIterator.<String>highLevelBuilder()
+            try (ExtendedElasticSearchIterator<String> iterator = ExtendedElasticSearchIterator.<String>extendedBuilder()
                 .client(factory.highLevelClient())
                 .adapt((sh) -> sh.get(Constants.Fields.SOURCE).get("childRef").textValue()) // todo
                 .routing(media.getMid())
@@ -528,7 +528,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
             }
         }
-        final HighLevelElasticSearchIterator<MediaChange> i = HighLevelElasticSearchIterator.<MediaChange>highLevelBuilder()
+        final ExtendedElasticSearchIterator<MediaChange> i = ExtendedElasticSearchIterator.<MediaChange>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(this::of)
             .requestVersion(true)
@@ -656,7 +656,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public CloseableIterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
-        HighLevelElasticSearchIterator<MediaObject> i = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
+        ExtendedElasticSearchIterator<MediaObject> i = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
             .build();
@@ -683,7 +683,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     synchronized void refillRedirectCache() {
         Map<String, String> newRedirects = new HashMap<>();
 
-        try(HighLevelElasticSearchIterator<MediaObject> i = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
+        try(ExtendedElasticSearchIterator<MediaObject> i = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
             .build()) {
