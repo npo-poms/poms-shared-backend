@@ -434,7 +434,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         } else {
             mids = new ArrayList<>();
             try (HighLevelElasticSearchIterator<String> iterator = HighLevelElasticSearchIterator.<String>highLevelBuilder()
-                .client(factory.get())
+                .client(factory.highLevelClient())
                 .adapt((sh) -> sh.get(Constants.Fields.SOURCE).get("childRef").textValue()) // todo
                 .routing(media.getMid())
                 .build()) {
@@ -529,7 +529,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             }
         }
         final HighLevelElasticSearchIterator<MediaChange> i = HighLevelElasticSearchIterator.<MediaChange>highLevelBuilder()
-            .client(factory.get())
+            .client(factory.highLevelClient())
             .adapt(this::of)
             .requestVersion(true)
             .build();
@@ -657,7 +657,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     @Override
     public CloseableIterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
         HighLevelElasticSearchIterator<MediaObject> i = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
-            .client(factory.get())
+            .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
             .build();
 
@@ -684,7 +684,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         Map<String, String> newRedirects = new HashMap<>();
 
         try(HighLevelElasticSearchIterator<MediaObject> i = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
-            .client(factory.get())
+            .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
             .build()) {
 
