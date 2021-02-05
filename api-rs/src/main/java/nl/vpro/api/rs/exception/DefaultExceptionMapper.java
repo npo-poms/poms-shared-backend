@@ -26,7 +26,11 @@ public class DefaultExceptionMapper implements ExceptionMapper<Exception> {
             // E.g. a DefaultOptionsMethodException. If you catch those, CORS wont' work any more.
             return null;
         } else {
-            log.warn("Wrapped an {} root cause {}. Request: {}", exception.getClass().getName(), exception.getMessage(), StoreRequestInThreadLocal.getRequestBody());
+            Throwable t = exception;
+            while(t.getCause() != null) {
+                t = t.getCause();
+            }
+            log.warn("Wrapped an {} root cause {}. Request: {}", t.getClass().getName(), t.getMessage(), StoreRequestInThreadLocal.getRequestBody());
             return Response
                     .serverError()
                     .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
