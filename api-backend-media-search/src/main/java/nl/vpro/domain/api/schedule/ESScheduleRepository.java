@@ -262,7 +262,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         Integer max = form.getPager().getMax();
         Optional<Long> total = Optional.empty();
         try (HighLevelElasticSearchIterator<MediaObject> searchIterator = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
-                     .client(factory.get())
+                     .client(factory.highLevelClient())
                      .adapt(this::getMediaObject)
                      .build()) {
             SearchSourceBuilder requestBuilder = searchIterator.prepareSearchSource(getIndexName());
