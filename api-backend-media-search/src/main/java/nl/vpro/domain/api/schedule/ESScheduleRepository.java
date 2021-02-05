@@ -30,7 +30,7 @@ import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-import nl.vpro.elasticsearch.highlevel.HighLevelElasticSearchIterator;
+import nl.vpro.elasticsearch.highlevel.ExtendedElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.TimeUtils;
@@ -261,7 +261,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         long offset = form.getPager().getOffset();
         Integer max = form.getPager().getMax();
         Optional<Long> total = Optional.empty();
-        try (HighLevelElasticSearchIterator<MediaObject> searchIterator = HighLevelElasticSearchIterator.<MediaObject>highLevelBuilder()
+        try (ExtendedElasticSearchIterator<MediaObject> searchIterator = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
                      .client(factory.highLevelClient())
                      .adapt(this::getMediaObject)
                      .build()) {
