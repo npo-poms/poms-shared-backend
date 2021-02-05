@@ -178,7 +178,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @NonNull BoolQueryBuilder rootQuery,
         long offset,
         Integer max) throws IOException {
-        SearchRequest request = new SearchRequest(indexNames.get(APIMEDIA));
+        SearchRequest request = new SearchRequest(getIndexName());
         SearchSourceBuilder searchSourceBuilder = mediaSearchBuilder(profile, form, mediaObject, rootQuery, offset, max);
         boolean maxWasZero = handleMaxZero(max, searchSourceBuilder::size);
 
@@ -220,6 +220,19 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         @Nullable Integer max) throws IOException {
 
         SearchSourceBuilder searchBuilder = new SearchSourceBuilder();
+        mediaSearchBuild(searchBuilder, profile, form, mediaObject, rootQuery, offset, max);
+        return searchBuilder;
+    }
+    final protected void mediaSearchBuild(
+        SearchSourceBuilder searchBuilder,
+        @Nullable ProfileDefinition<MediaObject> profile,
+        @Nullable AbstractMediaForm form,
+        @Nullable MediaObject mediaObject,
+        @NonNull BoolQueryBuilder rootQuery,
+        long offset,
+        @Nullable Integer max) throws IOException {
+
+
         // Handle profile and workflow filtering
         ESMediaFilterBuilder.filter(profile, rootQuery);
 
@@ -252,8 +265,6 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         handlePaging(offset, max, searchBuilder, queryBuilder, indexNames.get(APIMEDIA));
 
         log.debug("ES query: {}", searchBuilder);
-
-        return searchBuilder;
     }
 
     /**
