@@ -35,7 +35,6 @@ import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.elasticsearch.ElasticSearchIteratorInterface;
-import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.Common;
@@ -82,7 +81,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         .mid("POMS_S_12345")
         .type(GroupType.SERIES);
 
-    private static final ESMediaRepository target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
+    private  static ESMediaRepository target;
 
 
     private static Group group;
@@ -111,9 +110,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     static int deletedGroupCount = 0;
 
 
-
     @BeforeEach
     public void init() {
+
         // during debugging you could set this to false, which would simplify queries
         target.setScore(true);
     }
@@ -131,7 +130,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
      */
     @Override
     protected void firstRun() throws InterruptedException, ExecutionException, IOException {
-
+        target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
         createIndicesIfNecessary();
 
         BroadcasterServiceLocator.setInstance(mock(BroadcasterService.class));
