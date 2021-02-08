@@ -6,9 +6,10 @@ This is a shared project for all the applications that want to read and write in
 == Getting started
 
 You can run elasticsearch locally.
-– Install elasticsearch
-– Install icu tokenizer plugin
-`${ELASTIC_HOME}/bin/elasticsearch-plugin install analysis-icu`
+
+. Install elasticsearch
+. Install icu tokenizer plugin
+   `${ELASTIC_HOME}/bin/elasticsearch-plugin install analysis-icu`
 
 == ES Console
 
@@ -18,9 +19,10 @@ We recommend link:https://chrome.google.com/webstore/detail/elasticsearch-head/f
 
 Generate local ES indexes for our resources:
 
-`
+[source,bash]
+----
 (cd push-es-mappings/ ; mvn -Dhost=localhost:9200)
-`
+----
 If the indices did not yet exist, it as assumed that you want to run a reindex operation, and the refresh rates are set accordingly.
 
 Run the command again to make it ready for actual reading.
@@ -29,7 +31,10 @@ Run the command again to make it ready for actual reading.
 
 Via the same way mappings can be updated. After changing the mappings under:
 
-`./*-es-mapping/src/main/resources/es*/mapping/*.json`
+[source,bash]
+----
+./*-es-mapping/src/main/resources/es*/mapping/*.json
+----
 
 you can test your changes by executing the UnitTest in `ESMediaRepositoryPart1ITest`
 
@@ -40,6 +45,7 @@ you need to have a tunneling from your machine.
 
 The script can also be run against the elasticsearch implementation at amazon. This installation required username/password:
 
-`
+[source,bash]
+----
 (cd push-es-mappings/ ; mvn -Dhost=localhost:9200 -Duser=elastsicsearch -Dpassword=<>)
-`
+----
