@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryITest {
 
-    private static final ESMediaRepository target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
+    private static ESMediaRepository target;
 
     private long indexerStartTime;
     private long indexerStopTime;
@@ -48,6 +48,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
 
     @Override
     protected void firstRun() {
+        target = new ESMediaRepository(staticClientFactory, "tags", new MediaScoreManagerImpl());
         createIndicesIfNecessary();
         target.setIndexName(indexHelpers.get(ApiMediaIndex.APIMEDIA).getIndexName());
         clearIndices();
