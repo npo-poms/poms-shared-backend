@@ -34,6 +34,7 @@ import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
+import nl.vpro.elasticsearch.ElasticSearchIteratorInterface;
 import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
@@ -119,7 +120,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @AfterEach
     public void checkScrollIds() {
-        assertThat(ElasticSearchIterator.getScrollIds()).isEmpty();
+        assertThat(ElasticSearchIteratorInterface.getScrollIds()).isEmpty();
     }
 
 
