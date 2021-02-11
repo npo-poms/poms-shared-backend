@@ -34,7 +34,6 @@ import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.BroadcasterService;
-import nl.vpro.elasticsearch.ElasticSearchIteratorInterface;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.Common;
@@ -45,6 +44,7 @@ import static nl.vpro.domain.api.FacetResults.toSimpleMap;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.support.Workflow.PUBLISHED_AS_DELETED;
+import static nl.vpro.elasticsearch.ElasticSearchIteratorInterface.getScrollIds;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static nl.vpro.media.domain.es.ApiRefsIndex.APIMEDIA_REFS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -119,7 +119,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @AfterEach
     public void checkScrollIds() {
-        assertThat(ElasticSearchIteratorInterface.getScrollIds()).isEmpty();
+        assertThat(getScrollIds()).isEmpty();
     }
 
 
