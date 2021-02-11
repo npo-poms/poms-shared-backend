@@ -25,7 +25,6 @@ import static nl.vpro.domain.api.ESFacetsBuilder.getAggregationName;
 import static nl.vpro.domain.api.ESFacetsBuilder.getNestedFieldName;
 import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
 
-;
 
 /**
  * @author Roelof Jan Koekoek

@@ -27,11 +27,12 @@ import nl.vpro.domain.media.support.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.Portal;
 import nl.vpro.elasticsearch.Constants;
-import nl.vpro.elasticsearch.ElasticSearchIteratorInterface;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.ApiRefsIndex;
+import nl.vpro.poms.shared.ExtraHeaders;
+import nl.vpro.poms.shared.Headers;
 
 import static nl.vpro.domain.api.FacetOrder.VALUE_ASC;
 import static nl.vpro.domain.api.Match.MUST;
@@ -49,6 +50,7 @@ import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
 import static nl.vpro.domain.media.support.OwnerType.*;
 import static nl.vpro.domain.media.support.TextualType.MAIN;
+import static nl.vpro.elasticsearch.ElasticSearchIteratorInterface.getScrollIds;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -82,10 +84,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
     @AfterEach
     public void checkScrollIds() {
-        assertThat(ElasticSearchIteratorInterface.getScrollIds()).isEmpty();
+        assertThat(getScrollIds()).isEmpty();
     }
-
-
 
     @Test
     public void testLoad() {
@@ -1942,30 +1942,36 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     }
 
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     // NPA-490
     public void reruns() {
         index(program()
             .mid("mid_1")
             .mainTitle("original on ned1")
+            .broadcasters("VPRO", "EO")
             .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 12, 0).atZone(ZONE_ID).toInstant()).rerun(false).build())
         );
 
         index(program()
             .mid("mid_2")
             .mainTitle("rerun on ned1")
+            .broadcasters("VPRO", "EO")
             .scheduleEvent(ScheduleEvent.builder().channel(Channel.NED1).start(LocalDateTime.of(2019, 7, 30, 13, 0).atZone(ZONE_ID).toInstant()).rerun(true).build())
         );
 
         index(program()
             .mid("mid_3")
             .mainTitle("original on ned2")
+            .broadcasters("AVTR")
+
             .scheduleEvent(ScheduleEvent.builder().channel(NED2).start(LocalDateTime.of(2019, 7, 30, 14, 0).atZone(ZONE_ID).toInstant()).rerun(false).build())
         );
 
         index(program()
             .mid("mid_4")
             .mainTitle("rerun on ned2")
+            .broadcasters("EO", "VPRO")
             .scheduleEvent(ScheduleEvent.builder().channel(NED2).start(LocalDateTime.of(2019, 7, 30, 15, 0).atZone(ZONE_ID).toInstant()).rerun(true).build())
         );
 
@@ -1976,6 +1982,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         index(program()
             .mid("mid_5")
             .mainTitle("rereun on ned1 but original on ned2")
+            .broadcasters("KRNC", "VPRO")
             .scheduleEvent(
                 ScheduleEvent.builder()
                     .channel(Channel.NED1)
@@ -1998,11 +2005,23 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                      .channel(Channel.NED1) // not necessarily at the same time!
                      .build()
              )
+             .broadcasterFacet()
+             .broadcasters("VPRO")
              .build();
 
         MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
         log.info("{}", resultWithSearch);
         assertThat(resultWithSearch).hasSize(1); // mid_1 and _not_ mid_5
+        List<TermFacetResultItem> broadcasters = resultWithSearch.getFacets().getBroadcasters();
+        assertThat(broadcasters).hasSize(3);
+        assertThat(broadcasters.stream().map(TermFacetResultItem::toString)).containsOnly("EO:1", "KRNC:1", "VPRO:2");
+        assertThat(broadcasters.stream().filter(t -> t.getId().equals("VPRO")).findFirst().get().isSelected()).isTrue();
+        assertThat(broadcasters.stream().filter(t -> t.getId().equals("EO")).findFirst().get().isSelected()).isFalse();
+        assertThat(broadcasters.stream().filter(t -> t.getId().equals("KRNC")).findFirst().get().isSelected()).isFalse();
+
+        assertThat(ExtraHeaders.get().stream().filter(p -> p.getFirst().equals(Headers.NPO_WARNING_HEADER)).findFirst()).isPresent();
+
+
     }
 
 

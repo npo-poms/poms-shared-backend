@@ -81,6 +81,10 @@
       <artifactId>wiremock-junit5</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>nl.vpro.poms</groupId>
+      <artifactId>poms-shared</artifactId>
+    </dependency>
   </dependencies>
 
 

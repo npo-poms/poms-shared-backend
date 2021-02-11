@@ -36,9 +36,9 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
-import nl.vpro.elasticsearch.highlevel.ExtendedElasticSearchIterator;
-import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+import nl.vpro.elasticsearch.highlevel.*;
 import nl.vpro.media.domain.es.Common;
+import nl.vpro.poms.shared.ExtraHeaders;
 import nl.vpro.util.*;
 
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
@@ -121,6 +121,27 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         form = redirectForm(form);
 
+        boolean needsPostFilter = false;
+        if (form != null && form.hasSearches() && form.getSearches().getScheduleEvents() != null) {
+            for (ScheduleEventSearch ses : form.getSearches().getScheduleEvents()) {
+                if (ses.countSearches() > 1) {
+                    needsPostFilter = true;
+                    break;
+                }
+            }
+        }
+        if (needsPostFilter) {
+            return findWithPostFilter(profile, form, offset, max);
+        } else {
+            return findWithoutPostFilter(profile, form, offset, max);
+        }
+    }
+
+
+    /**
+     * Straight forward search were everything is let to Elasticsearch
+     */
+    private MediaSearchResult findWithoutPostFilter(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max) throws IOException {
         BoolQueryBuilder rootQuery = QueryBuilders.boolQuery();
 
         SearchRequestWrapper request = mediaSearchRequest(
@@ -143,40 +164,80 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         MediaSearchResults.setSelectedFacets(result.getFacets(), result.getSelectedFacets(), form);
         MediaSearchResults.sortFacets(result.getFacets(), result.getSelectedFacets(), form);
+        return new MediaSearchResult(result);
+    }
 
-        boolean needsPostFilter = false;
-        if (form != null && form.hasSearches() && form.getSearches().getScheduleEvents() != null) {
-            for (ScheduleEventSearch ses : form.getSearches().getScheduleEvents()) {
-                if (ses.countSearches() > 1) {
-                    needsPostFilter = true;
-                    break;
-                }
-            }
-        }
+    /**
+     * If the query could not be fully evaluated at ES then this one will be used.
+     *
+     * The query is executed, but using the scroll API. Resulting objects which don't match the form or profile are filtered.
+     *
+     * max/offset are done programmatically.
+     *
+     * The total count is always approximate (and normally overestimated)
+     */
+     private MediaSearchResult findWithPostFilter(ProfileDefinition<MediaObject> profile, @NonNull MediaForm form, long offset, Integer max) throws IOException {
+        try (HighLevelElasticSearchIterator<SearchResultItem<? extends MediaObject>> i = HighLevelElasticSearchIterator
+            .<SearchResultItem<? extends MediaObject>>builder()
+            .client(factory.highLevelClient(ESMediaRepository.class.getName()))
+            .adapt(h -> {
+                try {
+                    return getSearchResultItem(h, MediaObject.class);
+                } catch (IOException ioe) {
+                    log.warn(ioe.getMessage());
+                    return null;
+                }}
+            )
+            .build()) {
 
-        if (needsPostFilter) {
-            List<SearchResultItem<? extends MediaObject>> filtered = new ArrayList<>();
-            int correctTotal = 0;
-            for (SearchResultItem<? extends MediaObject> item : result) {
-                if (form.test(item.getResult())) {
-                    filtered.add(item);
-                } else {
-                    correctTotal++;
+            BoolQueryBuilder rootQuery = QueryBuilders.boolQuery();
 
-                }
-            }
+            mediaSearchBuild(i.prepareSearchSource(getIndexName()), profile,  form, null,  rootQuery, offset, max);
+            final AtomicInteger correctTotal = new AtomicInteger(0);
+            FilteringIterator<SearchResultItem<? extends MediaObject>> filteringIterator = FilteringIterator.<SearchResultItem<? extends MediaObject>>builder()
+                .wrapped(i)
+                .filter(item -> {
+                    if (form.test(item.getResult())) {
+                        return true;
+                    } else {
+                        correctTotal.incrementAndGet();
+                        return false;
+                    }
+                })
+                .build();
+
+            i.start();
+
+
+            MaxOffsetIterator<SearchResultItem<? extends MediaObject>> maxOffsetIterator = MaxOffsetIterator.<SearchResultItem<? extends MediaObject>>builder()
+                .wrapped(filteringIterator)
+                .offset(offset)
+                .max(max)
+                .build();
+
+            List<SearchResultItem<? extends MediaObject>> filtered = maxOffsetIterator.stream().collect(Collectors.toList());
+
             MediaSearchResult filteredResult =  new MediaSearchResult(
                 filtered,
-                result.getOffset(),
-                result.getMax(),
-                Result.Total.approximate(result.getTotal() - correctTotal)
+                offset,
+                max,
+                i.getTotalSize().map(t -> Result.Total.approximate(t - correctTotal.get())).orElse(Result.Total.MISSING)
             );
-            filteredResult.setSelectedFacets(result.getSelectedFacets());
-            filteredResult.setFacets(result.getFacets());
+
+
+            if (form.getFacets() != null) {
+                MediaFacetsResult facetsResult =
+                    ESMediaFacetsHandler.extractMediaFacets(i.getResponse(), form.getFacets(), this);
+                ExtraHeaders.warn("Faceting when needing post filtering may not be entirely accurate");
+                // To make this work properly we need to index scheduleevent seperately?
+                filteredResult.setFacets(facetsResult);
+                filteredResult.setSelectedFacets(new MediaFacetsResult());
+                MediaSearchResults.setSelectedFacets(filteredResult.getFacets(), filteredResult.getSelectedFacets(), form);
+            }
+
             return filteredResult;
-        } else {
-            return new MediaSearchResult(result);
         }
+
     }
 
     @Override
