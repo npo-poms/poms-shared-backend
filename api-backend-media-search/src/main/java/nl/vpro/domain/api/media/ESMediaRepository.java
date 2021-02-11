@@ -208,6 +208,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
             i.start();
 
+            MediaFacetsResult facetsResult;
+            if (form.getFacets() != null) {
+                facetsResult = ESMediaFacetsHandler.extractMediaFacets(i.getResponse(), form.getFacets(), this);
+            } else {
+                facetsResult = null;
+            }
 
             MaxOffsetIterator<SearchResultItem<? extends MediaObject>> maxOffsetIterator = MaxOffsetIterator.<SearchResultItem<? extends MediaObject>>builder()
                 .wrapped(filteringIterator)
@@ -225,9 +231,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             );
 
 
-            if (form.getFacets() != null) {
-                MediaFacetsResult facetsResult =
-                    ESMediaFacetsHandler.extractMediaFacets(i.getResponse(), form.getFacets(), this);
+            if (facetsResult != null) {
+
                 ExtraHeaders.warn("Faceting when needing post filtering may not be entirely accurate");
                 // To make this work properly we need to index scheduleevent seperately?
                 filteredResult.setFacets(facetsResult);
