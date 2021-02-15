@@ -5,7 +5,7 @@
   <parent>
     <artifactId>api-parent</artifactId>
     <groupId>nl.vpro.api</groupId>
-    <version>5.23-SNAPSHOT</version>
+    <version>5.24-SNAPSHOT</version>
   </parent>
 
   <artifactId>api-rs-schedule-filter</artifactId>
