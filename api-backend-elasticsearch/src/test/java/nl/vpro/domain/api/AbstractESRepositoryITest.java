@@ -46,7 +46,7 @@ public abstract class AbstractESRepositoryITest {
     protected static HighLevelClientFactory staticClientFactory;
 
     static {
-        log.info("JAVAPORT " + System.getProperty("integ.java.port"));
+        log.info("Elastic search port for integration tests: " + System.getProperty("integ.http.port"));
     }
 
     @Inject
