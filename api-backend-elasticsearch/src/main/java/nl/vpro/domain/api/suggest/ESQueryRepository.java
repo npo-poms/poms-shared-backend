@@ -106,9 +106,8 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
                 IndexRequest indexRequest = new IndexRequest(getIndexName());
                 indexRequest.id(query.getId());
                 indexRequest.source(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON);
-
                 IndexResponse response  = client().index(indexRequest, RequestOptions.DEFAULT);
-                log.info("indexed {}", response);
+                log.debug("indexed {}", response);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
