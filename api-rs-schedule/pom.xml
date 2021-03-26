@@ -37,10 +37,6 @@
       <classifier>tests</classifier>
     </dependency>
     <dependency>
-      <groupId>com.newrelic.agent.java</groupId>
-      <artifactId>newrelic-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-core</artifactId>
       <scope>test</scope>

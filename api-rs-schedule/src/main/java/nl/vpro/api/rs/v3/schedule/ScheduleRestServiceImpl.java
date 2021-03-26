@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.newrelic.api.agent.Trace;
 
 import nl.vpro.api.rs.exception.Exceptions;
 import nl.vpro.api.rs.filter.ApiMediaFilter;
@@ -89,7 +88,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         value = "List scheduled media"
     )
     @GET
-    @Trace(dispatcher = true)
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult list(
         @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
@@ -122,7 +120,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             value = "Find scheduled media"
     )
     @POST
-    @Trace(dispatcher = true)
     public ScheduleSearchResult find(
         @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM)
         ScheduleForm form,
@@ -147,7 +144,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/ancestor/{ancestor}")
     @GET
-    @Trace(dispatcher = true)
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
@@ -184,7 +180,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/ancestor/{ancestor}/now")
     @GET
-    @Trace(dispatcher = true)
     @NoCache
     public ApiScheduleEvent nowForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
@@ -218,7 +213,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     @Path("/ancestor/{ancestor}/next")
     @GET
     @NoCache
-    @Trace(dispatcher = true)
     public ApiScheduleEvent nextForAncestor(
             @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
             @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
@@ -247,7 +241,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/broadcaster/{broadcaster}")
     @GET
-    @Trace(dispatcher = true)
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
@@ -281,7 +274,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             value = "Current item for broadcaster. I.e. the item that started most recently, and is still running."
     )
     @Path("/broadcaster/{broadcaster}/now")
-    @Trace(dispatcher = true)
     @GET
     @NoCache
     public ApiScheduleEvent nowForBroadcaster(
@@ -323,7 +315,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/broadcaster/{broadcaster}/next")
     @GET
-    @Trace(dispatcher = true)
     @NoCache
     public ApiScheduleEvent nextForBroadcaster(
             @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
@@ -354,7 +345,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/channel/{channel}")
     @GET
-    @Trace(dispatcher = true)
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
@@ -390,7 +380,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         value = "Current item on channel"
     )
     @Path("/channel/{channel}/now")
-    @Trace(dispatcher = true)
     @GET
     @NoCache
     public ApiScheduleEvent nowForChannel(
@@ -430,7 +419,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/channel/{channel}/next")
     @GET
-    @Trace(dispatcher = true)
     @NoCache
     public ApiScheduleEvent nextForChannel(
         @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
@@ -463,7 +451,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/net/{net}")
     @GET
-    @Trace(dispatcher = true)
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
@@ -498,7 +485,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/net/{net}/now")
     @GET
-    @Trace(dispatcher = true)
     @NoCache
     public ApiScheduleEvent nowForNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
@@ -536,7 +522,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     )
     @Path("/net/{net}/next")
     @GET
-    @Trace(dispatcher = true)
     @NoCache
     public ApiScheduleEvent nextForNet(
         @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
