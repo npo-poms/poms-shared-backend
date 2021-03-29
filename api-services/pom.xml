@@ -5,7 +5,7 @@
   <parent>
     <artifactId>api-parent</artifactId>
     <groupId>nl.vpro.api</groupId>
-    <version>5.26-SNAPSHOT</version>
+    <version>5.27-SNAPSHOT</version>
   </parent>
 
   <artifactId>api-services</artifactId>
