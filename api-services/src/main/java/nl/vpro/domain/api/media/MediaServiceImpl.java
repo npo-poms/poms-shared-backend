@@ -16,6 +16,7 @@ import javax.inject.Named;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -72,6 +73,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("suggest")
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
@@ -120,6 +122,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("findByMid")
     public <T extends MediaObject> T findByMid(boolean loadDeleted, String mid) {
         return mediaSearchRepository.findByMid(loadDeleted, mid);
     }
@@ -127,18 +130,21 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("loadAll")
     public List<MediaObject> loadAll(List<String> ids) {
         return mediaSearchRepository.loadAll(false, ids);
     }
 
     @Override
     //@PreAuthorize("permitAll()")
+    @Cacheable("redirects")
     public RedirectList redirects() {
         return mediaSearchRepository.redirects();
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("list")
     public MediaResult list(Order order, Long offset, Integer max) {
         return mediaSearchRepository.list(order, offset, max);
     }
@@ -151,54 +157,63 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("find")
     public MediaSearchResult find(String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("listMembers")
     public MediaResult listMembers(MediaObject media, String profile, Order order, Long offset, Integer max) {
         return mediaSearchRepository.listMembers(media, getProfile(profile), order, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("findMembers")
     public MediaSearchResult findMembers(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findMembers(media, getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("listEpisodes")
     public ProgramResult listEpisodes(MediaObject media, String profile,  Order order, Long offset, Integer max) {
         return mediaSearchRepository.listEpisodes(media, getProfile(profile), order, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("findEpisodes")
     public ProgramSearchResult findEpisodes(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findEpisodes(media, getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("listDescendants")
     public MediaResult listDescendants(MediaObject media, String profile, Order order, Long offset, Integer max) {
         return mediaSearchRepository.listDescendants(media, getProfile(profile), order, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("findDescendants")
     public MediaSearchResult findDescendants(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
         return mediaSearchRepository.findDescendants(media, getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("findRelated")
     public MediaSearchResult findRelated(MediaObject media, String profile, MediaForm form, Integer max) {
         return mediaSearchRepository.findRelated(media, getProfile(profile), form, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("findRelatedInTopspin")
     public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max, String partyId, String clazz) {
         Recommendations recommendations = topSpinRepository.getForMid(media.getMid(), partyId, clazz);
 
@@ -230,6 +245,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
+    @Cacheable("getType")
     public MediaType getType(final String id) {
         MediaObject owner = findByMid(id);
         return owner != null ? MediaType.getMediaType(owner) : null;
@@ -237,6 +253,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize("permitAll()")
+    @Cacheable("redirect")
     public Optional<String> redirect(String mid) {
         return mediaSearchRepository.redirect(mid);
 
@@ -255,6 +272,4 @@ public class MediaServiceImpl implements MediaService {
         return p.getMediaProfile();
 
     }
-
-
 }
