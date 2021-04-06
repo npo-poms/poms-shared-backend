@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutionException;
 import javax.inject.Named;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -45,30 +46,35 @@ public class PageServiceImpl implements PageService {
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
+    @Cacheable("PageService.suggest")
     public SuggestResult suggest(String input, String profile, Integer max) {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
+    @Cacheable("PageService.find")
     public PageSearchResult find(PageForm form, String profile, Long offset, Integer max) {
         return pageSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
+    @Cacheable("PageService.load")
     public Page load(String url) {
         return pageSearchRepository.load(url);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
+    @Cacheable("PageService.loadByCrid")
     public Page[] loadByCrid(String... crid) {
         return pageSearchRepository.loadByCrid(crid);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
+    @Cacheable("PageService.loadForIds")
     public List<Page> loadForIds(IdList ids) {
         String[] idArray = ids.toArray(new String[0]);
         CompletableFuture<Page[]> urlPages     = pageSearchRepository.loadByUrlsAsync(idArray);
@@ -112,6 +118,7 @@ public class PageServiceImpl implements PageService {
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
+    @Cacheable("PageService.findRelated")
     public PageSearchResult findRelated(Page page, String profile, PageForm form, Integer max) throws ProfileNotFoundException {
         return pageSearchRepository.findRelated(page, getProfile(profile), form, max);
     }
