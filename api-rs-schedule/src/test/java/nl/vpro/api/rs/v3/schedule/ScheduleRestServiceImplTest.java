@@ -183,7 +183,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     private void MSE_2775(String form) throws URISyntaxException, IOException {
 
 
-        when(scheduleService.find(any(ScheduleForm.class), or(isNull(), anyString()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+        when(scheduleService.find(any(ScheduleForm.class), or(isNull(), any(Order.class)), or(isNull(), anyString()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
 
         {
             MockHttpRequest request = MockHttpRequest.post("/schedule");
@@ -202,7 +202,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
             ArgumentCaptor<ScheduleForm> argument = ArgumentCaptor.forClass(ScheduleForm.class);
 
-            verify(scheduleService).find(argument.capture(), isNull(), anyLong(), anyInt());
+            verify(scheduleService).find(argument.capture(), eq(Order.ASC), isNull(), anyLong(), anyInt());
             assertThat(argument.getValue().getSearches().getScheduleEvents().get(0)
                 .getBegin().toEpochMilli()).isEqualTo(1435733201098L);
         }
@@ -220,7 +220,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
     @Test
     public void NPA_202_scheduleform() throws URISyntaxException {
-        when(scheduleService.find(any(ScheduleForm.class), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+        when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
 
         MockHttpRequest request = MockHttpRequest.post("/schedule");
         request.contentType(MediaType.APPLICATION_XML);
@@ -239,7 +239,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
     @Test
     public void NPA_202_mediaform() throws URISyntaxException {
-        when(scheduleService.find(any(ScheduleForm.class), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+        when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
 
         MockHttpRequest request = MockHttpRequest.post("/schedule");
         request.contentType(MediaType.APPLICATION_XML);
@@ -252,7 +252,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
         JAXB.marshal(form, out);
 
-        System.out.println(new String(out.toByteArray()));
+        System.out.println(out.toString());
 
         request.content(out.toByteArray());
 
@@ -269,7 +269,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         ApiScheduleEvent event = new ApiScheduleEvent(program.getScheduleEvents().first(), program);
         SearchResultItem<ApiScheduleEvent> apiScheduleEventSearchResultItem = new SearchResultItem<>(event);
         ScheduleSearchResult result = new ScheduleSearchResult(Arrays.asList(apiScheduleEventSearchResultItem), 0L, 10, Result.Total.equalsTo(100L));
-        when(scheduleService.find(any(ScheduleForm.class), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(result);
+        when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(result);
 
         MockHttpRequest request = MockHttpRequest.post("/schedule?properties=none");
 
