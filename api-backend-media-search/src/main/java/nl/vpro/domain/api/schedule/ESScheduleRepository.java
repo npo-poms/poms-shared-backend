@@ -350,6 +350,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     public ScheduleSearchResult findSchedules(
         ProfileDefinition<MediaObject> profile,
         ScheduleForm form,
+        Order sort,
         long offset,
         Integer max) {
         form = redirectForm(form);
@@ -408,6 +409,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         for (nl.vpro.domain.media.ScheduleEvent event : schedule.getScheduleEvents()) {
             SearchResultItem<ApiScheduleEvent> item = new SearchResultItem<>((ApiScheduleEvent) event, 0.0f, Collections.emptyList());
             items.add(item);
+        }
+        if (sort == Order.DESC) {
+            Collections.reverse(items);
         }
         int total = items.size();
         int end = new Long(offset + max).intValue();

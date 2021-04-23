@@ -305,7 +305,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                         .rerun(true)
                         .build()
                 ).build());
-        ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
+        ScheduleSearchResult schedules = repository.findSchedules(null, form, null, 0L, 10);
         assertThat(schedules).hasSize(1);
     }
 
@@ -340,7 +340,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                         .rerun(false)
                         .build()
                 ).build());
-        ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
+        ScheduleSearchResult schedules = repository.findSchedules(null, form, null, 0L, 10);
         assertThat(schedules).hasSize(2);
 
         assertThat(schedules.getItems().stream().map(se -> se.getResult().getMidRef())).containsExactly("p1", "p2");
@@ -376,7 +376,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
             "  </api:searches>\n" +
             "</api:scheduleForm>";
         ScheduleForm form = JAXB.unmarshal(new StringReader(example), ScheduleForm.class);
-        ScheduleSearchResult schedules = repository.findSchedules(null, form, 0L, 10);
+        ScheduleSearchResult schedules = repository.findSchedules(null, form, null,0L, 10);
         assertThat(schedules).hasSize(1);
     }
 
@@ -397,7 +397,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                         .build()
                 ).build());
         assertThatThrownBy(() ->
-            repository.findSchedules(null, form, 0L, 10)).isInstanceOf(IllegalArgumentException.class)
+            repository.findSchedules(null, form,null,  0L, 10)).isInstanceOf(IllegalArgumentException.class)
             .hasMessageFindingMatch(".+");
 
     }
