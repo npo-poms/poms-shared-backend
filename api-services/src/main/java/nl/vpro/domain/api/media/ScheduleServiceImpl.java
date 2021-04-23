@@ -26,8 +26,8 @@ import nl.vpro.domain.media.Net;
 @Service
 @PreAuthorize("hasRole('ROLE_EVERYBODY_EXCLUDED')")
 public class ScheduleServiceImpl implements ScheduleService {
-    private final ProfileService profileRepository;
 
+    private final ProfileService profileRepository;
 
     private final ScheduleRepository searchRepository;
 
@@ -35,7 +35,6 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Autowired
     public ScheduleServiceImpl(
         ProfileService profileService,
-
         @Named("scheduleSearchRepository") ScheduleRepository searchRepository
         ) {
         this.profileRepository = profileService;
@@ -81,9 +80,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     @Cacheable("ScheduleService.find")
-    public ScheduleSearchResult find(ScheduleForm form, String profile, long offset, Integer max) {
+    public ScheduleSearchResult find(ScheduleForm form, Order sort, String profile, long offset, Integer max) {
         ProfileDefinition<MediaObject> profileDefinition = profileRepository.getMediaProfileDefinition(profile);
-        return searchRepository.findSchedules(profileDefinition, form, offset, max);
+        return searchRepository.findSchedules(profileDefinition, form, sort, offset, max);
     }
 
 }
