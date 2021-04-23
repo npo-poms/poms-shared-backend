@@ -123,6 +123,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     public ScheduleSearchResult find(
         @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM)
         ScheduleForm form,
+        @QueryParam(SORT) @DefaultValue(ASC) Order sort,
         @QueryParam(PROFILE) String profile,
         @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
@@ -130,8 +131,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     ) {
         max = handleTooManyResults(offset, max, maxResults);
 
-
-        ScheduleSearchResult result = scheduleService.find(form, profile, offset, max);
+        ScheduleSearchResult result = scheduleService.find(form, sort, profile, offset, max);
 
         ApiMediaFilter.set(properties);
 
