@@ -617,7 +617,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             since,
             currentProfile,
             previousProfile,
-            keepAlive == null ? Long.MAX_VALUE : keepAlive
+            keepAlive
         );
 
         CloseableIterator<MediaChange> iterator = changes;
