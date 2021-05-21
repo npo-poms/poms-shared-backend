@@ -2,6 +2,8 @@
   "index": {
     "number_of_shards" : 2,
     "number_of_replicas" : 2,
+    "sort.field": [ "parent", "sequence"],
+    "sort.order": [ "asc","asc" ],
     "analysis": {
       "filter": {
         "arabic_stop": {
