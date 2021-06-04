@@ -2280,6 +2280,9 @@
     },
     "url": {
       "type": "keyword"
+    },
+    "semantic_vectorization": {
+      "type": "float"
     }
   }
 }
