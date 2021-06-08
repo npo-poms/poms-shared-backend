@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.lucene.search.TotalHits;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -151,8 +152,7 @@ public abstract class AbstractESRepository<T> {
 
     protected String getIndexName(String id, Class<?> clazz) {
         ElasticSearchIndex index = getIndex(id, clazz);
-        String indexName = indexNames.get(index);
-        return indexName;
+        return indexNames.get(index);
     }
 
     protected T load(
@@ -213,7 +213,11 @@ public abstract class AbstractESRepository<T> {
         }
         MultiGetRequest request = new MultiGetRequest();
         for (String id : ids) {
-            request.add(indexName, id);
+            if (StringUtils.isNotBlank(id)) {
+                request.add(indexName, id);
+            } else {
+                log.debug("Ignoring empty id in list");
+            }
         }
         MultiGetResponse responses =
             client().mget(request, requestOptions());
