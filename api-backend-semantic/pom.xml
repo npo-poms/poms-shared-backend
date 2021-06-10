@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <parent>
+     <groupId>nl.vpro.poms</groupId>
+     <artifactId>poms-shared-backend-parent</artifactId>
+     <version>5.28-SNAPSHOT</version>
+   </parent>
+   <groupId>nl.vpro.api</groupId>
+   <artifactId>api-backend-semantic</artifactId>
+   <dependencies>
+     <dependency>
+       <groupId>org.apache.httpcomponents.client5</groupId>
+       <artifactId>httpclient5</artifactId>
+       <version>5.1</version>
+     </dependency>
+     <dependency>
+       <groupId>nl.vpro.shared</groupId>
+       <artifactId>vpro-shared-jackson2</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>de.mkammerer.wiremock-junit5</groupId>
+       <artifactId>wiremock-junit5</artifactId>
+       <version>1.1.0</version>
+       <scope>test</scope>
+     </dependency>
+   </dependencies>
+</project>

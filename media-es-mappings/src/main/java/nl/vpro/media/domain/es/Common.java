@@ -12,4 +12,6 @@ public class Common {
 
     public static final String ES_PUBLISH_DATE = "esPublishDate";
 
+    public static final String ES_VECTORIZATION = "semanticVectorization";
+
 }
