@@ -2280,6 +2280,11 @@
     },
     "url": {
       "type": "keyword"
+    },
+    "semanticVectorization": {
+      "type": "dense_vector",
+      "dims": 512
+
     }
   }
 }
