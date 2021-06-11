@@ -31,6 +31,8 @@
     <module>api-backend-elasticsearch</module>
     <module>api-backend-media-search</module>
     <module>api-backend-thesaurus</module>
+    <module>api-backend-semantic</module>
+
     <module>media-es-mappings</module>
     <module>pages-es-mappings</module>
     <module>query-es-mappings</module>
@@ -58,6 +60,10 @@
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
     </dependency>
   </dependencies>
 
