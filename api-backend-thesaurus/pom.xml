@@ -9,10 +9,6 @@
    <artifactId>api-backend-thesaurus</artifactId>
    <dependencies>
      <dependency>
-       <groupId>org.projectlombok</groupId>
-       <artifactId>lombok</artifactId>
-     </dependency>
-     <dependency>
        <groupId>nl.vpro.poms</groupId>
        <artifactId>gtaa-openskos</artifactId>
      </dependency>
