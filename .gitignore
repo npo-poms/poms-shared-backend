@@ -4,3 +4,5 @@
 /target
 */dep
 */.jqwik-database
+*/target
+*/*.iml
