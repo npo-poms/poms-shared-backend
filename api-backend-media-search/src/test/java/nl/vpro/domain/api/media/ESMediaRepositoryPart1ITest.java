@@ -1000,7 +1000,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(target.redirectForm(form().mediaIds("abc", "def").build()).getSearches().getMediaIds().asList()
                 .toString()).isEqualTo(
-                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+                        "[TextMatcher{value='xyz', match=SHOULD, matchType=TEXT}, TextMatcher{value='def', match=SHOULD, matchType=TEXT}]");
 
     }
 
@@ -1009,7 +1009,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         redirect("abc", "xyz");
         assertThat(target.redirectForm(form().descendantOfs("abc", "def").build()).getSearches().getDescendantOf()
                 .asList().toString()).isEqualTo(
-                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+                        "[TextMatcher{value='xyz', match=SHOULD, matchType=TEXT}, TextMatcher{value='def', match=SHOULD, matchType=TEXT}]");
 
     }
 
@@ -1019,7 +1019,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(target.redirectForm(form().episodeOfs("abc", "def").build()).getSearches().getEpisodeOf().asList()
                 .toString()).isEqualTo(
-                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+                        "[TextMatcher{value='xyz', match=SHOULD, matchType=TEXT}, TextMatcher{value='def', match=SHOULD, matchType=TEXT}]");
 
     }
 
@@ -1029,7 +1029,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         assertThat(target.redirectForm(MediaFormBuilder.form().memberOfs("abc", "def").build()).getSearches()
                 .getMemberOf().asList().toString()).isEqualTo(
-                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+                        "[TextMatcher{value='xyz', match=SHOULD, matchType=TEXT}, TextMatcher{value='def', match=SHOULD, matchType=TEXT}]");
 
     }
 
@@ -1043,7 +1043,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         facet.setFilter(helper.getSearches());
         assertThat(target.redirectForm(form().memberOfFacet(facet).build()).getFacets().getMemberOf().getFilter()
                 .getMemberOf().asList().toString()).isEqualTo(
-                        "[TextMatcher{value='xyz', match='SHOULD', matchType='TEXT'}, TextMatcher{value='def', match='SHOULD', matchType='TEXT'}]");
+                        "[TextMatcher{value='xyz', match=SHOULD, matchType=TEXT}, TextMatcher{value='def', match=SHOULD, matchType=TEXT}]");
 
     }
 

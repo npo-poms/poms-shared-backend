@@ -343,7 +343,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         }
     }
 
-     @Test
+    @Test
     public void testMediaChangesSinceWithMax() throws Exception {
         Instant prev = NOW.minus(1, ChronoUnit.SECONDS);
         try (CloseableIterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, 5, null, null, null)) {
