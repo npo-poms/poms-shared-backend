@@ -58,7 +58,7 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
 public class PushMappings implements Callable<Integer> {
 
 
-    @Option(names = {"-h", "--host"}, description = "host for elastisearch")
+    @Option(names = {"-h", "--host"}, description = "host for elasticsearch")
     private String host = "localhost";
 
     @Option(names = {"-u", "--user"})
