@@ -6,3 +6,4 @@
 */.jqwik-database
 */target
 */*.iml
+/push-es-mappings/dependency-reduced-pom.xml
