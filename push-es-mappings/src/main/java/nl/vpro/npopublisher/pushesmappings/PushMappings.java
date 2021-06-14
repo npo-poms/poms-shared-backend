@@ -9,14 +9,14 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import nl.vpro.elasticsearch.CreateIndex;
-import nl.vpro.elasticsearch.ElasticSearchIndex;
+import nl.vpro.elasticsearch.*;
 import nl.vpro.elasticsearchclient.ClientElasticSearchFactory;
 import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -86,7 +86,7 @@ public class PushMappings implements Callable<Integer> {
     public Integer call() throws Exception {
         try (ClientElasticSearchFactory factory = new ClientElasticSearchFactory()) {
             factory.setHosts(host);
-            if (cluster != null) {
+            if (StringUtils.isNotBlank(cluster) && ! "NOTGIVEN".equals(cluster)) {
                 factory.setClusterName(cluster);
                 log.info("Cluster name {}", cluster);
             }

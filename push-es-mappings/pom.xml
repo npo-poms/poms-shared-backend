@@ -13,7 +13,7 @@
 
   <properties>
     <host>http://localhost:9215</host>
-    <cluster />
+    <cluster>NOTGIVEN</cluster>
     <user>elasticsearch</user>
     <password>***</password>
   </properties>
@@ -57,7 +57,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <goals>
@@ -79,6 +79,27 @@
           </arguments>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.2.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <mainClass>nl.vpro.npopublisher.pushesmappings.PushMappings</mainClass>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
 
  <!--     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
