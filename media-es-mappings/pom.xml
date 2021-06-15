@@ -36,13 +36,8 @@
       <artifactId>vpro-shared-elasticsearch</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-    </dependency>
-    <dependency>
       <groupId>nl.vpro.shared</groupId>
       <artifactId>vpro-shared-i18n</artifactId>
     </dependency>
-
   </dependencies>
 </project>
