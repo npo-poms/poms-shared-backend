@@ -77,6 +77,10 @@ public class PushMappings implements Callable<Integer> {
     private String only  = "^.*$";
 
 
+    @Option(names = {"--experimental"})
+    private boolean  experimental  = false;
+
+
     public static void main(String[] argv) {
         int exitCode = new CommandLine(new PushMappings()).execute(argv);
         System.exit(exitCode);
@@ -98,6 +102,9 @@ public class PushMappings implements Callable<Integer> {
             Pattern onlyPattern = Pattern.compile(only);
 
             for (ElasticSearchIndex elasticSearchIndex : getIndices()) {
+                if (! experimental) {
+                    elasticSearchIndex = elasticSearchIndex.withoutExperimental();
+                }
                 if (! onlyPattern.matcher(elasticSearchIndex.getIndexName()).matches()) {
                     log.info("Skipping {}", elasticSearchIndex.getIndexName());
                     continue;

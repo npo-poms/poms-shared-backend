@@ -1,6 +1,8 @@
 package nl.vpro.pages.domain.es;
 
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 
 /**
@@ -16,5 +18,14 @@ public class ApiPagesIndex extends ElasticSearchIndex {
     protected ApiPagesIndex() {
         super(NAME,  "/es7/mapping/page.json", NAME + "-publish");
     }
+
+    @Override
+    public ElasticSearchIndex withoutExperimental() {
+        return withMappingsProcessor(jsonNode -> {
+            ObjectNode properties = jsonNode.with("properties");
+            properties.remove("semanticVectorization");
+        });
+    }
+
 
 }

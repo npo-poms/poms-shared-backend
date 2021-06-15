@@ -1511,7 +1511,7 @@
                           "properties": {
                             "audioCoding": {
                               "type": "keyword"
-                            },
+                             },
                             "numberOfChannels": {
                               "type": "long"
                             },

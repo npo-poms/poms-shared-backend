@@ -32,7 +32,8 @@ public abstract class ApiCueIndex extends ElasticSearchIndex {
         super(String.format(NAME, locale.toLanguageTag()),
             "/es7/setting/subtitles_" + locale.toLanguageTag() + ".json",
             "/es7/mapping/cue.json",
-            Arrays.asList(String.format(NAME, locale.toLanguageTag()) + "-publish")
+            Arrays.asList(String.format(NAME, locale.toLanguageTag()) + "-publish"),
+            null
         );
         this.locale = locale;
     }
@@ -42,9 +43,7 @@ public abstract class ApiCueIndex extends ElasticSearchIndex {
     public static Optional<ApiCueIndex> forLanguage(Locale locale) {
         ApiCueIndex result = null;
         int score = 0;
-        Iterator<ApiCueIndex> iterator = getInstances().iterator();
-        while(iterator.hasNext()) {
-            ApiCueIndex candidate = iterator.next();
+        for (ApiCueIndex candidate : getInstances()) {
             int scoreOfCandidate = score(locale, candidate.getLocale());
             if (scoreOfCandidate > score) {
                 result = candidate;
