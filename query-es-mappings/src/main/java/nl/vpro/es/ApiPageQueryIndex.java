@@ -14,7 +14,7 @@ public class ApiPageQueryIndex extends ElasticSearchIndex {
     public static final ApiPageQueryIndex APIPAGEQUERIES = new ApiPageQueryIndex();
 
     private ApiPageQueryIndex() {
-        super(NAME,  "/es7/setting/apiqueries.json", "/es7/mapping/query.json", new ArrayList<>());
+        super(NAME,  "/es7/setting/apiqueries.json", "/es7/mapping/query.json", new ArrayList<>(), null);
     }
 
 }

@@ -76,7 +76,6 @@ public class PushMappings implements Callable<Integer> {
     @Option(names = {"-o", "--only"})
     private String only  = "^.*$";
 
-
     @Option(names = {"--experimental"})
     private boolean  experimental  = false;
 
