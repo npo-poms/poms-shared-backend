@@ -43,9 +43,13 @@ you need to have a tunneling from your machine.
 
 == At openshift
 
-The script can also be run against the elasticsearch implementation at amazon. This installation required username/password:
+The script can also be run against the elasticsearch implementation at amazon. This installation required username/password, and port-forwarding.
+
+It is summarized in a makefile. I depends on openshift-cli, and that you're currently logged in.
 
 [source,bash]
 ----
-(cd push-es-mappings/ ; mvn -Dhost=localhost:9200 -Duser=elastsicsearch -Dpassword=<>)
+(cd push-es-mappings/ ; make push-prod)
 ----
+
+It can also be done via a pipeline in gitlab ci.
