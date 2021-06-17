@@ -79,6 +79,9 @@ public class PushMappings implements Callable<Integer> {
     @Option(names = {"--experimental"})
     private boolean  experimental  = false;
 
+    @Option(names = {"--new"})
+    private boolean newIndices = false;
+
 
     public static void main(String[] argv) {
         int exitCode = new CommandLine(new PushMappings()).execute(argv);
@@ -101,14 +104,15 @@ public class PushMappings implements Callable<Integer> {
             Pattern onlyPattern = Pattern.compile(only);
 
             for (ElasticSearchIndex elasticSearchIndex : getIndices()) {
-                if (! experimental) {
-                    elasticSearchIndex = elasticSearchIndex.withoutExperimental();
-                }
+
                 if (! onlyPattern.matcher(elasticSearchIndex.getIndexName()).matches()) {
                     log.info("Skipping {}", elasticSearchIndex.getIndexName());
                     continue;
                 }
-                pushMapping(factory, elasticSearchIndex);
+                if (! experimental) {
+                    elasticSearchIndex = elasticSearchIndex.withoutExperimental();
+                }
+                createIndexIfNecessaryAndPushMappings(factory, elasticSearchIndex);
             }
         }
         return 0;
@@ -116,27 +120,33 @@ public class PushMappings implements Callable<Integer> {
 
 
 
-    protected  void pushMapping(ClientElasticSearchFactory factory, ElasticSearchIndex elasticSearchIndex ) {
+    protected  void createIndexIfNecessaryAndPushMappings(ClientElasticSearchFactory factory, ElasticSearchIndex elasticSearchIndex ) {
         try {
             IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
 
-            // Try to create the index if it didn't exist already
-            boolean created = helper.createIndexIfNotExists(CreateIndex.builder()
-                .useNumberPostfix(true)
+            // Try to create the index if it didn't exist already, unlless --new given, then always create a new index
+            boolean created = helper.createIndex(! newIndices, CreateIndex.builder()
+                .useNumberPostfix(newIndices)
                 .forReindex(true) // no replicas, very long refresh
+                .mappingsProcessor(elasticSearchIndex.getMappingsProcessor())
                 .build());
 
             if (! created) {
+
+
                 // the index existed already, so simply reput the settings
                 // and prepare the index for actual usage
                 log.info("{} : {}", elasticSearchIndex, helper.count());
+                log.info("Reput mappings");
+                helper.reputMappings();
+                log.info("Reput settings");
                 helper.reputSettings((settings) -> {
                     if (forceReplicas != null) {
                         ObjectNode index = settings.with("settings").with("index");
                         index.put("number_of_replicas", forceReplicas);
                     }
                 });
-                helper.reputMappings();
+
             }
         } catch (Exception e) {
             log.error(e.getMessage());
