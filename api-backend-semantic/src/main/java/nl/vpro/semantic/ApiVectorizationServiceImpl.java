@@ -102,5 +102,4 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
         private float[] embedding;
     }
 
-
 }

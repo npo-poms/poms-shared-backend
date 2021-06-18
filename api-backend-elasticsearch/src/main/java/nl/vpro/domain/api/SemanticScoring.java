@@ -37,7 +37,7 @@ public class SemanticScoring {
         Map<String, Object> params = new LinkedHashMap<>();
         params.put("query_vector", vectorization);
         String field = prefix + Common.ES_VECTORIZATION;
-        Script script = new Script(ScriptType.INLINE, "painless", "doc.containsKey('" + field + "') ? (cosineSimilarity(params.query_vector, doc['"  + field + "']) + 1.0) : 0.0", params);
+        Script script = new Script(ScriptType.INLINE, "painless", "doc['" + field + "'].size() == 0 ? 0.0  : (cosineSimilarity(params.query_vector, doc['"  + field + "']) + 2)", params);
         return script;
     }
 }
