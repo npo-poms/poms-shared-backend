@@ -65,6 +65,9 @@ public abstract class ESQueryBuilder {
         @NonNull List<SearchFieldDefinition> searchFields,
         @Nullable VectorizationService vectorizationService) {
         if (textSearch.isSemantic()) {
+            if (vectorizationService == null) {
+                throw new UnsupportedOperationException("Semantic search not supported");
+            }
             // semantic search must be done via scoring only
             return QueryBuilders.matchAllQuery();
             ///return buildSemanticTextQuery(prefix, textSearch, vectorizationService);
