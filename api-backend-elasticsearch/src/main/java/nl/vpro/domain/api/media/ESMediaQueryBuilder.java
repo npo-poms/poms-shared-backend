@@ -105,9 +105,10 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
         {
             SimpleTextMatcher textSearch = searches.getText();
             if(textSearch != null && StringUtils.isNotBlank(textSearch.getValue())) {
-                BoolQueryBuilder textQuery = buildTextQuery(
+                QueryBuilder textQuery = buildTextQuery(
                     prefix, textSearch,
-                    SEARCH_FIELDS
+                    SEARCH_FIELDS,
+                    null
                 );
 
                /* if (SUBTITLES.getBoost() > 0.0f) {
