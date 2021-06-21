@@ -33,14 +33,17 @@ import nl.vpro.util.ThreadPools;
 public class Iterate {
 
     @SafeVarargs
-    public static <T> Response streamingJson(Function<JsonGenerator, CloseableIterator<T>> creator, JsonConsumer<T> streamer, Consumer<Response.ResponseBuilder>... responseBuilderConsumer) throws Exception {
-        PipedOutputStream pipedOutputStream = new PipedOutputStream();
-        PipedInputStream pipedInputStream = new PipedInputStream();
+    public static <T> Response streamingJson(
+        final Function<JsonGenerator, CloseableIterator<T>> creator,
+        final JsonConsumer<T> streamer,
+        final Consumer<Response.ResponseBuilder>... responseBuilderConsumer) throws Exception {
+        final PipedOutputStream pipedOutputStream = new PipedOutputStream();
+        final PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
 
-        JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory().createGenerator(pipedOutputStream);
+        final JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory().createGenerator(pipedOutputStream);
 
-        CloseableIterator<T> iterator;
+        final CloseableIterator<T> iterator;
         try {
             iterator = creator.apply(jg);
         } catch (Exception e) {
@@ -72,11 +75,14 @@ public class Iterate {
                 closeResources.run();
             }
             SecurityContextHolder.clearContext();
+            log.debug("Ready");
         });
 
         final StreamingOutput streamingOutput = output -> {
+            boolean ready = false;
             try {
                 IOUtils.copy(pipedInputStream, output);
+                ready = true;
             } catch (ClientErrorException | IOException clientError) {
                 log.info(clientError.getMessage());
                 throw clientError;
@@ -87,8 +93,12 @@ public class Iterate {
                 log.warn(t.getMessage(), t);
                 throw new RuntimeException(t);
             } finally {
-                if (submit.cancel(true)) {
-                    log.debug("Canceled {}", submit);
+                if (! ready) {
+                    if (submit.cancel(true)) {
+                        log.debug("Canceled {}", submit);
+                    }
+                } else {
+                    // let it end normally
                 }
             }
         };
