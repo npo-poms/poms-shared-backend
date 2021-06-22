@@ -678,27 +678,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         @NonNull Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
 
-        MaxOffsetIterator<MediaChange> maxed = new MaxOffsetIterator<MediaChange>(iterator, max, 0L, true) {
-            @Override
-            protected boolean findNext() {
-                boolean result = super.findNext();
-                if (result && count == offsetmax) {
-                    // maxed out
-                    if (tail != Tail.ALWAYS && peekingWrapped().hasNext()) {
-                        MediaChange peek = peekingWrapped.peek();
-                        if (peek.getPublishDate().isAfter(next.getPublishDate())) {
-                            log.debug("Maxed out, and no tail request. Next one would have been {}", peek);
-                            // NPA-105 change the publish date of the last one returned.
-                            // the point is that when filtering with some profiles otherwise a lot of needless
-                            // iteration will keep happening (e.g. human, max=1, may progress very slowly)
-                            next.setPublishDate(peek.getPublishDate());
-                        }
-                    }
-                }
-                return result;
-            }
-
-        };
+        MaxOffsetIterator<MediaChange> maxed = new MaxOffsetIterator<>(iterator, max, 0L, true);
         CloseableIterator<MediaChange> tailed =  TailAdder.withFunctions(maxed, (last) -> {
             if (actualTails == Tail.NEVER) {
                 throw new NoSuchElementException();
