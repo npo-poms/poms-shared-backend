@@ -1,4 +1,14 @@
+stages:
+  - develop
+  - integrate
+  - validate
+  - branch
+  - release
+
 include:
   - project: 'shared/gitlab/gitlab-templates'
     ref: master
     file: 'java_maven.yml'
+  - project: 'shared/gitlab/gitlab-templates'
+    ref: master
+    file: 'maven_release.yml'

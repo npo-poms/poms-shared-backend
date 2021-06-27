@@ -24,6 +24,7 @@ import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.index.query.*;
 
 import nl.vpro.domain.api.media.DurationRangeMatcher;
+import nl.vpro.semantic.VectorizationService;
 
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -58,13 +59,29 @@ public abstract class ESQueryBuilder {
         STOP_WORDS = sw;
     }
 
-    protected static <MT extends MatchType> BoolQueryBuilder buildTextQuery(
+    protected static <MT extends MatchType> QueryBuilder buildTextQuery(
         @NonNull String prefix,
         @NonNull AbstractTextMatcher<MT> textSearch,
-        @NonNull List<SearchFieldDefinition> searchFields) {
-        final BoolQueryBuilder answer = QueryBuilders.boolQuery();
+        @NonNull List<SearchFieldDefinition> searchFields,
+        @Nullable VectorizationService vectorizationService) {
+        if (textSearch.isSemantic()) {
+            if (vectorizationService == null) {
+                throw new UnsupportedOperationException("Semantic search not supported");
+            }
+            // semantic search must be done via scoring only
+            return QueryBuilders.matchAllQuery();
+            ///return buildSemanticTextQuery(prefix, textSearch, vectorizationService);
+        } else {
+            return buildNonSemanticTextQuery(prefix, textSearch, searchFields);
+        }
+    }
 
-        //answer(QueryBuilders.hasChildQuery(ApiCueIndex.NAME))
+    protected static <MT extends MatchType> BoolQueryBuilder buildNonSemanticTextQuery(
+        @NonNull String prefix,
+        @NonNull AbstractTextMatcher<MT> textSearch,
+        @NonNull List<SearchFieldDefinition> searchFields
+    ) {
+        final BoolQueryBuilder answer = QueryBuilders.boolQuery();
 
         String textWithoutStopWords = filterStopWords(textSearch.getValue());
         List<String> splitText = split(textSearch.getValue());

@@ -54,7 +54,8 @@ public class ESSubtitlesQueryBuilder extends ESQueryBuilder {
             if(textSearch != null && StringUtils.isNotBlank(textSearch.getValue())) {
                 QueryBuilder textQuery = buildTextQuery(
                     prefix, textSearch,
-                    SEARCH_FIELDS
+                    SEARCH_FIELDS,
+                    null
                 );
                 apply(booleanQuery, textQuery, textSearch.getMatch());
             }

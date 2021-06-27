@@ -89,14 +89,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public List<MediaObject> loadAll(@NonNull List<String> ids) {
-        return loadAll(MediaObject.class, ids).stream().map(o -> o.orElse(null)).collect(Collectors.toList());
+        return loadAll(MediaObject.class, ids).stream()
+            .map(o -> o.orElse(null))
+            .collect(Collectors.toList());
     }
 
 
     @SneakyThrows
     @Override
-    protected <S extends MediaObject> List<Optional<S>> loadAll(@NonNull Class<S> clazz,
-                                                      @NonNull List<String> ids) {
+    protected <S extends MediaObject> List<Optional<S>> loadAll(
+        @NonNull Class<S> clazz,
+        @NonNull List<String> ids) {
         ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
         return loadAll(clazz, getIndexName(), ids.toArray(new String[0]));
     }
@@ -612,7 +615,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (log.isDebugEnabled()) {
             log.debug("Found {} changes", i.getTotalSize());
         }
-        ChangeIterator changes = new ChangeIterator(
+        final ChangeIterator changes = new ChangeIterator(
             i,
             since,
             currentProfile,
@@ -673,9 +676,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 };
                 break;
         }
-        Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
+        @NonNull Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
 
-        CloseableIterator<MediaChange> maxed =   new MaxOffsetIterator<>(iterator, max, 0L, true);
+        MaxOffsetIterator<MediaChange> maxed = new MaxOffsetIterator<>(iterator, max, 0L, true);
         CloseableIterator<MediaChange> tailed =  TailAdder.withFunctions(maxed, (last) -> {
             if (actualTails == Tail.NEVER) {
                 throw new NoSuchElementException();
@@ -683,7 +686,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (last == null) {
                 return MediaChange.tail(changesUpto);
             } else if (tail == Tail.ALWAYS) {
-                return MediaChange.tail(last.asSince());
+                if (maxed.peekingWrapped().hasNext()) {
+                    return MediaChange.tail(maxed.peekingWrapped().peek().asSince());
+                } else {
+                    return MediaChange.tail(last.asSince());
+                }
             } else {
                 throw new NoSuchElementException();
             }
