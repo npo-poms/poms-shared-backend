@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-
 import nl.vpro.api.rs.exception.Exceptions;
 import nl.vpro.api.rs.filter.ApiMediaFilter;
 import nl.vpro.api.rs.v3.media.MediaRestService;
