@@ -7,8 +7,8 @@ stages:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: master
+    ref: 'tags/1.0'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: master
+    ref: 'tags/1.0'
     file: 'maven_release.yml'
