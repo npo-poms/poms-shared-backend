@@ -5,9 +5,12 @@ stages:
   - branch
   - release
 
+variables:
+  SKIP_IT_TESTS: 'false'
+
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.0'
+    ref: 'feature/SYS-955-extra-ES-container-in-builds'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
     ref: 'tags/1.0'
