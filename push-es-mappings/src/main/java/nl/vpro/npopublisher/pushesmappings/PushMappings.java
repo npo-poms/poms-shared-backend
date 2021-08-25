@@ -79,9 +79,6 @@ public class PushMappings implements Callable<Integer> {
     @Option(names = {"--experimental"})
     private boolean  experimental  = false;
 
-    @Option(names = {"--new"})
-    private boolean newIndices = false;
-
 
     public static void main(String[] argv) {
         int exitCode = new CommandLine(new PushMappings()).execute(argv);
@@ -124,16 +121,15 @@ public class PushMappings implements Callable<Integer> {
         try {
             IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
 
-            // Try to create the index if it didn't exist already, unlless --new given, then always create a new index
-            boolean created = helper.createIndex(! newIndices, CreateIndex.builder()
-                .useNumberPostfix(newIndices)
-                .forReindex(true) // no replicas, very long refresh
-                .mappingsProcessor(elasticSearchIndex.getMappingsProcessor())
-                .build());
+            boolean exists = helper.checkIndex();
 
-            if (! created) {
-
-
+            if (! exists) {
+                helper.createIndex(CreateIndex.builder()
+                    .useNumberPostfix(true)
+                    .forReindex(true) // no replicas, very long refresh
+                    .mappingsProcessor(elasticSearchIndex.getMappingsProcessor())
+                    .build());
+            } else {
                 // the index existed already, so simply reput the settings
                 // and prepare the index for actual usage
                 log.info("{} : {}", elasticSearchIndex, helper.count());
@@ -146,10 +142,9 @@ public class PushMappings implements Callable<Integer> {
                         index.put("number_of_replicas", forceReplicas);
                     }
                 });
-
             }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error(e.getMessage(), e);
 
         }
     }
@@ -178,7 +173,9 @@ public class PushMappings implements Callable<Integer> {
                 Response response = factory
                     .client(PushMappings.class)
                     .performRequest(request);
-                ArrayNode health = Jackson2Mapper.getLenientInstance().readerFor(ArrayNode.class).readValue(response.getEntity().getContent());
+                ArrayNode health = Jackson2Mapper.getLenientInstance()
+                    .readerFor(ArrayNode.class)
+                    .readValue(response.getEntity().getContent());
 
                 String status  = health.get(0).get("status").textValue();
                 boolean serviceIsUp = "green".equals(status) || "yellow".equals(status);
