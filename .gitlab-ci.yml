@@ -9,7 +9,7 @@ variables:
   SKIP_IT_TESTS: 'false'
   ELASTICSEARCH_HOST: 'elasticsearch'
   ELASTICSEARCH_CHECK: 'true'
-
+# test
 .build:
   services:
     - name: docker.vpro.nl/vpro-elasticsearch:1.0
