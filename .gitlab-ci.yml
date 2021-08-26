@@ -13,7 +13,7 @@ variables:
 .build:
   services:
     - name: docker.vpro.nl/vpro-elasticsearch:1.0
-      alias: elasticsearch
+      alias: elasticsearch # Alias is also the hostname (i.e. http://elasticsearch)
       command: [ "bin/elasticsearch", "-Ediscovery.type=single-node" ]
 
 include:
