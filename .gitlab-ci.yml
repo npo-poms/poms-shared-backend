@@ -8,10 +8,9 @@ stages:
 variables:
   SKIP_IT_TESTS: 'false'
   ELASTICSEARCH_HOST: 'elasticsearch'
+  ELASTICSEARCH_CHECK: 'ES returns status code $(curl -s -o /dev/null -w "%{http_code}" "http://elasticsearch:9200/_cat/health")'
 
 .build:
-  before_script:
-    - echo ES returns status code $(curl -s -o /dev/null -w "%{http_code}" "http://elasticsearch:9200/_cat/health")
   services:
     - name: docker.vpro.nl/vpro-elasticsearch:1.0
       alias: elasticsearch
