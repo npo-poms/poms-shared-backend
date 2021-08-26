@@ -19,7 +19,7 @@ variables:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'feature/SYS-955-extra-ES-container-in-builds'
+    ref: 'feature/SYS-955-extra-ES-container-in-builds' # change order
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
     ref: 'tags/1.0'
