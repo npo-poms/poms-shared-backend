@@ -7,7 +7,7 @@ stages:
 
 variables:
   SKIP_IT_TESTS: 'false'
-# try again
+# try again n
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
