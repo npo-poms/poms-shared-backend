@@ -8,7 +8,7 @@ stages:
 variables:
   SKIP_INTEGRATION_TESTS: 'false'
   MAVEN_EXTRA_OPTS: '-Dinteg.http.eshost=elasticsearch'
-
+# test
 .setup:
   script:
     - echo ES returns status code $(curl -s -o /dev/null -w "%{http_code}" "http://elasticsearch:9200/_cat/health")
