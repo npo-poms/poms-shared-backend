@@ -6,7 +6,7 @@ stages:
   - release
 
 variables:
-  SKIP_IT_TESTS: 'false'
+  SKIP_INTEGRATION_TESTS: 'false'
   MAVEN_EXTRA_COMMANDS: '-Dinteg.http.eshost=elasticsearch'
 
 .setup:
