@@ -7,7 +7,7 @@ stages:
 
 variables:
   SKIP_INTEGRATION_TESTS: 'false'
-  MAVEN_EXTRA_COMMANDS: '-Dinteg.http.eshost=elasticsearch'
+  MAVEN_EXTRA_OPTS: '-Dinteg.http.eshost=elasticsearch'
 
 .setup:
   script:
