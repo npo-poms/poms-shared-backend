@@ -5,10 +5,24 @@ stages:
   - branch
   - release
 
+variables:
+  SKIP_INTEGRATION_TESTS: 'false'
+  MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=elasticsearch'
+
+.setup:
+  script:
+    - echo ES returns status code $(curl -s -o /dev/null -w "%{http_code}" "http://elasticsearch:9200/_cat/health")
+
+.build:
+  services:
+    - name: docker.vpro.nl/vpro-elasticsearch:1.0
+      alias: elasticsearch # Alias is also the hostname (i.e. http://elasticsearch:9200)
+      command: [ "bin/elasticsearch", "-Ediscovery.type=single-node" ]
+
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.0'
+    ref: 'tags/1.4'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.0'
+    ref: 'tags/1.4'
     file: 'maven_release.yml'
