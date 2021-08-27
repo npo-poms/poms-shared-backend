@@ -10,6 +10,13 @@ variables:
   MAVEN_EXTRA_COMMANDS: '-Dinteg.http.eshost=elasticsearch'
   ELASTICSEARCH_CHECK: 'true'
 
+.setup:
+  script:
+    - >
+      if [ "$ELASTICSEARCH_CHECK" = "true" ];
+      then echo ES returns status code $(curl -s -o /dev/null -w "%{http_code}" "http://elasticsearch:9200/_cat/health");
+      fi
+
 .build:
   services:
     - name: docker.vpro.nl/vpro-elasticsearch:1.0
