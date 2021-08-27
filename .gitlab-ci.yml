@@ -7,7 +7,7 @@ stages:
 
 variables:
   SKIP_IT_TESTS: 'false'
-  #MAVEN_EXTRA_COMMANDS: '-Dinteg.http.eshost=elasticsearch'
+  MAVEN_EXTRA_COMMANDS: '-Dinteg.http.eshost=elasticsearch'
   ELASTICSEARCH_CHECK: 'true'
 
 .build:
