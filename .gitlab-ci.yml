@@ -8,14 +8,10 @@ stages:
 variables:
   SKIP_IT_TESTS: 'false'
   MAVEN_EXTRA_COMMANDS: '-Dinteg.http.eshost=elasticsearch'
-  ELASTICSEARCH_CHECK: 'true'
 
 .setup:
   script:
-    - >
-      if [ "$ELASTICSEARCH_CHECK" = "true" ];
-      then echo ES returns status code $(curl -s -o /dev/null -w "%{http_code}" "http://elasticsearch:9200/_cat/health");
-      fi
+    - echo ES returns status code $(curl -s -o /dev/null -w "%{http_code}" "http://elasticsearch:9200/_cat/health")
 
 .build:
   services:
