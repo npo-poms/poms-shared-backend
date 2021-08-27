@@ -21,7 +21,7 @@ variables:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.4' # change order
+    ref: 'tags/1.4'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
     ref: 'tags/1.4'
