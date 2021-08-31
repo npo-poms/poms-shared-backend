@@ -66,52 +66,6 @@
       <artifactId>lombok</artifactId>
     </dependency>
   </dependencies>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-      <groupId>nl.vpro.api</groupId>
-        <artifactId>api-backend-elasticsearch</artifactId>
-        <classifier>tests</classifier>
-        <scope>test</scope>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.api</groupId>
-        <artifactId>api-backend-thesaurus</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.api</groupId>
-        <artifactId>api-backend-semantic</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.api</groupId>
-        <artifactId>api-backend-media-search</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.poms</groupId>
-        <artifactId>media-es-mappings</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.poms</groupId>
-        <artifactId>pages-es-mappings</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-       <dependency>
-        <groupId>nl.vpro.poms</groupId>
-        <artifactId>query-es-mappings</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>nl.vpro.poms</groupId>
-        <artifactId>push-es-mappings</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <repositories>
     <repository>
@@ -138,6 +92,32 @@
     </pluginRepository>
   </pluginRepositories>
 
-  <build>
-  </build>
+  <profiles>
+    <profile>
+      <id>validate</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <version>3.0.0</version>
+            <configuration>
+              <rules>
+                <requireReleaseDeps>
+                  <failWhenParentIsSnapshot>false</failWhenParentIsSnapshot>
+                  <excludes>
+                    <exclude>${project.groupId}:*</exclude>
+                    <exclude>nl.vpro.api:*</exclude>
+                    <exclude>nl.vpro.poms:*</exclude>
+                  </excludes>
+                </requireReleaseDeps>
+              </rules>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+
 </project>
