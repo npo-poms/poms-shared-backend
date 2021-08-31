@@ -12,7 +12,7 @@
     <property name="locations">
       <list>
         <value>classpath:/gtaa-keys.properties</value>
-        <value>file:/${user.home}/conf/gtaa-keys.properties</value>
+        <value>file://${user.home}/conf/gtaa-keys.properties</value>
         <value>file:#{npo.configDirectory.toString()}/gtaa-keys.properties</value>
       </list>
     </property>
