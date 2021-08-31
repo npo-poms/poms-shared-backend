@@ -81,7 +81,7 @@ public class PushMappings implements Callable<Integer> {
 
 
     public static void main(String[] argv) {
-        int exitCode = new CommandLine(new PushMappings()).execute(argv);
+        int exitCode = new CommandLine(new PushMappings()).setTrimQuotes(true).execute(argv);
         System.exit(exitCode);
     }
 
