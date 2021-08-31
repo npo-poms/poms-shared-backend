@@ -15,7 +15,7 @@
   <properties>
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
-    <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
+
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
   </properties>
@@ -66,6 +66,52 @@
       <artifactId>lombok</artifactId>
     </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+      <groupId>nl.vpro.api</groupId>
+        <artifactId>api-backend-elasticsearch</artifactId>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.api</groupId>
+        <artifactId>api-backend-thesaurus</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.api</groupId>
+        <artifactId>api-backend-semantic</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.api</groupId>
+        <artifactId>api-backend-media-search</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.poms</groupId>
+        <artifactId>media-es-mappings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.poms</groupId>
+        <artifactId>pages-es-mappings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+       <dependency>
+        <groupId>nl.vpro.poms</groupId>
+        <artifactId>query-es-mappings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>nl.vpro.poms</groupId>
+        <artifactId>push-es-mappings</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <repositories>
     <repository>
