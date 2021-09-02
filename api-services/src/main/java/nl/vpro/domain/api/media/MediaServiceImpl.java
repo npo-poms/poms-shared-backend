@@ -39,7 +39,6 @@ import static nl.vpro.domain.Roles.HAS_API_ROLE;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-@ManagedResource(objectName = "nl.vpro.api:name=MediaService")
 @Service
 @Slf4j
 public class MediaServiceImpl implements MediaService {
