@@ -80,17 +80,24 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_CHANGES_ROLE)
-    public CloseableIterator<MediaChange> changes(final String profile, final boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, boolean withSequences, Deletes deletes, Tail tail) throws ProfileNotFoundException {
+    public CloseableIterator<MediaChange> changes(
+        final String profile,
+        final boolean profileCheck,
+        final Instant since,
+        final String mid,
+        final Order order,
+        final Integer max,
+        final Long keepAlive,
+        final boolean withSequences,
+        final Deletes deletes,
+        final Tail tail) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
                 return changesWithES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes, tail);
             } else {
-                CloseableIterator<MediaChange> iterator;
-
-                Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
-                log.info("Since {} is couchdb like, taking {}. Explicitely configured to use elastic search for changes feed. Note that clients don't receive sequences.", since.toEpochMilli(), i);
-                iterator = changesWithES(profile, profileCheck, i, mid, order, max, keepAlive, deletes, tail);
-                return iterator;
+                final Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
+                log.info("Since {} is couchdb like, taking {}. Explicitly configured to use elastic search for changes feed. Note that clients don't receive sequences.", since.toEpochMilli(), i);
+                return changesWithES(profile, profileCheck, i, mid, order, max, keepAlive, deletes, tail);
             }
         } else {
             // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' any more.
@@ -108,14 +115,24 @@ public class MediaServiceImpl implements MediaService {
     }
 
 
-    protected CloseableIterator<MediaChange> changesWithES(final String profile, boolean profileCheck, final Instant since, String mid, final Order order, final Integer max, final Long keepAlive, Deletes deletes, Tail tail) throws ProfileNotFoundException {
-        ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
+    protected CloseableIterator<MediaChange> changesWithES(
+        final String profile,
+        final boolean profileCheck,
+        final Instant since,
+        final String mid,
+        final Order order,
+        final Integer max,
+        final Long keepAlive,
+        final @Nullable Deletes deletes,
+        final Tail tail) throws ProfileNotFoundException {
+        final ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
-        ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? currentProfile : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
+        final ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? currentProfile : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
             throw new ProfileNotFoundException("No such media profile " + profile);
         }
-        return mediaSearchRepository.changes(since, mid, currentProfile, previousProfile, order, max, keepAlive, deletes, tail);
+        return mediaSearchRepository.changes(
+            since, mid, currentProfile, previousProfile, order, max, keepAlive, deletes, tail);
     }
 
 
