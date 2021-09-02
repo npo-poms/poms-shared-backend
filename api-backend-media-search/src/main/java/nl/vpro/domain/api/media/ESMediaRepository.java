@@ -570,15 +570,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @Override
     public CloseableIterator<MediaChange> changes(
-        Instant since,
-        String mid,
-        ProfileDefinition<MediaObject> currentProfile,
-        ProfileDefinition<MediaObject> previousProfile,
-        Order order,
-        Integer max,
-        Long keepAlive,
-        Deletes deletes,
-        Tail tail) {
+        final Instant since,
+        final String mid,
+        final ProfileDefinition<MediaObject> currentProfile,
+        final ProfileDefinition<MediaObject> previousProfile,
+        final Order order,
+        final Integer max,
+        final Long keepAlive,
+        @Nullable Deletes deletes,
+        final Tail tail) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
@@ -626,10 +626,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         CloseableIterator<MediaChange> iterator = changes;
 
         if (since != null && mid != null) {
-            CloseablePeekingIterator<MediaChange> peeking = changes.peeking();
+            final CloseablePeekingIterator<MediaChange> peeking = changes.peeking();
             iterator = peeking;
             while(peeking.hasNext()) {
-                MediaChange peek = peeking.peek();
+                final MediaChange peek = peeking.peek();
 
                 if (peek != null) {
                     if (peek.isTail() || peek.getPublishDate() == null || peek.getMid() == null) {
@@ -676,10 +676,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 };
                 break;
         }
-        @NonNull Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
+        final @NonNull Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
 
-        MaxOffsetIterator<MediaChange> maxed = new MaxOffsetIterator<>(iterator, max, 0L, true);
-        CloseableIterator<MediaChange> tailed =  TailAdder.withFunctions(maxed, (last) -> {
+        final MaxOffsetIterator<MediaChange> maxed = new MaxOffsetIterator<>(iterator, max, 0L, true);
+        final CloseableIterator<MediaChange> tailed =  TailAdder.withFunctions(maxed, (last) -> {
             if (actualTails == Tail.NEVER) {
                 throw new NoSuchElementException();
             }
