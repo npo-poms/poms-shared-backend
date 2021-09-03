@@ -75,6 +75,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     protected void firstRun() {
         createIndicesIfNecessary();
     }
+
     @BeforeEach
     public  void setup() {
         target.setIndexName(indexHelpers.get(ApiMediaIndex.APIMEDIA).getIndexName());
@@ -94,7 +95,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaObject result = target.load("MID_FOR_LOAD");
         assertThat(result.getMainTitle()).isEqualTo("foo bar");
         assertThat(result.getMid()).isEqualTo("MID_FOR_LOAD");
-
     }
 
     @Test
@@ -201,7 +201,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                     form().tags(MUST, ExtendedTextMatcher.must("FOO", false)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
-
     }
 
     @Test
@@ -225,7 +224,6 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
                     form().tags(ExtendedTextMatcher.must("FO.*", REGEX, false)).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
         }
-
     }
 
 

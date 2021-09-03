@@ -328,6 +328,17 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
     }
 
+
+    @Test
+    public void testMediaChangesExcludeDeletes() {
+        Iterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null, Deletes.EXCLUDE, null);
+        List<MediaChange> list = new ArrayList<>();
+        changes.forEachRemaining(list::add);
+        assertThat(list.stream().filter(Objects::nonNull).collect(Collectors.toList())).hasSize(indexedObjectCount);
+        assertThat(list.stream().filter(Objects::isNull).collect(Collectors.toList())).hasSize(deletedObjectCount);
+        assertThat(list).hasSize(indexedObjectCount +  deletedObjectCount);
+    }
+
     @Test
     public void testMediaChangesSince() {
         Iterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, Integer.MAX_VALUE, null, null, null);
