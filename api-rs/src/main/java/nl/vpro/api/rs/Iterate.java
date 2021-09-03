@@ -32,11 +32,22 @@ import nl.vpro.util.ThreadPools;
 @Slf4j
 public class Iterate {
 
+
+    /**
+     * @param creator  Supplies an iterator of objects, which will be used to make json objects.
+     *                 The JsonGenerator argument can be ignored, but it can also be used to write opening json
+     *                 and 'keepAlive' stuff.
+     *
+     * @param streamer When the iterator is created, this has to write it to the JsonGenerator
+     * @param responseBuilderConsumer Optionally you can build the response further before it it returned. E.g. to add headers.
+     */
     @SafeVarargs
     public static <T> Response streamingJson(
         final Function<JsonGenerator, CloseableIterator<T>> creator,
         final JsonConsumer<T> streamer,
         final Consumer<Response.ResponseBuilder>... responseBuilderConsumer) throws Exception {
+
+
         final PipedOutputStream pipedOutputStream = new PipedOutputStream();
         final PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
@@ -107,6 +118,7 @@ public class Iterate {
         Response.ResponseBuilder builder =  Response.ok()
             .type(MediaType.APPLICATION_JSON_TYPE)
             .entity(streamingOutput);
+
         for (Consumer<Response.ResponseBuilder> c : responseBuilderConsumer) {
             c.accept(builder);
         }
