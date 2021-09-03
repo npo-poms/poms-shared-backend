@@ -44,7 +44,7 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  * Test
  * :  mvn  -Dhost=localhost:9221 -Dcluster=poms-test
  * Dev
- * : mvn -Dhost=localhost:9215 -Dcluster=poms-dev
+ * : mvn -Dhost=localhost:9215 -Dcluster=poms-dev -Dexperimental=true
  *  Production
  *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost:9209 -Dcluster=poms-prod
  *
