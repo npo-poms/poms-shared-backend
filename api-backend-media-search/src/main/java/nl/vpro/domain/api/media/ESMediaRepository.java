@@ -658,10 +658,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             case INCLUDE:
                 break;
             case EXCLUDE:
-                iterator= FilteringIterator.<MediaChange>builder()
-                    .wrapped(iterator)
-                    .filter((c) -> c == null || !c.isDeleted())
-                    .build();
+                iterator= new BasicWrappedIterator<MediaChange>(iterator) {
+                    @Override
+                    public MediaChange next() {
+                        MediaChange n = super.next();
+                        if (n.isDeleted()) {
+                            log.debug("Returning null in stead since it is deleted. (This will output space to client)");
+                            return null;
+                        }
+                        return n;
+                    }
+                };
                 break;
             case ID_ONLY:
                 iterator = new BasicWrappedIterator<MediaChange>(iterator) {
@@ -728,7 +735,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
     @Override
-    public CloseableIterator<MediaObject> iterate(ProfileDefinition<MediaObject> profile, MediaForm form, long offset, Integer max, FilteringIterator.KeepAlive keepAlive) {
+    public CloseableIterator<MediaObject> iterate(
+        final ProfileDefinition<MediaObject> profile,
+        final MediaForm form,
+        final long offset,
+        final Integer max,
+        final FilteringIterator.KeepAlive keepAlive) {
         ExtendedElasticSearchIterator<MediaObject> i = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
