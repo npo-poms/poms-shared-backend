@@ -17,7 +17,6 @@ import javax.inject.Named;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +49,6 @@ public class MediaServiceImpl implements MediaService {
     private final QuerySearchRepository querySearchRepository;
 
     private final TopSpinRepository topSpinRepository;
-
 
     private final SinceToTimeStampService sinceToTimeStampService;
 
