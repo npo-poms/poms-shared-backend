@@ -25,7 +25,7 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
         Map<String, String> redirects = Redirector.REDIRECTS.get();
-        if (redirects != null) {
+        if (redirects != null && ! redirects.isEmpty()) {
             response.getHeaders().putSingle(Headers.NPO_REDIRECTS, redirects);
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
