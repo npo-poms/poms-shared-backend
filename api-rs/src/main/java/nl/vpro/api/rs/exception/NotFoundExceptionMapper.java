@@ -17,7 +17,7 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
  * @since 3.3
  */
 @Provider
-public class NotFoundExeptionMapper implements ExceptionMapper<NotFoundException> {
+public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
 
     @Override
     public Response toResponse(NotFoundException exception) {
