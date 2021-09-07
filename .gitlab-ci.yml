@@ -18,8 +18,8 @@ variables:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.9'
+    ref: 'master'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.9'
+    ref: 'master'
     file: 'maven_release.yml'
