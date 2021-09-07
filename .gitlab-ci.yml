@@ -1,8 +1,5 @@
 stages:
-  - develop
-  - integrate
-  - validate
-  - branch
+  - build
   - release
 
 variables:
