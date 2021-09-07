@@ -1,5 +1,6 @@
 stages:
   - build
+  - validate
   - release
 
 variables:
@@ -18,8 +19,8 @@ variables:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.9'
+    ref: 'tags/1.11'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.9'
+    ref: 'tags/1.11'
     file: 'maven_release.yml'
