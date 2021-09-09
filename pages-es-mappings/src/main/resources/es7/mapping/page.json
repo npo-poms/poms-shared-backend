@@ -2283,7 +2283,7 @@
     },
     "semanticVectorization": {
       "type": "dense_vector",
-      "dims": 768
+      "dims": "_set_by_code_"
 
     }
   }

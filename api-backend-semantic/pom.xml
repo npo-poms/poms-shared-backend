@@ -19,6 +19,11 @@
        <artifactId>vpro-shared-jackson2</artifactId>
      </dependency>
      <dependency>
+       <groupId>nl.vpro.poms</groupId>
+       <artifactId>pages-es-mappings</artifactId>
+       <version>${project.version}</version>
+     </dependency>
+     <dependency>
        <!-- ik gebruik normaal ru.lanwen.wiremock:wiremock-junit5, maar ik vind dat altijd een beetje gedoe, deze es proberen -->
        <groupId>de.mkammerer.wiremock-junit5</groupId>
        <artifactId>wiremock-junit5</artifactId>
