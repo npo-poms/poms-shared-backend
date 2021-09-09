@@ -46,7 +46,7 @@ public abstract class AbstractESRepositoryITest {
     protected static HighLevelClientFactory staticClientFactory;
 
     static {
-        log.info("Elastic search port for integration tests: " + System.getProperty("integ.http.port"));
+        log.info("Elastic search for integration tests: " + System.getProperty("integ.http.eshost") + ":" + System.getProperty("integ.http.port"));
     }
 
     @Inject
@@ -56,12 +56,12 @@ public abstract class AbstractESRepositoryITest {
     @Inject
     protected BroadcasterService broadcasterService;
 
-
     @BeforeEach
     public void abstractSetup() throws Exception {
         if (staticClientFactory == null) {
             ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
             staticClientFactory = clientFactory;
+            log.info("Using ES hosts: {}" + clientFactory.getLowLevelFactory().getHosts());
         }
 
         when(broadcasterService.find(any())).thenAnswer(invocation -> {
