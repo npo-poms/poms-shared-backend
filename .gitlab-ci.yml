@@ -17,6 +17,15 @@ variables:
       alias: elasticsearch # Alias is also the hostname (i.e. http://elasticsearch:9200)
       command: [ "bin/elasticsearch", "-Ediscovery.type=single-node" ]
 
+
+trigger_down_stream:
+  stage: build
+  needs: [build_and_publish]
+  trigger:
+    project: npo/api
+    branch: master
+
+
 include:
   - project: 'shared/gitlab/gitlab-templates'
     ref: 'tags/1.12'
