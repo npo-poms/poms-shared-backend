@@ -37,8 +37,8 @@ trigger_pages_publish:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'master'
+    ref: 'tags/1.14'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'master'
+    ref: 'tags/1.14'
     file: 'maven_release.yml'
