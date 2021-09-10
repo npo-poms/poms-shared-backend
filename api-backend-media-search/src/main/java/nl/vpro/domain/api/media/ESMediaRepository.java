@@ -675,7 +675,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                     @Override
                     public MediaChange next() {
                         MediaChange n = super.next();
-                        if (n.isDeleted()) {
+                        if (n != null && n.isDeleted()) {
                             n.setMedia(null);
                         }
                         return n;
