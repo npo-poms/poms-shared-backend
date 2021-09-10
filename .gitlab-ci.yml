@@ -1,4 +1,25 @@
+stages:
+  - build
+  - validate
+  - release
+
+variables:
+  SKIP_INTEGRATION_TESTS: 'false'
+  MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=elasticsearch'
+
+.setup:
+  script:
+    - !reference [ .elasticsearch, script ]
+
+.build:
+  services:
+    - !reference [ .elasticsearch, services]
+
+
 include:
-  - project: 'npo/gitlab-templates'
-    ref: master
+  - project: 'shared/gitlab/gitlab-templates'
+    ref: 'tags/1.14'
     file: 'java_maven.yml'
+  - project: 'shared/gitlab/gitlab-templates'
+    ref: 'tags/1.14'
+    file: 'maven_release.yml'
