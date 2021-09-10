@@ -61,7 +61,7 @@ public abstract class AbstractESRepositoryITest {
         if (staticClientFactory == null) {
             ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
             staticClientFactory = clientFactory;
-            log.info("Using ES hosts: {}" + clientFactory.getLowLevelFactory().getHosts());
+            log.info("Using ES hosts: {}", clientFactory.getLowLevelFactory().getHosts());
         }
 
         when(broadcasterService.find(any())).thenAnswer(invocation -> {
