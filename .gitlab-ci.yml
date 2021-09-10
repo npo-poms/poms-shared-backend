@@ -18,18 +18,31 @@ variables:
       command: [ "bin/elasticsearch", "-Ediscovery.type=single-node" ]
 
 
-trigger_down_stream:
-  stage: build
-  needs: [build_and_publish]
+
+trigger_api:
+  extends: .trigger_down_stream
   trigger:
     project: npo/api
     branch: master
 
 
+trigger_npo_publish:
+  extends: .trigger_down_stream
+  trigger:
+    project: npo/npo-publish
+    branch: master
+
+trigger_pages_publish:
+  extends: .trigger_down_stream
+  trigger:
+    project: npo/pages-publish
+    branch: master
+
+
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.12'
+    ref: 'master'
     file: 'java_maven.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.12'
+    ref: 'master'
     file: 'maven_release.yml'
