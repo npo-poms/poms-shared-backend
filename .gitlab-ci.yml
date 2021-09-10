@@ -8,10 +8,10 @@ variables:
   MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=elasticsearch'
 
 .setup:
-  -! reference [ .elasticsearch, script ]
+  - !reference [ .elasticsearch, script ]
 
 .build:
-  -! reference [ .elasticsearch, services]
+  - !reference [ .elasticsearch, services]
 
 trigger_api:
   extends: .trigger_down_stream
