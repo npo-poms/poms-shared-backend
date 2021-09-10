@@ -11,7 +11,7 @@ import nl.vpro.elasticsearch.ElasticSearchIndex;
  */
 public class ApiPagesIndex extends ElasticSearchIndex {
 
-    public static final int VECTOR_LENGTH = 768;
+    public static final int SEMANTIC_VECTOR_LENGTH = 768;
 
     public static final String FIELD_SEMANTIC_VECTORIZATION = "semanticVectorization";
 
@@ -22,7 +22,7 @@ public class ApiPagesIndex extends ElasticSearchIndex {
     protected ApiPagesIndex() {
         super(NAME,  "/es7/setting/apipages.json", "/es7/mapping/page.json", Arrays.asList(NAME + "-publish"), jsonNode -> {
             ObjectNode properties = jsonNode.with("properties");
-            properties.with(FIELD_SEMANTIC_VECTORIZATION).put("dims", VECTOR_LENGTH);
+            properties.with(FIELD_SEMANTIC_VECTORIZATION).put("dims", SEMANTIC_VECTOR_LENGTH);
         });
     }
 
