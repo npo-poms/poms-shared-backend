@@ -6,7 +6,7 @@
                ">
 
   <bean id="lowlevelClientFactory" class="nl.vpro.elasticsearchclient.ClientElasticSearchFactory">
-    <property name="hosts" value="localhost:#{T(java.lang.System).getProperty('integ.http.port', '9200')}" />
+    <property name="hosts" value="#{T(java.lang.System).getProperty('integ.http.eshost', 'localhost')}:#{T(java.lang.System).getProperty('integ.http.port', '9200')}" />
     <property name="clusterName" value="#{T(java.lang.System).getProperty('integ.cluster.name', 'elasticsearch')}" />
   </bean>
 
