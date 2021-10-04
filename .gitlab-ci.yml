@@ -1,3 +1,4 @@
+---
 stages:
   - build
   - validate
@@ -5,15 +6,15 @@ stages:
 
 variables:
   SKIP_INTEGRATION_TESTS: 'false'
-  MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=elasticsearch'
+  MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=opensearch'
 
 .setup:
   script:
-    - !reference [ .elasticsearch, script ]
+    - !reference [.opensearch, script]
 
 .build:
   services:
-    - !reference [ .elasticsearch, services]
+    - !reference [.opensearch, services]
 
 trigger_api:
   extends: .trigger_down_stream
@@ -37,8 +38,5 @@ trigger_pages_publish:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.14'
-    file: 'java_maven.yml'
-  - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/1.14'
+    ref: 'master'
     file: 'maven_release.yml'
