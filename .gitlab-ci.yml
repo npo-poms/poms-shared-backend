@@ -5,7 +5,6 @@ stages:
   - release
 
 variables:
-  SKIP_INTEGRATION_TESTS: 'false'
   MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=opensearch'
 
 .setup:
