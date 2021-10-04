@@ -6,15 +6,13 @@
                ">
 
   <bean id="lowlevelClientFactory" class="nl.vpro.elasticsearchclient.ClientElasticSearchFactory">
-    <property name="hosts" value="https://localhost:#{T(java.lang.System).getProperty('integ.http.port', '9200')}" />
+    <property name="hosts" value="#{T(java.lang.System).getProperty('integ.http.eshost', 'localhost')}:#{T(java.lang.System).getProperty('integ.http.port', '9200')}" />
     <property name="clusterName" value="#{T(java.lang.System).getProperty('integ.cluster.name', 'elasticsearch')}" />
-    <property name="basicUser" value="admin" />
-    <property name="basicPassword" value="admin" />
-    <property name="ignoreSSL" value="true" />
   </bean>
 
 
   <bean id="clientFactory" class="nl.vpro.elasticsearch.highlevel.HighLevelClientFactory">
     <constructor-arg name="lowLevelFactory" ref="lowlevelClientFactory" />
+
   </bean>
 </beans>
