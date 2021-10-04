@@ -6,6 +6,7 @@ ENV HOST=localhost
 ENV USER=elasticsearch
 ENV PASSWORD="secret"
 ENV CLUSTER="NOTGIVEN"
+ENV EXPERIMENTAL="false"
 
 ADD target/push-es-mappings-${version}.jar /root/push-es-mappings.jar
 
@@ -15,4 +16,4 @@ RUN apt-get update \
 
 WORKDIR /root
 
-CMD java -jar /root/push-es-mappings.jar --host $HOST --cluster $CLUSTER --user $USER --password $PASSWORD
+CMD java -jar /root/push-es-mappings.jar --host $HOST --cluster $CLUSTER --user $USER --password $PASSWORD $(if [ "$EXPERIMENTAL" = "true" ]; then echo "--experimental";  fi)
