@@ -1,9 +1,12 @@
 package nl.vpro.semantic;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Data;
 import lombok.SneakyThrows;
 
 import java.util.concurrent.Future;
+
+import javax.inject.Inject;
 
 import org.apache.hc.client5.http.async.methods.*;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
@@ -35,14 +38,14 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
 
     private final String endPoint;
 
+    @Inject
+    private MeterRegistry meterRegistry;
 
-    public ApiVectorizationServiceImpl(String apiKey) {
-        this(null, apiKey);
-    }
 
-    public ApiVectorizationServiceImpl(String endpoint, String apiKey) {
+    public ApiVectorizationServiceImpl(String endpoint, String apiKey, MeterRegistry meterRegistry) {
         this.apiKey = apiKey;
         this.endPoint = endpoint == null? "https://www.api.geniusvoicedemo.nl/semanticvectorizer" : endpoint;
+        this.meterRegistry = meterRegistry;
         client.start();
     }
 
@@ -50,11 +53,13 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
     @SneakyThrows
     @Override
     public float[] forQuery(String query) {
+        meterRegistry.counter("vectorization", "for", "query");
         return post(new Query(query)).getEmbedding();
     }
 
     @Override
     public float[] forText(String text) {
+        meterRegistry.counter("vectorization", "for", "text");
         return post(new Description(text)).getEmbedding();
     }
 
