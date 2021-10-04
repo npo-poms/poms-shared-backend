@@ -17,6 +17,7 @@ variables:
 
 trigger_api:
   extends: .trigger_down_stream
+  variables: {}
   trigger:
     project: npo/api
     branch: master
@@ -24,12 +25,14 @@ trigger_api:
 
 trigger_npo_publish:
   extends: .trigger_down_stream
+  variables: {}
   trigger:
     project: npo/npo-publish
     branch: master
 
 trigger_pages_publish:
   extends: .trigger_down_stream
+  variables: {}
   trigger:
     project: npo/pages-publish
     branch: master
