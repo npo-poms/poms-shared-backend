@@ -121,10 +121,9 @@ public class PushMappings implements Callable<Integer> {
 
     protected  void createIndexIfNecessaryAndPushMappings(ClientElasticSearchFactory factory, ElasticSearchIndex elasticSearchIndex ) {
         try {
-            IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
-            if (distribution != null && helper.getInfo().get().getDistribution() != distribution) {
-                throw new IllegalStateException("Unexpected distribution");
-            }
+            IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex)
+                .distribution(distribution)
+                .build();
 
             boolean exists = helper.checkIndex();
 
