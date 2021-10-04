@@ -2281,10 +2281,13 @@
     "url": {
       "type": "keyword"
     },
-    "semanticVectorization": {
+    "semanticVectorization|elasticsearch": {
       "type": "dense_vector",
       "dims": "_set_by_code_"
-
+    },
+    "semanticVectorization|opensearch": {
+      "type": "knn_vector",
+      "dimension": "_set_by_code_"
     }
   }
 }

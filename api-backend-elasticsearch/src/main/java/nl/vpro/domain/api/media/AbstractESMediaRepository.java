@@ -30,6 +30,7 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.MediaLoader;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
+import nl.vpro.elasticsearch.Distribution;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.elasticsearchclient.IndexHelper;
@@ -50,6 +51,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     private final IndexHelper helper;
     private final IndexHelper refsHelper;
+
+    private final Distribution distribution = Distribution.ELASTICSEARCH;
 
 
     protected AbstractESMediaRepository(HighLevelClientFactory client) {

@@ -5,8 +5,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -79,6 +78,9 @@ public class PushMappings implements Callable<Integer> {
     @Option(names = {"--experimental"})
     private boolean  experimental  = false;
 
+    @Option(names = {"--distribution"})
+    private Distribution  distribution  = null;
+
 
     public static void main(String[] argv) {
         int exitCode = new CommandLine(new PushMappings()).setTrimQuotes(true).execute(argv);
@@ -120,6 +122,9 @@ public class PushMappings implements Callable<Integer> {
     protected  void createIndexIfNecessaryAndPushMappings(ClientElasticSearchFactory factory, ElasticSearchIndex elasticSearchIndex ) {
         try {
             IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex).build();
+            if (distribution != null && helper.getInfo().get().getDistribution() != distribution) {
+                throw new IllegalStateException("Unexpected distribution");
+            }
 
             boolean exists = helper.checkIndex();
 
@@ -127,7 +132,6 @@ public class PushMappings implements Callable<Integer> {
                 helper.createIndex(CreateIndex.builder()
                     .useNumberPostfix(true)
                     .forReindex(true) // no replicas, very long refresh
-                    .mappingsProcessor(elasticSearchIndex.getMappingsProcessor())
                     .build());
             } else {
                 // the index existed already, so simply reput the settings
@@ -166,7 +170,7 @@ public class PushMappings implements Callable<Integer> {
     protected void waitForHealth(ClientElasticSearchFactory factory) throws InterruptedException {
         while (true) {
             try {
-                Request request  = new Request("GET", "/_cat/health");
+                Request request = new Request("GET", "/_cat/health");
                 request.setOptions(request.getOptions()
                     .toBuilder()
                     .addHeader("accept", "application/json"));
@@ -177,12 +181,14 @@ public class PushMappings implements Callable<Integer> {
                     .readerFor(ArrayNode.class)
                     .readValue(response.getEntity().getContent());
 
-                String status  = health.get(0).get("status").textValue();
+                String status = health.get(0).get("status").textValue();
                 boolean serviceIsUp = "green".equals(status) || "yellow".equals(status);
                 log.info("status {}", status);
                 if (serviceIsUp) {
                     break;
                 }
+            } catch (RuntimeException ee) {
+                throw ee;
             } catch (Exception e){
                 log.info(e.getMessage());
             }
