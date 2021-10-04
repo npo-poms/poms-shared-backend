@@ -45,6 +45,7 @@ public class ApiPagesIndex extends ElasticSearchIndex {
         return thenWithMappingsProcessor((distribution, jsonNode) -> {
             ObjectNode properties = jsonNode.with(PROPERTIES);
             properties.remove(FIELD_SEMANTIC_VECTORIZATION);
+            log.info("Removed experimental field {}", FIELD_SEMANTIC_VECTORIZATION);
         });
     }
 
