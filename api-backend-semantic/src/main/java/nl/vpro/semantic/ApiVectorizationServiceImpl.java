@@ -53,13 +53,13 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
     @SneakyThrows
     @Override
     public float[] forQuery(String query) {
-        meterRegistry.counter("vectorization", "for", "query");
+        meterRegistry.counter("vectorization", "for", "query").increment();
         return post(new Query(query)).getEmbedding();
     }
 
     @Override
     public float[] forText(String text) {
-        meterRegistry.counter("vectorization", "for", "text");
+        meterRegistry.counter("vectorization", "for", "text").increment();
         return post(new Description(text)).getEmbedding();
     }
 
