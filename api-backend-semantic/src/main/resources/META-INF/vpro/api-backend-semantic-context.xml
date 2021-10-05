@@ -8,7 +8,7 @@
   <bean class="nl.vpro.semantic.ApiVectorizationServiceImpl">
     <constructor-arg name="endpoint" value="${semantic.vectorizationapi.endpoint}" />
     <constructor-arg name="apiKey" value="${semantic.vectorizationapi.apikey}" />
-    <constructor-arg name="meterRegistry"  ref="meterRegistry"/>
+    <constructor-arg name="meterRegistry"  ref="globalMeterRegistry"/>
   </bean>
 </beans>
 
