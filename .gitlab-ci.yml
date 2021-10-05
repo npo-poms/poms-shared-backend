@@ -4,9 +4,6 @@ stages:
   - validate
   - release
 
-variables:
-  MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=opensearch'
-
 .setup:
   script:
     - !reference [.opensearch, script]
@@ -14,6 +11,8 @@ variables:
 .build:
   services:
     - !reference [.opensearch, services]
+  variables:
+    MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=opensearch'
 
 trigger_api:
   extends: .trigger_down_stream
