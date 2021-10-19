@@ -36,6 +36,7 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
             }
             response.getHeaders().putSingle(Headers.NPO_VERSION, VersionService.version());
 
+            ExtraHeaders.markUsed();
             ExtraHeaders.get().forEach(p -> {
                 response.getHeaders().putSingle(p.getKey(), p.getValue());
             });
