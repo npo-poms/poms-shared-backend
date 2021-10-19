@@ -583,7 +583,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             throw new IllegalStateException("Missing current profile");
         }
 
-
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
         final Instant changesUpto = Instant.now().minus(getCommitDelay());
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery(Common.ES_PUBLISH_DATE).to(changesUpto.toEpochMilli());
@@ -592,10 +591,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 long epoch = since.toEpochMilli();
                 restriction = restriction.from(epoch).includeLower(true);
             } else {
-                log.debug("Since is after commited changes window (before {}). Returing empty iterator.", changesUpto);
+                log.debug("Since is after committed changes window (before {}). Returning empty iterator.", changesUpto);
                 // This will result exactly nothing, so we return empty iterator immediately:
                 return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
             }
+        } else {
+            log.warn(ExtraHeaders.warn("A profile update occurred between {} and {}", currentProfile, previousProfile));
         }
         final ExtendedElasticSearchIterator<MediaChange> i = ExtendedElasticSearchIterator.<MediaChange>extendedBuilder()
             .client(factory.highLevelClient())
@@ -653,6 +654,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (deletes == null) {
             deletes = Deletes.ID_ONLY;
         }
+
 
         switch (deletes) {
             case INCLUDE:
