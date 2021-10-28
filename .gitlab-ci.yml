@@ -34,3 +34,6 @@ include:
   - project: 'shared/gitlab/gitlab-templates'
     ref: 'master'
     file: 'maven_release.yml'
+  - project: 'shared/gitlab/gitlab-templates'
+    ref: 'master'
+    file: 'util/elasticsearch_service.yml'
