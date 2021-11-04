@@ -67,7 +67,7 @@ public class GTAAServiceImpl implements GTAAService {
 
     @Override
     public  <T extends GTAAConcept, S extends GTAANewConcept>  T submitGTAAConcept(@NonNull S newObject, @NonNull String jws) {
-        String issuer = "POMS"; //authenticate(jws);
+        String issuer = authenticate(jws);
         return gtaaRepository.submit(newObject, issuer);
     }
 
