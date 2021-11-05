@@ -5,6 +5,7 @@
 package nl.vpro.api.rs.filter;
 
 import java.io.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
@@ -326,6 +327,10 @@ public class ApiMediaFilterTest {
             "}");
 
     }
+
+    /**
+     * See https://jira.vpro.nl/browse/NPA-602
+     */
     @ParameterizedTest
     @ValueSource(classes = {NewProgram.class, ReuseProgram.class})
     public void filterPredictionsTitleAndPredictions(Class<Supplier<Program>> supplierClass) throws InstantiationException, IllegalAccessException {
@@ -354,24 +359,74 @@ public class ApiMediaFilterTest {
 
     }
 
+    /**
+     * See https://jira.vpro.nl/browse/NPA-602
+     */
     @Test
-    @Disabled
     public void testFilterLocations() {
+        AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
 
         Program program = MediaTestDataBuilder.program()
             .mid("MID_123")
-            .locations("https://www.vpro.nl")
+            .withFixedDates()
+            .locations(Location.builder().programUrl("https://www.vpro.nl").creationDate(Instant.parse("2021-11-05T17:00:00Z")).build())
             .build();
 
         ApiMediaFilter.set("title");
         assertThat(program.getLocations()).isEmpty();
-        assertThatJson(program).isSimilarTo("{}");
+        assertThatJson(program).isSimilarTo("{\n" +
+            "  \"objectType\" : \"program\",\n" +
+            "  \"mid\" : \"MID_123\",\n" +
+            "  \"sortDate\" : 1425596400000,\n" +
+            "  \"creationDate\" : 1425596400000,\n" +
+            "  \"lastModified\" : 1425600000000,\n" +
+            "  \"embeddable\" : true,\n" +
+            "  \"publishDate\" : 1425603600000\n" +
+            "}");
 
         ApiMediaFilter.set("all");
         assertThat(program.getLocations()).isNotEmpty();
+        assertThatJson(program).isSimilarTo(
+            "{\n" +
+                "  \"objectType\" : \"program\",\n" +
+                "  \"mid\" : \"MID_123\",\n" +
+                "  \"workflow\" : \"FOR_PUBLICATION\",\n" +
+                "  \"sortDate\" : 1425596400000,\n" +
+                "  \"creationDate\" : 1425596400000,\n" +
+                "  \"lastModified\" : 1425600000000,\n" +
+                "  \"embeddable\" : true,\n" +
+                "  \"locations\" : [ {\n" +
+                "    \"programUrl\" : \"https://www.vpro.nl\",\n" +
+                "    \"avAttributes\" : {\n" +
+                "      \"avFileFormat\" : \"UNKNOWN\"\n" +
+                "    },\n" +
+                "    \"owner\" : \"BROADCASTER\",\n" +
+                "    \"creationDate\" : 1636131600000,\n" +
+                "    \"workflow\" : \"FOR_PUBLICATION\"\n" +
+                "  } ],\n" +
+                "  \"publishDate\" : 1425603600000\n" +
+                "}");
 
         ApiMediaFilter.set("title,locations");
         assertThat(program.getLocations()).isNotEmpty();
+        assertThatJson(program).isSimilarTo(
+            "{\n" +
+                "  \"objectType\" : \"program\",\n" +
+                "  \"mid\" : \"MID_123\",\n" +
+                "  \"sortDate\" : 1425596400000,\n" +
+                "  \"creationDate\" : 1425596400000,\n" +
+                "  \"lastModified\" : 1425600000000,\n" +
+                "  \"embeddable\" : true,\n" +
+                "  \"locations\" : [ {\n" +
+                "    \"programUrl\" : \"https://www.vpro.nl\",\n" +
+                "    \"avAttributes\" : {\n" +
+                "      \"avFileFormat\" : \"UNKNOWN\"\n" +
+                "    },\n" +
+                "    \"owner\" : \"BROADCASTER\",\n" +
+                "    \"creationDate\" : 1636131600000\n" +
+                "  } ],\n" +
+                "  \"publishDate\" : 1425603600000\n" +
+                "}");
 
  }
 

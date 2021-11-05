@@ -18,7 +18,7 @@ import java.util.*;
 @Slf4j
 public class MediaPropertiesFilters {
 
-    private static final Set<String> ignoreFields = new HashSet<>(Arrays.asList(
+    private static final Set<String> ignoreFields = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
         "mid",
         "midRef",
         "type",
@@ -26,9 +26,9 @@ public class MediaPropertiesFilters {
         "sortInstant",
         "isEmbeddable",
         "parent"
-    ));
+    )));
 
-    private static final Set<String> ignoreSignatures = new HashSet<>(Arrays.asList(
+    private static final Set<String> ignoreSignatures = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
         "Z", // boolean
         "B", // byte
         "C", // char
@@ -37,7 +37,7 @@ public class MediaPropertiesFilters {
         "J", // long
         "F", // float
         "D" // double
-    ));
+    )));
 
 
     private static final List<String> knownProperties = new ArrayList<>();
@@ -89,8 +89,8 @@ public class MediaPropertiesFilters {
                             try {
                                 /* Ignore static fields / methods */
                                 if ((f.getField().getModifiers() & Modifier.STATIC) == 0) {
-                                    String fieldName = f.getFieldName();
-                                    String fieldDescription = f.getSignature() + " " + f.getClassName() + "." + f.getFieldName();
+                                    final String fieldName = f.getFieldName();
+                                    final String fieldDescription = f.getSignature() + " " + f.getClassName() + "." + f.getFieldName();
                                     markKnown(fieldName, fieldDescription);
 
 
@@ -98,7 +98,7 @@ public class MediaPropertiesFilters {
                                         log.trace("Never filtering {} because signature {}", fieldName, f.getSignature());
                                         return;
                                     }
-                                    if (ignoreFields.contains(f.getFieldName())) {
+                                    if (ignoreFields.contains(fieldName)) {
                                         log.trace("Never filtering {} because fieldName", fieldName);
                                         return;
                                     }
@@ -111,18 +111,18 @@ public class MediaPropertiesFilters {
                                     if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
                                         log.debug("Instrumenting Set {}", fieldDescription);
                                         if ("titles".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + fieldName + "\", $proceed($$));");
                                         } else if ("descriptions".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + fieldName + "\", $proceed($$));");
                                         } else {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + fieldName+ "\", $proceed($$));");
                                         }
                                     } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
                                         log.debug("Instrumenting List {}", fieldDescription);
-                                        f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + f.getFieldName() + "\", $proceed($$));");
+                                        f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + fieldName + "\", $proceed($$));");
                                     } else {
                                         log.debug("Instrumenting {}", fieldDescription);
-                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + f.getFieldName() + "\"," +
+                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + fieldName + "\"," +
                                             " $proceed($$)).value();");
                                     }
                                 }
