@@ -336,7 +336,6 @@ public class ApiMediaFilterTest {
         assertThatJson(program.get()).isSimilarTo("{\n" +
             "  \"objectType\" : \"program\",\n" +
             "  \"mid\" : \"MID_123\",\n" +
-            "  \"workflow\" : \"FOR_PUBLICATION\",\n" +
             "  \"sortDate\" : 1425596400000,\n" +
             "  \"creationDate\" : 1425596400000,\n" +
             "  \"lastModified\" : 1425600000000,\n" +

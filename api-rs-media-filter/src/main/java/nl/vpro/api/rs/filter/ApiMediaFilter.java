@@ -11,15 +11,14 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.StringUtils;
 
-import nl.vpro.domain.media.Group;
-import nl.vpro.domain.media.Program;
-import nl.vpro.domain.media.Segment;
+import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.TextualType;
 
 /**
@@ -266,6 +265,13 @@ public class ApiMediaFilter {
         return knownPropertiesForExposure;
     }
 
+    private Stream<String> map(String fieldName){
+        switch(fieldName) {
+            case "predictions":
+                return Stream.of("predictionsForXml", "predictions");
+        }
+        return Stream.of(fieldName);
+    }
 
     private void filter(String properties) {
         this.properties.clear();
@@ -289,6 +295,7 @@ public class ApiMediaFilter {
         add(Arrays
             .stream(properties.split(","))
             .filter(StringUtils::isNotBlank)
+            .flatMap(this::map)
             .toArray(String[]::new));
 
         if (!this.properties.containsKey("title")) {
