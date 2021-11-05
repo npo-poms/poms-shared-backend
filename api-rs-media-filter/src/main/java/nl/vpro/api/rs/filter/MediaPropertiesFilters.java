@@ -133,11 +133,11 @@ public class MediaPropertiesFilters {
                     });
 
                     ctClass.toClass();
-                } catch (RuntimeException wtf ){
+                } catch (RuntimeException | CannotCompileException wtf ){
                     log.error(wtf.getMessage());
                 }
             }
-        } catch (CannotCompileException | NotFoundException e) {
+        } catch (NotFoundException e) {
             throw new RuntimeException(e);
         }
     }

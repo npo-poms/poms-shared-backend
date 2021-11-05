@@ -6,15 +6,20 @@ package nl.vpro.api.rs.filter;
 
 import java.io.*;
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
 import javax.xml.bind.JAXB;
 
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import nl.vpro.domain.bind.AbstractJsonIterable;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 
+import static nl.vpro.test.util.jackson2.Jackson2TestUtil.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -32,6 +37,11 @@ public class ApiMediaFilterTest {
     @BeforeEach
     public void setUp() {
         ApiMediaFilter.removeFilter();
+    }
+    @AfterEach
+    public void shutdown() {
+        ApiMediaFilter.removeFilter();
+        AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.remove();
     }
 
     @Test
@@ -228,6 +238,8 @@ public class ApiMediaFilterTest {
         assertThat(program.getMid()).isEqualTo("MID_123");
         assertThat(program.getAVType()).isEqualTo(AVType.MIXED);
         assertThat(program.getType()).isEqualTo(ProgramType.PROMO);
+        assertThat(program.getPredictions()).isEmpty();
+
 
          Segment segment  = MediaTestDataBuilder.segment()
              .midRef("MID_123")
@@ -235,6 +247,132 @@ public class ApiMediaFilterTest {
              .build();
         assertThat(segment.getMidRef()).isEqualTo("MID_123");
 
+
+    }
+
+    static class NewProgram implements Supplier<Program>  {
+
+        @Override
+        public Program get() {
+            return MediaTestDataBuilder.program()
+                .withFixedDates()
+                .mainTitle("foobar")
+                .mid("MID_123")
+                .predictions(Platform.INTERNETVOD)
+                .build();
+        }
+    }
+    static class ReuseProgram implements Supplier<Program> {
+        private static Program p = new NewProgram().get();
+
+        @Override
+        public Program get() {
+            return p;
+        }
+    }
+
+    static {
+        //Supplier<Program> breakeverything = Program::new; --> Causes  attempted  duplicate class definition for nae
+    }
+    @ParameterizedTest
+    @ValueSource(classes = {NewProgram.class, ReuseProgram.class})
+    public void filterPredictionsTitle(Class<Supplier<Program>> supplierClass) throws InstantiationException, IllegalAccessException {
+        AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
+        Supplier<Program> program = supplierClass.newInstance();
+
+        ApiMediaFilter.set("title");
+        assertThat(program.get().getPredictions()).isEmpty();
+        assertThatJson(program.get()).isSimilarTo("{\n" +
+            "  \"objectType\" : \"program\",\n" +
+            "  \"mid\" : \"MID_123\",\n" +
+            "  \"sortDate\" : 1425596400000,\n" +
+            "  \"creationDate\" : 1425596400000,\n" +
+            "  \"lastModified\" : 1425600000000,\n" +
+            "  \"embeddable\" : true,\n" +
+            "  \"titles\" : [ {\n" +
+            "    \"value\" : \"foobar\",\n" +
+            "    \"owner\" : \"BROADCASTER\",\n" +
+            "    \"type\" : \"MAIN\"\n" +
+            "  } ],\n" +
+                "  \"publishDate\" : 1425603600000\n" +
+            "}");
+    }
+
+    @ParameterizedTest
+    @ValueSource(classes = {NewProgram.class, ReuseProgram.class})
+    public void filterPredictionsAll(Class<Supplier<Program>> supplierClass) throws InstantiationException, IllegalAccessException {
+        AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
+        Supplier<Program> program = supplierClass.newInstance();
+        ApiMediaFilter.set("all");
+        assertThat(program.get().getPredictions()).isNotEmpty();
+        assertThatJson(program.get()).isSimilarTo("{\n" +
+            "  \"objectType\" : \"program\",\n" +
+            "  \"mid\" : \"MID_123\",\n" +
+            "  \"workflow\" : \"FOR_PUBLICATION\",\n" +
+            "  \"sortDate\" : 1425596400000,\n" +
+            "  \"creationDate\" : 1425596400000,\n" +
+            "  \"lastModified\" : 1425600000000,\n" +
+            "  \"embeddable\" : true,\n" +
+            "  \"titles\" : [ {\n" +
+            "    \"value\" : \"foobar\",\n" +
+            "    \"owner\" : \"BROADCASTER\",\n" +
+            "    \"type\" : \"MAIN\"\n" +
+            "  } ],\n" +
+            "  \"predictions\" : [ {\n" +
+            "    \"state\" : \"ANNOUNCED\",\n" +
+            "    \"platform\" : \"INTERNETVOD\"\n" +
+            "  } ],\n" +
+            "  \"publishDate\" : 1425603600000\n" +
+            "}");
+
+    }
+    @ParameterizedTest
+    @ValueSource(classes = {NewProgram.class, ReuseProgram.class})
+    public void filterPredictionsTitleAndPredictions(Class<Supplier<Program>> supplierClass) throws InstantiationException, IllegalAccessException {
+        AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
+        Supplier<Program> program = supplierClass.newInstance();
+        ApiMediaFilter.set("title,predictions");
+        assertThat(program.get().getPredictions()).isNotEmpty();
+        assertThatJson(program.get()).isSimilarTo("{\n" +
+            "  \"objectType\" : \"program\",\n" +
+            "  \"mid\" : \"MID_123\",\n" +
+            "  \"workflow\" : \"FOR_PUBLICATION\",\n" +
+            "  \"sortDate\" : 1425596400000,\n" +
+            "  \"creationDate\" : 1425596400000,\n" +
+            "  \"lastModified\" : 1425600000000,\n" +
+            "  \"embeddable\" : true,\n" +
+            "  \"titles\" : [ {\n" +
+            "    \"value\" : \"foobar\",\n" +
+            "    \"owner\" : \"BROADCASTER\",\n" +
+            "    \"type\" : \"MAIN\"\n" +
+            "  } ],\n" +
+            "  \"predictions\" : [ {\n" +
+            "    \"state\" : \"ANNOUNCED\",\n" +
+            "    \"platform\" : \"INTERNETVOD\"\n" +
+            "  } ],\n" +
+            "  \"publishDate\" : 1425603600000\n" +
+            "}");
+
+    }
+
+    @Test
+    @Disabled
+    public void testFilterLocations() {
+
+        Program program = MediaTestDataBuilder.program()
+            .mid("MID_123")
+            .locations("https://www.vpro.nl")
+            .build();
+
+        ApiMediaFilter.set("title");
+        assertThat(program.getLocations()).isEmpty();
+        assertThatJson(program).isSimilarTo("{}");
+
+        ApiMediaFilter.set("all");
+        assertThat(program.getLocations()).isNotEmpty();
+
+        ApiMediaFilter.set("title,locations");
+        assertThat(program.getLocations()).isNotEmpty();
 
  }
 
