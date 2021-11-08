@@ -369,7 +369,11 @@ public class ApiMediaFilterTest {
         Program program = MediaTestDataBuilder.program()
             .mid("MID_123")
             .withFixedDates()
-            .locations(Location.builder().programUrl("https://www.vpro.nl").creationDate(Instant.parse("2021-11-05T17:00:00Z")).build())
+            .locations(Location.builder()
+                .programUrl("https://www.vpro.nl")
+                .creationDate(Instant.parse("2021-11-05T17:00:00Z"))
+                .build()
+            )
             .build();
 
         ApiMediaFilter.set("title");
