@@ -14,10 +14,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class FilteredListTest {
 
+    static {
+        MediaPropertiesFilters.instrument();
+    }
+
     @BeforeAll
     public static void init() {
-        // Not really needed for this, but otherwise...
-        MediaPropertiesFilters.instrument();
+
     }
 
     @Test
@@ -48,7 +51,6 @@ public class FilteredListTest {
         List<String> list = Arrays.asList();
         FilteredList<String> filtered = FilteredList.wrap("title", list);
         assertThat(filtered.contains("b")).isFalse();
-
     }
 
 

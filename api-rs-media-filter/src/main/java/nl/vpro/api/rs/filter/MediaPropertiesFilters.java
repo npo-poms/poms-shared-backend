@@ -58,7 +58,7 @@ public class MediaPropertiesFilters {
             instrumented = true;
             log.info("Instrumented media properties " + getKnownProperties());
         } else {
-            log.warn("Instrumented already");
+            log.debug("Instrumented already");
         }
     }
 
@@ -81,11 +81,11 @@ public class MediaPropertiesFilters {
             CtClass[] ctClasses = cp.get(classNames);
 
             for (final CtClass ctClass : ctClasses) {
-                log.info("Instrumenting {}", ctClass.getName());
+                log.debug("Instrumenting {}", ctClass.getName());
                 try {
                     ctClass.instrument(new ExprEditor() {
                         @Override
-                        public void edit(FieldAccess f) throws CannotCompileException {
+                        public void edit(FieldAccess f) {
                             try {
                                 /* Ignore static fields / methods */
                                 if ((f.getField().getModifiers() & Modifier.STATIC) == 0) {
@@ -132,9 +132,10 @@ public class MediaPropertiesFilters {
                         }
                     });
 
-                    ctClass.toClass();
-                } catch (RuntimeException | CannotCompileException wtf ){
-                    log.error(wtf.getMessage());
+                    Class<?> aClass = ctClass.toClass();
+                    log.info("Successfully instrumented {}", aClass);
+                } catch (RuntimeException | CannotCompileException error ){
+                    log.error("During instrumentation of {}: {}",  ctClass.getName(), error.getMessage());
                 }
             }
         } catch (NotFoundException e) {

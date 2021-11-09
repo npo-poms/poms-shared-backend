@@ -13,7 +13,8 @@ import javax.xml.bind.JAXB;
 
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.meeuw.functional.Suppliers;
 
 import nl.vpro.domain.bind.AbstractJsonIterable;
 import nl.vpro.domain.media.*;
@@ -29,11 +30,10 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @since 3.0
  */
 public class ApiMediaFilterTest {
-
-    @BeforeAll
-    public static void init() {
+    static {
         MediaPropertiesFilters.instrument();
     }
+
 
     @BeforeEach
     public void setUp() {
@@ -251,35 +251,25 @@ public class ApiMediaFilterTest {
 
     }
 
-    static class NewProgram implements Supplier<Program>  {
 
-        @Override
-        public Program get() {
-            return MediaTestDataBuilder.program()
-                .withFixedDates()
-                .mainTitle("foobar")
-                .mid("MID_123")
-                .predictions(Platform.INTERNETVOD)
-                .build();
-        }
-    }
-    static class ReuseProgram implements Supplier<Program> {
-        private static Program p = new NewProgram().get();
-
-        @Override
-        public Program get() {
-            return p;
-        }
+    public static Object createProgram() { // We need to return Object here, otherwise our classes are loaded too early and cannot be instrumented any more by MediaPropertiesFilter
+        return MediaTestDataBuilder.program()
+            .withFixedDates()
+            .mainTitle("foobar")
+            .mid("MID_123")
+            .predictions(Platform.INTERNETVOD)
+            .build();
     }
 
-    static {
-        //Supplier<Program> breakeverything = Program::new; --> Causes  attempted  duplicate class definition for nae
+    public static Supplier<Object>[] suppliers() {
+        return new Supplier[] {ApiMediaFilterTest::createProgram,  Suppliers.memoize(ApiMediaFilterTest::createProgram)};
     }
+
     @ParameterizedTest
-    @ValueSource(classes = {NewProgram.class, ReuseProgram.class})
-    public void filterPredictionsTitle(Class<Supplier<Program>> supplierClass) throws InstantiationException, IllegalAccessException {
+    @MethodSource("suppliers")
+    public void filterPredictionsTitle(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
-        Supplier<Program> program = supplierClass.newInstance();
+
 
         ApiMediaFilter.set("title");
         assertThat(program.get().getPredictions()).isEmpty();
@@ -300,10 +290,9 @@ public class ApiMediaFilterTest {
     }
 
     @ParameterizedTest
-    @ValueSource(classes = {NewProgram.class, ReuseProgram.class})
-    public void filterPredictionsAll(Class<Supplier<Program>> supplierClass) throws InstantiationException, IllegalAccessException {
+    @MethodSource("suppliers")
+    public void filterPredictionsAll(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
-        Supplier<Program> program = supplierClass.newInstance();
         ApiMediaFilter.set("all");
         assertThat(program.get().getPredictions()).isNotEmpty();
         assertThatJson(program.get()).isSimilarTo("{\n" +
@@ -332,10 +321,9 @@ public class ApiMediaFilterTest {
      * See https://jira.vpro.nl/browse/NPA-602
      */
     @ParameterizedTest
-    @ValueSource(classes = {NewProgram.class, ReuseProgram.class})
-    public void filterPredictionsTitleAndPredictions(Class<Supplier<Program>> supplierClass) throws InstantiationException, IllegalAccessException {
+    @MethodSource("suppliers")
+    public void filterPredictionsTitleAndPredictions(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
-        Supplier<Program> program = supplierClass.newInstance();
         ApiMediaFilter.set("title,predictions");
         assertThat(program.get().getPredictions()).isNotEmpty();
         assertThatJson(program.get()).isSimilarTo("{\n" +
