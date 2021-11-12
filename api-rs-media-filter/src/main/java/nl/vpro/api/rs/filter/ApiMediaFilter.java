@@ -112,7 +112,7 @@ public class ApiMediaFilter {
 
     /**
      * Get singular name of a potential plural property name.
-     * @param name
+     * @param name The property name (possibly a plural)
      * @return Singular name
      */
     private String getSingular(String name) {
