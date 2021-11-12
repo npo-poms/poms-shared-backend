@@ -104,7 +104,7 @@ public class ApiMediaFilter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        localFilter.set(before);;
+        localFilter.set(before);
         return result;
     }
 
