@@ -2,7 +2,6 @@ package nl.vpro.api.rs.filter;
 
 import java.util.*;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import nl.vpro.domain.media.support.OwnerType;
@@ -16,9 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class FilteredSortedTitleSetTest {
 
-
-    @BeforeAll
-    public static void init() {
+    static {
         MediaPropertiesFilters.instrument();
     }
 
@@ -38,7 +35,6 @@ public class FilteredSortedTitleSetTest {
         assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
         assertThat(filtered.first().get()).isEqualTo("mis title");
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
-
     }
 
 
@@ -57,7 +53,6 @@ public class FilteredSortedTitleSetTest {
         assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
         assertThat(filtered.first().get()).isEqualTo("mis title");
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
-
     }
 
     @Test
@@ -78,8 +73,8 @@ public class FilteredSortedTitleSetTest {
         assertThat(filtered.first().get()).isEqualTo("mis title");
         assertThat(new ArrayList<>(filtered).get(1).get()).isEqualTo("subtitle");
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
-
     }
+
     @Test
     public void testWithTextualTypesMerge() {
 
@@ -118,9 +113,7 @@ public class FilteredSortedTitleSetTest {
         assertThat(filtered.contains(Title.main("mis title", OwnerType.MIS))).isTrue();
         assertThat(filtered.first().get()).isEqualTo("mis title");
         assertThat(filtered.contains(Title.main("what'son title", OwnerType.WHATS_ON))).isFalse();
-
     }
-
 
     @Test
     public void implicitTitle() {
@@ -134,11 +127,7 @@ public class FilteredSortedTitleSetTest {
         FilteredSortedTitleSet filtered = FilteredSortedTitleSet.wrapTitles("title", list);
         assertThat(filtered).hasSize(1);
         assertThat(filtered.first().get()).isEqualTo("a");
-
-
     }
-
-
 
     @Test
     public void testWithTextualTypeWithoutLimitSingular() {

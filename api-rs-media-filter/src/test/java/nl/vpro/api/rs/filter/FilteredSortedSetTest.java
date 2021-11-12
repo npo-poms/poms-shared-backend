@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,11 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class FilteredSortedSetTest {
 
-    @BeforeAll
-    public static void init() {
-        // Not really needed for this, but otherwise...
+    static {
         MediaPropertiesFilters.instrument();
     }
+
 
     @Test
     public void contains() {
@@ -74,8 +72,6 @@ public class FilteredSortedSetTest {
         assertThat(filtered.subSet("b", "c")).hasSize(1);
         assertThat(filtered.subSet("b", "c").first()).isEqualTo("b");
         assertThat(filtered.subSet("b", "c").last()).isEqualTo("b");
-
-
     }
 
     @Test
@@ -84,7 +80,6 @@ public class FilteredSortedSetTest {
         Set<String> list = new HashSet<>();
         FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("title", list);
         assertThat(filtered.contains("b")).isFalse();
-
     }
 
 
@@ -96,6 +91,5 @@ public class FilteredSortedSetTest {
         FilteredSortedSet<String> filtered = FilteredSortedSet.wrap("somethingelse", list);
         assertThat(filtered.contains("a1")).isTrue();
         assertThat(filtered).hasSize(101);
-
     }
 }
