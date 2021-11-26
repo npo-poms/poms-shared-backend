@@ -83,6 +83,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
 
     @Override
+    @NonNull
     public List<MediaObject> loadAll(boolean loadDeleted, List<String> ids) {
         throw new UnsupportedOperationException();
     }
