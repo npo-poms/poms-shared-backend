@@ -129,6 +129,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     @SneakyThrows(IOException.class)
     @Override
+    @NonNull
     public List<MediaObject> loadAll(boolean loadDeleted, List<String> ids) {
         return loadAll(MediaObject.class, ids)
             .stream()
@@ -138,8 +139,12 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     }
 
 
+    @NonNull
     protected <S extends MediaObject> List<Optional<S>> loadAll(Class<S> clazz, List<String> ids) throws IOException {
-        ids = ids.stream().map(id -> redirect(id).orElse(id)).collect(Collectors.toList());
+        ids = ids.stream()
+            .map(id -> redirect(id)
+            .orElse(id))
+            .collect(Collectors.toList());
         if (ids.isEmpty()) {
             return Collections.emptyList();
         }
