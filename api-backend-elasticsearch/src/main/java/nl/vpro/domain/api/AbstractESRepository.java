@@ -228,7 +228,7 @@ public abstract class AbstractESRepository<T> {
         }
 
         final Map<String, S> answerMap;
-        if (responses != null && !responses.iterator().hasNext()) {
+        if (responses != null && responses.iterator().hasNext()) {
             //List<T> answer = new ArrayList<>(responses.getResponses().length); // ES v > 0.20
             answerMap = new HashMap<>(responses.getResponses().length);
             for (MultiGetItemResponse response : responses) {
