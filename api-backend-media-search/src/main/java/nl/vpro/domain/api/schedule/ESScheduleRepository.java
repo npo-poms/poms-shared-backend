@@ -147,7 +147,9 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleResult listSchedules(Channel channel, LocalDate guideDay, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), guideDay);
+            new SchedulePager(offset, max, null, order.direction()),
+            guideDay
+        );
         form.setChannels(Collections.singletonList(channel));
         return execute(form);
     }
