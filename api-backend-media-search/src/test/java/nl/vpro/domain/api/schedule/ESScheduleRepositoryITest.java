@@ -9,16 +9,17 @@ import java.util.List;
 
 import javax.xml.bind.JAXB;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
 
-import static nl.vpro.domain.media.MediaBuilder.program;
+import static nl.vpro.domain.media.MediaBuilder.broadcast;
+import static nl.vpro.domain.media.MediaBuilder.movie;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     public ESScheduleRepository repository;
-
 
     @Override
     protected void firstRun() {
@@ -45,13 +45,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Test
     public void list() {
-        index(program().mid("DONNA_1")
+        index(broadcast().mid("DONNA_1")
             .scheduleEvents(
                 event(Channel.BBC1, "2015-06-19T10:00:00"),
                 event(Channel.BBC1, "2015-06-18T10:00:00")
             ));
 
-        index(program().mid("DONNA_2")
+        index(broadcast().mid("DONNA_2")
             .scheduleEvents(
                 event(Channel.BBC2, "2015-06-19T10:00:00")
             ));
@@ -63,19 +63,19 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Test
     public void listTestScrolled() {
-        index(program().mid("DONNA_1")
+        index(broadcast().mid("DONNA_1")
             .scheduleEvents(
                 event(Channel.BBC1, "2015-06-19T10:00:00"),
                 event(Channel.BBC1, "2015-06-18T10:00:00")
             ));
 
-        index(program().mid("DONNA_2")
+        index(broadcast().mid("DONNA_2")
             .scheduleEvents(
                 event(Channel.BBC2, "2015-06-19T10:00:00")
             ));
 
 
-        index(program().mid("DONNA_DELETED")
+        index(broadcast().mid("DONNA_DELETED")
             .workflow(Workflow.DELETED)
             .scheduleEvents(
                 event(Channel.BBC2, "2015-06-19T10:01:00")
@@ -92,13 +92,13 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Test
     public void listSchedulesWithChannel() {
-        index(program().mid("DONNA_1")
+        index(broadcast().mid("DONNA_1")
                 .scheduleEvents(
                         event(Channel.BBC1, "2015-06-19T10:00:00"),
                         event(Channel.BBC1, "2015-06-18T10:00:00")
                 ));
 
-        index(program().mid("DONNA_2")
+        index(broadcast().mid("DONNA_2")
                 .scheduleEvents(
                         event(Channel.BBC2, "2015-06-19T10:00:00")
                 ));
@@ -110,18 +110,18 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
             date("2015-06-20T00:00:00"), Order.ASC, 0L, 10);
         assertThat(result).hasSize(1);
     }
+
     @Test
     public void nowForChannel() {
-
         Instant now = LocalDateTime.of(2020, 4, 15, 20, 40).atZone(Schedule.ZONE_ID).toInstant();
 
-        index(program().mid("M_1")
+        index(broadcast().mid("M_1")
                 .scheduleEvents(
                         event(Channel.OPVO, "2020-04-15T20:20:00", Duration.ofMinutes(10)),
                         event(Channel.BBC1, "2020-04-15T20:35:00", Duration.ofMinutes(10))
                 ));
 
-        index(program().mid("DONNA_2")
+        index(broadcast().mid("DONNA_2")
                 .scheduleEvents(
                         event(Channel.BBC2, "2015-06-19T10:00:00")
                 ));
@@ -133,7 +133,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     @Test
     public void listSchedulesWithSubtitles() {
-        index(MediaTestDataBuilder.program().mid("SUBS_PROG_1").withDutchCaptions());
+        index(MediaTestDataBuilder.broadcast().mid("SUBS_PROG_1").withDutchCaptions());
         index(MediaTestDataBuilder.group().mid("SUBS_GROUP_1").withDutchCaptions());
         index(MediaTestDataBuilder.segment().mid("SUBS_SEGMENT_1").withDutchCaptions());
 
@@ -146,7 +146,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     public void findByCrid() {
         String cridToFind = "crid://uitzending/1";
         //String cridToFind = "criduitzending1";
-        index(program().mid("DONNA_2").crids(cridToFind));
+        index(broadcast().mid("DONNA_2").crids(cridToFind));
 
         assertThat(repository.load(cridToFind).getMid()).isEqualTo("DONNA_2");
         assertThat(repository.load("DONNA_2").getMid()).isEqualTo("DONNA_2");
@@ -154,17 +154,16 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     }
 
-
     @Test
     public void listSchedulesForBroadcaster() {
-        index(program().mid("DONNA_1")
+        index(broadcast().mid("DONNA_1")
                 .broadcasters(new Broadcaster("VPRO"))
                 .scheduleEvents(
                         event(Channel.BBC1, "2015-06-19T10:00:00"),
                         event(Channel.BBC1, "2015-06-18T10:00:00")
                 ));
 
-        index(program().mid("DONNA_2")
+        index(broadcast().mid("DONNA_2")
                 .broadcasters(new Broadcaster("VPRO"))
                 .scheduleEvents(
                         event(Channel.BBC2, "2015-06-19T11:00:00")
@@ -186,10 +185,9 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
 
     /**
-     * This reproduces API-249
+     * This reproduces NPA-526
      */
     @Test
-    @Disabled("API-249")
     public void listSchedulesForBroadcasterWithMax() {
 
         Instant now = Instant.now();
@@ -197,7 +195,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
         for (int i = 0 ; i < 40; i++) {
             ScheduleEvent e1 =   ScheduleEvent.builder().channel(Channel.BBC1).start(first.plus(Duration.ofHours(i))).duration(Duration.ofMinutes(20)).build();
             ScheduleEvent e2 =  ScheduleEvent.builder().channel(Channel.BBC2).start(first.plus(Duration.ofHours(i + 1))).rerun(true).duration(Duration.ofMinutes(20)).build();
-            MediaBuilder.ProgramBuilder builder = program().mid("MID_" + i)
+            MediaBuilder.ProgramBuilder builder = broadcast().mid("MID_" + i)
                 .broadcasters(i % 3 != 0 ? "VPRO" : "EO")
                 .creationDate(now.plusMillis(i))
                 .scheduleEvents(e1, e2)
@@ -247,11 +245,9 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     @Test
     public void listSchedulesForMediaType() {
         MediaObject[] indexed = index(
-            program().mid("GEENMOVIE")
-                .type(ProgramType.BROADCAST)
+            broadcast().mid("GEENMOVIE")
                 .scheduleEvents(event(Channel.NED2, "2016-07-08T11:00:00")),
-            program().mid("MOVIE")
-                .type(ProgramType.MOVIE)
+            movie().mid("MOVIE")
                 .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00")));
 
         ScheduleResult result = repository.listSchedulesForMediaType(MediaType.MOVIE, date("2016-07-08T10:00:00"), date("2016-07-08T12:00:00"), Order.ASC, 0L, 10);
@@ -263,13 +259,11 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     @Test
     public void listSchedulesForAncestors() {
         MediaObject[] indexed = index(
-            program().mid("p1")
+            broadcast().mid("p1")
                 .descendantOf("DESCENDANT1")
-                .type(ProgramType.BROADCAST)
                 .scheduleEvents(event(Channel.NED2, "2016-07-08T11:00:00")),
-            program().mid("p2")
+            movie().mid("p2")
                 .descendantOf("DESCENDANT2")
-                .type(ProgramType.MOVIE)
                 .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
         );
 
@@ -284,17 +278,15 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     @Test
     public void findSchedulesForRerun() {
         index(
-            program().mid("p1")
+            broadcast().mid("p1")
                 .descendantOf("DESCENDANT1")
-                .type(ProgramType.BROADCAST)
                 .scheduleEvents(
                     event(Channel.NED2, "2016-07-08T11:00:00"),
                     rerun(Channel.NED2, "2016-07-08T14:00:00")
                 ),
-            program().mid("p2")
-            .descendantOf("DESCENDANT2")
-            .type(ProgramType.MOVIE)
-            .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
+            movie().mid("p2")
+                .descendantOf("DESCENDANT2")
+                .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
         );
         ScheduleForm form = ScheduleForm.from(
             MediaForm.builder()
@@ -315,19 +307,17 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     public void findSchedulesForOriginal() {
 
         index(
-            program()
+            broadcast()
                 .mid("p1")
                 .mainTitle("original and rerun on the same channel")
                 .descendantOf("DESCENDANT1")
-                .type(ProgramType.BROADCAST)
                 .scheduleEvents(
                     event(Channel.NED2, "2016-07-08T11:00:00"),
                     rerun(Channel.NED2, "2016-07-08T14:00:00")
                 ),
-            program().mid("p2")
+            movie().mid("p2")
                 .descendantOf("DESCENDANT2")
                 .mainTitle("original on a channel")
-                .type(ProgramType.MOVIE)
                 .scheduleEvents(event(Channel.NED3, "2016-07-08T11:00:00"))
         );
 
@@ -349,14 +339,12 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
     @Test
     public void findScheduleWithGenre() {
         index(
-            program().mid("p1")
-                .type(ProgramType.BROADCAST)
+            broadcast().mid("p1")
                 .genres("3.0.1.2", "3.0.1.2.3")
                 .scheduleEvents(
                     event(Channel.NDR3, "2018-01-23T11:00:00")
                 ),
-            program().mid("p2")
-                .type(ProgramType.BROADCAST)
+            broadcast().mid("p2")
                 .scheduleEvents(
                     event(Channel.NDR3, "2018-01-23T12:00:00")
                 )
@@ -397,8 +385,41 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                         .build()
                 ).build());
         assertThatThrownBy(() ->
-            repository.findSchedules(null, form,null,  0L, 10)).isInstanceOf(IllegalArgumentException.class)
+            repository.findSchedules(null, form, null, 0L, 10)).isInstanceOf(IllegalArgumentException.class)
             .hasMessageFindingMatch(".+");
+
+    }
+
+    @Test
+    void listSchedulesChannelGuideDay() {
+        index(
+            broadcast().mid("p1") // doesn't match
+                .scheduleEvents(
+                    event(Channel.NED3, "2018-01-23T11:00:00")
+                ),
+            broadcast().mid("p2") //  matches
+                .scheduleEvents(
+                    event(Channel.NED3, "2021-10-23T12:00:00")
+                ),
+            broadcast().mid("p3") // matches date on wrong channel, and channel on wrong date, so doesn't math
+                .scheduleEvents(
+                    event(Channel.NED2, "2021-10-23T12:00:00"),
+                    event(Channel.NED3, "2020-10-23T12:00:00")
+                ),
+            broadcast().mid("p4") // matches in the night
+                .scheduleEvents(
+                    event(Channel.NED3, "2021-10-24T02:00:00")
+                )
+
+        );
+
+        ScheduleResult apiScheduleEvents = repository.listSchedules(Channel.NED3,
+            LocalDate.of(2021, 10, 23), Order.ASC, 0, 3);
+
+
+        assertThat(apiScheduleEvents.stream().map(ScheduleEvent::getMidRef)).containsExactly("p2", "p4");
+
+        //assertThat(apiScheduleEvents.getTotal()).isEqualTo(2); // FAILS NPA-599
 
     }
 

@@ -17,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import nl.vpro.domain.Displayable;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -27,6 +26,7 @@ import nl.vpro.domain.media.support.*;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.Portal;
 import nl.vpro.elasticsearch.Constants;
+import nl.vpro.i18n.Displayable;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.LoggerOutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
