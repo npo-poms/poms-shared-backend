@@ -47,14 +47,14 @@ public class PageServiceImpl implements PageService {
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     @Cacheable("PageService.suggest")
-    public SuggestResult suggest(String input, String profile, Integer max) {
+    public SuggestResult suggest(String input, String profile, Integer max) throws ProfileNotFoundException {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
     @Override
     @PreAuthorize(Roles.HAS_API_ROLE)
     @Cacheable("PageService.find")
-    public PageSearchResult find(PageForm form, String profile, Long offset, Integer max) {
+    public PageSearchResult find(PageForm form, String profile, Long offset, Integer max) throws ProfileNotFoundException {
         return pageSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
@@ -132,7 +132,7 @@ public class PageServiceImpl implements PageService {
     }
 
 
-    private ProfileDefinition<Page> getProfile(String profile) {
+    private ProfileDefinition<Page> getProfile(String profile) throws ProfileNotFoundException {
         if(profile == null || "".equals(profile) // handy for scripting (profile=$2 and so on...)
         ) {
             return null;

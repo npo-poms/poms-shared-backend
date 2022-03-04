@@ -71,7 +71,7 @@ public class MediaServiceImpl implements MediaService {
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.suggest")
-    public SuggestResult suggest(String input, String profile, Integer max) {
+    public SuggestResult suggest(String input, String profile, Integer max) throws ProfileNotFoundException {
         return querySearchRepository.suggest(input, getProfile(profile) != null ? profile : null, max);
     }
 
@@ -171,63 +171,63 @@ public class MediaServiceImpl implements MediaService {
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.find")
-    public MediaSearchResult find(String profile, MediaForm form, Long offset, Integer max) {
+    public MediaSearchResult find(String profile, MediaForm form, Long offset, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.find(getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.listMembers")
-    public MediaResult listMembers(MediaObject media, String profile, Order order, Long offset, Integer max) {
+    public MediaResult listMembers(MediaObject media, String profile, Order order, Long offset, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.listMembers(media, getProfile(profile), order, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.findMembers")
-    public MediaSearchResult findMembers(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
+    public MediaSearchResult findMembers(MediaObject media, String profile, MediaForm form, Long offset, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.findMembers(media, getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.listEpisodes")
-    public ProgramResult listEpisodes(MediaObject media, String profile,  Order order, Long offset, Integer max) {
+    public ProgramResult listEpisodes(MediaObject media, String profile,  Order order, Long offset, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.listEpisodes(media, getProfile(profile), order, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.findEpisodes")
-    public ProgramSearchResult findEpisodes(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
+    public ProgramSearchResult findEpisodes(MediaObject media, String profile, MediaForm form, Long offset, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.findEpisodes(media, getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.listDescendants")
-    public MediaResult listDescendants(MediaObject media, String profile, Order order, Long offset, Integer max) {
+    public MediaResult listDescendants(MediaObject media, String profile, Order order, Long offset, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.listDescendants(media, getProfile(profile), order, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.findDescendants")
-    public MediaSearchResult findDescendants(MediaObject media, String profile, MediaForm form, Long offset, Integer max) {
+    public MediaSearchResult findDescendants(MediaObject media, String profile, MediaForm form, Long offset, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.findDescendants(media, getProfile(profile), form, offset, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.findRelated")
-    public MediaSearchResult findRelated(MediaObject media, String profile, MediaForm form, Integer max) {
+    public MediaSearchResult findRelated(MediaObject media, String profile, MediaForm form, Integer max) throws ProfileNotFoundException {
         return mediaSearchRepository.findRelated(media, getProfile(profile), form, max);
     }
 
     @Override
     @PreAuthorize(HAS_API_ROLE)
     @Cacheable("MediaRestService.findRelatedInTopspin")
-    public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max, String partyId, String clazz) {
+    public MediaSearchResult findRelatedInTopspin(MediaObject media, String profile, MediaForm form, Integer max, String partyId, String clazz) throws ProfileNotFoundException {
         Recommendations recommendations = topSpinRepository.getForMid(media.getMid(), partyId, clazz);
 
         List<MediaObject> mediaObjects = loadAll(
@@ -273,7 +273,7 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Nullable
-    private ProfileDefinition<MediaObject> getProfile(String profile) {
+    private ProfileDefinition<MediaObject> getProfile(String profile) throws ProfileNotFoundException {
         if (profile == null || "".equals(profile) // handy for scripting (profile=$2 and so on...)
             ) {
             return null;
