@@ -35,7 +35,7 @@ public interface FilterProperties {
         return new FilterPropertiesImpl(1, option, false);
     }
 
-    static FilterProperties one(Enum option) {
+    static FilterProperties one(Enum<?> option) {
         return one(option.name().toLowerCase());
     }
 
