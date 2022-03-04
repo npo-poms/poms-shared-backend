@@ -24,7 +24,8 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
  */
 @Provider
 @Slf4j
-public class ValidationExceptionProvider implements ExceptionMapper<ResteasyViolationException> {
+public class ValidationExceptionMapper implements ExceptionMapper<ResteasyViolationException> {
+
     @Override
     public Response toResponse(final ResteasyViolationException e) {
         final String violationsAsString = e.getViolations().toString().replace('\r', ' ');

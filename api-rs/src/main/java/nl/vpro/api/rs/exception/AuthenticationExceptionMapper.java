@@ -17,7 +17,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
  * @since 3.0
  */
 @Provider
-public class AuthenticationExceptionProvider implements ExceptionMapper<AuthenticationException> {
+public class AuthenticationExceptionMapper implements ExceptionMapper<AuthenticationException> {
 
     @Override
     public Response toResponse(AuthenticationException exception) {

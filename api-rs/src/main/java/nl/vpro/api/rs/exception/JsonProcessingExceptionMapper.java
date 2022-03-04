@@ -23,7 +23,7 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
  */
 @Provider
 @Slf4j
-public class JsonProcessingExceptionProvider implements ExceptionMapper<JsonProcessingException> {
+public class JsonProcessingExceptionMapper implements ExceptionMapper<JsonProcessingException> {
 
     @Override
     public Response toResponse(JsonProcessingException exception) {

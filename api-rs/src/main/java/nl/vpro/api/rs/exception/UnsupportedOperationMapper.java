@@ -5,12 +5,11 @@
 package nl.vpro.api.rs.exception;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import nl.vpro.api.rs.interceptors.StoreRequestInThreadLocal;
 
@@ -21,9 +20,8 @@ import static javax.ws.rs.core.Response.Status.NOT_IMPLEMENTED;
  * @since 4.9
  */
 @Provider
-public class UnsupportedOperationProvider implements ExceptionMapper<UnsupportedOperationException> {
-
-    private static final Logger LOG = LoggerFactory.getLogger(UnsupportedOperationProvider.class);
+@Slf4j
+public class UnsupportedOperationMapper implements ExceptionMapper<UnsupportedOperationException> {
 
 
     @Override
@@ -39,7 +37,7 @@ public class UnsupportedOperationProvider implements ExceptionMapper<Unsupported
                 message = cause.getMessage();
             }
         }
-        LOG.info("Not implemented: {}. Request: {}", message, StoreRequestInThreadLocal.getRequestBody());
+        log.info("Not implemented: {}. Request: {}", message, StoreRequestInThreadLocal.getRequestBody());
         return Response
                 .status(NOT_IMPLEMENTED)
                 .entity(new nl.vpro.domain.api.Error(NOT_IMPLEMENTED, message))

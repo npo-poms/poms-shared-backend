@@ -14,7 +14,7 @@ import javax.ws.rs.ext.Provider;
  * @since 3.0
  */
 @Provider
-public class ClientErrorProvider implements ExceptionMapper<ClientErrorException> {
+public class ClientErrorMapper implements ExceptionMapper<ClientErrorException> {
 
     @Override
     public Response toResponse(ClientErrorException exception) {

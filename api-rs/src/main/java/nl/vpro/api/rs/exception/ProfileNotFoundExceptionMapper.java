@@ -8,20 +8,22 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
+
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 /**
- * @author Roelof Jan Koekoek
- * @since 3.0
+ * @author Michiel Meeuwissen
+ * @since 5.31
  */
 @Provider
-public class IllegalArgumentProvider implements ExceptionMapper<IllegalArgumentException> {
+public class ProfileNotFoundExceptionMapper implements ExceptionMapper<ProfileNotFoundException> {
 
     @Override
-    public Response toResponse(IllegalArgumentException exception) {
+    public Response toResponse(ProfileNotFoundException exception) {
         return Response
                 .status(BAD_REQUEST)
-                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception))
+                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception.getMessage()))
                 .build();
     }
 

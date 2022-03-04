@@ -6,6 +6,7 @@ package nl.vpro.api.rs.exception;
 
 import lombok.extern.slf4j.Slf4j;
 
+import javax.ws.rs.ServerErrorException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -20,13 +21,13 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
  */
 @Provider
 @Slf4j
-public class IllegalStateProvider implements ExceptionMapper<IllegalStateException> {
+public class ServerErrorMapper implements ExceptionMapper<ServerErrorException> {
 
     @Override
-    public Response toResponse(IllegalStateException exception) {
-        log.error("Wrapped a illegal state. For request: {}", StoreRequestInThreadLocal.getRequestBody(), exception);
+    public Response toResponse(ServerErrorException exception) {
+        log.warn("Server error exception for request: {}", StoreRequestInThreadLocal.getRequestBody(), exception);
         return Response
-                .status(INTERNAL_SERVER_ERROR)
+                .serverError()
                 .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
                 .build();
     }

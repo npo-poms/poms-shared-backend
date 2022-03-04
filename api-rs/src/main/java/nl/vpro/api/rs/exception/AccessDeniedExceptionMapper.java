@@ -22,9 +22,9 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
  */
 @Provider
 @Slf4j
-public class AccessDeniedExceptionProvider implements ExceptionMapper<AccessDeniedException> {
+public class AccessDeniedExceptionMapper implements ExceptionMapper<AccessDeniedException> {
 
-        @Override
+    @Override
     public Response toResponse(AccessDeniedException exception) {
         log.info("Access denied exception: {}. Request: {}", exception.getMessage(), StoreRequestInThreadLocal.getRequestBody());
         return Response

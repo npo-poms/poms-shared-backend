@@ -24,7 +24,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
  */
 @Provider
 @Slf4j
-public class BadRequestProvider implements ExceptionMapper<BadRequestException> {
+public class BadRequestMapper implements ExceptionMapper<BadRequestException> {
 
 
     @Override

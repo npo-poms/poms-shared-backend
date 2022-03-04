@@ -20,7 +20,7 @@ import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
  */
 @Provider
 @Slf4j
-public class NullPointerProvider implements ExceptionMapper<NullPointerException> {
+public class NullPointerMapper implements ExceptionMapper<NullPointerException> {
     @Override
     public Response toResponse(NullPointerException exception) {
         log.error("Wrapped a null pointer. Request: {}", StoreRequestInThreadLocal.getRequestBody(), exception);

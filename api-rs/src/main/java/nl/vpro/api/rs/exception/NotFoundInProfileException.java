@@ -11,7 +11,8 @@ import nl.vpro.i18n.Locales;
  */
 public class NotFoundInProfileException extends NotFoundException  {
 
-    private PredicateTestResult testResult;
+    private final PredicateTestResult testResult;
+
     public NotFoundInProfileException(PredicateTestResult testResult) {
         super(testResult.getDescription(Locales.DUTCH));
         this.testResult = testResult;

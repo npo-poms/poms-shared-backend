@@ -20,7 +20,7 @@ import static javax.ws.rs.core.Response.Status.FORBIDDEN;
  */
 @Provider
 @Slf4j
-public class SecurityExceptionProvider implements ExceptionMapper<SecurityException> {
+public class SecurityExceptionMapper implements ExceptionMapper<SecurityException> {
 
     @Override
     public Response toResponse(SecurityException exception) {
