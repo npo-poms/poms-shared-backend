@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import com.google.common.collect.ImmutableList;
 
 import nl.vpro.domain.api.profile.*;
+import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.topspin.Recommendation;
 import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.constraint.media.*;
@@ -83,26 +84,26 @@ public class TopspinTest {
     }
 
     @Test
-    public void topspinNoFilter() {
+    public void topspinNoFilter() throws ProfileNotFoundException {
         MediaSearchResult result = target.findRelatedInTopspin(program, null, null, 3, null, null);
         assertThat(result).hasSize(3);
     }
 
     @Test
-    public void topspinProfileFilter() {
+    public void topspinProfileFilter() throws ProfileNotFoundException {
         MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", null, 3, null, null);
         assertThat(result).hasSize(2);
     }
 
     @Test
-    public void topspinFormFilter() {
+    public void topspinFormFilter() throws ProfileNotFoundException {
         MediaForm form = MediaFormBuilder.form().avTypes(AVType.VIDEO).build();
         MediaSearchResult result = target.findRelatedInTopspin(program, null, form, 3, null, null);
         assertThat(result).hasSize(2);
     }
 
     @Test
-    public void topspinProfileAndFormFilter() {
+    public void topspinProfileAndFormFilter() throws ProfileNotFoundException {
         MediaForm form = MediaFormBuilder.form().avTypes(AVType.VIDEO).build();
         MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", form, 3, null, null);
         assertThat(result).hasSize(1);
