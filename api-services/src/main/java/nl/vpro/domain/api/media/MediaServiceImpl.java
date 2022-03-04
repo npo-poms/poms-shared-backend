@@ -126,7 +126,7 @@ public class MediaServiceImpl implements MediaService {
 
         final ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? currentProfile : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
         if (currentProfile == null && previousProfile == null && profile != null) {
-            throw new ProfileNotFoundException("No such media profile " + profile);
+            throw new ProfileNotFoundException(profile);
         }
         return mediaSearchRepository.changes(
             since, mid, currentProfile, previousProfile, order, max, keepAlive, deletes, tail);
