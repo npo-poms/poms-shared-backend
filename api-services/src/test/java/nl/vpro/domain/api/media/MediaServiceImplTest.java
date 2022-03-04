@@ -69,31 +69,31 @@ public class MediaServiceImplTest {
     }
 
     @Test
-    public void testFind() {
+    public void testFind() throws ProfileNotFoundException {
         target.find("vpro", form, offset, max);
         verify(mediaSearchRepository).find(profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindMembers()  {
+    public void testFindMembers() throws ProfileNotFoundException {
         target.findMembers(media, "vpro", form, offset, max);
         verify(mediaSearchRepository).findMembers(media, profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindEpisodes() {
+    public void testFindEpisodes() throws ProfileNotFoundException {
         target.findEpisodes(media, "vpro", form, offset, max);
         verify(mediaSearchRepository).findEpisodes(media, profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindDescendants() {
+    public void testFindDescendants() throws ProfileNotFoundException {
         target.findDescendants(media, "vpro", form, offset, max);
         verify(mediaSearchRepository).findDescendants(media, profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindRelated()  {
+    public void testFindRelated() throws ProfileNotFoundException {
         target.findRelated(media, "vpro", form, max);
         verify(mediaSearchRepository).findRelated(media, profileDefinition, form, max);
     }
