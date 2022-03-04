@@ -7,10 +7,9 @@ import org.junit.jupiter.api.Test;
 import nl.vpro.domain.api.IdList;
 import nl.vpro.domain.api.profile.Profile;
 import nl.vpro.domain.api.profile.ProfileService;
+import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
-import nl.vpro.domain.page.Page;
-import nl.vpro.domain.page.PageBuilder;
-import nl.vpro.domain.page.PageType;
+import nl.vpro.domain.page.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -31,7 +30,7 @@ public class PageServiceImplTest {
     final PageServiceImpl impl = new PageServiceImpl(profileService, pageSearchRepository, querySearchRepository);
 
     @Test
-    public void testFind() {
+    public void testFind() throws ProfileNotFoundException {
         when(profileService.getProfile("bla")).thenReturn(mock(Profile.class));
         impl.find(null, "bla", 0L, 10);
         verify(profileService).getProfile("bla");
