@@ -4,20 +4,19 @@
  */
 package nl.vpro.api.rs.exception;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-
-import nl.vpro.domain.NotFoundException;
 
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 /**
  * @author Michiel Meeuwissen
- * @since 3.3
+ * @since 5.31
  */
 @Provider
-public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
+public class RsNotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
 
     @Override
     public Response toResponse(NotFoundException exception) {
