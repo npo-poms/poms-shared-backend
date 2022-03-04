@@ -22,8 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.util.CloseableIterator;
-import nl.vpro.util.ThreadPools;
+import nl.vpro.util.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -42,8 +41,8 @@ public class Iterate {
      * @param responseBuilderConsumer Optionally you can build the response further before it it returned. E.g. to add headers.
      */
     @SafeVarargs
-    public static <T> Response streamingJson(
-        final Function<JsonGenerator, CloseableIterator<T>> creator,
+    public static <T, E extends Exception> Response streamingJson(
+        final ExceptionUtils.ThrowingFunction<JsonGenerator, CloseableIterator<T>, E> creator,
         final JsonConsumer<T> streamer,
         final Consumer<Response.ResponseBuilder>... responseBuilderConsumer) throws Exception {
 
@@ -56,7 +55,7 @@ public class Iterate {
 
         final CloseableIterator<T> iterator;
         try {
-            iterator = creator.apply(jg);
+            iterator = creator.applyWithException(jg);
         } catch (Exception e) {
             CloseableIterator.closeQuietly(jg);
             throw e;
