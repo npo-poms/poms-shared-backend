@@ -33,7 +33,7 @@ public class JsonProcessingExceptionMapper implements ExceptionMapper<JsonProces
                 .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception.getMessage()))
                 .build();
         } else {
-            // error didn't happend during parsing of client's content. Perhaps some bug on the server (parsing ES or so?)
+            // error didn't happen during parsing of client's content. Perhaps some bug on the server (parsing ES or so?)
             return Response
                 .status(INTERNAL_SERVER_ERROR)
                 .entity(new nl.vpro.domain.api.Error(INTERNAL_SERVER_ERROR, exception))
