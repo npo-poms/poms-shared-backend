@@ -6,8 +6,6 @@ import lombok.SneakyThrows;
 
 import java.util.concurrent.Future;
 
-import javax.inject.Inject;
-
 import org.apache.hc.client5.http.async.methods.*;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
@@ -38,11 +36,12 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
 
     private final String endPoint;
 
-    @Inject
-    private MeterRegistry meterRegistry;
+    private final MeterRegistry meterRegistry;
 
 
-    public ApiVectorizationServiceImpl(String endpoint, String apiKey, MeterRegistry meterRegistry) {
+    public ApiVectorizationServiceImpl(
+        String endpoint, String apiKey,
+        MeterRegistry meterRegistry) {
         this.apiKey = apiKey;
         this.endPoint = endpoint == null? "https://www.api.geniusvoicedemo.nl/semanticvectorizer" : endpoint;
         this.meterRegistry = meterRegistry;
