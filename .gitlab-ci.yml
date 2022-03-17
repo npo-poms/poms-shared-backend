@@ -32,8 +32,8 @@ trigger_pages_publish:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'master'
+    ref: 'tags/4.6'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'master'
+    ref: 'tags/4.6'
     file: 'util/elasticsearch_service.yml'
