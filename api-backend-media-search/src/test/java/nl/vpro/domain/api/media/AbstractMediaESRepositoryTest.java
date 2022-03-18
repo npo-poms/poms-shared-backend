@@ -1,6 +1,6 @@
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import static org.mockito.Mockito.mock;
  * @author Michiel Meeuwissen
  * @since 5.6
  */
-@Slf4j
+@Log4j2
 public class AbstractMediaESRepositoryTest {
 
     AbstractESMediaRepository repository = new AbstractESMediaRepository(mock(HighLevelClientFactory.class)) {

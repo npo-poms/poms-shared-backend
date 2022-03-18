@@ -1,6 +1,6 @@
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +16,7 @@ import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.logging.Slf4jHelper;
+import nl.vpro.logging.Log4j2Helper;
 import nl.vpro.media.domain.es.*;
 import nl.vpro.util.Truthiness;
 
@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Michiel Meeuwissen
  * @since 5.5
  */
-@Slf4j
+@Log4j2
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     protected static void createIndicesIfNecessary() {
@@ -67,7 +67,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
             if (Workflow.PUBLICATIONS.contains(mo.getWorkflow())) {
                 if (!inResult.contains(mo.getMid())) {
                     MediaSearch.TestResult testResult = form.getTestResult(mo);
-                    Slf4jHelper.debugOrInfo(log, misses.get()  == 0, "Asserting that {} is not in form", mo);
+                    Log4j2Helper.debugOrInfo(log, misses.get()  == 0, "Asserting that {} is not in form", mo);
                     assertThat(testResult.test())
                         .withFailMessage(form + " matched " + mo + " but it is not found! :" +
                             testResult.getDescription()

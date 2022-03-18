@@ -1,5 +1,6 @@
 package nl.vpro.domain.api.media;
 
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ import static org.mockito.Mockito.mock;
  * @since 2.0
  */
 
-@Slf4j
+@Log4j2
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
 

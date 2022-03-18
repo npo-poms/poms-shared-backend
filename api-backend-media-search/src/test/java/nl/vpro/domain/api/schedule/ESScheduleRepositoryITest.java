@@ -1,5 +1,6 @@
 package nl.vpro.domain.api.schedule;
 
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.StringReader;
@@ -24,7 +25,7 @@ import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Slf4j
+@Log4j2
 public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
 
     public ESScheduleRepository repository;

@@ -1,6 +1,6 @@
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.net.URI;
@@ -28,7 +28,7 @@ import nl.vpro.domain.user.Portal;
 import nl.vpro.elasticsearch.Constants;
 import nl.vpro.i18n.Displayable;
 import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.logging.LoggerOutputStream;
+import nl.vpro.logging.Log4j2OutputStream;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.poms.shared.ExtraHeaders;
@@ -65,7 +65,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @since 3.5
  */
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
-@Slf4j
+@Log4j2
 public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest {
 
     @Autowired
@@ -1702,7 +1702,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         list.setSort(FacetOrder.COUNT_ASC);
         form.getFacets().setTitles(new TitleFacetList());
 
-        JAXB.marshal(form, LoggerOutputStream.info(log));
+        JAXB.marshal(form, Log4j2OutputStream.info(log));
         assertThat(form.getFacets().getTitles().asMediaFacet()).isTrue();
 
         MediaSearchResult result = target.find(null, form, 0, 0);

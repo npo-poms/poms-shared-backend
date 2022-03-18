@@ -4,6 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
+import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author r.jansen
  */
-@Slf4j
+@Log4j2
 public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryITest {
 
     private static ESMediaRepository target;

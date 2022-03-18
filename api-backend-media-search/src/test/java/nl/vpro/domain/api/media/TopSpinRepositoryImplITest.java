@@ -1,6 +1,6 @@
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -9,7 +9,7 @@ import nl.vpro.domain.api.topspin.Recommendations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Slf4j
+@Log4j2
 public class TopSpinRepositoryImplITest {
 
     @Test
