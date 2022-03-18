@@ -1,8 +1,11 @@
 package nl.vpro.domain.api.media;
 
+import lombok.extern.log4j.Log4j2;
+
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.Test;
 
+@Log4j2
 public class ESMediaFacetsHandlerTest {
 
     @Test
@@ -14,7 +17,7 @@ public class ESMediaFacetsHandlerTest {
         form.setFacets(facets);
         SearchSourceBuilder searchBuilder = SearchSourceBuilder.searchSource();
         //ESMediaFacetsHandler.buildFacets(searchBuilder, form, null, "prefix");
-        System.out.println(searchBuilder.toString());
+        log.info("Search: {}", searchBuilder);
     }
 
     @Test
@@ -25,7 +28,7 @@ public class ESMediaFacetsHandlerTest {
         form.setFacets(facets);
         SearchSourceBuilder searchBuilder = SearchSourceBuilder.searchSource();
         //ESMediaFacetsHandler.(searchBuilder, form, null, "prefix");
-        System.out.println(searchBuilder.toString());
+        log.info("Search: {}", searchBuilder);
     }
 
 }
