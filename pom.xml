@@ -69,6 +69,16 @@
 
   <repositories>
     <repository>
+      <id>vpro-ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+       <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>vpro</id>
       <url>https://nexus.vpro.nl/content/groups/public</url>
       <releases>
@@ -79,18 +89,6 @@
       </snapshots>
     </repository>
   </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>vpro</id>
-      <url>https://nexus.vpro.nl/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 
   <profiles>
     <profile>
@@ -98,7 +96,6 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-enforcer-plugin</artifactId>
             <version>3.0.0</version>
             <configuration>
