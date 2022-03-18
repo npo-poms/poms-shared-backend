@@ -15,8 +15,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;;
-
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.HasAggregations;
 import org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
@@ -24,13 +23,15 @@ import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.bucket.range.Range;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 
-import nl.vpro.domain.Displayable;
 import nl.vpro.domain.media.Schedule;
 import nl.vpro.domain.user.Broadcaster;
 import nl.vpro.domain.user.ServiceLocator;
+import nl.vpro.i18n.Displayable;
 import nl.vpro.i18n.Locales;
 
 import static nl.vpro.domain.api.ESFacetsBuilder.*;
+
+;
 
 /**
  * @author Roelof Jan Koekoek
