@@ -21,7 +21,6 @@ public class RSContextResolver implements ContextResolver<JAXBContext> {
             ERROR_CONTEXT = JAXBContext.newInstance(
                 nl.vpro.domain.api.Error.class,
                 ResteasyConstraintViolation.class
-
             );
         } catch (JAXBException ex) {
             throw new RuntimeException(ex);

@@ -16,6 +16,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import nl.vpro.api.rs.exception.*;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.jackson2.rs.JacksonContextResolver;
 import nl.vpro.rs.converters.DateParamConverterProvider;
@@ -35,8 +36,6 @@ public abstract class AbstractRestServiceImplTest<T> {
     public static final MediaType XML;
 
     static {
-
-
         Map<String, String> parameters = new LinkedHashMap<>();
         parameters.put("charset", "utf-8");
 
@@ -55,8 +54,10 @@ public abstract class AbstractRestServiceImplTest<T> {
         dispatcher.getProviderFactory().registerProviderInstance(contextResolver);
         dispatcher.getProviderFactory().registerProvider(DateParamConverterProvider.class);
         dispatcher.getProviderFactory().registerProvider(LocaleParamConverterProvider.class);
-        //dispatcher.getProviderFactory().registerProvider(NotFoundExeptionMapper.class);
-        //dispatcher.getProviderFactory().registerProvider(NotFoundInProfileExeptionMapper.class);
+        dispatcher.getProviderFactory().registerProvider(NotFoundExceptionMapper.class);
+        dispatcher.getProviderFactory().registerProvider(NotFoundInProfileExeptionMapper.class);
+        dispatcher.getProviderFactory().registerProvider(ProfileNotFoundExceptionMapper.class);
+
 
         mapper = Jackson2Mapper.INSTANCE;
         dispatcher.getRegistry().addSingletonResource(getTestObject());
