@@ -21,7 +21,7 @@ public class IllegalArgumentMapper implements ExceptionMapper<IllegalArgumentExc
     public Response toResponse(IllegalArgumentException exception) {
         return Response
                 .status(BAD_REQUEST)
-                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception, false))
+                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception, false, true))
                 .build();
     }
 

@@ -23,7 +23,7 @@ public class ProfileNotFoundExceptionMapper implements ExceptionMapper<ProfileNo
     public Response toResponse(ProfileNotFoundException exception) {
         return Response
                 .status(BAD_REQUEST)
-                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception, false))
+                .entity(new nl.vpro.domain.api.Error(BAD_REQUEST, exception, false, true))
                 .build();
     }
 
