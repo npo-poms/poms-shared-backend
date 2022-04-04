@@ -8,7 +8,7 @@
 
   <bean class="nl.vpro.jackson2.rs.JacksonContextResolver"/>
 
-  <context:component-scan base-package="nl.vpro.api">
+  <context:component-scan base-package="nl.vpro.api.cors">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
     <context:include-filter type="annotation" expression="javax.ws.rs.NameBinding"/>
   </context:component-scan>
