@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.function.Predicate;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import nl.vpro.domain.media.ScheduleEvent;
 
 /**
@@ -22,12 +24,12 @@ public class ScheduleEventViewSortedSet extends FilteredSortedSet<ScheduleEvent>
     }
 
     @Override
-    public SortedSet<ScheduleEvent> headSet(ScheduleEvent toElement) {
+    public @NonNull SortedSet<ScheduleEvent> headSet(ScheduleEvent toElement) {
         return wrapped.headSet(toElement);
     }
 
     @Override
-    public SortedSet<ScheduleEvent> tailSet(ScheduleEvent fromElement) {
+    public @NonNull SortedSet<ScheduleEvent> tailSet(ScheduleEvent fromElement) {
         return wrapped.tailSet(fromElement);
     }
 
