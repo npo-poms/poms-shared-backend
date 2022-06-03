@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,10 +29,6 @@ import nl.vpro.domain.media.support.TextualType;
 
 @Slf4j
 public class ApiMediaFilter {
-
-    private boolean throwOnUnknownProperties = true;
-
-
 
     private final Map<String, FilterProperties> properties = new HashMap<>();
 
@@ -88,10 +85,27 @@ public class ApiMediaFilter {
      * "none": Return very limited set of properties (actually: title,broadcaster)
      * <property>[s][:<number>],...:
      */
+    public static void set(String properties, Consumer<String> unrecognized) {
+       get().filter(properties, unrecognized);
+    }
+
     public static void set(String properties) {
-       get().filter(properties);
+        final List<String> unrecognized = new ArrayList<>();
+        set(properties, unrecognized::add);
+        if (!unrecognized.isEmpty()) {
+            throw new IllegalArgumentException("Unrecognized properties " + unrecognized + " ( known are " + getKnownPropertiesForExposure() + ")");
+        }
+    }
+
+    public static void check(String properties) {
+        try {
+            set(properties);
+        } finally {
+            ApiMediaFilter.removeFilter();
+        }
 
     }
+
 
     public static <T> T doWithout(Callable<T> callable) {
         ApiMediaFilter before = get();
@@ -151,13 +165,13 @@ public class ApiMediaFilter {
      *                   will limit the amount of items returned of this List or Set to the given number if larger
      *                   than the original number of items in the wrapped List or Set.
      */
-    private void add(String... properties) {
+    private void add(String[] properties, Consumer<String> unrecognized) {
         for(String property : properties) {
             property = property.toLowerCase().trim();
             String name = aliasToProperty.getOrDefault(property, property);
             Integer max = null;
 
-            String[] split = name.split(":", 3);
+            final String[] split = name.split(":", 3);
             String[] extra = new String[] {null};
             boolean fromBack = false;
             name = split[0];
@@ -180,7 +194,7 @@ public class ApiMediaFilter {
             }
 
             if (name.toLowerCase().endsWith("of")) {
-                // This makes no sense at all, but for backwardscompatibility
+                // This makes no sense at all, but for backwards compatibility
                 // effect
                 name = name + "s";
             }
@@ -208,7 +222,8 @@ public class ApiMediaFilter {
                     }
                 }
             } else {
-                throw new IllegalArgumentException("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());
+                unrecognized.accept(name);
+                log.debug("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());
             }
         }
     }
@@ -273,7 +288,7 @@ public class ApiMediaFilter {
         return Stream.of(fieldName);
     }
 
-    private void filter(String properties) {
+    private void filter(String properties, Consumer<String> unrecognized) {
         this.properties.clear();
 
         if ("all".equals(properties)) {
@@ -292,7 +307,8 @@ public class ApiMediaFilter {
         if ("none".equals(properties)) {
             properties = "";
         }
-        add(Arrays
+        add(
+            Arrays
             .stream(properties.split(","))
             .filter(StringUtils::isNotBlank)
             .flatMap(this::map)
