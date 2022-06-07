@@ -97,8 +97,16 @@ public class Iterate {
             try {
                 // used BufferedInputStream will cause that the buffer used in copyLarge needs not be entirely every time (see java.io.BufferedInputStream.read(byte[], int, int) (may fix
 
-                long copied = IOUtils.copyLarge(new BufferedInputStream(pipedInputStream, 8172), output);
-
+                InputStream buffered = new BufferedInputStream(pipedInputStream, IOUtils.DEFAULT_BUFFER_SIZE);
+                byte[] buffer = new byte[IOUtils.DEFAULT_BUFFER_SIZE];
+                long copied = 0;
+                int n;
+                // doing it ourself, so we can flush also output
+                while (IOUtils.EOF != (n = buffered.read(buffer))) {
+                    output.write(buffer, 0, n);
+                    output.flush();
+                    copied += n;
+                }
                 log.debug("Streamed {} bytes", copied);
                 ready = true;
             } catch (ClientErrorException | IOException clientError) {
