@@ -19,9 +19,11 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.poms.shared.ExtraHeaders;
 import nl.vpro.util.*;
 
 /**
@@ -51,7 +53,9 @@ public class Iterate {
         final PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
 
-        final JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory().createGenerator(pipedOutputStream);
+        final JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory()
+            .createGenerator(pipedOutputStream, JsonEncoding.UTF8)
+            ;
 
         final CloseableIterator<T> iterator;
         try {
@@ -108,15 +112,18 @@ public class Iterate {
                         log.debug("Canceled {}", submit);
                     }
                 } else {
-                    // let it end normally
+                    log.debug("let it end normally");
                 }
             }
         };
 
 
         Response.ResponseBuilder builder =  Response.ok()
-            .type(MediaType.APPLICATION_JSON_TYPE)
+            .type(MediaType.APPLICATION_JSON_TYPE.withCharset("UTF-8"))
             .entity(streamingOutput);
+
+        ExtraHeaders.get().forEach((p) -> builder.header(p.getKey(), p.getValue()));
+        ExtraHeaders.markUsed();;
 
         for (Consumer<Response.ResponseBuilder> c : responseBuilderConsumer) {
             c.accept(builder);
