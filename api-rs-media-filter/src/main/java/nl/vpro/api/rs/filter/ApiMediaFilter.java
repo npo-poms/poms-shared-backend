@@ -61,9 +61,12 @@ public class ApiMediaFilter {
         aliasToProperty.put("member", "memberOf");
 
 
-        singularExceptions.put("countrie", "country");
+        singularExceptions.put("countries", "country");
+        singularExceptions.put("predictionsForXml", "predictionForXml");
 
         singularToPlural.put("email", "emails");
+        singularToPlural.put("predictionForXml", "predictionsForXml");
+
     }
 
     private static final ThreadLocal<ApiMediaFilter> localFilter = ThreadLocal.withInitial(ApiMediaFilter::new);
@@ -129,15 +132,18 @@ public class ApiMediaFilter {
      * @param name The property name (possibly a plural)
      * @return Singular name
      */
-    private String getSingular(String name) {
-        String singular;
-        if (name.endsWith("s")) {
-            singular = name.substring(0, name.length() - 1);
+    String getSingular(String name) {
+        String singular = singularExceptions.get(name);
+
+        if (singular != null) {
+            return singular;
         } else {
-            singular = name;
-        }
-        if (singularExceptions.containsKey(name)) {
-            singular = singularExceptions.get(name);
+
+            if (name.endsWith("s")) {
+                singular = name.substring(0, name.length() - 1);
+            } else {
+                singular = name;
+            }
         }
         return singular;
     }
@@ -154,6 +160,10 @@ public class ApiMediaFilter {
         } else {
             return name + "s";
         }
+    }
+
+    private boolean isSingular(String name) {
+        return getSingular(name).equals(name);
     }
 
     /**
@@ -198,13 +208,13 @@ public class ApiMediaFilter {
                 // effect
                 name = name + "s";
             }
-            String singular = getSingular(name);
+
             if (max == null) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
-                max = name.equals(singular) ? 1 : Integer.MAX_VALUE;
+                max = isSingular(name) ? 1 : Integer.MAX_VALUE;
             }
-            if (hasProperty(singular) || ! throwOnUnknownProperties) {
-
+            final String singular = getSingular(name);
+            if (hasProperty(singular)) {
                 for (String e : extra) {
                     FilterProperties newFilter = new FilterPropertiesImpl(max, e, fromBack);
                     FilterProperties existing = this.properties.get(singular);
@@ -280,12 +290,20 @@ public class ApiMediaFilter {
         return knownPropertiesForExposure;
     }
 
-    private Stream<String> map(String fieldName){
-        switch(fieldName) {
+    private Stream<String> mapProperty(String property){
+        switch(property) {
             case "predictions":
-                return Stream.of("predictionsForXml", "predictions");
+                return Stream.of(
+                    "predictionsForXml",
+                    "predictions"
+                );
+            case "prediction":
+                return Stream.of(
+                    "predictionsForXml",
+                    "prediction"
+                );
         }
-        return Stream.of(fieldName);
+        return Stream.of(property);
     }
 
     private void filter(String properties, Consumer<String> unrecognized) {
@@ -311,8 +329,10 @@ public class ApiMediaFilter {
             Arrays
             .stream(properties.split(","))
             .filter(StringUtils::isNotBlank)
-            .flatMap(this::map)
-            .toArray(String[]::new));
+            .flatMap(this::mapProperty)
+            .toArray(String[]::new),
+            unrecognized
+        );
 
         if (!this.properties.containsKey("title")) {
             this.properties.put("title", FilterProperties.one(TextualType.MAIN));
@@ -326,7 +346,6 @@ public class ApiMediaFilter {
         String singular = getSingular(property);
         if (! filtering) {
             return FilterProperties.ALL;
-
         } else {
             if (retainAll) {
                 // toch maar een beetje impliciet filteren voor scheduleevents want dat zijn er nogal veel soms!

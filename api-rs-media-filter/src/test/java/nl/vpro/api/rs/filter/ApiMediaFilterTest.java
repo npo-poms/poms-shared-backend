@@ -137,6 +137,28 @@ public class ApiMediaFilterTest {
         //assertThat(program.getType()).isNull(); // 'type' is excludes, so wont be filtered implicitely.
     }
 
+    @Test
+    public void testFilterPredictions() {
+        Program program = MediaTestDataBuilder.program().withPredictions().build();
+
+        assertThat(program.getPredictions()).isNotNull();
+
+        ApiMediaFilter.set("predictions");
+        assertThat(new FilteredObject<>("prediction", program.getPredictions()).value()).isNotNull();
+        assertThat(program.getPredictions()).isNotNull();
+        assertThat(program.getPredictions()).hasSize(2);
+
+
+        ApiMediaFilter.set("prediction");
+        assertThat(new FilteredObject<>("prediction", program.getPredictions()).value()).isNotNull();
+        assertThat(program.getPredictions()).isNotNull();
+        assertThat(program.getPredictions()).hasSize(1);
+
+        ApiMediaFilter.set("title");
+        assertThat(new FilteredObject<>("prediction", program.getPredictions()).value()).isNull();
+        assertThat(program.getPredictions()).isEmpty();
+    }
+
 
     @Test
     public void testFilterUnknownProperty() {
@@ -257,12 +279,15 @@ public class ApiMediaFilterTest {
             .withFixedDates()
             .mainTitle("foobar")
             .mid("MID_123")
-            .predictions(Platform.INTERNETVOD)
+            .withPredictions()
             .build();
     }
 
     public static Supplier<Object>[] suppliers() {
-        return new Supplier[] {ApiMediaFilterTest::createProgram,  Suppliers.memoize(ApiMediaFilterTest::createProgram)};
+        return new Supplier[] {
+            ApiMediaFilterTest::createProgram,
+            Suppliers.memoize(ApiMediaFilterTest::createProgram)
+        };
     }
 
     @ParameterizedTest
@@ -325,7 +350,7 @@ public class ApiMediaFilterTest {
     public void filterPredictionsTitleAndPredictions(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
         ApiMediaFilter.set("title,predictions");
-        assertThat(program.get().getPredictions()).isNotEmpty();
+        assertThat(program.get().getPredictions()).hasSize(2);
         assertThatJson(program.get()).isSimilarTo("{\n" +
             "  \"objectType\" : \"program\",\n" +
             "  \"mid\" : \"MID_123\",\n" +
