@@ -687,8 +687,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         final @NonNull Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
 
-        final MaxOffsetIterator<MediaChange> maxed = new MaxOffsetIterator<>(iterator, max, 0L, true);
-        final CloseableIterator<MediaChange> tailed =  TailAdder.withFunctions(maxed, (last) -> {
+        final MaxOffsetIterator<MediaChange> maxed = MaxOffsetIterator.<MediaChange>builder()
+            .wrapped(iterator)
+            .max(max)
+            .countNulls(false) // DELETES=EXCLUDE may put null in the stream. don't count them, max=1 may end up empty.
+            .autoClose(false)
+            .build();
+        return TailAdder.withFunctions(maxed, (last) -> {
             if (actualTails == Tail.NEVER) {
                 throw new NoSuchElementException();
             }
@@ -704,7 +709,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 throw new NoSuchElementException();
             }
         });
-        return tailed;
     }
 
     private MediaChange of(
