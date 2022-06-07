@@ -180,7 +180,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
      *
      * The total count is always approximate (and normally overestimated)
      */
-     private MediaSearchResult findWithPostFilter(ProfileDefinition<MediaObject> profile, @NonNull MediaForm form, long offset, Integer max) throws IOException {
+     private MediaSearchResult findWithPostFilter(
+         ProfileDefinition<MediaObject> profile,
+         @NonNull MediaForm form, long offset, Integer max) throws IOException {
         try (HighLevelElasticSearchIterator<SearchResultItem<? extends MediaObject>> i = HighLevelElasticSearchIterator
             .<SearchResultItem<? extends MediaObject>>builder()
             .client(factory.highLevelClient(ESMediaRepository.class.getName()))
