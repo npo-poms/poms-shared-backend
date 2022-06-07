@@ -4,6 +4,8 @@
  */
 package nl.vpro.api.rs.filter;
 
+import lombok.extern.log4j.Log4j2;
+
 import java.io.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -29,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
+@Log4j2
 public class ApiMediaFilterTest {
     static {
         MediaPropertiesFilters.instrument();
@@ -164,7 +167,7 @@ public class ApiMediaFilterTest {
     public void testFilterUnknownProperty() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> ApiMediaFilter.set("bestaatniet"))
-                .withMessageStartingWith("The property bestaatniet is not known.");
+                .withMessageStartingWith("Unrecognized properties [bestaatniet]");
     }
 
     @Test
@@ -280,6 +283,7 @@ public class ApiMediaFilterTest {
             .mainTitle("foobar")
             .mid("MID_123")
             .withPredictions()
+            .workflow(null)
             .build();
     }
 
@@ -294,7 +298,6 @@ public class ApiMediaFilterTest {
     @MethodSource("suppliers")
     public void filterPredictionsTitle(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
-
 
         ApiMediaFilter.set("title");
         assertThat(program.get().getPredictions()).isEmpty();
@@ -319,39 +322,42 @@ public class ApiMediaFilterTest {
     public void filterPredictionsAll(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
         ApiMediaFilter.set("all");
-        assertThat(program.get().getPredictions()).isNotEmpty();
-        assertThatJson(program.get()).isSimilarTo("{\n" +
-            "  \"objectType\" : \"program\",\n" +
-            "  \"mid\" : \"MID_123\",\n" +
-            "  \"workflow\" : \"FOR_PUBLICATION\",\n" +
-            "  \"sortDate\" : 1425596400000,\n" +
-            "  \"creationDate\" : 1425596400000,\n" +
-            "  \"lastModified\" : 1425600000000,\n" +
-            "  \"embeddable\" : true,\n" +
-            "  \"titles\" : [ {\n" +
-            "    \"value\" : \"foobar\",\n" +
-            "    \"owner\" : \"BROADCASTER\",\n" +
-            "    \"type\" : \"MAIN\"\n" +
-            "  } ],\n" +
-            "  \"predictions\" : [ {\n" +
-            "    \"state\" : \"ANNOUNCED\",\n" +
-            "    \"platform\" : \"INTERNETVOD\"\n" +
-            "  } ],\n" +
-            "  \"publishDate\" : 1425603600000\n" +
-            "}");
-
+        Program p = program.get();
+        log.info("{}", p);
+        assertJsonWithPredictions(p);
     }
 
+
     /**
-     * See https://jira.vpro.nl/browse/NPA-602
+     * See <a href="https://jira.vpro.nl/browse/NPA-602">JIRA</a>
      */
     @ParameterizedTest
     @MethodSource("suppliers")
+    @Disabled("TODO")
     public void filterPredictionsTitleAndPredictions(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
-        ApiMediaFilter.set("title,predictions");
-        assertThat(program.get().getPredictions()).hasSize(2);
-        assertThatJson(program.get()).isSimilarTo("{\n" +
+        ApiMediaFilter.set("titles,predictions");
+        Program p = program.get();
+        assertJsonWithPredictions(p);
+    }
+
+       /**
+     * See <a href="https://jira.vpro.nl/browse/NPA-602">JIRA</a>
+     */
+    @ParameterizedTest
+    @MethodSource("suppliers")
+    @Disabled("TODO")
+    public void filterPredictionsTitleAndPredictionsWorkaround(Supplier<Program> program) {
+        AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
+        ApiMediaFilter.set("predictionsForXml,predictions,title");
+        Program p = program.get();
+        assertJsonWithPredictions(p);
+    }
+
+    protected void assertJsonWithPredictions(Object p) { // argument can not be Program, that would break instrumentation
+
+        assertThat(((Program) p).getPredictions()).hasSize(2);
+        assertThatJson(p).isSimilarTo("{\n" +
             "  \"objectType\" : \"program\",\n" +
             "  \"mid\" : \"MID_123\",\n" +
             "  \"sortDate\" : 1425596400000,\n" +
@@ -364,16 +370,20 @@ public class ApiMediaFilterTest {
             "    \"type\" : \"MAIN\"\n" +
             "  } ],\n" +
             "  \"predictions\" : [ {\n" +
-            "    \"state\" : \"ANNOUNCED\",\n" +
+            "    \"state\" : \"REVOKED\",\n" +
             "    \"platform\" : \"INTERNETVOD\"\n" +
+            "  }, {\n" +
+            "    \"state\" : \"ANNOUNCED\",\n" +
+            "    \"platform\" : \"TVVOD\"\n" +
             "  } ],\n" +
             "  \"publishDate\" : 1425603600000\n" +
             "}");
 
     }
 
+
     /**
-     * See https://jira.vpro.nl/browse/NPA-602
+     * See <a href="https://jira.vpro.nl/browse/NPA-602">JIRA</a>
      */
     @Test
     public void testFilterLocations() {

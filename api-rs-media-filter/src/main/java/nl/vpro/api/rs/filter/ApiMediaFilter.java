@@ -96,7 +96,7 @@ public class ApiMediaFilter {
         final List<String> unrecognized = new ArrayList<>();
         set(properties, unrecognized::add);
         if (!unrecognized.isEmpty()) {
-            throw new IllegalArgumentException("Unrecognized properties " + unrecognized + " ( known are " + getKnownPropertiesForExposure() + ")");
+            throw new IllegalArgumentException("Unrecognized properties " + unrecognized + " (known are " + getKnownPropertiesForExposure() + ")");
         }
     }
 
