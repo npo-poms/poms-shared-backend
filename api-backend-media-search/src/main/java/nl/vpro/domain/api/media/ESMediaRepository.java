@@ -4,6 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -655,25 +656,16 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             deletes = Deletes.ID_ONLY;
         }
 
-
+        final CloseableIterator<MediaChange> finalIterator;
         switch (deletes) {
             case INCLUDE:
+                finalIterator = iterator;
                 break;
             case EXCLUDE:
-                iterator= new BasicWrappedIterator<MediaChange>(iterator) {
-                    @Override
-                    public MediaChange next() {
-                        MediaChange n = super.next();
-                        if (n != null && n.isDeleted()) {
-                            log.debug("Returning null in stead since it is deleted. (This will output space to client)");
-                            return null;
-                        }
-                        return n;
-                    }
-                };
+                finalIterator= new DeleteSkippingIterator(iterator);
                 break;
             case ID_ONLY:
-                iterator = new BasicWrappedIterator<MediaChange>(iterator) {
+                finalIterator = new BasicWrappedIterator<MediaChange>(iterator) {
                     @Override
                     public MediaChange next() {
                         MediaChange n = super.next();
@@ -684,11 +676,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                     }
                 };
                 break;
+            default:
+                throw new IllegalStateException();
         }
         final @NonNull Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
 
         final MaxOffsetIterator<MediaChange> maxed = MaxOffsetIterator.<MediaChange>builder()
-            .wrapped(iterator)
+            .wrapped(finalIterator)
             .max(max)
             .countNulls(false) // DELETES=EXCLUDE may put null in the stream. don't count them, max=1 may end up empty.
             .autoClose(false)
@@ -701,7 +695,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 return MediaChange.tail(changesUpto);
             } else if (tail == Tail.ALWAYS) {
                 if (maxed.peekingWrapped().hasNext()) {
-                    return MediaChange.tail(maxed.peekingWrapped().peek().asSince());
+                    MediaChange peek = maxed.peekingWrapped().peek();
+                    if (peek != null) {
+                        return MediaChange.tail(peek.asSince());
+                    } else {
+                        assert finalIterator instanceof  DeleteSkippingIterator;
+                        return MediaChange.tail(((DeleteSkippingIterator) finalIterator).getSince());
+                    }
                 } else {
                     return MediaChange.tail(last.asSince());
                 }
@@ -709,6 +709,29 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 throw new NoSuchElementException();
             }
         });
+    }
+
+    public static class DeleteSkippingIterator extends BasicWrappedIterator<MediaChange> {
+
+        public DeleteSkippingIterator(Iterator<MediaChange> wrapped) {
+            super(wrapped);
+        }
+
+        @Getter
+        MediaSince since;
+
+        @Override
+        public MediaChange next() {
+            MediaChange n = super.next();
+            if (n != null) {
+                since = n.asSince();
+                if (n.isDeleted()) {
+                    log.debug("Returning null in stead since it is deleted. (This will output space to client)");
+                    return null;
+                }
+            }
+            return n;
+        }
     }
 
     private MediaChange of(
