@@ -603,6 +603,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .client(factory.highLevelClient())
             .adapt(this::of)
             .requestVersion(true)
+            .warnSortNotOnDoc(false)
             .build();
 
         final SearchSourceBuilder searchRequestBuilder = i.prepareSearchSource(getIndexName());
