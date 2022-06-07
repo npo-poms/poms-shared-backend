@@ -95,7 +95,11 @@ public class Iterate {
         final StreamingOutput streamingOutput = output -> {
             boolean ready = false;
             try {
-                IOUtils.copy(pipedInputStream, output);
+                // used BufferedInputStream will cause that the buffer used in copyLarge needs not be entirely every time (see java.io.BufferedInputStream.read(byte[], int, int) (may fix
+
+                long copied = IOUtils.copyLarge(new BufferedInputStream(pipedInputStream, 8172), output);
+
+                log.debug("Streamed {} bytes", copied);
                 ready = true;
             } catch (ClientErrorException | IOException clientError) {
                 log.info(clientError.getMessage());
