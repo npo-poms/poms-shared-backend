@@ -123,7 +123,8 @@ public class Iterate {
             .entity(streamingOutput);
 
         ExtraHeaders.get().forEach((p) -> builder.header(p.getKey(), p.getValue()));
-        ExtraHeaders.markUsed();;
+        ExtraHeaders.markUsed();
+        ExtraHeaders.remove();
 
         for (Consumer<Response.ResponseBuilder> c : responseBuilderConsumer) {
             c.accept(builder);
