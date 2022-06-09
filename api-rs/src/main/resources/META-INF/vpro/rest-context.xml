@@ -15,7 +15,9 @@
   <context:component-scan base-package="nl.vpro.rs.converters">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
   </context:component-scan>
-  <context:component-scan base-package="nl.vpro.api.rs"/>
+  <context:component-scan base-package="nl.vpro.api.rs">
+    <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
+  </context:component-scan>
 
   <context:component-scan base-package="nl.vpro.api.rs.exception">
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
