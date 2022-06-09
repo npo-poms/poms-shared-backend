@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,10 +29,6 @@ import nl.vpro.domain.media.support.TextualType;
 
 @Slf4j
 public class ApiMediaFilter {
-
-    private boolean throwOnUnknownProperties = true;
-
-
 
     private final Map<String, FilterProperties> properties = new HashMap<>();
 
@@ -64,9 +61,12 @@ public class ApiMediaFilter {
         aliasToProperty.put("member", "memberOf");
 
 
-        singularExceptions.put("countrie", "country");
+        singularExceptions.put("countries", "country");
+        singularExceptions.put("predictionsForXml", "predictionForXml");
 
         singularToPlural.put("email", "emails");
+        singularToPlural.put("predictionForXml", "predictionsForXml");
+
     }
 
     private static final ThreadLocal<ApiMediaFilter> localFilter = ThreadLocal.withInitial(ApiMediaFilter::new);
@@ -88,10 +88,27 @@ public class ApiMediaFilter {
      * "none": Return very limited set of properties (actually: title,broadcaster)
      * <property>[s][:<number>],...:
      */
+    public static void set(String properties, Consumer<String> unrecognized) {
+       get().filter(properties, unrecognized);
+    }
+
     public static void set(String properties) {
-       get().filter(properties);
+        final List<String> unrecognized = new ArrayList<>();
+        set(properties, unrecognized::add);
+        if (!unrecognized.isEmpty()) {
+            throw new IllegalArgumentException("Unrecognized properties " + unrecognized + " (known are " + getKnownPropertiesForExposure() + ")");
+        }
+    }
+
+    public static void check(String properties) {
+        try {
+            set(properties);
+        } finally {
+            ApiMediaFilter.removeFilter();
+        }
 
     }
+
 
     public static <T> T doWithout(Callable<T> callable) {
         ApiMediaFilter before = get();
@@ -115,15 +132,18 @@ public class ApiMediaFilter {
      * @param name The property name (possibly a plural)
      * @return Singular name
      */
-    private String getSingular(String name) {
-        String singular;
-        if (name.endsWith("s")) {
-            singular = name.substring(0, name.length() - 1);
+    String getSingular(String name) {
+        String singular = singularExceptions.get(name);
+
+        if (singular != null) {
+            return singular;
         } else {
-            singular = name;
-        }
-        if (singularExceptions.containsKey(name)) {
-            singular = singularExceptions.get(name);
+
+            if (name.endsWith("s")) {
+                singular = name.substring(0, name.length() - 1);
+            } else {
+                singular = name;
+            }
         }
         return singular;
     }
@@ -142,6 +162,10 @@ public class ApiMediaFilter {
         }
     }
 
+    private boolean isSingular(String name) {
+        return getSingular(name).equals(name);
+    }
+
     /**
      * Add a property to the filtering API.
      * @param properties One or more properties with the following syntax:
@@ -151,13 +175,13 @@ public class ApiMediaFilter {
      *                   will limit the amount of items returned of this List or Set to the given number if larger
      *                   than the original number of items in the wrapped List or Set.
      */
-    private void add(String... properties) {
+    private void add(String[] properties, Consumer<String> unrecognized) {
         for(String property : properties) {
             property = property.toLowerCase().trim();
             String name = aliasToProperty.getOrDefault(property, property);
             Integer max = null;
 
-            String[] split = name.split(":", 3);
+            final String[] split = name.split(":", 3);
             String[] extra = new String[] {null};
             boolean fromBack = false;
             name = split[0];
@@ -180,17 +204,17 @@ public class ApiMediaFilter {
             }
 
             if (name.toLowerCase().endsWith("of")) {
-                // This makes no sense at all, but for backwardscompatibility
+                // This makes no sense at all, but for backwards compatibility
                 // effect
                 name = name + "s";
             }
-            String singular = getSingular(name);
+
             if (max == null) {
                 /* If given property name is singular, use maximum allowed = 1, otherwise maximum allowed unlimited */
-                max = name.equals(singular) ? 1 : Integer.MAX_VALUE;
+                max = isSingular(name) ? 1 : Integer.MAX_VALUE;
             }
-            if (hasProperty(singular) || ! throwOnUnknownProperties) {
-
+            final String singular = getSingular(name);
+            if (hasProperty(singular)) {
                 for (String e : extra) {
                     FilterProperties newFilter = new FilterPropertiesImpl(max, e, fromBack);
                     FilterProperties existing = this.properties.get(singular);
@@ -208,7 +232,8 @@ public class ApiMediaFilter {
                     }
                 }
             } else {
-                throw new IllegalArgumentException("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());
+                unrecognized.accept(name);
+                log.debug("The property " + name + (name.equals(singular) ? "" : (" ( or " + singular + ")")) + " is not known. Known are : " + getKnownPropertiesForExposure());
             }
         }
     }
@@ -265,15 +290,23 @@ public class ApiMediaFilter {
         return knownPropertiesForExposure;
     }
 
-    private Stream<String> map(String fieldName){
-        switch(fieldName) {
+    private Stream<String> mapProperty(String property){
+        switch(property) {
             case "predictions":
-                return Stream.of("predictionsForXml", "predictions");
+                return Stream.of(
+                    "predictionsForXml",
+                    "predictions"
+                );
+            case "prediction":
+                return Stream.of(
+                    "predictionsForXml",
+                    "prediction"
+                );
         }
-        return Stream.of(fieldName);
+        return Stream.of(property);
     }
 
-    private void filter(String properties) {
+    private void filter(String properties, Consumer<String> unrecognized) {
         this.properties.clear();
 
         if ("all".equals(properties)) {
@@ -292,11 +325,14 @@ public class ApiMediaFilter {
         if ("none".equals(properties)) {
             properties = "";
         }
-        add(Arrays
+        add(
+            Arrays
             .stream(properties.split(","))
             .filter(StringUtils::isNotBlank)
-            .flatMap(this::map)
-            .toArray(String[]::new));
+            .flatMap(this::mapProperty)
+            .toArray(String[]::new),
+            unrecognized
+        );
 
         if (!this.properties.containsKey("title")) {
             this.properties.put("title", FilterProperties.one(TextualType.MAIN));
@@ -310,7 +346,6 @@ public class ApiMediaFilter {
         String singular = getSingular(property);
         if (! filtering) {
             return FilterProperties.ALL;
-
         } else {
             if (retainAll) {
                 // toch maar een beetje impliciet filteren voor scheduleevents want dat zijn er nogal veel soms!

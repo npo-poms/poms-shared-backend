@@ -50,7 +50,6 @@ class FilterPropertiesImpl implements FilterProperties {
 
     final String option;
 
-
     final boolean fromBack;
 
     FilterPropertiesImpl(Integer max, String extra, boolean fromBack) {
