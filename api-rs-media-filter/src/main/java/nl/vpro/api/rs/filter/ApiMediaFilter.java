@@ -62,10 +62,10 @@ public class ApiMediaFilter {
 
 
         singularExceptions.put("countries", "country");
-        singularExceptions.put("predictionsForXml", "predictionForXml");
+        singularExceptions.put("predictionsforxml", "predictionForXml");
 
         singularToPlural.put("email", "emails");
-        singularToPlural.put("predictionForXml", "predictionsForXml");
+        singularToPlural.put("predictionforxml", "predictionsForXml");
 
     }
 
@@ -106,7 +106,6 @@ public class ApiMediaFilter {
         } finally {
             ApiMediaFilter.removeFilter();
         }
-
     }
 
 
@@ -219,14 +218,16 @@ public class ApiMediaFilter {
                     FilterProperties newFilter = new FilterPropertiesImpl(max, e, fromBack);
                     FilterProperties existing = this.properties.get(singular);
                     if (existing != null) {
-                        Combined combined;
-                        if (existing instanceof Combined) {
-                            combined = (Combined) existing;
-                        } else {
-                            combined = new Combined(existing);
-                            this.properties.put(singular, combined);
+                        if (! existing.equals(newFilter)) {
+                            Combined combined;
+                            if (existing instanceof Combined) {
+                                combined = (Combined) existing;
+                            } else {
+                                combined = new Combined(existing);
+                                this.properties.put(singular, combined);
+                            }
+                            combined.put(newFilter);
                         }
-                        combined.map.put(newFilter.getOption(), newFilter);
                     } else {
                         this.properties.put(singular, newFilter);
                     }
@@ -243,7 +244,7 @@ public class ApiMediaFilter {
 
     private boolean hasProperty(String singular) {
         if (MediaPropertiesFilters.isInstrumented()) {
-            return KNOWN_PROPERTIES.contains(singular.toLowerCase()) || KNOWN_PROPERTIES.contains(getPlural(singular).toLowerCase());
+            return KNOWN_PROPERTIES.contains(singular.toLowerCase()) || KNOWN_PROPERTIES.contains(getPlural(singular.toLowerCase()).toLowerCase());
         } else {
             log.warn("Not instrumented");
             return true;
@@ -299,7 +300,7 @@ public class ApiMediaFilter {
                 );
             case "prediction":
                 return Stream.of(
-                    "predictionsForXml",
+                    "predictionForXml",
                     "prediction"
                 );
         }

@@ -1,9 +1,9 @@
 package nl.vpro.api.rs.filter;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import lombok.*;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.*;
 
 /**
  * @author Michiel Meeuwissen
@@ -13,6 +13,9 @@ public interface FilterProperties {
 
     Integer get(String option);
 
+    /**
+     * Whether lists must be evaluated 'from the back'. i.e. if e.g. max = 1, the _last_ one of the list will be returned.
+     */
     boolean fromBack();
 
     default Integer get() {
@@ -45,16 +48,22 @@ public interface FilterProperties {
 }
 
 
+@Slf4j
+@ToString
+@EqualsAndHashCode
 class FilterPropertiesImpl implements FilterProperties {
+
+    @Getter
     final Integer max;
 
+    @Getter
     final String option;
 
     final boolean fromBack;
 
-    FilterPropertiesImpl(Integer max, String extra, boolean fromBack) {
+    FilterPropertiesImpl(Integer max, String option, boolean fromBack) {
         this.max = max;
-        this.option = extra;
+        this.option = option;
         this.fromBack = fromBack;
     }
 
@@ -63,20 +72,16 @@ class FilterPropertiesImpl implements FilterProperties {
         return this.option == null || Objects.equals(this.option, option) ? max : 0;
     }
 
-    @Override
-    public String getOption() {
-        return option;
-    }
-
-    @Override
     public boolean fromBack() {
         return fromBack;
     }
+
+
 }
 
-
+@Slf4j
 class Combined implements FilterProperties {
-    final Map<String, FilterProperties> map = new HashMap<>();
+    private final Map<String, FilterProperties> map = new HashMap<>();
 
     public Combined(FilterProperties first) {
         map.put(first.getOption(), first);
@@ -100,5 +105,11 @@ class Combined implements FilterProperties {
         return values.stream().map(FilterProperties::getOption).toArray(String[]::new);
     }
 
+    public void put(FilterProperties newFilter) {
+        FilterProperties prev = map.put(newFilter.getOption(), newFilter);
+        if (prev != null) {
+            log.warn("Replaced {} -> {}", prev, newFilter);
+        }
+    }
 }
 

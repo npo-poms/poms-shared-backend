@@ -333,20 +333,19 @@ public class ApiMediaFilterTest {
      */
     @ParameterizedTest
     @MethodSource("suppliers")
-    @Disabled("TODO")
     public void filterPredictionsTitleAndPredictions(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
         ApiMediaFilter.set("titles,predictions");
+
         Program p = program.get();
         assertJsonWithPredictions(p);
     }
 
-       /**
+    /**
      * See <a href="https://jira.vpro.nl/browse/NPA-602">JIRA</a>
      */
     @ParameterizedTest
     @MethodSource("suppliers")
-    @Disabled("TODO")
     public void filterPredictionsTitleAndPredictionsWorkaround(Supplier<Program> program) {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
         ApiMediaFilter.set("predictionsForXml,predictions,title");
