@@ -589,17 +589,19 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
         final Instant changesUpto = Instant.now().minus(getCommitDelay());
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery(Common.ES_PUBLISH_DATE).to(changesUpto.toEpochMilli());
-        if (!hasProfileUpdate(currentProfile, previousProfile) && since != null) {
-            if (since.isBefore(changesUpto)) {
-                long epoch = since.toEpochMilli();
-                restriction = restriction.from(epoch).includeLower(true);
+        if (since != null) {
+            if ((!hasProfileUpdate(currentProfile, previousProfile))) {
+                if (since.isBefore(changesUpto)) {
+                    long epoch = since.toEpochMilli();
+                    restriction = restriction.from(epoch).includeLower(true);
+                } else {
+                    log.debug("Since is after committed changes window (before {}). Returning empty iterator.", changesUpto);
+                    // This will result exactly nothing, so we return empty iterator immediately:
+                    return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
+                }
             } else {
-                log.debug("Since is after committed changes window (before {}). Returning empty iterator.", changesUpto);
-                // This will result exactly nothing, so we return empty iterator immediately:
-                return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
+                log.warn(ExtraHeaders.warn("A profile update occurred between {} and {}", currentProfile, previousProfile));
             }
-        } else {
-            log.warn(ExtraHeaders.warn("A profile update occurred between {} and {}", currentProfile, previousProfile));
         }
         final ExtendedElasticSearchIterator<MediaChange> i = ExtendedElasticSearchIterator.<MediaChange>extendedBuilder()
             .client(factory.highLevelClient())
@@ -865,7 +867,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     private boolean hasProfileUpdate(
         @Nullable ProfileDefinition<MediaObject> current,
         @Nullable ProfileDefinition<MediaObject> previous) {
-        return !(current == null ? previous == null : current.equals(previous));
+        if (current == null && previous == null) {
+            return false;
+        }
+        return ! (Objects.equals(current, previous));
     }
 
 }
