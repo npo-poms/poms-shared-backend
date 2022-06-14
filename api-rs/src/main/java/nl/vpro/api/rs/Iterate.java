@@ -134,9 +134,7 @@ public class Iterate {
             .type(MediaType.APPLICATION_JSON_TYPE.withCharset("UTF-8"))
             .entity(streamingOutput);
 
-        ExtraHeaders.get().forEach((p) -> builder.header(p.getKey(), p.getValue()));
-        ExtraHeaders.markUsed();
-        ExtraHeaders.remove();
+        ExtraHeaders.consume(builder::header);
 
         for (Consumer<Response.ResponseBuilder> c : responseBuilderConsumer) {
             c.accept(builder);
