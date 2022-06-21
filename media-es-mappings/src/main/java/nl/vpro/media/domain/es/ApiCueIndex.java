@@ -7,6 +7,7 @@ import java.util.*;
 
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 
+import static java.util.Collections.singletonList;
 import static nl.vpro.i18n.Locales.score;
 
 /**
@@ -32,7 +33,7 @@ public abstract class ApiCueIndex extends ElasticSearchIndex {
         super(String.format(NAME, locale.toLanguageTag()),
             "/es7/setting/subtitles_" + locale.toLanguageTag() + ".json",
             "/es7/mapping/cue.json",
-            Arrays.asList(String.format(NAME, locale.toLanguageTag()) + "-publish"),
+            singletonList(String.format(NAME, locale.toLanguageTag()) + "-publish"),
             null
         );
         this.locale = locale;
