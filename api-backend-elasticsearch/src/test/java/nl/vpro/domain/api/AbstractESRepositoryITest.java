@@ -132,7 +132,8 @@ public abstract class AbstractESRepositoryITest {
     protected static void clearIndices() {
         refresh();
         for (IndexHelper indexHelper : indexHelpers.values()) {
-            indexHelper.clearIndex();
+            long cleared = indexHelper.clearIndex();
+            log.info("Cleared {} objects from {}", cleared, indexHelper);
         }
         refresh();
         for (IndexHelper indexHelper : indexHelpers.values()) {
