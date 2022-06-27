@@ -138,7 +138,7 @@ public abstract class AbstractESRepositoryITest {
         for (IndexHelper indexHelper : indexHelpers.values()) {
             long count = indexHelper.count();
             if (count > 0) {
-                throw new IllegalStateException(String.format("The index for %s already contained %d objects", indexHelper, count));
+                throw new IllegalStateException(String.format("The index for %s still contains %d objects", indexHelper, count));
             }
         }
 
