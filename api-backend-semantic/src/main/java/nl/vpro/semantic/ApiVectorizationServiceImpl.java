@@ -7,10 +7,12 @@ import lombok.SneakyThrows;
 import java.util.concurrent.Future;
 
 import org.apache.hc.client5.http.async.methods.*;
+import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.core5.http.message.BasicHeader;
 import org.apache.hc.core5.reactor.IOReactorConfig;
+import org.apache.hc.core5.util.TimeValue;
 import org.apache.hc.core5.util.Timeout;
 
 import nl.vpro.jackson2.Jackson2Mapper;
@@ -23,14 +25,14 @@ import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
  */
 public class ApiVectorizationServiceImpl implements VectorizationService {
 
-
     private final IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
-                .setSoTimeout(Timeout.ofSeconds(5))
-                .build();
+        .setSoTimeout(Timeout.ofSeconds(5))
+        .build();
 
     private final CloseableHttpAsyncClient client = HttpAsyncClients.custom()
-                .setIOReactorConfig(ioReactorConfig)
-                .build();
+        .setIOReactorConfig(ioReactorConfig)
+        .setRetryStrategy(new DefaultHttpRequestRetryStrategy(5, TimeValue.ofSeconds(5)))
+        .build();
 
     private final String apiKey;
 
@@ -72,12 +74,15 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
             .setBody(Jackson2Mapper.getInstance().writeValueAsBytes(body), APPLICATION_JSON)
             .build();
 
-        Future<SimpleHttpResponse> execute = client.execute(
+        final Future<SimpleHttpResponse> execute = client.execute(
             SimpleRequestProducer.create(request),
             SimpleResponseConsumer.create(), null);
 
         SimpleBody responseBody = execute.get().getBody();
-        return Jackson2Mapper.getLenientInstance().readerFor(Response.class).readValue(responseBody.getBodyBytes());
+        return Jackson2Mapper
+            .getLenientInstance()
+            .readerFor(Response.class)
+            .readValue(responseBody.getBodyBytes());
     }
 
     @Data
