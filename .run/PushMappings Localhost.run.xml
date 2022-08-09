@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PushMappings Localhost" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="nl.vpro.npopublisher.pushesmappings.PushMappings" />
+    <module name="push-es-mappings" />
+    <option name="PROGRAM_PARAMETERS" value="--host=localhost:9200 --cluster=elasticsearch --experimental --only .*" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="nl.vpro.npopublisher.pushesmappings.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
