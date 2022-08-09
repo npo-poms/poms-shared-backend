@@ -4,6 +4,13 @@ stages:
   - validate
   - release
 
+variables:
+  ES_IMAGE_NAME: poms-plus/es-builder
+  REGISTRY: openshift-image-registry.apps.cluster.chp4.io
+  INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
+
+
+
 .build:
   services:
     - !reference [.opensearch, services]
@@ -29,6 +36,56 @@ trigger_pages_publish:
   trigger:
     project: npo/pages-publish
     branch: master
+
+
+.push: &push
+  stage: release
+  image: docker.vpro.nl/openshift-helm:1.0.0
+  needs: [build]
+  script:
+    - oc login --server=$OPENSHIFT_SERVER --token=$OPENSHIFT_TOKEN -n poms-util-$OS_ENV
+    - oc -n poms-util-$OS_ENV delete pod es-builder || echo 'No previous es-builder instance found'
+    - export PASSWORD="$(oc -n poms-stack-$OS_ENV get secret elasticsearch -o jsonpath="{['data']['password']}" | base64 --decode)"
+    - echo $PASSWORD | sha256sum
+    - |-
+      oc run es-builder \
+            --image=$INTERNAL_REGISTRY/$ES_IMAGE_NAME:dev \
+            --image-pull-policy='Always' \
+            --restart='Never' \
+            --env HOST="$HOST" \
+            --env USER="$USER" \
+            --env PASSWORD="$PASSWORD" \
+            --env CLUSTER="$CLUSTER" \
+            --env EXPERIMENTAL="$EXPERIMENTAL" \
+            -n poms-util-$OS_ENV
+
+
+push-mappings-test:
+  <<: *push
+  variables:
+    OS_ENV: test
+    HOST: https://vpc-poms-plus-elasticsearch-test-tu2husqhnj43tmsqnj2fvpi2hy.eu-central-1.es.amazonaws.com:443
+    USER: elasticsearch
+    CLUSTER: 755036500103:poms-plus-elasticsearch-test
+    EXPERIMENTAL: 'true'
+
+push-mappings-acc:
+  <<: *push
+  variables:
+    OS_ENV: acc
+    HOST: https://vpc-poms-plus-elasticsearch-acc-bk5ui3ubahkwhmygv7h7nqbti4.eu-central-1.es.amazonaws.com:443
+    USER: elasticsearch
+    CLUSTER: 755036500103:poms-plus-elasticsearch-acc
+    EXPERIMENTAL: 'true'
+
+publish-mappings-prod:
+  <<: *push
+  variables:
+    OS_ENV: prod
+    HOST: https://vpc-poms-plus-elasticsearch-prod-syxdj6ehquy6ruls6f6zdccxyq.eu-central-1.es.amazonaws.com:443
+    USER: elasticsearch
+    CLUSTER: 755036500103:poms-plus-elasticsearch-prod
+
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
