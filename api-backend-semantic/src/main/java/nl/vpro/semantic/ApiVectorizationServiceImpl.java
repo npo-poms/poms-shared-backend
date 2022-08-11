@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import lombok.Data;
 import lombok.SneakyThrows;
 
+import java.time.Duration;
 import java.util.concurrent.Future;
 
 import org.apache.hc.client5.http.async.methods.*;
@@ -25,14 +26,7 @@ import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
  */
 public class ApiVectorizationServiceImpl implements VectorizationService {
 
-    private final IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
-        .setSoTimeout(Timeout.ofSeconds(5))
-        .build();
-
-    private final CloseableHttpAsyncClient client = HttpAsyncClients.custom()
-        .setIOReactorConfig(ioReactorConfig)
-        .setRetryStrategy(new DefaultHttpRequestRetryStrategy(5, TimeValue.ofSeconds(5)))
-        .build();
+    private final CloseableHttpAsyncClient client;
 
     private final String apiKey;
 
@@ -41,12 +35,25 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
     private final MeterRegistry meterRegistry;
 
 
+
     public ApiVectorizationServiceImpl(
-        String endpoint, String apiKey,
-        MeterRegistry meterRegistry) {
+        String endpoint,
+        String apiKey,
+        MeterRegistry meterRegistry,
+        Duration timeout) {
         this.apiKey = apiKey;
         this.endPoint = endpoint == null? "https://www.api.geniusvoicedemo.nl/semanticvectorizer" : endpoint;
         this.meterRegistry = meterRegistry;
+        final IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
+            .setSoTimeout(Timeout.ofMilliseconds(timeout.toMillis()))
+            .build();
+
+        client = HttpAsyncClients.custom()
+            .setIOReactorConfig(ioReactorConfig)
+            .setRetryStrategy(
+                new DefaultHttpRequestRetryStrategy(5, TimeValue.ofSeconds(5))
+        )
+            .build();
         client.start();
     }
 
