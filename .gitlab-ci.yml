@@ -9,8 +9,6 @@ variables:
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
   INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
 
-
-
 .build:
   services:
     - !reference [.opensearch, services]
@@ -37,11 +35,26 @@ trigger_pages_publish:
     project: npo/pages-publish
     branch: master
 
+build_es_image:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [ "" ]
+  stage: build
+  needs: [build_and_publish]
+  dependencies: [build_and_publish]
+  tags:
+    - docker
+  script:
+    - !reference [.helm_functions, script]
+    - setup_kaniko push-es-mappings
+    - package_applications
+  rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successfull then)
 
-.push: &push
+
+.push_es: &push_es
   stage: release
   image: docker.vpro.nl/openshift-helm:1.0.0
-  needs: [build]
+  needs: [build_es_image]
   script:
     - oc login --server=$OPENSHIFT_SERVER --token=$OPENSHIFT_TOKEN -n poms-util-$OS_ENV
     - oc -n poms-util-$OS_ENV delete pod es-builder || echo 'No previous es-builder instance found'
@@ -61,7 +74,7 @@ trigger_pages_publish:
 
 
 push-mappings-test:
-  <<: *push
+  <<: *push_es
   variables:
     OS_ENV: test
     HOST: https://vpc-poms-plus-elasticsearch-test-tu2husqhnj43tmsqnj2fvpi2hy.eu-central-1.es.amazonaws.com:443
@@ -70,7 +83,7 @@ push-mappings-test:
     EXPERIMENTAL: 'true'
 
 push-mappings-acc:
-  <<: *push
+  <<: *push_es
   variables:
     OS_ENV: acc
     HOST: https://vpc-poms-plus-elasticsearch-acc-bk5ui3ubahkwhmygv7h7nqbti4.eu-central-1.es.amazonaws.com:443
@@ -79,7 +92,7 @@ push-mappings-acc:
     EXPERIMENTAL: 'true'
 
 publish-mappings-prod:
-  <<: *push
+  <<: *push_es
   variables:
     OS_ENV: prod
     HOST: https://vpc-poms-plus-elasticsearch-prod-syxdj6ehquy6ruls6f6zdccxyq.eu-central-1.es.amazonaws.com:443
@@ -89,8 +102,12 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.12'
+    ref: 'master'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.12'
+    ref: 'master'
     file: 'util/elasticsearch_service.yml'
+  - project: 'shared/gitlab/gitlab-templates'
+    ref: 'master'
+    file: 'util/kaniko.yml
+
