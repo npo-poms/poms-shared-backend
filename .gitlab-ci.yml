@@ -109,5 +109,5 @@ include:
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
     ref: 'master'
-    file: 'util/kaniko.yml
+    file: 'util/kaniko.yml'
 
