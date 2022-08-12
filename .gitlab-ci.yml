@@ -39,6 +39,8 @@ build_es_image:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
+  variables:
+    IMAGE_NAME: $ES_IMAGE_NAME
   stage: build
   needs: [build_and_publish]
   dependencies: [build_and_publish]
