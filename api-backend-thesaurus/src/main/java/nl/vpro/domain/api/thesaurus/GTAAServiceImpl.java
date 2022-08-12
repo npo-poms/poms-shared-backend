@@ -30,10 +30,9 @@ public class GTAAServiceImpl implements GTAAService {
 
     private final GTAAKeysRepository keysRepo;
 
-    private Duration maxAge = Duration.ofHours(12);
+    private final Duration maxAge = Duration.ofHours(12);
 
-
-    private SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
+    private final SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
 
         @Override
         public byte[] resolveSigningKeyBytes(@NonNull JwsHeader header, @NonNull Claims claims) {

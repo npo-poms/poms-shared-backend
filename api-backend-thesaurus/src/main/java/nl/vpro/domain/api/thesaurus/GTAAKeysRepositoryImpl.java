@@ -15,7 +15,7 @@ import org.springframework.core.io.Resource;
 
 
 /**
- * The implementation of {@link GTAAKeysRepositoryImpl} backed by a (number of) property file(s).
+ * The implementation of {@link GTAAKeysRepository} backed by a (number of) property file(s).
  */
 @Slf4j
 @NoArgsConstructor

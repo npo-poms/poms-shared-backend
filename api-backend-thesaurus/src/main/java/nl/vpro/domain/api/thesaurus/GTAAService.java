@@ -6,14 +6,14 @@ import nl.vpro.domain.gtaa.*;
 
 
 /**
- * The Service that facilitates sumbitting new GTAA concepts to the GTAA API from Beeld en Geluid
+ * The Service that facilitates submitting new GTAA concepts to the GTAA API from Beeld en Geluid
  */
 public interface GTAAService {
 
     /**
      * Submits a new person to the GTAA.
-     *
-     * This method is largely superseded by {@link #submitGTAAConcept(GTAANewConcept, String)}. A person is alo a gtaa concept.
+     * <p>
+     * This method is largely superseded by {@link #submitGTAAConcept(GTAANewConcept, String)}. A person is also a GTAA concept.
      *
      * @param newPerson The new person
      * @param jwt The JWT string for authentication. It will also be decrypted to get information about the 'creator'.
