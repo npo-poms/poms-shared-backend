@@ -37,17 +37,16 @@
        <artifactId>pages-rs-services</artifactId>
      </dependency>
      <dependency>
-       <groupId>org.slf4j</groupId>
-       <artifactId>slf4j-log4j12</artifactId>
-       <scope>test</scope>
-     </dependency>
-     <dependency>
        <groupId>nl.vpro.shared</groupId>
        <artifactId>vpro-shared-configuration</artifactId>
      </dependency>
      <dependency>
        <groupId>org.springframework</groupId>
        <artifactId>spring-context</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>jakarta.annotation</groupId>
+       <artifactId>jakarta.annotation-api</artifactId>
      </dependency>
    </dependencies>
 </project>
