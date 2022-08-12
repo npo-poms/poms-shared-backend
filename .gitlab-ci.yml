@@ -41,7 +41,6 @@ build_es_image:
     entrypoint: [ "" ]
   variables:
     IMAGE_NAME: $ES_IMAGE_NAME
-    DOCKER_BUILD_ARGS: --build-arg version=5.35-SNAPSHOT
   stage: build
   needs: [build_and_publish]
   dependencies: [build_and_publish]
