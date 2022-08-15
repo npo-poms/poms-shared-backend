@@ -16,6 +16,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.*;
 
 import org.apache.commons.io.IOUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -94,14 +95,13 @@ public class Iterate {
 
         final StreamingOutput streamingOutput = output -> {
             boolean ready = false;
-            try {
+            try (InputStream buffered = new BufferedInputStream(pipedInputStream, IOUtils.DEFAULT_BUFFER_SIZE)) {
                 // used BufferedInputStream will cause that the buffer used in copyLarge needs not be entirely every time (see java.io.BufferedInputStream.read(byte[], int, int) (may fix
 
-                InputStream buffered = new BufferedInputStream(pipedInputStream, IOUtils.DEFAULT_BUFFER_SIZE);
                 byte[] buffer = new byte[IOUtils.DEFAULT_BUFFER_SIZE];
                 long copied = 0;
                 int n;
-                // doing it ourself, so we can flush also output
+                // doing it ourselves, so we can flush also output
                 while (IOUtils.EOF != (n = buffered.read(buffer))) {
                     output.write(buffer, 0, n);
                     output.flush();
@@ -161,11 +161,16 @@ public class Iterate {
         };
     }
 
-    public static <T> void iterate(Iterator<T> i, JsonGenerator jg, String fieldName, String forString) throws IOException {
+    public static <T> void iterate(
+        @NonNull Iterator<T> i,
+        @NonNull JsonGenerator jg,
+        @NonNull String fieldName,
+        @NonNull String forString) throws IOException {
+
         jg.writeStartObject();
         jg.writeArrayFieldStart(fieldName);
 
-        Instant start = Instant.now();
+        final Instant start = Instant.now();
         long count = 0;
         long errors = 0;
 
