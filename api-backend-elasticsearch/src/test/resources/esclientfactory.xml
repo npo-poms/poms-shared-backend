@@ -10,9 +10,8 @@
     <property name="clusterName" value="#{T(java.lang.System).getProperty('integ.cluster.name', 'elasticsearch')}" />
   </bean>
 
-
   <bean id="clientFactory" class="nl.vpro.elasticsearch.highlevel.HighLevelClientFactory">
     <constructor-arg name="lowLevelFactory" ref="lowlevelClientFactory" />
-
   </bean>
+
 </beans>
