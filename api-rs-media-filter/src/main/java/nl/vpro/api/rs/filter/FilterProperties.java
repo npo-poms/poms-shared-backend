@@ -1,7 +1,7 @@
 package nl.vpro.api.rs.filter;
 
 import lombok.*;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 
@@ -48,7 +48,7 @@ public interface FilterProperties {
 }
 
 
-@Slf4j
+@Log4j2
 @ToString
 @EqualsAndHashCode
 class FilterPropertiesImpl implements FilterProperties {
@@ -79,7 +79,7 @@ class FilterPropertiesImpl implements FilterProperties {
 
 }
 
-@Slf4j
+@Log4j2
 class Combined implements FilterProperties {
     private final Map<String, FilterProperties> map = new HashMap<>();
 

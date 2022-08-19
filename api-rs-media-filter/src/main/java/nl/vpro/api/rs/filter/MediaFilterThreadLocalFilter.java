@@ -4,7 +4,7 @@
  */
 package nl.vpro.api.rs.filter;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import nl.vpro.mdc.MDCConstants;
 /**
  * @author rico
  */
-@Slf4j
+@Log4j2
 public class MediaFilterThreadLocalFilter implements Filter {
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

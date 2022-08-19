@@ -7,7 +7,7 @@ package nl.vpro.api.rs.filter;
 import javassist.*;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 
@@ -15,7 +15,7 @@ import java.util.*;
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
-@Slf4j
+@Log4j2
 public class MediaPropertiesFilters {
 
     private static final Set<String> ignoreFields = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(

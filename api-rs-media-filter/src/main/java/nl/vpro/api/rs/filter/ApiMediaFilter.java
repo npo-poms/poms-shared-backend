@@ -4,7 +4,7 @@
  */
 package nl.vpro.api.rs.filter;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -27,7 +27,7 @@ import nl.vpro.domain.media.support.TextualType;
  * @since 3.0
  */
 
-@Slf4j
+@Log4j2
 public class ApiMediaFilter {
 
     private final Map<String, FilterProperties> properties = new HashMap<>();
