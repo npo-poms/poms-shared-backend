@@ -4,7 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.time.Instant;
 import java.util.List;
@@ -39,7 +39,7 @@ import static nl.vpro.domain.Roles.HAS_API_ROLE;
  * @since 2.0
  */
 @Service
-@Slf4j
+@Log4j2
 public class MediaServiceImpl implements MediaService {
 
     private final ProfileService profileService;
