@@ -85,7 +85,7 @@ public class Iterate {
             try {
                 streamer.accept(iterator, jg);
             } catch (Exception e) {
-                log.error(e.getMessage(), e);
+                log.error(e.getClass().getName() + ":" + e.getMessage(), e);
             } finally {
                 closeResources.run();
             }
