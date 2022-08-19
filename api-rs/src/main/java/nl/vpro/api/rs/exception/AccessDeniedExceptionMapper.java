@@ -4,7 +4,7 @@
  */
 package nl.vpro.api.rs.exception;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -21,7 +21,7 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
  * @since 4.7
  */
 @Provider
-@Slf4j
+@Log4j2
 public class AccessDeniedExceptionMapper implements ExceptionMapper<AccessDeniedException> {
 
     @Override

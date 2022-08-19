@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.validation;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import nl.vpro.domain.api.media.ScheduleForm;
  * @since 4.2
  */
 @Provider
-@Slf4j
+@Log4j2
 public class ScheduleFormValidatingReader extends AbstractValidatingReader<ScheduleForm> {
 
 

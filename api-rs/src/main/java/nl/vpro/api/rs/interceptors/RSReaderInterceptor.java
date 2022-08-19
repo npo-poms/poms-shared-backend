@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.interceptors;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import javax.ws.rs.ext.ReaderInterceptorContext;
  * @since 4.1
  */
 @Provider
-@Slf4j
+@Log4j2
 public class RSReaderInterceptor implements ReaderInterceptor {
 
     public static final ThreadLocal<Boolean> READEXCEPTION = ThreadLocal.withInitial(() -> false);

@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.validation;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import nl.vpro.api.util.ApiMappings;
  * @since 3.4
  */
 @Consumes("application/xml")
-@Slf4j
+@Log4j2
 public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T> {
 
     private final Class<T> classToRead;

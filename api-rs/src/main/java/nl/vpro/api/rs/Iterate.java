@@ -1,6 +1,6 @@
 package nl.vpro.api.rs;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
 import java.time.Duration;
@@ -31,7 +31,7 @@ import nl.vpro.util.*;
  * @author Michiel Meeuwissen
  * @since 5.4
  */
-@Slf4j
+@Log4j2
 public class Iterate {
 
 

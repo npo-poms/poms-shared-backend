@@ -1,6 +1,6 @@
 package nl.vpro.api.cors;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
 import java.util.HashMap;
@@ -13,7 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author rico jansen
  */
-@Slf4j
+@Log4j2
 public class CorsPolicyImpl implements CorsPolicy {
     private final String policyFile;
     private final boolean enabled;
