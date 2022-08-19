@@ -654,6 +654,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                             log.debug("Skipping {} because of mid parameter", skipped);
                         }
                     }
+                } else {
+                    peeking.next();
+                    log.debug("Skipping because peek is nul");
                 }
             }
         }
