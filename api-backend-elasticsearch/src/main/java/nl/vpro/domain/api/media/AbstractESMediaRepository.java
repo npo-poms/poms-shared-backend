@@ -9,7 +9,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.validation.constraints.Null;
+
+import nl.vpro.util.CloseableIterator;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -76,7 +79,11 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     public void init() {
         helper.setIndexName(getIndexName());
         refsHelper.setIndexName(getRefsIndexName());
+    }
 
+    @PreDestroy
+    public void close() {
+        CloseableIterator.closeQuietly(helper, refsHelper);
     }
 
     public String getRefsIndexName() {
