@@ -511,6 +511,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .client(factory.highLevelClient())
                 .adapt((sh) -> sh.get(Constants.Fields.SOURCE).get("childRef").textValue()) // todo
                 .routing(media.getMid())
+                .warnSortNotOnDoc(warnSortNotOnDoc) // we know!
                 .build()) {
                 SearchSourceBuilder builder = iterator.prepareSearchSource(getRefsIndexName());
                 listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
@@ -536,6 +537,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
     }
 
+    /**
+     * this sorts,
+     */
     protected SearchSourceBuilder listMembersOrEpisodesBuildRequest(SearchSourceBuilder builder, StandaloneMemberRef.ObjectType objectType, MediaObject media, Order order) {
 
         BoolQueryBuilder must = QueryBuilders.boolQuery();
@@ -609,7 +613,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .client(factory.highLevelClient())
             .adapt(this::of)
             .requestVersion(true)
-            .warnSortNotOnDoc(false)
+            .warnSortNotOnDoc(warnSortNotOnDoc)
             .build();
 
         final SearchSourceBuilder searchRequestBuilder = i.prepareSearchSource(getIndexName());
@@ -780,14 +784,15 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         final long offset,
         final Integer max,
         final FilteringIterator.KeepAlive keepAlive) {
-        ExtendedElasticSearchIterator<MediaObject> i = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
+        final ExtendedElasticSearchIterator<MediaObject> i = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
+            .warnSortNotOnDoc(warnSortNotOnDoc)
             .build();
 
 
         SearchSourceBuilder builder = i.prepareSearchSource(getIndexName());
-        ESMediaSortHandler.sort(form, null, builder::sort);
+        boolean sort = ESMediaSortHandler.sort(form, null, builder::sort);
         builder
             .size(iterateBatchSize)
             .query(ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null))

@@ -265,9 +265,10 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         Integer max = form.getPager().getMax();
         Optional<Long> total = Optional.empty();
         try (ExtendedElasticSearchIterator<MediaObject> searchIterator = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
-                     .client(factory.highLevelClient())
-                     .adapt(this::getMediaObject)
-                     .build()) {
+            .client(factory.highLevelClient())
+            .adapt(this::getMediaObject)
+            .warnSortNotOnDoc(warnSortNotOnDoc)
+            .build()) {
             SearchSourceBuilder requestBuilder = searchIterator.prepareSearchSource(getIndexName());
             requestBuilder.query(toExecute);
             requestBuilder.sort("scheduleEvents.start", SortOrder.DESC);

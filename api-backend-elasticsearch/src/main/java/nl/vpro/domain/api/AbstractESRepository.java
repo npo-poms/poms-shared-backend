@@ -74,6 +74,12 @@ public abstract class AbstractESRepository<T> {
     @Setter
     protected Duration commitDelay = Duration.ofSeconds(30);
 
+    @Getter
+    @Setter
+    @Value("${elasticSearch.warnSortNotOnDoc:false}")
+    protected boolean warnSortNotOnDoc;
+
+
 
     protected AbstractESRepository(
         @NotNull HighLevelClientFactory factory) {
@@ -332,7 +338,7 @@ public abstract class AbstractESRepository<T> {
 
     protected void buildHighlights(@NonNull SearchSourceBuilder searchBuilder, @Nullable Form form, List<SearchFieldDefinition> searchFields) {
         if (form != null && form.isHighlight()) {
-            HighlightBuilder highlightBuilder = new HighlightBuilder();
+            final HighlightBuilder highlightBuilder = new HighlightBuilder();
             highlightBuilder.tagsSchema("styled");
 
             for (SearchFieldDefinition searchFieldDefinition : searchFields) {

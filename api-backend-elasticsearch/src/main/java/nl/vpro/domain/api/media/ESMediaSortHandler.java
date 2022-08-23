@@ -136,11 +136,12 @@ public class ESMediaSortHandler extends ESFacetsHandler {
         FIELDS.put(MediaSortField.lastModified, new DefaultSortHandler());
     }
 
-    public static void sort(SearchSourceBuilder searchBuilder, MediaForm form, MediaObject mediaObject) {
-        sort(form, mediaObject, searchBuilder::sort);
+    public static boolean  sort(SearchSourceBuilder searchBuilder, MediaForm form, MediaObject mediaObject) {
+        return sort(form, mediaObject, searchBuilder::sort);
     }
 
-    public static void sort(MediaForm form, MediaObject mediaObject, Consumer<SortBuilder> consumer) {
+    public static boolean sort(MediaForm form, MediaObject mediaObject, Consumer<SortBuilder<?>> consumer) {
+        boolean sort = false;
         if (form != null && form.isSorted()) {
             for (MediaSortOrder entry : form.getSortFields()) {
                 SortHandler field = FIELDS.get(entry.getField());
@@ -149,6 +150,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
                 }
                 FieldSortBuilder sortBuilder = field.apply(entry, mediaObject);
                 consumer.accept(sortBuilder);
+                sort = true;
             }
         }
 
@@ -159,6 +161,7 @@ public class ESMediaSortHandler extends ESFacetsHandler {
         }
         // And even more last, if everything else equals, or undecidable, sort on descending sort date (newest stuff first)
         consumer.accept(new FieldSortBuilder(MediaSortField.sortDate.name()).order(SortOrder.DESC));
+        return sort;
 
     }
 
