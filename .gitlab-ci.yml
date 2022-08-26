@@ -49,7 +49,6 @@ build_es_image:
   script:
     - setup_kaniko
     - kaniko_execute push-es-mappings
-    - package_applications
   rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
 
 
