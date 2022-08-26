@@ -24,3 +24,14 @@ target:
 .PHONY: target
 
 clean: stop-test stop-acc stop-prod
+
+docker:
+	export poms_version=6.0-SNAPSHOT
+	docker run -v "$$(pwd)":/share --entrypoint "" gcr.io/kaniko-project/executor:debug   /kaniko/executor \
+      --context /share \
+      --dockerfile /share/Dockerfile \
+      --build-arg POM_VERSION=6.0-SNAPSHOT \
+      --cache=false \
+      --destination test:test \
+      --no-push
+
