@@ -50,7 +50,7 @@ build_es_image:
     - setup_kaniko
     - kaniko_execute push-es-mappings
     - package_applications
-  rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successfull then)
+  rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
 
 
 .push_es: &push_es
