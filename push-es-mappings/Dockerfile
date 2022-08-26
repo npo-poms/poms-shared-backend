@@ -9,7 +9,7 @@ ENV PASSWORD="secret"
 ENV CLUSTER="NOTGIVEN"
 ENV EXPERIMENTAL="false"
 
-ADD target/push-es-mappings-${POM_VERSION}.jar /root/push-es-mappings.jar
+ADD target/push-es-mappings-$POM_VERSION.jar /root/push-es-mappings.jar
 
 RUN apt-get update \
   && chgrp -R 0 /root \
