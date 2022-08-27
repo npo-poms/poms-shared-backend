@@ -82,6 +82,10 @@ push-mappings-test:
     USER: elasticsearch
     CLUSTER: 755036500103:poms-plus-elasticsearch-test
     EXPERIMENTAL: 'true'
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH  # only publish main branches
+      when: on_success
+
 
 push-mappings-acc:
   <<: *push_es
@@ -91,6 +95,8 @@ push-mappings-acc:
     USER: elasticsearch
     CLUSTER: 755036500103:poms-plus-elasticsearch-acc
     EXPERIMENTAL: 'true'
+  rules:
+    - when: manual
 
 publish-mappings-prod:
   <<: *push_es
@@ -99,6 +105,8 @@ publish-mappings-prod:
     HOST: https://vpc-poms-plus-elasticsearch-prod-syxdj6ehquy6ruls6f6zdccxyq.eu-central-1.es.amazonaws.com:443
     USER: elasticsearch
     CLUSTER: 755036500103:poms-plus-elasticsearch-prod
+  rules:
+    - when: manual
 
 
 include:
