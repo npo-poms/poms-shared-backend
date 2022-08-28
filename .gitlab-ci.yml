@@ -111,12 +111,12 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'master'
+    ref: 'tags/4.19'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'master'
+    ref: 'tags/4.19'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'master'
+    ref: 'tags/4.19'
     file: 'util/kaniko.yml'
 
