@@ -3,7 +3,7 @@
 FROM openjdk:11
 MAINTAINER push-es-mappings
 
-ARG VERSION=6.1
+ARG VERSION
 
 ENV HOST=localhost
 ENV USER=elasticsearch
