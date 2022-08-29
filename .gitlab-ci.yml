@@ -35,14 +35,6 @@ trigger_pages_publish:
     project: npo/pages-publish
     branch: master
 
-get_version:
-  stage: build
-  needs: [build_and_publish]
-  script:
-    - echo PM_VERSION=$(cd push-es-mappings ; mvn help:evaluate -Dexpression=project.version -q -DforceStdout) >> job.env
-  artifacts:
-    reports:
-      dotenv: job.env  # pass  to next stages
 
 
 build_es_image:
@@ -52,12 +44,12 @@ build_es_image:
   variables:
     IMAGE_NAME: $ES_IMAGE_NAME
   stage: build
-  needs: [get_version]
+  needs: [build_and_publish]
   tags:
     - docker
   script:
     - setup_kaniko
-    - kaniko_execute push-es-mappings $PM_VERSION
+    - kaniko_execute push-es-mappings $POM_VERSION
   rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
 
 
