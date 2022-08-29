@@ -40,8 +40,9 @@ get_version:
   needs: [build_and_publish]
   script:
     - echo PM_VERSION=$(cd push-es-mappings ; mvn help:evaluate -Dexpression=project.version -q -DforceStdout) >> job.env
-  reports:
-    dotenv: job.env  # pass and some other settings job-ID to next stages
+  artifacts:
+    reports:
+      dotenv: job.env  # pass  to next stages
 
 
 build_es_image:
