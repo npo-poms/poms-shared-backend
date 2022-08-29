@@ -1,4 +1,5 @@
-# Sadly, this file is not really used curently. See https://git.vpro.nl/npo/docker/es-builder/-/blob/master/Dockerfile instead
+# This is a replacement for  https://git.vpro.nl/npo/docker/es-builder/-/blob/master/Dockerfile
+
 FROM openjdk:11
 MAINTAINER push-es-mappings
 
