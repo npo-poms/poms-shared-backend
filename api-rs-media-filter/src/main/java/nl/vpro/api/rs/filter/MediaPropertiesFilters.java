@@ -173,13 +173,13 @@ public class MediaPropertiesFilters {
                     });
                     ctClass.toClass();
                 } catch (RuntimeException wtf) {
-                    log.warn(wtf.getMessage());
+                    log.warn("{}:{}", wtf.getClass().getName(), wtf.getMessage());
                 }
             }
         } catch(CannotCompileException | NotFoundException e) {
             // schedule event stuff is optional
             // It is not used in the player api, so it does have ScheduleEventView.
-            log.warn(e.getMessage());
+            log.info("{}:{}", e.getClass().getName(), e.getMessage());
         }
     }
 
