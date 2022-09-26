@@ -255,7 +255,7 @@ public abstract class ESFacetsHandler {
                         String format = split[1];
                         DateTimeFormatter formatter = DateTimeFormatter
                             .ofPattern(format)
-                            .withLocale(/* first day of week must be monday */ Locales.DUTCH)
+                            .withLocale(/* first day of week must be monday */ Locales.NETHERLANDISH)
                             .withZone(Schedule.ZONE_ID);
                         DateFacetResultItem entry = DateFacetResultItem
                             .builder()
