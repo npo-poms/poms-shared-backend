@@ -41,7 +41,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
  */
 @Slf4j
 @Repository
-public class SimpleESRepository<T extends Identifiable<I>, I extends Serializable> extends AbstractESRepository<T> {
+public class SimpleESRepository<T extends Identifiable<I>, I extends Serializable & Comparable<I>> extends AbstractESRepository<T> {
 
     @Getter
     private final ElasticSearchIndex index;
@@ -89,8 +89,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
                 throw new RuntimeException(e);
             }
         }
-        try {
-            ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             Set<ConstraintViolation<T>> result = factory.getValidator().validate(update);
             if (result.size() > 0) {
                 throw  new ConstraintViolationException(result.toString(), result);
