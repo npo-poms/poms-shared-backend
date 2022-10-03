@@ -9,6 +9,10 @@ variables:
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
   INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
 
+# java 17
+default:
+  image: docker.vpro.nl/vpro/maven:4
+
 .build:
   services:
     - !reference [.opensearch, services]
