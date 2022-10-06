@@ -24,6 +24,8 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
 
 import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.logging.Log4j2Helper;
+import nl.vpro.logging.simple.Level;
 import nl.vpro.poms.shared.ExtraHeaders;
 import nl.vpro.util.*;
 
@@ -84,6 +86,11 @@ public class Iterate {
             SecurityContextHolder.setContext(context);
             try {
                 streamer.accept(iterator, jg);
+            } catch (IOException ioException) {
+                Log4j2Helper.log(log,
+                    ioException.getMessage().startsWith("Piped closed") ? Level.DEBUG: Level.WARN,
+                    ioException.getClass().getName() + ":" + ioException.getMessage()
+                );
             } catch (Exception e) {
                 log.error(e.getClass().getName() + ":" + e.getMessage(), e);
             } finally {
