@@ -88,7 +88,7 @@ public class MediaServiceImpl implements MediaService {
         final boolean withSequences,
         final Deletes deletes,
         final Tail tail,
-        Predicate<MediaChange> reasonFilter) throws ProfileNotFoundException {
+        final Predicate<MediaChange> reasonFilter) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
                 return changesWithES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes, tail);
