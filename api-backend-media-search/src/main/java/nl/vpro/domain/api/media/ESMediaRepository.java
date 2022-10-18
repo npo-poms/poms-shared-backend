@@ -587,7 +587,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         final Integer max,
         final Long keepAlive,
         @Nullable Deletes deletes,
-        final Tail tail) {
+        final Tail tail,
+        Predicate<MediaChange> mediaChangePredicate) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
@@ -763,7 +764,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 version = null;
             }
             JsonNode esPublishDate= jsonNode.get(Common.ES_PUBLISH_DATE);
-            return MediaChange.of(esPublishDate != null ? Instant.ofEpochMilli(esPublishDate.longValue()) : null, media, version);
+            return MediaChange
+                .builder()
+                .publishDate(esPublishDate != null ? Instant.ofEpochMilli(esPublishDate.longValue()) : null)
+                .media(media)
+                .deleted(Workflow.PUBLISHED_AS_DELETED.contains(media.getWorkflow()))
+                .revision(version)
+                .build();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             return null;
