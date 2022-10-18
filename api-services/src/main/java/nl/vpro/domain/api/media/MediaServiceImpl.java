@@ -87,7 +87,8 @@ public class MediaServiceImpl implements MediaService {
         final Long keepAlive,
         final boolean withSequences,
         final Deletes deletes,
-        final Tail tail) throws ProfileNotFoundException {
+        final Tail tail,
+        Predicate<MediaChange> reasonFilter) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
                 return changesWithES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes, tail);
@@ -129,7 +130,7 @@ public class MediaServiceImpl implements MediaService {
             throw new ProfileNotFoundException(profile);
         }
         return mediaSearchRepository.changes(
-            since, mid, currentProfile, previousProfile, order, max, keepAlive, deletes, tail);
+            since, mid, currentProfile, previousProfile, order, max, keepAlive, deletes, tail, null);
     }
 
 
