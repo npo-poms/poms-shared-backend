@@ -768,6 +768,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .builder()
                 .publishDate(esPublishDate != null ? Instant.ofEpochMilli(esPublishDate.longValue()) : null)
                 .media(media)
+                .mid(media.getMid())
                 .deleted(Workflow.PUBLISHED_AS_DELETED.contains(media.getWorkflow()))
                 .revision(version)
                 .build();
