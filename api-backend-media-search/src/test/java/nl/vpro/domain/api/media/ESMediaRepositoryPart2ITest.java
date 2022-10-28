@@ -24,6 +24,7 @@ import org.junit.jupiter.api.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import nl.vpro.domain.Change;
 import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -322,28 +323,28 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testMediaChanges() throws Exception {
         try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, null, null, null, null)) {
-        List<MediaChange> list = new ArrayList<>();
-        changes.forEachRemaining(list::add);
-        assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
-        assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
+            List<MediaChange> list = new ArrayList<>();
+            changes.forEachRemaining(list::add);
+            assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
+            assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
     }
     }
 
 
     @Test
     public void testMediaChangesExcludeDeletes() throws Exception {
-        try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, null, Deletes.EXCLUDE, null, null)) {
+        try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, Deletes.EXCLUDE, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
-            assertThat(list.stream().filter(Objects::nonNull).collect(Collectors.toList())).hasSize(indexedObjectCount);
-            assertThat(list.stream().filter(Objects::isNull).collect(Collectors.toList())).hasSize(deletedObjectCount);
+            assertThat(list.stream().filter(Change::isNotSkipped).collect(Collectors.toList())).hasSize(indexedObjectCount);
+            assertThat(list.stream().filter(Change::isSkipped).collect(Collectors.toList())).hasSize(deletedObjectCount);
             assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
         }
     }
 
     @Test
-        public void testMediaChangesSince() throws Exception {
-            try (CloseableIterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, null, null, null, null)) {
+    public void testMediaChangesSince() throws Exception {
+        try (CloseableIterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, Integer.MAX_VALUE, null, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
             assertThat(list).hasSize(indexedObjectCount - 17); // 17 objects created around EPOCH
@@ -360,7 +361,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testMediaChangesSinceWithMax() throws Exception {
         Instant prev = NOW.minus(1, ChronoUnit.SECONDS);
-        try (CloseableIterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, null, null, null, null)) {
+        try (CloseableIterator<MediaChange> changes = target.changes(prev, null, null, null, Order.DESC, 5, null, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
             assertThat(list).hasSize(5);
@@ -375,7 +376,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void testMediaChangesWithMax() throws Exception {
-        try (CloseableIterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, null, Order.DESC, null, null, null, null)) {
+        try (CloseableIterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, null, Order.DESC, 10, null, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
             assertThat(list).hasSize(10);
@@ -919,6 +920,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         MediaResult result = target.listMembers(target.load("POMS_S_12345"), null, Order.ASC, 0L, 10);
 
         log.info("{}", result.getTotal());
+
 
     }
 
