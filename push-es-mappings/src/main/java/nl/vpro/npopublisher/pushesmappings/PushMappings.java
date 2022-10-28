@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
+import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -85,7 +87,7 @@ public class PushMappings implements Callable<Integer> {
     public static void main(String[] argv) throws InterruptedException {
         int exitCode = new CommandLine(new PushMappings()).setTrimQuotes(true).execute(argv);
         log.info("Ready with exit code {}. Sleeping for inspection", exitCode);
-        Thread.sleep(Long.MAX_VALUE);
+        Thread.sleep(Duration.ofDays(2).toMillis());
         System.exit(exitCode);
     }
 
