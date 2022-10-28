@@ -82,8 +82,10 @@ public class PushMappings implements Callable<Integer> {
     private Distribution  distribution  = null;
 
 
-    public static void main(String[] argv) {
+    public static void main(String[] argv) throws InterruptedException {
         int exitCode = new CommandLine(new PushMappings()).setTrimQuotes(true).execute(argv);
+        log.info("Ready with exit code {}. Sleeping for inspection", exitCode);
+        Thread.sleep(Long.MAX_VALUE);
         System.exit(exitCode);
     }
 
