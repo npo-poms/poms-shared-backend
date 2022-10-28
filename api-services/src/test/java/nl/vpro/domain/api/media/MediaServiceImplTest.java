@@ -101,7 +101,7 @@ public class MediaServiceImplTest {
     @Test
     public void testChangesProfileNotFound() {
         assertThatThrownBy(() ->
-            target.changes("notfound", true, Instant.EPOCH,  null, null, 10, 100L, false, null, null, null)
+            target.changes("notfound", true, Instant.EPOCH,  null, null, 10, false, null, null, null)
         ).isInstanceOf(ProfileNotFoundException.class);
     }
 

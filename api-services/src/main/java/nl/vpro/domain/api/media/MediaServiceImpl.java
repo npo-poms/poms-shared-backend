@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Named;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -77,31 +78,30 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_CHANGES_ROLE)
-    public CloseableIterator<MediaChange> changes(
+    public CloseableIterator<@NonNull MediaChange> changes(
         final String profile,
         final boolean profileCheck,
         final Instant since,
         final String mid,
         final Order order,
         final Integer max,
-        final Long keepAlive,
         final boolean withSequences,
         final Deletes deletes,
         final Tail tail,
         final Predicate<MediaChange> reasonFilter) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
-                return changesWithES(profile, profileCheck, since, mid,  order, max, keepAlive, deletes, tail);
+                return changesWithES(profile, profileCheck, since, mid,  order, max, deletes, tail);
             } else {
                 final Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
                 log.info("Since {} is couchdb like, taking {}. Explicitly configured to use elastic search for changes feed. Note that clients don't receive sequences.", since.toEpochMilli(), i);
-                return changesWithES(profile, profileCheck, i, mid, order, max, keepAlive, deletes, tail);
+                return changesWithES(profile, profileCheck, i, mid, order, max, deletes, tail);
             }
         } else {
             // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' any more.
             return
                 FilteringIterator.<MediaChange>builder()
-                    .wrapped(changesWithES(profile, profileCheck, since, mid, order, max, keepAlive, deletes, tail))
+                    .wrapped(changesWithES(profile, profileCheck, since, mid, order, max, deletes, tail))
                     .filter((c) -> {
                         if (c != null) {
                             c.setSequence(null);
@@ -120,7 +120,6 @@ public class MediaServiceImpl implements MediaService {
         final String mid,
         final Order order,
         final Integer max,
-        final Long keepAlive,
         final @Nullable Deletes deletes,
         final Tail tail) throws ProfileNotFoundException {
         final ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
@@ -130,7 +129,7 @@ public class MediaServiceImpl implements MediaService {
             throw new ProfileNotFoundException(profile);
         }
         return mediaSearchRepository.changes(
-            since, mid, currentProfile, previousProfile, order, max, keepAlive, deletes, tail, null);
+            since, mid, currentProfile, previousProfile, order, max, deletes, tail, null);
     }
 
 
