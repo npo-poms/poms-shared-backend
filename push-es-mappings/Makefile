@@ -26,11 +26,12 @@ target:
 clean: stop-test stop-acc stop-prod
 
 docker:
-	export poms_version=6.0-SNAPSHOT
+	export pom_version=`mvn org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -Dexpression=project.version -q -DforceStdout` ; \
+	echo "pom version ${pom_version}" ; \
 	docker run -v "$$(pwd)":/share --entrypoint "" gcr.io/kaniko-project/executor:debug   /kaniko/executor \
       --context /share \
       --dockerfile /share/Dockerfile \
-      --build-arg POM_VERSION=6.0-SNAPSHOT \
+      --build-arg VERSION=${pom_version} \
       --cache=false \
       --destination test:test \
       --no-push

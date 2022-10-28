@@ -11,11 +11,14 @@ ENV PASSWORD="secret"
 ENV CLUSTER="NOTGIVEN"
 ENV EXPERIMENTAL="false"
 
-ADD target/push-es-mappings-${VERSION}.jar /root/push-es-mappings.jar
-
 RUN apt-get update \
   && chgrp -R 0 /root \
   && chmod -R g=u /root
+
+
+
+ADD target/push-es-mappings-${VERSION}.jar /root/push-es-mappings-${VERSION}.jar
+RUN ln -s  /root/push-es-mappings-${VERSION}.jar /root/push-es-mappings.jar
 
 WORKDIR /root
 
