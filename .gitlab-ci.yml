@@ -39,8 +39,6 @@ trigger_pages_publish:
     project: npo/pages-publish
     branch: master
 
-
-
 build_es_image:
   image:
     name: gcr.io/kaniko-project/executor:debug
@@ -101,7 +99,8 @@ push-mappings-acc:
     CLUSTER: 755036500103:poms-plus-elasticsearch-acc
     EXPERIMENTAL: 'true'
   rules:
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME =~ $release_branch_pattern
+      when: manual
 
 publish-mappings-prod:
   <<: *push_es
@@ -111,16 +110,17 @@ publish-mappings-prod:
     USER: elasticsearch
     CLUSTER: 755036500103:poms-plus-elasticsearch-prod
   rules:
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
+      when: manual
 
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.24'
+    ref: 'tags/4.27'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.24'
+    ref: 'tags/4.27'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.24'
+    ref: 'tags/4.27'
     file: 'util/kaniko.yml'
