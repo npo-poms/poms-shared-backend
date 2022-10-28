@@ -4,15 +4,12 @@ import lombok.*;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.validation.constraints.Null;
-
-import nl.vpro.util.CloseableIterator;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -38,6 +35,8 @@ import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.domain.es.ApiRefsIndex;
+import nl.vpro.media.domain.es.Common;
+import nl.vpro.util.CloseableIterator;
 import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
@@ -56,6 +55,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
     private final IndexHelper refsHelper;
 
     private final Distribution distribution = Distribution.ELASTICSEARCH;
+
 
 
     protected AbstractESMediaRepository(HighLevelClientFactory client) {
@@ -214,8 +214,8 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
     /**
      * Here is where the actual search query get built
-     *
-     * Builds  an Elastic Search {@link QueryBuilder} from a {@link MediaSearch}
+     * <p>
+     * Builds  an ElasticSearch {@link QueryBuilder} from a {@link MediaSearch}
      * If a score is present it will add it to the query see {@link FunctionScoreQueryBuilder }
      * If the {@link MediaForm} has facets {@link MediaFacets} it will add them to the query {@link QueryBuilder}
      * @param profile
@@ -263,7 +263,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
 
         if (isScore()) {
             searchBuilder.query(
-                ESMediaScoreBuilder.score(rootQuery, Instant.now())
+                ESMediaScoreBuilder.score(rootQuery, Common.CLOCK.instant())
             );
         } else {
             searchBuilder.query(rootQuery);

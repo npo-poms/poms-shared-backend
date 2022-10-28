@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Log4j2
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
+    @SuppressWarnings("resource")
     protected static void createIndicesIfNecessary() {
         IndexHelper helper = createIndexIfNecessary(APIMEDIA);
         createIndexIfNecessary(APIMEDIA_REFS, helper.getIndexName() + ApiRefsIndex.POSTFIX);

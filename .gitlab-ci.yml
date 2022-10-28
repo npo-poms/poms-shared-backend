@@ -40,7 +40,6 @@ trigger_pages_publish:
     branch: master
 
 
-
 build_es_image:
   image:
     name: gcr.io/kaniko-project/executor:debug
@@ -55,7 +54,6 @@ build_es_image:
     - setup_kaniko
     - kaniko_execute push-es-mappings $POM_VERSION
   rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
-
 
 .push_es: &push_es
   stage: release
@@ -90,6 +88,8 @@ push-mappings-test:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH  # only publish main branches
       when: on_success
+    - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
+      when: manual
 
 
 push-mappings-acc:
@@ -101,7 +101,8 @@ push-mappings-acc:
     CLUSTER: 755036500103:poms-plus-elasticsearch-acc
     EXPERIMENTAL: 'true'
   rules:
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
+      when: manual
 
 publish-mappings-prod:
   <<: *push_es
@@ -111,7 +112,8 @@ publish-mappings-prod:
     USER: elasticsearch
     CLUSTER: 755036500103:poms-plus-elasticsearch-prod
   rules:
-    - when: manual
+    - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
+      when: manual
 
 
 include:

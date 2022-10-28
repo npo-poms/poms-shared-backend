@@ -32,13 +32,13 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
 /**
  * Pushes the required mappings.
  * The indices are default configured for reindexation, so with a very long refresh rate.
- *
+ * <p>
  * If this is run when the indices exist already, then the index is only changed, and the refresh will be set to the default (30s)
- *
+ * <p>
  * Can be used with maven exec plugin.
- *
+ * <p>
  *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost -Dcluster=asfasd
- *
+ * <p>
  *
  * Test
  * :  mvn  -Dhost=localhost:9221 -Dcluster=poms-test
@@ -46,7 +46,7 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  * : mvn -Dhost=localhost:9215 -Dcluster=poms-dev -Dexperimental=true
  *  Production
  *  mihxil@baleno:~/npo/poms-shared-backend/trunk/push-es-mappings$ mvn  -Dhost=localhost:9209 -Dcluster=poms-prod
- *
+ * <p>
  *  You can also just run it from Intellij.
  *
  * @author Michiel Meeuwissen

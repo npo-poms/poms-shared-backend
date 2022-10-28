@@ -1,6 +1,7 @@
 package nl.vpro.domain.api.media;
 
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.*;
@@ -320,37 +321,40 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
     @Test
-    public void testMediaChanges() {
-        Iterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null, null, null, null);
-        List<MediaChange> list = new ArrayList<>();
-        changes.forEachRemaining(list::add);
-        assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
-        assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
+    public void testMediaChanges() throws Exception {
+        try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null, null, null, null)) {
+            List<MediaChange> list = new ArrayList<>();
+            changes.forEachRemaining(list::add);
+            assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
+            assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
+        }
     }
 
 
     @Test
-    public void testMediaChangesExcludeDeletes() {
-        Iterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null, Deletes.EXCLUDE, null, null);
-        List<MediaChange> list = new ArrayList<>();
-        changes.forEachRemaining(list::add);
-        assertThat(list.stream().filter(Objects::nonNull).collect(Collectors.toList())).hasSize(indexedObjectCount);
-        assertThat(list.stream().filter(Objects::isNull).collect(Collectors.toList())).hasSize(deletedObjectCount);
-        assertThat(list).hasSize(indexedObjectCount +  deletedObjectCount);
+    public void testMediaChangesExcludeDeletes() throws Exception {
+        try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, null, Order.ASC, Integer.MAX_VALUE, null, Deletes.EXCLUDE, null, null)) {
+            List<MediaChange> list = new ArrayList<>();
+            changes.forEachRemaining(list::add);
+            assertThat(list.stream().filter(Objects::nonNull).collect(Collectors.toList())).hasSize(indexedObjectCount);
+            assertThat(list.stream().filter(Objects::isNull).collect(Collectors.toList())).hasSize(deletedObjectCount);
+            assertThat(list).hasSize(indexedObjectCount + deletedObjectCount);
+        }
     }
 
     @Test
-    public void testMediaChangesSince() {
-        Iterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, Integer.MAX_VALUE, null, null, null, null);
-        List<MediaChange> list = new ArrayList<>();
-        changes.forEachRemaining(list::add);
-        assertThat(list).hasSize(indexedObjectCount - 17); // 17 objects created around EPOCH
-        assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
-        Instant prev = Instant.MIN;
+    public void testMediaChangesSince() throws Exception {
+        try (CloseableIterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, null, Order.DESC, Integer.MAX_VALUE, null, null, null, null)) {
+            List<MediaChange> list = new ArrayList<>();
+            changes.forEachRemaining(list::add);
+            assertThat(list).hasSize(indexedObjectCount - 17); // 17 objects created around EPOCH
+            assertThat(list.stream().filter(MediaChange::isDeleted).collect(Collectors.toList())).hasSize(3);
+            Instant prev = Instant.MIN;
 
-        for (MediaChange c : list) {
-            assertThat(c.getPublishDate().isBefore(prev)).isFalse();
-            prev = c.getPublishDate();
+            for (MediaChange c : list) {
+                assertThat(c.getPublishDate().isBefore(prev)).isFalse();
+                prev = c.getPublishDate();
+            }
         }
     }
 
@@ -978,8 +982,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         return Jackson2Mapper.getPublisherInstance().writeValueAsBytes(jsonNode);
 
     }
-    static Consumer<ObjectNode> addPublishDate(Instant now){
-        return (jsonNode) -> jsonNode.put(Common.ES_PUBLISH_DATE, now.toEpochMilli());
+    static Consumer<ObjectNode> addPublishDate(Instant instant) {
+        return (jsonNode) -> jsonNode.put(Common.ES_PUBLISH_DATE,  instant.toEpochMilli());
     }
 
 
