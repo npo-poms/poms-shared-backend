@@ -46,6 +46,7 @@ build_es_image:
     entrypoint: [ "" ]
   variables:
     IMAGE_NAME: $ES_IMAGE_NAME
+    IMAGE_TAG: dev
   stage: build
   needs: [build_and_publish]
   tags:
@@ -127,5 +128,5 @@ include:
     ref: 'tags/4.27'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.27'
+    ref: 'master'
     file: 'util/kaniko.yml'
