@@ -11,7 +11,7 @@ variables:
 
 # java 17
 default:
-  image: docker.vpro.nl/vpro/maven:4
+  image: docker.vpro.nl/vpro/maven:6
 
 .build:
   services:
@@ -53,6 +53,7 @@ build_es_image:
     - docker
   script:
     - setup_kaniko
+    - echo pom version $POM_VERSION
     - kaniko_execute push-es-mappings $POM_VERSION
   rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
 
