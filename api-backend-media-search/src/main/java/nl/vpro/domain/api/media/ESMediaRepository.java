@@ -742,7 +742,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (n != null) {
                 since = n.asSince();
                 if (n.isDeleted()) {
-                    log.debug("Returning null in stead since it is deleted. (This will output space to client)");
+                    log.debug("Skipping {} since it is deleted. (This will output space to client)", n);
                     n.setSkipped(true);
                 }
             }
