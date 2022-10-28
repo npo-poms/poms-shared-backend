@@ -40,6 +40,7 @@ trigger_pages_publish:
     branch: master
 
 
+
 build_es_image:
   image:
     name: gcr.io/kaniko-project/executor:debug
@@ -54,6 +55,7 @@ build_es_image:
     - setup_kaniko
     - kaniko_execute push-es-mappings $POM_VERSION
   rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
+
 
 .push_es: &push_es
   stage: release
@@ -101,7 +103,7 @@ push-mappings-acc:
     CLUSTER: 755036500103:poms-plus-elasticsearch-acc
     EXPERIMENTAL: 'true'
   rules:
-    - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
+    - if: $CI_COMMIT_REF_NAME =~ $release_branch_pattern
       when: manual
 
 publish-mappings-prod:
@@ -118,11 +120,11 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.24'
+    ref: 'tags/4.27'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.24'
+    ref: 'tags/4.27'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.24'
+    ref: 'tags/4.27'
     file: 'util/kaniko.yml'
