@@ -766,11 +766,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 version = null;
             }
             JsonNode esPublishDate = jsonNode.get(Common.ES_PUBLISH_DATE);
-            final List<String> reasons;
+            final List<MediaChange.Reason> reasons;
             if (jsonNode.has(Common.ES_REASONS)) {
                 ArrayNode esReasons = jsonNode.withArray(Common.ES_REASONS);
                 reasons = StreamSupport.stream(esReasons.spliterator(), false)
-                    .map(jn -> jn.get(Common.ES_REASONS_VALUE).textValue())
+                    .map(jn ->
+                        new MediaChange.Reason(
+                            jn.get(Common.ES_REASONS_VALUE).textValue(),
+                            Instant.ofEpochMilli(jn.get(Common.ES_PUBLISH_DATE).longValue())
+                        )
+
+                    )
                     .collect(Collectors
                     .toList());
             } else {
