@@ -46,7 +46,6 @@ build_es_image:
     entrypoint: [ "" ]
   variables:
     IMAGE_NAME: $ES_IMAGE_NAME
-    IMAGE_TAG: dev
   stage: build
   needs: [build_and_publish]
   tags:
