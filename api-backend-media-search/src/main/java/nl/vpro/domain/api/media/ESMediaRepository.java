@@ -16,6 +16,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
@@ -32,6 +33,7 @@ import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
@@ -45,6 +47,7 @@ import nl.vpro.util.*;
 
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
+import static nl.vpro.media.domain.es.Common.CLOCK;
 
 /**
  * @author Roelof Jan Koekoek
@@ -100,6 +103,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @SneakyThrows
     @Override
+    @NonNull
     protected <S extends MediaObject> List<Optional<S>> loadAll(
         @NonNull Class<S> clazz,
         @NonNull List<String> ids) {
@@ -426,7 +430,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         long offset,
         Integer max) {
         assert media.getMid() != null;
-        AtomicInteger atomicMax = new AtomicInteger(max);
+        final AtomicInteger atomicMax = new AtomicInteger(max);
         boolean wasZero = handleMaxZero(max, atomicMax::set);
 
         SearchRequest request = new SearchRequest(getIndexName());
@@ -578,22 +582,22 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public CloseableIterator<@NonNull MediaChange> changes(
-        final Instant since,
-        final String mid,
-        final ProfileDefinition<MediaObject> currentProfile,
-        final ProfileDefinition<MediaObject> previousProfile,
-        final Order order,
-        final Integer max,
+    public CloseableIterator<MediaChange> changes(
+        @Nullable final Instant since,
+        @Nullable final String mid,
+        @Nullable final ProfileDefinition<MediaObject> currentProfile,
+        @Nullable final ProfileDefinition<MediaObject> previousProfile,
+        @NonNull final Order order,
+        @Nullable final Integer max,
         @Nullable Deletes deletes,
-        final Tail tail,
-        Predicate<MediaChange> mediaChangePredicate) {
+        @Nullable final Tail tail,
+        @Nullable final Predicate<MediaChange> filter) {
         if (currentProfile == null && previousProfile != null) {
             throw new IllegalStateException("Missing current profile");
         }
 
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
-        final Instant changesUpto = Instant.now().minus(getCommitDelay());
+        final Instant changesUpto = CLOCK.instant().minus(getCommitDelay());
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery(Common.ES_PUBLISH_DATE).to(changesUpto.toEpochMilli());
         if (since != null) {
             if ((!hasProfileUpdate(currentProfile, previousProfile))) {
@@ -638,8 +642,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         CloseableIterator<MediaChange> iterator = changes;
 
         if (since != null && mid != null) {
-            final CloseablePeekingIterator<MediaChange> peeking = changes.peeking();
-            iterator = new BasicWrappedIterator<MediaChange>(peeking) {
+            // If needed, skip a few at the start.
+            iterator = new BasicWrappedIterator<MediaChange>(changes) {
                 boolean filtering = true;
                 @Override
                 public MediaChange next() {
@@ -653,7 +657,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                             log.debug("Change is ok {} > {}", change.getPublishDate(), since);
                             filtering = false;
                         } else if (change.getMid().compareTo(mid) > 0) {
-                            log.debug("Change is ok {} > {}", change.getMid(), mid);
+                            log.debug("Chnage is ok {} > {}", change.getMid(), mid);
                             filtering = false;
                         } else {
                             change.setSkipped(true);
@@ -738,7 +742,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (n != null) {
                 since = n.asSince();
                 if (n.isDeleted()) {
-                    log.debug("Returning null in stead since it is deleted. (This will output space to client)");
+                    log.debug("Skipping {} since it is deleted. (This will output space to client)", n);
                     n.setSkipped(true);
                 }
             }
@@ -749,8 +753,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     private MediaChange of(
         @NonNull JsonNode hit) {
         try {
-            JsonNode jsonNode = hit.get(Constants.Fields.SOURCE);
-            MediaObject media = getObject(jsonNode, MediaObject.class);
+            final JsonNode jsonNode = hit.get(Constants.Fields.SOURCE);
+            final MediaObject media = getObject(jsonNode, MediaObject.class);
 
             if (media == null) {
                 log.warn("No media found in {}", hit);
@@ -760,7 +764,18 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (version == -1) {
                 version = null;
             }
-            JsonNode esPublishDate= jsonNode.get(Common.ES_PUBLISH_DATE);
+            JsonNode esPublishDate = jsonNode.get(Common.ES_PUBLISH_DATE);
+            final List<String> reasons;
+            if (jsonNode.has(Common.ES_REASONS)) {
+                ArrayNode esReasons = jsonNode.withArray(Common.ES_REASONS);
+                reasons = StreamSupport.stream(esReasons.spliterator(), false)
+                    .map(jn -> jn.get(Common.ES_REASONS_VALUE).textValue())
+                    .collect(Collectors
+                    .toList());
+            } else {
+                reasons = null;
+            }
+
             return MediaChange
                 .builder()
                 .publishDate(esPublishDate != null ? Instant.ofEpochMilli(esPublishDate.longValue()) : null)
@@ -768,6 +783,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .mid(media.getMid())
                 .deleted(Workflow.PUBLISHED_AS_DELETED.contains(media.getWorkflow()))
                 .revision(version)
+                .reasons(reasons)
                 .build();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -838,10 +854,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             log.error(e.getMessage(), e);
         }
         if (redirects == null || ! newRedirects.equals(redirects.getMap())) {
-            redirects = new RedirectList(Instant.now(), newRedirects);
+            redirects = new RedirectList(CLOCK.instant(), newRedirects);
             log.info("Read {} redirects from ES", redirects.size());
         }
-        lastRedirectRead = Instant.now();
+        lastRedirectRead = CLOCK.instant();
     }
 
 
