@@ -20,7 +20,7 @@ public class Common {
     public static final String ES_VECTORIZATION = "semanticVectorization";
 
     public static final String ES_REASONS       = "republicationReasons";
-    public static final String ES_REASONS_TEXT  = "text";
+    public static final String ES_REASONS_VALUE = "value";
     public static final String ES_REASONS_PUBLISH_DATE  = ES_PUBLISH_DATE;
 
 }

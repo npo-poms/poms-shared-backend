@@ -642,9 +642,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         CloseableIterator<MediaChange> iterator = changes;
 
         if (since != null && mid != null) {
-            final CloseablePeekingIterator<MediaChange> peeking = changes.peeking();
-            iterator = new BasicWrappedIterator<MediaChange>(peeking) {
+            // If needed, skip a few at the start.
+            iterator = new BasicWrappedIterator<>(changes) {
                 boolean filtering = true;
+
                 @Override
                 public MediaChange next() {
                     MediaChange change = super.next();
@@ -769,7 +770,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (jsonNode.has(Common.ES_REASONS)) {
                 ArrayNode esReasons = jsonNode.withArray(Common.ES_REASONS);
                 reasons = StreamSupport.stream(esReasons.spliterator(), false)
-                    .map(jn -> jn.get(Common.ES_REASONS_TEXT).textValue())
+                    .map(jn -> jn.get(Common.ES_REASONS_VALUE).textValue())
                     .collect(Collectors
                     .toList());
             } else {

@@ -1902,7 +1902,7 @@
     },
     "republicationReasons": {
       "properties": {
-        "reason" : {
+        "value" : {
           "type" : "text",
           "index": false,
           "store": true
