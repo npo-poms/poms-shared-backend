@@ -578,14 +578,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     @Override
-    public CloseableIterator<MediaChange> changes(
+    public CloseableIterator<@NonNull MediaChange> changes(
         final Instant since,
         final String mid,
         final ProfileDefinition<MediaObject> currentProfile,
         final ProfileDefinition<MediaObject> previousProfile,
         final Order order,
         final Integer max,
-        final Long keepAlive,
         @Nullable Deletes deletes,
         final Tail tail,
         Predicate<MediaChange> mediaChangePredicate) {
@@ -629,43 +628,41 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (log.isDebugEnabled()) {
             log.debug("Found {} changes", i.getTotalSize());
         }
-        final ChangeIterator changes = new ChangeIterator(
+        final MarkSkippedChangeIterator changes = new MarkSkippedChangeIterator(
             i,
             since,
             currentProfile,
-            previousProfile,
-            keepAlive
+            previousProfile
         );
 
         CloseableIterator<MediaChange> iterator = changes;
 
         if (since != null && mid != null) {
             final CloseablePeekingIterator<MediaChange> peeking = changes.peeking();
-            iterator = peeking;
-            while(peeking.hasNext()) {
-                final MediaChange peek = peeking.peek();
+            iterator = new BasicWrappedIterator<MediaChange>(peeking) {
+                boolean filtering = true;
+                @Override
+                public MediaChange next() {
+                    MediaChange change = super.next();
+                    if (filtering) {
 
-                if (peek != null) {
-                    if (peek.isTail() || peek.getPublishDate() == null || peek.getMid() == null) {
-                        log.debug("Peek is ok");
-                        break;
-                    } else {
-                        if (peek.getPublishDate().isAfter(since)) {
-                            log.debug("Peek is ok {} > {}", peek.getPublishDate(), since);
-                            break;
-                        } else  if (peek.getMid().compareTo(mid) > 0) {
-                            log.debug("Peek is ok {} > {}", peek.getMid(), mid);
-                            break;
+                        if (change == null || change.isTail() || change.getPublishDate() == null || change.getMid() == null) {
+                            // tail, we are at the end, just continuing, we can't compare.
+                            filtering = false;
+                        } else if (change.getPublishDate().isAfter(since)) {
+                            log.debug("Change is ok {} > {}", change.getPublishDate(), since);
+                            filtering = false;
+                        } else if (change.getMid().compareTo(mid) > 0) {
+                            log.debug("Change is ok {} > {}", change.getMid(), mid);
+                            filtering = false;
                         } else {
-                            MediaChange skipped = peeking.next();
-                            log.debug("Skipping {} because of mid parameter", skipped);
+                            change.setSkipped(true);
+                            log.debug("Skipping {} because of mid parameter", change);
                         }
                     }
-                } else {
-                    peeking.next();
-                    log.debug("Skipping because peek is nul");
+                    return change;
                 }
-            }
+            };
         }
         if (deletes == null) {
             deletes = Deletes.ID_ONLY;
@@ -699,7 +696,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         final MaxOffsetIterator<MediaChange> maxed = MaxOffsetIterator.<MediaChange>builder()
             .wrapped(finalIterator)
             .max(max)
-            .countNulls(false) // DELETES=EXCLUDE may put null in the stream. don't count them, max=1 may end up empty.
+            .countPredicate(c -> ! c.isSkipped()) // DELETES=EXCLUDE may put skips in the stream. don't count them, max=1 may end up empty.
             .autoClose(false)
             .build();
         return TailAdder.withFunctions(maxed, (last) -> {
@@ -742,7 +739,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 since = n.asSince();
                 if (n.isDeleted()) {
                     log.debug("Returning null in stead since it is deleted. (This will output space to client)");
-                    return null;
+                    n.setSkipped(true);
                 }
             }
             return n;
