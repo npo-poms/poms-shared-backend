@@ -1,51 +1,51 @@
  package nl.vpro.domain.api;
 
-import lombok.Getter;
-import lombok.Setter;
+ import lombok.Getter;
+ import lombok.Setter;
 
-import java.io.IOException;
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
+ import java.io.IOException;
+ import java.time.Duration;
+ import java.util.*;
+ import java.util.concurrent.CompletableFuture;
+ import java.util.function.Consumer;
+ import java.util.stream.Collectors;
 
-import javax.validation.constraints.NotNull;
+ import javax.validation.constraints.NotNull;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.lucene.search.TotalHits;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.elasticsearch.action.get.*;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.*;
-import org.elasticsearch.common.text.Text;
-import org.elasticsearch.index.IndexNotFoundException;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.BucketOrder;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jmx.export.annotation.ManagedAttribute;
+ import org.apache.commons.lang.StringUtils;
+ import org.apache.http.client.config.RequestConfig;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ import org.apache.lucene.search.TotalHits;
+ import org.checkerframework.checker.nullness.qual.NonNull;
+ import org.checkerframework.checker.nullness.qual.Nullable;
+ import org.elasticsearch.action.get.*;
+ import org.elasticsearch.action.search.SearchRequest;
+ import org.elasticsearch.action.search.SearchResponse;
+ import org.elasticsearch.client.*;
+ import org.elasticsearch.common.text.Text;
+ import org.elasticsearch.index.IndexNotFoundException;
+ import org.elasticsearch.index.query.QueryBuilder;
+ import org.elasticsearch.search.SearchHit;
+ import org.elasticsearch.search.SearchHits;
+ import org.elasticsearch.search.aggregations.AggregationBuilders;
+ import org.elasticsearch.search.aggregations.BucketOrder;
+ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+ import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+ import org.elasticsearch.search.builder.SearchSourceBuilder;
+ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+ import org.springframework.beans.factory.annotation.Value;
+ import org.springframework.jmx.export.annotation.ManagedAttribute;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+ import com.fasterxml.jackson.core.JsonProcessingException;
+ import com.fasterxml.jackson.databind.JsonNode;
 
-import nl.vpro.elasticsearch.ElasticSearchIndex;
-import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-import nl.vpro.jackson2.Jackson2Mapper;
-import nl.vpro.util.ThreadPools;
-import nl.vpro.util.TimeUtils;
+ import nl.vpro.elasticsearch.ElasticSearchIndex;
+ import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+ import nl.vpro.jackson2.Jackson2Mapper;
+ import nl.vpro.util.ThreadPools;
+ import nl.vpro.util.TimeUtils;
 
 
 /**
@@ -54,10 +54,11 @@ import nl.vpro.util.TimeUtils;
  */
 public abstract class AbstractESRepository<T> {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass().getName());
-    protected final Logger LOG_ERRORS = LoggerFactory.getLogger(getClass().getName() + ".ERRORS");
+    protected final Logger log = LogManager.getLogger(getClass().getName());
+    protected final Logger LOG_ERRORS = LogManager.getLogger(getClass().getName() + ".ERRORS");
 
     protected final HighLevelClientFactory factory;
+
 
     @Getter
     @Setter

@@ -1899,6 +1899,19 @@
           "dynamic": false
         }
       }
+    },
+    "republicationReasons": {
+      "properties": {
+        "reason" : {
+          "type" : "text",
+          "index": false,
+          "store": true
+        },
+        "esPublishDate" : {
+          "type" : "date",
+          "format" : "epoch_millis"
+        }
+      }
     }
   }
 }
