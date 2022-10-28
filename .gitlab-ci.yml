@@ -5,7 +5,7 @@ stages:
   - release
 
 variables:
-  ES_IMAGE_NAME: poms-plus/es-builder
+  ES_IMAGE_NAME: poms-plus/es-builder-2
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
   INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
 
