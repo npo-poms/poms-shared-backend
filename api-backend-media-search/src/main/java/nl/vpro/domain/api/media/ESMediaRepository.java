@@ -647,7 +647,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 boolean filtering = true;
                 @Override
                 public MediaChange next() {
-                    MediaChange change = super.next();
+                    final MediaChange change = super.next();
                     if (filtering) {
 
                         if (change == null || change.isTail() || change.getPublishDate() == null || change.getMid() == null) {
