@@ -410,7 +410,7 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                 .scheduleEvents(
                     event(Channel.NED3, "2021-10-24T02:00:00")
                 ),
-            broadcast().mid("p5") // matches in the night
+            broadcast().mid("p5") // Precisely on the border of the next day (NPA-625), should therefore not match
                 .scheduleEvents(
                     event(Channel.NED3, "2021-10-24T06:00:00")
                 )
