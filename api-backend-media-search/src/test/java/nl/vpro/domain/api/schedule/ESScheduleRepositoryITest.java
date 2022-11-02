@@ -1,7 +1,6 @@
 package nl.vpro.domain.api.schedule;
 
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.StringReader;
 import java.time.*;
@@ -410,17 +409,33 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
             broadcast().mid("p4") // matches in the night
                 .scheduleEvents(
                     event(Channel.NED3, "2021-10-24T02:00:00")
+                ),
+            broadcast().mid("p5") // matches in the night
+                .scheduleEvents(
+                    event(Channel.NED3, "2021-10-24T06:00:00")
                 )
 
         );
 
-        ScheduleResult apiScheduleEvents = repository.listSchedules(Channel.NED3,
-            LocalDate.of(2021, 10, 23), Order.ASC, 0, 3);
+        LocalDate testDate = LocalDate.of(2021, 10, 23);
+        { // test with guideday
+            ScheduleResult apiScheduleEvents = repository.listSchedules(Channel.NED3,
+                testDate, Order.ASC, 0, 3);
 
 
-        assertThat(apiScheduleEvents.stream().map(ScheduleEvent::getMidRef)).containsExactly("p2", "p4");
+            assertThat(apiScheduleEvents.stream().map(ScheduleEvent::getMidRef)).containsExactly("p2", "p4");
+            //assertThat(apiScheduleEvents.getTotal()).isEqualTo(2); // FAILS NPA-599
 
-        //assertThat(apiScheduleEvents.getTotal()).isEqualTo(2); // FAILS NPA-599
+        }
+
+        { // test with start/stop
+
+            Instant start =  ScheduleService.guideDayStart(testDate).toInstant();
+            Instant stop =  ScheduleService.guideDayStop(testDate).toInstant();
+            ScheduleResult apiScheduleEvents = repository.listSchedules(Channel.NED3,
+                start, stop,  Order.ASC, 0, 10);
+            assertThat(apiScheduleEvents.stream().map(ScheduleEvent::getMidRef)).containsExactly("p2", "p4");
+        }
 
     }
 

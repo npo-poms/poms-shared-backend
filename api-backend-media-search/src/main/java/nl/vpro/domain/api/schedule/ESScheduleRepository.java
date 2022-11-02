@@ -132,7 +132,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public ScheduleResult listSchedules(Instant start, Instant stop, Order order, long offset, Integer max) {
         ExtendedScheduleForm form = new ExtendedScheduleForm(
-            new SchedulePager(offset, max, null, order.direction()), new InstantRange(start, stop));
+            new SchedulePager(offset, max, null, order.direction()),
+            new InstantRange(start, stop));
         return execute(form);
     }
 
