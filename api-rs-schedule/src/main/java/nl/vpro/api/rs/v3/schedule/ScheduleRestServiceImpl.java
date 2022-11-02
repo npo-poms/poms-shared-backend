@@ -555,7 +555,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
 
-
     private static Instant guideDayStop(LocalDate guideDay) {
         ZonedDateTime zoned = guideDay.atStartOfDay(ScheduleService.ZONE_ID);
         return ScheduleService.guideDayStop(zoned.toLocalDate()).toInstant();
