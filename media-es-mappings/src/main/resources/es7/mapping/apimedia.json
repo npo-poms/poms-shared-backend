@@ -1907,7 +1907,7 @@
           "index": false,
           "store": true
         },
-        "esPublishDate" : {
+        "publishDate" : {
           "type" : "date",
           "format" : "epoch_millis"
         }
