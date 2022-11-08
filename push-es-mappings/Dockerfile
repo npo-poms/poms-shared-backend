@@ -1,6 +1,6 @@
 # This is a replacement for  https://git.vpro.nl/npo/docker/es-builder/-/blob/master/Dockerfile
 
-FROM openjdk:11
+FROM openjdk:17
 MAINTAINER push-es-mappings
 
 ARG VERSION
