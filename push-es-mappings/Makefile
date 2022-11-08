@@ -25,6 +25,10 @@ target:
 
 clean: stop-test stop-acc stop-prod
 
+create-docker:
+	export pom_version=`mvn org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -Dexpression=project.version -q -DforceStdout` ; \
+	docker build -t push-es-mappings --build-arg VERSION=$${pom_version} .
+
 docker:
 	export pom_version=`mvn org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -Dexpression=project.version -q -DforceStdout` ; \
 	echo "pom version ${pom_version}" ; \

@@ -1,6 +1,6 @@
 # This is a replacement for  https://git.vpro.nl/npo/docker/es-builder/-/blob/master/Dockerfile
 
-FROM openjdk:17
+FROM openjdk:17-alpine
 MAINTAINER push-es-mappings
 
 ARG VERSION
@@ -11,10 +11,9 @@ ENV PASSWORD="secret"
 ENV CLUSTER="NOTGIVEN"
 ENV EXPERIMENTAL="false"
 
-RUN apt-get update \
+RUN apk upgrade \
   && chgrp -R 0 /root \
   && chmod -R g=u /root
-
 
 
 ADD target/push-es-mappings-${VERSION}.jar /root/push-es-mappings-${VERSION}.jar
