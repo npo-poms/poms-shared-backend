@@ -32,15 +32,18 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import nl.vpro.domain.PublicationReason;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearch.highlevel.*;
+import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.Common;
 import nl.vpro.poms.shared.ExtraHeaders;
 import nl.vpro.util.*;
@@ -179,11 +182,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     /**
      * If the query could not be fully evaluated at ES then this one will be used.
-     *
+     * <p>
      * The query is executed, but using the scroll API. Resulting objects which don't match the form or profile are filtered.
-     *
+     * <p>
      * max/offset are done programmatically.
-     *
+     * <p>
      * The total count is always approximate (and normally overestimated)
      */
      private MediaSearchResult findWithPostFilter(
@@ -766,17 +769,18 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 version = null;
             }
             JsonNode esPublishDate = jsonNode.get(Common.ES_PUBLISH_DATE);
-            final List<MediaChange.Reason> reasons;
+            final List<PublicationReason> reasons;
             if (jsonNode.has(Common.ES_REASONS)) {
                 ArrayNode esReasons = jsonNode.withArray(Common.ES_REASONS);
                 reasons = StreamSupport.stream(esReasons.spliterator(), false)
-                    .map(jn ->
-                        new MediaChange.Reason(
-                            jn.get(Common.ES_REASONS_VALUE).textValue(),
-                            Instant.ofEpochMilli(jn.get(Common.ES_PUBLISH_DATE).longValue())
-                        )
-
-                    )
+                    .map(jn -> {
+                        try {
+                            return Jackson2Mapper.getLenientInstance().treeToValue(jn, PublicationReason.class);
+                        } catch (JsonProcessingException e) {
+                            log.warn(e.getMessage(), e);
+                            return null;
+                        }
+                    })
                     .collect(Collectors
                     .toList());
             } else {
@@ -821,6 +825,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         SearchSourceBuilder builder = i.prepareSearchSource(getIndexName());
         boolean sort = ESMediaSortHandler.sort(form, null, builder::sort);
+        if (sort) {
+            log.warn("Iterate called with sort. This is ignored");
+        }
         builder
             .size(iterateBatchSize)
             .query(ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null))
