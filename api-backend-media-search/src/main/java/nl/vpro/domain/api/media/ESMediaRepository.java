@@ -172,7 +172,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             max,
             MediaObject.class
         );
-        if (form != null && form.getFacets() != null) {
+        if (MediaForm.isFaceted(form)) {
             result.setSelectedFacets(new MediaFacetsResult());
         }
         MediaSearchResults.setSelectedFacets(result.getFacets(), result.getSelectedFacets(), form);
@@ -279,7 +279,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable Integer max) {
         form = redirectForm(form);
         GenericMediaSearchResult<Program> result = findAssociatedMedia("episodeOf", media, profile, form, offset, max, Program.class);
-        if (form != null && form.getFacets() != null) {
+        if (MediaForm.isFaceted(form)) {
             result.setSelectedFacets(new MediaFacetsResult());
         }
         MediaSearchResults.setSelectedFacets(result.getFacets(), result.getSelectedFacets(), form);
@@ -308,10 +308,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable Integer max) {
         form = redirectForm(form);
         GenericMediaSearchResult<MediaObject> result = findAssociatedMedia(type, media, profile, form, offset, max, MediaObject.class);
-        if (form != null && form.getFacets() != null) {
+        if (MediaForm.isFaceted(form)) {
             result.setSelectedFacets(new MediaFacetsResult());
         }
-
 
         MediaSearchResults.setSelectedFacets(result.getFacets(), result.getSelectedFacets(), form);
         MediaSearchResults.sortFacets(result.getFacets(), result.getSelectedFacets(), form);
@@ -691,29 +690,20 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             };
         }
 
-        final CloseableIterator<MediaChange> finalIterator;
-        switch (deletes) {
-            case INCLUDE:
-                finalIterator = iterator;
-                break;
-            case EXCLUDE:
-                finalIterator= new DeleteSkippingIterator(iterator);
-                break;
-            case ID_ONLY:
-                finalIterator = new BasicWrappedIterator<>(iterator) {
-                    @Override
-                    public MediaChange next() {
-                        MediaChange n = super.next();
-                        if (n != null && n.isDeleted()) {
-                            n.setMedia(null);
-                        }
-                        return n;
+        final CloseableIterator<MediaChange> finalIterator = switch (deletes) {
+            case INCLUDE -> iterator;
+            case EXCLUDE -> new DeleteSkippingIterator(iterator);
+            case ID_ONLY -> new BasicWrappedIterator<>(iterator) {
+                @Override
+                public MediaChange next() {
+                    MediaChange n = super.next();
+                    if (n != null && n.isDeleted()) {
+                        n.setMedia(null);
                     }
-                };
-                break;
-            default:
-                throw new IllegalStateException();
-        }
+                    return n;
+                }
+            };
+        };
         final @NonNull Tail actualTails = tail == null ? Tail.IF_EMPTY : tail;
 
         final MaxOffsetIterator<MediaChange> maxed = MaxOffsetIterator.<MediaChange>builder()
