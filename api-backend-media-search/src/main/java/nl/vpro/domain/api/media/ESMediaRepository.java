@@ -675,6 +675,21 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (deletes == null) {
             deletes = Deletes.ID_ONLY;
         }
+        if (filter != null) {
+            iterator = new BasicWrappedIterator<>(iterator) {
+                @Override
+                public MediaChange next() {
+                    MediaChange n = super.next();
+                    if (! filter.test(n)) {
+                        log.debug("Skipping {}", n);
+                        n.setSkipped(true);
+                    } else {
+                        log.debug("Letting {}", n);
+                    }
+                    return n;
+                }
+            };
+        }
 
         final CloseableIterator<MediaChange> finalIterator;
         switch (deletes) {
@@ -685,7 +700,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 finalIterator= new DeleteSkippingIterator(iterator);
                 break;
             case ID_ONLY:
-                finalIterator = new BasicWrappedIterator<MediaChange>(iterator) {
+                finalIterator = new BasicWrappedIterator<>(iterator) {
                     @Override
                     public MediaChange next() {
                         MediaChange n = super.next();
@@ -831,7 +846,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         builder
             .size(iterateBatchSize)
             .query(ESMediaQueryBuilder.query("", form != null ? form.getSearches() : null))
-            .postFilter(ESMediaFilterBuilder.filter(profile))
+            .postFilter(
+                ESMediaFilterBuilder.filter(profile)
+            )
         ;
 
         Predicate<MediaObject> filter = Objects::nonNull;
