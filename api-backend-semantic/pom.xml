@@ -24,15 +24,12 @@
        <version>${project.version}</version>
      </dependency>
      <dependency>
-       <!-- ik gebruik normaal ru.lanwen.wiremock:wiremock-junit5, maar ik vind dat altijd een beetje gedoe, deze es proberen -->
-       <groupId>de.mkammerer.wiremock-junit5</groupId>
-       <artifactId>wiremock-junit5</artifactId>
-       <version>1.1.0</version>
-       <scope>test</scope>
-     </dependency>
-     <dependency>
        <groupId>io.micrometer</groupId>
        <artifactId>micrometer-core</artifactId>
+     </dependency>
+     <dependency>
+       <groupId>com.github.tomakehurst</groupId>
+       <artifactId>wiremock-jre8-standalone</artifactId>
      </dependency>
    </dependencies>
 </project>
