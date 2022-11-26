@@ -26,11 +26,6 @@
       <artifactId>javassist</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.mycila.testing.plugins</groupId>
-      <artifactId>mycila-testing-mockito</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-backend-elasticsearch</artifactId>
       <type>test-jar</type>
