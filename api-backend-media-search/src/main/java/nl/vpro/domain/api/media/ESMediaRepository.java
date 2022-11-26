@@ -774,7 +774,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 version = null;
             }
             JsonNode esPublishDate = jsonNode.get(Common.ES_PUBLISH_DATE);
-            final List<PublicationReason> reasons;
+            final SortedSet<PublicationReason> reasons;
             if (jsonNode.has(Common.ES_REASONS)) {
                 ArrayNode esReasons = jsonNode.withArray(Common.ES_REASONS);
                 reasons = StreamSupport.stream(esReasons.spliterator(), false)
@@ -787,7 +787,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                         }
                     })
                     .collect(Collectors
-                    .toList());
+                    .toCollection(TreeSet::new));
             } else {
                 reasons = null;
             }
