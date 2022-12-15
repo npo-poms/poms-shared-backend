@@ -6,6 +6,9 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
+  <bean id="userService" class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="org.springframework.security.core.userdetails.UserDetailsService"/>
+  </bean>
 
   <security:authentication-manager alias="authenticationManager">
     <security:authentication-provider user-service-ref="userService"/>
@@ -13,8 +16,5 @@
 
   <security:global-method-security pre-post-annotations="enabled"/>
 
-  <bean id="userService" class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="org.springframework.security.core.userdetails.UserDetailsService"/>
-  </bean>
 
 </beans>

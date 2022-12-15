@@ -36,12 +36,11 @@ public class ScheduleFilterTest {
     @Autowired
     UserDetailsService userDetailsService;
 
-    @SuppressWarnings("unchecked")
     @BeforeEach
     public void init() {
-        Collection roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
+        List<GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
         SecurityContext context = SecurityContextHolder.getContext();
-        context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", (List<GrantedAuthority>)roles));
+        context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", roles));
     }
 
     @Test

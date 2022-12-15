@@ -6,6 +6,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
+   <bean id="userService" class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="org.springframework.security.core.userdetails.UserDetailsService"/>
+  </bean>
+
   <!-- Instrument classes before they get loaded by the application. (Reloading classes is not possible) -->
   <bean id="instrumentMediaFilters" class="nl.vpro.api.rs.filter.MediaPropertiesFilters"/>
 
@@ -15,8 +19,6 @@
 
   <security:global-method-security pre-post-annotations="enabled"/>
 
-  <bean id="userService" class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="org.springframework.security.core.userdetails.UserDetailsService"/>
-  </bean>
+
 
 </beans>
