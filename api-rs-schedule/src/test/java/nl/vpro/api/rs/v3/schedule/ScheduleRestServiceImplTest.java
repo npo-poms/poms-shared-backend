@@ -79,9 +79,9 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     public void testGuideDayStartStop() {
 
         ScheduleRestService scheduleRestService = getTestObject();
-        Result res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 3, 28), null, null, null, "ASC", 0L, 100);
-        Instant start = ZonedDateTime.parse("2015-03-28T06:00:00+01:00").toInstant();
-        Instant stop = ZonedDateTime.parse("2015-03-29T06:00:00+02:00").toInstant();
+        Result<ApiScheduleEvent> res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 3, 28), null, null, null, "ASC", 0L, 100);
+        Instant start = ZonedDateTime.parse("2015-03-28T05:58:00+01:00").toInstant();
+        Instant stop = ZonedDateTime.parse("2015-03-29T05:58:00+02:00").toInstant();
 
         verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0L, 100);
     }
@@ -92,7 +92,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
 
         ScheduleRestService scheduleRestService = getTestObject();
-        Result res = scheduleRestService.listChannel(Channel.KETN.name(), null, LocalDate.of(2016, 3, 5).atTime(12, 34).atZone(Schedule.ZONE_ID).toInstant(), null, null, "ASC", 0L, 100);
+        Result<ApiScheduleEvent> res = scheduleRestService.listChannel(Channel.KETN.name(), null, LocalDate.of(2016, 3, 5).atTime(12, 34).atZone(Schedule.ZONE_ID).toInstant(), null, null, "ASC", 0L, 100);
         Instant start = ZonedDateTime.parse("2016-03-05T12:34:00+01:00").toInstant();
 
         verify(scheduleService).list(Channel.KETN, start, null, Order.ASC, 0L, 100);

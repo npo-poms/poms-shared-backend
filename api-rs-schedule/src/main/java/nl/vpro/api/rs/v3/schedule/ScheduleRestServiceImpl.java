@@ -464,6 +464,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         max = handleTooManyResults(offset, max, maxResults);
         Order order = parseOrder(sort);
         if (guideDay != null) {
+
             if (start != null || stop != null) {
                 throw new IllegalArgumentException("Specify either " + GUIDE_DAY + " _or_ " + START + "/" + STOP);
             }
@@ -551,7 +552,9 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     private static Instant  guideDayStart(LocalDate guideDay) {
         ZonedDateTime zoned = guideDay.atStartOfDay(ScheduleService.ZONE_ID);
-        return ScheduleService.guideDayStart(zoned.toLocalDate()).toInstant();
+        return ScheduleService.guideDayStart(
+            zoned.toLocalDate()
+        ).toInstant();
     }
 
 
