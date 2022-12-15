@@ -45,7 +45,7 @@ build_es_image:
   variables:
     IMAGE_NAME: $ES_IMAGE_NAME
   stage: build
-  needs: [build_and_publish]
+  needs: [build]
   tags:
     - docker
   script:
