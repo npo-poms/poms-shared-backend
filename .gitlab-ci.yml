@@ -9,11 +9,8 @@ variables:
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
   INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
 
-# java 17
-default:
-  image: docker.vpro.nl/vpro/maven:6
 
-.build:
+.maven:
   services:
     - !reference [.opensearch, services]
   before_script:
@@ -121,11 +118,11 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.28'
+    ref: 'main'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.28'
+    ref: 'main'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/4.28'
+    ref: 'main'
     file: 'util/kaniko.yml'
