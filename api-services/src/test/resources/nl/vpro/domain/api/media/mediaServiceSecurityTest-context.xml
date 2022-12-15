@@ -9,6 +9,24 @@
 
   <context:property-placeholder properties-ref="properties"/>
 
+ <bean class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="nl.vpro.domain.api.profile.ProfileService"/>
+  </bean>
+  <bean id="mediaLoadRepository" class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="nl.vpro.domain.api.media.MediaRepository"/>
+  </bean>
+  <bean class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="nl.vpro.domain.api.media.MediaSearchRepository"/>
+  </bean>
+  <bean id="mediaQueryRepository" class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="nl.vpro.domain.api.suggest.QuerySearchRepository" />
+  </bean>
+  <bean class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="nl.vpro.domain.api.media.SinceToTimeStampService" />
+  </bean>
+  <bean class="org.mockito.Mockito" factory-method="mock">
+    <constructor-arg type="java.lang.Class" value="nl.vpro.domain.api.media.TopSpinRepository" />
+  </bean>
 
   <bean id="properties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
     <property name="properties">
@@ -25,24 +43,6 @@
   <bean id="authenticationProvider" class="org.springframework.security.authentication.TestingAuthenticationProvider" />
 
   <security:global-method-security pre-post-annotations="enabled" />
-  <bean class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="nl.vpro.domain.api.profile.ProfileService"/>
-  </bean>
-  <bean id="mediaLoadRepository" class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="nl.vpro.domain.api.media.MediaRepository"/>
-  </bean>
-  <bean class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="nl.vpro.domain.api.media.MediaSearchRepository"/>
-  </bean>
-  <bean id="mediaQueryRepository" class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="nl.vpro.domain.api.suggest.QuerySearchRepository" />
-  </bean>
-  <bean class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="nl.vpro.domain.api.media.SinceToTimeStampService" />
-  </bean>
-  <bean class="org.mockito.Mockito" factory-method="mock">
-    <constructor-arg value="nl.vpro.domain.api.media.TopSpinRepository" />
-  </bean>
 
   <bean id="mediaService" class="nl.vpro.domain.api.media.MediaServiceImpl" />
 
