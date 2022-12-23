@@ -860,7 +860,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .build()) {
 
             i.prepareSearchSource(getIndexName())
-                .query(QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
+                .query(
+                    QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
                 .size(iterateBatchSize)
             ;
             while(i.hasNext()) {
@@ -868,7 +869,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 if (o.getMergedToRef() != null) {
                     newRedirects.put(o.getMid(), o.getMergedToRef());
                 } else {
-                    log.warn("Found merged object without merged to {}", o.getMid());
+                    if (o instanceof Segment) {
+                        // TODO: We could change query to not even query them?
+                        log.debug("Found merged segment {}. That only means that parent is merged", o.getMid());
+                    } else {
+                        log.warn("Found merged object without merged to {}", o.getMid());
+                    }
                 }
             }
         } catch (Exception e) {
