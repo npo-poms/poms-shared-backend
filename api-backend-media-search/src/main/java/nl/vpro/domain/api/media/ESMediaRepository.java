@@ -870,8 +870,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                     newRedirects.put(o.getMid(), o.getMergedToRef());
                 } else {
                     if (o instanceof Segment) {
-                        // TODO: We could change query to not even query them?
-                        log.debug("Found merged segment {}. That only means that parent is merged", o.getMid());
+                        log.warn("Found merged segment {}. This should not have been published", o.getMid());
                     } else {
                         log.warn("Found merged object without merged to {}", o.getMid());
                     }
