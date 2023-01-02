@@ -35,7 +35,7 @@ trigger_pages_publish:
   extends: .trigger_down_stream
   trigger:
     project: npo/pages-publish
-    branch: master
+    branch: main
 
 
 build_es_image:
