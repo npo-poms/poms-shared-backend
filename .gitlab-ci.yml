@@ -29,7 +29,7 @@ trigger_npo_publish:
   extends: .trigger_down_stream
   trigger:
     project: npo/npo-publish
-    branch: master
+    branch: main
 
 trigger_pages_publish:
   extends: .trigger_down_stream
