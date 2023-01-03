@@ -23,7 +23,7 @@ trigger_api:
   extends: .trigger_down_stream
   trigger:
     project: npo/api
-    branch: master
+    branch: main
 
 trigger_npo_publish:
   extends: .trigger_down_stream
