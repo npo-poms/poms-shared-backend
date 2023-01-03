@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
-import nl.vpro.mdc.MDCConstants;
+import nl.vpro.logging.mdc.MDCConstants;
 
 /**
  * @author rico
