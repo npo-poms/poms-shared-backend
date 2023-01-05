@@ -57,8 +57,7 @@ public class Iterate {
         pipedInputStream.connect(pipedOutputStream);
 
         final JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory()
-            .createGenerator(pipedOutputStream, JsonEncoding.UTF8)
-            ;
+            .createGenerator(pipedOutputStream, JsonEncoding.UTF8);
 
         final CloseableIterator<T> iterator;
         try {
