@@ -69,19 +69,20 @@ public class ApiMediaFilterTest {
     public void testJaxbReadWrite() {
         ApiMediaFilter.set("titles");
 
-        final Program program = JAXB.unmarshal(new StringReader("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-                "<program embeddable=\"true\" sortDate=\"1970-01-01T01:00:00.100+01:00\" creationDate=\"2014-02-18T12:13:50.123+01:00\" workflow=\"FOR PUBLICATION\" urn=\"urn:vpro:media:program:null\" xmlns=\"urn:vpro:media:2009\" xmlns:shared=\"urn:vpro:shared:2009\">\n" +
-                "    <scheduleEvents>\n" +
-                "        <scheduleEvent channel=\"NED3\" urnRef=\"urn:vpro:media:program:null\">\n" +
-                "            <start>1970-01-01T01:00:00.100+01:00</start>\n" +
-                "            <duration>P0DT0H0M0.200S</duration>\n" +
-                "        </scheduleEvent>\n" +
-                "        <scheduleEvent channel=\"NED3\" net=\"ZAPP\" urnRef=\"urn:vpro:media:program:null\">\n" +
-                "            <start>1970-01-04T01:00:00.300+01:00</start>\n" +
-                "            <duration>P0DT0H0M0.050S</duration>\n" +
-                "        </scheduleEvent>\n" +
-                "    </scheduleEvents>\n" +
-                "</program>"), Program.class);
+        final Program program = JAXB.unmarshal(new StringReader("""
+            <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+            <program embeddable="true" sortDate="1970-01-01T01:00:00.100+01:00" creationDate="2014-02-18T12:13:50.123+01:00" workflow="FOR PUBLICATION" urn="urn:vpro:media:program:null" xmlns="urn:vpro:media:2009" xmlns:shared="urn:vpro:shared:2009">
+                <scheduleEvents>
+                    <scheduleEvent channel="NED3" urnRef="urn:vpro:media:program:null">
+                        <start>1970-01-01T01:00:00.100+01:00</start>
+                        <duration>P0DT0H0M0.200S</duration>
+                    </scheduleEvent>
+                    <scheduleEvent channel="NED3" net="ZAPP" urnRef="urn:vpro:media:program:null">
+                        <start>1970-01-04T01:00:00.300+01:00</start>
+                        <duration>P0DT0H0M0.050S</duration>
+                    </scheduleEvent>
+                </scheduleEvents>
+            </program>"""), Program.class);
 
         assertThat(program.getScheduleEvents()).isEmpty();
 
@@ -235,13 +236,13 @@ public class ApiMediaFilterTest {
                         .withLocations()
                         .build());
         assertThat(segment.getLocations()).hasSize(4);
-        assertThat(segment.getLocations().first().getWorkflow()).isEqualTo(Workflow.FOR_PUBLICATION);
+        assertThat(segment.getLocations().first().getWorkflow()).isEqualTo(Workflow.PUBLISHED);
         ApiMediaFilter.set("location,workflow");
 
         assertThat(segment.getLocations()).hasSize(1);
         Location location = segment.getLocations().first();
         Workflow wf = location.getWorkflow();
-        assertThat(wf).isEqualTo(Workflow.FOR_PUBLICATION); // it is a bit odd that you have to request 'workflow' to also receive the workflow of location
+        assertThat(wf).isEqualTo(Workflow.PUBLISHED); // it is a bit odd that you have to request 'workflow' to also receive the workflow of location
         assertThat(location.getProgramUrl()).isEqualTo("http://cgi.omroep.nl/legacy/nebo?/ceres/1/vpro/rest/2009/VPRO_1132492/bb.20090317.m4v");
 
 
@@ -301,20 +302,21 @@ public class ApiMediaFilterTest {
 
         ApiMediaFilter.set("title");
         assertThat(program.get().getPredictions()).isEmpty();
-        assertThatJson(program.get()).isSimilarTo("{\n" +
-            "  \"objectType\" : \"program\",\n" +
-            "  \"mid\" : \"MID_123\",\n" +
-            "  \"sortDate\" : 1425596400000,\n" +
-            "  \"creationDate\" : 1425596400000,\n" +
-            "  \"lastModified\" : 1425600000000,\n" +
-            "  \"embeddable\" : true,\n" +
-            "  \"titles\" : [ {\n" +
-            "    \"value\" : \"foobar\",\n" +
-            "    \"owner\" : \"BROADCASTER\",\n" +
-            "    \"type\" : \"MAIN\"\n" +
-            "  } ],\n" +
-                "  \"publishDate\" : 1425603600000\n" +
-            "}");
+        assertThatJson(program.get()).isSimilarTo("""
+            {
+              "objectType" : "program",
+              "mid" : "MID_123",
+              "sortDate" : 1425596400000,
+              "creationDate" : 1425596400000,
+              "lastModified" : 1425600000000,
+              "embeddable" : true,
+              "titles" : [ {
+                "value" : "foobar",
+                "owner" : "BROADCASTER",
+                "type" : "MAIN"
+              } ],
+              "publishDate" : 1425603600000
+            }""");
     }
 
     @ParameterizedTest
@@ -356,27 +358,28 @@ public class ApiMediaFilterTest {
     protected void assertJsonWithPredictions(Object p) { // argument can not be Program, that would break instrumentation
 
         assertThat(((Program) p).getPredictions()).hasSize(2);
-        assertThatJson(p).isSimilarTo("{\n" +
-            "  \"objectType\" : \"program\",\n" +
-            "  \"mid\" : \"MID_123\",\n" +
-            "  \"sortDate\" : 1425596400000,\n" +
-            "  \"creationDate\" : 1425596400000,\n" +
-            "  \"lastModified\" : 1425600000000,\n" +
-            "  \"embeddable\" : true,\n" +
-            "  \"titles\" : [ {\n" +
-            "    \"value\" : \"foobar\",\n" +
-            "    \"owner\" : \"BROADCASTER\",\n" +
-            "    \"type\" : \"MAIN\"\n" +
-            "  } ],\n" +
-            "  \"predictions\" : [ {\n" +
-            "    \"state\" : \"REVOKED\",\n" +
-            "    \"platform\" : \"INTERNETVOD\"\n" +
-            "  }, {\n" +
-            "    \"state\" : \"ANNOUNCED\",\n" +
-            "    \"platform\" : \"TVVOD\"\n" +
-            "  } ],\n" +
-            "  \"publishDate\" : 1425603600000\n" +
-            "}");
+        assertThatJson(p).isSimilarTo("""
+            {
+              "objectType" : "program",
+              "mid" : "MID_123",
+              "sortDate" : 1425596400000,
+              "creationDate" : 1425596400000,
+              "lastModified" : 1425600000000,
+              "embeddable" : true,
+              "titles" : [ {
+                "value" : "foobar",
+                "owner" : "BROADCASTER",
+                "type" : "MAIN"
+              } ],
+              "predictions" : [ {
+                "state" : "REVOKED",
+                "platform" : "INTERNETVOD"
+              }, {
+                "state" : "ANNOUNCED",
+                "platform" : "TVVOD"
+              } ],
+              "publishDate" : 1425603600000
+            }""");
 
     }
 
@@ -400,59 +403,62 @@ public class ApiMediaFilterTest {
 
         ApiMediaFilter.set("title");
         assertThat(program.getLocations()).isEmpty();
-        assertThatJson(program).isSimilarTo("{\n" +
-            "  \"objectType\" : \"program\",\n" +
-            "  \"mid\" : \"MID_123\",\n" +
-            "  \"sortDate\" : 1425596400000,\n" +
-            "  \"creationDate\" : 1425596400000,\n" +
-            "  \"lastModified\" : 1425600000000,\n" +
-            "  \"embeddable\" : true,\n" +
-            "  \"publishDate\" : 1425603600000\n" +
-            "}");
+        assertThatJson(program).isSimilarTo("""
+            {
+              "objectType" : "program",
+              "mid" : "MID_123",
+              "sortDate" : 1425596400000,
+              "creationDate" : 1425596400000,
+              "lastModified" : 1425600000000,
+              "embeddable" : true,
+              "publishDate" : 1425603600000
+            }""");
 
         ApiMediaFilter.set("all");
         assertThat(program.getLocations()).isNotEmpty();
         assertThatJson(program).isSimilarTo(
-            "{\n" +
-                "  \"objectType\" : \"program\",\n" +
-                "  \"mid\" : \"MID_123\",\n" +
-                "  \"workflow\" : \"FOR_PUBLICATION\",\n" +
-                "  \"sortDate\" : 1425596400000,\n" +
-                "  \"creationDate\" : 1425596400000,\n" +
-                "  \"lastModified\" : 1425600000000,\n" +
-                "  \"embeddable\" : true,\n" +
-                "  \"locations\" : [ {\n" +
-                "    \"programUrl\" : \"https://www.vpro.nl\",\n" +
-                "    \"avAttributes\" : {\n" +
-                "      \"avFileFormat\" : \"UNKNOWN\"\n" +
-                "    },\n" +
-                "    \"owner\" : \"BROADCASTER\",\n" +
-                "    \"creationDate\" : 1636131600000,\n" +
-                "    \"workflow\" : \"FOR_PUBLICATION\"\n" +
-                "  } ],\n" +
-                "  \"publishDate\" : 1425603600000\n" +
-                "}");
+            """
+                {
+                  "objectType" : "program",
+                  "mid" : "MID_123",
+                  "workflow" : "FOR_PUBLICATION",
+                  "sortDate" : 1425596400000,
+                  "creationDate" : 1425596400000,
+                  "lastModified" : 1425600000000,
+                  "embeddable" : true,
+                  "locations" : [ {
+                    "programUrl" : "https://www.vpro.nl",
+                    "avAttributes" : {
+                      "avFileFormat" : "UNKNOWN"
+                    },
+                    "owner" : "BROADCASTER",
+                    "creationDate" : 1636131600000,
+                    "workflow" : "PUBLISHED"
+                  } ],
+                  "publishDate" : 1425603600000
+                }""");
 
         ApiMediaFilter.set("title,locations");
         assertThat(program.getLocations()).isNotEmpty();
         assertThatJson(program).isSimilarTo(
-            "{\n" +
-                "  \"objectType\" : \"program\",\n" +
-                "  \"mid\" : \"MID_123\",\n" +
-                "  \"sortDate\" : 1425596400000,\n" +
-                "  \"creationDate\" : 1425596400000,\n" +
-                "  \"lastModified\" : 1425600000000,\n" +
-                "  \"embeddable\" : true,\n" +
-                "  \"locations\" : [ {\n" +
-                "    \"programUrl\" : \"https://www.vpro.nl\",\n" +
-                "    \"avAttributes\" : {\n" +
-                "      \"avFileFormat\" : \"UNKNOWN\"\n" +
-                "    },\n" +
-                "    \"owner\" : \"BROADCASTER\",\n" +
-                "    \"creationDate\" : 1636131600000\n" +
-                "  } ],\n" +
-                "  \"publishDate\" : 1425603600000\n" +
-                "}");
+            """
+                {
+                  "objectType" : "program",
+                  "mid" : "MID_123",
+                  "sortDate" : 1425596400000,
+                  "creationDate" : 1425596400000,
+                  "lastModified" : 1425600000000,
+                  "embeddable" : true,
+                  "locations" : [ {
+                    "programUrl" : "https://www.vpro.nl",
+                    "avAttributes" : {
+                      "avFileFormat" : "UNKNOWN"
+                    },
+                    "owner" : "BROADCASTER",
+                    "creationDate" : 1636131600000
+                  } ],
+                  "publishDate" : 1425603600000
+                }""");
 
  }
 
