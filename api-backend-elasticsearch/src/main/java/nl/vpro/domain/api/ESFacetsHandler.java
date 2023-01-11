@@ -127,7 +127,7 @@ public abstract class ESFacetsHandler {
         @NonNull String prefix,
         HasAggregations rootFilter,
         @NonNull String fieldName,
-        @Nullable ExtendedTextFacet<?> extendedTextFacet) {
+        @Nullable ExtendedTextFacet<?, ?> extendedTextFacet) {
         if (extendedTextFacet != null) {
             return getFacetResultItems(
                 prefix,
@@ -143,7 +143,7 @@ public abstract class ESFacetsHandler {
         @NonNull String prefix,
         @Nullable HasAggregations rootFilter,
         @NonNull String fieldName,
-        @Nullable TextFacet<?> requestFacet,
+        @Nullable TextFacet<?, ?> requestFacet,
         @NonNull Class<T> enumClass,
         @NonNull Function<String, T> valueOf,
         @NonNull Function<T, String> xmlId) {
@@ -177,7 +177,7 @@ public abstract class ESFacetsHandler {
         @NonNull String prefix,
         @NonNull HasAggregations facets,
         @NonNull String fieldName,
-        @Nullable TextFacet<?> requestedFacet,
+        @Nullable TextFacet<?, ?> requestedFacet,
         @NonNull final Class<T> enumClass) {
         return getFacetResultItemsForEnum(
             prefix, facets, fieldName, requestedFacet, enumClass, s -> Enum.valueOf(enumClass, s), Enum::name

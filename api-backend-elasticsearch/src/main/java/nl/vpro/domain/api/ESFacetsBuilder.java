@@ -411,7 +411,7 @@ public abstract class ESFacetsBuilder {
 
     public static String esExtendedTextField(
         @NonNull String field,
-        @Nullable ExtendedTextFacet<?> facet) {
+        @Nullable ExtendedTextFacet<?, ?> facet) {
         return esExtendedTextField(field, facet == null || facet.isCaseSensitive());
     }
 
