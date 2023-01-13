@@ -588,31 +588,24 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable final Instant since,
         @Nullable final String mid,
         @Nullable final ProfileDefinition<MediaObject> currentProfile,
-        @Nullable final ProfileDefinition<MediaObject> previousProfile,
         @NonNull final Order order,
         @Nullable final Integer max,
         @Nullable Deletes deletes,
         @Nullable final Tail tail,
         @Nullable final Predicate<MediaChange> filter) {
-        if (currentProfile == null && previousProfile != null) {
-            throw new IllegalStateException("Missing current profile");
-        }
+
 
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
         final Instant changesUpto = CLOCK.instant().minus(getCommitDelay());
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery(Common.ES_PUBLISH_DATE).to(changesUpto.toEpochMilli());
         if (since != null) {
-            if ((!hasProfileUpdate(currentProfile, previousProfile))) {
-                if (since.isBefore(changesUpto)) {
-                    long epoch = since.toEpochMilli();
-                    restriction = restriction.from(epoch).includeLower(true);
-                } else {
-                    log.debug("Since is after committed changes window (before {}). Returning empty iterator.", changesUpto);
-                    // This will result exactly nothing, so we return empty iterator immediately:
-                    return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
-                }
+            if (since.isBefore(changesUpto)) {
+                long epoch = since.toEpochMilli();
+                restriction = restriction.from(epoch).includeLower(true);
             } else {
-                log.warn(ExtraHeaders.warn("A profile update occurred between {} and {}", currentProfile, previousProfile));
+                log.debug("Since is after committed changes window (before {}). Returning empty iterator.", changesUpto);
+                // This will result exactly nothing, so we return empty iterator immediately:
+                return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
             }
         }
         final ExtendedElasticSearchIterator<MediaChange> i = ExtendedElasticSearchIterator.<MediaChange>extendedBuilder()
@@ -637,8 +630,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         final MarkSkippedChangeIterator changes = new MarkSkippedChangeIterator(
             i,
             since,
-            currentProfile,
-            previousProfile
+            currentProfile
         );
 
         CloseableIterator<MediaChange> iterator = changes;
