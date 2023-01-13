@@ -50,13 +50,14 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     private static final String MESSAGE_ANCESTOR = "Media ID to list descendants for, e.g. 044411213";
 
 
-    private static final String DEFAULT_FORM = "{\n" +
-        "    \"searches\" : {\n" +
-        "        \"text\" : {\n" +
-        "                \"value\" : \"Argos\"\n" +
-        "        }\n" +
-        "    }\n" +
-        "}";
+    private static final String DEFAULT_FORM = """
+        {
+            "searches" : {
+                "text" : {
+                        "value" : "Argos"
+                }
+            }
+        }""";
 
     private final ScheduleService scheduleService;
 

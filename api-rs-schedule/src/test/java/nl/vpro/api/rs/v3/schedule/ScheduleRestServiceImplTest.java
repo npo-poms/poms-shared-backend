@@ -117,67 +117,71 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     private String MSE_2775form() {
-        return "{\n" +
-            "  \"searches\" : {\n" +
-            "    \"broadcasters\" : {\n" +
-            "      \"match\" : \"MUST\",\n" +
-            "      \"value\" : \"MAX\"\n" +
-            "    },\n" +
-            "    \"types\" : {\n" +
-            "      \"match\" : \"MUST\",\n" +
-            "      \"value\" : [ {\n" +
-            "        \"value\" : \"BROADCAST\",\n" +
-            "        \"match\" : \"SHOULD\"\n" +
-            "      }, {\n" +
-            "        \"value\" : \"SEGMENT\",\n" +
-            "        \"match\" : \"SHOULD\"\n" +
-            "      } ]\n" +
-            "    },\n" +
-            "    \"avTypes\" : {\n" +
-            "      \"match\" : \"MUST\",\n" +
-            "      \"value\" : \"VIDEO\"\n" +
-            "    },\n" +
-            "    \"scheduleEvents\" : {\n" +
-            "      \"channel\" : \"NED1\",\n" +
-            "      \"begin\" : \"2015-07-01T06:46:41.098Z\"\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"sort\" : {\n" +
-            "    \"sortDate\" : \"ASC\"\n" +
-            "  }\n" +
-            "}\n";
+        return """
+            {
+              "searches" : {
+                "broadcasters" : {
+                  "match" : "MUST",
+                  "value" : "MAX"
+                },
+                "types" : {
+                  "match" : "MUST",
+                  "value" : [ {
+                    "value" : "BROADCAST",
+                    "match" : "SHOULD"
+                  }, {
+                    "value" : "SEGMENT",
+                    "match" : "SHOULD"
+                  } ]
+                },
+                "avTypes" : {
+                  "match" : "MUST",
+                  "value" : "VIDEO"
+                },
+                "scheduleEvents" : {
+                  "channel" : "NED1",
+                  "begin" : "2015-07-01T06:46:41.098Z"
+                }
+              },
+              "sort" : {
+                "sortDate" : "ASC"
+              }
+            }
+            """;
     }
 
     private String MSE2775_formCorrected() {
-        return "{\n" +
-            "  \"searches\" : {\n" +
-            "    \"broadcasters\" : {\n" +
-            "      \"match\" : \"MUST\",\n" +
-            "      \"value\" : \"MAX\"\n" +
-            "    },\n" +
-            "    \"types\" : {\n" +
-            "      \"match\" : \"MUST\",\n" +
-            "      \"value\" : [ {\n" +
-            "        \"value\" : \"BROADCAST\",\n" +
-            "        \"match\" : \"SHOULD\"\n" +
-            "      }, {\n" +
-            "        \"value\" : \"SEGMENT\",\n" +
-            "        \"match\" : \"SHOULD\"\n" +
-            "      } ]\n" +
-            "    },\n" +
-            "    \"avTypes\" : {\n" +
-            "      \"match\" : \"MUST\",\n" +
-            "      \"value\" : \"VIDEO\"\n" +
-            "    },\n" +
-            "    \"scheduleEvents\" : {\n" +
-            "      \"channel\" : \"NED1\",\n" +
-            "      \"begin\" : 1435733201098\n" +
-            "    }\n" +
-            "  },\n" +
-            "  \"sort\" : {\n" +
-            "    \"sortDate\" : \"ASC\"\n" +
-            "  }\n" +
-            "}\n";
+        return """
+            {
+              "searches" : {
+                "broadcasters" : {
+                  "match" : "MUST",
+                  "value" : "MAX"
+                },
+                "types" : {
+                  "match" : "MUST",
+                  "value" : [ {
+                    "value" : "BROADCAST",
+                    "match" : "SHOULD"
+                  }, {
+                    "value" : "SEGMENT",
+                    "match" : "SHOULD"
+                  } ]
+                },
+                "avTypes" : {
+                  "match" : "MUST",
+                  "value" : "VIDEO"
+                },
+                "scheduleEvents" : {
+                  "channel" : "NED1",
+                  "begin" : 1435733201098
+                }
+              },
+              "sort" : {
+                "sortDate" : "ASC"
+              }
+            }
+            """;
     }
 
     private void MSE_2775(String form) throws URISyntaxException, IOException {
