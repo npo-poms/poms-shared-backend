@@ -79,7 +79,7 @@ public class MediaServiceImpl implements MediaService {
     @PreAuthorize(HAS_API_CHANGES_ROLE)
     public CloseableIterator<MediaChange> changes(
         final String profile,
-        final boolean profileCheck,
+        final Boolean profileCheck,
         final Instant since,
         final String mid,
         final Order order,
@@ -129,7 +129,7 @@ public class MediaServiceImpl implements MediaService {
             throw new ProfileNotFoundException(profile);
         }
         return mediaSearchRepository.changes(
-            since, mid, currentProfile, previousProfile, order, max, deletes, tail, postFilter);
+            since, mid, currentProfile, order, max, deletes, tail, postFilter);
     }
 
 
