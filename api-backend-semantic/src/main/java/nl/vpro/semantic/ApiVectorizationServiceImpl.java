@@ -34,6 +34,7 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
 
     private final MeterRegistry meterRegistry;
 
+    private final Duration timeout;
 
 
     public ApiVectorizationServiceImpl(
@@ -51,10 +52,13 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
         client = HttpAsyncClients.custom()
             .setIOReactorConfig(ioReactorConfig)
             .setRetryStrategy(
-                new DefaultHttpRequestRetryStrategy(5, TimeValue.ofSeconds(5))
-        )
+                new DefaultHttpRequestRetryStrategy(
+                    5, TimeValue.ofSeconds(5)
+                )
+            )
             .build();
         client.start();
+        this.timeout = timeout;
     }
 
 
