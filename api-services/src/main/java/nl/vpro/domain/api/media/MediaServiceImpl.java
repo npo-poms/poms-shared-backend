@@ -90,17 +90,17 @@ public class MediaServiceImpl implements MediaService {
         final Predicate<MediaChange> postFilter) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
-                return changesWithES(profile, profileCheck, since, mid,  order, max, deletes, tail, postFilter);
+                return changesWithES(profile, since, mid,  order, max, deletes, tail, postFilter);
             } else {
                 final Instant i = sinceToTimeStampService.getInstance(since.toEpochMilli());
                 log.info("Since {} is couchdb like, taking {}. Explicitly configured to use elastic search for changes feed. Note that clients don't receive sequences.", since.toEpochMilli(), i);
-                return changesWithES(profile, profileCheck, i, mid, order, max, deletes, tail, postFilter);
+                return changesWithES(profile, i, mid, order, max, deletes, tail, postFilter);
             }
         } else {
             // caller is aware of 'publishedSince' argument, so she doesn't need the 'sequences' anymore.
             return
                 FilteringIterator.<MediaChange>builder()
-                    .wrapped(changesWithES(profile, profileCheck, since, mid, order, max, deletes, tail, postFilter))
+                    .wrapped(changesWithES(profile, since, mid, order, max, deletes, tail, postFilter))
                     .filter((c) -> {
                         if (c != null) {
                             c.setSequence(null);
@@ -114,7 +114,6 @@ public class MediaServiceImpl implements MediaService {
 
     protected CloseableIterator<MediaChange> changesWithES(
         final String profile,
-        final boolean profileCheck,
         final Instant since,
         final String mid,
         final Order order,
@@ -124,8 +123,7 @@ public class MediaServiceImpl implements MediaService {
         final @Nullable Predicate<MediaChange> postFilter) throws ProfileNotFoundException {
         final ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
-        final ProfileDefinition<MediaObject> previousProfile = since == null || ! profileCheck ? currentProfile : profileService.getMediaProfileDefinition(profile, since); //getCombinedProfile(profile, since);
-        if (currentProfile == null && previousProfile == null && profile != null) {
+        if (currentProfile == null && profile != null) {
             throw new ProfileNotFoundException(profile);
         }
         return mediaSearchRepository.changes(
