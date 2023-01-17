@@ -857,12 +857,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .size(iterateBatchSize)
             ;
             while(i.hasNext()) {
-                MediaObject o = i.next();
+                final MediaObject o = i.next();
                 if (o.getMergedToRef() != null) {
                     newRedirects.put(o.getMid(), o.getMergedToRef());
                 } else {
                     if (o instanceof Segment) {
-                        log.warn("Found merged segment {}. This should not have been published", o.getMid());
+                        log.debug("Found merged segment {}. This is correct.", o.getMid());
                     } else {
                         log.warn("Found merged object without merged to {}", o.getMid());
                     }
@@ -880,7 +880,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
     /**
-     * Changes the form to 'redirect' all occurances of mids in it.
+     * Changes the form to 'redirect' all occurrences of mids in it.
      */
     MediaForm redirectForm(MediaForm form) {
         if (form == null) {
