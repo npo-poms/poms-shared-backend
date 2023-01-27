@@ -85,6 +85,17 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
+    <repository>
+      <!-- only essential when sonatype down (e.g. in jan 2023...)-->
+      <id>vpro</id>
+      <url>https://nexus.vpro.nl/content/groups/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
   <profiles>
