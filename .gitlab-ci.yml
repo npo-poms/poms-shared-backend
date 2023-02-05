@@ -1,10 +1,4 @@
 ---
-stages:
-  - build
-  - publish
-  - validate
-  - release
-
 variables:
   ES_IMAGE_NAME: poms-plus/es-builder-2
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
@@ -119,11 +113,11 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/5.6'
+    ref: 'tags/6.0'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/5.6'
+    ref: 'tags/6.0'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/5.6'
+    ref: 'tags/6.0'
     file: 'util/kaniko.yml'
