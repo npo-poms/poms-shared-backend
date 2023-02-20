@@ -21,7 +21,7 @@
     </dependency>
     <dependency>
       <groupId>nl.vpro.shared</groupId>
-      <artifactId>vpro-shared-swagger</artifactId>
+      <artifactId>vpro-shared-swagger3</artifactId>
     </dependency>
     <dependency>
       <groupId>nl.vpro.api</groupId>
