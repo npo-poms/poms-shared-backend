@@ -4,13 +4,14 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.*;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.ws.rs.*;
@@ -28,7 +29,6 @@ import nl.vpro.api.rs.v3.media.MediaRestService;
 import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.media.*;
 import nl.vpro.domain.media.*;
-import nl.vpro.swagger.SwaggerApplication;
 
 import static nl.vpro.api.rs.exception.Exceptions.handleTooManyResults;
 import static nl.vpro.domain.api.Constants.*;
@@ -38,7 +38,8 @@ import static nl.vpro.domain.api.Constants.*;
  * @author rico
  */
 @Service
-@Api(tags = {ScheduleRestService.TAG, MediaRestService.TAG}) //  documented with media, so also in that tag!
+@Tag(name = ScheduleRestService.TAG)
+@Tag(name = MediaRestService.TAG) //  documented with media, so also in that tag!
 @Path(ScheduleRestService.PATH)
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
 public class ScheduleRestServiceImpl implements ScheduleRestService {
@@ -61,9 +62,6 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     private final ScheduleService scheduleService;
 
-    @Value("${api.schedule.expose}")
-    private boolean expose;
-
     @Value("${api.schedule.maxResults}")
     private int maxResults = Constants.MAX_RESULTS;
 
@@ -75,25 +73,20 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         this.scheduleService = scheduleService;
     }
 
-    @PostConstruct
-    private void init() {
-        if(expose) {
-            SwaggerApplication.inject(this);
-        }
-    }
+
 
     @Override
-    @ApiOperation(
-        httpMethod = HttpMethod.GET,
-        value = "List scheduled media"
+    @Operation(
+        method = HttpMethod.GET,
+        summary = "List scheduled media"
     )
     @GET
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult list(
-        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
-        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(description = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
+        @Parameter(description = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+        @Parameter(description = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -115,17 +108,18 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-            httpMethod = HttpMethod.POST,
-            value = "Find scheduled media"
+    @Operation(
+        method = HttpMethod.POST,
+        summary = "Find scheduled media"
     )
     @POST
     public ScheduleSearchResult find(
-        @Valid @ApiParam(value = "Search form", required = true, defaultValue = DEFAULT_FORM)
-        ScheduleForm form,
+        @Valid
+        @Parameter(description = "Search form", required = true)
+            ScheduleForm form,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(PROFILE) String profile,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
@@ -139,18 +133,18 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "List scheduled media for an ancestor"
+    @Operation(method = HttpMethod.GET,
+            summary = "List scheduled media for an ancestor"
     )
     @Path("/ancestor/{ancestor}")
     @GET
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listForAncestor(
-            @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
-            @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-            @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
-            @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @Parameter(description = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
+            @Parameter(description = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
+            @Parameter(description = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+            @Parameter(description = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
+            @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
             @QueryParam(SORT) @DefaultValue(ASC) String sort,
             @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
             @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -175,15 +169,15 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "Current item for an ancestor"
+    @Operation(method = HttpMethod.GET,
+            description = "Current item for an ancestor"
     )
     @Path("/ancestor/{ancestor}/now")
     @GET
     @NoCache
     public ApiScheduleEvent nowForAncestor(
-            @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @Parameter(description = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
+            @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
             @QueryParam(NOW) Instant now
     ) {
         if (now == null) {
@@ -207,15 +201,15 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "Next item for an ancestor"
+    @Operation(method = HttpMethod.GET,
+            summary = "Next item for an ancestor"
     )
     @Path("/ancestor/{ancestor}/next")
     @GET
     @NoCache
     public ApiScheduleEvent nextForAncestor(
-            @ApiParam(value = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @Parameter(description = MESSAGE_ANCESTOR, required = true) @PathParam(ANCESTOR) String mediaId,
+            @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
             @QueryParam(NOW) Instant now
 
     ) {
@@ -236,18 +230,18 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(httpMethod = HttpMethod.GET,
-            value = "List scheduled media for a broadcaster"
+    @Operation(method = HttpMethod.GET,
+        summary = "List scheduled media for a broadcaster"
     )
     @Path("/broadcaster/{broadcaster}")
     @GET
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listBroadcaster(
-            @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
-            @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-            @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
-            @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @Parameter(description = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
+            @Parameter(description = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
+            @Parameter(description = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+            @Parameter(description = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
+            @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
             @QueryParam(SORT) @DefaultValue(ASC) String sort,
             @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
             @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -269,17 +263,17 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-            httpMethod = HttpMethod.GET,
-            value = "Current item for broadcaster. I.e. the item that started most recently, and is still running."
+    @Operation(
+            method = HttpMethod.GET,
+            summary = "Current item for broadcaster. I.e. the item that started most recently, and is still running."
     )
     @Path("/broadcaster/{broadcaster}/now")
     @GET
     @NoCache
     public ApiScheduleEvent nowForBroadcaster(
-            @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-            @ApiParam(value = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
+            @Parameter(description = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
+            @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @Parameter(description = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
             @QueryParam(NOW) Instant now
 
     ) {
@@ -309,16 +303,16 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-            httpMethod = HttpMethod.GET,
-            value = "Next item for broadcaster"
+    @Operation(
+            method = HttpMethod.GET,
+            summary = "Next item for broadcaster"
     )
     @Path("/broadcaster/{broadcaster}/next")
     @GET
     @NoCache
     public ApiScheduleEvent nextForBroadcaster(
-            @ApiParam(value = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
-            @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+            @Parameter(description = MESSAGE_BROADCASTER, required = true) @PathParam(BROADCASTER) String broadcaster,
+            @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
             @QueryParam(NOW) Instant now
 
     ) {
@@ -340,18 +334,18 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(httpMethod = HttpMethod.GET,
-        value = "List scheduled media for a channel"
+    @Operation(method = HttpMethod.GET,
+        summary = "List scheduled media for a channel"
     )
     @Path("/channel/{channel}")
     @GET
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listChannel(
-        @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
-        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
-        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(required = true, example = "NED1") @PathParam(CHANNEL) String channel,
+        @Parameter(description = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
+        @Parameter(description = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+        @Parameter(description = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -375,17 +369,17 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-        httpMethod = HttpMethod.GET,
-        value = "Current item on channel"
+    @Operation(
+        method = HttpMethod.GET,
+        summary = "Current item on channel"
     )
     @Path("/channel/{channel}/now")
     @GET
     @NoCache
     public ApiScheduleEvent nowForChannel(
-        @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-        @ApiParam(value = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
+        @Parameter(required = true, example = "NED1") @PathParam(CHANNEL) String channel,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(description = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
         @QueryParam(NOW) Instant now
 
     ) {
@@ -413,16 +407,16 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-            httpMethod = HttpMethod.GET,
-            value = "Next item on channel"
+    @Operation(
+            method = HttpMethod.GET,
+            summary = "Next item on channel"
     )
     @Path("/channel/{channel}/next")
     @GET
     @NoCache
     public ApiScheduleEvent nextForChannel(
-        @ApiParam(required = true, defaultValue = "NED1") @PathParam(CHANNEL) String channel,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(required = true, example = "NED1") @PathParam(CHANNEL) String channel,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(NOW) Instant now
 
     ) {
@@ -445,19 +439,19 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-        httpMethod = HttpMethod.GET,
-        value = "List scheduled media for a net"
+    @Operation(
+        method = HttpMethod.GET,
+        summary = "List scheduled media for a net"
     )
     @Path("/net/{net}")
     @GET
     @Cache(maxAge = 600, isPrivate = true)
     public ScheduleResult listNet(
-        @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
-        @ApiParam(value = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
-        @ApiParam(value = MESSAGE_START, required = false) @QueryParam(START) Instant start,
-        @ApiParam(value = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(required = true, example = "ZAPP") @PathParam(NET) String net,
+        @Parameter(description = MESSAGE_GUIDE_DAY, required = false) @QueryParam(GUIDE_DAY) LocalDate guideDay,
+        @Parameter(description = MESSAGE_START, required = false) @QueryParam(START) Instant start,
+        @Parameter(description = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
@@ -480,17 +474,17 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-        httpMethod = HttpMethod.GET,
-        value = "Current item on net"
+    @Operation(
+        method = HttpMethod.GET,
+        summary = "Current item on net"
     )
     @Path("/net/{net}/now")
     @GET
     @NoCache
     public ApiScheduleEvent nowForNet(
-        @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-        @ApiParam(value = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
+        @Parameter(required = true, example = "ZAPP") @PathParam(NET) String net,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(description = MUST_BE_RUNNING_MESSAGE)  @QueryParam(MUST_BE_RUNNING) @DefaultValue("true") boolean mustBeRunning,
 
         @QueryParam(NOW) Instant now
 
@@ -517,16 +511,16 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
     }
 
     @Override
-    @ApiOperation(
-        httpMethod = HttpMethod.GET,
-        value = "Next item on net"
+    @Operation(
+        method = HttpMethod.GET,
+        summary = "Next item on net"
     )
     @Path("/net/{net}/next")
     @GET
     @NoCache
     public ApiScheduleEvent nextForNet(
-        @ApiParam(required = true, defaultValue = "ZAPP") @PathParam(NET) String net,
-        @ApiParam(value = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
+        @Parameter(required = true, example = "ZAPP") @PathParam(NET) String net,
+        @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
         @QueryParam(NOW) Instant now
 
     ) {
