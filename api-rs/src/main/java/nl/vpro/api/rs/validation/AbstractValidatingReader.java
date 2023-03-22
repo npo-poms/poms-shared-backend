@@ -10,9 +10,7 @@ import java.lang.reflect.Type;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -33,6 +31,8 @@ import nl.vpro.api.util.ApiMappings;
 @Log4j2
 public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T> {
 
+    public static final ThreadLocal<Boolean> CLIENT_PREFERENCE  = ThreadLocal.withInitial(() -> null);
+
     private final Class<T> classToRead;
     private final String namespace;
 
@@ -43,7 +43,6 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
     @Value("${xml.input.validate}")
     protected boolean doValidate = true;
-
 
 
     public AbstractValidatingReader(Class<T> classToRead, String namespace) {
