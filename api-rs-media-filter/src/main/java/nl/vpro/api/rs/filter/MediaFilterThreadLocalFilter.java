@@ -12,7 +12,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.MDC;
+import org.apache.logging.log4j.ThreadContext;
 
 import nl.vpro.logging.mdc.MDCConstants;
 
@@ -35,8 +35,8 @@ public class MediaFilterThreadLocalFilter implements Filter {
             }
             String query = req.getQueryString();
             String path = req.getRequestURI().substring(req.getContextPath().length());
-            MDC.put(MDCConstants.REQUEST, req.getMethod() + " " + path + (StringUtils.isEmpty(query) ? "" : ("?" + query)));
-            MDC.put(MDCConstants.REMOTE_ADDR, ip);
+            ThreadContext.put(MDCConstants.REQUEST, req.getMethod() + " " + path + (StringUtils.isEmpty(query) ? "" : ("?" + query)));
+            ThreadContext.put(MDCConstants.REMOTE_ADDR, ip);
 
             ApiMediaFilter.removeFilter();
 
@@ -50,7 +50,7 @@ public class MediaFilterThreadLocalFilter implements Filter {
             throw ioe;
         } finally {
             ApiMediaFilter.removeFilter();
-            MDC.clear();
+            ThreadContext.clearAll();
         }
     }
 
