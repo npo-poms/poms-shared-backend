@@ -3,7 +3,7 @@
 FROM openjdk:17-alpine
 MAINTAINER push-es-mappings
 
-ARG POM_VERSION
+ARG PROJECT_VERSION
 
 ENV HOST=localhost
 ENV USER=elasticsearch
@@ -16,8 +16,8 @@ RUN apk upgrade \
   && chmod -R g=u /root
 
 
-ADD target/push-es-mappings-${POM_VERSION}.jar /root/push-es-mappings-${POM_VERSION}.jar
-RUN ln -s  /root/push-es-mappings-${POM_VERSION}.jar /root/push-es-mappings.jar
+ADD target/push-es-mappings-${PROJECT_VERSION}.jar /root/push-es-mappings-${PROJECT_VERSION}.jar
+RUN ln -s  /root/push-es-mappings-${PROJECT_VERSION}.jar /root/push-es-mappings.jar
 
 WORKDIR /root
 
