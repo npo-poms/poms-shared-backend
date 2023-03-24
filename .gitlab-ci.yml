@@ -52,7 +52,7 @@ build_es_image:
 
 .push_es: &push_es
   stage: release
-  image: docker.vpro.nl/openshift-helm:1.0.0
+  image: docker.vpro.nl/vpro/openshift-helm:2.0.0
   needs: [build_es_image]
   script:
     - oc login --server=$OPENSHIFT_SERVER --token=$OPENSHIFT_TOKEN -n poms-util-$OS_ENV
@@ -113,11 +113,11 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/6.2'
+    ref: 'tags/7.2'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/6.2'
+    ref: 'tags/7.2'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/6.2'
+    ref: 'tags/7.2'
     file: 'util/kaniko.yml'
