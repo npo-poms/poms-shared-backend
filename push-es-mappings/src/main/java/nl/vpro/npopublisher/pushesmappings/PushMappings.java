@@ -1,4 +1,4 @@
-package nl.vpro.vproapi.pushesmappings;
+package nl.vpro.npopublisher.pushesmappings;
 
 import lombok.extern.log4j.Log4j2;
 import picocli.CommandLine;

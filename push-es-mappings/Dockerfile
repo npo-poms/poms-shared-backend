@@ -21,4 +21,4 @@ RUN ln -s  /root/push-es-mappings-${PROJECT_VERSION}.jar /root/push-es-mappings.
 
 WORKDIR /root
 
-CMD java -jar /root/push-es-mappings.jar --host $HOST --cluster $CLUSTER --user $USER --password $PASSWORD $(if [ "$EXPERIMENTAL" = "true" ]; then echo "--experimental";  fi)
+CMD java -jar /root/push-es-mappings.jar --host "$HOST" --cluster "$CLUSTER" --user "$USER" --password "$PASSWORD" $(if [ "$EXPERIMENTAL" = "true" ]; then echo "--experimental";  fi)
