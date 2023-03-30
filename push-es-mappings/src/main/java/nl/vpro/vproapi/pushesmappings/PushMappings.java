@@ -1,26 +1,22 @@
-package nl.vpro.npopublisher.pushesmappings;
+package nl.vpro.vproapi.pushesmappings;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.Response;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import nl.vpro.elasticsearch.*;
 import nl.vpro.elasticsearchclient.ClientElasticSearchFactory;
 import nl.vpro.elasticsearchclient.IndexHelper;
-import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.logging.simple.Log4j2SimpleLogger;
 import nl.vpro.media.domain.es.ApiCueIndex;
 
 import static nl.vpro.es.ApiPageQueryIndex.APIPAGEQUERIES;
@@ -55,7 +51,7 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  * @since 5.12
  */
 @SuppressWarnings("FieldMayBeFinal")
-@Slf4j
+@Log4j2
 public class PushMappings implements Callable<Integer> {
 
 
@@ -102,7 +98,7 @@ public class PushMappings implements Callable<Integer> {
             factory.setBasicUser(username);
             factory.setBasicPassword(password);
 
-            waitForHealth(factory);
+            IndexHelper.waitForHealth(factory.client(PushMappings.class), Log4j2SimpleLogger.of(log));
 
             Pattern onlyPattern = Pattern.compile(only);
 
@@ -129,6 +125,7 @@ public class PushMappings implements Callable<Integer> {
                 .distribution(distribution)
                 .build();
 
+
             boolean exists = helper.checkIndex();
 
             if (! exists) {
@@ -145,7 +142,7 @@ public class PushMappings implements Callable<Integer> {
                 log.info("Reput settings");
                 helper.reputSettings((settings) -> {
                     if (forceReplicas != null) {
-                        ObjectNode index = settings.with("settings").with("index");
+                        ObjectNode index = settings.withObject("settings").withObject("index");
                         index.put("number_of_replicas", forceReplicas);
                     }
                 });
@@ -170,32 +167,4 @@ public class PushMappings implements Callable<Integer> {
     }
 
 
-    protected void waitForHealth(ClientElasticSearchFactory factory) throws InterruptedException {
-        while (true) {
-            try {
-                Request request = new Request("GET", "/_cat/health");
-                request.setOptions(request.getOptions()
-                    .toBuilder()
-                    .addHeader("accept", "application/json"));
-                Response response = factory
-                    .client(PushMappings.class)
-                    .performRequest(request);
-                ArrayNode health = Jackson2Mapper.getLenientInstance()
-                    .readerFor(ArrayNode.class)
-                    .readValue(response.getEntity().getContent());
-
-                String status = health.get(0).get("status").textValue();
-                boolean serviceIsUp = "green".equals(status) || "yellow".equals(status);
-                log.info("status {}", status);
-                if (serviceIsUp) {
-                    break;
-                }
-            } catch (RuntimeException ee) {
-                throw ee;
-            } catch (Exception e){
-                log.info(e.getMessage());
-            }
-            TimeUnit.SECONDS.sleep(2);
-        }
-    }
 }

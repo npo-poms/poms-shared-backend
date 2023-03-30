@@ -98,6 +98,8 @@ push-mappings-acc:
   rules:
     - if: $CI_COMMIT_REF_NAME =~ $release_branch_pattern
       when: manual
+    - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
+      when: manual
 
 publish-mappings-prod:
   <<: *push_es
