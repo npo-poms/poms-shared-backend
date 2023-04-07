@@ -4,8 +4,7 @@
  */
 package nl.vpro.api.rs.v3.schedule;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.*;
@@ -42,6 +41,17 @@ import static nl.vpro.domain.api.Constants.*;
 @Tag(name = MediaRestService.TAG) //  documented with media, so also in that tag!
 @Path(ScheduleRestService.PATH)
 @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+@OpenAPIDefinition(
+    tags = {
+        @Tag(
+            name = ScheduleRestService.TAG,
+            externalDocs = @ExternalDocumentation(
+                description = "wiki",
+                url = "https://wiki.vpro.nl/display/npoapi/Media-+and+Schedule-API"
+            )
+        )
+    }
+)
 public class ScheduleRestServiceImpl implements ScheduleRestService {
 
     private static final String MESSAGE_GUIDE_DAY = "Guide day in simple ISO8601 format, e.g. 2014-02-27";
