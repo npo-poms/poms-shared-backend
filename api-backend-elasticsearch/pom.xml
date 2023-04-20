@@ -64,6 +64,11 @@
       <groupId>nl.vpro.api</groupId>
       <artifactId>api-backend-semantic</artifactId>
     </dependency>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 
   <build>

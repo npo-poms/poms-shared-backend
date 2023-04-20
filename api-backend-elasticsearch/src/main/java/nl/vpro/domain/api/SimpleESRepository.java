@@ -39,6 +39,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
  * A repository that talks to exactly one type in exactly one index
  * @author Michiel Meeuwisssen
  */
+@SuppressWarnings("resource")
 @Slf4j
 @Repository
 public class SimpleESRepository<T extends Identifiable<I>, I extends Serializable & Comparable<I>> extends AbstractESRepository<T> {
