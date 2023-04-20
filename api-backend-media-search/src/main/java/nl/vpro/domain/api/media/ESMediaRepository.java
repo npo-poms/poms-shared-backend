@@ -588,7 +588,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable final Instant since,
         @Nullable final String mid,
         @Nullable final ProfileDefinition<MediaObject> currentProfile,
-        @NonNull final Order order,
+        @Nullable final Order order,
         @Nullable final Integer max,
         @Nullable Deletes deletes,
         @Nullable final Tail tail,
@@ -616,7 +616,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .build();
 
         final SearchSourceBuilder searchRequestBuilder = i.prepareSearchSource(getIndexName());
-        searchRequestBuilder.sort(Common.ES_PUBLISH_DATE, SortOrder.valueOf(order.name()));
+        searchRequestBuilder.sort(Common.ES_PUBLISH_DATE, order == null ? SortOrder.ASC : SortOrder.valueOf(order.name()));
         searchRequestBuilder.sort("mid", SortOrder.ASC);
 
         searchRequestBuilder.query(QueryBuilders.boolQuery()
