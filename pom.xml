@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>7.5.0</version>
+    <version>7.6.0</version>
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
@@ -14,6 +14,8 @@
 
   <properties>
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
+
+    <poms.shared.version>7.6-SNAPSHOT</poms.shared.version>
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
 
