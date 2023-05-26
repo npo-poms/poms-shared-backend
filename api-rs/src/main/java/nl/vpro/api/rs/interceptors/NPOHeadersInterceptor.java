@@ -39,8 +39,9 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
                 if (authentication.getAuthorities() != null) {
                     response.getHeaders().putSingle(Headers.NPO_ROLES, authentication.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
+                        .filter(Roles.RECOGNIZED::contains)
                         .map(a -> a.startsWith(Roles.ROLE) ? a.substring(Roles.ROLE.length()) : a)
-                        .filter(Roles.RECOGNIZED::contains).collect(Collectors.joining(",")));
+                        .collect(Collectors.joining(",")));
                 }
             }
             response.getHeaders().putSingle(Headers.NPO_VERSION, VersionService.version());
