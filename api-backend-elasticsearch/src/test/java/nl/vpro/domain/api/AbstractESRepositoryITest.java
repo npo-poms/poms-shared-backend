@@ -14,8 +14,7 @@ import javax.inject.Inject;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.parallel.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -40,6 +39,7 @@ import static org.mockito.Mockito.when;
 @ContextConfiguration(locations = {"classpath:/broadcasterService.xml", "classpath:/esclientfactory.xml"})
 @Log4j2
 @Execution(ExecutionMode.SAME_THREAD)
+@Isolated
 public abstract class AbstractESRepositoryITest {
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
