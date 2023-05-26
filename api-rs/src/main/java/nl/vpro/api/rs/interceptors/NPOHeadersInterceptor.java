@@ -3,14 +3,17 @@ package nl.vpro.api.rs.interceptors;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.container.*;
 import javax.ws.rs.ext.Provider;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import nl.vpro.VersionService;
+import nl.vpro.domain.Roles;
 import nl.vpro.domain.api.Result;
 import nl.vpro.domain.api.media.Redirector;
 import nl.vpro.poms.shared.ExtraHeaders;
@@ -33,6 +36,12 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication != null) {
                 response.getHeaders().putSingle(Headers.NPO_CURRENT_USER, authentication.getName());
+                if (authentication.getAuthorities() != null) {
+                    response.getHeaders().putSingle(Headers.NPO_ROLES, authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .map(a -> a.startsWith(Roles.ROLE) ? a.substring(Roles.ROLE.length()) : a)
+                        .filter(Roles.RECOGNIZED::contains).collect(Collectors.joining(",")));
+                }
             }
             response.getHeaders().putSingle(Headers.NPO_VERSION, VersionService.version());
 
