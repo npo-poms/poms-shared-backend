@@ -6,7 +6,7 @@
 
   <context:property-placeholder properties-ref="properties"/>
 
-   <bean class="org.mockito.Mockito" factory-method="mock" id="couchDBMediaRepository">
+   <bean class="org.mockito.Mockito" factory-method="mock">
     <constructor-arg type="java.lang.Class" value="nl.vpro.domain.api.media.MediaRepository"/>
   </bean>
 
@@ -41,8 +41,7 @@
 
 
   <bean class="nl.vpro.domain.api.media.ESMediaRepository">
-    <constructor-arg ref="clientFactory" />
-    <constructor-arg value="titles,descriptions"/>
+    <constructor-arg index="1" value="titles,descriptions"/>
   </bean>
   <bean class="nl.vpro.media.broadcaster.BroadcasterServiceLocator" />
 </beans>

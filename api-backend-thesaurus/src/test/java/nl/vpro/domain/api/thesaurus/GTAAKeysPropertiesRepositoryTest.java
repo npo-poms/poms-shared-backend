@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
+@SuppressWarnings("OptionalGetWithoutIsPresent")
 @ExtendWith(SpringExtension.class) //  implicitly uses GTAAKeysPropertiesRepositoryTest-context.xml ?
 public class GTAAKeysPropertiesRepositoryTest {
 
