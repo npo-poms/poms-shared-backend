@@ -19,7 +19,7 @@
               <directory>src/main/resources</directory>
               <filtering>true</filtering>
               <includes>
-                <include>es7/setting/media.json</include>
+                <include>es7/**</include>
               </includes>
             </resource>
           </resources>
