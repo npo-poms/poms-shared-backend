@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
-@ExtendWith(SpringExtension.class) //  implicitely uses GTAAKeysPropertiesRepositoryTest-context.xml ?
+@ExtendWith(SpringExtension.class) //  implicitly uses GTAAKeysPropertiesRepositoryTest-context.xml ?
 public class GTAAKeysPropertiesRepositoryTest {
 
     @Autowired
