@@ -112,7 +112,6 @@ publish-mappings-prod:
     - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
       when: manual
 
-
 include:
   - project: 'shared/gitlab/gitlab-templates'
     ref: 'tags/7.9'
