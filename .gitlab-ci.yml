@@ -4,7 +4,6 @@ variables:
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
   INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
 
-
 .maven:
   services:
     - !reference [.opensearch, services]
@@ -114,11 +113,11 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/7.9'
+    ref: 'tags/8.2'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/7.9'
+    ref: 'tags/8.2'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/7.9'
+    ref: 'tags/8.2'
     file: 'util/kaniko.yml'
