@@ -156,22 +156,18 @@ public abstract class ESFacetsBuilder {
 
     protected static DateHistogramInterval from(
         DateRangeInterval.@NonNull Interval interval) {
-        switch(interval.getUnit()) {
-            case YEAR:
-                return interval.amount == 1 ? DateHistogramInterval.YEAR : DateHistogramInterval.days(interval.amount * 365);
-            case MONTH:
-                return interval.amount == 1 ? DateHistogramInterval.MONTH : DateHistogramInterval.days(interval.amount * 30);
-            case WEEK:
-                return interval.amount == 1 ? DateHistogramInterval.WEEK : DateHistogramInterval.days(interval.amount * 7);
-            case DAY:
-                return DateHistogramInterval.days(interval.amount);
-            case HOUR:
-                return DateHistogramInterval.hours(interval.amount);
-            case MINUTE:
-                return DateHistogramInterval.minutes(interval.amount);
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (interval.getUnit()) {
+            case YEAR ->
+                interval.amount == 1 ? DateHistogramInterval.YEAR : DateHistogramInterval.days(interval.amount * 365);
+            case MONTH ->
+                interval.amount == 1 ? DateHistogramInterval.MONTH : DateHistogramInterval.days(interval.amount * 30);
+            case WEEK ->
+                interval.amount == 1 ? DateHistogramInterval.WEEK : DateHistogramInterval.days(interval.amount * 7);
+            case DAY -> DateHistogramInterval.days(interval.amount);
+            case HOUR -> DateHistogramInterval.hours(interval.amount);
+            case MINUTE -> DateHistogramInterval.minutes(interval.amount);
+            default -> throw new IllegalArgumentException();
+        };
     }
 
     protected static void addDurationFacet(

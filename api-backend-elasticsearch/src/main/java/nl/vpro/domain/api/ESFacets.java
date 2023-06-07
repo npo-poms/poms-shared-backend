@@ -12,33 +12,23 @@ public class ESFacets {
         if (facet.getSort() == null) {
             return BucketOrder.count(false);
         }
-        switch (facet.getSort()) {
-            case VALUE_ASC:
-                return BucketOrder.key(true);
-            case VALUE_DESC:
-                return BucketOrder.key(false);
-            case COUNT_DESC:
-                return BucketOrder.count(false);
-            case COUNT_ASC:
-            default:
-                return BucketOrder.count(true);
-        }
+        return switch (facet.getSort()) {
+            case VALUE_ASC -> BucketOrder.key(true);
+            case VALUE_DESC -> BucketOrder.key(false);
+            case COUNT_DESC -> BucketOrder.count(false);
+            default -> BucketOrder.count(true);
+        };
     }
 
     static BucketOrder getTermsOrder(LimitableFacet<?> facet) {
         if (facet.getSort() == null) {
             return BucketOrder.count(false);
         }
-        switch (facet.getSort()) {
-            case VALUE_ASC:
-                return BucketOrder.key(true);
-            case VALUE_DESC:
-                return BucketOrder.key(false);
-            case COUNT_ASC:
-                return BucketOrder.count(true);
-            case COUNT_DESC:
-            default:
-                return BucketOrder.count(false);
-        }
+        return switch (facet.getSort()) {
+            case VALUE_ASC -> BucketOrder.key(true);
+            case VALUE_DESC -> BucketOrder.key(false);
+            case COUNT_ASC -> BucketOrder.count(true);
+            default -> BucketOrder.count(false);
+        };
     }
 }

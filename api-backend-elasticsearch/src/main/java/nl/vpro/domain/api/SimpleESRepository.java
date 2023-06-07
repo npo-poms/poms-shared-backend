@@ -37,6 +37,8 @@ import nl.vpro.jackson2.Jackson2Mapper;
 
 /**
  * A repository that talks to exactly one type in exactly one index
+ * <p>
+ * Support also {@link PrePersist}, but needing {@code jakarta.persistence-api} dependency then.
  * @author Michiel Meeuwisssen
  */
 @SuppressWarnings("resource")
@@ -80,7 +82,6 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     public String getPublishIndexName() {
         return getIndexName();
     }
-
 
     public T save(T update) {
         if (prePersist != null) {
@@ -131,7 +132,6 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
             client().delete(request, RequestOptions.DEFAULT);
         log.info("Deleted {} {} ({})", id, response.getVersion(), response.status());
         return response.status() != RestStatus.NOT_FOUND;
-
     }
 
     protected T unMap(String string) {
@@ -142,7 +142,5 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
             throw new RuntimeException(string + ":" + e.getMessage(), e);
         }
     }
-
-
 
 }

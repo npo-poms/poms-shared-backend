@@ -319,12 +319,8 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         log.debug("Found {} different media objects" , mediaObjectCount);
 
         switch (form.getPager().getOrder()) {
-            case ASC:
-                Collections.sort(results);
-                break;
-            case DESC:
-                results.sort(Comparator.reverseOrder());
-                break;
+            case ASC -> Collections.sort(results);
+            case DESC -> results.sort(Comparator.reverseOrder());
         }
         List<ApiScheduleEvent> truncated;
         if (max != null && results.size() > max) {
@@ -403,8 +399,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
         for (SearchResultItem<? extends MediaObject> resultItem : result.getItems()) {
             MediaObject mediaObject = resultItem.getResult();
-            if (mediaObject instanceof Program) {
-                Program program = (Program) mediaObject;
+            if (mediaObject instanceof Program program) {
                 for (nl.vpro.domain.media.ScheduleEvent event : program.getScheduleEvents()) {
                     ApiScheduleEvent apiEvent = new ApiScheduleEvent(event, program);
                     schedule.addScheduleEvent(apiEvent);
@@ -420,7 +415,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             Collections.reverse(items);
         }
         int total = items.size();
-        int end = new Long(offset + max).intValue();
+        int end = Long.valueOf(offset + max).intValue();
         items = items.subList((int) offset, Math.min(end, total));
         return new ScheduleSearchResult(items, offset, max, Result.Total.equalsTo(total));
     }

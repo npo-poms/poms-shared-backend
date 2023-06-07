@@ -61,8 +61,7 @@ public abstract class ESFilterBuilder {
             return doOr((AbstractOr<T>) constraint);
         } else if (constraint instanceof AbstractNot) {
             return doNot((AbstractNot<T>) constraint);
-        } else if (constraint instanceof HasLocationConstraint) {
-            HasLocationConstraint hasLocation = (HasLocationConstraint) constraint;
+        } else if (constraint instanceof HasLocationConstraint hasLocation) {
             if (hasLocation.isNoPlatform()) {
                 BoolQueryBuilder booleanFilter = QueryBuilders.boolQuery();
                 booleanFilter.must(QueryBuilders.existsQuery("locations.urn"));
@@ -73,8 +72,7 @@ public abstract class ESFilterBuilder {
             } else {
                 return doExistsConstraint(hasLocation);
             }
-        } else if (constraint instanceof HasPredictionConstraint) {
-            HasPredictionConstraint hasPrediction = (HasPredictionConstraint) constraint;
+        } else if (constraint instanceof HasPredictionConstraint hasPrediction) {
             if (hasPrediction.getPlatform() != null) {
                 return QueryBuilders.termQuery(hasPrediction.getESPath(), hasPrediction.getPlatform().name());
             } else {
@@ -122,19 +120,22 @@ public abstract class ESFilterBuilder {
         boolean exactMatch = constraint.isExact();
         String value = exactMatch ? constraint.getValue() : constraint.getWildcardValue();
         switch (constraint.getCaseHandling()) {
-            case ASIS:
+            case ASIS -> {
                 return exactMatch ?
                     termQuery(constraint.getESPath(), value) :
                     toWildCard(constraint.getESPath(), value);
-            case LOWER:
+            }
+            case LOWER -> {
                 return exactMatch ?
                     termQuery(constraint.getESPath(), value.toLowerCase()) :
                     toWildCard(constraint.getESPath(), value.toLowerCase());
-            case UPPER:
+            }
+            case UPPER -> {
                 return exactMatch ?
                     QueryBuilders.termQuery(constraint.getESPath(), value.toUpperCase()) :
                     toWildCard(constraint.getESPath(), value.toUpperCase());
-            default:
+            }
+            default -> {
                 BoolQueryBuilder queryBuilder = QueryBuilders.boolQuery();
                 if (exactMatch) {
                     queryBuilder.should(QueryBuilders.termQuery(constraint.getESPath(), value.toLowerCase()));
@@ -145,6 +146,7 @@ public abstract class ESFilterBuilder {
                     queryBuilder.should(toWildCard(constraint.getESPath(), value.toUpperCase()));
                 }
                 return queryBuilder;
+            }
         }
     }
 
@@ -162,18 +164,13 @@ public abstract class ESFilterBuilder {
     }
 
     static protected <T> QueryBuilder doDateConstraint(DateConstraint<T> constraint) {
-        switch (constraint.getOperator()) {
-            case LT:
-                return rangeQuery(constraint.getESPath()).lt(constraint.getDateAsDate().getTime());
-            case LTE:
-                return rangeQuery(constraint.getESPath()).lte(constraint.getDateAsDate().getTime());
-            case GT:
-                return rangeQuery(constraint.getESPath()).gt(constraint.getDateAsDate().getTime());
-            case GTE:
-                return rangeQuery(constraint.getESPath()).gte(constraint.getDateAsDate().getTime());
-            default:
-                throw new UnsupportedOperationException();
-        }
+        return switch (constraint.getOperator()) {
+            case LT -> rangeQuery(constraint.getESPath()).lt(constraint.getDateAsDate().getTime());
+            case LTE -> rangeQuery(constraint.getESPath()).lte(constraint.getDateAsDate().getTime());
+            case GT -> rangeQuery(constraint.getESPath()).gt(constraint.getDateAsDate().getTime());
+            case GTE -> rangeQuery(constraint.getESPath()).gte(constraint.getDateAsDate().getTime());
+            default -> throw new UnsupportedOperationException();
+        };
     }
 
     static private <T> QueryBuilder doExistsConstraint(ExistsConstraint<T> constraint) {

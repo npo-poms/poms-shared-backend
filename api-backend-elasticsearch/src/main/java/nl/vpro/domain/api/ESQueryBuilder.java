@@ -7,7 +7,6 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.*;
@@ -85,7 +84,7 @@ public abstract class ESQueryBuilder {
 
         String textWithoutStopWords = filterStopWords(textSearch.getValue());
         List<String> splitText = split(textSearch.getValue());
-        List<String> quoted = splitText.stream().filter(ESQueryBuilder::isQuoted).collect(Collectors.toList());
+        List<String> quoted = splitText.stream().filter(ESQueryBuilder::isQuoted).toList();
 
         // we entirely don't use http://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax
         // So some of the features of that are redone here.
@@ -256,15 +255,9 @@ public abstract class ESQueryBuilder {
             match = Match.MUST;
         }
         switch (match) {
-            case SHOULD:
-                answer.should(subQuery);
-                break;
-            case MUST:
-                answer.must(subQuery);
-                break;
-            case NOT:
-                answer.mustNot(subQuery);
-                break;
+            case SHOULD -> answer.should(subQuery);
+            case MUST -> answer.must(subQuery);
+            case NOT -> answer.mustNot(subQuery);
         }
     }
 

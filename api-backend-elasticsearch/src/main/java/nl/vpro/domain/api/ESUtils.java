@@ -27,16 +27,11 @@ public class ESUtils {
         while (tokenizer.hasMoreElements()) {
             String token = tokenizer.nextToken();
             switch (token) {
-                case "?":
-                    regex.append(".");
-                    break;
-                case "*":
-                    regex.append(".*");
-                    break;
-                default:
+                case "?" -> regex.append(".");
+                case "*" -> regex.append(".*");
+                default ->
                     // Can't use Pattern.quote() as that uses \Q \E which is not supported by Lucene
                     regex.append(org.apache.lucene.queryparser.classic.QueryParser.escape(token));
-                    break;
             }
         }
         return regex.toString();

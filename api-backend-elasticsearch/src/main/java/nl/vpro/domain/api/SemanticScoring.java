@@ -64,7 +64,7 @@ public class SemanticScoring {
 
     @ManagedAttribute
     public String getMinScore() {
-        return minScore == null ? "" : "" + minScore;
+        return minScore == null ? "" : String.valueOf(minScore);
     }
     @ManagedAttribute
     public void setMinScore(String score) {

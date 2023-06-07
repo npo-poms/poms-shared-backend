@@ -193,36 +193,19 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
                     }
                 } else {
                     switch (entry.getKey()) {
-                        case "boost.max":
-                            setMaxBoost(Float.parseFloat(entry.getValue()));
-                            break;
-                        case "boost.type.series":
-                            setSeriesBoost(Float.parseFloat(entry.getValue()));
-                            break;
-                        case "boost.type.broadcast":
-                            setBroadcastBoost(Float.parseFloat(entry.getValue()));
-                            break;
-                        case "boost.location":
-                            setLocationBoost(Float.parseFloat(entry.getValue()));
-                            break;
-                        case "sortDate.decay":
-                            setSortDateDecay(Float.parseFloat(entry.getValue()));
-                            break;
-                        case "sortDate.scale":
-                            setSortDateScale(entry.getValue());
-                            break;
-                        case "sortDate.offset":
-                            setSortDateOffset(entry.getValue());
-                            break;
-                        case "sortDate.gaussFactor":
-                            setSortDateGaussFactor(Float.parseFloat(entry.getValue()));
-                            break;
-                        case "sortDate.gaussOffset":
-                            setSortDateGaussOffset(Float.parseFloat(entry.getValue()));
-                            break;
-                        default:
+                        case "boost.max" -> setMaxBoost(Float.parseFloat(entry.getValue()));
+                        case "boost.type.series" -> setSeriesBoost(Float.parseFloat(entry.getValue()));
+                        case "boost.type.broadcast" -> setBroadcastBoost(Float.parseFloat(entry.getValue()));
+                        case "boost.location" -> setLocationBoost(Float.parseFloat(entry.getValue()));
+                        case "sortDate.decay" -> setSortDateDecay(Float.parseFloat(entry.getValue()));
+                        case "sortDate.scale" -> setSortDateScale(entry.getValue());
+                        case "sortDate.offset" -> setSortDateOffset(entry.getValue());
+                        case "sortDate.gaussFactor" -> setSortDateGaussFactor(Float.parseFloat(entry.getValue()));
+                        case "sortDate.gaussOffset" -> setSortDateGaussOffset(Float.parseFloat(entry.getValue()));
+                        default -> {
                             log.warn("Unrecognized entry {}", entry);
                             continue;
+                        }
                     }
                 }
             } catch (Exception e) {
