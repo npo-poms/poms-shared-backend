@@ -20,8 +20,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.*;
 
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.Log4j2Helper;
@@ -36,7 +35,12 @@ import nl.vpro.util.*;
 @Log4j2
 public class Iterate {
 
-
+    static {
+        // this is the mapper used to read ES responses
+        Jackson2Mapper.getLenientInstance().getFactory()
+            .setStreamReadConstraints(StreamReadConstraints.builder().maxStringLength(50_000_000).build());
+        log.info("Set max string length of {} to 50_000_000", Jackson2Mapper.getLenientInstance().getFactory());
+    }
     /**
      * @param creator  Supplies an iterator of objects, which will be used to make json objects.
      *                 The JsonGenerator argument can be ignored, but it can also be used to write opening json
