@@ -231,10 +231,11 @@ public class ApiMediaFilterTest {
     @Test
     public void testSegment() throws Exception {
         Segment segment = Jackson2TestUtil.roundTrip(
-                MediaTestDataBuilder.segment()
-                        .midRef("ABC_DEF")
-                        .withLocations()
-                        .build());
+            MediaTestDataBuilder.segment()
+                .midRef("ABC_DEF")
+                .mid("segment_mid")
+                .withLocations()
+                .build());
         assertThat(segment.getLocations()).hasSize(4);
         assertThat(segment.getLocations().first().getWorkflow()).isEqualTo(Workflow.PUBLISHED);
         ApiMediaFilter.set("location,workflow");
