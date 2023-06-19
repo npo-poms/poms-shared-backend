@@ -951,7 +951,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             HasLocationConstraint hasLocationConstraint = new HasLocationConstraint();
             hasLocationConstraint.setPlatform(Platform.INTERNETVOD.name());
             filter.setConstraint(hasLocationConstraint);
-            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<MediaObject>(filter);
+            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<>(filter);
             JAXB.marshal(hasLocations, System.out);
 
             MediaSearchResult result = target.find(hasLocations, null, 0, null);
@@ -1889,28 +1889,30 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             .creationDate(LocalDateTime.of(2017, 10, 11, 10, 2))
         );
 
-        MediaForm form = Jackson2Mapper.getInstance().readValue("{\n" +
-            "    \"facets\": {\n" +
-            "        \"titles\": [\n" +
-            "            {\n" +
-            "                \"name\": \"a\",\n" +
-            "                \"subSearch\": {\n" +
-            "                    \"type\": \"MAIN\",\n" +
-            "                    \"value\": \"b*\",\n" +
-            "                    \"matchType\": \"WILDCARD\"\n" +
-            "                }\n" +
-            "            },\n" +
-            "            {\n" +
-            "                \"name\": \"b\",\n" +
-            "                \"subSearch\": {\n" +
-            "                    \"type\": \"MAIN\",\n" +
-            "                    \"value\": \"a*\",\n" +
-            "                    \"matchType\": \"WILDCARD\"\n" +
-            "                }\n" +
-            "            }\n" +
-            "        ]\n" +
-            "    }\n" +
-            "}\n", MediaForm.class);
+        MediaForm form = Jackson2Mapper.getInstance().readValue("""
+            {
+                "facets": {
+                    "titles": [
+                        {
+                            "name": "a",
+                            "subSearch": {
+                                "type": "MAIN",
+                                "value": "b*",
+                                "matchType": "WILDCARD"
+                            }
+                        },
+                        {
+                            "name": "b",
+                            "subSearch": {
+                                "type": "MAIN",
+                                "value": "a*",
+                                "matchType": "WILDCARD"
+                            }
+                        }
+                    ]
+                }
+            }
+            """, MediaForm.class);
 
         MediaSearchResult result = target.find(null, form, 0, 0);
 

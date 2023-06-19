@@ -23,11 +23,12 @@ public class ESMediaQueryBuilderTest {
         QueryBuilder builder = ESMediaQueryBuilder.query("", new MediaSearch());
 
         assertThat(builder.toString()).isEqualTo(
-            "{\n" +
-                "  \"match_all\" : {\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}");
+            """
+                {
+                  "match_all" : {
+                    "boost" : 1.0
+                  }
+                }""");
     }
 
     @Test
@@ -47,78 +48,79 @@ public class ESMediaQueryBuilderTest {
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
 
         assertThat(builder.toString()).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"must_not\" : [\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"mid\" : {\n" +
-                "                  \"value\" : \"POMS_12345\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"urn\" : {\n" +
-                "                  \"value\" : \"POMS_12345\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"crids\" : {\n" +
-                "                  \"value\" : \"POMS_12345\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"mid\" : {\n" +
-                "                  \"value\" : \"POMS_12346\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"urn\" : {\n" +
-                "                  \"value\" : \"POMS_12346\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"crids\" : {\n" +
-                "                  \"value\" : \"POMS_12346\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}");
+            """
+                {
+                  "bool" : {
+                    "must_not" : [
+                      {
+                        "bool" : {
+                          "should" : [
+                            {
+                              "term" : {
+                                "mid" : {
+                                  "value" : "POMS_12345",
+                                  "boost" : 1.0
+                                }
+                              }
+                            },
+                            {
+                              "term" : {
+                                "urn" : {
+                                  "value" : "POMS_12345",
+                                  "boost" : 1.0
+                                }
+                              }
+                            },
+                            {
+                              "term" : {
+                                "crids" : {
+                                  "value" : "POMS_12345",
+                                  "boost" : 1.0
+                                }
+                              }
+                            }
+                          ],
+                          "adjust_pure_negative" : true,
+                          "boost" : 1.0
+                        }
+                      },
+                      {
+                        "bool" : {
+                          "should" : [
+                            {
+                              "term" : {
+                                "mid" : {
+                                  "value" : "POMS_12346",
+                                  "boost" : 1.0
+                                }
+                              }
+                            },
+                            {
+                              "term" : {
+                                "urn" : {
+                                  "value" : "POMS_12346",
+                                  "boost" : 1.0
+                                }
+                              }
+                            },
+                            {
+                              "term" : {
+                                "crids" : {
+                                  "value" : "POMS_12346",
+                                  "boost" : 1.0
+                                }
+                              }
+                            }
+                          ],
+                          "adjust_pure_negative" : true,
+                          "boost" : 1.0
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }""");
     }
 
     @Test
@@ -128,30 +130,31 @@ public class ESMediaQueryBuilderTest {
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
 
         assertThat(builder.toString()).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"should\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"broadcasters.id\" : {\n" +
-                "            \"value\" : \"VPRO\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"broadcasters.id\" : {\n" +
-                "            \"value\" : \"BNN\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}");
+            """
+                {
+                  "bool" : {
+                    "should" : [
+                      {
+                        "term" : {
+                          "broadcasters.id" : {
+                            "value" : "VPRO",
+                            "boost" : 1.0
+                          }
+                        }
+                      },
+                      {
+                        "term" : {
+                          "broadcasters.id" : {
+                            "value" : "BNN",
+                            "boost" : 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }""");
     }
 
     @Test
@@ -161,38 +164,39 @@ public class ESMediaQueryBuilderTest {
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
 
         assertThat(builder.toString()).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"should\" : [\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"should\" : [\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"locations.programUrl\" : {\n" +
-                "                  \"value\" : \"mP3\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"locations.programUrl.extension\" : {\n" +
-                "                  \"value\" : \"mp3\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}");
+            """
+                {
+                  "bool" : {
+                    "should" : [
+                      {
+                        "bool" : {
+                          "should" : [
+                            {
+                              "term" : {
+                                "locations.programUrl" : {
+                                  "value" : "mP3",
+                                  "boost" : 1.0
+                                }
+                              }
+                            },
+                            {
+                              "term" : {
+                                "locations.programUrl.extension" : {
+                                  "value" : "mp3",
+                                  "boost" : 1.0
+                                }
+                              }
+                            }
+                          ],
+                          "adjust_pure_negative" : true,
+                          "boost" : 1.0
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }""");
     }
 
     @Test
@@ -200,30 +204,31 @@ public class ESMediaQueryBuilderTest {
         MediaForm form = MediaFormBuilder.form().tags("Kunst", "Kunst & Cultuur").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
-        assertThat(builder.toString()).isEqualTo("{\n" +
-            "  \"bool\" : {\n" +
-            "    \"should\" : [\n" +
-            "      {\n" +
-            "        \"term\" : {\n" +
-            "          \"tags.full\" : {\n" +
-            "            \"value\" : \"Kunst\",\n" +
-            "            \"boost\" : 1.0\n" +
-            "          }\n" +
-            "        }\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"term\" : {\n" +
-            "          \"tags.full\" : {\n" +
-            "            \"value\" : \"Kunst & Cultuur\",\n" +
-            "            \"boost\" : 1.0\n" +
-            "          }\n" +
-            "        }\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"adjust_pure_negative\" : true,\n" +
-            "    \"boost\" : 1.0\n" +
-            "  }\n" +
-            "}");
+        assertThat(builder.toString()).isEqualTo("""
+            {
+              "bool" : {
+                "should" : [
+                  {
+                    "term" : {
+                      "tags.full" : {
+                        "value" : "Kunst",
+                        "boost" : 1.0
+                      }
+                    }
+                  },
+                  {
+                    "term" : {
+                      "tags.full" : {
+                        "value" : "Kunst & Cultuur",
+                        "boost" : 1.0
+                      }
+                    }
+                  }
+                ],
+                "adjust_pure_negative" : true,
+                "boost" : 1.0
+              }
+            }""");
     }
 
     @Test
@@ -231,78 +236,79 @@ public class ESMediaQueryBuilderTest {
         MediaForm form = MediaFormBuilder.form().mediaIds("MID1", "MID2").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
-        assertThat(builder.toString()).isEqualTo("{\n" +
-            "  \"bool\" : {\n" +
-            "    \"should\" : [\n" +
-            "      {\n" +
-            "        \"bool\" : {\n" +
-            "          \"should\" : [\n" +
-            "            {\n" +
-            "              \"term\" : {\n" +
-            "                \"mid\" : {\n" +
-            "                  \"value\" : \"MID1\",\n" +
-            "                  \"boost\" : 1.0\n" +
-            "                }\n" +
-            "              }\n" +
-            "            },\n" +
-            "            {\n" +
-            "              \"term\" : {\n" +
-            "                \"urn\" : {\n" +
-            "                  \"value\" : \"MID1\",\n" +
-            "                  \"boost\" : 1.0\n" +
-            "                }\n" +
-            "              }\n" +
-            "            },\n" +
-            "            {\n" +
-            "              \"term\" : {\n" +
-            "                \"crids\" : {\n" +
-            "                  \"value\" : \"MID1\",\n" +
-            "                  \"boost\" : 1.0\n" +
-            "                }\n" +
-            "              }\n" +
-            "            }\n" +
-            "          ],\n" +
-            "          \"adjust_pure_negative\" : true,\n" +
-            "          \"boost\" : 1.0\n" +
-            "        }\n" +
-            "      },\n" +
-            "      {\n" +
-            "        \"bool\" : {\n" +
-            "          \"should\" : [\n" +
-            "            {\n" +
-            "              \"term\" : {\n" +
-            "                \"mid\" : {\n" +
-            "                  \"value\" : \"MID2\",\n" +
-            "                  \"boost\" : 1.0\n" +
-            "                }\n" +
-            "              }\n" +
-            "            },\n" +
-            "            {\n" +
-            "              \"term\" : {\n" +
-            "                \"urn\" : {\n" +
-            "                  \"value\" : \"MID2\",\n" +
-            "                  \"boost\" : 1.0\n" +
-            "                }\n" +
-            "              }\n" +
-            "            },\n" +
-            "            {\n" +
-            "              \"term\" : {\n" +
-            "                \"crids\" : {\n" +
-            "                  \"value\" : \"MID2\",\n" +
-            "                  \"boost\" : 1.0\n" +
-            "                }\n" +
-            "              }\n" +
-            "            }\n" +
-            "          ],\n" +
-            "          \"adjust_pure_negative\" : true,\n" +
-            "          \"boost\" : 1.0\n" +
-            "        }\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"adjust_pure_negative\" : true,\n" +
-            "    \"boost\" : 1.0\n" +
-            "  }\n" +
-            "}");
+        assertThat(builder.toString()).isEqualTo("""
+            {
+              "bool" : {
+                "should" : [
+                  {
+                    "bool" : {
+                      "should" : [
+                        {
+                          "term" : {
+                            "mid" : {
+                              "value" : "MID1",
+                              "boost" : 1.0
+                            }
+                          }
+                        },
+                        {
+                          "term" : {
+                            "urn" : {
+                              "value" : "MID1",
+                              "boost" : 1.0
+                            }
+                          }
+                        },
+                        {
+                          "term" : {
+                            "crids" : {
+                              "value" : "MID1",
+                              "boost" : 1.0
+                            }
+                          }
+                        }
+                      ],
+                      "adjust_pure_negative" : true,
+                      "boost" : 1.0
+                    }
+                  },
+                  {
+                    "bool" : {
+                      "should" : [
+                        {
+                          "term" : {
+                            "mid" : {
+                              "value" : "MID2",
+                              "boost" : 1.0
+                            }
+                          }
+                        },
+                        {
+                          "term" : {
+                            "urn" : {
+                              "value" : "MID2",
+                              "boost" : 1.0
+                            }
+                          }
+                        },
+                        {
+                          "term" : {
+                            "crids" : {
+                              "value" : "MID2",
+                              "boost" : 1.0
+                            }
+                          }
+                        }
+                      ],
+                      "adjust_pure_negative" : true,
+                      "boost" : 1.0
+                    }
+                  }
+                ],
+                "adjust_pure_negative" : true,
+                "boost" : 1.0
+              }
+            }""");
     }
 
     @Test
@@ -310,38 +316,39 @@ public class ESMediaQueryBuilderTest {
         MediaForm form = MediaFormBuilder.form().genres("3.0.1.1", "3.0.1.2").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
-        assertThat(builder.toString()).isEqualTo("{\n" +
-            "  \"nested\" : {\n" +
-            "    \"query\" : {\n" +
-            "      \"bool\" : {\n" +
-            "        \"should\" : [\n" +
-            "          {\n" +
-            "            \"term\" : {\n" +
-            "              \"genres.id\" : {\n" +
-            "                \"value\" : \"3.0.1.1\",\n" +
-            "                \"boost\" : 1.0\n" +
-            "              }\n" +
-            "            }\n" +
-            "          },\n" +
-            "          {\n" +
-            "            \"term\" : {\n" +
-            "              \"genres.id\" : {\n" +
-            "                \"value\" : \"3.0.1.2\",\n" +
-            "                \"boost\" : 1.0\n" +
-            "              }\n" +
-            "            }\n" +
-            "          }\n" +
-            "        ],\n" +
-            "        \"adjust_pure_negative\" : true,\n" +
-            "        \"boost\" : 1.0\n" +
-            "      }\n" +
-            "    },\n" +
-            "    \"path\" : \"genres\",\n" +
-            "    \"ignore_unmapped\" : false,\n" +
-            "    \"score_mode\" : \"avg\",\n" +
-            "    \"boost\" : 1.0\n" +
-            "  }\n" +
-            "}");
+        assertThat(builder.toString()).isEqualTo("""
+            {
+              "nested" : {
+                "query" : {
+                  "bool" : {
+                    "should" : [
+                      {
+                        "term" : {
+                          "genres.id" : {
+                            "value" : "3.0.1.1",
+                            "boost" : 1.0
+                          }
+                        }
+                      },
+                      {
+                        "term" : {
+                          "genres.id" : {
+                            "value" : "3.0.1.2",
+                            "boost" : 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                },
+                "path" : "genres",
+                "ignore_unmapped" : false,
+                "score_mode" : "avg",
+                "boost" : 1.0
+              }
+            }""");
     }
 
     @Test

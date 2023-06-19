@@ -350,19 +350,20 @@ public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
                 )
         );
 
-        String example = "<api:scheduleForm xmlns:api=\"urn:vpro:api:2013\" xmlns:media=\"urn:vpro:media:2009\" xmlns:pages=\"urn:vpro:pages:2013\">\n" +
-            "  <api:searches>\n" +
-            "    <api:genres match=\"MUST\">\n" +
-            "      <api:matcher match=\"SHOULD\">3.0.1.2</api:matcher>\n" +
-            "      <api:matcher matchType=\"WILDCARD\" match=\"SHOULD\">3.0.1.2.*</api:matcher>\n" +
-            "    </api:genres>\n" +
-            "    <api:scheduleEvents>\n" +
-            "      <api:begin>2018-01-23T06:00:00+01:00</api:begin>\n" +
-            "      <api:end>2018-01-24T06:00:00+01:00</api:end>\n" +
-            "      <api:channel>NDR3</api:channel>\n" +
-            "    </api:scheduleEvents>\n" +
-            "  </api:searches>\n" +
-            "</api:scheduleForm>";
+        String example = """
+            <api:scheduleForm xmlns:api="urn:vpro:api:2013" xmlns:media="urn:vpro:media:2009" xmlns:pages="urn:vpro:pages:2013">
+              <api:searches>
+                <api:genres match="MUST">
+                  <api:matcher match="SHOULD">3.0.1.2</api:matcher>
+                  <api:matcher matchType="WILDCARD" match="SHOULD">3.0.1.2.*</api:matcher>
+                </api:genres>
+                <api:scheduleEvents>
+                  <api:begin>2018-01-23T06:00:00+01:00</api:begin>
+                  <api:end>2018-01-24T06:00:00+01:00</api:end>
+                  <api:channel>NDR3</api:channel>
+                </api:scheduleEvents>
+              </api:searches>
+            </api:scheduleForm>""";
         ScheduleForm form = JAXB.unmarshal(new StringReader(example), ScheduleForm.class);
         ScheduleSearchResult schedules = repository.findSchedules(null, form, null,0L, 10);
         assertThat(schedules).hasSize(1);

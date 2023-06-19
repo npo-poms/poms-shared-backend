@@ -25,22 +25,23 @@ public class ESMediaFilterBuilderTest {
     @Test
     public void testFilterProfileOnNullArgument() {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
-        assertThat(toString(builder)).isEqualTo("{\n" +
-            "  \"bool\" : {\n" +
-            "    \"filter\" : [\n" +
-            "      {\n" +
-            "        \"term\" : {\n" +
-            "          \"workflow\" : {\n" +
-            "            \"value\" : \"PUBLISHED\",\n" +
-            "            \"boost\" : 1.0\n" +
-            "          }\n" +
-            "        }\n" +
-            "      }\n" +
-            "    ],\n" +
-            "    \"adjust_pure_negative\" : true,\n" +
-            "    \"boost\" : 1.0\n" +
-            "  }\n" +
-            "}"
+        assertThat(toString(builder)).isEqualTo("""
+            {
+              "bool" : {
+                "filter" : [
+                  {
+                    "term" : {
+                      "workflow" : {
+                        "value" : "PUBLISHED",
+                        "boost" : 1.0
+                      }
+                    }
+                  }
+                ],
+                "adjust_pure_negative" : true,
+                "boost" : 1.0
+              }
+            }"""
         );
     }
 
@@ -51,30 +52,31 @@ public class ESMediaFilterBuilderTest {
         ));
         QueryBuilder builder = ESMediaFilterBuilder.filter(definition);
         assertThat(toString(builder)).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"filter\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"workflow\" : {\n" +
-                "            \"value\" : \"PUBLISHED\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"broadcasters.id\" : {\n" +
-                "            \"value\" : \"vpro\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}"
+            """
+                {
+                  "bool" : {
+                    "filter" : [
+                      {
+                        "term" : {
+                          "workflow" : {
+                            "value" : "PUBLISHED",
+                            "boost" : 1.0
+                          }
+                        }
+                      },
+                      {
+                        "term" : {
+                          "broadcasters.id" : {
+                            "value" : "vpro",
+                            "boost" : 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }"""
         );
     }
 
@@ -95,82 +97,83 @@ public class ESMediaFilterBuilderTest {
         ));
         QueryBuilder builder = ESMediaFilterBuilder.filter(definition);
         assertThat(toString(builder)).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"filter\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"workflow\" : {\n" +
-                "            \"value\" : \"PUBLISHED\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"bool\" : {\n" +
-                "          \"must\" : [\n" +
-                "            {\n" +
-                "              \"term\" : {\n" +
-                "                \"broadcasters.id\" : {\n" +
-                "                  \"value\" : \"VpRo\",\n" +
-                "                  \"boost\" : 1.0\n" +
-                "                }\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"bool\" : {\n" +
-                "                \"should\" : [\n" +
-                "                  {\n" +
-                "                    \"term\" : {\n" +
-                "                      \"descendantOf.midRef\" : {\n" +
-                "                        \"value\" : \"POMS_S_aa12345\",\n" +
-                "                        \"boost\" : 1.0\n" +
-                "                      }\n" +
-                "                    }\n" +
-                "                  },\n" +
-                "                  {\n" +
-                "                    \"exists\" : {\n" +
-                "                      \"field\" : \"images.urn\",\n" +
-                "                      \"boost\" : 1.0\n" +
-                "                    }\n" +
-                "                  }\n" +
-                "                ],\n" +
-                "                \"adjust_pure_negative\" : true,\n" +
-                "                \"boost\" : 1.0\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"bool\" : {\n" +
-                "                \"must_not\" : [\n" +
-                "                  {\n" +
-                "                    \"term\" : {\n" +
-                "                      \"type\" : {\n" +
-                "                        \"value\" : \"VISUALRADIO\",\n" +
-                "                        \"boost\" : 1.0\n" +
-                "                      }\n" +
-                "                    }\n" +
-                "                  }\n" +
-                "                ],\n" +
-                "                \"adjust_pure_negative\" : true,\n" +
-                "                \"boost\" : 1.0\n" +
-                "              }\n" +
-                "            },\n" +
-                "            {\n" +
-                "              \"exists\" : {\n" +
-                "                \"field\" : \"images.urn\",\n" +
-                "                \"boost\" : 1.0\n" +
-                "              }\n" +
-                "            }\n" +
-                "          ],\n" +
-                "          \"adjust_pure_negative\" : true,\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}"
+            """
+                {
+                  "bool" : {
+                    "filter" : [
+                      {
+                        "term" : {
+                          "workflow" : {
+                            "value" : "PUBLISHED",
+                            "boost" : 1.0
+                          }
+                        }
+                      },
+                      {
+                        "bool" : {
+                          "must" : [
+                            {
+                              "term" : {
+                                "broadcasters.id" : {
+                                  "value" : "VpRo",
+                                  "boost" : 1.0
+                                }
+                              }
+                            },
+                            {
+                              "bool" : {
+                                "should" : [
+                                  {
+                                    "term" : {
+                                      "descendantOf.midRef" : {
+                                        "value" : "POMS_S_aa12345",
+                                        "boost" : 1.0
+                                      }
+                                    }
+                                  },
+                                  {
+                                    "exists" : {
+                                      "field" : "images.urn",
+                                      "boost" : 1.0
+                                    }
+                                  }
+                                ],
+                                "adjust_pure_negative" : true,
+                                "boost" : 1.0
+                              }
+                            },
+                            {
+                              "bool" : {
+                                "must_not" : [
+                                  {
+                                    "term" : {
+                                      "type" : {
+                                        "value" : "VISUALRADIO",
+                                        "boost" : 1.0
+                                      }
+                                    }
+                                  }
+                                ],
+                                "adjust_pure_negative" : true,
+                                "boost" : 1.0
+                              }
+                            },
+                            {
+                              "exists" : {
+                                "field" : "images.urn",
+                                "boost" : 1.0
+                              }
+                            }
+                          ],
+                          "adjust_pure_negative" : true,
+                          "boost" : 1.0
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }"""
         );
     }
 
@@ -178,22 +181,23 @@ public class ESMediaFilterBuilderTest {
     public void testFilterProfileWithExtraFilterOnNullArguments() {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"filter\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"workflow\" : {\n" +
-                "            \"value\" : \"PUBLISHED\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}"
+            """
+                {
+                  "bool" : {
+                    "filter" : [
+                      {
+                        "term" : {
+                          "workflow" : {
+                            "value" : "PUBLISHED",
+                            "boost" : 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }"""
         );
     }
 
@@ -203,14 +207,15 @@ public class ESMediaFilterBuilderTest {
         boolQueryBuilder.must(QueryBuilders.termQuery("name", "value"));
         ESMediaQueryBuilder.buildMediaQuery("", boolQueryBuilder,null);
         assertThat(toString(ESQueryBuilder.simplifyQuery(boolQueryBuilder))).isEqualTo(
-            "{\n" +
-                "  \"term\" : {\n" +
-                "    \"name\" : {\n" +
-                "      \"value\" : \"value\",\n" +
-                "      \"boost\" : 1.0\n" +
-                "    }\n" +
-                "  }\n" +
-                "}"
+            """
+                {
+                  "term" : {
+                    "name" : {
+                      "value" : "value",
+                      "boost" : 1.0
+                    }
+                  }
+                }"""
         );
     }
 
@@ -224,40 +229,41 @@ public class ESMediaFilterBuilderTest {
 
         ESMediaFilterBuilder.filter(definition, boolQueryBuilder);
         assertThat(toString(boolQueryBuilder)).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"must\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"name\" : {\n" +
-                "            \"value\" : \"value\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"filter\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"workflow\" : {\n" +
-                "            \"value\" : \"PUBLISHED\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"broadcasters.id\" : {\n" +
-                "            \"value\" : \"Vpro\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}"
+            """
+                {
+                  "bool" : {
+                    "must" : [
+                      {
+                        "term" : {
+                          "name" : {
+                            "value" : "value",
+                            "boost" : 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "filter" : [
+                      {
+                        "term" : {
+                          "workflow" : {
+                            "value" : "PUBLISHED",
+                            "boost" : 1.0
+                          }
+                        }
+                      },
+                      {
+                        "term" : {
+                          "broadcasters.id" : {
+                            "value" : "Vpro",
+                            "boost" : 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }"""
         );
     }
 
@@ -270,62 +276,63 @@ public class ESMediaFilterBuilderTest {
         builder.must(QueryBuilders.termQuery("name", "value"));
         ESMediaFilterBuilder.filter(definition, builder);
         assertThat(toString(builder)).isEqualTo(
-            "{\n" +
-                "  \"bool\" : {\n" +
-                "    \"must\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"name\" : {\n" +
-                "            \"value\" : \"value\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"filter\" : [\n" +
-                "      {\n" +
-                "        \"term\" : {\n" +
-                "          \"workflow\" : {\n" +
-                "            \"value\" : \"PUBLISHED\",\n" +
-                "            \"boost\" : 1.0\n" +
-                "          }\n" +
-                "        }\n" +
-                "      },\n" +
-                "      {\n" +
-                "        \"nested\" : {\n" +
-                "          \"query\" : {\n" +
-                "            \"bool\" : {\n" +
-                "              \"must\" : [\n" +
-                "                {\n" +
-                "                  \"exists\" : {\n" +
-                "                    \"field\" : \"locations.urn\",\n" +
-                "                    \"boost\" : 1.0\n" +
-                "                  }\n" +
-                "                }\n" +
-                "              ],\n" +
-                "              \"must_not\" : [\n" +
-                "                {\n" +
-                "                  \"exists\" : {\n" +
-                "                    \"field\" : \"locations.platform\",\n" +
-                "                    \"boost\" : 1.0\n" +
-                "                  }\n" +
-                "                }\n" +
-                "              ],\n" +
-                "              \"adjust_pure_negative\" : true,\n" +
-                "              \"boost\" : 1.0\n" +
-                "            }\n" +
-                "          },\n" +
-                "          \"path\" : \"locations\",\n" +
-                "          \"ignore_unmapped\" : false,\n" +
-                "          \"score_mode\" : \"avg\",\n" +
-                "          \"boost\" : 1.0\n" +
-                "        }\n" +
-                "      }\n" +
-                "    ],\n" +
-                "    \"adjust_pure_negative\" : true,\n" +
-                "    \"boost\" : 1.0\n" +
-                "  }\n" +
-                "}"
+            """
+                {
+                  "bool" : {
+                    "must" : [
+                      {
+                        "term" : {
+                          "name" : {
+                            "value" : "value",
+                            "boost" : 1.0
+                          }
+                        }
+                      }
+                    ],
+                    "filter" : [
+                      {
+                        "term" : {
+                          "workflow" : {
+                            "value" : "PUBLISHED",
+                            "boost" : 1.0
+                          }
+                        }
+                      },
+                      {
+                        "nested" : {
+                          "query" : {
+                            "bool" : {
+                              "must" : [
+                                {
+                                  "exists" : {
+                                    "field" : "locations.urn",
+                                    "boost" : 1.0
+                                  }
+                                }
+                              ],
+                              "must_not" : [
+                                {
+                                  "exists" : {
+                                    "field" : "locations.platform",
+                                    "boost" : 1.0
+                                  }
+                                }
+                              ],
+                              "adjust_pure_negative" : true,
+                              "boost" : 1.0
+                            }
+                          },
+                          "path" : "locations",
+                          "ignore_unmapped" : false,
+                          "score_mode" : "avg",
+                          "boost" : 1.0
+                        }
+                      }
+                    ],
+                    "adjust_pure_negative" : true,
+                    "boost" : 1.0
+                  }
+                }"""
         );
     }
 
