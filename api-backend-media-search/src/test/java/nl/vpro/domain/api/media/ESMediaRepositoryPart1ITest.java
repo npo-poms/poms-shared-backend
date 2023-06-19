@@ -951,7 +951,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             HasLocationConstraint hasLocationConstraint = new HasLocationConstraint();
             hasLocationConstraint.setPlatform(Platform.INTERNETVOD.name());
             filter.setConstraint(hasLocationConstraint);
-            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<>(filter, null);
+            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<MediaObject>(filter);
             JAXB.marshal(hasLocations, System.out);
 
             MediaSearchResult result = target.find(hasLocations, null, 0, null);
@@ -962,7 +962,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             HasLocationConstraint hasLocationConstraint = new HasLocationConstraint();
             hasLocationConstraint.setPlatform("NONE");
             filter.setConstraint(hasLocationConstraint);
-            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<>(filter, null);
+            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<>(filter);
             JAXB.marshal(hasLocations, System.out);
 
             MediaSearchResult result = target.find(hasLocations, null, 0, null);
@@ -979,7 +979,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             or.getConstraints().add(hasLocationConstraint2);
 
             filter.setConstraint(or);
-            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<>(filter, null);
+            ProfileDefinition<MediaObject> hasLocations = new ProfileDefinition<>(filter);
             JAXB.marshal(hasLocations, System.out);
 
             MediaSearchResult result = target.find(hasLocations, null, 0, null);
