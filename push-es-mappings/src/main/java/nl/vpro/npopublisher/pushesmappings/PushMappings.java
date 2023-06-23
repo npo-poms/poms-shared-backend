@@ -18,6 +18,8 @@ import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.logging.simple.Log4j2SimpleLogger;
 import nl.vpro.media.domain.es.ApiCueIndex;
 
+import static nl.vpro.elasticsearch.Constants.P_INDEX;
+import static nl.vpro.elasticsearch.Constants.P_SETTINGS;
 import static nl.vpro.es.ApiPageQueryIndex.APIPAGEQUERIES;
 import static nl.vpro.es.ApiQueryIndex.APIQUERIES;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
@@ -49,7 +51,7 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  * @author Michiel Meeuwissen
  * @since 5.12
  */
-@SuppressWarnings("FieldMayBeFinal")
+@SuppressWarnings({"FieldMayBeFinal", "FieldCanBeLocal"})
 @Log4j2
 public class PushMappings implements Callable<Integer> {
 
@@ -117,10 +119,10 @@ public class PushMappings implements Callable<Integer> {
 
 
     protected  void createIndexIfNecessaryAndPushMappings(ClientElasticSearchFactory factory, ElasticSearchIndex elasticSearchIndex ) {
-        try {
+        try (
             IndexHelper helper = IndexHelper.of(log, factory, elasticSearchIndex)
                 .distribution(distribution)
-                .build();
+                .build()) {
 
 
             boolean exists = helper.checkIndex();
@@ -139,7 +141,7 @@ public class PushMappings implements Callable<Integer> {
                 log.info("Reput settings");
                 helper.reputSettings((settings) -> {
                     if (forceReplicas != null) {
-                        ObjectNode index = settings.withObject("settings").withObject("index");
+                        ObjectNode index = settings.withObject(P_SETTINGS).withObject(P_INDEX);
                         index.put("number_of_replicas", forceReplicas);
                     }
                 });
