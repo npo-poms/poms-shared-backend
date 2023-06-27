@@ -98,8 +98,10 @@ push-mappings-acc:
   rules:
     - if: $CI_COMMIT_REF_NAME =~ $release_branch_pattern
       when: manual
+      allow_failure: true
     - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
       when: manual
+      allow_failure: true
 
 publish-mappings-prod:
   <<: *push_es
@@ -111,6 +113,7 @@ publish-mappings-prod:
   rules:
     - if: $CI_COMMIT_REF_NAME =~ $release_tag_pattern
       when: manual
+      allow_failure: true
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
