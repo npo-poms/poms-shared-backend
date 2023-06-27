@@ -53,6 +53,8 @@ build_es_image:
   stage: release
   image: docker.vpro.nl/vpro/openshift-helm:2.2.0
   needs: [build_es_image]
+  before_script:
+    - !reference [ .kaniko_build_setup, script ]
   script:
     - oc login --server=$OPENSHIFT_SERVER --token=$OPENSHIFT_TOKEN -n poms-util-$OS_ENV
     - oc -n poms-util-$OS_ENV delete pod es-builder || echo 'No previous es-builder instance found'
