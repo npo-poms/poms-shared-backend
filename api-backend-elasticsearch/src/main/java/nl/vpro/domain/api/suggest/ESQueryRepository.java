@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -118,7 +119,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
 
     @Override
     @SneakyThrows(IOException.class)
-    public SuggestResult suggest(String input, String profile, Integer max) {
+    public SuggestResult suggest(String input, @Nullable String profile, Integer max) {
         SearchRequest searchRequest = new SearchRequest(getIndexName());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.suggest(suggestBuilder(Query.queryId(input, profile), profile, max));
@@ -148,13 +149,13 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         return Comparator.comparingInt(o ->  LevenshteinDistance.getDefaultInstance().apply(input, o.getText()));
     }
 
-    SuggestResult adapt(Suggest suggestions, final String input, final String profile) {
+    SuggestResult adapt(Suggest suggestions, final String input, @Nullable final String profile) {
         if (suggestions == null) {
             log.debug("No suggestions given");
             return SuggestResult.emptyResult();
         }
         Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> esSuggestion = suggestions.getSuggestion("suggest");
-        if (esSuggestion != null && esSuggestion.getEntries().size() > 0) {
+        if (esSuggestion != null && !esSuggestion.getEntries().isEmpty()) {
             final List<? extends Suggest.Suggestion.Entry.Option> options = esSuggestion.getEntries().get(0).getOptions();
             if (options != null) {
                 final List<Suggestion> suggestionsList = options.stream()
