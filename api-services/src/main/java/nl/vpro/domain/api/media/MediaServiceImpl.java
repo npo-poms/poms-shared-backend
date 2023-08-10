@@ -272,7 +272,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Nullable
     private ProfileDefinition<MediaObject> getProfile(String profile) throws ProfileNotFoundException {
-        if (profile == null || "".equals(profile) // handy for scripting (profile=$2 and so on...)
+        if (profile == null || profile.isEmpty() // handy for scripting (profile=$2 and so on...)
             ) {
             return null;
         }
