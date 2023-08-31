@@ -23,6 +23,7 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.TextualType;
 
 /**
+ * The api media filter is a thread local singleton that can be used to filter the properties of a media object.
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
@@ -30,56 +31,60 @@ import nl.vpro.domain.media.support.TextualType;
 @Log4j2
 public class ApiMediaFilter {
 
-    private final Map<String, FilterProperties> properties = new HashMap<>();
 
     // List of properties that contain a different name in JSON/XML than the fieldname in the code
-    private static final Map<String, String> aliasToProperty = new HashMap<>();
+    private static final Map<String, String> ALIAS_TO_PROPERTY = Map.of(
+        "credit", "person",
+        "credits", "persons",
+        "exclusive", "portalrestriction",
+        "exclusives", "portalrestrictions",
+        "region", "georestriction",
+        "regions", "georestrictions",
+        "sortdate", "sortinstant",
+
+        // Makes no sense, but for backwards compatibility
+        "descendant", "descendantOf",
+        "episode", "episodeOf",
+        "member", "memberOf"
+    );
 
     // List of properties in the code that are singularly named but are collections so need a plural property name
-    private static final Map<String, String> singularToPlural = new HashMap<>();
+    private static final Map<String, String> SINGULAR_TO_PLURAL = Map.of(
+          "email", "emails",
+        "predictionforxml", "predictionsForXml"
+    );
 
     // List of properties that don't have a regular singular name (ie stripping the 's' or 'of' doesn't result in the correct singular form).
-    private static final Map<String, String> singularExceptions = new HashMap<>();
+    private static final Map<String, String> SINGULAR_EXCEPTIONS = Map.of(
+        "countries", "country",
+        "predictionsforxml", "predictionForXml"
+    );
+
+    private static final ThreadLocal<ApiMediaFilter> LOCAL_FILTER = ThreadLocal.withInitial(ApiMediaFilter::new);
+
+
+    private static final Set<String> KNOWN_PROPERTIES = MediaPropertiesFilters.getKnownProperties()
+        .stream()
+        .map(String::toLowerCase)
+        .collect(Collectors.toUnmodifiableSet());
+
+    private static Set<String> knownPropertiesForExposure = null;
+
+
+
+    private final Map<String, FilterProperties> properties = new HashMap<>();
 
     private boolean filtering = false;
     private Boolean retainAll = null;
 
-
-    static {
-        aliasToProperty.put("credit", "person");
-        aliasToProperty.put("credits", "persons");
-        aliasToProperty.put("exclusive", "portalrestriction");
-        aliasToProperty.put("exclusives", "portalrestrictions");
-        aliasToProperty.put("region", "georestriction");
-        aliasToProperty.put("regions", "georestrictions");
-        aliasToProperty.put("sortdate", "sortinstant");
-
-
-        // Makes no sense, but for backwards compatibility
-        aliasToProperty.put("descendant", "descendantOf");
-        aliasToProperty.put("episode", "episodeOf");
-        aliasToProperty.put("member", "memberOf");
-
-
-        singularExceptions.put("countries", "country");
-        singularExceptions.put("predictionsforxml", "predictionForXml");
-
-        singularToPlural.put("email", "emails");
-        singularToPlural.put("predictionforxml", "predictionsForXml");
-
-    }
-
-    private static final ThreadLocal<ApiMediaFilter> localFilter = ThreadLocal.withInitial(ApiMediaFilter::new);
-
     static ApiMediaFilter get() {
-        return localFilter.get();
+        return LOCAL_FILTER.get();
     }
 
     public static void removeFilter() {
-        localFilter.remove();
-        assert ! localFilter.get().filtering;
+        LOCAL_FILTER.remove();
+        assert ! LOCAL_FILTER.get().filtering;
     }
-
 
     /**
      * <code>null</code>: No filtering
@@ -120,7 +125,7 @@ public class ApiMediaFilter {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        localFilter.set(before);
+        LOCAL_FILTER.set(before);
         return result;
     }
 
@@ -131,8 +136,8 @@ public class ApiMediaFilter {
      * @param name The property name (possibly a plural)
      * @return Singular name
      */
-    String getSingular(String name) {
-        String singular = singularExceptions.get(name);
+    static String getSingular(String name) {
+        String singular = SINGULAR_EXCEPTIONS.get(name);
 
         if (singular != null) {
             return singular;
@@ -148,8 +153,8 @@ public class ApiMediaFilter {
     }
 
 
-    private String getPlural(String name) {
-        String plural  = singularToPlural.get(name);
+    private static String getPlural(String name) {
+        String plural  = SINGULAR_TO_PLURAL.get(name);
         if (plural != null) {
             return plural;
         }
@@ -161,7 +166,7 @@ public class ApiMediaFilter {
         }
     }
 
-    private boolean isSingular(String name) {
+    private static boolean isSingular(String name) {
         return getSingular(name).equals(name);
     }
 
@@ -177,7 +182,7 @@ public class ApiMediaFilter {
     private void add(String[] properties, Consumer<String> unrecognized) {
         for(String property : properties) {
             property = property.toLowerCase().trim();
-            String name = aliasToProperty.getOrDefault(property, property);
+            String name = ALIAS_TO_PROPERTY.getOrDefault(property, property);
             Integer max = null;
 
             final String[] split = name.split(":", 3);
@@ -239,10 +244,8 @@ public class ApiMediaFilter {
         }
     }
 
-    private static final Set<String> KNOWN_PROPERTIES = MediaPropertiesFilters.getKnownProperties().stream().map(String::toLowerCase).collect(Collectors.toSet());
-    private static Set<String> knownPropertiesForExposure = null;
 
-    private boolean hasProperty(String singular) {
+    private static boolean hasProperty(String singular) {
         if (MediaPropertiesFilters.isInstrumented()) {
             return KNOWN_PROPERTIES.contains(singular.toLowerCase()) || KNOWN_PROPERTIES.contains(getPlural(singular.toLowerCase()).toLowerCase());
         } else {
@@ -253,12 +256,12 @@ public class ApiMediaFilter {
 
     private static synchronized  Set<String> getKnownPropertiesForExposure() {
         if (knownPropertiesForExposure ==  null) {
-            knownPropertiesForExposure = new HashSet<>();
+            Set<String> set= new HashSet<>();
             for (Class<?> t : new Class[]{Program.class, Segment.class, Group.class}) {
                 while(t != null) {
                     XmlType annotation = t.getAnnotation(XmlType.class);
                     if (annotation != null) {
-                        Arrays.stream(annotation.propOrder()).filter(s -> ! s.isEmpty()).forEach(s -> knownPropertiesForExposure.add(s));
+                        Arrays.stream(annotation.propOrder()).filter(s -> ! s.isEmpty()).forEach(s -> set.add(s));
                     }
                     for (Field f : t.getDeclaredFields()) {
                         XmlAttribute attribute = f.getAnnotation(XmlAttribute.class);
@@ -267,7 +270,7 @@ public class ApiMediaFilter {
                             if (name.equals("##default")) {
                                 name = f.getName();
                             }
-                            knownPropertiesForExposure.add(name);
+                            set.add(name);
                         }
                     }
                     for (Method m : t.getDeclaredMethods()) {
@@ -281,30 +284,30 @@ public class ApiMediaFilter {
                                     name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
                                 }
                             }
-                            knownPropertiesForExposure.add(name);
+                            set.add(name);
                         }
                     }
                     t = t.getSuperclass();
                 }
             }
+            knownPropertiesForExposure = Collections.unmodifiableSet(set);
+            log.info("Determined for exposoure: {}", knownPropertiesForExposure);
         }
         return knownPropertiesForExposure;
     }
 
-    private Stream<String> mapProperty(String property){
-        switch(property) {
-            case "predictions":
-                return Stream.of(
-                    "predictionsForXml",
-                    "predictions"
-                );
-            case "prediction":
-                return Stream.of(
-                    "predictionForXml",
-                    "prediction"
-                );
-        }
-        return Stream.of(property);
+    private static Stream<String> mapProperty(String property){
+        return switch (property) {
+            case "predictions" -> Stream.of(
+                "predictionsForXml",
+                "predictions"
+            );
+            case "prediction" -> Stream.of(
+                "predictionForXml",
+                "prediction"
+            );
+            default -> Stream.of(property);
+        };
     }
 
     private void filter(String properties, Consumer<String> unrecognized) {
@@ -330,7 +333,7 @@ public class ApiMediaFilter {
             Arrays
             .stream(properties.split(","))
             .filter(StringUtils::isNotBlank)
-            .flatMap(this::mapProperty)
+            .flatMap(ApiMediaFilter::mapProperty)
             .toArray(String[]::new),
             unrecognized
         );
@@ -343,6 +346,8 @@ public class ApiMediaFilter {
         }
     }
 
+
+
     FilterProperties limitOrDefault(String property) {
         String singular = getSingular(property);
         if (! filtering) {
@@ -351,7 +356,7 @@ public class ApiMediaFilter {
             if (retainAll) {
                 // toch maar een beetje impliciet filteren voor scheduleevents want dat zijn er nogal veel soms!
                 if ("scheduleevent".equals(singular)) {
-                    return new FilterPropertiesImpl(100, null, true);
+                    return FilterProperties.MAX_100_FROM_BACK;
                 } else {
                     return FilterProperties.ALL;
                 }

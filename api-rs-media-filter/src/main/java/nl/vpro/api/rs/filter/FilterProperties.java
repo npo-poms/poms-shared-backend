@@ -45,6 +45,9 @@ public interface FilterProperties {
     FilterProperties ONE = one((String) null);
     FilterProperties NONE = new FilterPropertiesImpl(0, null, false);
     FilterProperties ALL = new FilterPropertiesImpl(Integer.MAX_VALUE, null, false);
+
+    FilterProperties MAX_100_FROM_BACK = new FilterPropertiesImpl(100, null, true);
+
 }
 
 
