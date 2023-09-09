@@ -126,8 +126,8 @@ public class MediaPropertiesFilters {
                                             " $proceed($$)).value();");
                                     }
                                 }
-                            } catch (RuntimeException | NotFoundException | CannotCompileException wtf) {
-                                log.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + wtf.getMessage(), wtf);
+                            } catch (RuntimeException | NotFoundException | CannotCompileException exception) {
+                                log.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + exception.getClass() + " " + exception.getMessage(), exception);
                             }
                         }
                     });
@@ -135,7 +135,10 @@ public class MediaPropertiesFilters {
                     Class<?> aClass = ctClass.toClass();
                     log.info("Successfully instrumented {}", aClass);
                 } catch (RuntimeException | CannotCompileException error ){
-                    log.error("During instrumentation of {}: {}",  ctClass.getName(), error.getMessage());
+                    log.error("During instrumentation of {}: {} {}",  ctClass.getName(), error.getClass(), error.getMessage());
+                    if (error.getCause() != null) {
+                        log.error("Caused by {} {}", error.getCause().getClass(), error.getCause().getMessage(), error.getCause());
+                    }
                 }
             }
         } catch (NotFoundException e) {

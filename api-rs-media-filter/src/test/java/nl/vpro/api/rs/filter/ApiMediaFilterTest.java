@@ -24,7 +24,7 @@ import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 
 import static nl.vpro.test.util.jackson2.Jackson2TestUtil.assertThatJson;
-import static nl.vpro.jassert.assertions.MediaAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
@@ -264,7 +264,7 @@ public class ApiMediaFilterTest {
         ApiMediaFilter.set("title");
         assertThat(program.getSortInstant()).isEqualTo("2019-08-26T19:50:00Z");
         assertThat(program.getMid()).isEqualTo("MID_123");
-        assertThat(program).isMixed();
+        assertThat((Object) program.getAVType()).isEqualTo(AVType.MIXED);
         assertThat(program.getType()).isEqualTo(ProgramType.PROMO);
         assertThat(program.getPredictions()).isEmpty();
 
