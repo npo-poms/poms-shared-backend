@@ -48,7 +48,7 @@ import static nl.vpro.domain.media.support.Workflow.PUBLISHED_AS_DELETED;
 import static nl.vpro.elasticsearch.ElasticSearchIteratorInterface.getScrollIds;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static nl.vpro.media.domain.es.ApiRefsIndex.APIMEDIA_REFS;
-import static org.assertj.core.api.Assertions.assertThat;
+import static nl.vpro.jassert.assertions.MediaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.data.Index.atIndex;
 import static org.mockito.Mockito.mock;
@@ -586,7 +586,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         SearchResult<MediaObject> result = getAndTestResult(form);
 
         assertThat(result.getSize()).isEqualTo(4);
-        assertThat(result.getItems().get(0).getResult().getAVType()).isEqualTo(AVType.AUDIO);
+        assertThat(result.getItems().get(0).getResult()).isAudio();
     }
 
     @Test
