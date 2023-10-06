@@ -1,11 +1,9 @@
 package nl.vpro.domain.api.thesaurus;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.*;
+import lombok.extern.log4j.Log4j2;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.*;
 
 import javax.annotation.PostConstruct;
@@ -17,13 +15,12 @@ import org.springframework.core.io.Resource;
 /**
  * The implementation of {@link GTAAKeysRepository} backed by a (number of) property file(s).
  */
-@Slf4j
+@Log4j2
 @NoArgsConstructor
+@Getter
+@Setter
 public class GTAAKeysRepositoryImpl implements GTAAKeysRepository {
 
-
-    @Getter
-    @Setter
     private List<Resource> locations;
 
 
@@ -39,7 +36,7 @@ public class GTAAKeysRepositoryImpl implements GTAAKeysRepository {
 
 
     @Override
-    public Optional<String> getKeyFor(@NonNull String issuer) {
+    public Optional<String> getKeyFor(@NonNull String issuer)  {
 
          for (Resource location : locations ) {
              log.debug("Searching key for {} in {}...", issuer, location);

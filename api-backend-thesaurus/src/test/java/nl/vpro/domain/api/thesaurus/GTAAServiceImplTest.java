@@ -1,14 +1,12 @@
 package nl.vpro.domain.api.thesaurus;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.time.Duration;
-import java.time.Instant;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -20,11 +18,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.meeuw.math.time.TestClock;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import nl.vpro.domain.gtaa.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -40,7 +40,11 @@ import static org.mockito.Mockito.when;
 @Slf4j
 public class GTAAServiceImplTest {
 
-    private static String SECRET_KEY = "ohzohj8Jwu1gieShciecev6Keiy3peiSteehuYa0sooFei4iCieV5rooeeB3eeZu";
+
+    private static final Clock clock = TestClock.twentyTwenty();
+
+
+    private static final String SECRET_KEY = "ohzohj8Jwu1gieShciecev6Keiy3peiSteehuYa0sooFei4iCieV5rooeeB3eeZu";
 
     @Mock
     GTAARepository gtaa;
@@ -52,6 +56,7 @@ public class GTAAServiceImplTest {
     @BeforeEach
     public void init() {
         gtaaService = new GTAAServiceImpl(gtaa, keysRepo);
+        gtaaService.setClock(clock);
     }
 
     @Test
@@ -64,6 +69,7 @@ public class GTAAServiceImplTest {
             .scopeNote("opmerking")
             .build();
         String jws = encrypt("demo-app", SECRET_KEY, "m.meeuwissen@vpro.nl", 10);
+        assertThat(jws).isEqualTo("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwidXNyIjoibS5tZWV1d2lzc2VuQHZwcm8ubmwiLCJpYXQiOjE1ODIxOTA0MDAsImlzcyI6ImRlbW8tYXBwIiwiZXhwIjoxNTgyMjMzNjAwfQ.kv_GnoHWu90m23yt6XwAKYuDrsf4-kkZjWpmtuOwLl0");
         gtaaService.submitGTAAPerson(newPerson, jws);
 
         verify(gtaa).submit(any(GTAANewPerson.class), eq("demo-app"));
@@ -88,9 +94,8 @@ public class GTAAServiceImplTest {
     public void testAddPersonWithoutIssuer() {
         GTAANewPerson newPerson = GTAANewPerson.builder().givenName("piet").familyName("hein").scopeNote("opmerking").build();
         Assertions.assertThatThrownBy(() -> {
-
-                String jws = encrypt(null, SECRET_KEY, "user y", 13);
-                gtaaService.submitGTAAPerson(newPerson, jws);
+            String jws = encrypt(null, SECRET_KEY, "user y", 13);
+            gtaaService.submitGTAAPerson(newPerson, jws);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -106,24 +111,28 @@ public class GTAAServiceImplTest {
         claims.put("usr", user);
         SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes());
         String compactJws = Jwts.builder()
-            .setSubject("test")
-            .setClaims(claims)
+            .subject("test")
+            .claims(claims)
             .signWith(secretKey)
-            .setIssuedAt(Date.from(Instant.now().minus(issuedBeforeHours, ChronoUnit.HOURS)))
+            .issuedAt(Date.from(clock.instant().minus(issuedBeforeHours, ChronoUnit.HOURS)))
             .compact();
         log.debug(compactJws);
         return compactJws;
     }
 
-    protected static String encrypt(@Nullable String issuer, @NonNull String key, @NonNull String user, int issuedBeforeHours) {
+    protected static String encrypt(
+        @Nullable String issuer,
+        @NonNull String key,
+        @NonNull String user,
+        int issuedBeforeHours) {
         SecretKey secretKey = Keys.hmacShaKeyFor(key.getBytes());
         return Jwts.builder()
-            .setSubject("test")
+            .subject("test")
             .claim("usr", user)
-            .setIssuedAt(Date.from(Instant.now().minus(issuedBeforeHours, ChronoUnit.HOURS)))
-            .setIssuer(issuer)
-            .setExpiration(java.util.Date.from(Instant.now().plus(Duration.ofHours(2))))
-            .signWith(secretKey, SignatureAlgorithm.HS256)
+            .issuedAt(Date.from(clock.instant().minus(issuedBeforeHours, ChronoUnit.HOURS)))
+            .issuer(issuer)
+            .expiration(java.util.Date.from(clock.instant().plus(Duration.ofHours(2))))
+            .signWith(secretKey, Jwts.SIG.HS256)
             .compact();
     }
 

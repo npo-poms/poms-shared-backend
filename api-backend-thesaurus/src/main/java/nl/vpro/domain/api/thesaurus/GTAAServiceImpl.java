@@ -2,11 +2,14 @@ package nl.vpro.domain.api.thesaurus;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.lang.Assert;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
+import java.time.Clock;
+import java.time.*;
+import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -32,7 +35,11 @@ public class GTAAServiceImpl implements GTAAService {
 
     private final Duration maxAge = Duration.ofHours(12);
 
-    private final SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
+    @Setter
+    @Getter
+    private Clock clock = java.time.Clock.systemUTC();
+
+   private final SigningKeyResolver keyResolver = new SigningKeyResolverAdapter() {
 
         @Override
         public byte[] resolveSigningKeyBytes(@NonNull JwsHeader header, @NonNull Claims claims) {
@@ -72,22 +79,24 @@ public class GTAAServiceImpl implements GTAAService {
 
 
     private String authenticate(@NonNull String jws) throws SecurityException{
-        JwtParser parser = Jwts.parserBuilder()
-            .setAllowedClockSkewSeconds(5)
-            .setSigningKeyResolver(keyResolver).build();
+         JwtParser parser = Jwts.parser()
+            .clockSkewSeconds(5)
+            .setSigningKeyResolver(keyResolver)
+            .clock(() -> Date.from(clock.instant()))
+            .build();
 
-        Jws<Claims> claims = parser.parseClaimsJws(jws);
-        String issuer = claims.getBody().getIssuer();
+        Jws<Claims> claims = parser.parseSignedClaims(jws);
+        String issuer = claims.getPayload().getIssuer();
 
-        Instant issuedAt = DateUtils.toInstant(claims.getBody().getIssuedAt());
-        Instant maxAllowed = Instant.now().minus(maxAge);
+        Instant issuedAt = DateUtils.toInstant(claims.getPayload().getIssuedAt());
+        Instant maxAllowed = clock.instant().minus(maxAge);
         if (issuedAt == null) {
             throw new SecurityException("JWT token didn't have an issued at time");
         }
         if (issuedAt.isBefore(maxAllowed)) {
-            throw new SecurityException("JWT token was issued more than the permitted " + maxAge + " ago");
+            throw new SecurityException("JWT token was issued more than then permitted " + maxAge + " ago");
         }
-        log.debug("JWS authenticated {} for subject {}", issuer, claims.getBody().getSubject());
+        log.debug("JWS authenticated {} for subject {}", issuer, claims.getPayload().getSubject());
         return issuer;
     }
 
