@@ -2,10 +2,11 @@ package nl.vpro.domain.api.thesaurus;
 
 import java.util.NoSuchElementException;
 
+import javax.inject.Inject;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ExtendWith(SpringExtension.class) //  implicitly uses GTAAKeysPropertiesRepositoryTest-context.xml ?
 public class GTAAKeysPropertiesRepositoryTest {
 
-    @Autowired
+    @Inject
     GTAAKeysRepositoryImpl repo;
 
     @Test
