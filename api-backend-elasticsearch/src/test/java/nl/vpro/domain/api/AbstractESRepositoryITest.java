@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
 
@@ -90,17 +89,13 @@ public abstract class AbstractESRepositoryITest {
     }
 
     @AfterAll
-    public static void shutdown() throws ExecutionException, InterruptedException, IOException {
+    public static void shutdown() throws IOException {
         for (IndexHelper indexHelper : indexHelpers.values()) {
             indexHelper.deleteIndex();
         }
         indexHelpers.clear();
         refresh();
         firstRun = true;
-        if (staticClientFactory != null) {
-            staticClientFactory.close();
-            staticClientFactory = null;
-        }
     }
 
     public static String getIndexName() {
