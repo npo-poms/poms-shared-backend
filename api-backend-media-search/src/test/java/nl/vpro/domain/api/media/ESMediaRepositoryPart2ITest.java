@@ -7,6 +7,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -46,9 +47,9 @@ import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
 import static nl.vpro.domain.media.support.Workflow.PUBLISHED_AS_DELETED;
 import static nl.vpro.elasticsearch.ElasticSearchIteratorInterface.getScrollIds;
+import static nl.vpro.jassert.assertions.MediaAssertions.assertThat;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 import static nl.vpro.media.domain.es.ApiRefsIndex.APIMEDIA_REFS;
-import static nl.vpro.jassert.assertions.MediaAssertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.assertj.core.data.Index.atIndex;
 import static org.mockito.Mockito.mock;
@@ -61,6 +62,7 @@ import static org.mockito.Mockito.mock;
  * @since 2.0
  */
 
+@SuppressWarnings("DataFlowIssue")
 @Log4j2
 @TestMethodOrder(MethodOrderer.MethodName.class)
 public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
@@ -102,6 +104,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     static List<MediaObject> indexed = new ArrayList<>();
 
     static int indexedObjectCount = 0;
+    static Map<AVType, AtomicInteger> avObjectCount = new HashMap<>();
     static int indexedProgramCount = 0;
     static int indexedGroupCount = 0;
 
@@ -212,7 +215,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .withGenres()
                 .broadcasters("OMROEP" + (i % 3))
                 .memberOf(g, 1)
-                .avType(AVType.values()[i % AVType.values().length])
+                .avType(AVType.values()[i % 3]) // don't use the last one 'MIXED'
                 .ageRating(ORIGINAL[i % ORIGINAL.length])
                 .predictions(Platform.INTERNETVOD)
                 .mid("MID-" + i)
@@ -585,6 +588,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         MediaForm form = form().avTypes(Match.MUST, AVType.AUDIO).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
+        assertThat(avObjectCount.get(AVType.AUDIO).get()).isEqualTo(result.getSize());
         assertThat(result.getSize()).isEqualTo(4);
         assertThat(result.getItems().get(0).getResult()).isAudio();
     }
@@ -930,7 +934,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
              builder.workflow(Workflow.PUBLISHED);
         }
 
-        T object = builder.build();
+        final T object = builder.build();
 
         Consumer<ObjectNode> addPublishdate = addPublishDate(object.getLastPublishedInstant());
 
@@ -961,6 +965,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             if (! mids.add(object.getMid())) {
                 throw new IllegalStateException("Object " + object + " was indexed already?");
             }
+            avObjectCount.computeIfAbsent(object.getAVType(), (t) -> new AtomicInteger(0)).incrementAndGet();
             indexedObjectCount++;
             if (object instanceof Program) {
                 indexedProgramCount++;
