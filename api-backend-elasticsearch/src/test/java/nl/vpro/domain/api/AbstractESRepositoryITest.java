@@ -97,7 +97,10 @@ public abstract class AbstractESRepositoryITest {
         indexHelpers.clear();
         refresh();
         firstRun = true;
-        staticClientFactory.close();
+        if (staticClientFactory != null) {
+            staticClientFactory.close();
+            staticClientFactory = null;
+        }
     }
 
     public static String getIndexName() {
