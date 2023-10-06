@@ -7,7 +7,7 @@ package nl.vpro.domain.api.media;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -57,7 +57,7 @@ import static nl.vpro.media.domain.es.Common.CLOCK;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-@Slf4j
+@Log4j2
 @Log4j2
 @ManagedResource(objectName = "nl.vpro.api:name=ESMediaRepository")
 public class ESMediaRepository extends AbstractESMediaRepository implements MediaSearchRepository {

@@ -4,7 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,7 +25,7 @@ import nl.vpro.util.TimeUtils;
  */
 @ManagedResource(objectName = "nl.vpro.api:name=MediaScoreManager")
 @Component
-@Slf4j
+@Log4j2
 public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implements MediaScoreManager {
 
     private static final String MEDIA_SCORES_FILE = "media.scores";

@@ -4,7 +4,7 @@
  */
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -40,7 +40,7 @@ import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-@Slf4j
+@Log4j2
 public class ESMediaQueryBuilder extends ESQueryBuilder {
 
     public static final List<SearchFieldDefinition> SEARCH_FIELDS = Arrays.asList(

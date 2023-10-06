@@ -2,7 +2,7 @@ package nl.vpro.domain.api.thesaurus;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when;
  * @since 5.4
  */
 @ExtendWith(MockitoExtension.class)
-@Slf4j
+@Log4j2
 public class GTAAServiceImplTest {
 
 

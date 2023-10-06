@@ -2,7 +2,7 @@ package nl.vpro.domain.api.schedule;
 
 import lombok.SneakyThrows;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.time.*;
@@ -40,7 +40,7 @@ import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
 /**
  * @since 4.8
  */
-@Slf4j
+@Log4j2
 @ToString(callSuper = true)
 public class ESScheduleRepository extends AbstractESMediaRepository implements ScheduleRepository, MediaLoader {
 

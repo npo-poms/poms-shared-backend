@@ -1,17 +1,19 @@
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status.Family;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -21,7 +23,7 @@ import nl.vpro.domain.api.topspin.Recommendations;
  * @author Michiel Meeuwissen
  * @since 4.8
  */
-@Slf4j
+@Log4j2
 public class TopSpinRepositoryImpl implements TopSpinRepository {
 
 
@@ -33,12 +35,21 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
 
     protected String clazz = "related-series";
 
+    protected ResteasyClient client;
+
     @PostConstruct
     public void init() {
         if (StringUtils.isBlank(topspinUrl)) {
             log.debug("{} is disabled", this);
         } else {
             log.info("Connecting with {} for related results (max results: {})", topspinUrl, topspinMaxResults);
+        }
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        if (client != null) {
+            client.close();
         }
     }
 
@@ -56,17 +67,21 @@ public class TopSpinRepositoryImpl implements TopSpinRepository {
                 .queryParam("max", topspinMaxResults)
                 .queryParam("partyId", partyId)
                 ;
-            Response response = target.request().get();
-            if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
-                log.warn("Could not get top spin recommendations for on url {} (status {})", topspinUrl, response.getStatus());
-                return new Recommendations();
+            try (Response response = target.request().get()) {
+                if (response.getStatusInfo().getFamily() != Family.SUCCESSFUL) {
+                    log.warn("Could not get top spin recommendations for on url {} (status {})", topspinUrl, response.getStatus());
+                    return new Recommendations();
+                }
+                return response.readEntity(Recommendations.class);
             }
-            return response.readEntity(Recommendations.class);
         }
     }
 
-    protected Client getTopSpinClient() {
-        return new ResteasyClientBuilderImpl().build();
+    protected synchronized  Client getTopSpinClient() {
+        if (client == null) {
+            client = new ResteasyClientBuilderImpl().build();
+        }
+        return client;
     }
 
     @Override

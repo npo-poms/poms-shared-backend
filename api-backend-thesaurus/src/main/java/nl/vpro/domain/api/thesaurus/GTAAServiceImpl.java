@@ -4,7 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.lang.Assert;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -26,7 +26,7 @@ import nl.vpro.util.DateUtils;
  * @author machiel
  */
 @Service
-@Slf4j
+@Log4j2
 public class GTAAServiceImpl implements GTAAService {
 
     private final GTAARepository gtaaRepository;

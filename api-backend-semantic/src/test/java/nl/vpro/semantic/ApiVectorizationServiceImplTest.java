@@ -1,7 +1,7 @@
 package nl.vpro.semantic;
 
 import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
 
@@ -14,7 +14,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@Slf4j
+@Log4j2
 @WireMockTest
 class ApiVectorizationServiceImplTest {
 

@@ -1,6 +1,6 @@
 package nl.vpro.domain.api;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -33,7 +33,7 @@ import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
  * @since 2.0
  */
 
-@Slf4j
+@Log4j2
 public abstract class ESQueryBuilder {
 
     static final TextSingleFieldApplier<StandardMatchType, TextMatcher> RELATIONS_APPLIER = new TextSingleFieldApplier<>("relations.broadcaster");

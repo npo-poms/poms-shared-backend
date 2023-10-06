@@ -5,7 +5,7 @@
 package nl.vpro.domain.api;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -42,7 +42,7 @@ import nl.vpro.jackson2.Jackson2Mapper;
  * @author Michiel Meeuwisssen
  */
 @SuppressWarnings("resource")
-@Slf4j
+@Log4j2
 @Repository
 public class SimpleESRepository<T extends Identifiable<I>, I extends Serializable & Comparable<I>> extends AbstractESRepository<T> {
 

@@ -6,7 +6,7 @@ package nl.vpro.domain.api;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
  * @author Roelof Jan Koekoek
  * @since 4.2
  */
-@Slf4j
+@Log4j2
 public abstract class AbstractConfigFileScoreManager implements ScoreManager {
 
     protected static final String TEXT_BOOST_PREFIX = "boost.text.";

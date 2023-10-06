@@ -1,5 +1,5 @@
 package nl.vpro.pages.domain.es;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Arrays;
 
@@ -13,7 +13,7 @@ import static nl.vpro.elasticsearch.Constants.Mappings.PROPERTIES;
  * @author Michiel Meeuwissen
  * @since 4.7
  */
-@Slf4j
+@Log4j2
 public class ApiPagesIndex extends ElasticSearchIndex {
 
     public static final int SEMANTIC_VECTOR_LENGTH = 768;

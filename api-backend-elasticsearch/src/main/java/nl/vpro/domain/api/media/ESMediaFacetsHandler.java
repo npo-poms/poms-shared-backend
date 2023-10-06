@@ -5,7 +5,7 @@
 package nl.vpro.domain.api.media;
 
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import static nl.vpro.domain.api.media.ESMediaFacetsBuilder.ROOT_FILTER;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-@Slf4j
+@Log4j2
 public class ESMediaFacetsHandler extends ESFacetsHandler {
 
     public static MediaFacetsResult extractMediaFacets(
