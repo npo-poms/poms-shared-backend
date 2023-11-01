@@ -31,7 +31,7 @@ trigger pages-publish:
     branch: main
 
 
-build push-mappings image:
+package push-mappings docker:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
@@ -50,7 +50,7 @@ build push-mappings image:
 .push_es: &push_es
   stage: release
   image: docker.vpro.nl/vpro/openshift-helm:2.2.1
-  needs: ["build push-mappings image"]
+  needs: ["package push-mappings docker"]
   before_script: !reference [ .docker_build_setup, script ]
   script:
     - get_artifact_versions push-es-mappings $POM_VERSION
