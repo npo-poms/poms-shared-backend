@@ -30,7 +30,6 @@ trigger pages-publish:
     project: npo/pages-publish
     branch: main
 
-
 package push-mappings docker:
   image:
     name: gcr.io/kaniko-project/executor:debug
@@ -44,7 +43,7 @@ package push-mappings docker:
     - setup_kaniko
     - echo pom version $POM_VERSION
     - kaniko_execute push-es-mappings $POM_VERSION
-  rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
+  rules: !reference [.rules, build] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
 
 
 .push_es: &push_es
