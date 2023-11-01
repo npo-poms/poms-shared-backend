@@ -1,6 +1,5 @@
 ---
 variables:
-  ES_IMAGE_NAME: poms-plus/es-builder-2
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
   INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
 
@@ -59,7 +58,7 @@ package push-mappings docker:
     - echo $PASSWORD | sha256sum
     - |-
       oc run es-builder \
-            --image=$INTERNAL_REGISTRY/$ES_IMAGE_NAME:dev \
+            --image=$IMAGE_INTERNAL \
             --image-pull-policy='Always' \
             --restart='Never' \
             --env HOST="$HOST" \
