@@ -89,7 +89,7 @@ push-mappings acc:
     USER: elasticsearch
     CLUSTER: 755036500103:poms-plus-elasticsearch-acc
     EXPERIMENTAL: 'true'
-  rules: !reference [ .rules, deploy_acc ]
+  rules: !reference [ .rules, deploy_accept ]
 
 
 publish-mappings prod:
