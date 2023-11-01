@@ -12,26 +12,26 @@ variables:
   variables:
     MAVEN_EXTRA_ARGS: '-Dinteg.http.eshost=opensearch'
 
-trigger_api:
+trigger api:
   extends: .trigger_down_stream
   trigger:
     project: npo/api
     branch: main
 
-trigger_npo_publish:
+trigger media-publish:
   extends: .trigger_down_stream
   trigger:
-    project: npo/npo-publish
+    project: npo/media-publish
     branch: main
 
-trigger_pages_publish:
+trigger pages-publish:
   extends: .trigger_down_stream
   trigger:
     project: npo/pages-publish
     branch: main
 
 
-build_es_image:
+build push-mappings image:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
@@ -50,7 +50,7 @@ build_es_image:
 .push_es: &push_es
   stage: release
   image: docker.vpro.nl/vpro/openshift-helm:2.2.1
-  needs: [build_es_image]
+  needs: ["build push-mappings image"]
   before_script: !reference [ .docker_build_setup, script ]
   script:
     - get_artifact_versions push-es-mappings $POM_VERSION
@@ -71,7 +71,7 @@ build_es_image:
             -n poms-util-$OS_ENV
 
 
-push-mappings-test:
+push-mappings test:
   <<: *push_es
   variables:
     OS_ENV: test
@@ -86,7 +86,7 @@ push-mappings-test:
       when: manual
 
 
-push-mappings-acc:
+push-mappings acc:
   <<: *push_es
   variables:
     OS_ENV: acc
@@ -102,7 +102,7 @@ push-mappings-acc:
       when: manual
       allow_failure: true
 
-publish-mappings-prod:
+publish-mappings prod:
   <<: *push_es
   variables:
     OS_ENV: prod
