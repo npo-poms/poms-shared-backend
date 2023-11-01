@@ -35,8 +35,6 @@ build_es_image:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [ "" ]
-  variables:
-    IMAGE_NAME: $ES_IMAGE_NAME
   stage: build
   needs: [build]
   tags:
@@ -46,7 +44,6 @@ build_es_image:
     - setup_kaniko
     - echo pom version $POM_VERSION
     - kaniko_execute push-es-mappings $POM_VERSION
-    - store_image_version
   rules: !reference [.rules, publish] # For packaging the same rules apply as for building. (just the build _itself_ needs to be successful then)
 
 
@@ -54,7 +51,9 @@ build_es_image:
   stage: release
   image: docker.vpro.nl/vpro/openshift-helm:2.2.1
   needs: [build_es_image]
+  before_script: !reference [ .docker_build_setup, script ]
   script:
+    - get_artifact_versions push-es-mappings $POM_VERSION
     - oc login --server=$OPENSHIFT_SERVER --token=$OPENSHIFT_TOKEN -n poms-util-$OS_ENV
     - oc -n poms-util-$OS_ENV delete pod es-builder || echo 'No previous es-builder instance found'
     - export PASSWORD="$(oc -n poms-stack-$OS_ENV get secret elasticsearch -o jsonpath="{['data']['password']}" | base64 --decode)"
@@ -117,11 +116,11 @@ publish-mappings-prod:
 
 include:
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/9.11'
+    ref: 'main'
     file: 'maven_release.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/9.11'
+    ref: 'main'
     file: 'util/elasticsearch_service.yml'
   - project: 'shared/gitlab/gitlab-templates'
-    ref: 'tags/9.11'
+    ref: 'main'
     file: 'util/kaniko.yml'
