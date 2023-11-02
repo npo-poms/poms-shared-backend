@@ -25,14 +25,14 @@ public class ApiPagesIndex extends ElasticSearchIndex {
 
     protected ApiPagesIndex() {
         super(NAME,  "/es7/setting/apipages.json", "/es7/mapping/page.json", Arrays.asList(NAME + "-publish"), (distribution, jsonNode) -> {
-            ObjectNode properties = jsonNode.with(PROPERTIES);
+            ObjectNode properties = jsonNode.withObject(PROPERTIES);
             switch (distribution) {
                 case OPENSEARCH:
-                    properties.with(FIELD_SEMANTIC_VECTORIZATION).put("dimension", SEMANTIC_VECTOR_LENGTH);
+                    properties.withObject(FIELD_SEMANTIC_VECTORIZATION).put("dimension", SEMANTIC_VECTOR_LENGTH);
                     log.info("Detected opensearch");
                     break;
                 case ELASTICSEARCH:
-                    properties.with(FIELD_SEMANTIC_VECTORIZATION).put("dims", SEMANTIC_VECTOR_LENGTH);
+                    properties.withObject(FIELD_SEMANTIC_VECTORIZATION).put("dims", SEMANTIC_VECTOR_LENGTH);
                     log.info("Detected elasticsearch");
                     break;
             }
@@ -43,7 +43,7 @@ public class ApiPagesIndex extends ElasticSearchIndex {
     @Override
     public ElasticSearchIndex withoutExperimental() {
         return thenWithMappingsProcessor((distribution, jsonNode) -> {
-            ObjectNode properties = jsonNode.with(PROPERTIES);
+            ObjectNode properties = jsonNode.withObject(PROPERTIES);
             properties.remove(FIELD_SEMANTIC_VECTORIZATION);
             log.info("Removed experimental field {}", FIELD_SEMANTIC_VECTORIZATION);
         });
