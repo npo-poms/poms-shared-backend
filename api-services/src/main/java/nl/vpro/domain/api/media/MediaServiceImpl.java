@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.inject.Named;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.meeuw.functional.Predicates;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -239,8 +240,8 @@ public class MediaServiceImpl implements MediaService {
         if (form != null) {
             filter = filter == null ? form : filter.and(form);
         }
-        List<SearchResultItem<? extends MediaObject>> filtered = mediaObjects.stream()
-            .filter(filter)
+        final List<SearchResultItem<? extends MediaObject>> filtered = mediaObjects.stream()
+            .filter(filter == null ? Predicates.alwaysTrue() : filter)
             .limit(max)
             .map(SearchResultItem::new)
             .collect(Collectors.toList());
