@@ -622,9 +622,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .filter(QueryBuilders.existsQuery(Common.ES_PUBLISH_DATE))
         );
 
-        if (log.isDebugEnabled()) {
-            log.debug("Found {} changes", i.getTotalSize());
-        }
+        log.debug("Found {} changes", i::getTotalSize);
+
         final MarkSkippedChangeIterator changes = new MarkSkippedChangeIterator(
             i,
             since,
