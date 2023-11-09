@@ -187,7 +187,12 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     private void MSE_2775(String form) throws URISyntaxException, IOException {
 
 
-        when(scheduleService.find(any(ScheduleForm.class), or(isNull(), any(Order.class)), or(isNull(), anyString()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+        when(scheduleService.find(
+            any(ScheduleForm.class),
+            or(isNull(), any(Order.class)),
+            or(isNull(), anyString()),
+            anyLong(), anyInt())
+        ).thenReturn(new ScheduleSearchResult());
 
         {
             MockHttpRequest request = MockHttpRequest.post("/schedule");

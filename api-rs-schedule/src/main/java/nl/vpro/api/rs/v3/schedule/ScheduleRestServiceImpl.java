@@ -130,7 +130,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(PROFILE) String profile,
         @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-        @Parameter(description = OFFSET_MESSAGE) @DefaultValue(ZERO) @Min(0) long offset,
+         @QueryParam(Constants.OFFSET) @Parameter(description = OFFSET_MESSAGE) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         max = handleTooManyResults(offset, max, maxResults);
