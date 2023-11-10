@@ -26,13 +26,12 @@ public class FilteredList<T> extends AbstractList<T>  {
     public static <T> FilteredList<T> wrap(String property, List<T> wrapped) {
         log.debug("Wrapping {}", wrapped);
 
-        if(wrapped instanceof FilteredList) {
-            FilteredList wrappedList = (FilteredList) wrapped;
+        if (wrapped instanceof FilteredList<?> wrappedList) {
             if(!(wrappedList.filterHelper.property).equals(property)) {
                 throw new IllegalArgumentException("Can't wrap different properties " + property + " != "+ wrappedList.filterHelper.property);
             }
 
-            return (FilteredList<T>)wrapped;
+            return (FilteredList<T>) wrappedList;
         }
 
         return new FilteredList<>(property, wrapped);
