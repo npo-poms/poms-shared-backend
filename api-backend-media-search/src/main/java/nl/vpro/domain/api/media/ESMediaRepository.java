@@ -567,7 +567,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             objects.removeIf((p) -> !profile.test(p));
             long result = objects.size();
             if (offset > 0 || max != null) {
-                while (offset-- > 0 && objects.size() > 0) {
+                while (offset-- > 0 && !objects.isEmpty()) {
                     objects.remove(0);
                 }
                 if (max != null) {
@@ -649,7 +649,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                             log.debug("Change is ok {} > {}", change.getPublishDate(), since);
                             filtering = false;
                         } else if (change.getMid().compareTo(mid) > 0) {
-                            log.debug("Chnage is ok {} > {}", change.getMid(), mid);
+                            log.debug("Change is ok {} > {}", change.getMid(), mid);
                             filtering = false;
                         } else {
                             change.setSkipped(true);
@@ -706,8 +706,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 throw new NoSuchElementException();
             }
             if (last == null) {
+                // nothing, or everything iterated, this is simple
                 return MediaChange.tail(changesUpto);
             } else if (tail == Tail.ALWAYS) {
+                if (max == null) {
+                    // no need to be difficult
+                    return MediaChange.tail(changesUpto);
+                }
+                // _something_ iterated, so we can return the last one.
                 if (maxed.peekingWrapped().hasNext()) {
                     MediaChange peek = maxed.peekingWrapped().peek();
                     if (peek != null) {
