@@ -2,6 +2,7 @@
 variables:
   REGISTRY: openshift-image-registry.apps.cluster.chp4.io
   INTERNAL_REGISTRY: image-registry.openshift-image-registry.svc:5000
+  NAMESPACE: poms-plus
 
 .maven:
   services:
