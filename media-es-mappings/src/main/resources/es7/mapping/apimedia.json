@@ -749,6 +749,9 @@
       "type": "date",
       "format": "epoch_millis"
     },
+    "esSequence": {
+      "type": "long"
+    },
     "regions": {
       "type": "keyword"
     },

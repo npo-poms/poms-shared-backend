@@ -17,6 +17,11 @@ public class Common {
 
     public static final String ES_PUBLISH_DATE  = "esPublishDate";
 
+    public static final String ES_SEQUENCE  = "esSequence";
+
+    public static final String ES_INDEX  = "esIndex";
+
+
     public static final String ES_VECTORIZATION = "semanticVectorization";
 
     public static final String ES_REASONS       = "republicationReasons";
