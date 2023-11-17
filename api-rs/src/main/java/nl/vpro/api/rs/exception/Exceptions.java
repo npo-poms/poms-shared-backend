@@ -38,7 +38,7 @@ public class Exceptions {
             max = maxResults;
         }
         if (max > maxResults) {
-            throw badRequest("Requesting more than {} results is not allowed. Use a pager!", maxResults);
+            throw badRequest("Requesting more than {} results is not allowed.", maxResults);
         }
         if (offset + max > 10000) { // See ES max_result_window setting. This is the default, we may want to find out what the _actual_ configured value is
             throw badRequest("Offset + max may not be more than 10000 ({} + {} = {} > 10000). Use a query or the iterate call.", offset, max, offset + max);
