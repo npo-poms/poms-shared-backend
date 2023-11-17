@@ -47,7 +47,7 @@ public class Iterate {
      *                 and 'keepAlive' stuff.
      *
      * @param streamer When the iterator is created, this has to write it to the JsonGenerator
-     * @param responseBuilderConsumer Optionally you can build the response further before it it returned. E.g. to add headers.
+     * @param responseBuilderConsumer Optionally you can build the response further before it is returned. E.g. to add headers.
      */
     @SafeVarargs
     public static <T, E extends Exception> Response streamingJson(
