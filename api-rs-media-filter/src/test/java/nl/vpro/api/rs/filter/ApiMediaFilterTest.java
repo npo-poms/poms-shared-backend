@@ -434,7 +434,8 @@ public class ApiMediaFilterTest {
                     },
                     "owner" : "BROADCASTER",
                     "creationDate" : 1636131600000,
-                    "workflow" : "PUBLISHED"
+                    "workflow" : "PUBLISHED",
+                    "platform" : "INTERNETVOD"
                   } ],
                   "publishDate" : 1425603600000
                 }""");
@@ -456,7 +457,9 @@ public class ApiMediaFilterTest {
                       "avFileFormat" : "UNKNOWN"
                     },
                     "owner" : "BROADCASTER",
-                    "creationDate" : 1636131600000
+                    "creationDate" : 1636131600000,
+                    "platform" : "INTERNETVOD"
+
                   } ],
                   "publishDate" : 1425603600000
                 }""");
