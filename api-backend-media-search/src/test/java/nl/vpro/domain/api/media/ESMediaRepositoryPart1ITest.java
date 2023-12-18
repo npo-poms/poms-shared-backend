@@ -2067,6 +2067,13 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
         MediaSearchResult limited = target.findRelated(aboutFlowers, eo, null, null);
         assertThat(limited.getTotal()).isEqualTo(1);
         log.info("{}", limited);
+
+        MediaSearchResult limitedByForm = target.findRelated(aboutFlowers, null, MediaForm
+            .builder()
+            .broadcasters("EO")
+            .build(), null);
+        assertThat(limitedByForm.getTotal()).isEqualTo(1);
+        log.info("{}", limitedByForm);
     }
 
 
