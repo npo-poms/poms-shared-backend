@@ -749,7 +749,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(resultList.get(2)).isEqualTo(sub_program2);
         assertThat(resultList.get(3)).isEqualTo(program1);
         assertThat(resultList.get(4)).isEqualTo(sub_program1);
-
     }
 
     @Test
@@ -763,7 +762,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(result.getItems().get(0).getResult().getMid()).isEqualTo("MID-0");
         assertThat(result.getItems().get(1).getResult().getMid()).isEqualTo("MID-4");
         assertThat(result.getItems().get(2).getResult().getMid()).isEqualTo("MID-8");
-
     }
 
     @Test
@@ -916,17 +914,18 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         assertThat(ageRatings.get(1).getCount()).isEqualTo(1);
 
         log.info("{}", result);
-
     }
 
     @Test
     public void withMaxZero() {
-        MediaResult result = target.listMembers(target.load("POMS_S_12345"), null, Order.ASC, 0L, 10);
+        MediaResult result = target.listMembers(target.load(group.getMid()), null, Order.ASC, 0L, 10);
 
         log.info("{}", result.getTotal());
-
-
+        assertThat(result.getTotal()).isGreaterThan(0);
+        assertThat(result.getSize()).isEqualTo(0);
+        assertThat(result.getItems().size()).isEqualTo(0);
     }
+
 
 
     private static <T extends MediaObject> T index(MediaBuilder<?, T> builder) throws IOException {

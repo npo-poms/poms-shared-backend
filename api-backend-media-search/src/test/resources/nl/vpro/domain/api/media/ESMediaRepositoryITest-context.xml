@@ -41,7 +41,7 @@
 
 
   <bean class="nl.vpro.domain.api.media.ESMediaRepository">
-    <constructor-arg index="1" value="titles,descriptions"/>
+    <constructor-arg index="1" value="titles.value,descriptions.value"/>
   </bean>
   <bean class="nl.vpro.media.broadcaster.BroadcasterServiceLocator" />
 </beans>
