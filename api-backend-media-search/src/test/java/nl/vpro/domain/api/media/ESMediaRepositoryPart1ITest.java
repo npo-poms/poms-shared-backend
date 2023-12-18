@@ -8,6 +8,7 @@ import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXB;
 
@@ -2023,6 +2024,58 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
 
     }
+
+
+    /**
+     * Unit test for NPA-513
+     */
+    @Test
+    public void findRelated() {
+        Program aboutFlowers = index(program()
+            .mid("mid_1")
+            .mainTitle("flowers")
+            .mainDescription("flowers are nice. Flowers flowers flowers flowers")
+            .broadcasters("KRNC", "VPRO"));
+
+        Program aboutFlowersToo = index(program()
+            .mid("mid_2")
+            .mainTitle("flowers")
+            .mainDescription("We think that flowers are nice. Flowers flowers flowers flowers. Bees.")
+            .broadcasters("EO"));
+
+        Program notAboutFlowers = index(program()
+            .mid("mid_100")
+              .mainTitle("cats")
+            .mainDescription("We hate cats. cats cats cats cats. Hello Schrödinger!")
+            .broadcasters("EO"));
+
+        for (int i = 3 ; i < 20; i++){
+            index(program().mid("mid_" + i)
+            .mainTitle("flowers" + i)
+            .mainDescription("BNN also thinks that flowers are nice. Flowers flowers flowers flowers. Butterflies.")
+            .broadcasters("BNVA"));
+        }
+
+
+        MediaSearchResult related = target.findRelated(aboutFlowers, null, null, null);
+        assertThat(related.getTotal()).isEqualTo(18);
+        log.info("{}", related.stream().map(r -> r.getResult().getMid()).collect(Collectors.toList()));
+
+        // now limit with profile
+        ProfileDefinition<MediaObject> eo = ProfileDefinition.of(new Filter(new BroadcasterConstraint("EO")));
+
+        MediaSearchResult limited = target.findRelated(aboutFlowers, eo, null, null);
+        assertThat(limited.getTotal()).isEqualTo(1);
+        log.info("{}", limited);
+
+        MediaSearchResult limitedByForm = target.findRelated(aboutFlowers, null, MediaForm
+            .builder()
+            .broadcasters("EO")
+            .build(), null);
+        assertThat(limitedByForm.getTotal()).isEqualTo(1);
+        log.info("{}", limitedByForm);
+    }
+
 
 
     private void indexWithGeoLocations() {
