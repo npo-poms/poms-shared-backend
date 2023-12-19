@@ -949,7 +949,6 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         for (MemberRef r : object.getMemberOf()) {
             StandaloneMemberRef ref = StandaloneMemberRef.builder()
                 .memberRef(r)
-                .objectType(StandaloneMemberRef.ObjectType.memberRef)
                 .build();
             indexHelpers.get(APIMEDIA_REFS).indexWithRouting(
                 ref.getId().toString(),
@@ -960,8 +959,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         if (object instanceof Program program) {
             for (MemberRef r : program.getEpisodeOf()) {
                 StandaloneMemberRef ref = StandaloneMemberRef.builder()
-                    .memberRef(r)
-                    .objectType(StandaloneMemberRef.ObjectType.episodeRef)
+                    .episodeRef(r)
                     .build();
                 indexHelpers.get(APIMEDIA_REFS).indexWithRouting(
                     ref.getId().toString(),
