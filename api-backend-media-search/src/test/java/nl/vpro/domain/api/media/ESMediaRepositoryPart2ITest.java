@@ -149,7 +149,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         program1 = index(programBuilder.copy()
             .publishStart(LocalDateTime.of(2017, 1, 30, 0, 0)) // sortDate is relevant for listDescendants
             .memberOf(group, 1)
-            .memberOf(group_ordered, 7).episodeOf(group, 3));
+            .memberOf(group_ordered, 7)
+            .episodeOf(group, 3));
         program2 = index(MediaTestDataBuilder.program().constrained()
             .publishStart(LocalDateTime.of(2017, 1, 29, 0, 0))
             .published(NOW).withMid()
@@ -921,7 +922,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
     @Test
     public void withMaxZero() {
-        MediaResult result = target.listMembers(target.load(group.getMid()), null, Order.ASC, 0L, 10);
+        Group loadedGroup = (Group) target.load(group.getMid());
+        MediaResult result = target.listMembers(loadedGroup, null, Order.ASC, 0L, 0);
 
         log.info("{}", result.getTotal());
         assertThat(result.getTotal()).isGreaterThan(0);
@@ -931,9 +933,9 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
 
-    private static <T extends MediaObject> T index(MediaBuilder<?, T> builder) throws IOException {
-        if (! PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
-             builder.workflow(Workflow.PUBLISHED);
+    private static <T extends MediaObject> T  index(MediaBuilder<?, T> builder) throws IOException {
+        if (!PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
+            builder.workflow(Workflow.PUBLISHED);
         }
 
         final T object = builder.build();
@@ -945,11 +947,27 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             map(object, addPublishdate));
 
         for (MemberRef r : object.getMemberOf()) {
-            StandaloneMemberRef ref = StandaloneMemberRef.builder().memberRef(r).build();
+            StandaloneMemberRef ref = StandaloneMemberRef.builder()
+                .memberRef(r)
+                .objectType(StandaloneMemberRef.ObjectType.memberRef)
+                .build();
             indexHelpers.get(APIMEDIA_REFS).indexWithRouting(
                 ref.getId().toString(),
                 map(ref, addPublishdate),
                 ref.getMidRef());
+        }
+
+        if (object instanceof Program program) {
+            for (MemberRef r : program.getEpisodeOf()) {
+                StandaloneMemberRef ref = StandaloneMemberRef.builder()
+                    .memberRef(r)
+                    .objectType(StandaloneMemberRef.ObjectType.episodeRef)
+                    .build();
+                indexHelpers.get(APIMEDIA_REFS).indexWithRouting(
+                    ref.getId().toString(),
+                    map(ref, addPublishdate),
+                    ref.getMidRef());
+            }
         }
         indexed.add(object);
         assertThat(object.getLastPublishedInstant()).isNotNull();
