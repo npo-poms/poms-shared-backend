@@ -113,6 +113,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     static int deletedProgramCount = 0;
     static int deletedGroupCount = 0;
 
+    static int withPredictionCount = 0;
+
 
     @BeforeEach
     public void init() {
@@ -217,7 +219,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
                 .memberOf(g, 1)
                 .avType(AVType.values()[i % 3]) // don't use the last one 'MIXED'
                 .ageRating(ORIGINAL[i % ORIGINAL.length])
-                .predictions(Platform.INTERNETVOD)
+                .predictions(Platform.INTERNETVOD) // 10 times predictions.
                 .mid("MID-" + i)
                 );
         }
@@ -239,7 +241,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         Location wm = new Location("http://somedomain.com/path/to/file", OwnerType.BROADCASTER);
         wm.setAvFileFormat(AVFileFormat.WM);
 
-        index(programBuilder.copy().mid("MID_WITH_LOCATION").locations(wm));
+        index(programBuilder.copy().mid("MID_WITH_LOCATION").locations(wm)); // this one as location, so implicitely a prediction too.
 
         index(programBuilder.copy().mid("MID_DRENTHE").broadcasters(new Broadcaster("TVDRENTHE", "TVDrenthe")));
 
@@ -620,7 +622,8 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         );
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
-        assertThat(result.getSize()).isEqualTo(10);
+        assertThat(result.getSize()).isEqualTo(withPredictionCount);
+        assertThat(result.getSize()).isEqualTo(11); // 10 times explicit, 1 time implicit because it had a location only.
     }
 
     @Test
@@ -972,7 +975,11 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
             if (object instanceof Group) {
                 indexedGroupCount++;
             }
-            log.info("{} Indexed {} for {}", mids.size(), object, object.getLastPublishedInstant());
+
+            if (!object.getPredictions().isEmpty())  {
+                withPredictionCount++;
+            }
+            log.info("{} Indexed {} for {} ({})", mids.size(), object, object.getLastPublishedInstant(), object.getPredictions());
         }
         //log.info(Jackson2Mapper.getPrettyInstance().writeValueAsString(object));
 
