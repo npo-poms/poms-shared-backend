@@ -7,8 +7,10 @@ package nl.vpro.api.rs.filter;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.function.Supplier;
 
 import javax.xml.bind.JAXB;
@@ -22,6 +24,7 @@ import nl.vpro.domain.bind.AbstractJsonIterable;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
+import nl.vpro.util.ReflectionUtils;
 
 import static nl.vpro.test.util.jackson2.Jackson2TestUtil.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +39,6 @@ public class ApiMediaFilterTest {
     static {
         MediaPropertiesFilters.instrument();
     }
-
 
     @BeforeEach
     public void setUp() {
@@ -389,7 +391,7 @@ public class ApiMediaFilterTest {
      * See <a href="https://jira.vpro.nl/browse/NPA-602">JIRA</a>
      */
     @Test
-    public void testFilterLocations() {
+    public void testFilterLocations() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
 
         Program program = MediaTestDataBuilder.program()
@@ -401,6 +403,10 @@ public class ApiMediaFilterTest {
                 .build()
             )
             .build();
+        program.implicitPredictions();
+
+        assertThat(program.getLocations()).isNotEmpty();
+        assertThat(program.getPredictions()).hasSize(1);
 
         ApiMediaFilter.set("title");
         assertThat(program.getLocations()).isEmpty();
@@ -416,7 +422,11 @@ public class ApiMediaFilterTest {
             }""");
 
         ApiMediaFilter.set("all");
+
         assertThat(program.getLocations()).isNotEmpty();
+        assertThat(program.getPredictions()).isNotEmpty();
+        Collection<Prediction> predictionsForXml = ReflectionUtils.callProtected(program, "getPredictionsForXml");
+        assertThat(predictionsForXml).isNotEmpty();
         assertThatJson(program).isSimilarTo(
             """
                 {
@@ -427,6 +437,10 @@ public class ApiMediaFilterTest {
                   "creationDate" : 1425596400000,
                   "lastModified" : 1425600000000,
                   "embeddable" : true,
+                  "predictions" : [ {
+                      "state" : "REALIZED",
+                      "platform" : "INTERNETVOD"
+                    } ],
                   "locations" : [ {
                     "programUrl" : "https://www.vpro.nl",
                     "avAttributes" : {
