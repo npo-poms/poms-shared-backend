@@ -28,15 +28,15 @@ import nl.vpro.domain.media.support.Workflow;
 public class ESMediaFilterBuilder extends ESFilterBuilder {
 
 
-    public static <T, W extends Enum<W>> QueryBuilder filter(ProfileDefinition<T> definition) {
-        return filter(definition, "workflow", Workflow.PUBLISHED);
+    public static <T, W extends Enum<W>> QueryBuilder filter(ProfileDefinition<T> profileDefinition) {
+        return filter(profileDefinition, "workflow", Workflow.PUBLISHED);
     }
 
     public static <T, W extends Enum<W>> void filter(
-        @Nullable ProfileDefinition<T> definition,
+        @Nullable ProfileDefinition<T> profileDefinition,
         @NonNull BoolQueryBuilder rootQuery
         ) {
-         filter(definition, rootQuery, "workflow", Workflow.PUBLISHED);
+         filter(profileDefinition, rootQuery, "workflow", Workflow.PUBLISHED);
      }
 
     /**
