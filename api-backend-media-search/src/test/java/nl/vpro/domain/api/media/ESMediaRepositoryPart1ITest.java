@@ -937,15 +937,16 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
     @Test
     public void testWithLocationFilter() {
 
-        index(program()); // no locations
+        index(program().mid("m1")); // no locations
         final Location location1 = new Location("http://www.locations.nl/1", BROADCASTER);
         location1.setId(1L);
-        index(program().locations(location1)); // just a location with
-                                                       // no platform
+        location1.setPlatform(null); // this case is deprecated
+
+        index(program().mid("m2").locations(location1)); // just a location with no platform
         final Location location2 = new Location("http://www.locations.nl/2", BROADCASTER,
                 Platform.INTERNETVOD);
         location2.setId(2L);
-        index(program().authoritativeRecord(Platform.INTERNETVOD).locations(location2)); // a location with  a specific platform
+        index(program().mid("m3").authoritativeRecord(Platform.INTERNETVOD).locations(location2)); // a location with  a specific platform
 
         {
             Filter filter = new Filter();
@@ -2045,7 +2046,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         Program notAboutFlowers = index(program()
             .mid("mid_100")
-              .mainTitle("cats")
+            .mainTitle("cats")
             .mainDescription("We hate cats. cats cats cats cats. Hello Schrödinger!")
             .broadcasters("EO"));
 
@@ -2234,8 +2235,8 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
             indexRef(object, ref, memberRef);
         }
 
-        if (object instanceof Program) {
-            for (MemberRef ref : ((Program) object).getEpisodeOf()) {
+        if (object instanceof Program program) {
+            for (MemberRef ref : program.getEpisodeOf()) {
                 indexRef(object, ref, episodeRef);
             }
         }
