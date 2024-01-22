@@ -17,6 +17,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -84,6 +86,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             refillRedirectCache();
             EXECUTOR.scheduleAtFixedRate(this::refillRedirectCache, 5, 5, TimeUnit.MINUTES);
         }
+    }
+
+    @PostConstruct
+    public void log() {
+        log.info("Using {} as related fields. Score manager {}", Arrays.toString(relatedFields), scoreManager);
     }
 
     @SneakyThrows
