@@ -6,6 +6,7 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.log4j.Log4j2;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -220,6 +221,21 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         if (! unHandledKeys.isEmpty()) {
             log.info("Keys not configured: {}", unHandledKeys);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (Method method : MediaScoreManagerImpl.class.getDeclaredMethods()) {
+            if (method.getName().startsWith("get")) {
+                try {
+                    builder.append("\n").append(method.getName().substring(3)).append(": ").append(method.invoke(this));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+        return builder.toString();
     }
 
 }

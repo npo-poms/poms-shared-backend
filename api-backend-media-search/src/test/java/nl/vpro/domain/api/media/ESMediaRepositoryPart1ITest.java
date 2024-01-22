@@ -2046,7 +2046,7 @@ public class ESMediaRepositoryPart1ITest extends AbstractMediaESRepositoryITest 
 
         Program notAboutFlowers = index(program()
             .mid("mid_100")
-              .mainTitle("cats")
+            .mainTitle("cats")
             .mainDescription("We hate cats. cats cats cats cats. Hello Schrödinger!")
             .broadcasters("EO"));
 

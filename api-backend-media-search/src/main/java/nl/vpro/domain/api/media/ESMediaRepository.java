@@ -90,7 +90,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
     @PostConstruct
     public void log() {
-        log.info("Using {} as related fields. Score manager {}", Arrays.toString(relatedFields), scoreManager);
+        log.info("Using as related fields: {}", Arrays.toString(relatedFields));
+        log.info("Score manager: {}", scoreManager);
     }
 
     @SneakyThrows
