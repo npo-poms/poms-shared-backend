@@ -620,7 +620,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
         );
         SearchResult<MediaObject> result = target.find(omroepProfile, null, 0, null);
 
-        assertThat(result.getSize()).isEqualTo(10);
+        assertThat(result.getSize()).isEqualTo(11); // 10 times explicit, 1 time implicit because it had a location only.
     }
 
     @Test
