@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>7.10.2</version>
+  <version>7.10.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
@@ -24,7 +24,7 @@
     <connection>scm:git:ssh://git@git.vpro.nl/npo/poms-shared-backend.git</connection>
     <developerConnection>scm:git:ssh://git@git.vpro.nl/npo/poms-shared-backend.git</developerConnection>
     <url>https://git.vpro.nl/npo/poms-shared-backend</url>
-    <tag>REL-7.10.2</tag>
+    <tag>REL-7.10-SNAPSHOT</tag>
   </scm>
 
   <modules>
