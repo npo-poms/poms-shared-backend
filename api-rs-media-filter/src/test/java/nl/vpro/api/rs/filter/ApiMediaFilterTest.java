@@ -478,6 +478,112 @@ public class ApiMediaFilterTest {
                   "publishDate" : 1425603600000
                 }""");
 
- }
+    }
+
+    /**
+     * See NPA-649
+     */
+    @Test
+    public void filteringAndPredictions()  {
+        Program program = JAXB.unmarshal(new StringReader("""
+                                <?xml version="1.0"?>
+                                <program xmlns="urn:vpro:media:2009" xmlns:shared="urn:vpro:shared:2009" type="BROADCAST" avType="VIDEO" embeddable="true" mid="POW_00221203" sortDate="2009-10-25T08:45:00+01:00" creationDate="2013-01-28T01:56:11.067+01:00" lastModified="2013-12-05T21:23:14.924+01:00" publishDate="2022-06-08T11:18:58.064+02:00" urn="urn:vpro:media:program:18160902">
+                                  <crid>crid://tmp.program.omroep.nl/10225602</crid>
+                                  <broadcaster id="MAX">MAX</broadcaster>
+                                  <title owner="BROADCASTER" type="MAIN">Nederland in Beweging!</title>
+                                  <title owner="NEBO" type="MAIN">Nederland in Beweging!</title>
+                                  <description owner="BROADCASTER" type="MAIN">Te veel frisdranken gebruiken is vaak &#xE9;&#xE9;n van de belangrijkste voedingsfouten, vooral bij kinderen. Met &#xE9;&#xE9;n blikje frisdrank heb je al snel zo'n 7 klontjes suiker of ongeveer 150 kcal binnen. Cola bevat bovendien cafe&#xEF;ne, waardoor vooral kinderen snel opgewonden of prikkelbaar kunnen worden. Presentatie: Olga Commandeur, Duco Bauwens.</description>
+                                  <description owner="NEBO" type="EPISODE">Met niet aflatend enthousiasme wordt elke Nederlander gestimuleerd om mee te bewegen! Presentatie: Olga Commandeur, Duco Bauwens.</description>
+                                  <genre id="3.0.1.4">
+                                    <term>Sport</term>
+                                  </genre>
+                                  <avAttributes>
+                                    <bitrate>0</bitrate>
+                                    <avFileFormat>WM</avFileFormat>
+                                    <videoAttributes>
+                                      <videoCoding>WM</videoCoding>
+                                      <aspectRatio>16:9</aspectRatio>
+                                    </videoAttributes>
+                                  </avAttributes>
+                                  <duration>P0DT0H15M0.000S</duration>
+                                  <credits>
+                                    <person role="PRESENTER">
+                                      <givenName>Duco</givenName>
+                                      <familyName>Bauwens</familyName>
+                                    </person>
+                                    <person role="PRESENTER">
+                                      <givenName>Olga</givenName>
+                                      <familyName>Commandeur</familyName>
+                                    </person>
+                                  </credits>
+                                  <descendantOf urnRef="urn:vpro:media:group:18143816" midRef="POW_00220729" type="SEASON"/>
+                                  <descendantOf urnRef="urn:vpro:media:group:70888160" midRef="POW_03108318" type="SERIES"/>
+                                  <descendantOf urnRef="urn:vpro:media:group:83745239" midRef="POMS_S_NPO_5931497" type="PLAYLIST"/>
+                                  <prediction state="REVOKED" publishStart="2009-10-23T07:05:02+02:00">INTERNETVOD</prediction>
+                                  <locations>
+                                    <location owner="NEBO" platform="INTERNETVOD" creationDate="2013-01-28T01:56:11.070+01:00" lastModified="2013-01-28T01:56:11.081+01:00" publishStart="2009-10-23T07:05:02+02:00" urn="urn:vpro:media:location:18160911">
+                                      <programUrl>odi+http://odi.omroep.nl/video/h264_bb/POW_00221203</programUrl>
+                                      <avAttributes>
+                                        <bitrate>512000</bitrate>
+                                        <avFileFormat>MP4</avFileFormat>
+                                        <videoAttributes>
+                                          <videoCoding>WM</videoCoding>
+                                          <aspectRatio>16:9</aspectRatio>
+                                        </videoAttributes>
+                                      </avAttributes>
+                                    </location>
+                                  </locations>
+                                  <images/>
+                                  <scheduleEvents/>
+                                  <segments/>
+                                </program>
+                                """), Program.class);
+        ApiMediaFilter.set("title,predictions");
+        assertThatJson(program).isSimilarTo(
+            """
+                {
+                   "objectType": "program",
+                   "mid": "POW_00221203",
+                   "type": "BROADCAST",
+                   "avType": "VIDEO",
+                   "sortDate": 1256456700000,
+                   "creationDate": 1359334571067,
+                   "lastModified": 1386274994924,
+                   "urn": "urn:vpro:media:program:18160902",
+                   "embeddable": true,
+                   "broadcasters": [
+                     {
+                       "id": "MAX",
+                       "value": "MAX"
+                     }
+                   ],
+                   "titles": [
+                     {
+                       "value": "Nederland in Beweging!",
+                       "owner": "BROADCASTER",
+                       "type": "MAIN"
+                     }
+                   ],
+                   "genres": [
+                    \s
+                   ],
+                   "countries": [
+                    \s
+                   ],
+                   "languages": [
+                    \s
+                   ],
+                   "predictions": [
+                     {
+                       "state": "REALIZED",
+                       "publishStart": 1256274302000,
+                       "platform": "INTERNETVOD"
+                     }
+                   ],
+                   "publishDate": 1654679938064
+                 }""");
+
+    }
+
 
 }
