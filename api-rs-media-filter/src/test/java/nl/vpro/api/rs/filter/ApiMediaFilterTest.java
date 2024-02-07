@@ -10,6 +10,7 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.function.Supplier;
 
 import javax.xml.bind.JAXB;
@@ -23,6 +24,7 @@ import nl.vpro.domain.bind.AbstractJsonIterable;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
+import nl.vpro.util.ReflectionUtils;
 
 import static nl.vpro.test.util.jackson2.Jackson2TestUtil.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -423,8 +425,8 @@ public class ApiMediaFilterTest {
 
         assertThat(program.getLocations()).isNotEmpty();
         assertThat(program.getPredictions()).isNotEmpty();
-        //Collection<Prediction> predictionsForXml = ReflectionUtils.callProtected(program, "getPredictionsForXml");
-        //assertThat(predictionsForXml).isNotEmpty();
+        Collection<Prediction> predictionsForXml = ReflectionUtils.callProtected(program, "getPredictionsForXml");
+        assertThat(predictionsForXml).isNotEmpty();
         assertThatJson(program).isSimilarTo(
             """
                 {
