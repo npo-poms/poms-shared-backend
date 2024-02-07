@@ -565,12 +565,6 @@ public class ApiMediaFilterTest {
                    "genres": [
                     \s
                    ],
-                   "countries": [
-                    \s
-                   ],
-                   "languages": [
-                    \s
-                   ],
                    "predictions": [
                      {
                        "state": "REALIZED",
