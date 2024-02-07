@@ -517,7 +517,7 @@ public class ApiMediaFilterTest {
                                   <descendantOf urnRef="urn:vpro:media:group:18143816" midRef="POW_00220729" type="SEASON"/>
                                   <descendantOf urnRef="urn:vpro:media:group:70888160" midRef="POW_03108318" type="SERIES"/>
                                   <descendantOf urnRef="urn:vpro:media:group:83745239" midRef="POMS_S_NPO_5931497" type="PLAYLIST"/>
-                                  <prediction state="REVOKED" publishStart="2009-10-23T07:05:02+02:00">INTERNETVOD</prediction>
+                                  <prediction state="REALIZED" publishStart="2009-10-23T07:05:02+02:00">INTERNETVOD</prediction>
                                   <locations>
                                     <location owner="NEBO" platform="INTERNETVOD" creationDate="2013-01-28T01:56:11.070+01:00" lastModified="2013-01-28T01:56:11.081+01:00" publishStart="2009-10-23T07:05:02+02:00" urn="urn:vpro:media:location:18160911">
                                       <programUrl>odi+http://odi.omroep.nl/video/h264_bb/POW_00221203</programUrl>
