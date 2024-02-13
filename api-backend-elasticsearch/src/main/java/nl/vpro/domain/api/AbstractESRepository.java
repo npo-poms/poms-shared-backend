@@ -276,7 +276,6 @@ public abstract class AbstractESRepository<T> {
     }
 
 
-    @SuppressWarnings("UnusedReturnValue")
     protected boolean handlePaging(
         long offset,
         @Nullable Integer max,
@@ -356,11 +355,11 @@ public abstract class AbstractESRepository<T> {
     }
 
     protected final <S extends T> S getObject(@NonNull SearchHit hit, @NonNull Class<S> clazz) throws IOException {
-        return getObject(Jackson2Mapper.getLenientInstance().readTree(hit.getSourceRef().toBytesRef().bytes), clazz);
+        return getObject(lenient.readTree(hit.getSourceRef().toBytesRef().bytes), clazz);
     }
 
     protected final <S extends T> S getObject(@NonNull JsonNode source, @NonNull Class<S> clazz) throws IOException {
-        return Jackson2Mapper.getLenientInstance()
+        return lenient
             .readerFor(clazz)
             .readValue(source);
     }
