@@ -13,9 +13,9 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.persistence.PrePersist;
-import javax.validation.*;
+import jakarta.inject.Inject;
+import jakarta.persistence.PrePersist;
+import jakarta.validation.*;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.elasticsearch.ElasticsearchException;
