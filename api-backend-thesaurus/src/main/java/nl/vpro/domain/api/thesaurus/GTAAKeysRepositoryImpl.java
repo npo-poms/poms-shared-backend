@@ -6,7 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import java.io.IOException;
 import java.util.*;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.core.io.Resource;

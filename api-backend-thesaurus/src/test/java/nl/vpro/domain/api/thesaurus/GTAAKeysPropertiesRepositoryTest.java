@@ -2,7 +2,7 @@ package nl.vpro.domain.api.thesaurus;
 
 import java.util.NoSuchElementException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

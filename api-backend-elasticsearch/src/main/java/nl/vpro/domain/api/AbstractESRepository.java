@@ -10,7 +10,7 @@
  import java.util.function.Consumer;
  import java.util.stream.Collectors;
 
- import javax.validation.constraints.NotNull;
+ import jakarta.validation.constraints.NotNull;
 
  import org.apache.commons.lang3.StringUtils;
  import org.apache.http.client.config.RequestConfig;
@@ -190,7 +190,7 @@ public abstract class AbstractESRepository<T> {
             return null;
         }
         try {
-            return Jackson2Mapper.LENIENT.readValue(response.getSourceAsString(), clazz);
+            return Jackson2Mapper.getLenientInstance().readValue(response.getSourceAsString(), clazz);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -248,7 +248,7 @@ public abstract class AbstractESRepository<T> {
                 } else {
                     if (response.getResponse().isExists()) {
                         try {
-                            S item = Jackson2Mapper.LENIENT.readValue(response.getResponse().getSourceAsString(), clazz);
+                            S item = Jackson2Mapper.getLenientInstance().readValue(response.getResponse().getSourceAsString(), clazz);
                             answerMap.put(response.getId(), item);
                         } catch (IllegalArgumentException iae) {
                             log.warn(iae.getMessage());
@@ -273,6 +273,7 @@ public abstract class AbstractESRepository<T> {
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
     protected boolean handlePaging(
         long offset,
         @Nullable Integer max,

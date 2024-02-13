@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 
 import java.time.Duration;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

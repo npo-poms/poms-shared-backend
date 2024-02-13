@@ -6,7 +6,7 @@ package nl.vpro.domain.api.media;
 
 import lombok.extern.log4j.Log4j2;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
