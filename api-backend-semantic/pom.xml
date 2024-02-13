@@ -1,19 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
    <modelVersion>4.0.0</modelVersion>
    <parent>
      <groupId>nl.vpro.poms</groupId>
      <artifactId>poms-shared-backend-parent</artifactId>
-     <version>7.8-SNAPSHOT</version>
+     <version>8.0-SNAPSHOT</version>
    </parent>
    <groupId>nl.vpro.api</groupId>
    <artifactId>api-backend-semantic</artifactId>
    <dependencies>
-     <dependency>
-       <!-- nieuwe versie van http client es proberen, volgende keer gaan we wel voor okclient of zo -->
-       <groupId>org.apache.httpcomponents.client5</groupId>
-       <artifactId>httpclient5</artifactId>
-       <version>5.1.1</version>
-     </dependency>
      <dependency>
        <groupId>nl.vpro.shared</groupId>
        <artifactId>vpro-shared-jackson2</artifactId>
@@ -28,8 +22,8 @@
        <artifactId>micrometer-core</artifactId>
      </dependency>
      <dependency>
-       <groupId>com.github.tomakehurst</groupId>
-       <artifactId>wiremock-jre8-standalone</artifactId>
-     </dependency>
+      <groupId>org.wiremock</groupId>
+      <artifactId>wiremock-standalone</artifactId>
+    </dependency>
    </dependencies>
 </project>

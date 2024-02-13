@@ -10,7 +10,7 @@
  import java.util.function.Consumer;
  import java.util.stream.Collectors;
 
- import javax.validation.constraints.NotNull;
+ import jakarta.validation.constraints.NotNull;
 
  import org.apache.commons.lang3.StringUtils;
  import org.apache.http.client.config.RequestConfig;
@@ -276,6 +276,7 @@ public abstract class AbstractESRepository<T> {
     }
 
 
+    @SuppressWarnings("UnusedReturnValue")
     protected boolean handlePaging(
         long offset,
         @Nullable Integer max,
@@ -355,11 +356,11 @@ public abstract class AbstractESRepository<T> {
     }
 
     protected final <S extends T> S getObject(@NonNull SearchHit hit, @NonNull Class<S> clazz) throws IOException {
-        return getObject(lenient.readTree(hit.getSourceRef().toBytesRef().bytes), clazz);
+        return getObject(Jackson2Mapper.getLenientInstance().readTree(hit.getSourceRef().toBytesRef().bytes), clazz);
     }
 
     protected final <S extends T> S getObject(@NonNull JsonNode source, @NonNull Class<S> clazz) throws IOException {
-        return lenient
+        return Jackson2Mapper.getLenientInstance()
             .readerFor(clazz)
             .readValue(source);
     }

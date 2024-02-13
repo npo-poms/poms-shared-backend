@@ -1,7 +1,7 @@
 package nl.vpro.media.domain.es;
 
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 
@@ -14,7 +14,7 @@ import static nl.vpro.i18n.Locales.score;
  * @author Michiel Meeuwissen
  * @since 4.8
  */
-@Slf4j
+@Log4j2
 public abstract class ApiCueIndex extends ElasticSearchIndex {
 
     public static final String NAME = "subtitles_%s";

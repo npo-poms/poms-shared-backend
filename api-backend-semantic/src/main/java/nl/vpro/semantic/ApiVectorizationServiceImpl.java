@@ -1,24 +1,16 @@
 package nl.vpro.semantic;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.Data;
-import lombok.SneakyThrows;
+import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
+import lombok.*;
 
+import java.net.URI;
+import java.net.http.*;
 import java.time.Duration;
-import java.util.concurrent.Future;
 
-import org.apache.hc.client5.http.async.methods.*;
-import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
-import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
-import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
-import org.apache.hc.core5.http.message.BasicHeader;
-import org.apache.hc.core5.reactor.IOReactorConfig;
-import org.apache.hc.core5.util.TimeValue;
-import org.apache.hc.core5.util.Timeout;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.vpro.jackson2.Jackson2Mapper;
-
-import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
 
 
 /**
@@ -26,7 +18,8 @@ import static org.apache.hc.core5.http.ContentType.APPLICATION_JSON;
  */
 public class ApiVectorizationServiceImpl implements VectorizationService {
 
-    private final CloseableHttpAsyncClient client;
+    private final HttpClient client;
+
 
     private final String apiKey;
 
@@ -38,26 +31,17 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
 
 
     public ApiVectorizationServiceImpl(
-        String endpoint,
-        String apiKey,
-        MeterRegistry meterRegistry,
+        @Nullable String endpoint,
+        @NonNull String apiKey,
+        @Nullable MeterRegistry meterRegistry,
         Duration timeout) {
         this.apiKey = apiKey;
         this.endPoint = endpoint == null? "https://www.api.geniusvoicedemo.nl/semanticvectorizer" : endpoint;
-        this.meterRegistry = meterRegistry;
-        final IOReactorConfig ioReactorConfig = IOReactorConfig.custom()
-            .setSoTimeout(Timeout.ofMilliseconds(timeout.toMillis()))
+        this.meterRegistry = meterRegistry == null ? new LoggingMeterRegistry() : meterRegistry;
+        client = HttpClient.newBuilder()
+            .connectTimeout(timeout)
+            .followRedirects(HttpClient.Redirect.ALWAYS)
             .build();
-
-        client = HttpAsyncClients.custom()
-            .setIOReactorConfig(ioReactorConfig)
-            .setRetryStrategy(
-                new DefaultHttpRequestRetryStrategy(
-                    5, TimeValue.ofSeconds(5)
-                )
-            )
-            .build();
-        client.start();
         this.timeout = timeout;
     }
 
@@ -78,22 +62,18 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
 
     @SneakyThrows
     protected Response post(Object body) {
-        final SimpleHttpRequest request = SimpleRequestBuilder.post(endPoint)
-            .addHeader(new BasicHeader("api_key", apiKey))
-            .addHeader(new BasicHeader("accept", APPLICATION_JSON))
-            .addHeader(new BasicHeader("content-type", APPLICATION_JSON))
-            .setBody(Jackson2Mapper.getInstance().writeValueAsBytes(body), APPLICATION_JSON)
+        var request = HttpRequest.newBuilder(URI.create(endPoint))
+            .POST(HttpRequest.BodyPublishers.ofByteArray(Jackson2Mapper.getInstance().writeValueAsBytes(body)))
+            .header("api_key", apiKey)
+            .header("accept", "application/json")
+            .header("content-type", "application/json")
             .build();
 
-        final Future<SimpleHttpResponse> execute = client.execute(
-            SimpleRequestProducer.create(request),
-            SimpleResponseConsumer.create(), null);
-
-        SimpleBody responseBody = execute.get().getBody();
+        final HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
         return Jackson2Mapper
             .getLenientInstance()
             .readerFor(Response.class)
-            .readValue(responseBody.getBodyBytes());
+            .readValue(response.body());
     }
 
     @Data

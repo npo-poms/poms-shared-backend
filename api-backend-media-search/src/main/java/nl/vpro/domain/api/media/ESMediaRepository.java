@@ -7,7 +7,6 @@ package nl.vpro.domain.api.media;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -18,6 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
@@ -58,7 +59,6 @@ import static nl.vpro.media.domain.es.Common.CLOCK;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-@Slf4j
 @Log4j2
 @ManagedResource(objectName = "nl.vpro.api:name=ESMediaRepository")
 public class ESMediaRepository extends AbstractESMediaRepository implements MediaSearchRepository {
@@ -87,6 +87,12 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             refillRedirectCache();
             EXECUTOR.scheduleAtFixedRate(this::refillRedirectCache, 5, 5, TimeUnit.MINUTES);
         }
+    }
+
+    @PostConstruct
+    public void log() {
+        log.info("Using as related fields: {}", Arrays.toString(relatedFields));
+        log.info("Score manager: {}", scoreManager);
     }
 
     @SneakyThrows
@@ -334,7 +340,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             filter.must(QueryBuilders.termQuery("ageRating", ratingString));
         }
 
-        SearchSourceBuilder search = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
+        SearchSourceBuilder sourceBuilder = mediaSearchBuilder(profile, form, filter, 0L, 0x7ffffef);
         assert media.getMid() != null;
         MoreLikeThisQueryBuilder.Item item = new MoreLikeThisQueryBuilder.Item(getIndexName(), media.getMid());
         MoreLikeThisQueryBuilder moreLikeThisQueryBuilder = QueryBuilders.moreLikeThisQuery(
@@ -354,9 +360,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
         SearchRequest searchRequest = new SearchRequest(getIndexName());
 
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         sourceBuilder.size(max == null ? defaultMax : max);
-        sourceBuilder.query(moreLikeThisQueryBuilder);
+
+        if (sourceBuilder.query() != null) {
+            filter.must(moreLikeThisQueryBuilder);
+        } else {
+            sourceBuilder.query(moreLikeThisQueryBuilder);
+        }
         searchRequest.source(sourceBuilder);
         SearchResponse response  = client().search(searchRequest, requestOptions());
 
@@ -570,7 +580,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             objects.removeIf((p) -> !profile.test(p));
             long result = objects.size();
             if (offset > 0 || max != null) {
-                while (offset-- > 0 && objects.size() > 0) {
+                while (offset-- > 0 && !objects.isEmpty()) {
                     objects.remove(0);
                 }
                 if (max != null) {
@@ -625,9 +635,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .filter(QueryBuilders.existsQuery(Common.ES_PUBLISH_DATE))
         );
 
-        if (log.isDebugEnabled()) {
-            log.debug("Found {} changes", i.getTotalSize());
-        }
+        log.debug("Found {} changes", i::getTotalSize);
+
         final MarkSkippedChangeIterator changes = new MarkSkippedChangeIterator(
             i,
             since,
@@ -653,7 +662,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                             log.debug("Change is ok {} > {}", change.getPublishDate(), since);
                             filtering = false;
                         } else if (change.getMid().compareTo(mid) > 0) {
-                            log.debug("Chnage is ok {} > {}", change.getMid(), mid);
+                            log.debug("Change is ok {} > {}", change.getMid(), mid);
                             filtering = false;
                         } else {
                             change.setSkipped(true);
@@ -710,8 +719,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 throw new NoSuchElementException();
             }
             if (last == null) {
+                // nothing, or everything iterated, this is simple
                 return MediaChange.tail(changesUpto);
             } else if (tail == Tail.ALWAYS) {
+                if (max == null) {
+                    // no need to be difficult
+                    return MediaChange.tail(changesUpto);
+                }
+                // _something_ iterated, so we can return the last one.
                 if (maxed.peekingWrapped().hasNext()) {
                     MediaChange peek = maxed.peekingWrapped().peek();
                     if (peek != null) {

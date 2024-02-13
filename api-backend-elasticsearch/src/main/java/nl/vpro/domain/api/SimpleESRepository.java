@@ -5,7 +5,7 @@
 package nl.vpro.domain.api;
 
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -13,9 +13,9 @@ import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.inject.Inject;
-import javax.persistence.PrePersist;
-import javax.validation.*;
+import jakarta.inject.Inject;
+import jakarta.persistence.PrePersist;
+import jakarta.validation.*;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.elasticsearch.ElasticsearchException;
@@ -41,7 +41,7 @@ import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
  * @author Michiel Meeuwisssen
  */
 @SuppressWarnings("resource")
-@Slf4j
+@Log4j2
 @Repository
 public class SimpleESRepository<T extends Identifiable<I>, I extends Serializable & Comparable<I>> extends AbstractESRepository<T> {
 

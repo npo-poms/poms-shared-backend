@@ -4,12 +4,13 @@
  */
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jmx.export.annotation.*;
@@ -25,7 +26,7 @@ import nl.vpro.util.TimeUtils;
  */
 @ManagedResource(objectName = "nl.vpro.api:name=MediaScoreManager")
 @Component
-@Slf4j
+@Log4j2
 public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implements MediaScoreManager {
 
     private static final String MEDIA_SCORES_FILE = "media.scores";
@@ -220,6 +221,21 @@ public class MediaScoreManagerImpl extends AbstractConfigFileScoreManager implem
         if (! unHandledKeys.isEmpty()) {
             log.info("Keys not configured: {}", unHandledKeys);
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (Method method : MediaScoreManagerImpl.class.getDeclaredMethods()) {
+            if (method.getName().startsWith("get")) {
+                try {
+                    builder.append("\n").append(method.getName().substring(3)).append(": ").append(method.invoke(this));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+        return builder.toString();
     }
 
 }

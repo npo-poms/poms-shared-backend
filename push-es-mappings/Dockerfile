@@ -3,6 +3,8 @@
 FROM openjdk:17-alpine
 MAINTAINER push-es-mappings
 
+ARG NAME=push-es-mappings
+
 ARG PROJECT_VERSION
 
 ENV HOST=localhost

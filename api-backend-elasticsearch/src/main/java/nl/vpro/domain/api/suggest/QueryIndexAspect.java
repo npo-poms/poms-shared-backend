@@ -4,7 +4,7 @@
  */
 package nl.vpro.domain.api.suggest;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -18,7 +18,7 @@ import nl.vpro.domain.api.profile.ProfileDefinition;
  * @since 3.2
  */
 @Aspect
-@Slf4j
+@Log4j2
 public class QueryIndexAspect {
 
     private final ESQueryRepository queryRepository;

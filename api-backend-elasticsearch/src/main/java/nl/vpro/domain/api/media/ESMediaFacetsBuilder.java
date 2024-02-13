@@ -4,9 +4,9 @@
  */
 package nl.vpro.domain.api.media;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -25,7 +25,7 @@ import nl.vpro.domain.api.*;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-@Slf4j
+@Log4j2
 public class ESMediaFacetsBuilder extends ESFacetsBuilder {
 
     protected static final String ROOT_FILTER = "mediaRootFilter";

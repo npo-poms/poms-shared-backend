@@ -3,13 +3,13 @@ package nl.vpro.domain.api;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.*;
@@ -89,7 +89,7 @@ public abstract class AbstractESRepositoryITest {
     }
 
     @AfterAll
-    public static void shutdown() throws ExecutionException, InterruptedException {
+    public static void shutdown() throws IOException {
         for (IndexHelper indexHelper : indexHelpers.values()) {
             indexHelper.deleteIndex();
         }
