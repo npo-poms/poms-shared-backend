@@ -33,7 +33,6 @@ import org.springframework.stereotype.Repository;
 import nl.vpro.domain.Identifiable;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-import nl.vpro.jackson2.Jackson2Mapper;
 
 /**
  * A repository that talks to exactly one type in exactly one index
@@ -102,7 +101,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
         try {
             IndexRequest request = new IndexRequest(getPublishIndexName());
             request.id(update.getId().toString());
-            request.source(Jackson2Mapper.getInstance().writeValueAsBytes(update), XContentType.JSON);
+            request.source(mapper.writeValueAsBytes(update), XContentType.JSON);
             IndexResponse response = client().index(request, RequestOptions.DEFAULT);
             log.info("Indexed {} {}", update, response.getVersion());
             return update;
@@ -136,7 +135,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
 
     protected T unMap(String string) {
         try {
-            return Jackson2Mapper.getInstance().readValue(string, clazz);
+            return mapper.readValue(string, clazz);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(string + ":" + e.getMessage(), e);
