@@ -59,6 +59,9 @@ public abstract class AbstractESRepository<T> {
 
     protected final HighLevelClientFactory factory;
 
+    protected static final Jackson2Mapper mapper = Jackson2Mapper.getInstance();
+    protected static final Jackson2Mapper lenient = Jackson2Mapper.getLenientInstance();
+
 
     @Getter
     @Setter
@@ -190,7 +193,7 @@ public abstract class AbstractESRepository<T> {
             return null;
         }
         try {
-            return Jackson2Mapper.LENIENT.readValue(response.getSourceAsString(), clazz);
+            return lenient.readValue(response.getSourceAsString(), clazz);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -248,7 +251,7 @@ public abstract class AbstractESRepository<T> {
                 } else {
                     if (response.getResponse().isExists()) {
                         try {
-                            S item = Jackson2Mapper.LENIENT.readValue(response.getResponse().getSourceAsString(), clazz);
+                            S item = lenient.readValue(response.getResponse().getSourceAsString(), clazz);
                             answerMap.put(response.getId(), item);
                         } catch (IllegalArgumentException iae) {
                             log.warn(iae.getMessage());
@@ -352,11 +355,11 @@ public abstract class AbstractESRepository<T> {
     }
 
     protected final <S extends T> S getObject(@NonNull SearchHit hit, @NonNull Class<S> clazz) throws IOException {
-        return getObject(Jackson2Mapper.getLenientInstance().readTree(hit.getSourceRef().toBytesRef().bytes), clazz);
+        return getObject(lenient.readTree(hit.getSourceRef().toBytesRef().bytes), clazz);
     }
 
     protected final <S extends T> S getObject(@NonNull JsonNode source, @NonNull Class<S> clazz) throws IOException {
-        return Jackson2Mapper.getLenientInstance()
+        return lenient
             .readerFor(clazz)
             .readValue(source);
     }
@@ -366,7 +369,7 @@ public abstract class AbstractESRepository<T> {
         @NonNull String[] fields,
         @NonNull String fallBack) {
         List<String> result = new ArrayList<>();
-        JsonNode root = Jackson2Mapper.getInstance().valueToTree(mo);
+        JsonNode root = mapper.valueToTree(mo);
         for (String path : fields) {
             if (hasEsPath(root, path)) {
                 result.add(path);
@@ -381,7 +384,7 @@ public abstract class AbstractESRepository<T> {
     static <S> boolean hasEsPath(
         @NonNull S o,
         @NonNull String path) {
-        JsonNode root = Jackson2Mapper.getInstance().valueToTree(o);
+        JsonNode root = mapper.valueToTree(o);
         return hasEsPath(root, path);
     }
 

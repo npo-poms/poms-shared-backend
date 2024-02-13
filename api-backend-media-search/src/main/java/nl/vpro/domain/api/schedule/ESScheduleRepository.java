@@ -29,9 +29,8 @@ import nl.vpro.domain.media.search.InstantRange;
 import nl.vpro.domain.media.search.SchedulePager;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
-import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.elasticsearch.highlevel.ExtendedElasticSearchIterator;
-import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.media.domain.es.ApiMediaIndex;
 import nl.vpro.util.TimeUtils;
 
@@ -204,7 +203,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         if(hits.getTotalHits().value == 0) {
             return null;
         }
-        return Jackson2Mapper.getInstance().readValue(hits.getHits()[0].getSourceAsString(), MediaObject.class);
+        return mapper.readValue(hits.getHits()[0].getSourceAsString(), MediaObject.class);
     }
 
     private ScheduleResult execute(ExtendedScheduleForm form) {

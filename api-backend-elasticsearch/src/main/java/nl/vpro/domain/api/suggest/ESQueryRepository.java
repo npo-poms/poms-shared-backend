@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import nl.vpro.domain.api.*;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
-import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.util.ThreadPools;
 
 import static nl.vpro.es.ApiQueryIndex.APIQUERIES;
@@ -106,7 +105,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
             try {
                 IndexRequest indexRequest = new IndexRequest(getIndexName());
                 indexRequest.id(query.getId());
-                indexRequest.source(Jackson2Mapper.getInstance().writeValueAsString(query), XContentType.JSON);
+                indexRequest.source(mapper.writeValueAsString(query), XContentType.JSON);
                 IndexResponse response  = client().index(indexRequest, RequestOptions.DEFAULT);
                 log.debug("indexed {}", response);
             } catch (IOException e) {
