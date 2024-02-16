@@ -22,4 +22,4 @@ RUN ln -s  /root/push-es-mappings-${PROJECT_VERSION}.jar /root/push-es-mappings.
 
 WORKDIR /root
 
-CMD java -jar /root/push-es-mappings.jar --host "$HOST" --cluster "$CLUSTER" --user "$USER" --password "$PASSWORD" $(if [ "$EXPERIMENTAL" = "true" ]; then echo "--experimental";  fi) ; echo "sleeping for inspection" ; sleep $(expr 3600 \* 24 \* 2)
+CMD java -jar /root/push-es-mappings.jar --host "$HOST" --cluster "$CLUSTER" --user "$USER" --password "$PASSWORD" $(if [ "$EXPERIMENTAL" = "true" ]; then echo "--experimental";  fi) ; echo "Sleeping 2 days for inspection" ; sleep $(expr 3600 \* 24 \* 2)
