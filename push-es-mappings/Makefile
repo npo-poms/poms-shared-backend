@@ -27,7 +27,7 @@ clean: stop-test stop-acc stop-prod
 
 create-docker:
 	export pom_version=`mvn org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -Dexpression=project.version -q -DforceStdout` ; \
-	docker build -t push-es-mappings --build-arg VERSION=$${pom_version} .
+	docker build -t push-es-mappings --build-arg PROJECT_VERSION=$${pom_version} .
 
 docker:
 	export pom_version=`mvn org.apache.maven.plugins:maven-help-plugin:3.3.0:evaluate -Dexpression=project.version -q -DforceStdout` ; \
@@ -35,7 +35,7 @@ docker:
 	docker run -v "$$(pwd)":/share --entrypoint "" gcr.io/kaniko-project/executor:debug   /kaniko/executor \
       --context /share \
       --dockerfile /share/Dockerfile \
-      --build-arg VERSION=${pom_version} \
+      --build-arg PROJECT_VERSION=${pom_version} \
       --cache=false \
       --destination test:test \
       --no-push

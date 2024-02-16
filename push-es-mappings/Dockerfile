@@ -1,6 +1,5 @@
-# This is a replacement for  https://git.vpro.nl/npo/docker/es-builder/-/blob/master/Dockerfile
+FROM amazoncorretto:21-alpine
 
-FROM openjdk:17-alpine
 MAINTAINER push-es-mappings
 
 ARG NAME=push-es-mappings
