@@ -18,6 +18,8 @@ import nl.vpro.jackson2.Jackson2Mapper;
  */
 public class ApiVectorizationServiceImpl implements VectorizationService {
 
+    private static final Jackson2Mapper MAPPER = Jackson2Mapper.getInstance();
+
     private final HttpClient client;
 
 
@@ -63,7 +65,7 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
     @SneakyThrows
     protected Response post(Object body) {
         var request = HttpRequest.newBuilder(URI.create(endPoint))
-            .POST(HttpRequest.BodyPublishers.ofByteArray(Jackson2Mapper.getInstance().writeValueAsBytes(body)))
+            .POST(HttpRequest.BodyPublishers.ofByteArray(MAPPER.writeValueAsBytes(body)))
             .header("api_key", apiKey)
             .header("accept", "application/json")
             .header("content-type", "application/json")

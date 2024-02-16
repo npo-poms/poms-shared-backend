@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
@@ -84,7 +84,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     protected void fillRedirects() {
         if (redirects == null) {
             refillRedirectCache();
-            EXECUTOR.scheduleAtFixedRate(this::refillRedirectCache, 5, 5, TimeUnit.MINUTES);
+            EXECUTOR.scheduleAtFixedRate(
+                this::refillRedirectCache, 5, 5, TimeUnit.MINUTES);
         }
     }
 
