@@ -9,6 +9,7 @@ import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
@@ -17,7 +18,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
@@ -862,9 +863,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     synchronized void refillRedirectCache() {
         Map<String, String> newRedirects = new HashMap<>();
 
-        try(ExtendedElasticSearchIterator<MediaObject> i = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
+        var start = Instant.now();
+        try(ExtendedElasticSearchIterator<JsonNode> i = ExtendedElasticSearchIterator.<JsonNode>extendedBuilder()
             .client(factory.highLevelClient())
-            .adapt(this::getMediaObject)
+            .adapt(h -> h.get(Constants.Fields.SOURCE))
             .build()) {
 
             i.prepareSearchSource(getIndexName())
@@ -873,14 +875,17 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .size(iterateBatchSize)
             ;
             while(i.hasNext()) {
-                final MediaObject o = i.next();
-                if (o.getMergedToRef() != null) {
-                    newRedirects.put(o.getMid(), o.getMergedToRef());
+                final JsonNode o = i.next();
+                String mid = o.get("mid").textValue();
+                String mergedToRef = Optional.ofNullable(o.get("mergedTo")).map(JsonNode::textValue).orElse(null);
+                if (mergedToRef != null) {
+                    newRedirects.put(mid, mergedToRef);
                 } else {
-                    if (o instanceof Segment) {
-                        log.debug("Found merged segment {}. This is correct.", o.getMid());
+                    boolean segment = "segment".equals(o.get("objectType").textValue());
+                    if (segment) {
+                        log.debug("Found merged segment {}. This is correct.", mid);
                     } else {
-                        log.warn("Found merged object without merged to {}", o.getMid());
+                        log.warn("Found merged object without merged to {}", mid);
                     }
                 }
             }
@@ -889,10 +894,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         }
         if (redirects == null || ! newRedirects.equals(redirects.getMap())) {
             redirects = new RedirectList(CLOCK.instant(), newRedirects);
-            log.info("Read {} redirects from ES", redirects.size());
+            log.info("Read {} redirects from ES in {}", redirects.size(), Duration.between(start, Instant.now()));
         }
         lastRedirectRead = CLOCK.instant();
     }
+
 
 
     /**
