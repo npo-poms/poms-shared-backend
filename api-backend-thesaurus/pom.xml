@@ -3,7 +3,7 @@
    <parent>
      <groupId>nl.vpro.poms</groupId>
      <artifactId>poms-shared-backend-parent</artifactId>
-     <version>7.10.3-SNAPSHOT</version>
+     <version>7.10.4-SNAPSHOT</version>
    </parent>
    <groupId>nl.vpro.api</groupId>
    <artifactId>api-backend-thesaurus</artifactId>
