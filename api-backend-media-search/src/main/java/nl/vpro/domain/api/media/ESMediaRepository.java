@@ -45,7 +45,6 @@ import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearch.highlevel.*;
-import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.domain.es.Common;
 import nl.vpro.poms.shared.ExtraHeaders;
 import nl.vpro.util.*;
@@ -789,7 +788,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 reasons = StreamSupport.stream(esReasons.spliterator(), false)
                     .map(jn -> {
                         try {
-                            return Jackson2Mapper.getLenientInstance().treeToValue(jn, PublicationReason.class);
+                            return LENIENT.treeToValue(jn, PublicationReason.class);
                         } catch (JsonProcessingException e) {
                             log.warn(e.getMessage(), e);
                             return null;
