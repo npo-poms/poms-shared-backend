@@ -203,7 +203,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         if(hits.getTotalHits().value == 0) {
             return null;
         }
-        return mapper.readValue(hits.getHits()[0].getSourceAsString(), MediaObject.class);
+        return MAPPER.readValue(hits.getHits()[0].getSourceAsString(), MediaObject.class);
     }
 
     private ScheduleResult execute(ExtendedScheduleForm form) {

@@ -105,7 +105,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
             try {
                 IndexRequest indexRequest = new IndexRequest(getIndexName());
                 indexRequest.id(query.getId());
-                indexRequest.source(mapper.writeValueAsString(query), XContentType.JSON);
+                indexRequest.source(MAPPER.writeValueAsString(query), XContentType.JSON);
                 IndexResponse response  = client().index(indexRequest, RequestOptions.DEFAULT);
                 log.debug("indexed {}", response);
             } catch (IOException e) {

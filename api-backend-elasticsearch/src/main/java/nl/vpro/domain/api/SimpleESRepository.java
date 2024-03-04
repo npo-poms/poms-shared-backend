@@ -101,7 +101,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
         try {
             IndexRequest request = new IndexRequest(getPublishIndexName());
             request.id(update.getId().toString());
-            request.source(mapper.writeValueAsBytes(update), XContentType.JSON);
+            request.source(MAPPER.writeValueAsBytes(update), XContentType.JSON);
             IndexResponse response = client().index(request, RequestOptions.DEFAULT);
             log.info("Indexed {} {}", update, response.getVersion());
             return update;
@@ -135,7 +135,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
 
     protected T unMap(String string) {
         try {
-            return mapper.readValue(string, clazz);
+            return MAPPER.readValue(string, clazz);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(string + ":" + e.getMessage(), e);
