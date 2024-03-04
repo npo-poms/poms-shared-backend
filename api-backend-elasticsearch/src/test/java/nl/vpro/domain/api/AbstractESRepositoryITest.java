@@ -26,6 +26,7 @@ import nl.vpro.elasticsearch.CreateIndex;
 import nl.vpro.elasticsearch.ElasticSearchIndex;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.elasticsearchclient.IndexHelper;
+import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +42,9 @@ import static org.mockito.Mockito.when;
 @Execution(ExecutionMode.SAME_THREAD)
 @Isolated
 public abstract class AbstractESRepositoryITest {
+
+    protected static final Jackson2Mapper MAPPER = Jackson2Mapper.getLenientInstance();
+
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
     protected static final  Map<ElasticSearchIndex, IndexHelper> indexHelpers = new HashMap<>();

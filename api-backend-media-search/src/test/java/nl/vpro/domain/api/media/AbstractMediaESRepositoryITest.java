@@ -15,7 +15,6 @@ import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearchclient.ElasticSearchIterator;
 import nl.vpro.elasticsearchclient.IndexHelper;
-import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.Log4j2Helper;
 import nl.vpro.media.domain.es.*;
 import nl.vpro.util.Truthiness;
@@ -41,7 +40,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
     }
 
     /**
-     * Testing wheter implemetation via es corresponds with predicate implementation of form itself.
+     * Testing whether implemetation via es corresponds with predicate implementation of form itself.
      */
     protected void testResult(MediaForm form, MediaSearchResult result) {
         Set<String> inResult = new HashSet<>();
@@ -56,7 +55,7 @@ public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositor
         ElasticSearchIterator<MediaObject> i = new ElasticSearchIterator<>(staticClientFactory.get(),
             (jn) -> {
                 try {
-                    return Jackson2Mapper.getLenientInstance().treeToValue(jn.get(Constants.Fields.SOURCE), MediaObject.class);
+                    return MAPPER.treeToValue(jn.get(Constants.Fields.SOURCE), MediaObject.class);
                 } catch (JsonProcessingException e) {
                     log.error(e.getMessage(), e);
                     return null;
