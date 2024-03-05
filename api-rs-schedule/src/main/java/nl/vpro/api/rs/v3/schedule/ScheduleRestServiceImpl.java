@@ -130,7 +130,7 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
         @QueryParam(SORT) @DefaultValue(ASC) String sort,
         @QueryParam(PROFILE) String profile,
         @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-         @QueryParam(Constants.OFFSET) @Parameter(description = OFFSET_MESSAGE) @DefaultValue(ZERO) @Min(0) long offset,
+        @QueryParam(Constants.OFFSET) @Parameter(description = OFFSET_MESSAGE) @DefaultValue(ZERO) @Min(0) long offset,
         @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         max = handleTooManyResults(offset, max, maxResults);
@@ -155,9 +155,9 @@ public class ScheduleRestServiceImpl implements ScheduleRestService {
             @Parameter(description = MESSAGE_START, required = false) @QueryParam(START) Instant start,
             @Parameter(description = MESSAGE_STOP, required = false) @QueryParam(STOP) Instant stop,
             @Parameter(description = PROPERTIES_MESSAGE, required = false) @QueryParam(PROPERTIES) @DefaultValue(PROPERTIES_NONE) String properties,
-            @QueryParam(SORT) @DefaultValue(ASC) String sort,
-            @Parameter(description = OFFSET_MESSAGE) @DefaultValue(ZERO) @Min(0) long offset,
-            @QueryParam(MAX) @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
+            @QueryParam(SORT)   @DefaultValue(ASC) String sort,
+            @Parameter(description = OFFSET_MESSAGE, required = false) @QueryParam(OFFSET) @DefaultValue(ZERO) @Min(0) long offset,
+            @QueryParam(MAX)    @DefaultValue(Constants.DEFAULT_MAX_RESULTS_STRING) Integer max
     ) {
         max = handleTooManyResults(offset, max, maxResults);
 
