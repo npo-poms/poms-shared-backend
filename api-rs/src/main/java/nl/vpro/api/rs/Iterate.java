@@ -11,9 +11,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.*;
+import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.*;
 
 import org.apache.commons.io.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;

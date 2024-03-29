@@ -3,11 +3,11 @@ package nl.vpro.api.cors;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.jboss.resteasy.core.ResteasyContext;
 import org.junit.jupiter.api.BeforeEach;

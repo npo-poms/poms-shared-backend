@@ -4,8 +4,8 @@
  */
 package nl.vpro.api.rs.exception;
 
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.exception;
 
-import javax.ws.rs.NotFoundException;
+import jakarta.ws.rs.NotFoundException;
 
 import nl.vpro.domain.constraint.PredicateTestResult;
 import nl.vpro.i18n.Locales;

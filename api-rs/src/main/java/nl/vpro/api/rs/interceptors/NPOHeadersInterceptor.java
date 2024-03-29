@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.container.*;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.container.*;
+import jakarta.ws.rs.ext.Provider;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
