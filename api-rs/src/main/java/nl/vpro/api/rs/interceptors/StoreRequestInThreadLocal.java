@@ -4,10 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.container.*;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.*;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.*;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.ext.*;
 
 import org.apache.commons.io.IOUtils;
 

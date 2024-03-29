@@ -4,8 +4,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
 
 import org.assertj.core.api.AbstractCharSequenceAssert;
 import org.jboss.resteasy.mock.MockDispatcherFactory;

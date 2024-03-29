@@ -6,15 +6,15 @@ package nl.vpro.api.rs.exception;
 
 import lombok.extern.log4j.Log4j2;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 import org.springframework.security.access.AccessDeniedException;
 
 import nl.vpro.api.rs.interceptors.StoreRequestInThreadLocal;
 
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import static jakarta.ws.rs.core.Response.Status.UNAUTHORIZED;
 
 /**
  * @author Michiel Meeuwissen

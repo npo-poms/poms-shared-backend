@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.validation;
 
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.ext.Provider;
 
 import nl.vpro.domain.Xmlns;
 import nl.vpro.domain.api.media.MediaForm;
