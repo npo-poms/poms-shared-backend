@@ -6,7 +6,7 @@ package nl.vpro.domain.api.media;
 
 import java.time.Instant;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
