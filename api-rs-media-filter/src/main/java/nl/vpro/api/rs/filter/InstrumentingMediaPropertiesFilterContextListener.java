@@ -4,8 +4,8 @@
  */
 package nl.vpro.api.rs.filter;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * @author Roelof Jan Koekoek
