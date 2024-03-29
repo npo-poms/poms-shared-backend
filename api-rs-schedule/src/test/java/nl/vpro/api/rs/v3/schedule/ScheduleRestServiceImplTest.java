@@ -5,9 +5,9 @@ import java.net.URISyntaxException;
 import java.time.*;
 import java.util.Arrays;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBException;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXB;
+import jakarta.xml.bind.JAXBException;
 
 import org.jboss.resteasy.mock.MockHttpRequest;
 import org.jboss.resteasy.mock.MockHttpResponse;
