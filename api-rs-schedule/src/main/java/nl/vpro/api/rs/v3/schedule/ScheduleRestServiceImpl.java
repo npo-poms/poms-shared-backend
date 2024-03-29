@@ -11,10 +11,10 @@ import java.time.*;
 import java.util.Collections;
 import java.util.List;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
 import org.jboss.resteasy.annotations.cache.Cache;
 import org.jboss.resteasy.annotations.cache.NoCache;
