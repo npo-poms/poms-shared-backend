@@ -8,7 +8,7 @@ import lombok.extern.log4j.Log4j2;
 
 import java.util.*;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
