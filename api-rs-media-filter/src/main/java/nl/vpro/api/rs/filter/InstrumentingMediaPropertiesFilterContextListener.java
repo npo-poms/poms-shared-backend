@@ -8,6 +8,10 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 
 /**
+ * Sets up {@link MediaPropertiesFilters} which is used for properties filtering.
+ * <p>
+ * This needs to be the first class loading the relevant classes
+ *
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
@@ -16,10 +20,5 @@ public class InstrumentingMediaPropertiesFilterContextListener implements Servle
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         MediaPropertiesFilters.instrument();
-    }
-
-    @Override
-    public void contextDestroyed(ServletContextEvent sce) {
-
     }
 }
