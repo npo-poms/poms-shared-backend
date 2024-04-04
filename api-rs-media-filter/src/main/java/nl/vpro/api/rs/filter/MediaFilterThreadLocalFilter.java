@@ -4,12 +4,11 @@
  */
 package nl.vpro.api.rs.filter;
 
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
-
-import jakarta.servlet.*;
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.ThreadContext;
@@ -20,17 +19,14 @@ import nl.vpro.logging.mdc.MDCConstants;
  * @author rico
  */
 @Log4j2
-public class MediaFilterThreadLocalFilter implements Filter {
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-    }
+public class MediaFilterThreadLocalFilter extends HttpFilter {
+
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    public void doFilter(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         try {
-            HttpServletRequest req = (HttpServletRequest) request;
             String ip = req.getHeader("X-Forwarded-For");
-            if (ip == null || "".equals(ip)) {
+            if (ip == null || ip.isEmpty()) {
                 ip = req.getRemoteAddr();
             }
             String query = req.getQueryString();
@@ -40,7 +36,7 @@ public class MediaFilterThreadLocalFilter implements Filter {
 
             ApiMediaFilter.removeFilter();
 
-            chain.doFilter(request, response);
+            chain.doFilter(req, res);
         } catch (ServletException | IOException | RuntimeException ioe) {
             if (ioe.getCause() != null && ioe.getCause().getClass().getSimpleName().equals("ClientAbortException")) {
                 // NPA-346 Don't log client errors!
@@ -54,7 +50,4 @@ public class MediaFilterThreadLocalFilter implements Filter {
         }
     }
 
-    @Override
-    public void destroy() {
-    }
 }
