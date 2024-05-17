@@ -612,7 +612,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         var now = CLOCK.instant();
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
         final Instant changesUpto = now.minus(commitDelay);
-        log.info("Changed up to {} -> {}", now, changesUpto);
+        log.debug("Changed up to {} -> {}", now, changesUpto);
         RangeQueryBuilder restriction = QueryBuilders.rangeQuery(ES_PUBLISH_DATE)
             .to(changesUpto.toEpochMilli());
         if (since != null) {
@@ -640,7 +640,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .must(restriction)
             .filter(QueryBuilders.existsQuery(ES_PUBLISH_DATE))
         );
-        log.info("Found {} changes up to {}, from {} to {}", () -> i.getTotalSize().orElse(-1L), () -> changesUpto, since::toEpochMilli, changesUpto::toEpochMilli);
+        log.debug("Found {} changes up to {}, from {} to {}", () -> i.getTotalSize().orElse(-1L), () -> changesUpto, since::toEpochMilli, changesUpto::toEpochMilli);
 
         final MarkSkippedChangeIterator changes = new MarkSkippedChangeIterator(
             i,
@@ -658,7 +658,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 @Override
                 public MediaChange next() {
                     MediaChange change = super.next();
-                    log.info("Found published date {}", change.getPublishDate());
                     if (filtering) {
 
                         if (change == null || change.isTail() || change.getPublishDate() == null || change.getMid() == null) {
@@ -672,7 +671,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                             filtering = false;
                         } else {
                             change.setSkipped(true);
-                            log.info("Skipping {} because of mid parameter", change);
+                            log.debug("Skipping {} because of mid parameter", change);
                         }
                     }
                     return change;
@@ -689,7 +688,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                     MediaChange n = super.next();
                     ReasonedPredicate.TestResult test = filter.testWithReason(n);
                     if (! test.getAsBoolean()) {
-                        log.info("Skipping {} because filter ({})", n, test.getReason());
+                        log.debug("Skipping {} because filter ({})", n, test.getReason());
                         n.setSkipped(true);
                     } else {
                         log.debug("Letting {}", n);
