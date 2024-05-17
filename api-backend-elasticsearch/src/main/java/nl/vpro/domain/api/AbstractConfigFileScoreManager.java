@@ -22,6 +22,7 @@ import org.springframework.jmx.export.annotation.ManagedOperation;
  * @author Roelof Jan Koekoek
  * @since 4.2
  */
+@Getter
 @Log4j2
 public abstract class AbstractConfigFileScoreManager implements ScoreManager {
 
@@ -33,7 +34,6 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
 
     protected abstract void loadScores();
 
-    @Getter
     @Setter
     private boolean score = true;
 

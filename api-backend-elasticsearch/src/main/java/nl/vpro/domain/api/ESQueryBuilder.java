@@ -183,12 +183,12 @@ public abstract class ESQueryBuilder {
             stream.reset();
             CharTermAttribute termAttribute = stream.getAttribute(CharTermAttribute.class);
             while (stream.incrementToken()) {
-                if (builder.length() > 0) {
+                if (!builder.isEmpty()) {
                     builder.append(" ");
                 }
                 builder.append(termAttribute.toString());
             }
-            if (builder.length() > 0) {
+            if (!builder.isEmpty()) {
                 textWithoutStopWords = builder.toString();
             }
         } catch (IOException ioe) {

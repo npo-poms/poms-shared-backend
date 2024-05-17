@@ -50,15 +50,13 @@ public class ESMediaSortHandler extends ESFacetsHandler {
     static class DefaultSortHandler implements SortHandler {
     }
 
+    @Getter
     @AllArgsConstructor
     static class NestedSortHandler implements SortHandler {
-        @Getter
         private final String field;
 
-        @Getter
         private final String nestedField;
 
-        @Getter
         private final String filteredField;
 
 

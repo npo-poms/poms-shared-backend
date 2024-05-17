@@ -13,13 +13,13 @@ import org.elasticsearch.script.ScriptType;
 
 /**
  * We use a small variant of the decayDateGauss function of elasticsearch to boost down older search results.
- *
+ * <p>
  * decayDateGauss is something like exp(-0.5*pow(valueExpl,2.0) + -1 * scale)
- *
+ * <p>
  * We add to new parameters 'gaussFactor' and 'gaussOffset':
- *
+ * <p>
  * gaussOffset + gaussFactor * exp(-0.5*pow(valueExpl,2.0) + -1 * scale)
- *
+ * <p>
  * Like this we can ensure that we never boost things entirely to zero.
  *
  * @author Michiel Meeuwissen

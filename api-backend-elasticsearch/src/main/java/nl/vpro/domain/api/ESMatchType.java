@@ -53,7 +53,7 @@ public enum ESMatchType {
                 return useCardinality(esField, pred, fieldInfo.getPossibleValues());
             } else {
                 if (value.startsWith("?") || value.startsWith("*")) {
-                    log.warn("Wildcard query starting with " + value.charAt(0) + ": " + value);
+                    log.warn(() -> "Wildcard query starting with " + value.charAt(0) + ": " + value);
                 }
 
                 return QueryBuilders.wildcardQuery(esField, value);

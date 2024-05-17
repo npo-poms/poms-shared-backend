@@ -40,7 +40,6 @@ import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
  * Support also {@link PrePersist}, but needing {@code jakarta.persistence-api} dependency then.
  * @author Michiel Meeuwisssen
  */
-@SuppressWarnings("resource")
 @Log4j2
 @Repository
 public class SimpleESRepository<T extends Identifiable<I>, I extends Serializable & Comparable<I>> extends AbstractESRepository<T> {
@@ -92,7 +91,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
         }
         try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
             Set<ConstraintViolation<T>> result = factory.getValidator().validate(update);
-            if (result.size() > 0) {
+            if (!result.isEmpty()) {
                 throw  new ConstraintViolationException(result.toString(), result);
             }
         } catch (NoProviderFoundException npfe) {
