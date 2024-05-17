@@ -3,6 +3,7 @@ package nl.vpro.domain.api.media;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -1014,7 +1015,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
     }
 
 
-    private <T> void assertRelatedMediaResult(SearchResult<T> result, Program expectedProgram) {
+    private <T extends Serializable> void assertRelatedMediaResult(SearchResult<T> result, Program expectedProgram) {
         assertThat(result.getItems()).hasSize(1);
         SearchResultItem<? extends T> actual = result.getItems().get(0);
         assertThat(actual.getResult()).isNotNull();
