@@ -4,6 +4,8 @@
  */
 package nl.vpro.domain.api.media;
 
+import java.security.cert.CertPathValidatorException;
+
 import lombok.extern.log4j.Log4j2;
 
 import java.time.Instant;
@@ -16,6 +18,7 @@ import jakarta.inject.Named;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.meeuw.functional.Predicates;
+import org.meeuw.functional.ReasonedPredicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -88,7 +91,7 @@ public class MediaServiceImpl implements MediaService {
         final boolean withSequences,
         final Deletes deletes,
         final Tail tail,
-        final Predicate<MediaChange> postFilter) throws ProfileNotFoundException {
+        final ReasonedPredicate<MediaChange> postFilter) throws ProfileNotFoundException {
         if (withSequences) {
             if (since.isAfter(SinceToTimeStampService.DIVIDING_SINCE)) { // Certainly using ES
                 return changesWithES(profile, since, mid,  order, max, deletes, tail, postFilter);
@@ -121,7 +124,7 @@ public class MediaServiceImpl implements MediaService {
         final Integer max,
         final @Nullable Deletes deletes,
         final Tail tail,
-        final @Nullable Predicate<MediaChange> postFilter) throws ProfileNotFoundException {
+        final @Nullable ReasonedPredicate<MediaChange> postFilter) throws ProfileNotFoundException {
         final ProfileDefinition<MediaObject> currentProfile = profileService.getMediaProfileDefinition(profile); //getCombinedProfile(profile, since);
 
         if (currentProfile == null && profile != null) {
