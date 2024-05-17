@@ -20,7 +20,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 
-import nl.vpro.domain.XmlValued;
+import nl.vpro.util.XmlValued;
 
 /**
  * @author rico
@@ -101,8 +101,8 @@ public enum ESMatchType {
                     .collect(Collectors.toList()));
             }
             protected String xmlValue(Enum<?> enumValue) {
-                if (enumValue instanceof XmlValued) {
-                    return ((XmlValued)enumValue).getXmlValue();
+                if (enumValue instanceof XmlValued xmlValued) {
+                    return xmlValued.getXmlValue();
                 } else {
                     return enumValue.name();
                 }
