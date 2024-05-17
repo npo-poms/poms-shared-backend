@@ -635,6 +635,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         final SearchSourceBuilder searchRequestBuilder = i.prepareSearchSource(getIndexName());
         searchRequestBuilder.sort(ES_PUBLISH_DATE, order == null ? SortOrder.ASC : SortOrder.valueOf(order.name()));
         searchRequestBuilder.sort("mid", SortOrder.ASC);
+        searchRequestBuilder.trackScores(false);
+        //searchRequestBuilder.trackTotalHitsUpTo(0);
 
         searchRequestBuilder.query(QueryBuilders.boolQuery()
             .must(restriction)
@@ -843,6 +845,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
 
 
         SearchSourceBuilder builder = i.prepareSearchSource(getIndexName());
+        //builder.trackTotalHitsUpTo(0);
+        builder.trackScores(false);
+
         boolean sort = ESMediaSortHandler.sort(form, null, builder::sort);
         if (sort) {
             log.warn("Iterate called with sort. This is ignored");
