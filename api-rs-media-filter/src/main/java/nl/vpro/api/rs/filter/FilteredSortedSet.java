@@ -6,9 +6,8 @@ package nl.vpro.api.rs.filter;
 
 import lombok.extern.log4j.Log4j2;
 
+import java.io.Serializable;
 import java.util.*;
-
-import jakarta.validation.constraints.NotNull;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -19,7 +18,7 @@ import nl.vpro.util.ResortedSortedSet;
  * @since 3.0
  */
 @Log4j2
-public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T> {
+public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>, Serializable {
     protected final SortedSet<T> wrapped;
     protected final FilterHelper filterHelper;
 
