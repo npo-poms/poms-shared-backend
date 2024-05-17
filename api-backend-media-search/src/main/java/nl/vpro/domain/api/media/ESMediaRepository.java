@@ -31,6 +31,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.meeuw.functional.ReasonedPredicate;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
 
@@ -52,6 +53,7 @@ import nl.vpro.util.*;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;
 import static nl.vpro.media.domain.es.Common.CLOCK;
+import static nl.vpro.media.domain.es.Common.ES_PUBLISH_DATE;
 
 /**
  * @author Roelof Jan Koekoek
@@ -594,6 +596,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         return null;
     }
 
+    private static Instant latest;
+
     @Override
     public CloseableIterator<MediaChange> changes(
         @Nullable final Instant since,
@@ -603,12 +607,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         @Nullable final Integer max,
         @Nullable Deletes deletes,
         @Nullable final Tail tail,
-        @Nullable final Predicate<MediaChange> filter) {
+        @Nullable final ReasonedPredicate<MediaChange> filter) {
 
-
+        var now = CLOCK.instant();
         // NPA-429 since elastic search takes time to show indexed objects in queries we limit our query from since to now - commitdelay.
-        final Instant changesUpto = CLOCK.instant().minus(getCommitDelay());
-        RangeQueryBuilder restriction = QueryBuilders.rangeQuery(Common.ES_PUBLISH_DATE).to(changesUpto.toEpochMilli());
+        final Instant changesUpto = now.minus(commitDelay);
+        log.info("Changed up to {} -> {}", now, changesUpto);
+        RangeQueryBuilder restriction = QueryBuilders.rangeQuery(ES_PUBLISH_DATE)
+            .to(changesUpto.toEpochMilli());
         if (since != null) {
             if (since.isBefore(changesUpto)) {
                 long epoch = since.toEpochMilli();
@@ -627,15 +633,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .build();
 
         final SearchSourceBuilder searchRequestBuilder = i.prepareSearchSource(getIndexName());
-        searchRequestBuilder.sort(Common.ES_PUBLISH_DATE, order == null ? SortOrder.ASC : SortOrder.valueOf(order.name()));
+        searchRequestBuilder.sort(ES_PUBLISH_DATE, order == null ? SortOrder.ASC : SortOrder.valueOf(order.name()));
         searchRequestBuilder.sort("mid", SortOrder.ASC);
 
         searchRequestBuilder.query(QueryBuilders.boolQuery()
             .must(restriction)
-            .filter(QueryBuilders.existsQuery(Common.ES_PUBLISH_DATE))
+            .filter(QueryBuilders.existsQuery(ES_PUBLISH_DATE))
         );
-
-        log.debug("Found {} changes", i::getTotalSize);
+        log.info("Found {} changes up to {}, from {} to {}", () -> i.getTotalSize().orElse(-1L), () -> changesUpto, since::toEpochMilli, changesUpto::toEpochMilli);
 
         final MarkSkippedChangeIterator changes = new MarkSkippedChangeIterator(
             i,
@@ -653,6 +658,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 @Override
                 public MediaChange next() {
                     MediaChange change = super.next();
+                    log.info("Found published date {}", change.getPublishDate());
                     if (filtering) {
 
                         if (change == null || change.isTail() || change.getPublishDate() == null || change.getMid() == null) {
@@ -666,7 +672,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                             filtering = false;
                         } else {
                             change.setSkipped(true);
-                            log.debug("Skipping {} because of mid parameter", change);
+                            log.info("Skipping {} because of mid parameter", change);
                         }
                     }
                     return change;
@@ -681,8 +687,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 @Override
                 public MediaChange next() {
                     MediaChange n = super.next();
-                    if (! filter.test(n)) {
-                        log.debug("Skipping {}", n);
+                    ReasonedPredicate.TestResult test = filter.testWithReason(n);
+                    if (! test.getAsBoolean()) {
+                        log.info("Skipping {} because filter ({})", n, test.getReason());
                         n.setSkipped(true);
                     } else {
                         log.debug("Letting {}", n);
@@ -744,13 +751,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         });
     }
 
+    @Getter
     public static class DeleteSkippingIterator extends BasicWrappedIterator<MediaChange> {
 
         public DeleteSkippingIterator(Iterator<MediaChange> wrapped) {
             super(wrapped);
         }
 
-        @Getter
         MediaSince since;
 
         @Override
@@ -781,7 +788,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             if (version == -1) {
                 version = null;
             }
-            JsonNode esPublishDate = jsonNode.get(Common.ES_PUBLISH_DATE);
+            JsonNode esPublishDate = jsonNode.get(ES_PUBLISH_DATE);
             final SortedSet<PublicationReason> reasons;
             if (jsonNode.has(Common.ES_REASONS)) {
                 ArrayNode esReasons = jsonNode.withArray(Common.ES_REASONS);
