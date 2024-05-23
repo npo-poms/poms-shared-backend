@@ -201,6 +201,9 @@
     "embeddable": {
       "type": "boolean"
     },
+    "adoptQualityFromPlus": {
+      "type": "boolean"
+    },
     "episodeOf": {
       "type": "nested",
       "include_in_parent": true,
