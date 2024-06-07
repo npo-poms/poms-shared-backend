@@ -642,7 +642,9 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .must(restriction)
             .filter(QueryBuilders.existsQuery(ES_PUBLISH_DATE))
         );
-        log.debug("Found {} changes up to {}, from {} to {}", () -> i.getTotalSize().orElse(-1L), () -> changesUpto, since::toEpochMilli, changesUpto::toEpochMilli);
+        log.debug("Found {} changes up to {}, from {} to {}", () -> i.getTotalSize().orElse(-1L), () -> changesUpto,
+            () -> since == null ? null : since.toEpochMilli(),
+            changesUpto::toEpochMilli);
 
         final MarkSkippedChangeIterator changes = new MarkSkippedChangeIterator(
             i,
