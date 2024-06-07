@@ -1162,6 +1162,9 @@
         "embeddable": {
           "type": "boolean"
         },
+        "adoptQualityFromPlus": {
+          "type": "boolean"
+        },
         "exclusives": {
           "type": "keyword",
           "fields": {
