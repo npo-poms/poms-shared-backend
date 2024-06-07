@@ -668,10 +668,10 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                             // tail, we are at the end, just continuing, we can't compare.
                             filtering = false;
                         } else if (change.getPublishDate().isAfter(since)) {
-                            log.debug("Change is ok {} > {}", change.getPublishDate(), since);
+                            log.debug("Change is ok {} > {} (date)", change.getPublishDate(), since);
                             filtering = false;
                         } else if (change.getMid().compareTo(mid) > 0) {
-                            log.debug("Change is ok {} > {}", change.getMid(), mid);
+                            log.debug("Change is ok {} > {} (mid)", change.getMid(), mid);
                             filtering = false;
                         } else {
                             change.setSkipped(true);
