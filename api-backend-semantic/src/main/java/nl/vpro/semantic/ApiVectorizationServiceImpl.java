@@ -20,6 +20,9 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
 
     private static final Jackson2Mapper MAPPER = Jackson2Mapper.getInstance();
 
+    protected static final Jackson2Mapper LENIENT = Jackson2Mapper.getLenientInstance();
+
+
     private final HttpClient client;
 
 
@@ -72,8 +75,7 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
             .build();
 
         final HttpResponse<byte[]> response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
-        return Jackson2Mapper
-            .getLenientInstance()
+        return LENIENT
             .readerFor(Response.class)
             .readValue(response.body());
     }
