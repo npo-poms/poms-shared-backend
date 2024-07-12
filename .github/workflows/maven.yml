@@ -29,6 +29,10 @@ jobs:
       run: mvn -U -B -Pgithub deploy  -Dinteg.cluster.name=docker-elasticsearch
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2.17.0
+      with:
+        junit_files: "**/target/surefire-reports/*.xml"
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
 #    - name: Update dependency graph
