@@ -1,6 +1,5 @@
 ---
-name: Java CI with Maven
-
+name: build
 on:
   push:
     branches: [ "main" ]
