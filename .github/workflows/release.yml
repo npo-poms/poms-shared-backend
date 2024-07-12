@@ -25,10 +25,12 @@ jobs:
           name: 'github $GITHUB_ACTOR'
           email: 'digitaal-techniek@vpro.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
-      - name: Release
+      - name: Prepare release
         run: |
           mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
           git push --atomic -v --follow-tags
+      - name: Perform release
+        run: |
           mvn -Pdeploy,github --batch-mode -Darguments=-DskipTests release:perform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
