@@ -610,6 +610,9 @@
                 "code": {
                   "type": "keyword"
                 },
+                "usage": {
+                  "type": "keyword"
+                },
                 "value": {
                   "type": "text",
                   "index": false,

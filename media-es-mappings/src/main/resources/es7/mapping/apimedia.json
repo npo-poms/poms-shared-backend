@@ -535,6 +535,9 @@
         "code": {
           "type": "keyword"
         },
+        "usage": {
+          "type": "keyword"
+        },
         "value": {
           "type": "text",
           "index": false,
@@ -1433,6 +1436,9 @@
         "languages": {
           "properties": {
             "code": {
+              "type": "keyword"
+            },
+            "usage": {
               "type": "keyword"
             },
             "value": {
