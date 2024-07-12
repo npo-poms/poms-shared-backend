@@ -18,6 +18,7 @@
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
+    <java.version>21</java.version>
   </properties>
 
   <scm>
@@ -99,6 +100,17 @@
       </snapshots>
     </repository>
   </repositories>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/npo-poms/poms-shared-backend</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </snapshotRepository>
+  </distributionManagement>
 
   <profiles>
     <profile>
