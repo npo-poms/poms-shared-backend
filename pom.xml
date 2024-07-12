@@ -18,7 +18,7 @@
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
-    <java.version>21</java.version>
+    <java.version>17</java.version>
   </properties>
 
   <scm>
