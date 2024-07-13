@@ -24,7 +24,6 @@ jobs:
         with:
           global: true
           name: 'github $GITHUB_ACTOR'
-          email: 'digitaal-techniek@vpro.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Prepare release
         run: |
