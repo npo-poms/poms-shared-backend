@@ -2,7 +2,9 @@
 name: 'create release branch'
 run-name: Creating release branch by ${{ github.actor }}
 on:
-  workflow_dispatch:
+  push:
+    tags:
+      - "REL-*"
 
 jobs:
   branch:

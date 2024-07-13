@@ -1,0 +1,29 @@
+---
+name: deploy release
+run-name: Deploying release by ${{ github.actor }} on ${{ github.ref_name }}
+on:
+  push:
+    tags:
+      - "REL-*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    env:
+      MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: maven
+          gpg-private-key: ${{ secrets.GPG_SECRET_KEY }}
+          gpg-passphrase: GPG_SECRET_KEY_PASSPHRASE
+      - name: Deploy release
+        run: |
+          mvn -X -Pdeploy,github --batch-mode -Darguments=-DskipTests deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_SECRET_KEY_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
