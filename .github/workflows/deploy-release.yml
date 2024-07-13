@@ -27,7 +27,7 @@ jobs:
           gpg-passphrase: GPG_SECRET_KEY_PASSPHRASE
       - name: Deploy release
         run: |
-          mvn -X -Pdeploy,github --batch-mode -Darguments=-DskipTests deploy
+          mvn -Pdeploy,github --batch-mode -Darguments=-DskipTests deploy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GPG_SECRET_KEY_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
