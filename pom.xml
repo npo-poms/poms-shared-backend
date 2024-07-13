@@ -19,10 +19,12 @@
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
     <java.version>17</java.version>
+
+    <git.name>npo-poms/poms-shared-backend</git.name>
   </properties>
 
   <scm>
-    <url>https://github.com/npo-poms/poms-shared-backend.git</url>
+    <url>https://github.com/${git.name}.git</url>
     <connection>scm:git:${project.scm.url}</connection>
     <developerConnection>scm:git:${project.scm.url}</developerConnection>
     <tag>REL-8.2.0</tag>
@@ -88,28 +90,19 @@
       <id>sonatype</id>
       <url>https://oss.sonatype.org/service/local/repositories/releases/content</url>
     </repository>
-    <repository>
-      <!-- only essential when sonatype down (e.g. in jan 2023...)-->
-      <id>vpro</id>
-      <url>https://nexus.vpro.nl/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
   </repositories>
 
   <distributionManagement>
     <snapshotRepository>
       <id>github</id>
       <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/npo-poms/poms-shared-backend</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
+      <url>https://maven.pkg.github.com/${git.name}</url>
     </snapshotRepository>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/${git.name}</url>
+    </repository>
   </distributionManagement>
 
   <profiles>
