@@ -5,6 +5,8 @@ on:
   push:
     tags:
       - "REL-*"
+  workflow_dispatch:
+
 
 jobs:
   release:
