@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>8.2.1</version>
+  <version>8.2.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
@@ -27,7 +27,7 @@
     <url>https://github.com/${git.name}.git</url>
     <connection>scm:git:${project.scm.url}</connection>
     <developerConnection>scm:git:${project.scm.url}</developerConnection>
-    <tag>REL-8.2.1</tag>
+    <tag>REL-8.2.0</tag>
   </scm>
 
   <modules>
