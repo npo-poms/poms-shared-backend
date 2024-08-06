@@ -12,6 +12,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      checks: write
+      pull-requests: write
     env:
       MAVEN_OPTS: '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'
     steps:
