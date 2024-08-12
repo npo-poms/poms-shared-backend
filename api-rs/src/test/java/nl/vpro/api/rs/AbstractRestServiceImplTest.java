@@ -79,13 +79,6 @@ public abstract class AbstractRestServiceImplTest<T> {
         assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
     }
 
-    protected void assert400(MockHttpResponse response) {
-        try {
-            assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 400, response.getStatus());
-        } catch (UnsupportedEncodingException use) {
-            throw new RuntimeException(use);
-        }
-    }
 
     protected AbstractCharSequenceAssert<?, String> assert404(MockHttpResponse response) {
         try {

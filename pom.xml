@@ -44,7 +44,7 @@
     <module>api-rs-media-filter</module>
     <module>api-services</module>
     <module>api-rs-schedule</module>
-
+    <module>api-rs-schedule-filter</module>
   </modules>
 
   <dependencies>

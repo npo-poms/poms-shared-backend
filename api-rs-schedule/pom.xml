@@ -50,5 +50,11 @@
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-core-spi</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>nl.vpro.media</groupId>
+      <artifactId>media-test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 </project>
