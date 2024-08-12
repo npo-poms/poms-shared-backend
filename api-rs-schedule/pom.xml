@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>api-parent</artifactId>
+    <groupId>nl.vpro.api</groupId>
+    <version>8.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>api-rs-schedule</artifactId>
+
+  <dependencies>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs-services</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.shared</groupId>
+      <artifactId>vpro-shared-swagger3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs-media-filter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs-schedule-filter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>nl.vpro.api</groupId>
+      <artifactId>api-rs</artifactId>
+      <classifier>tests</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-core-spi</artifactId>
+    </dependency>
+  </dependencies>
+</project>

@@ -1,0 +1,313 @@
+package nl.vpro.api.rs.v3.schedule;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.time.*;
+import java.util.Arrays;
+
+import jakarta.ws.rs.core.MediaType;
+import jakarta.xml.bind.JAXB;
+import jakarta.xml.bind.JAXBException;
+
+import org.jboss.resteasy.mock.MockHttpRequest;
+import org.jboss.resteasy.mock.MockHttpResponse;
+import org.junit.jupiter.api.*;
+import org.mockito.ArgumentCaptor;
+import org.xml.sax.SAXException;
+
+import nl.vpro.api.rs.AbstractRestServiceImplTest;
+import nl.vpro.api.rs.validation.ScheduleFormValidatingReader;
+import nl.vpro.domain.api.Order;
+import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.media.*;
+import nl.vpro.domain.media.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.AdditionalMatchers.or;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<ScheduleRestServiceImpl> {
+
+
+    private final ScheduleService scheduleService = mock(ScheduleService.class);
+
+
+    @BeforeEach
+    public void setupSchedule() throws JAXBException, IOException, SAXException {
+        ScheduleFormValidatingReader reader = new ScheduleFormValidatingReader();
+        reader.setDoValidate(true);
+        reader.init();
+        dispatcher.getProviderFactory().register(reader);
+    }
+
+    @AfterEach
+    public void after() {
+        reset(scheduleService);
+    }
+
+    @Test
+    public void activeEvent() {
+
+        ScheduleRestServiceImpl scheduleRestService = getTestObject();
+
+        ScheduleEvent scheduleEvent = new ScheduleEvent();
+        scheduleEvent.setStartInstant(Instant.ofEpochMilli(1000000));
+        scheduleEvent.setDuration(Duration.ofMillis(1000));
+
+        Boolean eventActive = scheduleRestService.isActiveEvent(scheduleEvent, Instant.ofEpochMilli(1000100));
+
+        assertThat(eventActive).isTrue();
+    }
+
+    @Test
+    public void inactiveEvent() {
+        ScheduleRestServiceImpl scheduleRestService = getTestObject();
+
+
+
+        ScheduleEvent scheduleEvent = new ScheduleEvent();
+        scheduleEvent.setStartInstant(Instant.ofEpochMilli(1000000));
+        scheduleEvent.setDuration(Duration.ofMillis(1000));
+
+        Boolean eventActive = scheduleRestService.isActiveEvent(scheduleEvent, Instant.ofEpochMilli(1002100));
+
+        assertThat(eventActive).isFalse();
+    }
+
+    @Test
+    public void testGuideDayStartStop() {
+
+        ScheduleRestService scheduleRestService = getTestObject();
+        Result<ApiScheduleEvent> res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 3, 28), null, null, null, "ASC", 0L, 100);
+        Instant start = ZonedDateTime.parse("2015-03-28T05:58:00+01:00").toInstant();
+        Instant stop = ZonedDateTime.parse("2015-03-29T05:58:00+02:00").toInstant();
+
+        verify(scheduleService).list(Channel.KETN, start, stop, Order.ASC, 0L, 100);
+    }
+
+
+    @Test
+    public void testStartStop() {
+
+
+        ScheduleRestService scheduleRestService = getTestObject();
+        Result<ApiScheduleEvent> res = scheduleRestService.listChannel(Channel.KETN.name(), null, LocalDate.of(2016, 3, 5).atTime(12, 34).atZone(Schedule.ZONE_ID).toInstant(), null, null, "ASC", 0L, 100);
+        Instant start = ZonedDateTime.parse("2016-03-05T12:34:00+01:00").toInstant();
+
+        verify(scheduleService).list(Channel.KETN, start, null, Order.ASC, 0L, 100);
+    }
+
+    @Test
+    public void testStartStopRequest() throws URISyntaxException {
+        when(scheduleService.list(any(Channel.class),
+            or(isNull(), any(Instant.class)),
+            or(isNull(), any(Instant.class)), any(Order.class), anyLong(), anyInt())).thenReturn(new ScheduleResult());
+
+        MockHttpRequest request = MockHttpRequest.get("/schedule/channel/KETN?start=2016-03-05T06:00:00&max=100");
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        dispatcher.invoke(request, response);
+
+        assert200(response);
+
+        Instant start = ZonedDateTime.parse("2016-03-05T06:00:00+01:00").toInstant();
+        verify(scheduleService).list(Channel.KETN, start, null, Order.ASC, 0L, 100);
+    }
+
+    private String MSE_2775form() {
+        return """
+            {
+              "searches" : {
+                "broadcasters" : {
+                  "match" : "MUST",
+                  "value" : "MAX"
+                },
+                "types" : {
+                  "match" : "MUST",
+                  "value" : [ {
+                    "value" : "BROADCAST",
+                    "match" : "SHOULD"
+                  }, {
+                    "value" : "SEGMENT",
+                    "match" : "SHOULD"
+                  } ]
+                },
+                "avTypes" : {
+                  "match" : "MUST",
+                  "value" : "VIDEO"
+                },
+                "scheduleEvents" : {
+                  "channel" : "NED1",
+                  "begin" : "2015-07-01T06:46:41.098Z"
+                }
+              },
+              "sort" : {
+                "sortDate" : "ASC"
+              }
+            }
+            """;
+    }
+
+    private String MSE2775_formCorrected() {
+        return """
+            {
+              "searches" : {
+                "broadcasters" : {
+                  "match" : "MUST",
+                  "value" : "MAX"
+                },
+                "types" : {
+                  "match" : "MUST",
+                  "value" : [ {
+                    "value" : "BROADCAST",
+                    "match" : "SHOULD"
+                  }, {
+                    "value" : "SEGMENT",
+                    "match" : "SHOULD"
+                  } ]
+                },
+                "avTypes" : {
+                  "match" : "MUST",
+                  "value" : "VIDEO"
+                },
+                "scheduleEvents" : {
+                  "channel" : "NED1",
+                  "begin" : 1435733201098
+                }
+              },
+              "sort" : {
+                "sortDate" : "ASC"
+              }
+            }
+            """;
+    }
+
+    private void MSE_2775(String form) throws URISyntaxException, IOException {
+
+
+        when(scheduleService.find(
+            any(ScheduleForm.class),
+            or(isNull(), any(Order.class)),
+            or(isNull(), anyString()),
+            anyLong(), anyInt())
+        ).thenReturn(new ScheduleSearchResult());
+
+        {
+            MockHttpRequest request = MockHttpRequest.post("/schedule");
+            request.contentType(MediaType.APPLICATION_JSON);
+            request.accept(MediaType.APPLICATION_JSON);
+
+            MockHttpResponse response = new MockHttpResponse();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            out.write(form.getBytes());
+            request.content(out.toByteArray());
+
+            dispatcher.invoke(request, response);
+
+            System.out.println(response.getContentAsString());
+            assertThat(response.getStatus()).isEqualTo(200);
+
+            ArgumentCaptor<ScheduleForm> argument = ArgumentCaptor.forClass(ScheduleForm.class);
+
+            verify(scheduleService).find(argument.capture(), eq(Order.ASC), isNull(), anyLong(), anyInt());
+            assertThat(argument.getValue().getSearches().getScheduleEvents().get(0)
+                .getBegin().toEpochMilli()).isEqualTo(1435733201098L);
+        }
+    }
+    @Test
+    public void MSE_2775_1() throws IOException, URISyntaxException {
+        MSE_2775(MSE_2775form());
+    }
+
+    @Test
+    public void MSE_2775_2() throws IOException, URISyntaxException {
+        MSE_2775(MSE2775_formCorrected());
+
+    }
+
+    @Test
+    public void NPA_202_scheduleform() throws URISyntaxException {
+        when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+
+        MockHttpRequest request = MockHttpRequest.post("/schedule");
+        request.contentType(MediaType.APPLICATION_XML);
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JAXB.marshal(new ScheduleForm(), out);
+        request.content(out.toByteArray());
+
+        dispatcher.invoke(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(200);
+
+    }
+
+    @Test
+    public void NPA_202_mediaform() throws URISyntaxException {
+        when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
+
+        MockHttpRequest request = MockHttpRequest.post("/schedule");
+        request.contentType(MediaType.APPLICATION_XML);
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        MediaForm form = new MediaForm();
+        form.setSearches(new MediaSearch());
+
+        JAXB.marshal(form, out);
+
+        System.out.println(out.toString());
+
+        request.content(out.toByteArray());
+
+        dispatcher.invoke(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(200);
+    }
+
+
+    @Test
+    public void NPA_359() throws URISyntaxException, UnsupportedEncodingException {
+
+        Program program = MediaTestDataBuilder.program().withDescendantOf().withScheduleEvents().build();
+        ApiScheduleEvent event = new ApiScheduleEvent(program.getScheduleEvents().first(), program);
+        SearchResultItem<ApiScheduleEvent> apiScheduleEventSearchResultItem = new SearchResultItem<>(event);
+        ScheduleSearchResult result = new ScheduleSearchResult(Arrays.asList(apiScheduleEventSearchResultItem), 0L, 10, Result.Total.equalsTo(100L));
+        when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(result);
+
+        MockHttpRequest request = MockHttpRequest.post("/schedule?properties=none");
+
+        request.contentType(MediaType.APPLICATION_XML);
+        request.accept(MediaType.APPLICATION_XML);
+
+        MockHttpResponse response = new MockHttpResponse();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        MediaForm form = new MediaForm();
+        form.setSearches(new MediaSearch());
+
+        JAXB.marshal(ScheduleForm.from(form), out);
+
+
+
+        request.content(out.toByteArray());
+
+        dispatcher.invoke(request, response);
+
+        assertThat(response.getStatus()).isEqualTo(200);
+
+        System.out.println(response.getContentAsString());
+
+        ScheduleSearchResult searchResultItems  = JAXB.unmarshal(new StringReader(response.getContentAsString()), ScheduleSearchResult.class);
+
+    }
+
+    @Override
+    protected ScheduleRestServiceImpl getTestObject() {
+        return new ScheduleRestServiceImpl(scheduleService);
+    }
+}
