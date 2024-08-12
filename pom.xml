@@ -42,6 +42,7 @@
     <!-- used to be in api itself, but used @vpro -->
     <module>api-rs</module>
     <module>api-rs-media-filter</module>
+    <module>api-services</module>
   </modules>
 
   <dependencies>
