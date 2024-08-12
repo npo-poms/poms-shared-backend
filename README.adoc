@@ -13,7 +13,7 @@ You can run elasticsearch locally.
 
 == ES Console
 
-We recommend link:https://chrome.google.com/webstore/detail/elasticsearch-head/ffmkiejjmecolpfloofpjologoblkegm[ElasticSearch Head] chrome plugin to connect to ES
+We recommend link:https://chromewebstore.google.com/detail/cpmmilfkofbeimbmgiclohpodggeheim[ElasticSearch Head] chrome plugin to connect to ES
 
 == Configure your local ES
 
