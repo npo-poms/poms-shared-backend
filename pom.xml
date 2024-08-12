@@ -38,6 +38,8 @@
     <module>pages-es-mappings</module>
     <module>query-es-mappings</module>
     <module>push-es-mappings</module>
+
+    <module>api-rs</module>
   </modules>
 
   <dependencies>
