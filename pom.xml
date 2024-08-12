@@ -39,7 +39,9 @@
     <module>query-es-mappings</module>
     <module>push-es-mappings</module>
 
+    <!-- used to be in api itself, but used @vpro -->
     <module>api-rs</module>
+    <module>api-rs-media-filter</module>
   </modules>
 
   <dependencies>
