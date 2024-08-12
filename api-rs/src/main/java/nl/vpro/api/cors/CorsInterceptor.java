@@ -7,10 +7,7 @@ import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.container.ContainerRequestFilter;
-import jakarta.ws.rs.container.ContainerResponseContext;
-import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.ext.Provider;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +18,7 @@ import static org.jboss.resteasy.spi.CorsHeaders.*;
 
 
 /**
+ * Is this still in use? Why not use generic filter?
  * @author rico
  * @author Michiel Meeuwissen
  */
@@ -64,7 +62,7 @@ public class CorsInterceptor implements ContainerResponseFilter, ContainerReques
 
 
     /**
-     * Hack for IE 8 . See http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx
+     * Hack for IE 8 . See <a href="http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx">here</a>
      * (so this is related to cors)
      */
     @Override
