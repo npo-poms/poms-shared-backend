@@ -58,7 +58,7 @@ public abstract class AbstractRestServiceImplTest<T> {
         dispatcher.getProviderFactory().registerProvider(ProfileNotFoundExceptionMapper.class);
 
 
-        mapper = Jackson2Mapper.INSTANCE;
+        mapper = Jackson2Mapper.getInstance();
         dispatcher.getRegistry().addSingletonResource(getTestObject());
 
     }
@@ -69,6 +69,14 @@ public abstract class AbstractRestServiceImplTest<T> {
     protected void assert200(MockHttpResponse response) {
         try {
             assertThat(response.getStatus()).withFailMessage(response.getErrorMessage() + " " + response.getContentAsString()).isEqualTo(200);
+        } catch (UnsupportedEncodingException use) {
+            throw new RuntimeException(use);
+        }
+    }
+
+    protected void assert400(MockHttpResponse response) {
+        try {
+            assertThat(response.getStatus()).withFailMessage(response.getErrorMessage() + " " + response.getContentAsString()).isEqualTo(400);
         } catch (UnsupportedEncodingException use) {
             throw new RuntimeException(use);
         }
