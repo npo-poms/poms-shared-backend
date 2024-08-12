@@ -1,0 +1,61 @@
+/*
+ * Copyright (C) 2014 All rights reserved
+ * VPRO The Netherlands
+ */
+package nl.vpro.api.rs.filter;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.*;
+
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import nl.vpro.domain.media.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * @author rico
+ * @since 3.0
+ */
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = "classpath:/nl/vpro/api/rs/filter/scheduleFilterTest-context.xml")
+public class ScheduleFilterTest {
+
+    @Autowired
+    UserDetailsService userDetailsService;
+
+    @BeforeEach
+    public void init() {
+        List<GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(new TestingAuthenticationToken("user", "dontcare", roles));
+    }
+
+    @Test
+    @Disabled("See nl.vpro.api.rs.filter.ScheduleEventViewSortedSetTest for how it's done.")
+    public void testFilter() {
+        Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
+        ScheduleEvent event = new ScheduleEvent(Channel.NED3, Instant.now().plus(Duration.ofDays(4)), Duration.ofMillis(1000));
+        program.getScheduleEvents().add(event);
+
+        assertThat(program.getScheduleEvents().size()).isEqualTo(5);
+
+        Schedule schedule = new Schedule();
+        schedule.addScheduleEventsFromMedia(program);
+
+        assertThat(schedule.getScheduleEvents().size()).isEqualTo(4);
+    }
+
+}
