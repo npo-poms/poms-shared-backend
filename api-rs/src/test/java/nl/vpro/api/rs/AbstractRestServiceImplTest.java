@@ -12,7 +12,7 @@ import org.jboss.resteasy.mock.MockDispatcherFactory;
 import org.jboss.resteasy.mock.MockHttpResponse;
 import org.jboss.resteasy.spi.Dispatcher;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.mock.web.MockHttpServletResponse;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,7 +23,6 @@ import nl.vpro.rs.converters.DateParamConverterProvider;
 import nl.vpro.rs.converters.LocaleParamConverterProvider;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
 
 
 /**
@@ -69,21 +68,18 @@ public abstract class AbstractRestServiceImplTest<T> {
 
     protected void assert200(MockHttpResponse response) {
         try {
-            assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
+            assertThat(response.getStatus()).withFailMessage(response.getErrorMessage() + " " + response.getContentAsString()).isEqualTo(200);
         } catch (UnsupportedEncodingException use) {
             throw new RuntimeException(use);
         }
-    }
-
-    protected void assert200(MockHttpServletResponse response) throws UnsupportedEncodingException {
-        assertEquals(response.getErrorMessage() + " " + response.getContentAsString(), 200, response.getStatus());
     }
 
 
     protected AbstractCharSequenceAssert<?, String> assert404(MockHttpResponse response) {
         try {
             String result = response.getContentAsString();
-            assertEquals(response.getErrorMessage() + " " + result, 404, response.getStatus());
+            assertThat(response.getStatus()).withFailMessage(
+                response.getErrorMessage() + " " + response.getContentAsString(), response.getStatus()).isEqualTo(404);
             return assertThat(result);
         } catch (UnsupportedEncodingException use) {
             throw new RuntimeException(use);
