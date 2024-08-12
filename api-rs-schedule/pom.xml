@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>api-parent</artifactId>
-    <groupId>nl.vpro.api</groupId>
+    <artifactId>poms-shared-backend-parent</artifactId>
+    <groupId>nl.vpro.poms</groupId>
     <version>8.3-SNAPSHOT</version>
   </parent>
-
+  <groupId>nl.vpro.api</groupId>
   <artifactId>api-rs-schedule</artifactId>
 
   <dependencies>

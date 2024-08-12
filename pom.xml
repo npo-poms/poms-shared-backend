@@ -43,6 +43,8 @@
     <module>api-rs</module>
     <module>api-rs-media-filter</module>
     <module>api-services</module>
+    <module>api-rs-schedule</module>
+
   </modules>
 
   <dependencies>
