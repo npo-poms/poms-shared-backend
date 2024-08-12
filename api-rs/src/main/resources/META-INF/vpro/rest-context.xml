@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+  <bean class="nl.vpro.jackson2.rs.JacksonContextResolver"/>
+
+  <context:component-scan base-package="nl.vpro.api.cors">
+    <context:include-filter type="annotation" expression="jakarta.ws.rs.ext.Provider"/>
+    <context:include-filter type="annotation" expression="jakarta.ws.rs.NameBinding"/>
+  </context:component-scan>
+  <context:component-scan base-package="nl.vpro.rs.converters">
+    <context:include-filter type="annotation" expression="jakarta.ws.rs.ext.Provider"/>
+  </context:component-scan>
+  <context:component-scan base-package="nl.vpro.api.rs">
+    <context:include-filter type="annotation" expression="jakarta.ws.rs.ext.Provider"/>
+  </context:component-scan>
+
+  <context:component-scan base-package="nl.vpro.api.rs.exception">
+    <context:include-filter type="annotation" expression="jakarta.ws.rs.ext.Provider"/>
+  </context:component-scan>
+
+
+  <bean class="nl.vpro.api.cors.CorsPolicyImpl" id="corsPolicy">
+    <constructor-arg index="0" value="${cors.enabled}"/>
+    <constructor-arg index="1" value="${cors.policy}"/>
+  </bean>
+
+  <bean class="nl.vpro.rs.interceptors.LoggingInterceptor">
+    <property name="enabled" value="${logging.interceptor.enabled}" />
+  </bean>
+
+
+</beans>
