@@ -1,5 +1,7 @@
 package nl.vpro.api.rs.interceptors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
@@ -26,6 +28,7 @@ import nl.vpro.poms.shared.Headers;
  * @since 5.13
  */
 @Provider
+@Slf4j
 public class NPOHeadersInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
 
     private static Predicate<String> aEqualsB(String a) {
@@ -60,6 +63,8 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
                         .map(a -> a.startsWith(Roles.ROLE) ? a.substring(Roles.ROLE.length()) : a)
                         .collect(Collectors.joining(",")));
                 }
+            } else {
+                log.debug("Not authenticated");
             }
             response.getHeaders().putSingle(Headers.NPO_VERSION, VersionService.version());
 
