@@ -1,8 +1,7 @@
 package nl.vpro.api.rs.interceptors;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import jakarta.ws.rs.container.*;
@@ -26,6 +25,14 @@ import nl.vpro.poms.shared.Headers;
  */
 @Provider
 public class NPOHeadersInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
+    private static final Set<String> RECOGNIZED = Roles.RECOGNIZED;
+
+
+    public static void addRecognizedRoles(String... roles) {
+        RECOGNIZED.addAll(List.of(roles));
+    }
+
+
     @Override
     public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
         try {
@@ -39,7 +46,7 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
                 if (authentication.getAuthorities() != null) {
                     response.getHeaders().putSingle(Headers.NPO_ROLES, authentication.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .filter(Roles.RECOGNIZED::contains)
+                        .filter(RECOGNIZED::contains)
                         .map(a -> a.startsWith(Roles.ROLE) ? a.substring(Roles.ROLE.length()) : a)
                         .collect(Collectors.joining(",")));
                 }
