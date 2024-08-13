@@ -2,7 +2,9 @@ package nl.vpro.api.rs.interceptors;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.ws.rs.container.*;
 import jakarta.ws.rs.ext.Provider;
@@ -25,11 +27,19 @@ import nl.vpro.poms.shared.Headers;
  */
 @Provider
 public class NPOHeadersInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
-    private static final Set<String> RECOGNIZED = Roles.RECOGNIZED;
+
+    private static Predicate<String> aEqualsB(String a) {
+        return b -> Objects.equals(a, b);
+    }
+
+    private static final List<Predicate<String>> RECOGNIZED = Roles.RECOGNIZED.stream().map(NPOHeadersInterceptor::aEqualsB).collect(Collectors.toCollection(ArrayList::new));
 
 
+    public static void addRecognizedRolePredicate(Predicate<String>  role) {
+        RECOGNIZED.add(role);
+    }
     public static void addRecognizedRoles(String... roles) {
-        RECOGNIZED.addAll(List.of(roles));
+        Stream.of(roles).map(NPOHeadersInterceptor::aEqualsB).forEach(NPOHeadersInterceptor::addRecognizedRolePredicate);
     }
 
 
@@ -46,7 +56,7 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
                 if (authentication.getAuthorities() != null) {
                     response.getHeaders().putSingle(Headers.NPO_ROLES, authentication.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .filter(RECOGNIZED::contains)
+                        .filter(s -> RECOGNIZED.stream().anyMatch(p -> p.test(s)))
                         .map(a -> a.startsWith(Roles.ROLE) ? a.substring(Roles.ROLE.length()) : a)
                         .collect(Collectors.joining(",")));
                 }
