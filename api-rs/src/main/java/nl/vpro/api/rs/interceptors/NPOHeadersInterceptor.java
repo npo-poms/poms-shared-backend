@@ -73,8 +73,8 @@ public class NPOHeadersInterceptor implements ContainerResponseFilter, Container
                 response.getHeaders().putSingle(p.getKey(), p.getValue());
             });
             Object entity = response.getEntity();
-            if (entity instanceof Result) {
-                response.getHeaders().putSingle(Headers.NPO_TOOK, ((Result<?>) entity).getTook());
+            if (entity instanceof Result<?> result) {
+                response.getHeaders().putSingle(Headers.NPO_TOOK, result.getTook());
             }
         } finally {
             ExtraHeaders.remove();
