@@ -69,6 +69,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
         return index;
     }
 
+    @NonNull
     public String getIndexName() {
         return indexNames.get(index);
     }

@@ -62,6 +62,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         super.setIndexName(APIQUERIES, indexName);
     }
 
+    @NonNull
     public String getIndexName() {
         return indexNames.get(APIQUERIES);
     }

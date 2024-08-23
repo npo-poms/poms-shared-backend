@@ -90,9 +90,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         return getIndexName() + ApiRefsIndex.POSTFIX;
     }
 
-    public String getIndexName() {
-        return indexNames.get(APIMEDIA);
-    }
+
 
     @Value("${elasticSearch.media.index}")
     public void setIndexName(@NonNull String indexName) {

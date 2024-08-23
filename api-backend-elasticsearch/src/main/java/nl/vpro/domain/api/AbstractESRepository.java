@@ -47,6 +47,8 @@
  import nl.vpro.util.ThreadPools;
  import nl.vpro.util.TimeUtils;
 
+ import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
+
 
 /**
  * @author Michiel Meeuwissen
@@ -95,6 +97,16 @@ public abstract class AbstractESRepository<T> {
 
     public void setIndexName(ElasticSearchIndex index, @NonNull String indexName) {
         indexNames.put(index, indexName);
+    }
+
+    @NonNull
+    public String getIndexName() {
+        String indexName = indexNames.get(APIMEDIA);
+        if (indexName == null){
+            throw new IllegalStateException("Not found %s in %s".formatted(APIMEDIA, indexNames));
+        }
+        return indexName;
+
     }
 
     protected void logIntro() {

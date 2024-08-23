@@ -90,7 +90,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
     @Override
     public boolean isScore() {
         return scoreManager.getIsScoring();
-
     }
 
     public void  setScore(boolean score) {

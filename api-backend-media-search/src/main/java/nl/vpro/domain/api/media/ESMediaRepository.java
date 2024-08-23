@@ -873,15 +873,16 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     }
 
     synchronized void refillRedirectCache() {
-        Map<String, String> newRedirects = new HashMap<>();
-
+        final Map<String, String> newRedirects = new HashMap<>();
+        final String indexName = getIndexName();
+        assert indexName != null;
         var start = Instant.now();
         try(ExtendedElasticSearchIterator<JsonNode> i = ExtendedElasticSearchIterator.<JsonNode>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(h -> h.get(Constants.Fields.SOURCE))
             .build()) {
 
-            i.prepareSearchSource(getIndexName())
+            i.prepareSearchSource(indexName)
                 .query(
                     QueryBuilders.termQuery("workflow", Workflow.MERGED.name()))
                 .size(iterateBatchSize)
