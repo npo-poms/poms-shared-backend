@@ -78,6 +78,8 @@ public abstract class AbstractESRepositoryITest {
             staticClientFactory = clientFactory;
             log.info("Elastic search for integration tests: " + opensearch.getHost()+ ":" + opensearch.getMappedPort(9200));
             clientFactory.setHosts(new HttpHost( opensearch.getHost(), opensearch.getMappedPort(9200)));
+            clientFactory.invalidate();
+
             log.info("Using ES hosts: {}", clientFactory.getLowLevelFactory().getHosts());
         }
 
@@ -138,8 +140,12 @@ public abstract class AbstractESRepositoryITest {
             IndexHelper helper = IndexHelper.of(log, staticClientFactory, abstractIndex)
                 .indexName(indexName)
                 .build();
+
             indexHelpers.put(abstractIndex, helper);
+            helper.waitForHealth();
+
             helper.createIndex(CreateIndex.FOR_TEST);
+
             refresh();
         }
         return indexHelpers.get(abstractIndex);
