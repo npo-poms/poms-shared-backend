@@ -11,12 +11,16 @@ import java.util.Map;
 
 import jakarta.inject.Inject;
 
+import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.*;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.MediaClassificationService;
@@ -36,11 +40,22 @@ import static org.mockito.Mockito.when;
  */
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = {"classpath:/broadcasterService.xml", "classpath:/esclientfactory.xml"})
+@ContextConfiguration(locations = {
+    "classpath:/broadcasterService.xml",
+    "classpath:/esclientfactory.xml"})
 @Log4j2
 @Execution(ExecutionMode.SAME_THREAD)
 @Isolated
+@Testcontainers
 public abstract class AbstractESRepositoryITest {
+
+
+
+    @SuppressWarnings("resource")
+    @Container
+    public static GenericContainer<?> opensearch = new GenericContainer<>("ghcr.io/npo-poms/opensearch:opendistro")
+        .withExposedPorts(9200);
+
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
     protected static final  Map<ElasticSearchIndex, IndexHelper> indexHelpers = new HashMap<>();
@@ -48,9 +63,6 @@ public abstract class AbstractESRepositoryITest {
 
     protected static HighLevelClientFactory staticClientFactory;
 
-    static {
-        log.info("Elastic search for integration tests: " + System.getProperty("integ.http.eshost") + ":" + System.getProperty("integ.http.port"));
-    }
 
     @Inject
     protected HighLevelClientFactory clientFactory;
@@ -64,6 +76,8 @@ public abstract class AbstractESRepositoryITest {
         if (staticClientFactory == null) {
             ClassificationServiceLocator.setInstance(MediaClassificationService.getInstance());
             staticClientFactory = clientFactory;
+            log.info("Elastic search for integration tests: " + opensearch.getHost()+ ":" + opensearch.getMappedPort(9200));
+            clientFactory.setHosts(new HttpHost( opensearch.getHost(), opensearch.getMappedPort(9200)));
             log.info("Using ES hosts: {}", clientFactory.getLowLevelFactory().getHosts());
         }
 
