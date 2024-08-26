@@ -4,7 +4,6 @@ import java.util.NoSuchElementException;
 
 import jakarta.inject.Inject;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -25,11 +24,6 @@ public class GTAAKeysPropertiesRepositoryTest {
         assertThat(repo.getKeyFor("npo-functional-tests").get()).isEqualTo("***REMOVED***");
     }
 
-    @Test
-    @Disabled
-    public void testGetKeyFor2() {
-        assertThat(repo.getKeyFor("issuer").get()).isEqualTo("test");
-    }
 
     @Test
     public void testGetKeyFor3() {
