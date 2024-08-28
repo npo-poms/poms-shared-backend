@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
                ">
 
-  <bean id="lowlevelClientFactory" class="nl.vpro.elasticsearchclient.ClientElasticSearchFactory">
-    <property name="hosts" value="#{T(java.lang.System).getProperty('integ.http.eshost', 'localhost')}:#{T(java.lang.System).getProperty('integ.http.port', '9200')}" />
-    <property name="clusterName" value="#{T(java.lang.System).getProperty('integ.cluster.name', 'opensearch-cluster')}" />
-    <property name="basicUser" value="#{T(java.lang.System).getProperty('integ.cluster.basicUser')}" />
-    <property name="basicPassword" value="#{T(java.lang.System).getProperty('integ.cluster.basicPassword')}" />
+  <bean class="nl.vpro.test.opensearch.ElasticsearchContainerSupport" />
 
+  <bean id="lowlevelClientFactory" class="nl.vpro.elasticsearchclient.ClientElasticSearchFactory">
+    <property name="host" value="#{elasticSearchContainer.httpHost}" />
+    <property name="clusterName" value="#{elasticsearchContainer.clusterName}" />
   </bean>
 
   <bean id="clientFactory" class="nl.vpro.elasticsearch.highlevel.HighLevelClientFactory">
