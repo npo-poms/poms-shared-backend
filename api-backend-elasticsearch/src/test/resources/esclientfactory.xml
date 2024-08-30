@@ -8,7 +8,7 @@
   <bean class="nl.vpro.test.opensearch.ElasticsearchContainerSupport" />
 
   <bean id="lowlevelClientFactory" class="nl.vpro.elasticsearchclient.ClientElasticSearchFactory">
-    <property name="host" value="#{elasticSearchContainer.httpHost}" />
+    <property name="host" value="#{elasticsearchContainer.httpHost}" />
     <property name="clusterName" value="#{elasticsearchContainer.clusterName}" />
   </bean>
 
