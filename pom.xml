@@ -117,6 +117,10 @@
         <enabled>true</enabled>
       </snapshots>
     </snapshotRepository>
+    <repository>
+      <id>github</id>
+      <url>https://maven.pkg.github.com/npo-poms/poms-shared-backend</url>
+    </repository>
   </distributionManagement>
 
   <profiles>
