@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
 
     @SuppressWarnings("resource")
-    protected static void createIndicesIfNecessary() {
+    protected  void createIndicesIfNecessary() {
         IndexHelper helper = createIndexIfNecessary(APIMEDIA);
         createIndexIfNecessary(APIMEDIA_REFS, helper.getIndexName() + ApiRefsIndex.POSTFIX);
         for (ApiCueIndex i : ApiCueIndex.getInstances()) {

@@ -5,7 +5,6 @@
 package nl.vpro.domain.api.media;
 
 import lombok.extern.log4j.Log4j2;
-import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -140,7 +139,7 @@ public class ESMediaRepositoryFlushDelayITest extends AbstractMediaESRepositoryI
         };
     }
 
-    private static <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
+    private  <T extends MediaObject> T index(T object) throws IOException, ExecutionException, InterruptedException {
         indexHelpers.get(ApiMediaIndex.APIMEDIA).index(object.getMid(), object);
         return object;
     }

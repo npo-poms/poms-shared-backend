@@ -934,7 +934,7 @@ public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest 
 
 
 
-    private static <T extends MediaObject> T  index(MediaBuilder<?, T> builder) throws IOException {
+    private  <T extends MediaObject> T  index(MediaBuilder<?, T> builder) throws IOException {
         if (!PUBLISHED_AS_DELETED.contains(builder.getWorkflow())) {
             builder.workflow(Workflow.PUBLISHED);
         }

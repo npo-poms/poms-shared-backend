@@ -42,14 +42,15 @@ import static org.mockito.Mockito.when;
 @Log4j2
 @Execution(ExecutionMode.SAME_THREAD)
 @Isolated
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractESRepositoryITest {
 
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());
-    protected static final  Map<ElasticSearchIndex, IndexHelper> indexHelpers = new HashMap<>();
-    protected static boolean firstRun = true;
+    protected final  Map<ElasticSearchIndex, IndexHelper> indexHelpers = new HashMap<>();
+    protected boolean firstRun = true;
 
-    protected static HighLevelClientFactory staticClientFactory;
+    protected HighLevelClientFactory staticClientFactory;
 
     @Inject
     protected HighLevelClientFactory clientFactory;
@@ -85,12 +86,12 @@ public abstract class AbstractESRepositoryITest {
     protected abstract void firstRun() throws Exception;
 
     @BeforeAll
-    public static void staticSetup() {
+    public  void staticSetup() {
         indexHelpers.clear();
     }
 
     @AfterAll
-    public static void shutdown() throws IOException {
+    public void shutdown() throws IOException {
         for (IndexHelper indexHelper : indexHelpers.values()) {
             indexHelper.deleteIndex();
         }
@@ -99,7 +100,7 @@ public abstract class AbstractESRepositoryITest {
         firstRun = true;
     }
 
-    public static String getIndexName() {
+    public String getIndexName() {
         if (indexHelpers.size() == 1) {
             return indexHelpers.values().iterator().next().getIndexName();
         } else {
@@ -107,19 +108,19 @@ public abstract class AbstractESRepositoryITest {
         }
     }
 
-    public static String getIndexName(ElasticSearchIndex elasticSearchIndex) {
+    public String getIndexName(ElasticSearchIndex elasticSearchIndex) {
         return indexHelpers.get(elasticSearchIndex).getIndexName();
     }
 
-    public static  RestHighLevelClient highLevelClient() {
+    public  RestHighLevelClient highLevelClient() {
         return staticClientFactory.highLevelClient("test");
     }
 
-    protected static IndexHelper createIndexIfNecessary(ElasticSearchIndex abstractIndex)  {
+    protected IndexHelper createIndexIfNecessary(ElasticSearchIndex abstractIndex)  {
         return createIndexIfNecessary(abstractIndex, "test-" + abstractIndex.getIndexName() + "-" + NOW);
     }
 
-    protected static IndexHelper createIndexIfNecessary(ElasticSearchIndex abstractIndex, String indexName)  {
+    protected IndexHelper createIndexIfNecessary(ElasticSearchIndex abstractIndex, String indexName)  {
         if (! indexHelpers.containsKey(abstractIndex)) {
             log.info("Creating index {}: {}", abstractIndex, indexName);
             IndexHelper helper = IndexHelper.of(log, staticClientFactory, abstractIndex)
@@ -137,7 +138,7 @@ public abstract class AbstractESRepositoryITest {
     }
 
 
-    protected static void clearIndices() {
+    protected void clearIndices() {
         refresh();
         for (IndexHelper indexHelper : indexHelpers.values()) {
             long cleared = indexHelper.clearIndex();
@@ -155,7 +156,7 @@ public abstract class AbstractESRepositoryITest {
     }
 
     @SneakyThrows
-    protected static void refresh() {
+    protected  void refresh() {
         for (IndexHelper indexHelper : indexHelpers.values()) {
             log.debug("Refreshing {}", indexHelper.getIndexName());
             indexHelper.refresh();
