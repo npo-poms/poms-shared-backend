@@ -43,7 +43,8 @@ import static org.mockito.Mockito.when;
 @Execution(ExecutionMode.SAME_THREAD)
 @Isolated
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class AbstractESRepositoryITest {
+
+public abstract class AbstractESRepositoryContainerTest {
 
 
     protected static final String NOW = DateTimeFormatter.ofPattern("yyyy-MM-dd't'HHmmss").format(LocalDateTime.now());

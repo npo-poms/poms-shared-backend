@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.ContextConfiguration;
 
-import nl.vpro.domain.api.AbstractESRepositoryITest;
+import nl.vpro.domain.api.AbstractESRepositoryContainerTest;
 import nl.vpro.domain.api.SuggestResult;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.es.ApiQueryIndex;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
  */
 @ContextConfiguration
 @Log4j2
-public class ESQueryRepositoryITest extends AbstractESRepositoryITest {
+public class ESQueryRepositoryITest extends AbstractESRepositoryContainerTest {
 
 
     @Inject

@@ -57,7 +57,7 @@ import static org.mockito.Mockito.mock;
 
 /**
  * These are integration tests where the index is build in the @BeforeClass.
- * Test which don't need that are placed in {@link ESMediaRepositoryPart1ITest}
+ * Test which don't need that are placed in {@link ESMediaRepositoryPart1ContainerTest}
  *
  * @author Michiel Meeuwissen
  * @since 2.0
@@ -66,7 +66,7 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("DataFlowIssue")
 @Log4j2
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class ESMediaRepositoryPart2ITest extends AbstractMediaESRepositoryITest {
+public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESRepositoryContainerTest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();
     private static final Instant LONGAGO = LocalDate.of(1970, Month.JANUARY, 1).atStartOfDay().atZone(Schedule.ZONE_ID).toInstant();
