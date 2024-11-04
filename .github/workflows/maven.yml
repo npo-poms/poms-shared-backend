@@ -34,7 +34,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -U -B -Pgithub deploy
+      run: mvn -U -B -Pgithub -DskipITs=false deploy
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish Unit Test Results
