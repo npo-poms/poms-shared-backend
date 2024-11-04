@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>8.3.2</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
@@ -58,7 +58,6 @@
       <artifactId>mockito-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>nl.vpro.shared</groupId>
       <artifactId>vpro-shared-test</artifactId>
@@ -122,6 +121,7 @@
       <url>https://maven.pkg.github.com/npo-poms/poms-shared-backend</url>
     </repository>
   </distributionManagement>
+
 
   <profiles>
     <profile>
