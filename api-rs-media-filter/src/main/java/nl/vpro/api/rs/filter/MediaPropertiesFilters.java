@@ -108,22 +108,26 @@ public class MediaPropertiesFilters {
                                     }
 
 
-                                    if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
-                                        log.debug("Instrumenting Set {}", fieldDescription);
-                                        if ("titles".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + fieldName + "\", $proceed($$));");
-                                        } else if ("descriptions".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + fieldName + "\", $proceed($$));");
-                                        } else {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + fieldName+ "\", $proceed($$));");
+                                    if (f.isReader()) {
+                                        if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature()))) {
+                                            log.debug("Instrumenting Set {}", fieldDescription);
+                                            if ("titles".equals(fieldName)) {
+                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + fieldName + "\", $proceed($$));");
+                                            } else if ("descriptions".equals(fieldName)) {
+                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + fieldName + "\", $proceed($$));");
+                                            } else {
+                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + fieldName + "\", $proceed($$));");
+                                            }
+                                        } else if ("Ljava/util/List;".equals(f.getSignature())) {
+                                            log.debug("Instrumenting List {}", fieldDescription);
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + fieldName + "\", $proceed($$));");
+                                        } else  {
+                                            log.debug("Instrumenting {}", fieldDescription);
+                                            f.replace("$_ = $proceed($$) == null ? null : ($r) nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + fieldName + "\"," +
+                                                " $proceed($$)).value();");
                                         }
-                                    } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
-                                        log.debug("Instrumenting List {}", fieldDescription);
-                                        f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + fieldName + "\", $proceed($$));");
                                     } else {
-                                        log.debug("Instrumenting {}", fieldDescription);
-                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + fieldName + "\"," +
-                                            " $proceed($$)).value();");
+                                        log.debug("Not a reader {}", f);
                                     }
                                 }
                             } catch (RuntimeException | NotFoundException | CannotCompileException exception) {
@@ -168,9 +172,14 @@ public class MediaPropertiesFilters {
                     ctClass.instrument(new ExprEditor() {
                         @Override
                         public void edit(FieldAccess f) throws CannotCompileException {
-                            if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() && f.getFieldName().equals("scheduleEvents")) {
-                                log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
-                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
+                            if (f.getFieldName().equals("scheduleEvents")) {
+                                if (("Ljava/util/Set;".equals(f.getSignature()) || "Ljava/util/SortedSet;".equals(f.getSignature()))
+                                    && f.isReader()) {
+                                    log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
+                                    f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
+                                } else {
+                                    log.info("Field scheduleEvents has unexpected signature {}", f);
+                                }
                             }
                         }
                     });
