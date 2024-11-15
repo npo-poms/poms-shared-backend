@@ -15,7 +15,6 @@
      <dependency>
        <groupId>nl.vpro.poms</groupId>
        <artifactId>pages-es-mappings</artifactId>
-       <version>${project.version}</version>
      </dependency>
      <dependency>
        <groupId>io.micrometer</groupId>
