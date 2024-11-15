@@ -2,7 +2,6 @@ package nl.vpro.api.rs.filter;
 
 import java.util.*;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,15 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 4.9
  */
 public class FilteredListTest {
-
-    static {
-        MediaPropertiesFilters.instrument();
-    }
-
-    @BeforeAll
-    public static void init() {
-
-    }
 
     @Test
     public void contains() {
