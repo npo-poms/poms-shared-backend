@@ -24,7 +24,6 @@
         <prop key="mediaService.loadRepository">ELASTICSEARCH</prop>
         <prop key="mediaService.listRepository">ELASTICSEARCH</prop>
         <prop key="mediaService.changesRepository">ELASTICSEARCH</prop>
-        <prop key="mediaService.redirectsRepository">COUCHDB</prop>
         <prop key="mediaService.membersRepository">ELASTICSEARCH</prop>
         <prop key="scheduleService.repository">ELASTICSEARCH</prop>
         <prop key="elasticSearch.commitDelay">10s</prop>

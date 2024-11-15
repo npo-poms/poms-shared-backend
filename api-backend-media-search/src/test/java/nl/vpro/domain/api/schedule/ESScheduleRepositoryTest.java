@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Log4j2
-public class ESScheduleRepositoryITest extends AbstractMediaESRepositoryITest {
+public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainerTest {
 
     public ESScheduleRepository repository;
 

@@ -36,9 +36,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 @Log4j2
 public class ApiMediaFilterTest {
-    static {
-        MediaPropertiesFilters.instrument();
-    }
 
     @BeforeEach
     public void setUp() {

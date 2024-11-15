@@ -107,8 +107,8 @@ public class MediaPropertiesFilters {
                                         return;
                                     }
 
-                                    if (f.isReader()) {
 
+                                    if (f.isReader()) {
                                         if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature()))) {
                                             log.debug("Instrumenting Set {}", fieldDescription);
                                             if ("titles".equals(fieldName)) {
@@ -121,10 +121,13 @@ public class MediaPropertiesFilters {
                                         } else if ("Ljava/util/List;".equals(f.getSignature())) {
                                             log.debug("Instrumenting List {}", fieldDescription);
                                             f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + fieldName + "\", $proceed($$));");
-                                        } else {
+                                        } else  {
                                             log.debug("Instrumenting {}", fieldDescription);
-                                            f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + fieldName + "\", $proceed($$)).value();");
+                                            f.replace("$_ = $proceed($$) == null ? null : ($r) nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + fieldName + "\"," +
+                                                " $proceed($$)).value();");
                                         }
+                                    } else {
+                                        log.debug("Not a reader {}", f);
                                     }
                                 }
                             } catch (RuntimeException | NotFoundException | CannotCompileException exception) {
@@ -169,9 +172,14 @@ public class MediaPropertiesFilters {
                     ctClass.instrument(new ExprEditor() {
                         @Override
                         public void edit(FieldAccess f) throws CannotCompileException {
-                            if ("Ljava/util/SortedSet;".equals(f.getSignature()) && f.isReader() && f.getFieldName().equals("scheduleEvents")) {
-                                log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
-                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
+                            if (f.getFieldName().equals("scheduleEvents")) {
+                                if (("Ljava/util/Set;".equals(f.getSignature()) || "Ljava/util/SortedSet;".equals(f.getSignature()))
+                                    && f.isReader()) {
+                                    log.debug("Instrumenting ScheduleEvents for {} on field {}", f.getClassName(), f.getFieldName());
+                                    f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.ScheduleEventViewSortedSet.wrap($proceed($$));");
+                                } else {
+                                    log.info("Field scheduleEvents has unexpected signature {}", f);
+                                }
                             }
                         }
                     });

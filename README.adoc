@@ -36,7 +36,7 @@ Via the same way mappings can be updated. After changing the mappings under:
 ./*-es-mapping/src/main/resources/es*/mapping/*.json
 ----
 
-you can test your changes by executing the UnitTest in `ESMediaRepositoryPart1ITest`
+you can test your changes by executing the UnitTest in `ESMediaRepositoryPart1ContainerTest`
 
 To be able to change the dev/test or even prod environment
 you need to have a tunneling from your machine.

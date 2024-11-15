@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>8.3.0</version>
+    <version>8.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
@@ -18,7 +18,6 @@
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
-    <java.version>17</java.version>
   </properties>
 
   <scm>
@@ -58,7 +57,6 @@
       <artifactId>mockito-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>nl.vpro.shared</groupId>
       <artifactId>vpro-shared-test</artifactId>
@@ -95,17 +93,6 @@
       <id>sonatype</id>
       <url>https://oss.sonatype.org/service/local/repositories/releases/content</url>
     </repository>
-    <repository>
-      <!-- only essential when sonatype down (e.g. in jan 2023...)-->
-      <id>vpro</id>
-      <url>https://nexus.vpro.nl/content/groups/public</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
   </repositories>
 
   <distributionManagement>
@@ -122,6 +109,7 @@
       <url>https://maven.pkg.github.com/npo-poms/poms-shared-backend</url>
     </repository>
   </distributionManagement>
+
 
   <profiles>
     <profile>

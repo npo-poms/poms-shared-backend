@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import nl.vpro.domain.api.AbstractESRepositoryITest;
+import nl.vpro.domain.api.AbstractESRepositoryContainerTest;
 import nl.vpro.domain.api.SearchResultItem;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.support.Workflow;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 5.5
  */
 @Log4j2
-public abstract class AbstractMediaESRepositoryITest extends AbstractESRepositoryITest {
+public abstract class AbstractMediaESRepositoryContainerTest extends AbstractESRepositoryContainerTest {
 
     @SuppressWarnings("resource")
     protected  void createIndicesIfNecessary() {
