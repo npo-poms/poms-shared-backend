@@ -40,8 +40,8 @@ public class FilteredSortedSet<T> extends AbstractSet<T> implements SortedSet<T>
         log.debug("Wrapping {}", wrapped);
 
         if(wrapped instanceof FilteredSortedSet filteredSortedSet) {
-            if(!(filteredSortedSet.filterHelper.property).equals(property)) {
-                throw new IllegalArgumentException("Can't wrap different properties");
+            if(!(filteredSortedSet.filterHelper.property).equalsIgnoreCase(property)) {
+                throw new IllegalArgumentException("Can't wrap different properties %s != %s".formatted(filteredSortedSet.filterHelper.property, property));
             }
 
             return filteredSortedSet;
