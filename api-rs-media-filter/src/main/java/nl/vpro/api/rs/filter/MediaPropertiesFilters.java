@@ -107,23 +107,24 @@ public class MediaPropertiesFilters {
                                         return;
                                     }
 
+                                    if (f.isReader()) {
 
-                                    if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature())) && f.isReader()) {
-                                        log.debug("Instrumenting Set {}", fieldDescription);
-                                        if ("titles".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + fieldName + "\", $proceed($$));");
-                                        } else if ("descriptions".equals(fieldName)) {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + fieldName + "\", $proceed($$));");
+                                        if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature()))) {
+                                            log.debug("Instrumenting Set {}", fieldDescription);
+                                            if ("titles".equals(fieldName)) {
+                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + fieldName + "\", $proceed($$));");
+                                            } else if ("descriptions".equals(fieldName)) {
+                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedDescriptionSet.wrapDescriptions(\"" + fieldName + "\", $proceed($$));");
+                                            } else {
+                                                f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + fieldName + "\", $proceed($$));");
+                                            }
+                                        } else if ("Ljava/util/List;".equals(f.getSignature())) {
+                                            log.debug("Instrumenting List {}", fieldDescription);
+                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + fieldName + "\", $proceed($$));");
                                         } else {
-                                            f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedSet.wrap(\"" + fieldName+ "\", $proceed($$));");
+                                            log.debug("Instrumenting {}", fieldDescription);
+                                            f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + fieldName + "\", $proceed($$)).value();");
                                         }
-                                    } else if ("Ljava/util/List;".equals(f.getSignature()) && f.isReader()) {
-                                        log.debug("Instrumenting List {}", fieldDescription);
-                                        f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredList.wrap(\"" + fieldName + "\", $proceed($$));");
-                                    } else {
-                                        log.debug("Instrumenting {}", fieldDescription);
-                                        f.replace("$_ = $proceed($$) == null ? null : ($r)nl.vpro.api.rs.filter.FilteredObject.wrap(\"" + fieldName + "\"," +
-                                            " $proceed($$)).value();");
                                     }
                                 }
                             } catch (RuntimeException | NotFoundException | CannotCompileException exception) {
