@@ -175,7 +175,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
             assertThat(score0).isGreaterThan(score1);
             assertThat(score1).isGreaterThanOrEqualTo(score2);
             //assertThat(score1).isGreaterThan(score2);
-            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("De Ideale Wereld");
+            assertThat(result.getItems().getFirst().getResult().getMainTitle()).isEqualTo("De Ideale Wereld");
             //assertThat(result.getItems().get(1).getResult().getMainTitle()).isEqualTo("Alleen op de Wereld");
             //assertThat(result.getItems().get(2).getResult().getMainTitle()).isEqualTo("De Wereld Draait Door");
 
@@ -258,7 +258,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         index(program().withMid());
 
         final Program withImages = program().withMid().withImages().build();
-        withImages.getImages().get(0).setId(2L);
+        withImages.getImages().getFirst().setId(2L);
         index(MediaBuilder.program(withImages));
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(new Filter(new HasImageConstraint()));
@@ -288,25 +288,25 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         {
             MediaForm countAsc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.COUNT_ASC, null)).build();
             MediaSearchResult result = getAndTestResult(countAsc);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+            assertThat(result.getFacets().getBroadcasters().getFirst().getId()).isEqualTo("A");
         }
 
         {
             MediaForm countDesc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.COUNT_DESC, null)).build();
             MediaSearchResult result = getAndTestResult(countDesc);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
+            assertThat(result.getFacets().getBroadcasters().getFirst().getId()).isEqualTo("B");
         }
 
         {
             MediaForm valueAsc = form().broadcasterFacet(new MediaFacet(null, VALUE_ASC, null)).build();
             MediaSearchResult result = getAndTestResult(valueAsc);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+            assertThat(result.getFacets().getBroadcasters().getFirst().getId()).isEqualTo("A");
         }
 
         {
             MediaForm valueDesc = form().broadcasterFacet(new MediaFacet(null, FacetOrder.VALUE_DESC, null)).build();
             MediaSearchResult result = getAndTestResult(valueDesc);
-            assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("B");
+            assertThat(result.getFacets().getBroadcasters().getFirst().getId()).isEqualTo("B");
         }
     }
 
@@ -321,7 +321,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getBroadcasters()).hasSize(1);
-        assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+        assertThat(result.getFacets().getBroadcasters().getFirst().getId()).isEqualTo("A");
     }
 
     @Test
@@ -333,7 +333,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getBroadcasters()).hasSize(1);
-        assertThat(result.getFacets().getBroadcasters().get(0).getId()).isEqualTo("A");
+        assertThat(result.getFacets().getBroadcasters().getFirst().getId()).isEqualTo("A");
     }
 
     @Test
@@ -559,7 +559,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getGenres()).hasSize(2);
-        final GenreFacetResultItem first = result.getFacets().getGenres().get(0);
+        final GenreFacetResultItem first = result.getFacets().getGenres().getFirst();
         assertThat(first.getValue()).isEqualTo("Documentaire - Natuur");
         assertThat(first.getId()).isEqualTo("3.0.1.8.25");
         assertThat(first.getTerms()).hasSize(2);
@@ -608,8 +608,8 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         MediaSearchResult result = getAndTestResult(form);
 
         assertThat(result.getFacets().getGenres()).hasSize(1);
-        assertThat(result.getFacets().getGenres().get(0).getId()).isEqualTo("3.0.1.1.6");
-        assertThat(result.getFacets().getGenres().get(0).getCount()).isEqualTo(2);
+        assertThat(result.getFacets().getGenres().getFirst().getId()).isEqualTo("3.0.1.1.6");
+        assertThat(result.getFacets().getGenres().getFirst().getCount()).isEqualTo(2);
 
     }
 
@@ -649,7 +649,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         assertThat(result.getFacets().getTags().get(1).isSelected()).isTrue();
 
         assertThat(result.getSelectedFacets().getTags()).hasSize(1);
-        assertThat(result.getSelectedFacets().getTags().get(0).getId()).isEqualTo("foo");
+        assertThat(result.getSelectedFacets().getTags().getFirst().getId()).isEqualTo("foo");
 
     }
 
@@ -667,8 +667,8 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         final List<MemberRefFacetResultItem> memberOf = result.getFacets().getMemberOf();
 
         assertThat(memberOf).isNotEmpty();
-        assertThat(memberOf.get(0).getId()).isEqualTo(program.getMemberOf().first().getMidRef());
-        assertThat(memberOf.get(0).getValue()).isEqualTo("Group title");
+        assertThat(memberOf.getFirst().getId()).isEqualTo(program.getMemberOf().first().getMidRef());
+        assertThat(memberOf.getFirst().getValue()).isEqualTo("Group title");
     }
 
     @Test
@@ -716,8 +716,8 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
         assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("my_relationsfacets");
-        assertThat(relations.get(0)).hasSize(2);
+        assertThat(relations.getFirst().getName()).isEqualTo("my_relationsfacets");
+        assertThat(relations.getFirst()).hasSize(2);
     }
 
     @Test
@@ -743,9 +743,9 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
         assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0).getFacets()).hasSize(2);
-        assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
+        assertThat(relations.getFirst().getName()).isEqualTo("test");
+        assertThat(relations.getFirst().getFacets()).hasSize(2);
+        assertThat(relations.getFirst().getFacets().getFirst().getId()).isEqualTo("blue note");
 
     }
 
@@ -786,21 +786,21 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
             final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
             assertThat(relations).isNotEmpty();
-            assertThat(relations.get(0).getName()).isEqualTo("test");
-            assertThat(relations.get(0).getFacets()).hasSize(2);
-            assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-            assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(3);
-            assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
+            assertThat(relations.getFirst().getName()).isEqualTo("test");
+            assertThat(relations.getFirst().getFacets()).hasSize(2);
+            assertThat(relations.getFirst().getFacets().getFirst().getId()).isEqualTo("blue note");
+            assertThat(relations.getFirst().getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(relations.getFirst().getFacets().get(0).isSelected()).isTrue();
 
-            assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("evangelisch");
-            assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
-            assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
+            assertThat(relations.getFirst().getFacets().get(1).getId()).isEqualTo("evangelisch");
+            assertThat(relations.getFirst().getFacets().get(1).getCount()).isEqualTo(1);
+            assertThat(relations.getFirst().getFacets().get(1).isSelected()).isFalse();
 
             assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
-            assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
-            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
-            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(3);
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getName()).isEqualTo("test");
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getFacets()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getFacets().getFirst().getId()).isEqualTo("blue note");
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getFacets().getFirst().getCount()).isEqualTo(3);
         }
 
     }
@@ -853,24 +853,24 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
             final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
             assertThat(relations).hasSize(1);
-            assertThat(relations.get(0).getName()).isEqualTo("test");
-            assertThat(relations.get(0).getFacets()).hasSize(2);
-            assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-            assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(4);
-            assertThat(relations.get(0).getFacets().get(0).isSelected()).isTrue();
+            assertThat(relations.getFirst().getName()).isEqualTo("test");
+            assertThat(relations.getFirst().getFacets()).hasSize(2);
+            assertThat(relations.getFirst().getFacets().getFirst().getId()).isEqualTo("blue note");
+            assertThat(relations.getFirst().getFacets().get(0).getCount()).isEqualTo(4);
+            assertThat(relations.getFirst().getFacets().get(0).isSelected()).isTrue();
 
 
             // In 5.4 this fails, it gives 'evangelisch'.
             // which is incorrect, since the relation search limit on vproLabels.
-            assertThat(relations.get(0).getFacets().get(1).getId()).isEqualTo("red note");
-            assertThat(relations.get(0).getFacets().get(1).getCount()).isEqualTo(1);
-            assertThat(relations.get(0).getFacets().get(1).isSelected()).isFalse();
+            assertThat(relations.getFirst().getFacets().get(1).getId()).isEqualTo("red note");
+            assertThat(relations.getFirst().getFacets().get(1).getCount()).isEqualTo(1);
+            assertThat(relations.getFirst().getFacets().get(1).isSelected()).isFalse();
 
             assertThat(result.getSelectedFacets().getRelations()).hasSize(1);
-            assertThat(result.getSelectedFacets().getRelations().get(0).getName()).isEqualTo("test");
-            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets()).hasSize(1);
-            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getId()).isEqualTo("blue note");
-            assertThat(result.getSelectedFacets().getRelations().get(0).getFacets().get(0).getCount()).isEqualTo(4);
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getName()).isEqualTo("test");
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getFacets()).hasSize(1);
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getFacets().getFirst().getId()).isEqualTo("blue note");
+            assertThat(result.getSelectedFacets().getRelations().getFirst().getFacets().getFirst().getCount()).isEqualTo(4);
         }
 
     }
@@ -902,10 +902,10 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
         assertThat(relations).hasSize(1);
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0)).hasSize(1);
-        assertThat(relations.get(0).getFacets().get(0).getId()).isEqualTo("Blue Note");
-        assertThat(relations.get(0).getFacets().get(0).getCount()).isEqualTo(1);
+        assertThat(relations.getFirst().getName()).isEqualTo("test");
+        assertThat(relations.getFirst()).hasSize(1);
+        assertThat(relations.getFirst().getFacets().getFirst().getId()).isEqualTo("Blue Note");
+        assertThat(relations.getFirst().getFacets().getFirst().getCount()).isEqualTo(1);
 
     }
 
@@ -930,8 +930,8 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         final List<MultipleFacetsResult> relations = result.getFacets().getRelations();
 
         assertThat(relations).isNotEmpty();
-        assertThat(relations.get(0).getName()).isEqualTo("test");
-        assertThat(relations.get(0)).hasSize(1);
+        assertThat(relations.getFirst().getName()).isEqualTo("test");
+        assertThat(relations.getFirst()).hasSize(1);
     }
 
     @Test
@@ -1094,7 +1094,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
             MediaResult result = target.listMembers(unrelatedGroup, omroepProfile, Order.ASC, 0L, 10);
 
             assertThat(result).hasSize(1);
-            assertThat(result.getItems().get(0).getMid()).isEqualTo("MID_1");
+            assertThat(result.getItems().getFirst().getMid()).isEqualTo("MID_1");
         }
 
     }
@@ -1236,12 +1236,12 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         {
             SearchResult<MediaObject> result = target.find(null, form().ageRating(_6).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
-            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("t1");
+            assertThat(result.getItems().getFirst().getResult().getMainTitle()).isEqualTo("t1");
         }
         {
             SearchResult<MediaObject> result = target.find(null, form().ageRating(_12).build(), 0, null);
             assertThat(result.getSize()).isEqualTo(1);
-            assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+            assertEquals("t2", result.getItems().getFirst().getResult().getMainTitle());
         }
 
         assertEquals(2L, (long) target.find(null, form().ageRating(_6, _12).build(), 0, null).getSize());
@@ -1280,8 +1280,8 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
             SearchResult<MediaObject> result = target.find(null, form().build(), 0, null);
             assertEquals(1, result.getSize().intValue());
             assertEquals("Jeugd - Amusement",
-                    result.getItems().get(0).getResult().getGenres().first().getDisplayName());
-            assertEquals("t1", result.getItems().get(0).getResult().getMainTitle());
+                    result.getItems().getFirst().getResult().getGenres().first().getDisplayName());
+            assertEquals("t1", result.getItems().getFirst().getResult().getMainTitle());
         }
 
         index(program().mainTitle("t2").genres(new Genre("3.0.1.5")));
@@ -1291,8 +1291,8 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         {
             SearchResult<MediaObject> result = target.find(genreProfile, form().build(), 0, null);
             assertEquals(1, result.getSize().intValue());
-            assertEquals("Muziek", result.getItems().get(0).getResult().getGenres().first().getDisplayName());
-            assertEquals("t2", result.getItems().get(0).getResult().getMainTitle());
+            assertEquals("Muziek", result.getItems().getFirst().getResult().getGenres().first().getDisplayName());
+            assertEquals("t2", result.getItems().getFirst().getResult().getMainTitle());
 
         }
 
@@ -1385,8 +1385,8 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         {
             MediaSearchResult result1 = target.find(null, form().ageRating(_16).ageRatingFacet().build(), 0, null);
             assertEquals(1L, result1.getSelectedFacets().getAgeRatings().size());
-            assertEquals(_16.getXmlValue(), result1.getSelectedFacets().getAgeRatings().get(0).getValue());
-            assertEquals(0, result1.getSelectedFacets().getAgeRatings().get(0).getCount());
+            assertEquals(_16.getXmlValue(), result1.getSelectedFacets().getAgeRatings().getFirst().getValue());
+            assertEquals(0, result1.getSelectedFacets().getAgeRatings().getFirst().getCount());
         }
     }
 
@@ -1450,12 +1450,12 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         {
             SearchResult<MediaObject> result = target.find(pornoSiteProfile, null, 0, null);
             assertThat(result.getSize()).isEqualTo(1);
-            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("sex!");
+            assertThat(result.getItems().getFirst().getResult().getMainTitle()).isEqualTo("sex!");
         }
         {
             SearchResult<MediaObject> result = target.find(childrenSiteProfile, null, 0, null);
             assertThat(result.getSize()).isEqualTo(1);
-            assertThat(result.getItems().get(0).getResult().getMainTitle()).isEqualTo("heel gewoon");
+            assertThat(result.getItems().getFirst().getResult().getMainTitle()).isEqualTo("heel gewoon");
         }
     }
 
@@ -1582,6 +1582,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testFindByTitlesCaseSensitive() {
         index(program()
@@ -1676,6 +1677,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testTitlesFacetsBackwards() {
         target.setScore(false);
@@ -1863,6 +1865,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         assertThat(result.getFacets().getTitles().get(2).getCount()).isEqualTo(1);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void expandedTitles() throws IOException {
         index(program()
@@ -1933,7 +1936,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
             .build());
 
         MediaSearchResult resultWithSearch = target.find(null, form, 0, 0);
-        assertThat(resultWithSearch.getFacets().getTitles().get(0).getId()).isEqualTo("a");
+        assertThat(resultWithSearch.getFacets().getTitles().getFirst().getId()).isEqualTo("a");
         assertThat(resultWithSearch.getFacets().getTitles().get(0).getCount()).isEqualTo(2);
         assertThat(resultWithSearch.getFacets().getTitles().get(0).isSelected()).isTrue();
 
@@ -2125,7 +2128,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
             MediaSearchResult resultWithSearch = target.find(null, form, 0, 10);
             log.info("{}", resultWithSearch);
             assertThat(resultWithSearch).hasSize(1);  // mid_geo_1
-            form.getSearches().getGeoLocations().get(0).setOwner(null);
+            form.getSearches().getGeoLocations().getFirst().setOwner(null);
             // if you don't specify owner, it will be implicit 'broadcaster' too.
             resultWithSearch = target.find(null, form, 0, 10);
             log.info("{}", resultWithSearch);
