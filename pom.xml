@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>8.4.1</version>
+  <version>8.4.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
@@ -24,7 +24,7 @@
     <url>https://github.com/npo-poms/poms-shared-backend</url>
     <connection>scm:git:${project.scm.url}</connection>
     <developerConnection>scm:git:${project.scm.url}</developerConnection>
-    <tag>REL-8.4.1</tag>
+    <tag>REL-8.4-SNAPSHOT</tag>
   </scm>
 
   <modules>
