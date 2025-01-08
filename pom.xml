@@ -21,7 +21,7 @@
   </properties>
 
   <scm>
-    <url>https://github.com/npo-poms/poms-shared-backend.git</url>
+    <url>https://github.com/npo-poms/poms-shared-backend</url>
     <connection>scm:git:${project.scm.url}</connection>
     <developerConnection>scm:git:${project.scm.url}</developerConnection>
     <tag>HEAD</tag>

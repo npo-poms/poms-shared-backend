@@ -24,7 +24,7 @@ jobs:
       - uses: oleksiyrudenko/gha-git-credentials@v2.1.2
         with:
           global: true
-          name: 'github $GITHUB_ACTOR'
+          name: 'github'
           email: 'digitaal-techniek@vpro.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Release
