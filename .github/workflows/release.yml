@@ -29,11 +29,8 @@ jobs:
           email: 'digitaal-techniek@vpro.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Release
-        # todo, this seems to fail often. Lets simplify it?
         run: |
-          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
-          git push --atomic -v --follow-tags
-          mvn -Pdeploy,github --batch-mode -Darguments=-DskipTests release:perform
+          mvn -ntp -Pdeploy,github --batch-mode  -Darguments=-DskipTests  release:prepare release:perform
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
