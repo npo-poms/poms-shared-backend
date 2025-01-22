@@ -26,11 +26,12 @@ jobs:
         with:
           global: true
           name: 'github'
-          email: 'digitaal-techniek@vpro.nl'
+          email: 'poms@mmprogrami.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Release
         run: |
-          mvn -ntp -Pdeploy,github --batch-mode  -Darguments=-DskipTests  release:prepare release:perform
+          git remote -v
+          mvn -ntp -Pdeploy,github --batch-mode  -Darguments=-DskipTests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
