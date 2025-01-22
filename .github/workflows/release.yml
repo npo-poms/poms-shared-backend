@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     env:
       MAVEN_OPTS: -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
     if: startsWith(github.ref, 'refs/heads/REL-')
@@ -24,15 +25,11 @@ jobs:
       - uses: oleksiyrudenko/gha-git-credentials@v2.1.2
         with:
           global: true
-          name: 'github'
-          email: 'digitaal-techniek@vpro.nl'
+          name: 'github $GITHUB_ACTOR'
+          email: 'poms@mmprogrami.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Release
-        # todo, this seems to fail often. Lets simplify it?
         run: |
-          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
+          git remote -v
+          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false -Pdeploy release:prepare
           git push --atomic -v --follow-tags
-          mvn -Pdeploy,github --batch-mode -Darguments=-DskipTests release:perform
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GPG_SECRET_KEY_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
