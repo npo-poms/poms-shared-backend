@@ -28,8 +28,14 @@ jobs:
           name: 'github $GITHUB_ACTOR'
           email: 'poms@mmprogrami.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
-      - name: Release
+      - name: Prepare Release
         run: |
           git remote -v
-          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false -Pdeploy release:prepare
+          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false  release:prepare
           git push --atomic -v --follow-tags
+      - name: Perform release
+        run: |
+          mvn -Pdeploy --batch-mode -Darguments=-DskipTests release:perform
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GPG_SECRET_KEY_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
