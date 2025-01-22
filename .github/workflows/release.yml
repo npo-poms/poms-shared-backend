@@ -25,13 +25,11 @@ jobs:
       - uses: oleksiyrudenko/gha-git-credentials@v2.1.2
         with:
           global: true
-          name: 'github'
+          name: 'github $GITHUB_ACTOR'
           email: 'poms@mmprogrami.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Release
         run: |
           git remote -v
-          mvn -ntp -Pdeploy,github --batch-mode  -Darguments=-DskipTests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false -Pdeploy,gitlab-com release:prepare
+          git push --atomic -v --follow-tags
