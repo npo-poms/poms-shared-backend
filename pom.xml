@@ -14,6 +14,8 @@
 
   <properties>
     <poms.shared.backend.version>${project.version}</poms.shared.backend.version>
+    <vpro.shared.version>5.4.6-SNAPSHOT</vpro.shared.version>
+
     <!-- Tied to ES version! -->
     <lucene.version>${lucene.elasticsearch.version}</lucene.version>
     <skipIntegTests>true</skipIntegTests>
