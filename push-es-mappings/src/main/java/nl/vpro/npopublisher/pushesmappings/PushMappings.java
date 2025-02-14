@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.regex.Pattern;
@@ -87,7 +88,7 @@ public class PushMappings implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws Exception {
+    public Integer call() {
         try (ClientElasticSearchFactory factory = new ClientElasticSearchFactory()) {
             factory.setHosts(host);
             if (StringUtils.isNotBlank(cluster) && ! "NOTGIVEN".equals(cluster)) {
@@ -97,7 +98,7 @@ public class PushMappings implements Callable<Integer> {
             factory.setBasicUser(username);
             factory.setBasicPassword(password);
 
-            IndexHelper.waitForHealth(factory.client(PushMappings.class), Log4j2SimpleLogger.of(log));
+            IndexHelper.waitForHealth(factory.client(PushMappings.class), Log4j2SimpleLogger.of(log), Duration.ofSeconds(10), "yellow");
 
             Pattern onlyPattern = Pattern.compile(only);
 
