@@ -36,6 +36,7 @@ jobs:
     - name: Build with Maven
       run: mvn -U -B -Pgithub deploy
       env:
+        GITHUB_USERNAME: ${{ github.actor }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2.18.0
