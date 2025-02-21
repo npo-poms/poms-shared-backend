@@ -31,6 +31,8 @@ jobs:
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Prepare / Perform Release
         run: |
+          cat ~/.m2/settings.xml
+          echo ${{github.actor}}
           mvn   -U --batch-mode  -Darguments=-DskipTests  -Pdeploy release:prepare release:perform
         env:
           GITHUB_USERNAME: ${{ github.actor }}
