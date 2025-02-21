@@ -5,7 +5,7 @@
   <parent>
      <artifactId>poms-shared-backend-parent</artifactId>
     <groupId>nl.vpro.poms</groupId>
-    <version>8.5</version>
+    <version>8.6-SNAPSHOT</version>
   </parent>
 
   <groupId>nl.vpro.api</groupId>
