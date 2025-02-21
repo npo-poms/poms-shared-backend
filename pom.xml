@@ -99,7 +99,7 @@
 
   <distributionManagement>
     <snapshotRepository>
-      <id>github</id>
+      <id>github-poms-shared-backend</id>
       <name>GitHub Packages</name>
       <url>https://maven.pkg.github.com/npo-poms/poms-shared-backend</url>
       <snapshots>
@@ -107,7 +107,7 @@
       </snapshots>
     </snapshotRepository>
     <repository>
-      <id>github</id>
+      <id>github-poms-shared-backend</id>
       <url>https://maven.pkg.github.com/npo-poms/poms-shared-backend</url>
     </repository>
   </distributionManagement>

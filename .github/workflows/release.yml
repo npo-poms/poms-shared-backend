@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: maven
-          server-id: github
+          server-id: github-poms-shared-backend
           server-username: GITHUB_USERNAME
           server-password: GITHUB_TOKEN
       - uses: oleksiyrudenko/gha-git-credentials@v2.1.2
