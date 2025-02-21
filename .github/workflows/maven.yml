@@ -33,6 +33,9 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+        server-id: github-poms-shared-backend
+        server-username: GITHUB_USERNAME
+        server-password: GITHUB_TOKEN
     - name: Build with Maven
       run: mvn -U -B -Pdeploy deploy
       env:
