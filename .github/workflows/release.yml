@@ -33,7 +33,7 @@ jobs:
         run: |
           mvn   -U --batch-mode  -Darguments=-DskipTests  -Pdeploy release:prepare release:perform
         env:
-          GITHUB_USERNAME: github
+          GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
