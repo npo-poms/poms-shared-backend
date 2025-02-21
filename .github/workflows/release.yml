@@ -21,8 +21,8 @@ jobs:
           java-version: 21
           cache: maven
           server-id: github
-          server-username: '${env.GITHUB_USERNAME}'
-          server-password: '${env.GITHUB_TOKEN}'
+          server-username: GITHUB_USERNAME
+          server-password: GITHUB_TOKEN
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }}
           gpg-passphrase: GPG_SECRET_KEY_PASSPHRASE
       - uses: oleksiyrudenko/gha-git-credentials@v2.1.2
