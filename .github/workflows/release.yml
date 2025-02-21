@@ -26,7 +26,7 @@ jobs:
       - uses: oleksiyrudenko/gha-git-credentials@v2.1.2
         with:
           global: true
-          name: ${{ github.actor }}
+          name: github
           email: 'poms@mmprogrami.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Prepare / Perform Release
