@@ -11,7 +11,7 @@ jobs:
       contents: write
       packages: write
     env:
-      MAVEN_OPTS: -ntp
+      MAVEN_ARGS: '--no-transfer-progress'
     if: startsWith(github.ref, 'refs/heads/REL-')
     steps:
       - uses: actions/checkout@v4
