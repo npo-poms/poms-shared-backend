@@ -34,6 +34,7 @@ jobs:
       - name: Prepare / Perform Release
         run: |
           git remote -v
+          cat ~/.m2/settings.xml
           mvn   -U --batch-mode  -Darguments=-DskipTests  -Pdeploy release:prepare release:perform
         env:
           GITHUB_USERNAME: x-access-token
