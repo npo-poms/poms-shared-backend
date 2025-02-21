@@ -20,15 +20,18 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           cache: maven
+          server-id: github
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }}
           gpg-passphrase: GPG_SECRET_KEY_PASSPHRASE
       - uses: oleksiyrudenko/gha-git-credentials@v2.1.2
         with:
           global: true
-          name: 'github $GITHUB_ACTOR'
+          name: 'github'
           email: 'poms@mmprogrami.nl'
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Prepare / Perform Release
         run: |
           git remote -v
           mvn -U --batch-mode  -Darguments=-DskipTests  release:prepare release:perform
+        env:
+           GITHUB_TOKEN: ${{ github.token }}

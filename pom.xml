@@ -23,7 +23,7 @@
   </properties>
 
   <scm>
-    <url>${project.url}.git</url>
+    <url>${project.url}</url>
     <connection>scm:git:${project.scm.url}</connection>
     <developerConnection>scm:git:${project.scm.url}</developerConnection>
     <tag>REL-8.5-SNAPSHOT</tag>
