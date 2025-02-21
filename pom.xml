@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>8.5.0-SNAPSHOT</version>
+  <version>8.5.0</version>
   <packaging>pom</packaging>
   <url>https://github.com/npo-poms/poms-shared-backend</url>
 
@@ -26,7 +26,7 @@
     <url>${project.url}</url>
     <connection>scm:git:${project.scm.url}</connection>
     <developerConnection>scm:git:${project.scm.url}</developerConnection>
-    <tag>REL-8.5-SNAPSHOT</tag>
+    <tag>REL-8.5.0</tag>
   </scm>
 
   <modules>
