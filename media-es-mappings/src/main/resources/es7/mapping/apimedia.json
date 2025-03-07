@@ -7,6 +7,9 @@
     "start": {
       "type": "long"
     },
+    "chapterType": {
+      "type": "keyword"
+    },
     "urnRef": {
       "type": "keyword"
     },
@@ -976,6 +979,9 @@
         },
         "start": {
           "type": "long"
+        },
+        "chapterType": {
+          "type": "keyword"
         },
         "urnRef": {
           "type": "keyword"
