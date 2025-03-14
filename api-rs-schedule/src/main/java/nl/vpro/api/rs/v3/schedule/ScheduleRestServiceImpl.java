@@ -47,7 +47,7 @@ import static nl.vpro.domain.api.Constants.*;
             name = ScheduleRestService.TAG,
             externalDocs = @ExternalDocumentation(
                 description = "wiki",
-                url = "https://wiki.vpro.nl/display/npoapi/Media-+and+Schedule-API"
+                url = "https://publiekeomroep.atlassian.net/wiki/spaces/npoapi/pages/3904471886/Media-+and+Schedule-API"
             )
         )
     }
