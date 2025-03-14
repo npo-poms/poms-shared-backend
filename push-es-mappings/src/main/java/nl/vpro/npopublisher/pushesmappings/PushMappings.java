@@ -42,6 +42,8 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  *
  * Test
  * :  mvn  -Dhost=https://vpc-poms-plus-elasticsearch-test-tu2husqhnj43tmsqnj2fvpi2hy.eu-central-1.es.amazonaws.com:9240/ -Dcluster=755036500103:poms-plus-elasticsearch-test -Duser=elasticsearch -Dpassword=`cat ~/npo/poms-forward/es.test.password`
+ *
+ *    mvn  -Dhost=https://vpc-poms-plus-elasticsearch-acc-bk5ui3ubahkwhmygv7h7nqbti4.eu-central-1.es.amazonaws.com:9230/ -Dcluster=755036500103:poms-plus-elasticsearch-acc -Duser=elasticsearch -Dpassword=`cat ~/npo/poms-forward/es.acc.password`
  * Dev
  * : mvn -Dhost=localhost:9215 -Dcluster=poms-dev -Dexperimental=true
  *  Production
