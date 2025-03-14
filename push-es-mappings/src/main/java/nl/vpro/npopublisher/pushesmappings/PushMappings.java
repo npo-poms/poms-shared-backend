@@ -41,7 +41,7 @@ import static nl.vpro.pages.domain.es.ApiPagesIndex.APIPAGES;
  * <p>
  *
  * Test
- * :  mvn  -Dhost=localhost:9221 -Dcluster=poms-test
+ * :  mvn  -Dhost=https://vpc-poms-plus-elasticsearch-test-tu2husqhnj43tmsqnj2fvpi2hy.eu-central-1.es.amazonaws.com:9240/ -Dcluster=755036500103:poms-plus-elasticsearch-test -Duser=elasticsearch -Dpassword=`cat ~/npo/poms-forward/es.test.password`
  * Dev
  * : mvn -Dhost=localhost:9215 -Dcluster=poms-dev -Dexperimental=true
  *  Production
