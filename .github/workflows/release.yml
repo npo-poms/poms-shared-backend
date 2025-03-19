@@ -31,9 +31,9 @@ jobs:
       - name: Prepare and perform Release
         run: |
           git remote -v
-          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
+          mvn -Pgithub -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
           git push --atomic -v --follow-tags
-          mvn -Pdeploy  --batch-mode -Darguments=-DskipTests release:perform
+          mvn -Pdeploy,github  --batch-mode -Darguments=-DskipTests release:perform
         env:
          GPG_SECRET_KEY_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
 
