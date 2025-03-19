@@ -4,6 +4,10 @@ import lombok.extern.log4j.Log4j2;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -98,6 +102,10 @@ public class PushMappings implements Callable<Integer> {
                 log.info("Cluster name {}", cluster);
             }
             factory.setBasicUser(username);
+            File file = new File(password);
+            if (file.canRead()) {
+                password = Files.readString(file.toPath(), StandardCharsets.UTF_8).trim();
+            }
             factory.setBasicPassword(password);
 
             IndexHelper.waitForHealth(factory.client(PushMappings.class), Log4j2SimpleLogger.of(log), Duration.ofSeconds(10), "yellow");
@@ -115,6 +123,8 @@ public class PushMappings implements Callable<Integer> {
                 }
                 createIndexIfNecessaryAndPushMappings(factory, elasticSearchIndex);
             }
+        } catch (IOException e) {
+            log.warn(e.getMessage(), e);
         }
         return 0;
     }

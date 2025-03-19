@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PushMappings acc" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="nl.vpro.npopublisher.pushesmappings.PushMappings" />
+    <module name="push-es-mappings" />
+    <option name="PROGRAM_PARAMETERS" value="--host=https://vpc-poms-plus-elasticsearch-acc-bk5ui3ubahkwhmygv7h7nqbti4.eu-central-1.es.amazonaws.com:9230/ --cluster=755036500103:poms-plus-elasticsearch-acc --user=elasticsearch --password=$USER_HOME$/npo/poms-forward/es.acc.password" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="nl.vpro.npopublisher.pushesmappings.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
