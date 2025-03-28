@@ -4,7 +4,7 @@ run-name: Deploying release by ${{ github.actor }} on ${{ github.ref_name }}
 on:
   push:
     tags:
-      - "REL-*"
+      - "*"
   workflow_dispatch:
 
 jobs:
