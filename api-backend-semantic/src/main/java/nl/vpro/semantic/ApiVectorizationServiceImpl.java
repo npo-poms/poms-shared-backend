@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.*;
 import java.time.Duration;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import nl.vpro.jackson2.Jackson2Mapper;

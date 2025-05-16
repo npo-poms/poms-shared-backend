@@ -23,6 +23,10 @@
      <dependency>
       <groupId>org.wiremock</groupId>
       <artifactId>wiremock-standalone</artifactId>
-    </dependency>
+     </dependency>
+     <dependency>
+       <groupId>org.checkerframework</groupId>
+       <artifactId>checker-qual</artifactId>
+     </dependency>
    </dependencies>
 </project>
