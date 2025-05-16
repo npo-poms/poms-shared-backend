@@ -2,11 +2,15 @@ package nl.vpro.semantic;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.logging.LoggingMeterRegistry;
-import lombok.*;
+import lombok.Data;
+import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 
 import java.net.URI;
 import java.net.http.*;
 import java.time.Duration;
+
+import jakarta.annotation.PostConstruct;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -16,7 +20,10 @@ import nl.vpro.jackson2.Jackson2Mapper;
 
 /**
  * Implementation of {@link VectorizationService}
+ *
  */
+@Deprecated
+@Log4j2
 public class ApiVectorizationServiceImpl implements VectorizationService {
 
     private static final Jackson2Mapper MAPPER = Jackson2Mapper.getInstance();
@@ -49,6 +56,11 @@ public class ApiVectorizationServiceImpl implements VectorizationService {
             .followRedirects(HttpClient.Redirect.ALWAYS)
             .build();
         this.timeout = timeout;
+    }
+
+    @PostConstruct
+    public void init() {
+        log.warn("Deprecated {} used, since depends on demo api only", this);;
     }
 
 
