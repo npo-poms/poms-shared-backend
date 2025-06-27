@@ -18,7 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.meeuw.math.time.TestClock;
+import org.meeuw.time.TestClock;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
