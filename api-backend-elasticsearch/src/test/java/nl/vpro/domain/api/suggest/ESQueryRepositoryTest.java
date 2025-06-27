@@ -3,7 +3,7 @@ package nl.vpro.domain.api.suggest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.LevenshteinDistance;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.suggest.SortBy;
 import org.elasticsearch.search.suggest.Suggest;
@@ -43,7 +43,7 @@ public class ESQueryRepositoryTest {
         assertThat(adapt.getItems()).hasSameSizeAs(suggestions);
         int prevDistance = Integer.MIN_VALUE;
         for (Suggestion sug : adapt.getItems()) {
-            int distance = StringUtils.getLevenshteinDistance(input, sug.getText());
+            int distance = LevenshteinDistance.getDefaultInstance().apply(input, sug.getText());
             System.out.println(distance + ":" + sug.getText());
             assertThat(distance).isGreaterThanOrEqualTo(prevDistance);
             prevDistance = distance;
