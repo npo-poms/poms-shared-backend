@@ -40,7 +40,7 @@ public class MediaPropertiesFilters {
     )));
 
 
-    private static final List<String> knownProperties = new ArrayList<>();
+    private static final Set<String> knownProperties = new TreeSet<>();
 
     private static boolean instrumented = false;
 
@@ -62,8 +62,8 @@ public class MediaPropertiesFilters {
         }
     }
 
-    static List<String> getKnownProperties() {
-        return Collections.unmodifiableList(knownProperties);
+    static Set<String> getKnownProperties() {
+        return Collections.unmodifiableSet(knownProperties);
     }
     static boolean isInstrumented() {
         return instrumented;
