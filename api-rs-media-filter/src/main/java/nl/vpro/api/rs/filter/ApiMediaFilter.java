@@ -6,20 +6,14 @@ package nl.vpro.api.rs.filter;
 
 import lombok.extern.log4j.Log4j2;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlType;
-
 import org.apache.commons.lang3.StringUtils;
 
-import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.TextualType;
 
 /**
@@ -33,26 +27,22 @@ public class ApiMediaFilter {
 
 
     // List of properties that contain a different name in JSON/XML than the fieldname in the code
-    private static final Map<String, String> ALIAS_TO_PROPERTY = Map.of(
-        "credit", "person",
-        "credits", "persons",
-        "exclusive", "portalrestriction",
-        "exclusives", "portalrestrictions",
-        "region", "georestriction",
-        "regions", "georestrictions",
-        "sortdate", "sortinstant",
-
-        // Makes no sense, but for backwards compatibility
-        "descendant", "descendantOf",
-        "episode", "episodeOf",
-        "member", "memberOf"
+    private static final Map<String, String> ALIAS_TO_PROPERTY = Map.ofEntries(
+       Map.entry("person", "credit"),
+        Map.entry("persons", "credits"),
+        Map.entry("exclusive", "portalrestriction"),
+        Map.entry("exclusives", "portalrestrictions"),
+        Map.entry("region", "georestriction"),
+        Map.entry("regions", "georestrictions"),
+        Map.entry("sortdate", "sortinstant"),
+        Map.entry("descendant", "descendantOf"),
+        Map.entry("episode", "episodeOf"),
+        Map.entry("member", "memberOf")
     );
 
     // List of properties in the code that are singularly named but are collections so need a plural property name
-    private static final Map<String, String> SINGULAR_TO_PLURAL = Map.of(
-          "email", "emails",
-        "predictionforxml", "predictionsForXml"
-    );
+    private static final Map<String, String> SINGULAR_TO_PLURAL;
+
 
     // List of properties that don't have a regular singular name (ie stripping the 's' or 'of' doesn't result in the correct singular form).
     private static final Map<String, String> SINGULAR_EXCEPTIONS = Map.of(
@@ -60,17 +50,29 @@ public class ApiMediaFilter {
         "predictionsforxml", "predictionForXml"
     );
 
+    static {
+        Map<String, String> singularToPluser = new HashMap<>(Map.of(
+          "email", "emails",
+        "predictionforxml", "predictionsForXml"));
+        SINGULAR_EXCEPTIONS.forEach((key, value) -> {
+            singularToPluser.put(value, key);
+        });
+        SINGULAR_TO_PLURAL = Collections.unmodifiableMap(singularToPluser);
+    }
+
     private static final ThreadLocal<ApiMediaFilter> LOCAL_FILTER = ThreadLocal.withInitial(ApiMediaFilter::new);
 
 
     private static final Set<String> KNOWN_PROPERTIES = MediaPropertiesFilters.getKnownProperties()
         .stream()
         .map(String::toLowerCase)
-        .collect(Collectors.toUnmodifiableSet());
+        .collect(Collectors.collectingAndThen(
+            Collectors.toCollection(TreeSet::new),
+            Collections::unmodifiableSortedSet
+            )
+        );
 
     private static Set<String> knownPropertiesForExposure = null;
-
-
 
     private final Map<String, FilterProperties> properties = new HashMap<>();
 
@@ -254,44 +256,21 @@ public class ApiMediaFilter {
         }
     }
 
-    private static synchronized  Set<String> getKnownPropertiesForExposure() {
+    static synchronized  Set<String> getKnownPropertiesForExposure() {
         if (knownPropertiesForExposure ==  null) {
-            Set<String> set= new HashSet<>();
-            for (Class<?> t : new Class[]{Program.class, Segment.class, Group.class}) {
-                while(t != null) {
-                    XmlType annotation = t.getAnnotation(XmlType.class);
-                    if (annotation != null) {
-                        Arrays.stream(annotation.propOrder()).filter(s -> ! s.isEmpty()).forEach(s -> set.add(s));
-                    }
-                    for (Field f : t.getDeclaredFields()) {
-                        XmlAttribute attribute = f.getAnnotation(XmlAttribute.class);
-                        if (attribute != null) {
-                            String name = attribute.name();
-                            if (name.equals("##default")) {
-                                name = f.getName();
-                            }
-                            set.add(name);
-                        }
-                    }
-                    for (Method m : t.getDeclaredMethods()) {
-                        XmlAttribute attribute = m.getAnnotation(XmlAttribute.class);
-                        if (attribute != null) {
-                            String name = attribute.name();
-                            if (name.equals("##default")) {
-                                name = m.getName();
-                                if (name.startsWith("get") || name.startsWith("set")) {
-                                    name = name.substring(3);
-                                    name = Character.toLowerCase(name.charAt(0)) + name.substring(1);
-                                }
-                            }
-                            set.add(name);
-                        }
-                    }
-                    t = t.getSuperclass();
-                }
-            }
+            Set<String> set= new LinkedHashSet<>();
+            set.addAll(MediaPropertiesFilters.getKnownProperties());
+            set.addAll(ALIAS_TO_PROPERTY.keySet());
+            set.add("all");
+            set.add("none");
+            set.add("credits:1");
+            set.add("image:2");
+            set.add("title:main:1");
+            set.add("title:main:");
+            set.add("description:main:1");
+
             knownPropertiesForExposure = Collections.unmodifiableSet(set);
-            log.info("Determined for exposoure: {}", knownPropertiesForExposure);
+            log.info("Determined for exposure: {}", knownPropertiesForExposure);
         }
         return knownPropertiesForExposure;
     }

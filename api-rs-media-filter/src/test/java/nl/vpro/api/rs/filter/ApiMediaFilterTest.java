@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 
 import jakarta.xml.bind.JAXB;
 
+import org.apache.commons.io.output.NullWriter;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,6 +24,7 @@ import org.meeuw.functional.Suppliers;
 import nl.vpro.domain.bind.AbstractJsonIterable;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.Workflow;
+import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
 import nl.vpro.util.ReflectionUtils;
 
@@ -36,6 +38,10 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 @Log4j2
 public class ApiMediaFilterTest {
+
+    static {
+        MediaPropertiesFilters.instrument();
+    }
 
     @BeforeEach
     public void setUp() {
@@ -573,6 +579,20 @@ public class ApiMediaFilterTest {
                    ],
                    "publishDate": 1654679938064
                  }""");
+
+    }
+
+
+
+    @ParameterizedTest
+    @MethodSource("nl.vpro.api.rs.filter.ApiMediaFilter#getKnownPropertiesForExposure")
+    public void allKnowns(String p) throws IOException {
+        Program program = MediaTestDataBuilder.program().withEverything().build();
+
+        AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
+
+        ApiMediaFilter.set(p);
+        Jackson2Mapper.getInstance().writeValue(NullWriter.INSTANCE, program);
 
     }
 

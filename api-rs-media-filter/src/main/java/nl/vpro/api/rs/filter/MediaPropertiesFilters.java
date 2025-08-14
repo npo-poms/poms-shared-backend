@@ -12,11 +12,14 @@ import lombok.extern.log4j.Log4j2;
 import java.util.*;
 
 /**
+ *
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
 @Log4j2
 public class MediaPropertiesFilters {
+
+    private MediaPropertiesFilters() {}
 
     private static final Set<String> ignoreFields = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
         "mid",
@@ -110,7 +113,7 @@ public class MediaPropertiesFilters {
 
                                     if (f.isReader()) {
                                         if (("Ljava/util/SortedSet;".equals(f.getSignature()) || "Ljava/util/Set;".equals(f.getSignature()))) {
-                                            log.debug("Instrumenting Set {}", fieldDescription);
+                                            log.debug("Instrumenting SortedSet/Set {}", fieldDescription);
                                             if ("titles".equals(fieldName)) {
                                                 f.replace("$_ = $proceed($$) == null ? null : nl.vpro.api.rs.filter.FilteredSortedTitleSet.wrapTitles(\"" + fieldName + "\", $proceed($$));");
                                             } else if ("descriptions".equals(fieldName)) {
@@ -131,7 +134,7 @@ public class MediaPropertiesFilters {
                                     }
                                 }
                             } catch (RuntimeException | NotFoundException | CannotCompileException exception) {
-                                log.error("During instrumentation of '" + ctClass + "." + f.getFieldName() + "' : " + exception.getClass() + " " + exception.getMessage(), exception);
+                                log.error("During instrumentation of '{}.{}' : {} {}", ctClass, f.getFieldName(), exception.getClass(), exception.getMessage(), exception);
                             }
                         }
                     });
