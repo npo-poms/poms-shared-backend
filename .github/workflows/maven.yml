@@ -26,7 +26,7 @@ jobs:
     env:
       MAVEN_ARGS: '--no-transfer-progress'
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up JDK
       uses: actions/setup-java@v5
       with:
@@ -44,7 +44,7 @@ jobs:
       if: always()
       with:
         files: "**/target/surefire-reports/*.xml"
-    - uses: MMProgrami/after-maven-action@v2
+    - uses: MMProgrami/after-maven-action@v1
 
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
