@@ -4,7 +4,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-shared-backend-parent</artifactId>
-    <version>8.10-SNAPSHOT</version>
+    <version>8.11-SNAPSHOT</version>
   </parent>
   <artifactId>query-es-mappings</artifactId>
 
