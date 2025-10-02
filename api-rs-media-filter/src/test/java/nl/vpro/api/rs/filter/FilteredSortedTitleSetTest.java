@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Michiel Meeuwissen
  * @since 5.0
  */
+@SuppressWarnings("deprecation")
 public class FilteredSortedTitleSetTest {
 
     static {

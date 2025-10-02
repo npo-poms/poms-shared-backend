@@ -27,12 +27,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import nl.vpro.domain.Change;
-import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.PredicateTestResult;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
+import nl.vpro.domain.media.MediaType;
 import nl.vpro.domain.media.support.OwnerType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.domain.user.Broadcaster;
