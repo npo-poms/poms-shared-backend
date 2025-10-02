@@ -23,6 +23,7 @@ import org.meeuw.functional.Suppliers;
 
 import nl.vpro.domain.bind.AbstractJsonIterable;
 import nl.vpro.domain.media.*;
+import nl.vpro.domain.media.MediaType;
 import nl.vpro.domain.media.support.Workflow;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.test.util.jackson2.Jackson2TestUtil;
