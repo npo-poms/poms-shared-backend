@@ -30,7 +30,7 @@ jobs:
     - name: Set up JDK
       uses: actions/setup-java@v5
       with:
-        java-version: '21'
+        java-version: '25'
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
@@ -44,7 +44,7 @@ jobs:
       if: always()
       with:
         files: "**/target/surefire-reports/*.xml"
-    - uses: MMProgrami/after-maven-action@v1
+    - uses: MMProgrami/after-maven-action@v2
 
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
