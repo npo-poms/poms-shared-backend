@@ -22,7 +22,6 @@ jobs:
       packages: write
       checks: write
       pull-requests: write
-      actions: write # needed for cancel-workflow
     env:
       MAVEN_ARGS: '--no-transfer-progress'
     steps:
@@ -36,7 +35,7 @@ jobs:
     - name: Build with Maven
       run: |
         git remote -v
-        mvn -U -B -Pgithub -D"maven.test.failure.ignore=true" deploy
+        mvn -U -B -D"maven.test.failure.ignore=true" deploy
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Publish Unit Test Results
