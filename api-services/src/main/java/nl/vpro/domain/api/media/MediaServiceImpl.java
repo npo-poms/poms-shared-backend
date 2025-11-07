@@ -4,8 +4,6 @@
  */
 package nl.vpro.domain.api.media;
 
-import java.security.cert.CertPathValidatorException;
-
 import lombok.extern.log4j.Log4j2;
 
 import java.time.Instant;
