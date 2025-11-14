@@ -28,11 +28,11 @@ jobs:
           token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Prepare and perform Release
         run: |
-          git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
+          git config --global credential.helper '!f() { echo "username=x-access-token"; echo "password=${{ secrets.GITHUB_TOKEN }}"; }; f'
           git remote -v
           git config --global user.name "github $GITHUB_ACTOR"
           git config --global user.email "poms@mmprogrami.nl"
-          mvn -Pgithub -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
+          mvn  -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
           git push --atomic -v --follow-tags
           mvn -Pdeploy  --batch-mode -Darguments=-DskipTests release:perform
         env:
