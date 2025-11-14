@@ -32,7 +32,7 @@ jobs:
           git remote -v
           git config --global user.name "github $GITHUB_ACTOR"
           git config --global user.email "poms@mmprogrami.nl"
-          mvn -Pgithub -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
+          mvn -U --batch-mode  -Darguments=-DskipTests  -DpushChanges=false release:prepare
           git push --atomic -v --follow-tags
           mvn -Pdeploy  --batch-mode -Darguments=-DskipTests release:perform
         env:
