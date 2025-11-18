@@ -43,7 +43,7 @@ import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
 @Log4j2
 public class ESMediaQueryBuilder extends ESQueryBuilder {
 
-    public static final List<SearchFieldDefinition> SEARCH_FIELDS = Arrays.asList(
+    public static final List<SearchFieldDefinition> SEARCH_FIELDS = List.of(
         new SearchFieldDefinition("broadcasters.value.text", 2f),
         new SearchFieldDefinition("countries.value.text", 1.2f),
         new SearchFieldDefinition("credits.name.text", 2f),
