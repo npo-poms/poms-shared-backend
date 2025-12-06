@@ -232,6 +232,9 @@
                 "scopeNotes": {
                   "type": "text"
                 },
+                "externalId": {
+                  "type": "keyword"
+                },
                 "objectType": {
                   "type": "keyword"
                 }
