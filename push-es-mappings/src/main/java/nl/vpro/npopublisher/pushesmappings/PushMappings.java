@@ -25,6 +25,7 @@ import nl.vpro.media.domain.es.ApiCueIndex;
 
 import static nl.vpro.elasticsearch.Constants.P_INDEX;
 import static nl.vpro.elasticsearch.Constants.P_SETTINGS;
+import static nl.vpro.elasticsearch.Status.yellow;
 import static nl.vpro.es.ApiPageQueryIndex.APIPAGEQUERIES;
 import static nl.vpro.es.ApiQueryIndex.APIQUERIES;
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
@@ -88,7 +89,7 @@ public class PushMappings implements Callable<Integer> {
     private Distribution  distribution  = null;
 
 
-    public static void main(String[] argv) throws InterruptedException {
+    static void main(String[] argv) {
         int exitCode = new CommandLine(new PushMappings()).setTrimQuotes(true).execute(argv);
         log.info("Ready with exit code {}", exitCode);
     }
@@ -108,7 +109,12 @@ public class PushMappings implements Callable<Integer> {
             }
             factory.setBasicPassword(password);
 
-            IndexHelper.waitForHealth(factory.client(PushMappings.class), Log4j2SimpleLogger.of(log), Duration.ofSeconds(10), "yellow");
+            IndexHelper.waitForHealth(
+                factory.client(PushMappings.class),
+                Log4j2SimpleLogger.of(log),
+                Duration.ofSeconds(10),
+                yellow
+            );
 
             Pattern onlyPattern = Pattern.compile(only);
 
