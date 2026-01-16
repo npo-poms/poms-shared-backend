@@ -325,12 +325,12 @@ public abstract class AbstractESRepository<T> {
         @NonNull final SearchHits hits,
         @NonNull final Class<S> clazz) {
         final SearchHit[] array = hits.getHits();
-        return new AbstractList<SearchResultItem<? extends S>>() {
+        return new AbstractList<>() {
             @Override
             public SearchResultItem<S> get(int index) {
                 try {
                     return getSearchResultItem(array[index], clazz);
-                } catch(Throwable e) {
+                } catch (Throwable e) {
                     String string = "Error while reading " + array[index].getIndex() + "/" + array[index].getId() + " " + e.getClass().getName();
                     log.warn(string, e);
                     throw new RuntimeException(string, e); // this exception seems to disappear completely, so logged above.

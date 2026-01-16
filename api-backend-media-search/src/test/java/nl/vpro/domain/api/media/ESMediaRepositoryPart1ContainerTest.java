@@ -18,8 +18,8 @@ import org.springframework.test.context.ContextConfiguration;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.*;
+import nl.vpro.domain.api.Order;
 import nl.vpro.domain.api.profile.ProfileDefinition;
 import nl.vpro.domain.constraint.media.*;
 import nl.vpro.domain.media.*;
@@ -39,6 +39,7 @@ import static nl.vpro.domain.api.FacetOrder.VALUE_ASC;
 import static nl.vpro.domain.api.Match.MUST;
 import static nl.vpro.domain.api.StandardMatchType.REGEX;
 import static nl.vpro.domain.api.StandardMatchType.WILDCARD;
+import static nl.vpro.domain.api.TermFacetResultItem.find;
 import static nl.vpro.domain.api.TextMatcher.must;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
 import static nl.vpro.domain.media.AgeRating.*;
@@ -1365,21 +1366,22 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
         assertEquals((int) Arrays.stream(AgeRating.values()).filter(Displayable::display).count(), ageRatings.size());
 
         /* 3 x 6, 0 x 9, 2 * 12, 0 x 16, 1 * Alle Leeftijden */
-        assertEquals(3, ageRatings.get(_6.ordinal()).getCount());
-        assertEquals(_6.getXmlValue(), ageRatings.get(_6.ordinal()).getId());
-
-        assertEquals(0, ageRatings.get(_9.ordinal()).getCount());
-        assertEquals(_9.getXmlValue(), ageRatings.get(_9.ordinal()).getId());
-
-        assertEquals(2, ageRatings.get(_12.ordinal()).getCount());
-        assertEquals(_12.getXmlValue(), ageRatings.get(_12.ordinal()).getId());
-
-        assertEquals(0, ageRatings.get(_16.ordinal()).getCount());
-        assertEquals(_16.getXmlValue(), ageRatings.get(_16.ordinal()).getId());
+        assertEquals(_6.getXmlValue(), ageRatings.get(0).getId());
+        assertEquals(3, find(_6.getXmlValue(), ageRatings).getCount());
 
 
-        assertEquals(ALL.getXmlValue(), ageRatings.get(ALL.ordinal()).getId());
-        assertEquals(ALL.getDisplayName(), ageRatings.get(ALL.ordinal()).getValue());
+        assertEquals(0, find(_9, ageRatings).getCount());
+        assertEquals(_9.getXmlValue(), ageRatings.get(1).getId());
+
+        assertEquals(2, ageRatings.get(2).getCount());
+        assertEquals(_12.getXmlValue(), ageRatings.get(2).getId());
+
+        assertEquals(0, ageRatings.get(4).getCount());
+        assertEquals(_16.getXmlValue(), ageRatings.get(4).getId());
+
+
+        assertEquals(ALL.getXmlValue(), ageRatings.get(6).getId());
+        assertEquals(ALL.getDisplayName(), ageRatings.get(6).getValue());
 
 
         {
