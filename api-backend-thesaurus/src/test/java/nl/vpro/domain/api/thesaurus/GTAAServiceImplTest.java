@@ -44,8 +44,7 @@ public class GTAAServiceImplTest {
     private static final Clock clock = TestClock.twentyTwenty();
 
 
-    private static final String SECRET_KEY = "ohzohj8Jwu1gieShciecev6Keiy3peiSteehuYa0sooFei4iCieV5rooeeB3eeZu";
-
+    private static final String SECRET_KEY = "abcdefghijklmnopqrstuvwxzy0123456789";
     @Mock
     GTAARepository gtaa;
 
@@ -69,7 +68,7 @@ public class GTAAServiceImplTest {
             .scopeNote("opmerking")
             .build();
         String jws = encrypt("demo-app", SECRET_KEY, "m.meeuwissen@vpro.nl", 10);
-        assertThat(jws).isEqualTo("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwidXNyIjoibS5tZWV1d2lzc2VuQHZwcm8ubmwiLCJpYXQiOjE1ODIxOTA0MDAsImlzcyI6ImRlbW8tYXBwIiwiZXhwIjoxNTgyMjMzNjAwfQ.kv_GnoHWu90m23yt6XwAKYuDrsf4-kkZjWpmtuOwLl0");
+        assertThat(jws).isEqualTo("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwidXNyIjoibS5tZWV1d2lzc2VuQHZwcm8ubmwiLCJpYXQiOjE1ODIxOTA0MDAsImlzcyI6ImRlbW8tYXBwIiwiZXhwIjoxNTgyMjMzNjAwfQ.yh5zSkiQu55S21qXt8d7qxqTAj30nsiuOLUFRmU0o98");
         gtaaService.submitGTAAPerson(newPerson, jws);
 
         verify(gtaa).submit(any(GTAANewPerson.class), eq("demo-app"));
