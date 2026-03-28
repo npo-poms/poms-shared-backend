@@ -11,7 +11,7 @@ jobs:
       contents: write
       packages: write
     env:
-      MAVEN_ARGS: '--no-transfer-progress'
+      MAVEN_ARGS: '--no-transfer-progress --color always'
     if: startsWith(github.ref, 'refs/heads/REL-')
     steps:
       - uses: actions/checkout@v6
