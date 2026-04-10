@@ -33,10 +33,5 @@
       <artifactId>junit-platform-launcher</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.checkerframework</groupId>
-      <artifactId>checker-qual</artifactId>
-      <optional>true</optional>
-    </dependency>
   </dependencies>
 </project>
