@@ -12,6 +12,7 @@ jobs:
       packages: write
     env:
       MAVEN_ARGS: '--no-transfer-progress --color always'
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     if: startsWith(github.ref, 'refs/heads/REL-')
     steps:
       - uses: actions/checkout@v6
@@ -20,12 +21,10 @@ jobs:
           distribution: 'temurin'
           java-version: 25
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
           gpg-private-key: ${{ secrets.GPG_SECRET_KEY }}
-      - uses: oleksiyrudenko/gha-git-credentials@v2
-        with:
-          name: 'github $GITHUB_ACTOR'
-          email: 'poms@mmprogrami.nl'
-          token: '${{ secrets.GITHUB_TOKEN  }}'
       - name: Prepare and perform Release
         run: |
           git config --global url."https://${{ secrets.GITHUB_TOKEN }}@github.com/".insteadOf "https://github.com/"
@@ -36,5 +35,5 @@ jobs:
           git push --atomic -v --follow-tags
           mvn -Pdeploy  --batch-mode -Darguments=-DskipTests release:perform
         env:
-         MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_SECRET_KEY_PASSPHRASE }}
 
