@@ -9,7 +9,6 @@ import java.lang.reflect.Type;
 
 import javax.xml.transform.stream.StreamSource;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -38,7 +37,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     @Inject
     private ApiMappings mappings;
 
-    private ThreadLocal<Unmarshaller> unmarshaller;
+    private Unmarshaller unmarshaller;
 
     @Value("${xml.input.validate}")
     protected boolean doValidate = true;
@@ -67,10 +66,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
             log.info("XML inputs for " + this.getClass().getName() + " will not be validated (Setting xml.input.validate=false)");
         }
     }
-    @PreDestroy
-    public void shutdown() {
-        unmarshaller.remove();
-    }
+
 
     public void setDoValidate(boolean doValidate) {
         this.doValidate = doValidate;
@@ -83,7 +79,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
 
     public final T unmarshal(InputStream inputStream) throws JAXBException {
-        return unmarshaller.get().unmarshal(new StreamSource(inputStream), classToRead).getValue();
+        return unmarshaller.unmarshal(new StreamSource(inputStream), classToRead).getValue();
     }
 
     @Override
