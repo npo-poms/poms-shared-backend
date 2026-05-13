@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.xml.transform.stream.StreamSource;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
@@ -16,10 +17,8 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.xml.sax.SAXException;
 
 import nl.vpro.api.util.ApiMappings;
 
@@ -56,7 +55,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     }
 
     @PostConstruct
-    public void init() throws JAXBException, IOException, SAXException {
+    public void init() {
         if (mappings == null) {
             log.info("No apimappings injected");
             mappings = new ApiMappings(null);
