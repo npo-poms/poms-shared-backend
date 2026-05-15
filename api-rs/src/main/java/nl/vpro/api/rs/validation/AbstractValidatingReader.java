@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
+import javax.xml.transform.stream.StreamSource;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
@@ -16,7 +17,6 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.ext.MessageBodyReader;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.xml.sax.SAXException;
@@ -39,7 +39,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     @Inject
     private ApiMappings mappings;
 
-    private ThreadLocal<Unmarshaller> unmarshaller;
+    private Unmarshaller unmarshaller;
 
     @Value("${xml.input.validate}")
     protected boolean doValidate = true;
@@ -70,7 +70,6 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
     }
     @PreDestroy
     public void shutdown() {
-        unmarshaller.remove();
     }
 
     public void setDoValidate(boolean doValidate) {
@@ -84,7 +83,7 @@ public abstract class AbstractValidatingReader<T> implements MessageBodyReader<T
 
 
     public final T unmarshal(InputStream inputStream) throws JAXBException {
-        return unmarshaller.get().unmarshal(new StreamSource(inputStream), classToRead).getValue();
+        return unmarshaller.unmarshal(new StreamSource(inputStream), classToRead).getValue();
     }
 
     @Override
