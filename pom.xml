@@ -3,7 +3,7 @@
   <parent>
     <groupId>nl.vpro.poms</groupId>
     <artifactId>poms-parent</artifactId>
-    <version>8.14.0</version>
+    <version>8.15-SNAPSHOT</version>
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
@@ -25,7 +25,6 @@
     <url>https://github.com/npo-poms/poms-shared-backend</url>
     <connection>scm:git:${project.scm.url}</connection>
     <developerConnection>scm:git:${project.scm.url}</developerConnection>
-    <tag>REL-8.13-SNAPSHOT</tag>
   </scm>
 
   <modules>
