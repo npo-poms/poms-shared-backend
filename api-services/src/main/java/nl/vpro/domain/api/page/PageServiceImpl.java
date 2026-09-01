@@ -7,6 +7,8 @@ import java.util.concurrent.ExecutionException;
 
 import jakarta.inject.Named;
 
+import org.meeuw.collections.CloseableIterator;
+import org.meeuw.collections.FilteringIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,8 +21,6 @@ import nl.vpro.domain.api.profile.*;
 import nl.vpro.domain.api.profile.exception.ProfileNotFoundException;
 import nl.vpro.domain.api.suggest.QuerySearchRepository;
 import nl.vpro.domain.page.Page;
-import nl.vpro.util.CloseableIterator;
-import nl.vpro.util.FilteringIterator;
 
 /**
  * @author Michiel Meeuwissen

@@ -8,6 +8,7 @@ import java.time.Instant;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.meeuw.collections.FilteringIterator;
 import org.mockito.Mockito;
 
 import nl.vpro.domain.api.profile.*;
@@ -17,7 +18,6 @@ import nl.vpro.domain.constraint.media.Filter;
 import nl.vpro.domain.constraint.media.MediaConstraints;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaTestDataBuilder;
-import nl.vpro.util.FilteringIterator;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;

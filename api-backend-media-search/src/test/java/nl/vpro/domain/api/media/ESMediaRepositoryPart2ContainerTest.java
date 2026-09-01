@@ -22,6 +22,8 @@ import org.elasticsearch.search.aggregations.BucketOrder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.*;
+import org.meeuw.collections.CloseableIterator;
+import org.meeuw.collections.FilteringIterator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -41,8 +43,6 @@ import nl.vpro.domain.user.BroadcasterService;
 import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
 import nl.vpro.media.domain.es.Common;
-import nl.vpro.util.CloseableIterator;
-import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.api.FacetResults.toSimpleMap;
 import static nl.vpro.domain.api.media.MediaFormBuilder.form;
