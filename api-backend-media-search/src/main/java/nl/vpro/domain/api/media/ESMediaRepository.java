@@ -31,6 +31,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.meeuw.collections.*;
 import org.meeuw.functional.ReasonedPredicate;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -48,7 +49,6 @@ import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearch.highlevel.*;
 import nl.vpro.media.domain.es.Common;
 import nl.vpro.poms.shared.ExtraHeaders;
-import nl.vpro.util.*;
 
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.episodeRef;
 import static nl.vpro.domain.media.StandaloneMemberRef.ObjectType.memberRef;

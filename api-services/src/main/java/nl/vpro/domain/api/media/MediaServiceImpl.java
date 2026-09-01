@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import jakarta.inject.Named;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.meeuw.collections.CloseableIterator;
+import org.meeuw.collections.FilteringIterator;
 import org.meeuw.functional.Predicates;
 import org.meeuw.functional.ReasonedPredicate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,6 @@ import nl.vpro.domain.api.topspin.Recommendation;
 import nl.vpro.domain.api.topspin.Recommendations;
 import nl.vpro.domain.media.MediaObject;
 import nl.vpro.domain.media.MediaType;
-import nl.vpro.util.CloseableIterator;
-import nl.vpro.util.FilteringIterator;
 
 import static nl.vpro.domain.Roles.HAS_API_CHANGES_ROLE;
 import static nl.vpro.domain.Roles.HAS_API_ROLE;
@@ -79,7 +79,7 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     @PreAuthorize(HAS_API_CHANGES_ROLE)
-    public CloseableIterator<MediaChange> changes(
+    public org.meeuw.collections.CloseableIterator<MediaChange> changes(
         final String profile,
         final Boolean profileCheck,
         final Instant since,

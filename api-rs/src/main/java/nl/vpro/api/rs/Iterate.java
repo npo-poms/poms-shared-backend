@@ -17,6 +17,8 @@ import jakarta.ws.rs.core.*;
 
 import org.apache.commons.io.IOUtils;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.meeuw.collections.CloseableIterator;
+import org.meeuw.functional.ThrowingFunction;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -26,7 +28,8 @@ import nl.vpro.jackson2.Jackson2Mapper;
 import nl.vpro.logging.Log4j2Helper;
 import nl.vpro.logging.simple.Level;
 import nl.vpro.poms.shared.ExtraHeaders;
-import nl.vpro.util.*;
+import nl.vpro.util.ThreadPools;
+
 
 /**
  * @author Michiel Meeuwissen
@@ -34,6 +37,8 @@ import nl.vpro.util.*;
  */
 @Log4j2
 public class Iterate {
+
+    private static final Jackson2Mapper mapper = Jackson2Mapper.getInstance();
 
     static {
         // this is the mapper used to read ES responses
@@ -47,11 +52,11 @@ public class Iterate {
      *                 and 'keepAlive' stuff.
      *
      * @param streamer When the iterator is created, this has to write it to the JsonGenerator
-     * @param responseBuilderConsumer Optionally you can build the response further before it is returned. E.g. to add headers.
+     * @param responseBuilderConsumer Optionally, you can build the response further before it is returned. E.g. to add headers.
      */
     @SafeVarargs
     public static <T, E extends Exception> Response streamingJson(
-        final ExceptionUtils.ThrowingFunction<JsonGenerator, CloseableIterator<T>, E> creator,
+        final ThrowingFunction<JsonGenerator, CloseableIterator<T>, E> creator,
         final JsonConsumer<T> streamer,
         final Consumer<Response.ResponseBuilder>... responseBuilderConsumer) throws Exception {
 
@@ -60,10 +65,10 @@ public class Iterate {
         final PipedInputStream pipedInputStream = new PipedInputStream();
         pipedInputStream.connect(pipedOutputStream);
 
-        final JsonGenerator jg = Jackson2Mapper.INSTANCE.getFactory()
+        final JsonGenerator jg = mapper.getFactory()
             .createGenerator(pipedOutputStream, JsonEncoding.UTF8);
 
-        final CloseableIterator<T> iterator;
+        final org.meeuw.collections.CloseableIterator<T> iterator;
         try {
             iterator = creator.applyWithException(jg);
         } catch (Exception e) {
@@ -194,7 +199,7 @@ public class Iterate {
                         log.info("Streamed for {}, entries: {}, errors: {} (busy {})", forString, count, errors, Duration.between(start, Instant.now()));
                     }
                 } catch (IOException ioe) {
-                    log.warn(ioe.getClass().getName() + ":" + ioe.getMessage()); // e.g. Client Aborted
+                    log.warn("{}:{}", ioe.getClass().getName(), ioe.getMessage()); // e.g. Client Aborted
                     break;
                 } catch (Throwable t) {
                     log.error(t.getClass().getName() + ":" + t.getMessage(), t);
