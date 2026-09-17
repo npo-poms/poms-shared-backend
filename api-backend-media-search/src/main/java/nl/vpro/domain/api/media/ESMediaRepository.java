@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.search.TotalHits;
@@ -83,7 +84,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         this.scoreManager = scoreManager;
     }
 
-    protected void fillRedirects() {
+    protected synchronized void fillRedirects() {
         if (redirects == null) {
             refillRedirectCache();
             EXECUTOR.scheduleAtFixedRate(
@@ -95,6 +96,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
     public void log() {
         log.info("Using as related fields: {}", Arrays.toString(relatedFields));
         log.info("Score manager: {}", scoreManager);
+    }
+
+    @Override
+    @PreDestroy
+    public void close() {
+        EXECUTOR.shutdown();
+        super.close();
     }
 
     @SneakyThrows
@@ -724,7 +732,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .countPredicate(c -> ! c.isSkipped()) // DELETES=EXCLUDE may put skips in the stream. don't count them, max=1 may end up empty.
             .autoClose(false)
             .build();
-        return TailAdder.withFunctions(maxed, (last) -> {
+        TailAdder<MediaChange> tailed = TailAdder.withFunctions(maxed, (last) -> {
             if (actualTails == Tail.NEVER) {
                 throw new NoSuchElementException();
             }
@@ -752,6 +760,35 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 throw new NoSuchElementException();
             }
         });
+
+        return new BasicWrappedIterator<>(tailed) {
+            private boolean closed;
+
+            @Override
+            public boolean hasNext() {
+                boolean hasNext = super.hasNext();
+                if (! hasNext) {
+                    closeAfterExhaustion();
+                }
+                return hasNext;
+            }
+
+            private void closeAfterExhaustion() {
+                try {
+                    close();
+                } catch (Exception e) {
+                    throw new IllegalStateException("Could not close changes iterator", e);
+                }
+            }
+
+            @Override
+            public void close() throws Exception {
+                if (! closed) {
+                    closed = true;
+                    super.close();
+                }
+            }
+        };
     }
 
     @Getter
