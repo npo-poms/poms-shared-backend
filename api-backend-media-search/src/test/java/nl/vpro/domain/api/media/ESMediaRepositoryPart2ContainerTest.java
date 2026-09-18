@@ -67,7 +67,7 @@ import static org.mockito.Mockito.mock;
 @SuppressWarnings("DataFlowIssue")
 @Log4j2
 @TestMethodOrder(MethodOrderer.MethodName.class)
-public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESRepositoryContainerTest {
+class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESRepositoryContainerTest {
 
     private static final Instant NOW = LocalDate.of(2016, Month.JULY, 24).atTime(20, 0).atZone(Schedule.ZONE_ID).toInstant();
     private static final Instant LONGAGO = LocalDate.of(1970, Month.JANUARY, 1).atStartOfDay().atZone(Schedule.ZONE_ID).toInstant();
@@ -223,7 +223,8 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
                 .avType(AVType.values()[i % 3]) // don't use the last one 'MIXED'
                 .ageRating(ORIGINAL[i % ORIGINAL.length])
                 .predictions(Platform.INTERNETVOD) // 10 times predictions.
-                .mid("MID-" + i)
+                    .mid("MID-" + i)
+                    .crids("crid:test:test:" + i)
                 );
         }
         // 10 groups, and 10 programs (broadcasts)
@@ -312,6 +313,24 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
         assertThat(results.get(1)).isNull();
         assertThat(results.get(2)).isNotNull();
 
+    }
+
+    @Test
+    void findAllIds() {
+        MediaForm form = MediaForm.builder().mediaIds("MID-1", "BESTAATNIET", "MID-2").build();
+        var results = target.find(null, form, 0, 240);
+        assertThat(results).hasSize(2);
+        assertThat(results.get(0)).isNotNull();
+        assertThat(results.get(1)).isNotNull();
+    }
+
+    @Test
+    void findAllIdsIncludingACrid() {
+        MediaForm form = MediaForm.builder().mediaIds("crid:test:test:1", "BESTAATNIET", "MID-2").build();
+        var results = target.find(null, form, 0, 240);
+        assertThat(results).hasSize(2);
+        assertThat(results.get(0)).isNotNull();
+        assertThat(results.get(1)).isNotNull();
     }
 
     @Test

@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
  * @since 5.6
  */
 @Log4j2
-public class AbstractMediaESRepositoryTest {
+class AbstractMediaESRepositoryTest {
 
     AbstractESMediaRepository repository = new AbstractESMediaRepository(mock(HighLevelClientFactory.class)) {
 

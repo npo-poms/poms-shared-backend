@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author r.jansen
  */
 @Log4j2
-public class ESMediaRepositoryFlushDelayContainerTest extends AbstractMediaESRepositoryContainerTest {
+class ESMediaRepositoryFlushDelayContainerTest extends AbstractMediaESRepositoryContainerTest {
 
     private static ESMediaRepository target;
 
