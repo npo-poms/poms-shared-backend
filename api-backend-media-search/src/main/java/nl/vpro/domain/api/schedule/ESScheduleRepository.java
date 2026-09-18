@@ -268,6 +268,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
             .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
             .warnSortNotOnDoc(warnSortNotOnDoc)
+            .opaqueId("api-schedule-events")
             .build()) {
             SearchSourceBuilder requestBuilder = searchIterator.prepareSearchSource(getIndexName());
             requestBuilder.query(toExecute);
