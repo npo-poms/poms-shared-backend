@@ -3,7 +3,6 @@ package nl.vpro.domain.api;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -92,7 +91,7 @@ public abstract class AbstractESRepositoryContainerTest {
     }
 
     @AfterAll
-    public void shutdown() throws IOException {
+    public void shutdown() {
         for (IndexHelper indexHelper : indexHelpers.values()) {
             indexHelper.deleteIndex();
         }
