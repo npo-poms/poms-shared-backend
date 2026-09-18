@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-public class ESMediaQueryBuilderTest {
+class ESMediaQueryBuilderTest {
 
     @Test
     void queryTextWithoutAForm() {

@@ -17,7 +17,7 @@ import nl.vpro.test.util.jackson2.Jackson2TestUtil;
  * @author Roelof Jan Koekoek
  * @since 3.0
  */
-public class ESMediaScoreBuilderTest {
+class ESMediaScoreBuilderTest {
 
     @Test
     void score() {

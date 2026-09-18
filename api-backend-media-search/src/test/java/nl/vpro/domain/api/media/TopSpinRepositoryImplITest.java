@@ -10,7 +10,7 @@ import nl.vpro.domain.api.topspin.Recommendations;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Log4j2
-public class TopSpinRepositoryImplITest {
+class TopSpinRepositoryImplITest {
 
     @Test
     void new_() {

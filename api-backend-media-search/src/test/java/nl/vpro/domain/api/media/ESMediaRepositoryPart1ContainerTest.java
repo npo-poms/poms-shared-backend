@@ -68,7 +68,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 @ContextConfiguration(locations = "classpath:nl/vpro/domain/api/media/ESMediaRepositoryITest-context.xml")
 @Log4j2
-public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESRepositoryContainerTest {
+class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESRepositoryContainerTest {
 
     @Autowired
     private ESMediaRepository target;

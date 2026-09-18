@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-public class ESMediaFilterBuilderTest {
+class ESMediaFilterBuilderTest {
 
     @Test
     void filterProfileOnNullArgument() {
