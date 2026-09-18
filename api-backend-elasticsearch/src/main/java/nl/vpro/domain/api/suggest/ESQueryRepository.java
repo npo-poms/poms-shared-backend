@@ -17,7 +17,6 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.reindex.BulkByScrollResponse;
@@ -86,7 +85,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
                 DeleteByQueryRequest deleteByQueryRequest = new DeleteByQueryRequest(indexNames.get(APIQUERIES));
                 deleteByQueryRequest.setQuery(QueryBuilders.rangeQuery("sortDate")
                     .lte(Instant.now().minus(ttl).toEpochMilli()));
-                BulkByScrollResponse response = client().deleteByQuery(deleteByQueryRequest, RequestOptions.DEFAULT);
+                BulkByScrollResponse response = client().deleteByQuery(deleteByQueryRequest, requestOptions());
                 log.info("Deleted {}", response.getDeleted());
             } catch (IOException ioe) {
                 log.error(ioe.getMessage());
@@ -107,7 +106,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
                 IndexRequest indexRequest = new IndexRequest(getIndexName());
                 indexRequest.id(query.getId());
                 indexRequest.source(MAPPER.writeValueAsString(query), XContentType.JSON);
-                IndexResponse response  = client().index(indexRequest, RequestOptions.DEFAULT);
+                IndexResponse response  = client().index(indexRequest, requestOptions());
                 log.debug("indexed {}", response);
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -125,7 +124,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         sourceBuilder.suggest(suggestBuilder(Query.queryId(input, profile), profile, max));
         searchRequest.source(sourceBuilder);
 
-        SearchResponse searchResponse = client().search(searchRequest, RequestOptions.DEFAULT);
+        SearchResponse searchResponse = client().search(searchRequest, requestOptions());
         Suggest suggest = searchResponse.getSuggest();
         return adapt(suggest, input, profile);
     }

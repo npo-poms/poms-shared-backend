@@ -25,7 +25,6 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.rest.RestStatus;
 import org.springframework.stereotype.Repository;
@@ -102,7 +101,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
             IndexRequest request = new IndexRequest(getPublishIndexName());
             request.id(update.getId().toString());
             request.source(MAPPER.writeValueAsBytes(update), XContentType.JSON);
-            IndexResponse response = client().index(request, RequestOptions.DEFAULT);
+            IndexResponse response = client().index(request, requestOptions());
             log.info("Indexed {} {}", update, response.getVersion());
             return update;
         } catch (ElasticsearchException  e) {
@@ -117,7 +116,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
 
     public Optional<T> get(I id) throws IOException {
         GetRequest request = new GetRequest(getIndexName(), id.toString());
-        GetResponse response = client().get(request, RequestOptions.DEFAULT);
+        GetResponse response = client().get(request, requestOptions());
         if (response.isExists()) {
             return Optional.of(unMap(response.getSourceAsString()));
         }
@@ -128,7 +127,7 @@ public class SimpleESRepository<T extends Identifiable<I>, I extends Serializabl
     public boolean delete(I id) throws IOException {
         DeleteRequest request = new DeleteRequest(getIndexName(), id.toString());
         DeleteResponse response =
-            client().delete(request, RequestOptions.DEFAULT);
+            client().delete(request, requestOptions());
         log.info("Deleted {} {} ({})", id, response.getVersion(), response.status());
         return response.status() != RestStatus.NOT_FOUND;
     }
