@@ -399,6 +399,24 @@ public abstract class ESQueryBuilder {
         @Nullable TML textMatchers,
         @NonNull FieldApplier<TM> applier) {
         if (textMatchers != null) {
+            if (applier instanceof TextSingleFieldApplier<?, ?> singleFieldApplier
+                && singleFieldApplier.fieldInfo == ESMatchType.FieldInfo.TEXT
+                && !textMatchers.isEmpty()) {
+                List<TM> matchers = textMatchers.asList();
+                Match match = matchers.get(0).getMatch();
+                if ((match == Match.SHOULD || match == Match.NOT)
+                    && matchers.stream().allMatch(matcher ->
+                        matcher.getMatch() == match
+                            && ESMatchType.valueOf(matcher.getMatchType().getName()) == ESMatchType.TEXT)) {
+                    List<String> values = matchers.stream()
+                        .map(matcher -> ESMatchType.esValue(matcher.getValue(), matcher.isCaseSensitive()))
+                        .toList();
+                    BoolQueryBuilder sub = QueryBuilders.boolQuery();
+                    apply(sub, QueryBuilders.termsQuery(prefix + singleFieldApplier.fieldName, values), match);
+                    apply(booleanQueryBuilder, sub, textMatchers.getMatch());
+                    return;
+                }
+            }
             BoolQueryBuilder sub = QueryBuilders.boolQuery();
             for (TM matcher : textMatchers.asList()) {
                 applier.applyField(prefix, sub, matcher);

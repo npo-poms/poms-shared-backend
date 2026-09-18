@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ESMediaFilterBuilderTest {
 
     @Test
-    public void testFilterProfileOnNullArgument() {
+    void filterProfileOnNullArgument() {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo("""
             {
@@ -46,7 +46,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileOnWrappedSingleArgument() {
+    void filterProfileOnWrappedSingleArgument() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("vpro")
         ));
@@ -81,7 +81,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileOnNestedArguments() {
+    void filterProfileOnNestedArguments() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             and(
                 broadcaster("VpRo"),
@@ -178,7 +178,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileWithExtraFilterOnNullArguments() {
+    void filterProfileWithExtraFilterOnNullArguments() {
         QueryBuilder builder = ESMediaFilterBuilder.filter(null);
         assertThat(toString(builder)).isEqualTo(
             """
@@ -202,7 +202,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileWithExtraFilterOnNullProfile() {
+    void filterProfileWithExtraFilterOnNullProfile() {
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         boolQueryBuilder.must(QueryBuilders.termQuery("name", "value"));
         ESMediaQueryBuilder.buildMediaQuery("", boolQueryBuilder,null);
@@ -220,7 +220,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterProfileWithExtraFilter() {
+    void filterProfileWithExtraFilter() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             broadcaster("Vpro")
         ));
@@ -268,7 +268,7 @@ public class ESMediaFilterBuilderTest {
     }
 
     @Test
-    public void testFilterLocationsWithPlatform() {
+    void filterLocationsWithPlatform() {
         ProfileDefinition<MediaObject> definition = new ProfileDefinition<>(new Filter(
             hasLocation("NONE")
         ));

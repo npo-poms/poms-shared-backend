@@ -261,7 +261,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testGroupBy() throws IOException {
+    void groupBy() throws IOException {
 
         SearchSourceBuilder source = new SearchSourceBuilder();
         source.aggregation(AggregationBuilders.terms("workflows")
@@ -297,7 +297,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testLoad() {
+    void load() {
         Program in = programBuilder.build();
         MediaObject result = target.load(in.getMid());
 
@@ -305,7 +305,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testLoadAll() {
+    void loadAll() {
         List<MediaObject> results = target.loadAll(Arrays.asList("MID-1", "BESTAATNIET", "MID-2"));
         assertThat(results).hasSize(3);
         assertThat(results.get(0)).isNotNull();
@@ -315,21 +315,21 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testList() {
+    void list() {
         MediaResult results = target.list(Order.ASC, 0L, 1000);
         assertThat(results).hasSize(indexedObjectCount);
         log.info("All mids: {}", results.stream().map(MediaObject::getMid).collect(Collectors.toList()));
     }
 
     @Test
-    public void testListWithOffset() {
+    void listWithOffset() {
         MediaResult results = target.list(Order.ASC, 10L, 1000);
         assertThat(results).hasSize(indexedObjectCount - 10);
 
     }
 
     @Test
-    public void testMediaChanges() throws Exception {
+    void mediaChanges() throws Exception {
         try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, Order.ASC, null, null, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
@@ -340,7 +340,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testMediaChangesExcludeDeletes() throws Exception {
+    void mediaChangesExcludeDeletes() throws Exception {
         try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, Order.ASC, Integer.MAX_VALUE, Deletes.EXCLUDE, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
@@ -351,7 +351,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testMediaChangesSince() throws Exception {
+    void mediaChangesSince() throws Exception {
         try (CloseableIterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, Order.DESC, Integer.MAX_VALUE, null, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
@@ -367,7 +367,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testMediaChangesSinceWithMax() throws Exception {
+    void mediaChangesSinceWithMax() throws Exception {
         Instant prev = NOW.minus(1, ChronoUnit.SECONDS);
         CloseableIterator<MediaChange> changes = target.changes(prev, null, null, Order.DESC, 5, null, null, null);
         List<MediaChange> list = new ArrayList<>();
@@ -383,7 +383,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testMediaChangesWithMax() throws Exception {
+    void mediaChangesWithMax() throws Exception {
         try (CloseableIterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, Order.DESC, 10, null, null, null)) {
             List<MediaChange> list = new ArrayList<>();
             changes.forEachRemaining(list::add);
@@ -392,7 +392,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testIterate() throws Exception {
+    void iterate() throws Exception {
         target.iterateBatchSize = 10;
         try (CloseableIterator<MediaObject> results = target.iterate(null, null, 0L, 1000, FilteringIterator.noKeepAlive())) {
             assertThat(results).toIterable().hasSize(indexedObjectCount);
@@ -400,7 +400,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testIterateWithOffset() throws Exception {
+    void iterateWithOffset() throws Exception {
         target.iterateBatchSize = 10;
         try (CloseableIterator<MediaObject> results = target.iterate(null, null, 10L, 1000, FilteringIterator.noKeepAlive())) {
             assertThat(results).toIterable().hasSize(indexedObjectCount - 10);
@@ -409,14 +409,14 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testLoadNotFound() {
+    void loadNotFound() {
         MediaObject object = target.findByMid("bestaatniet");
 
         assertThat(object).isNull();
     }
 
     @Test
-    public void testFindAll() {
+    void findAll() {
         SearchResult<MediaObject> result = target.find(null, null, 0L, 100);
         assertThat(result.asList().stream().map(MediaObject::getMid).sorted()).containsExactlyElementsOf(mids);
 
@@ -427,7 +427,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void  testFind() {
+    void find() {
         SearchResult<MediaObject> result = target.find(null, null, 2L, 5);
         assertThat(result.getTotal()).isEqualTo(indexedObjectCount);
         assertThat(result.getOffset()).isEqualTo(2);
@@ -438,7 +438,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindOnProfileWithTextScore() {
+    void findOnProfileWithTextScore() {
         MediaForm form = form().text("Text with Score words").build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -448,7 +448,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithWithMidMediaId() {
+    void findWithWithMidMediaId() {
         MediaForm form = form().mediaIds(programBuilder.build().getMid()).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -456,7 +456,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithWithMidMediaIds() {
+    void findWithWithMidMediaIds() {
         MediaForm form = form().mediaIds("MID-1", "MID-2").build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -464,7 +464,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithWithSortDate() {
+    void findWithWithSortDate() {
         MediaForm form = form().asc(MediaSortField.sortDate).sortDate(NOW,  NOW.plus(Duration.ofHours(2))).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -476,7 +476,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithWithPublishDateAsc() {
+    void findWithWithPublishDateAsc() {
         MediaForm form = form()
             .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
             .sortOrder(MediaSortOrder.asc(MediaSortField.publishDate))
@@ -495,7 +495,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithWithPublishDateDesc() {
+    void findWithWithPublishDateDesc() {
         MediaForm form = form()
             .publishDate(LONGAGO, LONGAGO.plusSeconds(5))
             .sortOrder(MediaSortOrder.desc(MediaSortField.publishDate))
@@ -509,7 +509,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithWithDuration() {
+    void findWithWithDuration() {
         MediaForm form = form().duration(Duration.ZERO, Duration.ofMillis(200)).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -519,7 +519,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
     @Test
     @Disabled("Dropped support for finding by urn")
-    public void testFindWithWithUrnMediaId() {
+    void findWithWithUrnMediaId() {
         MediaForm form = form().mediaIds(programBuilder.build().getUrn()).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -527,7 +527,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithWithBroadcasterWithVariedCaseMiss() {
+    void findWithWithBroadcasterWithVariedCaseMiss() {
 
         MediaForm form = form().broadcasters("TVDrenthe").build();
         SearchResult<MediaObject> result = getAndTestResult(form);
@@ -536,7 +536,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithWithBroadcasterWithVariedCaseHit() {
+    void findWithWithBroadcasterWithVariedCaseHit() {
         MediaForm form = form().broadcasters("TVDRENTHE").build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -544,7 +544,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithLocationsExtensionWithVariedCase() {
+    void findWithLocationsExtensionWithVariedCase() {
         MediaForm form = form().locations("mP3").build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -552,7 +552,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithTags() {
+    void findWithTags() {
         MediaForm form = form().tags("Tag 2").build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -560,7 +560,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithTagsIgnoreCase() {
+    void findWithTagsIgnoreCase() {
         MediaForm form = form().tags(Match.SHOULD, new ExtendedTextMatcher("OnderKast", StandardMatchType.TEXT, false)).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -569,7 +569,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithExcludeMediaIds() {
+    void findWithExcludeMediaIds() {
         MediaForm form = form().mediaIds(Match.NOT, "MID-1", "MID-2").build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -579,7 +579,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithExcludeTypes() {
+    void findWithExcludeTypes() {
         MediaForm form = form().types(Match.NOT, MediaType.BROADCAST).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -589,7 +589,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithAVType() {
+    void findWithAVType() {
         MediaForm form = form().avTypes(Match.MUST, AVType.AUDIO).build();
         SearchResult<MediaObject> result = getAndTestResult(form);
 
@@ -599,7 +599,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithBroadcasterProfile() {
+    void findWithBroadcasterProfile() {
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("OMROEP1"))
         );
@@ -609,7 +609,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithAFFileExtensionProfile() {
+    void findWithAFFileExtensionProfile() {
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new AVFileExtensionConstraint("MP3"))
         );
@@ -619,7 +619,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithHasPredictionsProfile() {
+    void findWithHasPredictionsProfile() {
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new HasPredictionConstraint())
         );
@@ -630,7 +630,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithHighlights() {
+    void findWithHighlights() {
         MediaForm form = form().text("title").highlight(true).build();
 
         MediaSearchResult result = getAndTestResult(form);
@@ -642,27 +642,27 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindMembersOnMid() {
+    void findMembersOnMid() {
         assertRelatedMediaResult(target.findMembers(group, null, null, 0L, 10), program1);
     }
 
     @Test
-    public void testFindMembersOnUrn() {
+    void findMembersOnUrn() {
         assertRelatedMediaResult(target.findMembers(group, null, null, 0L, 10), program1);
     }
 
     @Test
-    public void testFindEpisodes() {
+    void findEpisodes() {
         assertRelatedMediaResult(target.findEpisodes(group, null, null, 0L, 10), program1);
     }
 
     @Test
-    public void testFindDescendants() {
+    void findDescendants() {
         assertRelatedMediaResult(target.findDescendants(group, null, null, 0L, 10), program1);
     }
 
     @Test
-    public void testFindDescendantsOrderedByMember() {
+    void findDescendantsOrderedByMember() {
         MediaForm form = MediaFormBuilder.form()
             .sortOrder(MediaSortOrder.asc(MediaSortField.member)).build();
         MediaSearchResult result =
@@ -687,7 +687,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindDescendantsOrderedSortDate() {
+    void findDescendantsOrderedSortDate() {
         MediaForm form = MediaFormBuilder.form().sortOrder(MediaSortOrder.asc(MediaSortField.sortDate)).build();
         MediaSearchResult result =
             target.findDescendants(group_ordered, null, form, 0L, 10);
@@ -702,7 +702,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testWithRelations() {
+    void withRelations() {
 
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
@@ -712,7 +712,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testWithRelationsIgnoreCase() {
+    void withRelationsIgnoreCase() {
         RelationDefinition director = RelationDefinition.of("director", "VPRO");
 
         ExtendedTextMatcher kubrick = new ExtendedTextMatcher("StanLey KubRick", false);
@@ -723,7 +723,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testListDescendants() {
+    void listDescendants() {
         MediaResult result = target.listDescendants(group_ordered, null,  Order.ASC, 0L, 100);
 
         List<? extends MediaObject> resultList = result.getItems();
@@ -738,7 +738,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testListDescendantsWithProfile() {
+    void listDescendantsWithProfile() {
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
         );
@@ -758,7 +758,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithChannel() {
+    void findWithChannel() {
         MediaSearchResult result = getAndTestResult(MediaFormBuilder.form()
             .scheduleEvents(ScheduleEventSearch.builder().channel(Channel.NED1).build())
             .sortOrder(MediaSortOrder.asc(MediaSortField.creationDate))
@@ -771,7 +771,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithChannels() {
+    void findWithChannels() {
         MediaSearchResult result = getAndTestResult(MediaFormBuilder.form()
             .scheduleEvents(
                 ScheduleEventSearch.builder().channel(Channel.NED1).match(Match.SHOULD).build(),
@@ -788,7 +788,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testWithMultipleFacetsAndFiltersAndProfile() {
+    void withMultipleFacetsAndFiltersAndProfile() {
         target.setScore(false);
 
         LocalDateTime since = LocalDateTime.of(2010, 1, 1, 12, 0);
@@ -923,7 +923,7 @@ public class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void withMaxZero() {
+    void withMaxZero() {
         Group loadedGroup = (Group) target.load(group.getMid());
         MediaResult result = target.listMembers(loadedGroup, null, Order.ASC, 0L, 0);
 

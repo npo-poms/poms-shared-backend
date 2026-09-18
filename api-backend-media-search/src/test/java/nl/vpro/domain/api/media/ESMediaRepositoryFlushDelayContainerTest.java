@@ -55,7 +55,7 @@ public class ESMediaRepositoryFlushDelayContainerTest extends AbstractMediaESRep
     }
 
     @Test
-    public void testIndexingDelay() throws Exception {
+    void indexingDelay() throws Exception {
 
         List<Callable<Long>> callables = Arrays.asList(
             indexer(),
