@@ -761,34 +761,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             }
         });
 
-        return new BasicWrappedIterator<>(tailed) {
-            private boolean closed;
-
-            @Override
-            public boolean hasNext() {
-                boolean hasNext = super.hasNext();
-                if (! hasNext) {
-                    closeAfterExhaustion();
-                }
-                return hasNext;
-            }
-
-            private void closeAfterExhaustion() {
-                try {
-                    close();
-                } catch (Exception e) {
-                    throw new IllegalStateException("Could not close changes iterator", e);
-                }
-            }
-
-            @Override
-            public void close() throws Exception {
-                if (! closed) {
-                    closed = true;
-                    super.close();
-                }
-            }
-        };
+        return tailed;
     }
 
     @Getter
