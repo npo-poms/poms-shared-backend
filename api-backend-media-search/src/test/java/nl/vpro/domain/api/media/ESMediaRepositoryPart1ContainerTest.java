@@ -91,7 +91,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testLoad() {
+    void load() {
         index(program().mainTitle("foo bar").mid("MID_FOR_LOAD"));
         target.setScore(false);
         MediaObject result = target.load("MID_FOR_LOAD");
@@ -100,7 +100,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testText() {
+    void text() {
         index(program().mainTitle("foo"));
         index(program().mainTitle("bar"));
 
@@ -119,7 +119,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testTextFuzzy() {
+    void textFuzzy() {
         index(program().mainTitle("foo"));
         index(program().mainTitle("foa"));
         index(program().mainTitle("bar"));
@@ -145,7 +145,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testResultOrderTextSearch() {
+    void resultOrderTextSearch() {
         target.setScore(true);
         index(program().mainTitle("De Ideale Wereld").tags("wereld")); // scores best, it also has a tag
         index(program().mainTitle("Alleen op de Wereld"));
@@ -184,7 +184,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindTagText() {
+    void findTagText() {
         index(program().mainTitle("t1").tags("foo", "bar"));
         index(program().mainTitle("t2").tags("xxx", "yyy"));
 
@@ -206,7 +206,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindTagTextRegex() {
+    void findTagTextRegex() {
         index(program().mainTitle("t1").tags("foo", "bar"));
         index(program().mainTitle("t2").tags("xxx", "yyy"));
 
@@ -231,7 +231,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindTagWildcard() {
+    void findTagWildcard() {
         index(program().mainTitle("t1").tags("foobar", "xxxyyyy"));
         index(program().mainTitle("t2").tags("xxx", "yyy"));
 
@@ -255,7 +255,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithHasImageProfile() {
+    void findWithHasImageProfile() {
         index(program().withMid());
 
         final Program withImages = program().withMid().withImages().build();
@@ -269,7 +269,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithHasLocationsProfile() {
+    void findWithHasLocationsProfile() {
         index(program().withMid());
 
         final Program withLocations = program().withMid().withLocations().build();
@@ -283,7 +283,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithFacetOrderings() {
+    void findWithFacetOrderings() {
         index(program().withMid().broadcasters(new Broadcaster("A"), new Broadcaster("A"), new Broadcaster("B")));
 
         {
@@ -312,7 +312,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithFacetWithThreshold() {
+    void findWithFacetWithThreshold() {
         index(program().withMid().broadcasters(new Broadcaster("A"), new Broadcaster("B")));
 
         index(program().withMid().broadcasters(new Broadcaster("A")));
@@ -326,7 +326,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithFacetWithMax() {
+    void findWithFacetWithMax() {
         index(program().withMid().broadcasters(new Broadcaster("A"), new Broadcaster("B")));
 
         MediaForm form = form().broadcasterFacet(new MediaFacet(null, VALUE_ASC, 1)).build();
@@ -338,7 +338,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithAvTypeFacet() {
+    void findWithAvTypeFacet() {
         index(program().withMid().withAVType());
 
         MediaForm form = form().avTypes(AVType.VIDEO).avTypeFacet().build();
@@ -358,7 +358,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithTypeFacet() {
+    void findWithTypeFacet() {
         index(program().withMid().withType());
 
         MediaForm form = form().typeFacet().build();
@@ -377,7 +377,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithSortDateFacet() {
+    void findWithSortDateFacet() {
         index(program().withMid().withPublishStart());
 
         // both ranges
@@ -398,7 +398,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithSortDateFacetMonth() {
+    void findWithSortDateFacetMonth() {
         index(program().withMid().withPublishStart());
 
         // both ranges
@@ -412,7 +412,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithSortDateFacetHistogram() {
+    void findWithSortDateFacetHistogram() {
         index(program().withMid().withPublishStart());
 
         // both ranges
@@ -426,7 +426,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithDurationFacetHistogram() {
+    void findWithDurationFacetHistogram() {
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)));
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)));
         index(program().withMid().duration(Duration.of(2, ChronoUnit.HOURS)));
@@ -450,7 +450,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithDurationFacetHistogramAndProfile() {
+    void findWithDurationFacetHistogramAndProfile() {
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)));
         index(program().withMid().portalRestrictions(PortalRestriction.builder().portal(Portal.builder().id("eo").build()).build()).duration(Duration.of(1, ChronoUnit.HOURS)));
         index(program().withMid().duration(Duration.of(2, ChronoUnit.HOURS)));
@@ -481,7 +481,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithDurationFacet() {
+    void findWithDurationFacet() {
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)));
         index(program().withMid().duration(Duration.of(1, ChronoUnit.HOURS)));
         index(program().withMid().duration(Duration.of(3, ChronoUnit.HOURS)));
@@ -515,7 +515,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithGenreWildcard() {
+    void findWithGenreWildcard() {
         index(program().withMid().genres(new Genre("3.0.1.1.6")));
         index(program().withMid().genres(new Genre("3.0.1.1.7")));
         index(program().withMid().genres(new Genre("3.0.1.2.7")));
@@ -532,7 +532,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithGenreWildcardNothing() {
+    void findWithGenreWildcardNothing() {
         index(program().withMid().genres(new Genre("3.0.1.1.6")));
         index(program().withMid().genres(new Genre("3.0.1.1.7")));
         index(program().withMid().genres(new Genre("3.0.1.2.7")));
@@ -549,7 +549,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testFindWithGenreFacet() {
+    void findWithGenreFacet() {
         target.setScore(false);
 
         index(program().withMid().withGenres());
@@ -567,7 +567,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithGenreFacetWhenFiltered() {
+    void findWithGenreFacetWhenFiltered() {
         target.setScore(false);
 
         index(program().withMid().genres(new Genre("3.0.1.1.6")));
@@ -591,7 +591,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithGenreFacetWithSubSearch() {
+    void findWithGenreFacetWithSubSearch() {
         target.setScore(false);
 
         index(program().withMid().genres(new Genre("3.0.1.1.6")));
@@ -615,7 +615,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithTagFacet() {
+    void findWithTagFacet() {
         index(program().withMid().withTags());
 
         MediaForm form = form().tagFacet().build();
@@ -626,7 +626,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithTagFacetIgnoreCase() {
+    void findWithTagFacetIgnoreCase() {
         index(program().withMid().tags("foo", "bar"));
         index(program().withMid().tags("FOO", "BAR"));
 
@@ -638,7 +638,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithTagFacetIgnoreCaseWithSelected() {
+    void findWithTagFacetIgnoreCaseWithSelected() {
         index(program().withMid().tags("foo", "bar"));
         index(program().withMid().tags("FOO", "BAR"));
 
@@ -655,7 +655,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithMemberOfFacetWithAdditionalFields() {
+    void findWithMemberOfFacetWithAdditionalFields() {
         target.setScore(false);
 
         final Group group = index(group().withMid().mainTitle("Group title"));
@@ -673,7 +673,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithEpisodeOfFacet() {
+    void findWithEpisodeOfFacet() {
         index(program().withMid().type(ProgramType.BROADCAST).withEpisodeOf());
 
         MediaForm form = form().episodeOfFacet().build();
@@ -686,7 +686,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithDescendantOfFacet() {
+    void findWithDescendantOfFacet() {
         index(program().withMid().withDescendantOf());
 
         MediaForm form = form().descendantOfFacet().build();
@@ -699,7 +699,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithRelationFacet() {
+    void findWithRelationFacet() {
         target.setScore(false);
 
         RelationDefinition label = new RelationDefinition("label", "VPRO");
@@ -722,7 +722,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithRelationFacetCaseInsensitive() {
+    void findWithRelationFacetCaseInsensitive() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
 
@@ -751,7 +751,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithRelationFacetAndSearchCaseInsensitive() {
+    void findWithRelationFacetAndSearchCaseInsensitive() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
 
@@ -806,7 +806,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     }
     @Test
-    public void testFindWithRelationFacetWithSubSearchAndSearchCaseInsensitive() {
+    void findWithRelationFacetWithSubSearchAndSearchCaseInsensitive() {
         target.setScore(false);
         RelationDefinition vproLabel = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
@@ -877,7 +877,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithRelationFacetWithSearch() {
+    void findWithRelationFacetWithSearch() {
         target.setScore(false);
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
@@ -911,7 +911,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithRelationFacetWithFilter() {
+    void findWithRelationFacetWithFilter() {
         RelationDefinition label = new RelationDefinition("label", "VPRO");
         RelationDefinition eoLabel = new RelationDefinition("label", "EO");
         index(program().withMid().broadcasters(new Broadcaster("VPRO"))
@@ -936,7 +936,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testWithLocationFilter() {
+    void withLocationFilter() {
 
         index(program().mid("m1")); // no locations
         final Location location1 = new Location("http://www.locations.nl/1", BROADCASTER);
@@ -991,12 +991,12 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testRedirectFormNull() {
+    void redirectFormNull() {
         assertThat(target.redirectForm(null)).isNull();
     }
 
     @Test
-    public void testRedirectFormWithMediaIds() {
+    void redirectFormWithMediaIds() {
         redirect("abc", "xyz");
 
         assertThat(target.redirectForm(form().mediaIds("abc", "def").build()).getSearches().getMediaIds().asList()
@@ -1006,7 +1006,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testRedirectFormWithDescendantsOf() {
+    void redirectFormWithDescendantsOf() {
         redirect("abc", "xyz");
         assertThat(target.redirectForm(form().descendantOfs("abc", "def").build()).getSearches().getDescendantOf()
                 .asList().toString()).isEqualTo(
@@ -1015,7 +1015,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testRedirectFormWithEpisodeOf() {
+    void redirectFormWithEpisodeOf() {
         redirect("abc", "xyz");
 
         assertThat(target.redirectForm(form().episodeOfs("abc", "def").build()).getSearches().getEpisodeOf().asList()
@@ -1025,7 +1025,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testRedirectFormWithMemberOf() {
+    void redirectFormWithMemberOf() {
         redirect("abc", "xyz");
 
         assertThat(target.redirectForm(MediaFormBuilder.form().memberOfs("abc", "def").build()).getSearches()
@@ -1035,7 +1035,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testRedirectFormFilter() {
+    void redirectFormFilter() {
         redirect("abc", "xyz");
 
         MediaForm helper = form().memberOfs("abc", "def").build();
@@ -1049,7 +1049,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testListMembers() {
+    void listMembers() {
 
         Group group = index(group().mid("MID_0"));
         index(program().mid("MID_1")
@@ -1070,7 +1070,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testListMembers3WithProfile() {
+    void listMembers3WithProfile() {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -1102,7 +1102,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testListMembersWithProfileAndOffet() {
+    void listMembersWithProfileAndOffet() {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -1123,7 +1123,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testListEpisodes() {
+    void listEpisodes() {
 
         Group group = index(season().mid("MID_0"));
         index(broadcast().mid("MID_1").episodeOf(group, 0).episodeOf(group, 2));
@@ -1162,7 +1162,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testListEpisodesWithProfile() {
+    void listEpisodesWithProfile() {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -1185,7 +1185,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testListEpisodesWithProfileAndOffset() {
+    void listEpisodesWithProfileAndOffset() {
 
         ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
             new Filter(new BroadcasterConstraint("BNN"))
@@ -1219,7 +1219,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testRedirect() {
+    void redirect() {
         Group group1 = index(group().published().mid("MID_0"));
         index(group().mergedTo(group1).mid("MID_1"));
         target.refillRedirectCache();
@@ -1229,7 +1229,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testAgeRating() {
+    void ageRating() {
         index(program().mainTitle("t1").ageRating(_6));
         index(program().mainTitle("t2").ageRating(_12));
         index(program().mainTitle("t3").ageRating(ALL));
@@ -1259,7 +1259,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
      * to test that our mapping is complete.
      */
     @Test
-    public void ableToIndexAllMediaObject(){
+    void ableToIndexAllMediaObject(){
         assertThatCode(() -> {
             index(MediaTestDataBuilder.group().withEverything().published());
             index(MediaTestDataBuilder.segment().withEverything());
@@ -1274,7 +1274,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testGenreFilter() {
+    void genreFilter() {
         index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")));
 
         {
@@ -1301,7 +1301,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testGenreFilterWildCard() {
+    void genreFilterWildCard() {
         index(program().mainTitle("t1").genres(new Genre("3.0.1.1.6")));
         index(program().mainTitle("t2").genres(new Genre("3.0.1.5")));
         index(program().mainTitle("t3").genres(new Genre("3.0.1")));
@@ -1316,7 +1316,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testContentRatings() {
+    void contentRatings() {
         index(program().mainTitle("t1").contentRatings(ANGST));
         index(program().mainTitle("t2").contentRatings(DRUGS_EN_ALCOHOL));
         index(program().mainTitle("t3").contentRatings(ANGST, DRUGS_EN_ALCOHOL));
@@ -1332,7 +1332,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testAgeAndContentRatings() {
+    void ageAndContentRatings() {
         index(program().mainTitle("t1").contentRatings(SEKS).ageRating(_16));
 
         assertEquals(1L, (long) target.find(null, form().build(), 0, null).getSize());
@@ -1347,7 +1347,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testAgeRatingWithFacets() {
+    void ageRatingWithFacets() {
         index(program().mainTitle("t1").ageRating(_12));
         index(program().mainTitle("t2").ageRating(_12));
         index(program().mainTitle("t3").ageRating(_6));
@@ -1393,7 +1393,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testContentRatingWithFacets() {
+    void contentRatingWithFacets() {
         index(program().mainTitle("t1").contentRatings(DISCRIMINATIE, DRUGS_EN_ALCOHOL, ANGST));
         index(program().mainTitle("t2").contentRatings(SEKS));
         index(program().mainTitle("t3").contentRatings(DRUGS_EN_ALCOHOL));
@@ -1427,7 +1427,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithAgeRatingProfile() {
+    void findWithAgeRatingProfile() {
         index(program().mainTitle("sex!").contentRatings(SEKS).ageRating(_16));
         index(program().mainTitle("heel gewoon"));
 
@@ -1440,7 +1440,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindWithContentRatingsProfile() {
+    void findWithContentRatingsProfile() {
         index(program().mainTitle("sex!").contentRatings(SEKS).ageRating(_16));
         index(program().mainTitle("heel gewoon"));
 
@@ -1463,7 +1463,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     @Test
     // NPA-403
-    public void testSortByTitles() {
+    void sortByTitles() {
         index(program()
             .mainTitle("aa")
             .lexicoTitle("bb")
@@ -1498,7 +1498,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     @Test
     // NPA-403
-    public void testSortByLexico() {
+    void sortByLexico() {
         index(program()
             .mainTitle("bb")
             //.lexicoTitle("bb") Should be implicit
@@ -1526,7 +1526,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     @Test
     // NPA-403
-    public void testSortByLexicoForOwner() {
+    void sortByLexicoForOwner() {
         index(program()
             .mainTitle("bbmis", OwnerType.MIS)      // so this is its npo lexico title
             .mainTitle("cc", BROADCASTER) // so this is its broadcaster lexico title
@@ -1569,7 +1569,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testSortByLexicoForOwnerIllegalOwner() {
+    void sortByLexicoForOwnerIllegalOwner() {
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
             MediaForm form = new MediaForm();
             form.addSortField(TitleSortOrder.builder()
@@ -1586,7 +1586,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     @SuppressWarnings("deprecation")
     @Test
-    public void testFindByTitlesCaseSensitive() {
+    void findByTitlesCaseSensitive() {
         index(program()
             .mainTitle("abcde", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")
@@ -1632,7 +1632,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindByTitlesCaseInSensitive() {
+    void findByTitlesCaseInSensitive() {
         index(program()
             .mainTitle("abcde", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("abcde")
@@ -1681,7 +1681,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     @SuppressWarnings("deprecation")
     @Test
-    public void testTitlesFacetsBackwards() {
+    void titlesFacetsBackwards() {
         target.setScore(false);
         index(program()
             .mainTitle("abcde", WHATS_ON) // no broadcaster title, so it should fall back to this.
@@ -1720,7 +1720,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
 
     @Test
-    public void testTitlesFacetsWithTextualType() {
+    void titlesFacetsWithTextualType() {
         target.setScore(false);
         index(program()
             .mainTitle("aaa")
@@ -1787,7 +1787,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testTitlesFacetsWithTextualTypeAndCaseSensitive() {
+    void titlesFacetsWithTextualTypeAndCaseSensitive() {
         index(program()
             .mainTitle("AAA")
             .subTitle("xxx")
@@ -1869,7 +1869,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     @SuppressWarnings("deprecation")
     @Test
-    public void expandedTitles() throws IOException {
+     void expandedTitles() throws IOException {
         index(program()
             .mainTitle("christmas", WHATS_ON) // no broadcaster title, so it should fall back to this.
             .mid("POW_123")
@@ -1952,7 +1952,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Test
     // NPA-490
-    public void reruns() {
+    void reruns() {
         index(program()
             .mid("mid_1")
             .mainTitle("original on ned1")
@@ -2036,7 +2036,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
      * Unit test for NPA-513
      */
     @Test
-    public void findRelated() {
+    void findRelated() {
         Program aboutFlowers = index(program()
             .mid("mid_1")
             .mainTitle("flowers")
@@ -2116,7 +2116,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
     }
 
     @Test
-    public void testFindByGeoLocation() {
+    void findByGeoLocation() {
         indexWithGeoLocations();
         {
             // Now find all objects that according to broadcaster are about amsterdam
@@ -2205,7 +2205,7 @@ public class ESMediaRepositoryPart1ContainerTest extends AbstractMediaESReposito
 
     @Test
     @Disabled("Not yet implemented")
-    public void testFacetByGeoName() {
+    void facetByGeoName() {
         indexWithGeoLocations();
 
         MediaForm form = MediaForm.builder()

@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TopSpinRepositoryImplITest {
 
     @Test
-    public void testNew() {
+    void new_() {
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
         repo.topspinUrl = "https://hub.npo-data.nl/api/v4/media/{mediaId}/recommendations/{class}";
         Recommendations forMid = repo.getForMid("RBX_BV_13063322", null, "related-broadcasts");
@@ -24,7 +24,7 @@ public class TopSpinRepositoryImplITest {
 
     @Test
     @Disabled("I suppose the endpoint is dropped now")
-    public void testOld() {
+    void old() {
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
         repo.topspinUrl = "https://api.npo.nl/api/v3/recommendations/related/{mediaId}";
         Recommendations forMid = repo.getForMid("RBX_BV_13063322", null, null);

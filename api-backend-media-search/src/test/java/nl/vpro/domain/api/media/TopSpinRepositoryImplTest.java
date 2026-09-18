@@ -22,7 +22,7 @@ public class TopSpinRepositoryImplTest {
 
 
     @Test
-    public void testNoExists(WireMockRuntimeInfo wireMockRuntimeInfo) {
+    void noExists(WireMockRuntimeInfo wireMockRuntimeInfo) {
         WireMock.stubFor(get(urlEqualTo("/notexist")).willReturn(notFound()));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();
         repo.topspinUrl = wireMockRuntimeInfo.getHttpBaseUrl() + "/{mediaId}";
@@ -32,7 +32,7 @@ public class TopSpinRepositoryImplTest {
     }
 
     @Test
-    public void testExists(WireMockRuntimeInfo wireMockRuntimeInfo) throws IOException {
+    void exists(WireMockRuntimeInfo wireMockRuntimeInfo) throws IOException {
         String json = IOUtils.toString(getClass().getResourceAsStream("/topspin-response.json"), StandardCharsets.UTF_8);
         WireMock.stubFor(get(urlEqualTo("/midthatexists")).willReturn(okJson(json)));
         TopSpinRepositoryImpl repo = new TopSpinRepositoryImpl();

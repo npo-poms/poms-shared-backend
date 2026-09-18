@@ -128,11 +128,14 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             }
         }
 
+        TextMatcherList mediaIds = searches.getMediaIds();
         buildFromList(
             prefix,
             booleanQuery,
-            searches.getMediaIds(),
-            new TextMultipleFieldsApplier<>("mid", "urn", "crids")
+            mediaIds,
+            containsOnlyMids(mediaIds)
+                ? new TextSingleFieldApplier<>("mid")
+                : new TextMultipleFieldsApplier<>("mid", "urn", "crids")
         );
         buildFromList(
             prefix,
@@ -305,6 +308,14 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
                 }
             }
         }
+    }
+
+    private static boolean containsOnlyMids(@Nullable TextMatcherList mediaIds) {
+        return mediaIds != null && mediaIds.asList().stream().allMatch(mediaId ->
+            ESMatchType.valueOf(mediaId.getMatchType().getName()) == ESMatchType.TEXT
+                && !StringUtils.startsWithIgnoreCase(mediaId.getValue(), "urn:")
+                && !StringUtils.startsWithIgnoreCase(mediaId.getValue(), "crid:")
+        );
     }
 
 

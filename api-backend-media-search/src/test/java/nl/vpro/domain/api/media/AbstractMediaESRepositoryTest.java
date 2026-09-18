@@ -38,7 +38,7 @@ public class AbstractMediaESRepositoryTest {
     }
 
     @Test
-    public void searchRequest() throws IOException {
+    void searchRequest() throws IOException {
 
         AbstractESMediaRepository.SearchRequestWrapper sr = repository.mediaSearchRequest(
             null,

@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ESMediaQueryBuilderTest {
 
     @Test
-    public void testQueryTextWithoutAForm() {
+    void queryTextWithoutAForm() {
         QueryBuilder builder = ESMediaQueryBuilder.query("", new MediaSearch());
 
         assertThat(builder.toString()).isEqualTo(
@@ -32,7 +32,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryTextWithoutProfile() {
+    void queryTextWithoutProfile() {
         MediaForm form = MediaFormBuilder.form().text("Text to search for").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query("", form.getSearches());
@@ -42,7 +42,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForExcludeMediaIds() {
+    void queryForExcludeMediaIds() {
         MediaForm form = MediaFormBuilder.form().mediaIds(Match.NOT, "POMS_12345", "POMS_12346").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -53,66 +53,11 @@ public class ESMediaQueryBuilderTest {
                   "bool" : {
                     "must_not" : [
                       {
-                        "bool" : {
-                          "should" : [
-                            {
-                              "term" : {
-                                "mid" : {
-                                  "value" : "POMS_12345",
-                                  "boost" : 1.0
-                                }
-                              }
-                            },
-                            {
-                              "term" : {
-                                "urn" : {
-                                  "value" : "POMS_12345",
-                                  "boost" : 1.0
-                                }
-                              }
-                            },
-                            {
-                              "term" : {
-                                "crids" : {
-                                  "value" : "POMS_12345",
-                                  "boost" : 1.0
-                                }
-                              }
-                            }
+                        "terms" : {
+                          "mid" : [
+                            "POMS_12345",
+                            "POMS_12346"
                           ],
-                          "adjust_pure_negative" : true,
-                          "boost" : 1.0
-                        }
-                      },
-                      {
-                        "bool" : {
-                          "should" : [
-                            {
-                              "term" : {
-                                "mid" : {
-                                  "value" : "POMS_12346",
-                                  "boost" : 1.0
-                                }
-                              }
-                            },
-                            {
-                              "term" : {
-                                "urn" : {
-                                  "value" : "POMS_12346",
-                                  "boost" : 1.0
-                                }
-                              }
-                            },
-                            {
-                              "term" : {
-                                "crids" : {
-                                  "value" : "POMS_12346",
-                                  "boost" : 1.0
-                                }
-                              }
-                            }
-                          ],
-                          "adjust_pure_negative" : true,
                           "boost" : 1.0
                         }
                       }
@@ -124,7 +69,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForBroadcasters() {
+    void queryForBroadcasters() {
         MediaForm form = MediaFormBuilder.form().broadcasters("VPRO", "BNN").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -158,7 +103,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForLocationsOnVaryingCase() {
+    void queryForLocationsOnVaryingCase() {
         MediaForm form = MediaFormBuilder.form().locations("mP3").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -200,7 +145,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForTags() {
+    void queryForTags() {
         MediaForm form = MediaFormBuilder.form().tags("Kunst", "Kunst & Cultuur").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -232,7 +177,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForIds() {
+    void queryForIds() {
         MediaForm form = MediaFormBuilder.form().mediaIds("MID1", "MID2").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -241,66 +186,11 @@ public class ESMediaQueryBuilderTest {
               "bool" : {
                 "should" : [
                   {
-                    "bool" : {
-                      "should" : [
-                        {
-                          "term" : {
-                            "mid" : {
-                              "value" : "MID1",
-                              "boost" : 1.0
-                            }
-                          }
-                        },
-                        {
-                          "term" : {
-                            "urn" : {
-                              "value" : "MID1",
-                              "boost" : 1.0
-                            }
-                          }
-                        },
-                        {
-                          "term" : {
-                            "crids" : {
-                              "value" : "MID1",
-                              "boost" : 1.0
-                            }
-                          }
-                        }
+                    "terms" : {
+                      "mid" : [
+                        "MID1",
+                        "MID2"
                       ],
-                      "adjust_pure_negative" : true,
-                      "boost" : 1.0
-                    }
-                  },
-                  {
-                    "bool" : {
-                      "should" : [
-                        {
-                          "term" : {
-                            "mid" : {
-                              "value" : "MID2",
-                              "boost" : 1.0
-                            }
-                          }
-                        },
-                        {
-                          "term" : {
-                            "urn" : {
-                              "value" : "MID2",
-                              "boost" : 1.0
-                            }
-                          }
-                        },
-                        {
-                          "term" : {
-                            "crids" : {
-                              "value" : "MID2",
-                              "boost" : 1.0
-                            }
-                          }
-                        }
-                      ],
-                      "adjust_pure_negative" : true,
                       "boost" : 1.0
                     }
                   }
@@ -312,7 +202,33 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void testQueryForGenres() {
+    void queryForUrnsDoesNotUseMidOptimization() {
+        MediaForm form = MediaFormBuilder.form().mediaIds("urn:vpro:media:1").build();
+
+        QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
+
+        assertThat(builder.toString()).contains(
+            "\"mid\"",
+            "\"urn\"",
+            "\"crids\""
+        );
+    }
+
+    @Test
+    void queryForCridsDoesNotUseMidOptimization() {
+        MediaForm form = MediaFormBuilder.form().mediaIds("crid://vpro.nl/media/1").build();
+
+        QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
+
+        assertThat(builder.toString()).contains(
+            "\"mid\"",
+            "\"urn\"",
+            "\"crids\""
+        );
+    }
+
+    @Test
+    void queryForGenres() {
         MediaForm form = MediaFormBuilder.form().genres("3.0.1.1", "3.0.1.2").build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
@@ -352,7 +268,7 @@ public class ESMediaQueryBuilderTest {
     }
 
     @Test
-    public void withEverything() {
+    void withEverything() {
         MediaForm form = MediaForm.builder().withEverything().build();
 
         QueryBuilder builder = ESMediaQueryBuilder.query(form.getSearches());
