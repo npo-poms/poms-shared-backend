@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @since 5.0
  */
 @SuppressWarnings("deprecation")
-public class FilteredSortedTitleSetTest {
+class FilteredSortedTitleSetTest {
 
     static {
         MediaPropertiesFilters.instrument();
@@ -22,7 +22,7 @@ public class FilteredSortedTitleSetTest {
 
 
     @Test
-    public void testNoTextualType() {
+    void noTextualType() {
 
         ApiMediaFilter.set("title:1");
         Set<Title> list = new TreeSet<>(
@@ -40,7 +40,7 @@ public class FilteredSortedTitleSetTest {
 
 
     @Test
-    public void testWithTextualType() {
+    void withTextualType() {
 
         ApiMediaFilter.set("title:main:1");
         Set<Title> list = new TreeSet<>(
@@ -57,7 +57,7 @@ public class FilteredSortedTitleSetTest {
     }
 
     @Test
-    public void testWithTextualTypes() {
+    void withTextualTypes() {
 
         ApiMediaFilter.set("title:main|sub:1");
         Set<Title> list = new TreeSet<>(
@@ -77,7 +77,7 @@ public class FilteredSortedTitleSetTest {
     }
 
     @Test
-    public void testWithTextualTypesMerge() {
+    void withTextualTypesMerge() {
 
         ApiMediaFilter.set("title:main:1,title:sub:2");
         Set<Title> list = new TreeSet<>(
@@ -97,7 +97,7 @@ public class FilteredSortedTitleSetTest {
     }
 
     @Test
-    public void testWithTextualTypesMergeOverride() {
+    void withTextualTypesMergeOverride() {
 
         ApiMediaFilter.set("title:sub:2,title:1");
         Set<Title> list = new TreeSet<>(
@@ -117,7 +117,7 @@ public class FilteredSortedTitleSetTest {
     }
 
     @Test
-    public void implicitTitle() {
+    void implicitTitle() {
         ApiMediaFilter.set("none");
         SortedSet<Title> list = new TreeSet<>(Arrays.asList(
             Title.main("b", OwnerType.CERES),
@@ -131,7 +131,7 @@ public class FilteredSortedTitleSetTest {
     }
 
     @Test
-    public void testWithTextualTypeWithoutLimitSingular() {
+    void withTextualTypeWithoutLimitSingular() {
 
         ApiMediaFilter.set("title:main:");
         Set<Title> list = new TreeSet<>(
@@ -149,7 +149,7 @@ public class FilteredSortedTitleSetTest {
 
 
     @Test
-    public void testWithTextualTypeWithoutLimitPlural() {
+    void withTextualTypeWithoutLimitPlural() {
 
         ApiMediaFilter.set("titles:main:");
         Set<Title> list = new TreeSet<>(

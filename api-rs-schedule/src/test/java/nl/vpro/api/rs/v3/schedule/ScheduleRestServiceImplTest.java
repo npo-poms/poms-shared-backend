@@ -27,7 +27,7 @@ import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<ScheduleRestServiceImpl> {
+class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<ScheduleRestServiceImpl> {
 
 
     private final ScheduleService scheduleService = mock(ScheduleService.class);
@@ -47,7 +47,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void activeEvent() {
+    void activeEvent() {
 
         ScheduleRestServiceImpl scheduleRestService = getTestObject();
 
@@ -61,7 +61,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void inactiveEvent() {
+    void inactiveEvent() {
         ScheduleRestServiceImpl scheduleRestService = getTestObject();
 
 
@@ -76,7 +76,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void testGuideDayStartStop() {
+    void guideDayStartStop() {
 
         ScheduleRestService scheduleRestService = getTestObject();
         Result<ApiScheduleEvent> res = scheduleRestService.listChannel(Channel.KETN.name(), LocalDate.of(2015, 3, 28), null, null, null, "ASC", 0L, 100);
@@ -88,7 +88,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
 
     @Test
-    public void testStartStop() {
+    void startStop() {
 
 
         ScheduleRestService scheduleRestService = getTestObject();
@@ -99,7 +99,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void testStartStopRequest() throws URISyntaxException {
+    void startStopRequest() throws URISyntaxException {
         when(scheduleService.list(any(Channel.class),
             or(isNull(), any(Instant.class)),
             or(isNull(), any(Instant.class)), any(Order.class), anyLong(), anyInt())).thenReturn(new ScheduleResult());
@@ -217,18 +217,18 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
         }
     }
     @Test
-    public void MSE_2775_1() throws IOException, URISyntaxException {
+    void MSE_2775_1() throws IOException, URISyntaxException {
         MSE_2775(MSE_2775form());
     }
 
     @Test
-    public void MSE_2775_2() throws IOException, URISyntaxException {
+    void MSE_2775_2() throws IOException, URISyntaxException {
         MSE_2775(MSE2775_formCorrected());
 
     }
 
     @Test
-    public void NPA_202_scheduleform() throws URISyntaxException {
+    void NPA_202_scheduleform() throws URISyntaxException {
         when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
 
         MockHttpRequest request = MockHttpRequest.post("/schedule");
@@ -247,7 +247,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
     }
 
     @Test
-    public void NPA_202_mediaform() throws URISyntaxException {
+    void NPA_202_mediaform() throws URISyntaxException {
         when(scheduleService.find(any(ScheduleForm.class), eq(Order.ASC), or(anyString(), isNull()), anyLong(), anyInt())).thenReturn(new ScheduleSearchResult());
 
         MockHttpRequest request = MockHttpRequest.post("/schedule");
@@ -272,7 +272,7 @@ public class ScheduleRestServiceImplTest extends AbstractRestServiceImplTest<Sch
 
 
     @Test
-    public void NPA_359() throws URISyntaxException, UnsupportedEncodingException {
+    void NPA_359() throws URISyntaxException, UnsupportedEncodingException {
 
         Program program = MediaTestDataBuilder.program().withDescendantOf().withScheduleEvents().build();
         ApiScheduleEvent event = new ApiScheduleEvent(program.getScheduleEvents().first(), program);

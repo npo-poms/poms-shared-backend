@@ -21,10 +21,10 @@ import static org.mockito.Mockito.mock;
  * @author Michiel Meeuwissen
  * @since 5.3
  */
-public class ESQueryRepositoryTest {
+class ESQueryRepositoryTest {
     //https://jira.vpro.nl/browse/NPA-384
     @Test()
-    public void adapt() throws Exception {
+    void adapt() throws Exception {
         testAdapt("luba",
             "cuba",
             "dubai",

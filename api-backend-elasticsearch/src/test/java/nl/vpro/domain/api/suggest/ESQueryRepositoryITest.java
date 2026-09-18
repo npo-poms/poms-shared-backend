@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
  */
 @ContextConfiguration
 @Log4j2
-public class ESQueryRepositoryITest extends AbstractESRepositoryContainerTest {
+class ESQueryRepositoryITest extends AbstractESRepositoryContainerTest {
 
 
     @Inject
@@ -45,7 +45,7 @@ public class ESQueryRepositoryITest extends AbstractESRepositoryContainerTest {
 
 
     @Test
-    public void indexSuggestAndClear() throws InterruptedException {
+    void indexSuggestAndClear() throws InterruptedException {
         repository.index(new Query("lubach", "vpro"));
         repository.index(new Query("luitjes", "eo"));
         repository.setTtl(Duration.ofSeconds(1));

@@ -14,7 +14,7 @@ import org.xml.sax.SAXException;
 import nl.vpro.api.util.ApiMappings;
 import nl.vpro.domain.api.page.PageForm;
 
-public class PageFormValidatingReaderTest {
+class PageFormValidatingReaderTest {
 
     private static final byte[] VALID_FORM = ("""
         <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -37,7 +37,7 @@ public class PageFormValidatingReaderTest {
         """).getBytes();
 
     @Test
-    public void testReadFromInvalid() {
+    void readFromInvalid() {
         Assertions.assertThatThrownBy(() -> {
             PageFormValidatingReader reader = createReader();
             reader.setDoValidate(true);
@@ -67,7 +67,7 @@ public class PageFormValidatingReaderTest {
     }
 
     @Test
-    public void testRead() throws Exception {
+    void read() throws Exception {
         PageFormValidatingReader reader = createReader();
         reader.setDoValidate(true);
         reader.init();
@@ -79,7 +79,7 @@ public class PageFormValidatingReaderTest {
     }
 
     @Test
-    public void testPerformance() throws JAXBException, IOException, SAXException {
+    void performance() throws JAXBException, IOException, SAXException {
         long COUNT = 10000;
         {
             PageFormValidatingReader reader = createReader();

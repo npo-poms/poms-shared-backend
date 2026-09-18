@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
  * @author Roelof Jan Koekoek
  * @since 2.0
  */
-public class MediaServiceImplTest {
+class MediaServiceImplTest {
 
 
     private final MediaSearchRepository mediaSearchRepository = Mockito.mock(MediaSearchRepository.class);
@@ -63,57 +63,57 @@ public class MediaServiceImplTest {
     }
 
     @Test
-    public void testLoad()  {
+    void load()  {
         target.findByMid(media.getMid());
         verify(mediaSearchRepository).findByMid(true, media.getMid());
     }
 
     @Test
-    public void testFind() throws ProfileNotFoundException {
+    void find() throws ProfileNotFoundException {
         target.find("vpro", form, offset, max);
         verify(mediaSearchRepository).find(profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindMembers() throws ProfileNotFoundException {
+    void findMembers() throws ProfileNotFoundException {
         target.findMembers(media, "vpro", form, offset, max);
         verify(mediaSearchRepository).findMembers(media, profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindEpisodes() throws ProfileNotFoundException {
+    void findEpisodes() throws ProfileNotFoundException {
         target.findEpisodes(media, "vpro", form, offset, max);
         verify(mediaSearchRepository).findEpisodes(media, profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindDescendants() throws ProfileNotFoundException {
+    void findDescendants() throws ProfileNotFoundException {
         target.findDescendants(media, "vpro", form, offset, max);
         verify(mediaSearchRepository).findDescendants(media, profileDefinition, form, offset, max);
     }
 
     @Test
-    public void testFindRelated() throws ProfileNotFoundException {
+    void findRelated() throws ProfileNotFoundException {
         target.findRelated(media, "vpro", form, max);
         verify(mediaSearchRepository).findRelated(media, profileDefinition, form, max);
     }
 
     @Test
-    public void testChangesProfileNotFound() {
+    void changesProfileNotFound() {
         assertThatThrownBy(() ->
             target.changes("notfound", true, Instant.EPOCH,  null, null, 10, false, null, null, null)
         ).isInstanceOf(ProfileNotFoundException.class);
     }
 
     @Test
-    public void testIterateProfileNotFound() {
+    void iterateProfileNotFound() {
         assertThatThrownBy(() ->
             target.iterate("notfound", null, 0L, 10, FilteringIterator.keepAliveWithoutBreaks((c) -> {}))
         ).isInstanceOf(ProfileNotFoundException.class);
     }
 
     @Test
-    public void testFindProfileNotFound() {
+    void findProfileNotFound() {
         assertThatThrownBy(() ->
             target.find("notfound", null, 0L, 10)
         ).isInstanceOf(ProfileNotFoundException.class);
@@ -121,7 +121,7 @@ public class MediaServiceImplTest {
     }
 
     @Test
-    public void testFindMembersProfileNotFound() {
+    void findMembersProfileNotFound() {
         assertThatThrownBy(() ->
                 target.findMembers(media, "notfound", null, 0L, 10)
         ).isInstanceOf(ProfileNotFoundException.class);
@@ -129,7 +129,7 @@ public class MediaServiceImplTest {
     }
 
     @Test
-    public void testFindEpisodesProfileNotFound() {
+    void findEpisodesProfileNotFound() {
         assertThatThrownBy(() ->
             target.findEpisodes(media, "notfound", null, 0L, 10)
         ).isInstanceOf(ProfileNotFoundException.class);
@@ -137,14 +137,14 @@ public class MediaServiceImplTest {
     }
 
     @Test
-    public void testFindDescendantsProfileNotFound() {
+    void findDescendantsProfileNotFound() {
         assertThatThrownBy(() ->
             target.findDescendants(media, "notfound", null, 0L, 10)
         ).isInstanceOf(ProfileNotFoundException.class);
     }
 
     @Test
-    public void testFindRelatedProfileNotFound() {
+    void findRelatedProfileNotFound() {
         assertThatThrownBy(() ->
             target.findRelated(media, "notfound", null, 10)
         ).isInstanceOf(ProfileNotFoundException.class);

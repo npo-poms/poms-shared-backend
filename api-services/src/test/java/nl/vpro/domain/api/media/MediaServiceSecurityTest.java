@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "classpath:/nl/vpro/domain/api/media/mediaServiceSecurityTest-context.xml")
-public class MediaServiceSecurityTest {
+class MediaServiceSecurityTest {
 
     @Autowired
     MediaService mediaService;
@@ -39,14 +39,14 @@ public class MediaServiceSecurityTest {
     }
 
     @Test
-    public void testWithoutRole() {
+    void withoutRole() {
         assertThatThrownBy(() ->
             mediaService.getType("album")
         ).isInstanceOf(AuthenticationCredentialsNotFoundException.class);
     }
 
     @Test
-    public void testWithWrongRole() {
+    void withWrongRole() {
         assertThatThrownBy(() -> {
 
             Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_DOESNOTEXISTS"));
@@ -58,7 +58,7 @@ public class MediaServiceSecurityTest {
     }
 
     @Test
-    public void testWithRightRole() {
+    void withRightRole() {
         Collection roles = Arrays.asList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(new TestingAuthenticationToken("user","dontcare", (List<GrantedAuthority>) roles));

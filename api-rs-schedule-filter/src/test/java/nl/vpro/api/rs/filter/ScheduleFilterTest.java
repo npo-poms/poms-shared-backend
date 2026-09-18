@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "classpath:/nl/vpro/api/rs/filter/scheduleFilterTest-context.xml")
-public class ScheduleFilterTest {
+class ScheduleFilterTest {
 
     @Autowired
     UserDetailsService userDetailsService;
@@ -46,7 +46,7 @@ public class ScheduleFilterTest {
 
     @Test
     @Disabled("See nl.vpro.api.rs.filter.ScheduleEventViewSortedSetTest for how it's done.")
-    public void testFilter() {
+    void filter() {
         Program program = MediaTestDataBuilder.program().withScheduleEvents().withMid().build();
         ScheduleEvent event = new ScheduleEvent(Channel.NED3, Instant.now().plus(Duration.ofDays(4)), Duration.ofMillis(1000));
         program.getScheduleEvents().add(event);

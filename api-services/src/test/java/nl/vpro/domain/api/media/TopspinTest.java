@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
-public class TopspinTest {
+class TopspinTest {
 
     MediaSearchRepository mediaRepository = Mockito.mock(MediaSearchRepository.class);
 
@@ -84,26 +84,26 @@ public class TopspinTest {
     }
 
     @Test
-    public void topspinNoFilter() throws ProfileNotFoundException {
+    void topspinNoFilter() throws ProfileNotFoundException {
         MediaSearchResult result = target.findRelatedInTopspin(program, null, null, 3, null, null);
         assertThat(result).hasSize(3);
     }
 
     @Test
-    public void topspinProfileFilter() throws ProfileNotFoundException {
+    void topspinProfileFilter() throws ProfileNotFoundException {
         MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", null, 3, null, null);
         assertThat(result).hasSize(2);
     }
 
     @Test
-    public void topspinFormFilter() throws ProfileNotFoundException {
+    void topspinFormFilter() throws ProfileNotFoundException {
         MediaForm form = MediaFormBuilder.form().avTypes(AVType.VIDEO).build();
         MediaSearchResult result = target.findRelatedInTopspin(program, null, form, 3, null, null);
         assertThat(result).hasSize(2);
     }
 
     @Test
-    public void topspinProfileAndFormFilter() throws ProfileNotFoundException {
+    void topspinProfileAndFormFilter() throws ProfileNotFoundException {
         MediaForm form = MediaFormBuilder.form().avTypes(AVType.VIDEO).build();
         MediaSearchResult result = target.findRelatedInTopspin(program, "noteoprofile", form, 3, null, null);
         assertThat(result).hasSize(1);

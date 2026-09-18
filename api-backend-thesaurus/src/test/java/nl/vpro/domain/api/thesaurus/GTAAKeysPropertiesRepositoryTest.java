@@ -14,19 +14,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 @ExtendWith(SpringExtension.class) //  implicitly uses GTAAKeysPropertiesRepositoryTest-context.xml ?
-public class GTAAKeysPropertiesRepositoryTest {
+class GTAAKeysPropertiesRepositoryTest {
 
     @Inject
     GTAAKeysRepositoryImpl repo;
 
     @Test
-    public void testGetKeyFor1() {
+    void getKeyFor1() {
         assertThat(repo.getKeyFor("npo-functional-tests").get()).isEqualTo("***REMOVED***");
     }
 
 
     @Test
-    public void testGetKeyFor3() {
+    void getKeyFor3() {
         assertThatThrownBy(() -> {
             repo.getKeyFor("demo-user").get();
         }).isInstanceOf(NoSuchElementException.class);

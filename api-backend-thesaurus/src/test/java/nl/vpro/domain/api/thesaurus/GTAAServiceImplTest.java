@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
  */
 @ExtendWith(MockitoExtension.class)
 @Log4j2
-public class GTAAServiceImplTest {
+class GTAAServiceImplTest {
 
 
     private static final Clock clock = TestClock.twentyTwenty();
@@ -59,7 +59,7 @@ public class GTAAServiceImplTest {
     }
 
     @Test
-    public void testSubmitPersonWithValidToken() throws IOException {
+    void submitPersonWithValidToken() throws IOException {
         when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of(SECRET_KEY));
         GTAANewPerson newPerson = GTAANewPerson
             .builder()
@@ -75,7 +75,7 @@ public class GTAAServiceImplTest {
     }
 
     @Test
-    public void testSubmitPersonWithExpiredToken() throws IOException {
+    void submitPersonWithExpiredToken() throws IOException {
         when(keysRepo.getKeyFor("demo-app")).thenReturn(Optional.of(SECRET_KEY));
 
         Assertions.assertThatThrownBy(() -> {
@@ -90,7 +90,7 @@ public class GTAAServiceImplTest {
         }).isInstanceOf(SecurityException.class);
     }
     @Test
-    public void testAddPersonWithoutIssuer() {
+    void addPersonWithoutIssuer() {
         GTAANewPerson newPerson = GTAANewPerson.builder().givenName("piet").familyName("hein").scopeNote("opmerking").build();
         Assertions.assertThatThrownBy(() -> {
             String jws = encrypt(null, SECRET_KEY, "user y", 13);

@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @since 3.0
  */
 @Log4j2
-public class ApiMediaFilterTest {
+class ApiMediaFilterTest {
 
     static {
         MediaPropertiesFilters.instrument();
@@ -55,7 +55,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterObjectField() {
+    void filterObjectField() {
         Program program = MediaTestDataBuilder.program()
             .withMemberOf()
             .withSource().build();
@@ -72,7 +72,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testJaxbReadWrite() {
+    void jaxbReadWrite() {
         ApiMediaFilter.set("titles");
 
         final Program program = JAXB.unmarshal(new StringReader("""
@@ -99,7 +99,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterSegments() {
+    void filterSegments() {
         Program program = MediaTestDataBuilder.program().mid("MID_TEST").withSegments().build();
         assertThat(program.getSegments()).hasSize(3);
         assertThat(program.getSegments().first().getMidRef()).isNotNull();
@@ -134,7 +134,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterType() {
+    void filterType() {
         Program program = MediaTestDataBuilder.program().withType().build();
         assertThat(program.getType()).isNotNull();
 
@@ -148,7 +148,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterPredictions() {
+    void filterPredictions() {
         Program program = MediaTestDataBuilder.program().withPredictions().build();
 
         assertThat(program.getPredictions()).isNotNull();
@@ -171,14 +171,14 @@ public class ApiMediaFilterTest {
 
 
     @Test
-    public void testFilterUnknownProperty() {
+    void filterUnknownProperty() {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> ApiMediaFilter.set("bestaatniet"))
                 .withMessageStartingWith("Unrecognized properties [bestaatniet]");
     }
 
     @Test
-    public void testFilterAwards() {
+    void filterAwards() {
         Program program = MediaTestDataBuilder.program().awards("AWARD").build();
         assertThat(program.getAwards()).isNotNull();
 
@@ -208,7 +208,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterCrids() {
+    void filterCrids() {
         Program program = MediaTestDataBuilder.program().crids("crid1", "crid2", "crid3").build();
         assertThat(program.getCrids()).isNotNull();
         assertThat(program.getCrids()).hasSize(3);
@@ -235,7 +235,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testSegment() throws Exception {
+    void segment() throws Exception {
         Segment segment = Jackson2TestUtil.roundTrip(
             MediaTestDataBuilder.segment()
                 .midRef("ABC_DEF")
@@ -258,7 +258,7 @@ public class ApiMediaFilterTest {
     }
 
     @Test
-    public void testFilterIgnoreFields() {
+    void filterIgnoreFields() {
         Program program = MediaTestDataBuilder.program()
             .mid("MID_123")
             .avType(AVType.MIXED)
@@ -395,7 +395,7 @@ public class ApiMediaFilterTest {
      * See <a href="https://jira.vpro.nl/browse/NPA-602">JIRA</a>
      */
     @Test
-    public void testFilterLocations() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    void filterLocations() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         AbstractJsonIterable.DEFAULT_CONSIDER_JSON_INCLUDE.set(true);
 
         Program program = MediaTestDataBuilder.program()
@@ -488,7 +488,7 @@ public class ApiMediaFilterTest {
      * See NPA-649
      */
     @Test
-    public void filteringAndPredictions()  {
+    void filteringAndPredictions()  {
         Program program = JAXB.unmarshal(new StringReader("""
                                 <?xml version="1.0"?>
                                 <program xmlns="urn:vpro:media:2009" xmlns:shared="urn:vpro:shared:2009" type="BROADCAST" avType="VIDEO" embeddable="true" mid="POW_00221203" sortDate="2009-10-25T08:45:00+01:00" creationDate="2013-01-28T01:56:11.067+01:00" lastModified="2013-12-05T21:23:14.924+01:00" publishDate="2022-06-08T11:18:58.064+02:00" urn="urn:vpro:media:program:18160902">

@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Log4j2
-public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainerTest {
+class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainerTest {
 
     public ESScheduleRepository repository;
 
@@ -49,7 +49,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
     }
 
     @Test
-    public void list() {
+    void list() {
         index(broadcast().mid("DONNA_1")
             .scheduleEvents(
                 event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -67,7 +67,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
     }
 
     @Test
-    public void listTestScrolled() {
+    void listTestScrolled() {
         index(broadcast().mid("DONNA_1")
             .scheduleEvents(
                 event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -96,7 +96,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
 
 
     @Test
-    public void listSchedulesWithChannel() {
+    void listSchedulesWithChannel() {
         index(broadcast().mid("DONNA_1")
                 .scheduleEvents(
                         event(Channel.BBC1, "2015-06-19T10:00:00"),
@@ -117,7 +117,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
     }
 
     @Test
-    public void nowForChannel() {
+    void nowForChannel() {
         Instant now = LocalDateTime.of(2020, 4, 15, 20, 40).atZone(Schedule.ZONE_ID).toInstant();
 
         index(broadcast().mid("M_1")
@@ -137,7 +137,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
     }
 
     @Test
-    public void listSchedulesWithSubtitles() {
+    void listSchedulesWithSubtitles() {
         index(MediaTestDataBuilder.broadcast().mid("SUBS_PROG_1").withDutchCaptions());
         index(MediaTestDataBuilder.group().mid("SUBS_GROUP_1").withDutchCaptions());
         index(MediaTestDataBuilder.segment().mid("SUBS_SEGMENT_1").withDutchCaptions());
@@ -148,7 +148,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
     }
 
     @Test
-    public void findByCrid() {
+    void findByCrid() {
         String cridToFind = "crid://uitzending/1";
         //String cridToFind = "criduitzending1";
         index(broadcast().mid("DONNA_2").crids(cridToFind));
@@ -160,7 +160,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
     }
 
     @Test
-    public void listSchedulesForBroadcaster() {
+    void listSchedulesForBroadcaster() {
         index(broadcast().mid("DONNA_1")
                 .broadcasters(new Broadcaster("VPRO"))
                 .scheduleEvents(
@@ -193,7 +193,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
      * This reproduces NPA-526
      */
     @Test
-    public void listSchedulesForBroadcasterWithMax() {
+    void listSchedulesForBroadcasterWithMax() {
 
         Instant now = Instant.now();
         Instant first = LocalDateTime.parse("2018-11-19T10:00:00").atZone(Schedule.ZONE_ID).toInstant();
@@ -248,7 +248,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
 
 
     @Test
-    public void listSchedulesForMediaType() {
+    void listSchedulesForMediaType() {
         MediaObject[] indexed = index(
             broadcast().mid("GEENMOVIE")
                 .scheduleEvents(event(Channel.NED2, "2016-07-08T11:00:00")),
@@ -262,7 +262,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
 
 
     @Test
-    public void listSchedulesForAncestors() {
+    void listSchedulesForAncestors() {
         MediaObject[] indexed = index(
             broadcast().mid("p1")
                 .descendantOf("DESCENDANT1")
@@ -281,7 +281,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
 
 
     @Test
-    public void findSchedulesForRerun() {
+    void findSchedulesForRerun() {
         index(
             broadcast().mid("p1")
                 .descendantOf("DESCENDANT1")
@@ -309,7 +309,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
 
 
     @Test
-    public void findSchedulesForOriginal() {
+    void findSchedulesForOriginal() {
 
         index(
             broadcast()
@@ -342,7 +342,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
 
     }
     @Test
-    public void findScheduleWithGenre() {
+    void findScheduleWithGenre() {
         index(
             broadcast().mid("p1")
                 .genres("3.0.1.2", "3.0.1.2.3")
@@ -375,7 +375,7 @@ public class ESScheduleRepositoryTest extends AbstractMediaESRepositoryContainer
     }
 
     @Test
-    public void illegalIfMoreScheduleEvents() {
+    void illegalIfMoreScheduleEvents() {
         ScheduleForm form = ScheduleForm.from(
             MediaForm.builder()
                 .scheduleEvents(

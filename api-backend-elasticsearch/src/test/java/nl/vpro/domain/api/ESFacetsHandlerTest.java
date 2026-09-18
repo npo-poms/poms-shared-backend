@@ -1,10 +1,10 @@
 package nl.vpro.domain.api;
 
-public class ESFacetsHandlerTest {
+class ESFacetsHandlerTest {
 /*
 
     @Test
-    public void testParse() {
+    void parse() {
 
         assertThat(ESFacetsHandler.ESInterval.parse("YEAR").unit).isEqualTo(DateRangeInterval.Unit.YEAR);
         assertThat(ESFacetsHandler.ESInterval.parse("MONTH").unit).isEqualTo(DateRangeInterval.Unit.MONTH);
@@ -18,7 +18,7 @@ public class ESFacetsHandlerTest {
         assertThat(ESFacetsHandler.ESInterval.parse("2 MINUTE").getEsValue()).isEqualTo("2m");
     }
     @Test
-    public void testParseForgivingly() {
+    void parseForgivingly() {
         assertThat(ESFacetsHandler.ESInterval.parse("2 MINUTES").getEsValue()).isEqualTo("2m");
         assertThat(ESFacetsHandler.ESInterval.parse("2 minutes").getEsValue()).isEqualTo("2m");
 

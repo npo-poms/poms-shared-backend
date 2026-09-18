@@ -28,9 +28,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "classpath:/nl/vpro/api/rs/filter/scheduleEventViewSortedSetTest-context.xml")
-public class ScheduleEventViewSortedSetTest {
+class ScheduleEventViewSortedSetTest {
     @Test
-    public void testFilteredSetApiClient() {
+    void filteredSetApiClient() {
         ApiMediaFilter.removeFilter();
 
         Collection<GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_CLIENT"));
@@ -51,7 +51,7 @@ public class ScheduleEventViewSortedSetTest {
     }
 
     @Test
-    public void testFilteredSetApiUser() {
+    void filteredSetApiUser() {
         ApiMediaFilter.removeFilter();
 
         Collection<GrantedAuthority> roles = Collections.singletonList(new SimpleGrantedAuthority("ROLE_API_USER"));

@@ -6,10 +6,10 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.jupiter.api.Test;
 
 @Log4j2
-public class ESMediaFacetsHandlerTest {
+class ESMediaFacetsHandlerTest {
 
     @Test
-    public void testBuildRelationsFacets() {
+    void buildRelationsFacets() {
         MediaForm form = new MediaForm();
         MediaFacets facets = new MediaFacets();
         RelationFacetList list = new RelationFacetList();
@@ -21,7 +21,7 @@ public class ESMediaFacetsHandlerTest {
     }
 
     @Test
-    public void testAgeRatingFacet() {
+    void ageRatingFacet() {
         MediaForm form = new MediaForm();
         MediaFacets facets = new MediaFacets();
         facets.setAgeRatings(new MediaFacet());

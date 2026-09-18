@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public class CorsInterceptorTest {
+class CorsInterceptorTest {
     private final CorsPolicy corsPolicy = mock(CorsPolicy.class);
 
     @BeforeEach
@@ -32,7 +32,7 @@ public class CorsInterceptorTest {
     }
 
     @Test
-    public void testFilterDisabled() {
+    void filterDisabled() {
 
         MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
 
@@ -54,7 +54,7 @@ public class CorsInterceptorTest {
     }
 
     @Test
-    public void testIEHack() {
+    void iEHack() {
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
 
@@ -71,7 +71,7 @@ public class CorsInterceptorTest {
     }
 
     @Test
-    public void testIEHack2() {
+    void iEHack2() {
 
         MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         headers.put(HttpHeaders.CONTENT_TYPE, new ArrayList<>(Collections.singletonList("text/plain")));

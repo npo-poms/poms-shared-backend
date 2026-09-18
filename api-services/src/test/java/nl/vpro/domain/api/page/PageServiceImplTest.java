@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public class PageServiceImplTest {
+class PageServiceImplTest {
 
     final ProfileService profileService = mock(ProfileService.class);
 
@@ -30,7 +30,7 @@ public class PageServiceImplTest {
     final PageServiceImpl impl = new PageServiceImpl(profileService, pageSearchRepository, querySearchRepository);
 
     @Test
-    public void testFind() throws ProfileNotFoundException {
+    void find() throws ProfileNotFoundException {
         when(profileService.getProfile("bla")).thenReturn(mock(Profile.class));
         impl.find(null, "bla", 0L, 10);
         verify(profileService).getProfile("bla");
@@ -38,13 +38,13 @@ public class PageServiceImplTest {
     }
 
     @Test
-    public void testLoad() {
+    void load() {
         impl.load("1234");
         verify(pageSearchRepository).load("1234");
     }
 
     @Test
-    public void testLoadForIds() {
+    void loadForIds() {
         String url = "http://a";
         String alternativeUrl = "http://b";
         String crid = "crid://c";

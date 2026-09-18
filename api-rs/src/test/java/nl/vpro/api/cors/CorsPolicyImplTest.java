@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Michiel Meeuwissen
  * @since 2.0
  */
-public class CorsPolicyImplTest {
+class CorsPolicyImplTest {
 
 
     @Test
-    public void test() {
+    void test() {
         CorsPolicyImpl impl = new CorsPolicyImpl(true, "classpath:/cors/policy.properties");
 
         assertTrue(impl.allowedOriginAndMethod("localhost", "GET"));

@@ -4,15 +4,15 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ESFacetsBuilderTest {
+class ESFacetsBuilderTest {
 
     @Test
-    public void testEscapeFacetName() {
+    void escapeFacetName() {
         assertThat(ESFacetsBuilder.escape("Eerste componist")).isEqualTo("Eerste/componist");
     }
 /*
     @Test(expected = UnsupportedOperationException.class)
-    public void year() {
+    void year() {
         assertThat(IntervalUnit.YEAR.getShortEs());
     }*/
  /*   @Test
@@ -23,12 +23,12 @@ public class ESFacetsBuilderTest {
     }*/
     /*
     @Test(expected = UnsupportedOperationException.class)
-    public void month() {
+    void month() {
         assertThat(IntervalUnit.MONTH.getShortEs());
     }*/
 /*
     @Test
-    public void months() {
+    void months() {
         assertThat(ESFacetsBuilder.ESInterval.parse("MONTH").number).isEqualTo(1);
         assertThat(ESFacetsBuilder.ESInterval.parse("MONTH").unit).isEqualTo(ESFacetsBuilder.IntervalUnit.MONTH);
         assertThat(ESFacetsBuilder.ESInterval.parse("MONTH").getEsValue()).isEqualTo("month");
@@ -37,7 +37,7 @@ public class ESFacetsBuilderTest {
     }
 
     @Test
-    public void weeks() {
+    void weeks() {
         assertThat(ESFacetsBuilder.ESInterval.parse("2WEEK").number).isEqualTo(2);
         assertThat(ESFacetsBuilder.ESInterval.parse("2WEEK").unit).isEqualTo(ESFacetsBuilder.IntervalUnit.WEEK);
         assertThat(ESFacetsBuilder.ESInterval.parse("2WEEK").getEsValue()).isEqualTo("2w");
@@ -45,14 +45,14 @@ public class ESFacetsBuilderTest {
 
 
     @Test
-    public void days() {
+    void days() {
         assertThat(ESFacetsBuilder.ESInterval.parse("2DAY").number).isEqualTo(2);
         assertThat(ESFacetsBuilder.ESInterval.parse("2DAY").unit).isEqualTo(ESFacetsBuilder.IntervalUnit.DAY);
         assertThat(ESFacetsBuilder.ESInterval.parse("2DAY").getEsValue()).isEqualTo("2d");
     }
 
     @Test
-    public void hours() {
+    void hours() {
         assertThat(ESFacetsBuilder.ESInterval.parse("2HOUR").number).isEqualTo(2);
         assertThat(ESFacetsBuilder.ESInterval.parse("2HOUR").unit).isEqualTo(ESFacetsBuilder.IntervalUnit.HOUR);
         assertThat(ESFacetsBuilder.ESInterval.parse("2HOUR").getEsValue()).isEqualTo("2h");
@@ -61,7 +61,7 @@ public class ESFacetsBuilderTest {
     }
 
     @Test
-    public void minutes() {
+    void minutes() {
         assertThat(ESFacetsBuilder.ESInterval.parse("2MINUTE").number).isEqualTo(2);
         assertThat(ESFacetsBuilder.ESInterval.parse("2MINUTE").unit).isEqualTo(ESFacetsBuilder.IntervalUnit.MINUTE);
         assertThat(ESFacetsBuilder.ESInterval.parse("2MINUTE").getEsValue()).isEqualTo("2m");
