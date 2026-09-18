@@ -43,6 +43,7 @@
 
  import nl.vpro.elasticsearch.ElasticSearchIndex;
  import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+ import nl.vpro.elasticsearchclient.ElasticSearchOpaqueId;
  import nl.vpro.jackson2.Jackson2Mapper;
  import nl.vpro.util.ThreadPools;
  import nl.vpro.util.TimeUtils;
@@ -126,7 +127,7 @@ public abstract class AbstractESRepository<T> {
                         searchSourceBuilder.size(0);
                         searchRequest.source(searchSourceBuilder);
 
-                        SearchResponse response = client().search(searchRequest, RequestOptions.DEFAULT);
+                        SearchResponse response = client().search(searchRequest, requestOptions());
 
                         Terms a = response.getAggregations().get("types");
                         String result = a.getBuckets().stream().map(b -> b.getKey() + ":" + b.getDocCount()).collect(Collectors.joining(","));
@@ -349,7 +350,7 @@ public abstract class AbstractESRepository<T> {
         @NonNull String... indexNames) throws IOException {
         SearchRequest request = new SearchRequest(indexNames);
         request.source(new SearchSourceBuilder().size(1).query(builder));
-        return client().search(request, RequestOptions.DEFAULT).getHits().getTotalHits();
+        return client().search(request, requestOptions()).getHits().getTotalHits();
     }
 
     protected void buildHighlights(@NonNull SearchSourceBuilder searchBuilder, @Nullable Form form, List<SearchFieldDefinition> searchFields) {
@@ -471,9 +472,16 @@ public abstract class AbstractESRepository<T> {
 
      protected RequestOptions.Builder requestOptionsBuilder() {
         RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();
-
+        builder.addHeader("X-Opaque-Id", ElasticSearchOpaqueId.withRequest(opaqueId()));
         builder.setRequestConfig(RequestConfig.custom().setConnectionRequestTimeout((int) timeOut.toMillis()).build());
         return builder;
+    }
+
+    protected String opaqueId() {
+        String name = getClass().getSimpleName()
+            .replaceFirst("^ES", "")
+            .replaceFirst("Repository$", "");
+        return "api-" + name.replaceAll("([a-z])([A-Z])", "$1-$2").toLowerCase(Locale.ROOT);
     }
 
 
