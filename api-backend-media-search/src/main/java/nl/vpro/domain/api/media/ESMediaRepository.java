@@ -539,6 +539,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 .adapt((sh) -> sh.get(Constants.Fields.SOURCE).get("childRef").textValue()) // todo
                 .routing(media.getMid())
                 .warnSortNotOnDoc(warnSortNotOnDoc) // we know!
+                .opaqueId("api-media-members-or-episodes")
                 .build()) {
                 SearchSourceBuilder builder = iterator.prepareSearchSource(getRefsIndexName());
                 listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
@@ -638,6 +639,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .adapt(this::of)
             .requestVersion(true)
             .warnSortNotOnDoc(warnSortNotOnDoc)
+            .opaqueId("api-media-changes")
             .build();
 
         final SearchSourceBuilder searchRequestBuilder = i.prepareSearchSource(getIndexName());
@@ -853,6 +855,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
             .warnSortNotOnDoc(warnSortNotOnDoc)
+            .opaqueId("api-media-iterate")
             .build();
 
 
@@ -890,7 +893,8 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         try(ExtendedElasticSearchIterator<JsonNode> i = ExtendedElasticSearchIterator.<JsonNode>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(h -> h.get(Constants.Fields.SOURCE))
-            .scrollContext(Duration.ofMillis(62000L))
+            .scrollContext(Duration.ofMillis(58000L))
+            .opaqueId("api-media-redirect-cache")
             .build()) {
 
             i.prepareSearchSource(indexName)
