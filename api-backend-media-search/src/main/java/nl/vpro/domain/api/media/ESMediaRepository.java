@@ -88,7 +88,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         if (redirects == null) {
             refillRedirectCache();
             EXECUTOR.scheduleAtFixedRate(
-                this::refillRedirectCache, 5, 5, TimeUnit.MINUTES);
+                this::refillRedirectCache, 10, 10, TimeUnit.MINUTES);
         }
     }
 
@@ -890,6 +890,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         try(ExtendedElasticSearchIterator<JsonNode> i = ExtendedElasticSearchIterator.<JsonNode>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(h -> h.get(Constants.Fields.SOURCE))
+            .scrollContext(Duration.ofMillis(62000L))
             .build()) {
 
             i.prepareSearchSource(indexName)
