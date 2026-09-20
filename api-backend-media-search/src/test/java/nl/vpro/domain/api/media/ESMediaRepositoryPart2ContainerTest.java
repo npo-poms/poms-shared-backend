@@ -370,6 +370,22 @@ class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESRepositoryConta
     }
 
     @Test
+    void mediaChangesWithProfileExcludeDeletes() throws Exception {
+        ProfileDefinition<MediaObject> omroepProfile = new ProfileDefinition<>(
+            new Filter(new BroadcasterConstraint("OMROEP1"))
+        );
+
+        try (CloseableIterator<MediaChange> changes = target.changes(
+            LONGAGO.minus(1, ChronoUnit.SECONDS), null, omroepProfile, Order.ASC, Integer.MAX_VALUE, Deletes.EXCLUDE, null, null)) {
+            List<MediaChange> list = new ArrayList<>();
+            changes.forEachRemaining(list::add);
+
+            assertThat(list).allMatch(change -> !change.isSkipped());
+            assertThat(list).allMatch(change -> omroepProfile.test(change.getMedia()));
+        }
+    }
+
+    @Test
     void mediaChangesSince() throws Exception {
         try (CloseableIterator<MediaChange> changes = target.changes(NOW.minus(1, ChronoUnit.SECONDS), null, null, Order.DESC, Integer.MAX_VALUE, null, null, null)) {
             List<MediaChange> list = new ArrayList<>();

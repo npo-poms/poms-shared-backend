@@ -634,6 +634,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 return TailAdder.withFunctions(CloseableIterator.empty(), (last) -> MediaChange.tail(changesUpto));
             }
         }
+        final Deletes effectiveDeletes = deletes == null ? Deletes.ID_ONLY : deletes;
         final ExtendedElasticSearchIterator<MediaChange> i = ExtendedElasticSearchIterator.<MediaChange>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(this::of)
@@ -648,10 +649,13 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
         searchRequestBuilder.trackScores(false);
         //searchRequestBuilder.trackTotalHitsUpTo(0);
 
-        searchRequestBuilder.query(QueryBuilders.boolQuery()
+        BoolQueryBuilder changesQuery = QueryBuilders.boolQuery()
             .must(restriction)
-            .filter(QueryBuilders.existsQuery(ES_PUBLISH_DATE))
-        );
+            .filter(QueryBuilders.existsQuery(ES_PUBLISH_DATE));
+        if (effectiveDeletes == Deletes.EXCLUDE && currentProfile != null) {
+            ESMediaFilterBuilder.filter(currentProfile, changesQuery);
+        }
+        searchRequestBuilder.query(changesQuery);
         log.debug("Found {} changes up to {}, from {} to {}", () -> i.getTotalSize().orElse(-1L), () -> changesUpto,
             () -> since == null ? null : since.toEpochMilli(),
             changesUpto::toEpochMilli);
@@ -692,9 +696,6 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 }
             };
         }
-        if (deletes == null) {
-            deletes = Deletes.ID_ONLY;
-        }
         if (filter != null) {
             iterator = new BasicWrappedIterator<>(iterator) {
                 @Override
@@ -712,7 +713,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             };
         }
 
-        final CloseableIterator<MediaChange> finalIterator = switch (deletes) {
+        final CloseableIterator<MediaChange> finalIterator = switch (effectiveDeletes) {
             case INCLUDE -> iterator;
             case EXCLUDE -> new DeleteSkippingIterator(iterator);
             case ID_ONLY -> new BasicWrappedIterator<>(iterator) {
