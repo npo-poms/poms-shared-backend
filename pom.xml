@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>poms-shared-backend-parent</artifactId>
-  <version>8.15.3-SNAPSHOT</version>
+  <version>8.15.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <description>Shared backend implementation. The elasticsearch backend e.g. is used by both the frontend api as the publisher</description>
@@ -20,7 +20,7 @@
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
     <java.version>25</java.version>
 
-    <vpro.shared.version>5.17.5-SNAPSHOT</vpro.shared.version>
+    <vpro.shared.version>5.17.5</vpro.shared.version>
 
   </properties>
 
