@@ -19,9 +19,6 @@
     <skipIntegTests>true</skipIntegTests>
     <assembly.tarLongFileMode>posix</assembly.tarLongFileMode>
     <java.version>25</java.version>
-
-    <vpro.shared.version>5.17.5</vpro.shared.version>
-
   </properties>
 
   <scm>
