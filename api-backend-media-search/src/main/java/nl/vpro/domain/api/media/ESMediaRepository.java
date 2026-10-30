@@ -33,6 +33,7 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.meeuw.collections.*;
+import org.meeuw.functional.Optionals;
 import org.meeuw.functional.ReasonedPredicate;
 import org.springframework.jmx.export.annotation.ManagedAttribute;
 import org.springframework.jmx.export.annotation.ManagedResource;
@@ -259,7 +260,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 filtered,
                 offset,
                 max,
-                i.getTotalSize().map(t -> Result.Total.approximate(t - correctTotal.get())).orElse(Result.Total.MISSING)
+                Optionals.boxed(i.getTotalSize()).map(t -> Result.Total.approximate(t - correctTotal.get())).orElse(Result.Total.MISSING)
             );
 
 
@@ -545,7 +546,7 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                 listMembersOrEpisodesBuildRequest(builder, objectType, media, order);
                 iterator.forEachRemaining(mids::add);
 
-                total = iterator.getTotalSize().map(s -> new TotalHits(s, TotalHits.Relation.EQUAL_TO)).orElse(null);
+                total = Optionals.boxed(iterator.getTotalSize()).map(s -> new TotalHits(s, TotalHits.Relation.EQUAL_TO)).orElse(null);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }

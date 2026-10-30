@@ -17,6 +17,8 @@ import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.meeuw.functional.Optionals;
+import org.meeuw.time.TimeUtils;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,7 +34,6 @@ import nl.vpro.elasticsearch.Constants;
 import nl.vpro.elasticsearch.highlevel.ExtendedElasticSearchIterator;
 import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.media.domain.es.ApiMediaIndex;
-import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.domain.api.ESQueryBuilder.simplifyQuery;
 
@@ -263,7 +264,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         long mediaObjectCount = 0;
         long offset = form.getPager().getOffset();
         Integer max = form.getPager().getMax();
-        Optional<Long> total = Optional.empty();
+        OptionalLong total = OptionalLong.empty();
         try (ExtendedElasticSearchIterator<MediaObject> searchIterator = ExtendedElasticSearchIterator.<MediaObject>extendedBuilder()
             .client(factory.highLevelClient())
             .adapt(this::getMediaObject)
@@ -276,7 +277,6 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
 
             long skipped = 0;
             long count = 0;
-            searchIterator.getTotalSize();
             total = searchIterator.getTotalSize();
 
             OUTER:
@@ -330,7 +330,7 @@ public class ESScheduleRepository extends AbstractESMediaRepository implements S
         return new ScheduleResult(new Result<>(truncated,
             offset,
             max,
-            total.map(t -> Result.Total.atLeast(Math.max(t, truncated.size()))).orElse(Result.Total.MISSING))
+            Optionals.boxed(total).map(t -> Result.Total.atLeast(Math.max(t, truncated.size()))).orElse(Result.Total.MISSING))
         );
     }
 
