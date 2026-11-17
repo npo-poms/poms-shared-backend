@@ -593,11 +593,11 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
             long result = objects.size();
             if (offset > 0 || max != null) {
                 while (offset-- > 0 && !objects.isEmpty()) {
-                    objects.remove(0);
+                    objects.removeFirst();
                 }
                 if (max != null) {
                     while (objects.size() > max) {
-                        objects.remove(objects.size() - 1);
+                        objects.removeLast();
                     }
                 }
             }
@@ -748,17 +748,14 @@ public class ESMediaRepository extends AbstractESMediaRepository implements Medi
                     // no need to be difficult
                     return MediaChange.tail(changesUpto);
                 }
-                // _something_ iterated, so we can return the last one.
                 if (maxed.peekingWrapped().hasNext()) {
-                    MediaChange peek = maxed.peekingWrapped().peek();
-                    if (peek != null) {
-                        return MediaChange.tail(peek.asSince());
-                    } else {
-                        assert finalIterator instanceof  DeleteSkippingIterator;
-                        return MediaChange.tail(((DeleteSkippingIterator) finalIterator).getSince());
-                    }
-                } else {
+                    // Cut off by max. The tail must point at the last change actually emitted.
+                    // It must _not_ point at the next (not yet emitted) one: since its asSince() includes the mid,
+                    // a next call with that as 'publishedSince' would skip it.
                     return MediaChange.tail(last.asSince());
+                } else {
+                    // everything iterated
+                    return MediaChange.tail(changesUpto);
                 }
             } else {
                 throw new NoSuchElementException();

@@ -417,6 +417,43 @@ class ESMediaRepositoryPart2ContainerTest extends AbstractMediaESRepositoryConta
         }
     }
 
+    /**
+     * Paging through the feed with max and tail=ALWAYS, using the tail as next 'since', must not lose changes.
+     * (The tail used to point at the first change _not_ yet returned, which was then skipped by the next call)
+     */
+    @Test
+    void mediaChangesPagingWithTail() throws Exception {
+        final List<String> all = new ArrayList<>();
+        try (CloseableIterator<MediaChange> changes = target.changes(LONGAGO.minus(1, ChronoUnit.SECONDS), null, null, Order.ASC, null, null, Tail.NEVER, null)) {
+            changes.forEachRemaining(c -> all.add(c.getMid()));
+        }
+        assertThat(all).hasSize(indexedObjectCount + deletedObjectCount);
+
+        final List<String> paged = new ArrayList<>();
+        MediaSince since = MediaSince.of(LONGAGO.minus(1, ChronoUnit.SECONDS));
+        for (int page = 0; page < all.size() + 2; page++) {
+            MediaChange tail = null;
+            int count = 0;
+            try (CloseableIterator<MediaChange> changes = target.changes(since.getInstant(), since.getMid(), null, Order.ASC, 3, null, Tail.ALWAYS, null)) {
+                while (changes.hasNext()) {
+                    MediaChange c = changes.next();
+                    if (c.isTail()) {
+                        tail = c;
+                    } else if (!c.isSkipped()) {
+                        paged.add(c.getMid());
+                        count++;
+                    }
+                }
+            }
+            assertThat(tail).isNotNull();
+            since = tail.asSince();
+            if (count == 0) {
+                break;
+            }
+        }
+        assertThat(paged).containsExactlyElementsOf(all);
+    }
+
     @Test
     void mediaChangesWithMax() throws Exception {
         try (CloseableIterator<MediaChange> changes = target.changes(Instant.EPOCH, "MID_DRENTHE", null, Order.DESC, 10, null, null, null)) {
