@@ -1,6 +1,6 @@
 package nl.vpro.api.rs.interceptors;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
 import java.util.*;
@@ -28,7 +28,7 @@ import nl.vpro.poms.shared.Headers;
  * @since 5.13
  */
 @Provider
-@Slf4j
+@Log4j2
 public class NPOHeadersInterceptor implements ContainerResponseFilter, ContainerRequestFilter {
 
     private static Predicate<String> aEqualsB(String a) {
