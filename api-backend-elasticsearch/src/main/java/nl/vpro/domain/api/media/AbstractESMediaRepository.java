@@ -21,6 +21,8 @@ import org.elasticsearch.index.query.functionscore.FunctionScoreQueryBuilder;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.transport.TransportSerializationException;
+import org.meeuw.collections.CloseableIterator;
+import org.meeuw.time.TimeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,8 +38,6 @@ import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
 import nl.vpro.elasticsearchclient.IndexHelper;
 import nl.vpro.media.domain.es.ApiRefsIndex;
 import nl.vpro.media.domain.es.Common;
-import nl.vpro.util.CloseableIterator;
-import nl.vpro.util.TimeUtils;
 
 import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 
@@ -153,7 +153,7 @@ public abstract class AbstractESMediaRepository extends AbstractESRepository<Med
         if (ids.isEmpty()) {
             return Collections.emptyList();
         }
-        return loadAll(clazz, getIndexName(ids.get(0), clazz), ids.toArray(new String[0]));
+        return loadAll(clazz, getIndexName(ids.getFirst(), clazz), ids.toArray(new String[0]));
     }
 
 

@@ -1,55 +1,53 @@
- package nl.vpro.domain.api;
+package nl.vpro.domain.api;
 
- import lombok.Getter;
- import lombok.Setter;
+import lombok.Getter;
+import lombok.Setter;
 
- import java.io.IOException;
- import java.time.Duration;
- import java.util.*;
- import java.util.concurrent.CompletableFuture;
- import java.util.function.Consumer;
- import java.util.stream.Collectors;
+import java.io.IOException;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
- import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
- import org.apache.commons.lang3.StringUtils;
- import org.apache.http.client.config.RequestConfig;
- import org.apache.logging.log4j.LogManager;
- import org.apache.logging.log4j.Logger;
- import org.apache.lucene.search.TotalHits;
- import org.checkerframework.checker.nullness.qual.NonNull;
- import org.checkerframework.checker.nullness.qual.Nullable;
- import org.elasticsearch.action.get.*;
- import org.elasticsearch.action.search.SearchRequest;
- import org.elasticsearch.action.search.SearchResponse;
- import org.elasticsearch.client.*;
- import org.elasticsearch.common.text.Text;
- import org.elasticsearch.index.IndexNotFoundException;
- import org.elasticsearch.index.query.QueryBuilder;
- import org.elasticsearch.search.SearchHit;
- import org.elasticsearch.search.SearchHits;
- import org.elasticsearch.search.aggregations.AggregationBuilders;
- import org.elasticsearch.search.aggregations.BucketOrder;
- import org.elasticsearch.search.aggregations.bucket.terms.Terms;
- import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
- import org.elasticsearch.search.builder.SearchSourceBuilder;
- import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
- import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
- import org.springframework.beans.factory.annotation.Value;
- import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.lucene.search.TotalHits;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.elasticsearch.action.get.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.*;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.index.IndexNotFoundException;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.BucketOrder;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.meeuw.time.TimeUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
 
- import com.fasterxml.jackson.core.JsonProcessingException;
- import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 
- import nl.vpro.elasticsearch.ElasticSearchIndex;
- import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
- import nl.vpro.elasticsearchclient.ElasticSearchOpaqueId;
- import nl.vpro.jackson2.Jackson2Mapper;
- import nl.vpro.util.ThreadPools;
- import nl.vpro.util.TimeUtils;
-
- import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
-
+import nl.vpro.elasticsearch.ElasticSearchIndex;
+import nl.vpro.elasticsearch.highlevel.HighLevelClientFactory;
+import nl.vpro.elasticsearchclient.ElasticSearchOpaqueId;
+import nl.vpro.jackson2.Jackson2Mapper;
+import nl.vpro.util.ThreadPools;
+import static nl.vpro.media.domain.es.ApiMediaIndex.APIMEDIA;
 
 /**
  * @author Michiel Meeuwissen

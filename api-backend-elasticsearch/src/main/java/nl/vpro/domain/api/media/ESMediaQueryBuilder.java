@@ -7,24 +7,27 @@ package nl.vpro.domain.api.media;
 import lombok.extern.log4j.Log4j2;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import jakarta.annotation.PostConstruct;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.lucene.search.join.ScoreMode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.elasticsearch.index.query.*;
 
+import nl.vpro.domain.api.*;
 import nl.vpro.domain.api.ESMatchType.FieldInfo;
 import nl.vpro.domain.api.ESMatchType.FieldInfoWrapper;
-import nl.vpro.domain.api.*;
 import nl.vpro.domain.classification.ClassificationServiceLocator;
 import nl.vpro.domain.media.*;
 import nl.vpro.domain.media.support.OwnerType;
-import nl.vpro.media.broadcaster.BroadcasterServiceLocator;
+import nl.vpro.domain.user.Broadcaster;
+import nl.vpro.domain.user.ServiceLocator;
 
 import static nl.vpro.domain.api.ESMatchType.FieldInfo.TEXT;
 import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
@@ -42,6 +45,15 @@ import static nl.vpro.domain.api.ESMatchType.FieldInfo.enumValue;
  */
 @Log4j2
 public class ESMediaQueryBuilder extends ESQueryBuilder {
+
+
+    @PostConstruct
+    void checkBroadcasterService() {
+        if (ServiceLocator.findBroadcasterService().isEmpty()) {
+            log.warn("No broadcaster service configured; broadcaster regex/wildcard searches will not use term queries");
+            // or throw, if you really want startup to fail
+        }
+    }
 
     public static final List<SearchFieldDefinition> SEARCH_FIELDS = List.of(
         new SearchFieldDefinition("broadcasters.value.text", 2f),
@@ -179,7 +191,10 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
             searches.getBroadcasters(),
             new TextSingleFieldApplier<>("broadcasters.id",
                 FieldInfo.builder()
-                    .possibleValues(BroadcasterServiceLocator.getIds())
+                    .possibleValues(ServiceLocator.getBroadcasterService().findAll()
+                        .stream()
+                        .map(Broadcaster::getId)
+                        .toList())
                     .build()
             )
         );
@@ -313,8 +328,8 @@ public class ESMediaQueryBuilder extends ESQueryBuilder {
     private static boolean containsOnlyMids(@Nullable TextMatcherList mediaIds) {
         return mediaIds != null && mediaIds.asList().stream().allMatch(mediaId ->
             ESMatchType.valueOf(mediaId.getMatchType().getName()) == ESMatchType.TEXT
-                && !StringUtils.startsWithIgnoreCase(mediaId.getValue(), "urn:")
-                && !StringUtils.startsWithIgnoreCase(mediaId.getValue(), "crid:")
+                && !Strings.CI.startsWith(mediaId.getValue(), "urn:")
+                && !Strings.CI.startsWith(mediaId.getValue(), "crid:")
         );
     }
 

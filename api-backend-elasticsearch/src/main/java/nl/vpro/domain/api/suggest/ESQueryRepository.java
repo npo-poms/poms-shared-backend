@@ -155,7 +155,7 @@ public class ESQueryRepository extends AbstractESRepository<Query> implements Qu
         }
         Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> esSuggestion = suggestions.getSuggestion("suggest");
         if (esSuggestion != null && !esSuggestion.getEntries().isEmpty()) {
-            final List<? extends Suggest.Suggestion.Entry.Option> options = esSuggestion.getEntries().get(0).getOptions();
+            final List<? extends Suggest.Suggestion.Entry.Option> options = esSuggestion.getEntries().getFirst().getOptions();
             if (options != null) {
                 final List<Suggestion> suggestionsList = options.stream()
                     .map(option -> {

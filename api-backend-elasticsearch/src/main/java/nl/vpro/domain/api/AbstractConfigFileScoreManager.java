@@ -37,6 +37,7 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
     @Setter
     private boolean score = true;
 
+    @SuppressWarnings("unchecked")
     protected Map<String, String> loadConfig() {
         Properties properties = new Properties();
         Path configPath = Paths.get(getConfigDir(), getConfigFileName());
@@ -68,7 +69,10 @@ public abstract class AbstractConfigFileScoreManager implements ScoreManager {
             }
         };
 
-        FileAlterationObserver observer = new FileAlterationObserver(getConfigDir(), pathname -> getConfigFileName().equals(pathname.getName()));
+        FileAlterationObserver observer = FileAlterationObserver.builder()
+            .setFile(getConfigDir())
+            .setFileFilter(pathname -> getConfigFileName().equals(pathname.getName()))
+            .get();
         observer.addListener(listener);
 
         FileAlterationMonitor monitor = new FileAlterationMonitor(10);

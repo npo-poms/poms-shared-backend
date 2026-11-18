@@ -365,7 +365,7 @@ public abstract class ESQueryBuilder {
             if (clauses.isEmpty()) {
                 return;
             } else if (clauses.size() == 1) {
-                apply(booleanQueryBuilder, clauses.get(0), matcher.getMatch());
+                apply(booleanQueryBuilder, clauses.getFirst(), matcher.getMatch());
             } else {
                 apply(booleanQueryBuilder, bool, matcher.getMatch());
             }
@@ -403,7 +403,7 @@ public abstract class ESQueryBuilder {
                 && singleFieldApplier.fieldInfo == ESMatchType.FieldInfo.TEXT
                 && !textMatchers.isEmpty()) {
                 List<TM> matchers = textMatchers.asList();
-                Match match = matchers.get(0).getMatch();
+                Match match = matchers.getFirst().getMatch();
                 if ((match == Match.SHOULD || match == Match.NOT)
                     && matchers.stream().allMatch(matcher ->
                         matcher.getMatch() == match
@@ -610,9 +610,9 @@ public abstract class ESQueryBuilder {
         if (booleanQuery.hasClauses()) {
             if ((booleanQuery.must().size() + booleanQuery.should().size() == 1 && booleanQuery.filter().isEmpty())) {
                 if (booleanQuery.must().size() == 1) {
-                    return booleanQuery.must().get(0);
+                    return booleanQuery.must().getFirst();
                 } else {
-                    return booleanQuery.should().get(0);
+                    return booleanQuery.should().getFirst();
                 }
             }
             return booleanQuery;

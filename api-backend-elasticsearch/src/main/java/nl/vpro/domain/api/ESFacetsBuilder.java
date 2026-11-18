@@ -128,8 +128,7 @@ public abstract class ESFacetsBuilder {
                             dateRange.getBegin() != null ? dateRange.getBegin().toEpochMilli() : Double.MIN_VALUE,
                             dateRange.getEnd() != null ? dateRange.getEnd().toEpochMilli() : Double.MAX_VALUE
                         );
-                    } else if (range instanceof DateRangeInterval) {
-                        DateRangeInterval dateRange = (DateRangeInterval) range;
+                    } else if (range instanceof DateRangeInterval dateRange) {
                         String name = fieldName + "." + dateRange.getInterval();
                         String format = dateRange.getInterval().getUnit().getFormat();
 
@@ -166,7 +165,6 @@ public abstract class ESFacetsBuilder {
             case DAY -> DateHistogramInterval.days(interval.amount);
             case HOUR -> DateHistogramInterval.hours(interval.amount);
             case MINUTE -> DateHistogramInterval.minutes(interval.amount);
-            default -> throw new IllegalArgumentException();
         };
     }
 
@@ -179,21 +177,19 @@ public abstract class ESFacetsBuilder {
             if (facet.getRanges() != null) {
                 RangeAggregationBuilder aggregationBuilder = null;
                 for (nl.vpro.domain.api.RangeFacet<Duration> range : facet.getRanges()) {
-                    if (range instanceof  DurationRangeFacetItem) {
+                    if (range instanceof DurationRangeFacetItem durationRange) {
                         if (aggregationBuilder == null){
                             aggregationBuilder = AggregationBuilders
                                 .range(prefix + fieldName)
                                 .field(prefix + fieldName)
                                 .keyed(true);
                         }
-                        DurationRangeFacetItem durationRange = (DurationRangeFacetItem) range;
                         aggregationBuilder.addRange(
                             durationRange.getName(),
                             durationRange.getBegin() != null ? durationRange.getBegin().toMillis() : 0,
                             durationRange.getEnd() != null ? durationRange.getEnd().toMillis() : Double.MAX_VALUE
                         );
-                    } else if (range instanceof DurationRangeInterval) {
-                        DurationRangeInterval durationRange = (DurationRangeInterval) range;
+                    } else if (range instanceof DurationRangeInterval durationRange) {
                         HistogramAggregationBuilder histogramAggregationBuilder = AggregationBuilders
                             .histogram(prefix + fieldName + "." + durationRange.getInterval())
                             .interval(durationRange.getInterval().getDuration().toMillis())

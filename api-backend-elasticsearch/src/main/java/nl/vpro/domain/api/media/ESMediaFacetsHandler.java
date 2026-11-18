@@ -252,8 +252,7 @@ public class ESMediaFacetsHandler extends ESFacetsHandler {
 
             Aggregation aggregation = root.getAggregations().get(escapedFacetName);
             if (aggregation != null) {
-                if (aggregation instanceof Filter) {
-                    Filter filter = (Filter) aggregation;
+                if (aggregation instanceof Filter filter) {
                     TermFacetResultItem item = TermFacetResultItem.builder()
                         .count(filter.getDocCount())
                         .id(escapedFacetName)

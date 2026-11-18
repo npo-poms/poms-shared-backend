@@ -230,8 +230,7 @@ public abstract class ESFacetsHandler {
                 //RangeFacet<Instant> interval;
                 //List<RangeFacet<Instant>> ranges = dateRangeFacets.getRanges();
                 for (MultiBucketsAggregation.Bucket bucket : buckets) {
-                    if (bucket instanceof Range.Bucket) {
-                        Range.Bucket rangeBucket = (Range.Bucket) bucket;
+                    if (bucket instanceof Range.Bucket rangeBucket) {
                         String value = bucket.getKeyAsString();
                         String name = value;
                         if (value.startsWith("PRESET:")) {

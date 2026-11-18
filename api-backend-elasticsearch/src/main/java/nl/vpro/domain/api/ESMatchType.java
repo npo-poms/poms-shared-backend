@@ -73,7 +73,7 @@ public enum ESMatchType {
             // every possible value matches, so this simply means that the value should exist
             return QueryBuilders.existsQuery(esField);
         } else if (builders.size() == 1) {
-            return QueryBuilders.termQuery(esField, builders.get(0));
+            return QueryBuilders.termQuery(esField, builders.getFirst());
         } else if (builders.isEmpty()) {
             return QueryBuilders.termQuery(esField, "____IMPOSSIBLE_VALUES___" + value);
         } else {
