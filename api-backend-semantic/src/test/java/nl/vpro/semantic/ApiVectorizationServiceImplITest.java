@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Log4j2
 @Disabled
+@Deprecated
 class ApiVectorizationServiceImplITest {
 
 
