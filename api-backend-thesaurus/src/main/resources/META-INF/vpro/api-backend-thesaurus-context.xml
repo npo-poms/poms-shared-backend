@@ -14,6 +14,8 @@
         <value>classpath:/gtaa-keys.properties</value>
         <value>file://${user.home}/conf/gtaa-keys.properties</value>
         <value>file:///conf/gtaa-keys.properties</value>
+        <!-- in k8s, mount the secret as a directory (not with subPath), so updates of it are picked up (this file is read on every lookup) -->
+        <value>file:///conf/gtaa/gtaa-keys.properties</value>
       </list>
     </property>
   </bean>
